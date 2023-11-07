@@ -3,4 +3,6 @@
 .vscode
 .idea
 .eclipse
-.example
+
+cmd
+example
