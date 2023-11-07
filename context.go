@@ -59,7 +59,7 @@ func (c *Context) MustGetString(key string) string {
 	return s
 }
 
-func New() *Context {
+func NewContext() *Context {
 	return &Context{
 		ctx: context.Background(),
 	}

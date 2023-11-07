@@ -26,8 +26,8 @@ type Engine struct {
 	// Used to create a map of analyzers for each visitor.
 	analyzerFactoryMap AnalyzerFactoryGroup
 
-	mutex sync.RWMutex
-	once  sync.Once
+	mu   sync.RWMutex
+	once sync.Once
 
 	eventCh       chan event.Event
 	unsubscribeCh chan struct{}
