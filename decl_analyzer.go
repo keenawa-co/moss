@@ -1,22 +1,19 @@
-package analyzer
+package compass
 
 import (
-	"context"
 	"errors"
 	"go/ast"
 	"go/token"
 
 	"github.com/4rchr4y/go-compass/obj"
+	"github.com/4rchr4y/go-compass/state"
 )
 
-func NewFuncDeclAnalyzer(file *obj.FileObj) Analyzer[ast.Node, obj.Object] {
-	return NewAnalyzer[ast.Node, obj.Object](
-		file,
-		analyzeFuncDecl,
-	)
+func NewFuncDeclAnalyzer() Analyzer[ast.Node, obj.Object] {
+	return NewAnalyzer[ast.Node, obj.Object](analyzeFuncDecl)
 }
 
-func analyzeFuncDecl(ctx context.Context, f *obj.FileObj, node ast.Node) (obj.Object, error) {
+func analyzeFuncDecl(state *state.State, node ast.Node) (obj.Object, error) {
 	funcDecl, _ := node.(*ast.FuncDecl)
 
 	ps, err := getParentStruct(funcDecl)
@@ -24,18 +21,18 @@ func analyzeFuncDecl(ctx context.Context, f *obj.FileObj, node ast.Node) (obj.Ob
 		return nil, err
 	}
 
-	params, deps, err := processFuncParams(f.FileSet, funcDecl, f.Entities.Imports.InternalImportsMeta)
+	params, deps, err := processFuncParams(state.File.FileSet, funcDecl, state.File.Entities.Imports.InternalImportsMeta)
 	if err != nil {
 		return nil, errors.New("some error from analyzeFuncNode 3") // TODO: add normal error return message
 	}
 
-	funcDeclObj := obj.NewFuncDeclObj(f.FileSet, funcDecl, params, deps, ps)
+	funcDeclObj := obj.NewFuncDeclObj(state.File.FileSet, funcDecl, params, deps, ps)
 
-	if err := inspectFuncBody(funcDecl, funcDeclObj, f.Entities.Imports.InternalImportsMeta); err != nil {
+	if err := inspectFuncBody(funcDecl, funcDeclObj, state.File.Entities.Imports.InternalImportsMeta); err != nil {
 		return nil, errors.New("some error from analyzeFuncNode 4") // TODO: add normal error return message
 	}
 
-	declObj := obj.NewDeclObj(f.FileSet, node, funcDeclObj, funcDeclObj.Name)
+	declObj := obj.NewDeclObj(state.File.FileSet, node, funcDeclObj, funcDeclObj.Name)
 	return declObj, nil
 }
 

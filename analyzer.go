@@ -1,13 +1,9 @@
-package analyzer
+package compass
 
-import (
-	"context"
-
-	"github.com/4rchr4y/go-compass/obj"
-)
+import "github.com/4rchr4y/go-compass/state"
 
 type Analyzer[Input, Output any] interface {
-	Analyze(ctx context.Context, i Input) (Output, error)
+	Analyze(state *state.State, input Input) (Output, error)
 }
 
 type (
@@ -21,26 +17,20 @@ type (
 )
 
 type (
-	AnalyzerFactory[Input, Output any] func(f *obj.FileObj) Analyzer[Input, Output]
-	AnalyzeFunc[Input, Output any]     func(ctx context.Context, f *obj.FileObj, i Input) (Output, error)
-	SplitterFunc[Input, Output any]    func(ctx context.Context, i Input) AnalyzeFunc[Input, Output]
+	AnalyzerFactory[Input, Output any] func() Analyzer[Input, Output]
+	AnalyzeFunc[Input, Output any]     func(s *state.State, i Input) (Output, error)
 )
 
-func NewAnalyzer[Input, Output any](
-	file *obj.FileObj,
-	analyze AnalyzeFunc[Input, Output],
-) Analyzer[Input, Output] {
+func NewAnalyzer[Input, Output any](analyze AnalyzeFunc[Input, Output]) Analyzer[Input, Output] {
 	return &analyzer[Input, Output]{
-		file:    file,
 		analyze: analyze,
 	}
 }
 
 type analyzer[Input, Output any] struct {
-	file    *obj.FileObj
 	analyze AnalyzeFunc[Input, Output]
 }
 
-func (a *analyzer[Input, Output]) Analyze(ctx context.Context, i Input) (Output, error) {
-	return a.analyze(ctx, a.file, i)
+func (a *analyzer[Input, Output]) Analyze(s *state.State, i Input) (Output, error) {
+	return a.analyze(s, i)
 }

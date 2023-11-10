@@ -1,22 +1,19 @@
-package analyzer
+package compass
 
 import (
-	"context"
 	"errors"
 	"go/ast"
 	"strings"
 
 	"github.com/4rchr4y/go-compass/obj"
+	"github.com/4rchr4y/go-compass/state"
 )
 
-func NewImportSpecAnalyzer(file *obj.FileObj) Analyzer[ast.Node, obj.Object] {
-	return NewAnalyzer[ast.Node, obj.Object](
-		file,
-		analyzeImportSpec,
-	)
+func NewImportSpecAnalyzer() Analyzer[ast.Node, obj.Object] {
+	return NewAnalyzer[ast.Node, obj.Object](analyzeImportSpec)
 }
 
-func analyzeImportSpec(ctx context.Context, f *obj.FileObj, node ast.Node) (obj.Object, error) {
+func analyzeImportSpec(state *state.State, node ast.Node) (obj.Object, error) {
 	importSpec, _ := node.(*ast.ImportSpec)
 
 	if importSpec.Path == nil && importSpec.Path.Value == "" {
@@ -24,7 +21,7 @@ func analyzeImportSpec(ctx context.Context, f *obj.FileObj, node ast.Node) (obj.
 	}
 
 	path := strings.Trim(importSpec.Path.Value, `"`)
-	if !strings.HasPrefix(path, f.Metadata.Module) {
+	if !strings.HasPrefix(path, state.File.Metadata.Module) {
 		return obj.NewImportObj(importSpec, obj.ImportTypeExternal), nil
 	}
 
