@@ -24,5 +24,8 @@ type Config struct {
 	TargetDir   string
 	IgnoredList map[string]struct{}
 
-	Group AnalyzerFactoryGroup
+	MaxDirParserCount  uint
+	MaxFileParserCount uint
+
+	Group PickerFactoryGroup
 }

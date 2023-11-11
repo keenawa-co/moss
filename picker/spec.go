@@ -1,4 +1,4 @@
-package compass
+package picker
 
 import (
 	"errors"
@@ -9,11 +9,11 @@ import (
 	"github.com/4rchr4y/go-compass/state"
 )
 
-func NewImportSpecAnalyzer() Analyzer[ast.Node, obj.Object] {
-	return NewAnalyzer[ast.Node, obj.Object](analyzeImportSpec)
+func NewImportSpecPicker() Picker[obj.Object] {
+	return NewPicker[obj.Object](pickImportSpec)
 }
 
-func analyzeImportSpec(state *state.State, node ast.Node) (obj.Object, error) {
+func pickImportSpec(state *state.State, node ast.Node) (obj.Object, error) {
 	importSpec, _ := node.(*ast.ImportSpec)
 
 	if importSpec.Path == nil && importSpec.Path.Value == "" {

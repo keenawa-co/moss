@@ -1,4 +1,4 @@
-package compass
+package picker
 
 import (
 	"errors"
@@ -9,11 +9,11 @@ import (
 	"github.com/4rchr4y/go-compass/state"
 )
 
-func NewFuncDeclAnalyzer() Analyzer[ast.Node, obj.Object] {
-	return NewAnalyzer[ast.Node, obj.Object](analyzeFuncDecl)
+func NewFuncDeclPicker() Picker[obj.Object] {
+	return NewPicker[obj.Object](pickFuncDecl)
 }
 
-func analyzeFuncDecl(state *state.State, node ast.Node) (obj.Object, error) {
+func pickFuncDecl(state *state.State, node ast.Node) (obj.Object, error) {
 	funcDecl, _ := node.(*ast.FuncDecl)
 
 	ps, err := getParentStruct(funcDecl)

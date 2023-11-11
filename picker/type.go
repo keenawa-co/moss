@@ -1,4 +1,4 @@
-package compass
+package picker
 
 import (
 	"errors"
@@ -10,15 +10,15 @@ import (
 	"github.com/4rchr4y/go-compass/state"
 )
 
-func NewFuncTypeAnalyzer() Analyzer[ast.Node, obj.Object] {
-	return NewAnalyzer[ast.Node, obj.Object](analyzeFuncType)
+func NewFuncTypePicker() Picker[obj.Object] {
+	return NewPicker[obj.Object](pickFuncType)
 }
 
-func NewStructTypeAnalyzer() Analyzer[ast.Node, obj.Object] {
-	return NewAnalyzer[ast.Node, obj.Object](analyzeStructType)
+func NewStructTypePicker() Picker[obj.Object] {
+	return NewPicker[obj.Object](pickStructType)
 }
 
-func analyzeStructType(state *state.State, node ast.Node) (obj.Object, error) {
+func pickStructType(state *state.State, node ast.Node) (obj.Object, error) {
 	typeSpec, ok := node.(*ast.TypeSpec)
 	if !ok {
 		return nil, fmt.Errorf("some error from analyzeStructNode : %s", reflect.TypeOf(node).String()) // TODO: add normal error return message
@@ -45,7 +45,7 @@ func analyzeStructType(state *state.State, node ast.Node) (obj.Object, error) {
 	return typeObject, nil
 }
 
-func analyzeFuncType(state *state.State, node ast.Node) (obj.Object, error) {
+func pickFuncType(state *state.State, node ast.Node) (obj.Object, error) {
 	typeSpec, ok := node.(*ast.TypeSpec)
 	if !ok {
 		return nil, fmt.Errorf("some error from analyzeStructNode : %s", reflect.TypeOf(node).String()) // TODO: add normal error return message

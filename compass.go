@@ -19,7 +19,7 @@ type Compass struct {
 	noCopy    core.NoCopy
 	noCompare core.NoCompare
 
-	MaxDirParserCount uint
+	MaxParserConcurrency uint
 
 	engine *Engine
 	parser parserClient
@@ -32,7 +32,7 @@ func (c *Compass) Scan() error {
 	}
 
 	var wg sync.WaitGroup
-	sema := make(chan struct{}, c.MaxDirParserCount)
+	sema := make(chan struct{}, c.MaxParserConcurrency)
 	c.engine.modfile = modfile
 
 	for _, dir := range dirGroup {
@@ -58,10 +58,10 @@ func (c *Compass) Scan() error {
 
 func New(cfg *Config) *Compass {
 	return &Compass{
-		MaxDirParserCount: 1,
+		MaxParserConcurrency: 1,
 		engine: &Engine{
-			MaxFileParserCount: 10,
-			group:              cfg.Group,
+			MaxEngineConcurrency: 10,
+			group:                cfg.Group,
 		},
 		parser: &service.Parser{
 			RootDir:     cfg.RootDir,

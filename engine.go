@@ -18,7 +18,7 @@ type Engine struct {
 	noCopy    core.NoCopy
 	noCompare core.NoCompare
 
-	MaxFileParserCount uint
+	MaxEngineConcurrency uint
 
 	// Required to identify internal dependencies.
 	modfile *modfile.File
@@ -26,7 +26,7 @@ type Engine struct {
 	// group is a map of functions of analyzer creators. The map key is the analyzer key,
 	// which is identical to the key for the already created analyzer in the map of analyzers.
 	// Used to create a map of analyzers for each visitor.
-	group AnalyzerFactoryGroup
+	group PickerFactoryGroup
 }
 
 func (e *Engine) ParseDir(targetDir string) ([]*obj.PackageObj, error) {
@@ -68,7 +68,7 @@ func (e *Engine) processPkg(fset *token.FileSet, pkgAst *ast.Package, targetDir 
 	pkgObj := obj.NewPackageObj(pkgAst, targetDir)
 
 	var wg sync.WaitGroup
-	fmt.Println(e.MaxFileParserCount)
+	fmt.Println(e.MaxEngineConcurrency)
 	sema := make(chan struct{}, 3)
 
 	for fileName, fileAst := range pkgAst.Files {

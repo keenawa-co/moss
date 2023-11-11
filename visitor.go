@@ -18,12 +18,12 @@ type visitor struct {
 	noCopy core.NoCopy
 
 	// Created map of analyzers for a specific file
-	analyzerGroup AnalyzerGroup
+	analyzerGroup PickerGroup
 
 	once sync.Once
 }
 
-func NewVisitor(group AnalyzerFactoryGroup) *visitor {
+func NewVisitor(group PickerFactoryGroup) *visitor {
 	v := new(visitor)
 	v.once.Do(func() {
 		v.analyzerGroup = group.Make()
@@ -43,7 +43,7 @@ func (v *visitor) Visit(state *state.State, node ast.Node) Visitor {
 		return v
 	}
 
-	object, err := analyzer.Analyze(state, node)
+	object, err := analyzer.Pick(state, node)
 	if err != nil {
 		fmt.Println(err) // TODO: decide later how to handle the error
 		return v
