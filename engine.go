@@ -1,7 +1,6 @@
 package compass
 
 import (
-	"fmt"
 	"go/ast"
 	"go/parser"
 	"go/token"
@@ -68,7 +67,6 @@ func (e *Engine) processPkg(fset *token.FileSet, pkgAst *ast.Package, targetDir 
 	pkgObj := obj.NewPackageObj(pkgAst, targetDir)
 
 	var wg sync.WaitGroup
-	fmt.Println(e.MaxEngineConcurrency)
 	sema := make(chan struct{}, 3)
 
 	for fileName, fileAst := range pkgAst.Files {

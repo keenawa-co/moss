@@ -24,6 +24,11 @@ func (o ImportObj) Type() string {
 	return "import"
 }
 
+func (o *ImportObj) TrimModName(modName string) *ImportObj {
+	o.Path = o.Path[len(modName):]
+	return o
+}
+
 func (o *ImportObj) CheckAndTrim(modName string) bool {
 	if len(o.Path) < len(modName) {
 		return false
@@ -45,8 +50,9 @@ func NewImportObj(importSpec *ast.ImportSpec, typ ImportType) *ImportObj {
 		alias = importSpec.Name.Name
 		isWithAlias = true
 	}
+
 	return &ImportObj{
-		Path:       strings.Trim(importSpec.Path.Value, `"`),
+		Path:       importSpec.Path.Value,
 		Alias:      alias,
 		WithAlias:  isWithAlias,
 		ImportType: typ,

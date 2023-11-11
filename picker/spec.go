@@ -20,8 +20,10 @@ func pickImportSpec(state *state.State, node ast.Node) (obj.Object, error) {
 		return nil, errors.New("some error from analyzeImportNode 1") // TODO: add normal error return message
 	}
 
-	path := strings.Trim(importSpec.Path.Value, `"`)
-	if !strings.HasPrefix(path, state.File.Metadata.Module) {
+	// by default, from ast we get an import string that is wrapped in quotes
+	importSpec.Path.Value = strings.Trim(importSpec.Path.Value, `"`)
+
+	if !strings.HasPrefix(importSpec.Path.Value, state.File.Metadata.Module) {
 		return obj.NewImportObj(importSpec, obj.ImportTypeExternal), nil
 	}
 

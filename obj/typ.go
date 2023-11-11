@@ -4,7 +4,7 @@ type AstTyp uint
 
 const (
 	ImportSpec AstTyp = iota + 1
-	TypeScpec
+	TypeSpec
 	FuncDecl
 	StructType
 	FuncType
@@ -14,7 +14,7 @@ const (
 const (
 	UndefinedString     = "undefined"
 	ImportSpecString    = "import_spec"
-	TypeScpecString     = "type_scpec"
+	TypeSpecString      = "type_spec"
 	FuncDeclString      = "func_decl"
 	StructTypeString    = "struct_type"
 	FuncTypeString      = "func_type"
@@ -25,8 +25,8 @@ func (typ AstTyp) String() string {
 	switch typ {
 	case ImportSpec:
 		return ImportSpecString
-	case TypeScpec:
-		return TypeScpecString
+	case TypeSpec:
+		return TypeSpecString
 	case FuncDecl:
 		return FuncDeclString
 	case StructType:
