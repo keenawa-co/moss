@@ -14,22 +14,38 @@ func NewImportSpecPicker() Picker[obj.Object] {
 }
 
 func pickImportSpec(state *state.State, node ast.Node) (obj.Object, error) {
-	importSpec, _ := node.(*ast.ImportSpec)
+	importSpec, ok := node.(*ast.ImportSpec)
+	if !ok {
+		return nil, errors.New("node is not an ImportSpec")
+	}
 
-	if importSpec.Path == nil && importSpec.Path.Value == "" {
-		return nil, errors.New("some error from analyzeImportNode 1") // TODO: add normal error return message
+	if importSpec.Path == nil {
+		return nil, errors.New("import spec path is nil")
 	}
 
 	// by default, from ast we get an import string that is wrapped in quotes
-	importSpec.Path.Value = strings.Trim(importSpec.Path.Value, `"`)
-
-	if !strings.HasPrefix(importSpec.Path.Value, state.File.Metadata.Module) {
-		return obj.NewImportObj(importSpec, obj.ImportTypeExternal), nil
+	path := strings.Trim(importSpec.Path.Value, `"`)
+	hasModPrefix := strings.HasPrefix(path, state.Modfile.Module.Mod.Path)
+	if hasModPrefix {
+		path = path[len(state.Modfile.Module.Mod.Path):]
 	}
 
 	if importSpec.Name != nil && importSpec.Name.Name == "_" {
-		return obj.NewImportObj(importSpec, obj.ImportTypeSideEffect), nil
+		importObj := obj.NewImportObj(importSpec, obj.ImportTypeSideEffect)
+		importObj.Path = path
+
+		return importObj, nil
 	}
 
-	return obj.NewImportObj(importSpec, obj.ImportTypeInternal), nil
+	if !hasModPrefix {
+		importObj := obj.NewImportObj(importSpec, obj.ImportTypeExternal)
+		importObj.Path = path
+
+		return importObj, nil
+	}
+
+	importObj := obj.NewImportObj(importSpec, obj.ImportTypeInternal)
+	importObj.Path = path
+
+	return importObj, nil
 }

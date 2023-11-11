@@ -24,11 +24,6 @@ func (o ImportObj) Type() string {
 	return "import"
 }
 
-func (o *ImportObj) TrimModName(modName string) *ImportObj {
-	o.Path = o.Path[len(modName):]
-	return o
-}
-
 func (o *ImportObj) CheckAndTrim(modName string) bool {
 	if len(o.Path) < len(modName) {
 		return false

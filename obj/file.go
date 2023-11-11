@@ -25,23 +25,12 @@ type FileObjEntitySet struct {
 	DeclIndexes  map[string]int
 }
 
-type FileObjStats struct {
-	Functions,
-	Structs, Interfaces int
-}
-
-type FileObjMeta struct {
-	Module string
-}
-
 type FileObj struct {
 	mutex sync.Mutex
 
 	Name     string
 	FileSet  *token.FileSet
 	Entities *FileObjEntitySet
-	Metadata *FileObjMeta
-	Stats    *FileObjStats
 }
 
 func (o *FileObj) Save(object Object) error {
@@ -73,7 +62,6 @@ func (o *FileObj) AppendType(typ *TypeObj) {
 func (o *FileObj) AppendDecl(decl *DeclObj) {
 	o.mutex.Lock()
 
-	// TODO: obj.Name = "$" + obj.Name
 	o.Entities.DeclIndexes[decl.Name] = len(o.Entities.Decls)
 	o.Entities.Decls = append(o.Entities.Decls, decl)
 	o.mutex.Unlock()
@@ -94,7 +82,7 @@ func (o *FileObj) AppendImport(obj *ImportObj) {
 		}
 
 		o.Entities.Imports.InternalImportsMeta[alias] = len(o.Entities.Imports.InternalImports)
-		o.Entities.Imports.InternalImports = append(o.Entities.Imports.InternalImports, obj.Path[len(o.Metadata.Module):])
+		o.Entities.Imports.InternalImports = append(o.Entities.Imports.InternalImports, obj.Path)
 	case ImportTypeExternal:
 		o.Entities.Imports.ExternalImports = append(o.Entities.Imports.ExternalImports, obj.Path)
 	case ImportTypeSideEffect:
@@ -102,25 +90,6 @@ func (o *FileObj) AppendImport(obj *ImportObj) {
 	}
 	o.mutex.Unlock()
 }
-
-// func (o *FileObj) AppendStruct(obj *StructTypeObj) {
-// 	o.mutex.Lock()
-// 	o.Entities.StructIndexes[*obj.Name] = len(o.Entities.Structs)
-// 	o.Entities.Structs = append(o.Entities.Structs, obj)
-// 	o.mutex.Unlock()
-// }
-
-// func (o *FileObj) AppendFunc(obj *FuncDeclObj) {
-// 	o.mutex.Lock()
-
-// 	if obj.Receiver != nil {
-// 		obj.Name = "$" + obj.Name
-// 	}
-
-// 	o.Entities.FunctionIndexes[obj.Name] = len(o.Entities.Functions)
-// 	o.Entities.Functions = append(o.Entities.Functions, obj)
-// 	o.mutex.Unlock()
-// }
 
 func NewFileObj(fset *token.FileSet, moduleName, fileName string) *FileObj {
 	return &FileObj{
@@ -137,9 +106,6 @@ func NewFileObj(fset *token.FileSet, moduleName, fileName string) *FileObj {
 			TypesIndexes: make(map[string]int),
 			Decls:        make([]*DeclObj, 0),
 			DeclIndexes:  make(map[string]int),
-		},
-		Metadata: &FileObjMeta{
-			Module: moduleName,
 		},
 	}
 }

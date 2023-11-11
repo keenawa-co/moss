@@ -70,8 +70,9 @@ func (s *State) MustGetString(key string) string {
 	return str
 }
 
-func New(fobj *obj.FileObj) *State {
+func New(fobj *obj.FileObj, modfile *modfile.File) *State {
 	return &State{
-		File: fobj,
+		File:    fobj,
+		Modfile: modfile,
 	}
 }

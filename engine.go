@@ -96,7 +96,8 @@ func (e *Engine) processPkg(fset *token.FileSet, pkgAst *ast.Package, targetDir 
 func (e *Engine) processFile(fset *token.FileSet, fileAst *ast.File, fileName string) *obj.FileObj {
 	fileObj := obj.NewFileObj(fset, e.modfile.Module.Mod.Path, filepath.Base(fileName))
 	visitor := NewVisitor(e.group)
+	state := state.New(fileObj, e.modfile)
 
-	Walk(state.New(fileObj), visitor, fileAst)
+	Walk(state, visitor, fileAst)
 	return fileObj
 }
