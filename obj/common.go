@@ -55,12 +55,6 @@ func CalcNodeLOC(fset *token.FileSet, node ast.Node) int {
 	return fset.Position(node.End()).Line - fset.Position(node.Pos()).Line + 1
 }
 
-type exprTypeMetaData struct {
-	Type           string
-	UsedPackages   []UsedPackage
-	EmbeddedStruct *StructTypeObj
-}
-
 func determineExprType(fobj *FileObj, expr ast.Expr, adder func(index int, name string)) (any, error) {
 	switch e := expr.(type) {
 	case *ast.StructType:

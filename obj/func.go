@@ -6,23 +6,35 @@ import (
 	"go/token"
 )
 
-type (
-	FuncDeclObj struct {
-		Recv      []*FieldObj
-		Name      *IdentObj
-		Typ       *FuncTypeObj // TODO: remove method Type() and rename this field to Type
-		Body      *FuncDeclBodyObj
-		Recursive bool
+type FuncTypeObj struct {
+	Params       []*FieldObj
+	Results      map[string]*FieldObj // TODO: Not implemented
+	Dependencies map[string]int
+}
+
+func (o *FuncTypeObj) ImportAdder(importIndex int, element string) {
+	if o.Dependencies == nil {
+		o.Dependencies = make(map[string]int)
 	}
 
-	FuncDeclBodyObj struct {
-		FieldAccess map[string]int
-		Stmt        *BlockStmtObj
-	}
-)
+	o.Dependencies[element] = importIndex
+}
 
-func (o *FuncDeclObj) IsExported() bool {
-	return token.IsExported(o.Name.Name)
+func NewFuncTypeObj(fobj *FileObj, funcType *ast.FuncType) (*FuncTypeObj, error) {
+	funcTypeObj := new(FuncTypeObj)
+
+	paramList, err := processFieldList(fobj, funcType.Params.List, funcTypeObj.ImportAdder)
+	if err != nil {
+		return nil, fmt.Errorf("failed to extract func param list: %w", err)
+	}
+
+	funcTypeObj.Params = paramList
+	return funcTypeObj, nil
+}
+
+type FuncDeclBodyObj struct {
+	FieldAccess map[string]int
+	Stmt        *BlockStmtObj
 }
 
 func (o *FuncDeclBodyObj) FieldAdder(fieldName string) {
@@ -34,31 +46,16 @@ func (o *FuncDeclBodyObj) FieldAdder(fieldName string) {
 
 }
 
-func NewFuncDeclObj(fobj *FileObj, decl *ast.FuncDecl) (*FuncDeclObj, error) {
-	funcDeclObj := new(FuncDeclObj)
-	funcDeclObj.Name = NewIdentObj(decl.Name)
+type FuncDeclObj struct {
+	Recv      []*FieldObj
+	Name      *IdentObj
+	Typ       *FuncTypeObj // TODO: remove method Type() and rename this field to Type
+	Body      *FuncDeclBodyObj
+	Recursive bool
+}
 
-	receiver, err := receiverDefinition(fobj, decl)
-	if err != nil {
-		return nil, err
-	}
-
-	if receiver != nil {
-		// Adding a `$` sign to distinguish between method names and regular function names.
-		// To use function names as declaration map keys in a file object
-		// funcDeclObj.Name = &IdentObj{Name: "$" + decl.Name.Name}
-		funcDeclObj.Recv = receiver
-	}
-
-	funcTypeObj, err := NewFuncTypeObj(fobj, decl.Type)
-	if err != nil {
-		return nil, err
-	}
-
-	funcDeclObj.Typ = funcTypeObj
-	funcDeclObj.Body = inspectBody(fobj, funcDeclObj, decl.Body)
-
-	return funcDeclObj, nil
+func (o *FuncDeclObj) IsExported() bool {
+	return token.IsExported(o.Name.Name)
 }
 
 func inspectBody(fobj *FileObj, obj *FuncDeclObj, body *ast.BlockStmt) *FuncDeclBodyObj {
@@ -145,28 +142,23 @@ func (o *FuncDeclObj) Type() string {
 	return "func"
 }
 
-type FuncTypeObj struct {
-	Params       []*FieldObj
-	Results      map[string]*FieldObj // TODO: Not implemented
-	Dependencies map[string]int
-}
+func NewFuncDeclObj(fobj *FileObj, decl *ast.FuncDecl) (*FuncDeclObj, error) {
+	funcDeclObj := new(FuncDeclObj)
+	funcDeclObj.Name = NewIdentObj(decl.Name)
 
-func (o *FuncTypeObj) Adder(importIndex int, element string) {
-	if o.Dependencies == nil {
-		o.Dependencies = make(map[string]int)
-	}
-
-	o.Dependencies[element] = importIndex
-}
-
-func NewFuncTypeObj(fobj *FileObj, funcType *ast.FuncType) (*FuncTypeObj, error) {
-	funcTypeObj := new(FuncTypeObj)
-
-	paramList, err := processFieldList(fobj, funcType.Params.List, funcTypeObj.Adder)
+	receiver, err := receiverDefinition(fobj, decl)
 	if err != nil {
-		return nil, fmt.Errorf("failed to extract func param list: %w", err)
+		return nil, err
 	}
 
-	funcTypeObj.Params = paramList
-	return funcTypeObj, nil
+	funcTypeObj, err := NewFuncTypeObj(fobj, decl.Type)
+	if err != nil {
+		return nil, err
+	}
+
+	funcDeclObj.Recv = receiver
+	funcDeclObj.Typ = funcTypeObj
+	funcDeclObj.Body = inspectBody(fobj, funcDeclObj, decl.Body)
+
+	return funcDeclObj, nil
 }
