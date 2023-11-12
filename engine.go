@@ -67,7 +67,7 @@ func (e *Engine) processPkg(fset *token.FileSet, pkgAst *ast.Package, targetDir 
 	pkgObj := obj.NewPackageObj(pkgAst, targetDir)
 
 	var wg sync.WaitGroup
-	sema := make(chan struct{}, 3)
+	sema := make(chan struct{}, e.MaxEngineConcurrency)
 
 	for fileName, fileAst := range pkgAst.Files {
 		wg.Add(1)
