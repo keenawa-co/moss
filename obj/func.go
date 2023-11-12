@@ -4,98 +4,169 @@ import (
 	"fmt"
 	"go/ast"
 	"go/token"
-	"reflect"
-	"unicode"
 )
 
 type (
-	FuncObjParam struct {
-		Type  string
-		Usage int
+	FuncDeclObj struct {
+		Recv      []*FieldObj
+		Name      *IdentObj
+		Typ       *FuncTypeObj // TODO: remove method Type() and rename this field to Type
+		Body      *FuncDeclBodyObj
+		Recursive bool
 	}
 
-	FuncDeclObj struct {
-		Name           string
-		Receiver       *string
-		FieldAccess    map[string]int
-		Params         map[string]*FuncObjParam
-		Dependencies   map[string]*DependencyObj
-		Visibility     bool
-		Arity          int
-		ReturnCount    int
-		Recursive      bool
-		HasSideEffects bool
+	FuncDeclBodyObj struct {
+		FieldAccess map[string]int
+		Stmt        *BlockStmtObj
 	}
 )
+
+func (o *FuncDeclObj) IsExported() bool {
+	return token.IsExported(o.Name.Name)
+}
+
+func (o *FuncDeclBodyObj) FieldAdder(fieldName string) {
+	if o.FieldAccess == nil {
+		o.FieldAccess = make(map[string]int)
+	}
+
+	o.FieldAccess[fieldName]++
+
+}
+
+func NewFuncDeclObj(fobj *FileObj, decl *ast.FuncDecl) (*FuncDeclObj, error) {
+	funcDeclObj := new(FuncDeclObj)
+	funcDeclObj.Name = NewIdentObj(decl.Name)
+
+	receiver, err := receiverDefinition(fobj, decl)
+	if err != nil {
+		return nil, err
+	}
+
+	if receiver != nil {
+		// Adding a `$` sign to distinguish between method names and regular function names.
+		// To use function names as declaration map keys in a file object
+		// funcDeclObj.Name = &IdentObj{Name: "$" + decl.Name.Name}
+		funcDeclObj.Recv = receiver
+	}
+
+	funcTypeObj, err := NewFuncTypeObj(fobj, decl.Type)
+	if err != nil {
+		return nil, err
+	}
+
+	funcDeclObj.Typ = funcTypeObj
+	funcDeclObj.Body = inspectBody(fobj, funcDeclObj, decl.Body)
+
+	return funcDeclObj, nil
+}
+
+func inspectBody(fobj *FileObj, obj *FuncDeclObj, body *ast.BlockStmt) *FuncDeclBodyObj {
+	bodyObj := &FuncDeclBodyObj{
+		Stmt: &BlockStmtObj{
+			Rbrace: body.Rbrace,
+			Lbrace: body.Lbrace,
+		},
+	}
+
+	ast.Inspect(body, func(n ast.Node) bool {
+		switch expr := n.(type) {
+		case *ast.SelectorExpr:
+			handleSelectorExpr(fobj, bodyObj, obj, expr)
+		case *ast.CallExpr:
+			handleCallExpr(obj, expr)
+		}
+		return true
+	})
+
+	return bodyObj
+}
+
+func handleSelectorExpr(fobj *FileObj, body *FuncDeclBodyObj, obj *FuncDeclObj, expr *ast.SelectorExpr) {
+	ident, ok := expr.X.(*ast.Ident)
+	if !ok {
+		return
+	}
+
+	if obj.Recv[0].Names[0].Name == ident.Name {
+		body.FieldAdder(expr.Sel.Name)
+		return
+	}
+
+	if index, exists := fobj.Entities.Imports.InternalImportsMeta[ident.Name]; exists {
+		body.Stmt.ImportAdder(index, expr.Sel.Name)
+		return
+	}
+}
+
+func handleCallExpr(obj *FuncDeclObj, expr *ast.CallExpr) {
+	// checking for direct recursion in regular functions
+	if ident, ok := expr.Fun.(*ast.Ident); ok {
+		if ident.Name == obj.Name.Name {
+			obj.Recursive = true
+		}
+		return
+	}
+
+	// checking for recursion in structure methods
+	if sel, ok := expr.Fun.(*ast.SelectorExpr); ok {
+		ident, ok := sel.X.(*ast.Ident)
+		if !ok {
+			return
+		}
+
+		// check that the called method is of the same type as the recipient
+		if obj.Recv[0].Names[0].Name != ident.Name {
+			return
+		}
+
+		if sel.Sel.Name != obj.Name.Name {
+			return
+		}
+
+		obj.Recursive = true
+	}
+}
+
+func receiverDefinition(fobj *FileObj, decl *ast.FuncDecl) ([]*FieldObj, error) {
+	if decl.Recv == nil || len(decl.Recv.List) == 0 {
+		return nil, nil
+	}
+
+	fieldObjList, err := processFieldList(fobj, decl.Recv.List, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return fieldObjList, nil
+}
 
 func (o *FuncDeclObj) Type() string {
 	return "func"
 }
 
-func (o *FuncDeclObj) AddDependency(importIndex int, element string) {
-	if _, exists := o.Dependencies[element]; !exists {
-		o.Dependencies[element] = &DependencyObj{
-			ImportIndex: importIndex,
-			Usage:       1,
-		}
-
-		return
-	}
-
-	o.Dependencies[element].Usage++
+type FuncTypeObj struct {
+	Params       []*FieldObj
+	Results      map[string]*FieldObj // TODO: Not implemented
+	Dependencies map[string]int
 }
 
-func NewFuncDeclObj(fset *token.FileSet, res *ast.FuncDecl, params map[string]*FuncObjParam, initDeps map[string]*DependencyObj, receiver *ast.Ident) *FuncDeclObj {
-	funcDeclObj := new(FuncDeclObj)
-
-	funcDeclObj.Name = res.Name.Name
-	funcDeclObj.Dependencies = initDeps
-	funcDeclObj.Params = params
-	funcDeclObj.Visibility = unicode.IsUpper(rune(res.Name.Name[0]))
-	funcDeclObj.Arity = len(params)
-
-	if receiver != nil {
-		// Adding a `$` sign to distinguish between method names and regular function names.
-		// To use function names as declaration map keys in a file object
-		funcDeclObj.Name = "$" + funcDeclObj.Name
-		funcDeclObj.Receiver = &receiver.Name
-		funcDeclObj.FieldAccess = make(map[string]int)
+func (o *FuncTypeObj) Adder(importIndex int, element string) {
+	if o.Dependencies == nil {
+		o.Dependencies = make(map[string]int)
 	}
 
-	return funcDeclObj
+	o.Dependencies[element] = importIndex
 }
 
-type (
-	// TODO: get rid of this structure
-	FuncFieldObj struct {
-		Name string
-		Type string
-	}
+func NewFuncTypeObj(fobj *FileObj, funcType *ast.FuncType) (*FuncTypeObj, error) {
+	funcTypeObj := new(FuncTypeObj)
 
-	FuncTypeObj struct {
-		Params  []*StructFieldObj         // TODO: convert it into a map
-		Results map[string]*FuncFieldObj  // TODO: Not implemented
-		Deps    map[string]*DependencyObj // TODO: Not implemented
-	}
-)
-
-func NewFuncTypeObj(fset *token.FileSet, node ast.Node) (*FuncTypeObj, error) {
-	ts, ok := node.(*ast.TypeSpec)
-	if !ok {
-		return nil, fmt.Errorf("node is not a TypeSpec: %s", reflect.TypeOf(node))
-	}
-
-	funcType, ok := ts.Type.(*ast.FuncType)
-	if !ok {
-		return nil, fmt.Errorf("node is not a FuncType: %s", reflect.TypeOf(node))
-	}
-
-	extrParamsData, err := extractFieldMap(fset, funcType.Params.List)
+	paramList, err := processFieldList(fobj, funcType.Params.List, funcTypeObj.Adder)
 	if err != nil {
-		return nil, fmt.Errorf("failed to extract func field map: %w", err)
+		return nil, fmt.Errorf("failed to extract func param list: %w", err)
 	}
 
-	return &FuncTypeObj{
-		Params: extrParamsData.fieldsSet,
-	}, nil
+	funcTypeObj.Params = paramList
+	return funcTypeObj, nil
 }
