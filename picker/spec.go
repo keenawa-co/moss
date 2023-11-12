@@ -23,7 +23,7 @@ func pickImportSpec(state *state.State, node ast.Node) (obj.Object, error) {
 		return nil, errors.New("import spec path is nil")
 	}
 
-	// by default, from ast we get an import string that is wrapped in quotes
+	// from ast get an import string that is wrapped in quotes
 	path := strings.Trim(importSpec.Path.Value, `"`)
 	hasModPrefix := strings.HasPrefix(path, state.Modfile.Module.Mod.Path)
 	if hasModPrefix {
