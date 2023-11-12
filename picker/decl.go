@@ -15,7 +15,7 @@ func NewFuncDeclPicker() Picker[obj.Object] {
 func pickFuncDecl(state *state.State, node ast.Node) (obj.Object, error) {
 	funcDecl, _ := node.(*ast.FuncDecl)
 
-	funcDeclObj, err := obj.NewFuncDeclObj2(state.File, funcDecl)
+	funcDeclObj, err := obj.NewFuncDeclObj(state.File, funcDecl)
 	if err != nil {
 		return nil, err
 	}

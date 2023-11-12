@@ -5,17 +5,6 @@ import (
 	"go/token"
 )
 
-// Obtained after traversing the array of `*ast.Field`
-type extractedFieldsData struct {
-	usedPackages []UsedPackage
-	fieldsSet    []*StructFieldObj
-}
-
-type FieldObj struct {
-	Name string
-	Type string
-}
-
 type DeclObj struct {
 	Start token.Pos
 	End   token.Pos
@@ -38,6 +27,6 @@ func NewDeclObj(fset *token.FileSet, node ast.Node, obj Object, name string) *De
 		Name:  name,
 		Typ:   0,
 		Obj:   obj,
-		Loc:   CalcEntityLOC(fset, node),
+		Loc:   CalcNodeLOC(fset, node),
 	}
 }

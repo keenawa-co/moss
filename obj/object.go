@@ -1,5 +1,5 @@
 package obj
 
 type Object interface {
-	Type() string
+	Type() string // Kind
 }

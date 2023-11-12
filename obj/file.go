@@ -1,7 +1,6 @@
 package obj
 
 import (
-	"errors"
 	"fmt"
 	"go/token"
 	"path"
@@ -48,13 +47,13 @@ func (o *FileObj) Save(object Object) error {
 		return nil
 
 	default:
-		return errors.New(fmt.Sprintf("%s: invalid object type", reflect.TypeOf(obj)))
+		return fmt.Errorf("%s: invalid object type", reflect.TypeOf(obj))
 	}
 }
 
 func (o *FileObj) AppendType(typ *TypeObj) {
 	o.mutex.Lock()
-	o.Entities.TypesIndexes[typ.Name] = len(o.Entities.Types)
+	o.Entities.TypesIndexes[typ.Name.Name] = len(o.Entities.Types)
 	o.Entities.Types = append(o.Entities.Types, typ)
 	o.mutex.Unlock()
 }
