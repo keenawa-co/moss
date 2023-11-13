@@ -2,7 +2,7 @@ package obj
 
 import (
 	"go/ast"
-	"strings"
+	"go/token"
 )
 
 type ImportType int
@@ -14,42 +14,33 @@ const (
 )
 
 type ImportObj struct {
+	Pos token.Pos
+	End token.Pos
+
 	Path       string
-	Alias      string
+	Alias      string // TODO: should be a Name and type Ident
 	WithAlias  bool
 	ImportType ImportType
 }
 
-func (o ImportObj) Type() string {
-	return "import"
+func (o *ImportObj) IsValid() bool {
+	return o.Pos != token.NoPos
 }
 
-func (o *ImportObj) CheckAndTrim(modName string) bool {
-	if len(o.Path) < len(modName) {
-		return false
-	}
-
-	if !strings.HasPrefix(o.Path, modName) {
-		return false
-	}
-
-	o.Path = o.Path[len(modName):]
-	return true
+func (o *ImportObj) IsExported() bool {
+	return false
 }
 
 func NewImportObj(importSpec *ast.ImportSpec, typ ImportType) *ImportObj {
-	var isWithAlias bool
-	var alias string
+	importObj := new(ImportObj)
 
 	if importSpec.Name != nil {
-		alias = importSpec.Name.Name
-		isWithAlias = true
+		importObj.Alias = importSpec.Name.Name
+		importObj.WithAlias = true
 	}
 
-	return &ImportObj{
-		Path:       importSpec.Path.Value,
-		Alias:      alias,
-		WithAlias:  isWithAlias,
-		ImportType: typ,
-	}
+	importObj.Path = importSpec.Path.Value
+	importObj.ImportType = typ
+
+	return importObj
 }

@@ -6,11 +6,20 @@ import (
 	"go/token"
 )
 
+// TODO: check type params for *ast.FuncType
 type FuncTypeObj struct {
-	Params       []*FieldObj
-	Results      map[string]*FieldObj // TODO: Not implemented
+	Func         token.Pos            // position of "func" keyword (token.NoPos if there is no "func")
+	Params       *FieldObjList        // (incoming) parameters
+	Results      map[string]*FieldObj // (outgoing) results TODO: Not implemented
 	Dependencies map[string]int
 }
+
+// func (x *FuncTypeObj) Pos() token.Pos {
+// 	if x.Func.IsValid() || x.Params == nil { // see issue 3870
+// 		return x.Func
+// 	}
+// 	return x.Params.Pos() // interface method declarations have no "func" keyword
+// }
 
 func (o *FuncTypeObj) ImportAdder(importIndex int, element string) {
 	if o.Dependencies == nil {
@@ -23,7 +32,7 @@ func (o *FuncTypeObj) ImportAdder(importIndex int, element string) {
 func NewFuncTypeObj(fobj *FileObj, funcType *ast.FuncType) (*FuncTypeObj, error) {
 	funcTypeObj := new(FuncTypeObj)
 
-	paramList, err := processFieldList(fobj, funcType.Params.List, funcTypeObj.ImportAdder)
+	paramList, err := processFieldList(fobj, funcType.Params, funcTypeObj.ImportAdder)
 	if err != nil {
 		return nil, fmt.Errorf("failed to extract func param list: %w", err)
 	}
@@ -47,15 +56,52 @@ func (o *FuncDeclBodyObj) FieldAdder(fieldName string) {
 }
 
 type FuncDeclObj struct {
-	Recv      []*FieldObj
+	Pos       token.Pos
+	End       token.Pos
+	Recv      *FieldObjList
 	Name      *IdentObj
-	Typ       *FuncTypeObj // TODO: remove method Type() and rename this field to Type
+	Type      *FuncTypeObj
 	Body      *FuncDeclBodyObj
 	Recursive bool
 }
 
+// func (o *FuncDeclObj) Pos() token.Pos {
+// 	return o.Type.Pos()
+// }
+
+// func (o *FuncDeclObj) End() token.Pos {
+// 	return o.Type.Pos()
+// }
+
 func (o *FuncDeclObj) IsExported() bool {
-	return token.IsExported(o.Name.Name)
+	return o.Name.IsExported()
+}
+
+func (o *FuncDeclObj) IsValid() bool {
+	return o.Pos != token.NoPos && o.End != token.NoPos
+}
+
+func NewFuncDeclObj(fobj *FileObj, decl *ast.FuncDecl) (*FuncDeclObj, error) {
+	funcDeclObj := new(FuncDeclObj)
+	funcDeclObj.Name = NewIdentObj(decl.Name)
+	funcDeclObj.Pos = decl.Pos()
+	funcDeclObj.End = decl.End()
+
+	receiver, err := receiverDefinition(fobj, decl)
+	if err != nil {
+		return nil, err
+	}
+
+	funcTypeObj, err := NewFuncTypeObj(fobj, decl.Type)
+	if err != nil {
+		return nil, err
+	}
+
+	funcDeclObj.Recv = receiver
+	funcDeclObj.Type = funcTypeObj
+	funcDeclObj.Body = inspectBody(fobj, funcDeclObj, decl.Body)
+
+	return funcDeclObj, nil
 }
 
 func inspectBody(fobj *FileObj, obj *FuncDeclObj, body *ast.BlockStmt) *FuncDeclBodyObj {
@@ -85,7 +131,7 @@ func handleSelectorExpr(fobj *FileObj, body *FuncDeclBodyObj, obj *FuncDeclObj, 
 		return
 	}
 
-	if obj.Recv[0].Names[0].Name == ident.Name {
+	if obj.Recv.List[0].Names[0].Name == ident.Name {
 		body.FieldAdder(expr.Sel.Name)
 		return
 	}
@@ -113,7 +159,7 @@ func handleCallExpr(obj *FuncDeclObj, expr *ast.CallExpr) {
 		}
 
 		// check that the called method is of the same type as the recipient
-		if obj.Recv[0].Names[0].Name != ident.Name {
+		if obj.Recv.List[0].Names[0].Name != ident.Name {
 			return
 		}
 
@@ -125,40 +171,15 @@ func handleCallExpr(obj *FuncDeclObj, expr *ast.CallExpr) {
 	}
 }
 
-func receiverDefinition(fobj *FileObj, decl *ast.FuncDecl) ([]*FieldObj, error) {
+func receiverDefinition(fobj *FileObj, decl *ast.FuncDecl) (*FieldObjList, error) {
 	if decl.Recv == nil || len(decl.Recv.List) == 0 {
 		return nil, nil
 	}
 
-	fieldObjList, err := processFieldList(fobj, decl.Recv.List, nil)
+	fieldObjList, err := processFieldList(fobj, decl.Recv, nil)
 	if err != nil {
 		return nil, err
 	}
 
 	return fieldObjList, nil
-}
-
-func (o *FuncDeclObj) Type() string {
-	return "func"
-}
-
-func NewFuncDeclObj(fobj *FileObj, decl *ast.FuncDecl) (*FuncDeclObj, error) {
-	funcDeclObj := new(FuncDeclObj)
-	funcDeclObj.Name = NewIdentObj(decl.Name)
-
-	receiver, err := receiverDefinition(fobj, decl)
-	if err != nil {
-		return nil, err
-	}
-
-	funcTypeObj, err := NewFuncTypeObj(fobj, decl.Type)
-	if err != nil {
-		return nil, err
-	}
-
-	funcDeclObj.Recv = receiver
-	funcDeclObj.Typ = funcTypeObj
-	funcDeclObj.Body = inspectBody(fobj, funcDeclObj, decl.Body)
-
-	return funcDeclObj, nil
 }

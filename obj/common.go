@@ -13,6 +13,13 @@ type IdentObj struct {
 	Name string
 }
 
+func (id *IdentObj) String() string {
+	if id != nil {
+		return id.Name
+	}
+	return "<nil>"
+}
+
 func (idObj *IdentObj) IsExported() bool {
 	return token.IsExported(idObj.Name)
 }
@@ -30,6 +37,27 @@ func mapIdentAstArray(array []*ast.Ident) []*IdentObj {
 	}
 
 	return result
+}
+
+type FieldObjList struct {
+	Opening token.Pos   // position of opening parenthesis/brace/bracket, if any
+	List    []*FieldObj // field list; or nil
+	Closing token.Pos   // position of closing parenthesis/brace/bracket, if any
+}
+
+// NumFields returns the number of parameters or struct fields represented by a FieldList.
+func (f *FieldObjList) NumFields() int {
+	n := 0
+	if f != nil {
+		for _, g := range f.List {
+			m := len(g.Names)
+			if m == 0 {
+				m = 1
+			}
+			n += m
+		}
+	}
+	return n
 }
 
 type FieldObj struct {
@@ -107,17 +135,21 @@ func processField(fobj *FileObj, field *ast.Field, adder func(index int, name st
 	}, nil
 }
 
-func processFieldList(fobj *FileObj, fieldList []*ast.Field, adder func(index int, name string)) ([]*FieldObj, error) {
-	result := make([]*FieldObj, 0, len(fieldList))
+func processFieldList(fobj *FileObj, fieldList *ast.FieldList, adder func(index int, name string)) (*FieldObjList, error) {
+	fieldObjList := &FieldObjList{
+		Opening: fieldList.Opening,
+		List:    make([]*FieldObj, 0, len(fieldList.List)),
+		Closing: fieldList.Closing,
+	}
 
-	for _, field := range fieldList {
+	for _, field := range fieldList.List {
 		fieldObj, err := processField(fobj, field, adder)
 		if err != nil {
 			return nil, err
 		}
 
-		result = append(result, fieldObj)
+		fieldObjList.List = append(fieldObjList.List, fieldObj)
 	}
 
-	return result, nil
+	return fieldObjList, nil
 }

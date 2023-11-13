@@ -3,30 +3,37 @@ package obj
 import (
 	"go/ast"
 	"go/token"
+
+	"github.com/4rchr4y/go-compass/utils"
 )
 
 type DeclObj struct {
-	Start token.Pos
-	End   token.Pos
-	Name  string
-	Obj   Object
-	// TODO: Introduce the use of internal object markings.
-	// Stop using reflection in groups of anatomyizers and link everything to internal types of AST
-	Typ AstTyp
-	Loc int
+	Name string // TODO: should be a Ident
+	Type Object
+	Loc  int
 }
 
-func (o *DeclObj) Type() string {
-	return "decl"
+// func (o *DeclObj) Pos() token.Pos {
+// 	return o.Type.Pos()
+// }
+
+// func (o *DeclObj) End() token.Pos {
+// 	return o.Type.End()
+// }
+
+// func (o *DeclObj) IsValid() bool {
+// 	return o.Pos() != token.NoPos && o.End() != token.NoPos
+// }
+
+// TODO: make a real func
+func (o *DeclObj) IsExported() bool {
+	return true
 }
 
 func NewDeclObj(fset *token.FileSet, node ast.Node, obj Object, name string) *DeclObj {
 	return &DeclObj{
-		Start: node.Pos(),
-		End:   node.End(),
-		Name:  name,
-		Typ:   0,
-		Obj:   obj,
-		Loc:   CalcNodeLOC(fset, node),
+		Name: name,
+		Type: obj,
+		Loc:  utils.CalcNodeLOC(fset, node),
 	}
 }
