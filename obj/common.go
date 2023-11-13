@@ -51,14 +51,10 @@ func (o *BlockStmtObj) ImportAdder(importIndex int, element string) {
 	o.Dependencies[element] = importIndex
 }
 
-func CalcNodeLOC(fset *token.FileSet, node ast.Node) int {
-	return fset.Position(node.End()).Line - fset.Position(node.Pos()).Line + 1
-}
-
 func determineExprType(fobj *FileObj, expr ast.Expr, adder func(index int, name string)) (any, error) {
 	switch e := expr.(type) {
 	case *ast.StructType:
-		return NewStructObj(fobj, e, nil)
+		return NewStructObj(fobj, e)
 
 	case *ast.SelectorExpr:
 		ident, ok := e.X.(*ast.Ident)
