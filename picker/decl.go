@@ -1,6 +1,7 @@
 package picker
 
 import (
+	"errors"
 	"go/ast"
 
 	"github.com/4rchr4y/go-compass/obj"
@@ -12,14 +13,17 @@ func NewFuncDeclPicker() Picker[obj.Object] {
 }
 
 func pickFuncDecl(state *state.State, node ast.Node) (obj.Object, error) {
-	funcDecl, _ := node.(*ast.FuncDecl)
+	decl, _ := node.(*ast.FuncDecl)
 
-	funcDeclObj, err := obj.NewFuncDeclObj(state.File, funcDecl)
+	funcDeclObj, err := obj.NewFuncDeclObj(state.File, decl)
 	if err != nil {
-		return nil, err
+		return nil, errors.New("some error from pickFuncDecl 1") // TODO: add normal error return message
 	}
 
-	// TODO: use IdentObj as name arg
-	declObj := obj.NewDeclObj(state.File.FileSet, node, funcDeclObj, funcDeclObj.Name.Name)
-	return declObj, nil
+	return &obj.DeclObj{
+		Pos:  state.File.FileSet.Position(decl.Pos()).Line,
+		End:  state.File.FileSet.Position(decl.End()).Line,
+		Name: obj.NewIdentObj(decl.Name),
+		Type: funcDeclObj,
+	}, nil
 }

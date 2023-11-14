@@ -40,9 +40,7 @@ func mapIdentAstArray(array []*ast.Ident) []*IdentObj {
 }
 
 type FieldObjList struct {
-	Opening token.Pos   // position of opening parenthesis/brace/bracket, if any
-	List    []*FieldObj // field list; or nil
-	Closing token.Pos   // position of closing parenthesis/brace/bracket, if any
+	List []*FieldObj // field list; or nil
 }
 
 // NumFields returns the number of parameters or struct fields represented by a FieldList.
@@ -66,9 +64,7 @@ type FieldObj struct {
 }
 
 type BlockStmtObj struct {
-	Lbrace       token.Pos // position of "{"
 	Dependencies map[string]int
-	Rbrace       token.Pos // position of "}", if any (may be absent due to syntax error)
 }
 
 func (o *BlockStmtObj) ImportAdder(importIndex int, element string) {
@@ -82,7 +78,7 @@ func (o *BlockStmtObj) ImportAdder(importIndex int, element string) {
 func determineExprType(fobj *FileObj, expr ast.Expr, adder func(index int, name string)) (any, error) {
 	switch e := expr.(type) {
 	case *ast.StructType:
-		return NewStructObj(fobj, e)
+		return NewStructTypeObj(fobj, e)
 
 	case *ast.SelectorExpr:
 		ident, ok := e.X.(*ast.Ident)
@@ -135,11 +131,9 @@ func processField(fobj *FileObj, field *ast.Field, adder func(index int, name st
 	}, nil
 }
 
-func processFieldList(fobj *FileObj, fieldList *ast.FieldList, adder func(index int, name string)) (*FieldObjList, error) {
+func ProcessFieldList(fobj *FileObj, fieldList *ast.FieldList, adder func(index int, name string)) (*FieldObjList, error) {
 	fieldObjList := &FieldObjList{
-		Opening: fieldList.Opening,
-		List:    make([]*FieldObj, 0, len(fieldList.List)),
-		Closing: fieldList.Closing,
+		List: make([]*FieldObj, 0, len(fieldList.List)),
 	}
 
 	for _, field := range fieldList.List {

@@ -61,7 +61,7 @@ func (o *FileObj) AppendType(typ *TypeObj) {
 func (o *FileObj) AppendDecl(decl *DeclObj) {
 	o.mutex.Lock()
 
-	o.Entities.DeclIndexes[decl.Name] = len(o.Entities.Decls)
+	o.Entities.DeclIndexes[decl.Name.Name] = len(o.Entities.Decls)
 	o.Entities.Decls = append(o.Entities.Decls, decl)
 	o.mutex.Unlock()
 }

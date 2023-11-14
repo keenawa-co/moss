@@ -14,13 +14,6 @@ type FuncTypeObj struct {
 	Dependencies map[string]int
 }
 
-// func (x *FuncTypeObj) Pos() token.Pos {
-// 	if x.Func.IsValid() || x.Params == nil { // see issue 3870
-// 		return x.Func
-// 	}
-// 	return x.Params.Pos() // interface method declarations have no "func" keyword
-// }
-
 func (o *FuncTypeObj) ImportAdder(importIndex int, element string) {
 	if o.Dependencies == nil {
 		o.Dependencies = make(map[string]int)
@@ -32,7 +25,7 @@ func (o *FuncTypeObj) ImportAdder(importIndex int, element string) {
 func NewFuncTypeObj(fobj *FileObj, funcType *ast.FuncType) (*FuncTypeObj, error) {
 	funcTypeObj := new(FuncTypeObj)
 
-	paramList, err := processFieldList(fobj, funcType.Params, funcTypeObj.ImportAdder)
+	paramList, err := ProcessFieldList(fobj, funcType.Params, funcTypeObj.ImportAdder)
 	if err != nil {
 		return nil, fmt.Errorf("failed to extract func param list: %w", err)
 	}
@@ -56,8 +49,6 @@ func (o *FuncDeclBodyObj) FieldAdder(fieldName string) {
 }
 
 type FuncDeclObj struct {
-	Pos       token.Pos
-	End       token.Pos
 	Recv      *FieldObjList
 	Name      *IdentObj
 	Type      *FuncTypeObj
@@ -65,27 +56,13 @@ type FuncDeclObj struct {
 	Recursive bool
 }
 
-// func (o *FuncDeclObj) Pos() token.Pos {
-// 	return o.Type.Pos()
-// }
-
-// func (o *FuncDeclObj) End() token.Pos {
-// 	return o.Type.Pos()
-// }
-
 func (o *FuncDeclObj) IsExported() bool {
 	return o.Name.IsExported()
-}
-
-func (o *FuncDeclObj) IsValid() bool {
-	return o.Pos != token.NoPos && o.End != token.NoPos
 }
 
 func NewFuncDeclObj(fobj *FileObj, decl *ast.FuncDecl) (*FuncDeclObj, error) {
 	funcDeclObj := new(FuncDeclObj)
 	funcDeclObj.Name = NewIdentObj(decl.Name)
-	funcDeclObj.Pos = decl.Pos()
-	funcDeclObj.End = decl.End()
 
 	receiver, err := receiverDefinition(fobj, decl)
 	if err != nil {
@@ -106,10 +83,7 @@ func NewFuncDeclObj(fobj *FileObj, decl *ast.FuncDecl) (*FuncDeclObj, error) {
 
 func inspectBody(fobj *FileObj, obj *FuncDeclObj, body *ast.BlockStmt) *FuncDeclBodyObj {
 	bodyObj := &FuncDeclBodyObj{
-		Stmt: &BlockStmtObj{
-			Rbrace: body.Rbrace,
-			Lbrace: body.Lbrace,
-		},
+		Stmt: new(BlockStmtObj),
 	}
 
 	ast.Inspect(body, func(n ast.Node) bool {
@@ -176,7 +150,7 @@ func receiverDefinition(fobj *FileObj, decl *ast.FuncDecl) (*FieldObjList, error
 		return nil, nil
 	}
 
-	fieldObjList, err := processFieldList(fobj, decl.Recv, nil)
+	fieldObjList, err := ProcessFieldList(fobj, decl.Recv, nil)
 	if err != nil {
 		return nil, err
 	}

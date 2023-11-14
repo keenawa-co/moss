@@ -21,46 +21,69 @@ func NewStructTypePicker() Picker[obj.Object] {
 func pickStructType(state *state.State, node ast.Node) (obj.Object, error) {
 	typeSpec, ok := node.(*ast.TypeSpec)
 	if !ok {
-		return nil, fmt.Errorf("some error from analyzeStructNode : %s", reflect.TypeOf(node).String()) // TODO: add normal error return message
+		return nil, fmt.Errorf("some error from pickStructType : %s not a *ast.TypeSpec", reflect.TypeOf(node).String()) // TODO: add normal error return message
 	}
 
-	// structObj, err := obj.NewStructObj(state.File, typeSpec, &typeSpec.Name.Name)
-	// if err != nil {
-	// 	return nil, errors.New("some error from analyzeStructNode 3") // TODO: add normal error return message
-	// }
+	structType, ok := typeSpec.Type.(*ast.StructType)
+	if !ok {
+		return nil, fmt.Errorf("some error from pickStructType : %s not a *ast.StructType", reflect.TypeOf(node).String()) // TODO: add normal error return message
+	}
 
-	typeObject, err := obj.NewTypeObj(state.File, typeSpec)
+	typeObj := new(obj.TypeObj)
+
+	if typeSpec.TypeParams != nil {
+		typeParams, err := obj.ProcessFieldList(state.File, typeSpec.TypeParams, typeObj.ImportAdder)
+		if err != nil {
+			return nil, err
+		}
+
+		typeObj.TypeParams = typeParams
+	}
+
+	structTypeObj, err := obj.NewStructTypeObj(state.File, structType)
 	if err != nil {
-		return nil, errors.New("some error from analyzeStructNode 4") // TODO: add normal error return message
+		return nil, errors.New("some error from pickStructType 3") // TODO: add normal error return message
 	}
 
-	// typeObject.EmbedObject(structObj)
+	typeObj.Pos = state.File.FileSet.Position(typeSpec.Pos()).Line
+	typeObj.End = state.File.FileSet.Position(typeSpec.End()).Line
+	typeObj.Name = obj.NewIdentObj(typeSpec.Name)
+	typeObj.Type = structTypeObj
 
-	return typeObject, nil
+	return typeObj, nil
 }
 
 func pickFuncType(state *state.State, node ast.Node) (obj.Object, error) {
 	ts, ok := node.(*ast.TypeSpec)
 	if !ok {
-		return nil, fmt.Errorf("some error from analyzeStructNode : %s", reflect.TypeOf(node).String()) // TODO: add normal error return message
+		return nil, fmt.Errorf("some error from pickFuncType : %s not a *ast.TypeSpec", reflect.TypeOf(node).String()) // TODO: add normal error return message
 	}
 
-	// _, ok = ts.Type.(*ast.FuncType)
-	// if !ok {
-	// 	return nil, fmt.Errorf("node is not a FuncType: %s", reflect.TypeOf(node))
-	// }
+	funcType, ok := ts.Type.(*ast.FuncType)
+	if !ok {
+		return nil, fmt.Errorf("some error from pickFuncType : %s not a *ast.StructType", reflect.TypeOf(node).String()) // TODO: add normal error return message
+	}
 
-	// funcTypeObj, err := obj.NewFuncTypeObj(state.File, funcType)
-	// if err != nil {
-	// 	return nil, fmt.Errorf("some error from analyzeStructNode %w", err) // TODO: add normal error return message
-	// }
+	typeObj := new(obj.TypeObj)
 
-	typeObject, err := obj.NewTypeObj(state.File, ts)
+	if ts.TypeParams != nil {
+		typeParams, err := obj.ProcessFieldList(state.File, ts.TypeParams, typeObj.ImportAdder)
+		if err != nil {
+			return nil, err
+		}
+
+		typeObj.TypeParams = typeParams
+	}
+
+	funcTypeObj, err := obj.NewFuncTypeObj(state.File, funcType)
 	if err != nil {
-		return nil, errors.New("some error from analyzeStructNode 4") // TODO: add normal error return message
+		return nil, errors.New("some error from pickFuncType 3") // TODO: add normal error return message
 	}
 
-	// typeObject.EmbedObject(funcTypeObj)
+	typeObj.Pos = state.File.FileSet.Position(ts.Pos()).Line
+	typeObj.End = state.File.FileSet.Position(ts.End()).Line
+	typeObj.Name = obj.NewIdentObj(ts.Name)
+	typeObj.Type = funcTypeObj
 
-	return typeObject, nil
+	return typeObj, nil
 }

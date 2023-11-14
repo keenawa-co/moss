@@ -25,9 +25,9 @@ func (o *StructTypeObj) ImportAdder(importIndex int, element string) {
 	o.Dependencies[element] = importIndex
 }
 
-func NewStructObj(fobj *FileObj, structType *ast.StructType) (*StructTypeObj, error) {
+func NewStructTypeObj(fobj *FileObj, structType *ast.StructType) (*StructTypeObj, error) {
 	structTypeObj := new(StructTypeObj)
-	fieldList, err := processFieldList(fobj, structType.Fields, structTypeObj.ImportAdder)
+	fieldList, err := ProcessFieldList(fobj, structType.Fields, structTypeObj.ImportAdder)
 	if err != nil {
 		return nil, fmt.Errorf("failed to extract struct field map: %w", err)
 	}
