@@ -13,6 +13,10 @@ func (o *TypeObj) IsExported() bool {
 	return o.Name.IsExported()
 }
 
+func (o *TypeObj) IsValid() bool {
+	return o.Pos != NoPos && o.End != NoPos
+}
+
 func (o *TypeObj) ImportAdder(importIndex int, element string) {
 	if o.Dependencies == nil {
 		o.Dependencies = make(map[string]int)

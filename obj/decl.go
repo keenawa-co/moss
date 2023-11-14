@@ -10,3 +10,7 @@ type DeclObj struct {
 func (o *DeclObj) IsExported() bool {
 	return o.Name.IsExported()
 }
+
+func (o *DeclObj) IsValid() bool {
+	return o.Pos != NoPos && o.End != NoPos
+}

@@ -1,8 +1,8 @@
 package obj
 
+const NoPos int = 0
+
 type Object interface {
-	// Pos() token.Pos // position of first character belonging to the node
-	// End() token.Pos // position of first character immediately after the node
-	// IsValid() bool
-	// IsExported() bool
+	IsValid() bool
+	IsExported() bool
 }
