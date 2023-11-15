@@ -66,15 +66,15 @@ func (o *FileObj) AppendDecl(decl *DeclObj) {
 	o.mutex.Unlock()
 }
 
-func (o *FileObj) IsInternalDependency(alias string) (int, bool) {
-	index, exists := o.Entities.Imports.InternalImportsMeta[alias]
+func (o *FileObj) IsInternalDependency(name string) (int, bool) {
+	index, exists := o.Entities.Imports.InternalImportsMeta[name]
 	return index, exists
 }
 
 func (o *FileObj) AppendImport(object *ImportObj) {
 	o.mutex.Lock()
 	switch object.ImportKind {
-	case ImportTypeInternal:
+	case Internal:
 		if object.Name == nil {
 			object.Name = &IdentObj{
 				Name: path.Base(object.Path),
@@ -83,9 +83,9 @@ func (o *FileObj) AppendImport(object *ImportObj) {
 
 		o.Entities.Imports.InternalImportsMeta[object.Name.String()] = len(o.Entities.Imports.InternalImports)
 		o.Entities.Imports.InternalImports = append(o.Entities.Imports.InternalImports, object.Path)
-	case ImportTypeExternal:
+	case External:
 		o.Entities.Imports.ExternalImports = append(o.Entities.Imports.ExternalImports, object.Path)
-	case ImportTypeSideEffect:
+	case SideEffect:
 		o.Entities.Imports.SideEffectImports = append(o.Entities.Imports.SideEffectImports, object.Path)
 	}
 	o.mutex.Unlock()

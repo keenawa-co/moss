@@ -31,22 +31,21 @@ func pickImportSpec(state *state.State, node ast.Node) (obj.Object, error) {
 	}
 
 	if importSpec.Name != nil && importSpec.Name.Name == "_" {
-		importObj := obj.NewImportObj(importSpec, obj.ImportTypeSideEffect)
+		importObj := obj.NewImportObj(importSpec, obj.SideEffect)
 		importObj.Path = path
 
 		return importObj, nil
 	}
 
 	if !hasModPrefix {
-		importObj := obj.NewImportObj(importSpec, obj.ImportTypeExternal)
+		importObj := obj.NewImportObj(importSpec, obj.External)
 		importObj.Path = path
 
 		return importObj, nil
 	}
 
-	importObj := obj.NewImportObj(importSpec, obj.ImportTypeInternal)
+	importObj := obj.NewImportObj(importSpec, obj.Internal)
 	importObj.Path = path
-	importObj.TypeKind = obj.Imp
 
 	return importObj, nil
 }

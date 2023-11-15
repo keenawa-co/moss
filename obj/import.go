@@ -7,9 +7,9 @@ import (
 type ImpKind int
 
 const (
-	ImportTypeExternal ImpKind = iota
-	ImportTypeInternal
-	ImportTypeSideEffect
+	External   ImpKind = iota // any package not defined within the analyzed project
+	Internal                  // package defined within the analyzed project
+	SideEffect                // can be either an internal or external package
 )
 
 type ImportObj struct {
@@ -20,7 +20,7 @@ type ImportObj struct {
 }
 
 func (o *ImportObj) Kind() ObjKind {
-	return o.TypeKind
+	return Imp
 }
 
 func (o *ImportObj) IsValid() bool {

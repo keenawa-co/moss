@@ -8,8 +8,9 @@ import (
 
 // TODO: check type params for *ast.FuncType
 type FuncTypeObj struct {
-	Func         token.Pos            // position of "func" keyword (token.NoPos if there is no "func")
-	Params       *FieldObjList        // (incoming) parameters
+	Func         token.Pos     // position of "func" keyword (token.NoPos if there is no "func")
+	Params       *FieldObjList // (incoming) parameters
+	TypeParams   *FieldObjList
 	Results      map[string]*FieldObj // (outgoing) results TODO: Not implemented
 	Dependencies map[string]int
 }
@@ -30,7 +31,13 @@ func NewFuncTypeObj(fobj *FileObj, funcType *ast.FuncType) (*FuncTypeObj, error)
 		return nil, fmt.Errorf("failed to extract func param list: %w", err)
 	}
 
+	typeParamList, err := ProcessFieldList(fobj, funcType.TypeParams, funcTypeObj.ImportAdder)
+	if err != nil {
+		return nil, fmt.Errorf("failed to extract func param list: %w", err)
+	}
+
 	funcTypeObj.Params = paramList
+	funcTypeObj.TypeParams = typeParamList
 	return funcTypeObj, nil
 }
 
@@ -54,10 +61,6 @@ type FuncDeclObj struct {
 	Type      *FuncTypeObj
 	Body      *FuncDeclBodyObj
 	Recursive bool
-}
-
-func (o *FuncDeclObj) IsExported() bool {
-	return o.Name.IsExported()
 }
 
 func NewFuncDeclObj(fobj *FileObj, decl *ast.FuncDecl) (*FuncDeclObj, error) {
