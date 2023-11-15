@@ -49,6 +49,7 @@ func pickStructType(state *state.State, node ast.Node) (obj.Object, error) {
 	typeObj.End = state.File.FileSet.Position(typeSpec.End()).Line
 	typeObj.Name = obj.NewIdentObj(typeSpec.Name)
 	typeObj.Type = structTypeObj
+	typeObj.TypeKind = obj.Typ
 
 	return typeObj, nil
 }
@@ -84,6 +85,7 @@ func pickFuncType(state *state.State, node ast.Node) (obj.Object, error) {
 	typeObj.End = state.File.FileSet.Position(ts.End()).Line
 	typeObj.Name = obj.NewIdentObj(ts.Name)
 	typeObj.Type = funcTypeObj
+	typeObj.TypeKind = obj.Typ
 
 	return typeObj, nil
 }

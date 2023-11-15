@@ -5,8 +5,13 @@ type TypeObj struct {
 	End          int
 	Name         *IdentObj
 	Type         any
+	TypeKind     ObjKind
 	TypeParams   *FieldObjList
 	Dependencies map[string]int
+}
+
+func (o *TypeObj) Kind() ObjKind {
+	return o.TypeKind
 }
 
 func (o *TypeObj) IsExported() bool {

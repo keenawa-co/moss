@@ -21,9 +21,10 @@ func pickFuncDecl(state *state.State, node ast.Node) (obj.Object, error) {
 	}
 
 	return &obj.DeclObj{
-		Pos:  state.File.FileSet.Position(decl.Pos()).Line,
-		End:  state.File.FileSet.Position(decl.End()).Line,
-		Name: obj.NewIdentObj(decl.Name),
-		Type: funcDeclObj,
+		Pos:      state.File.FileSet.Position(decl.Pos()).Line,
+		End:      state.File.FileSet.Position(decl.End()).Line,
+		Name:     obj.NewIdentObj(decl.Name),
+		Type:     funcDeclObj,
+		TypeKind: obj.Fun,
 	}, nil
 }

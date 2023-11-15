@@ -46,6 +46,7 @@ func pickImportSpec(state *state.State, node ast.Node) (obj.Object, error) {
 
 	importObj := obj.NewImportObj(importSpec, obj.ImportTypeInternal)
 	importObj.Path = path
+	importObj.TypeKind = obj.Imp
 
 	return importObj, nil
 }
