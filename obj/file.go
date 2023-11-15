@@ -71,21 +71,22 @@ func (o *FileObj) IsInternalDependency(alias string) (int, bool) {
 	return index, exists
 }
 
-func (o *FileObj) AppendImport(obj *ImportObj) {
+func (o *FileObj) AppendImport(object *ImportObj) {
 	o.mutex.Lock()
-	switch obj.ImportType {
+	switch object.ImportKind {
 	case ImportTypeInternal:
-		alias := obj.Alias
-		if !obj.WithAlias {
-			alias = path.Base(obj.Path)
+		if object.Name == nil {
+			object.Name = &IdentObj{
+				Name: path.Base(object.Path),
+			}
 		}
 
-		o.Entities.Imports.InternalImportsMeta[alias] = len(o.Entities.Imports.InternalImports)
-		o.Entities.Imports.InternalImports = append(o.Entities.Imports.InternalImports, obj.Path)
+		o.Entities.Imports.InternalImportsMeta[object.Name.String()] = len(o.Entities.Imports.InternalImports)
+		o.Entities.Imports.InternalImports = append(o.Entities.Imports.InternalImports, object.Path)
 	case ImportTypeExternal:
-		o.Entities.Imports.ExternalImports = append(o.Entities.Imports.ExternalImports, obj.Path)
+		o.Entities.Imports.ExternalImports = append(o.Entities.Imports.ExternalImports, object.Path)
 	case ImportTypeSideEffect:
-		o.Entities.Imports.SideEffectImports = append(o.Entities.Imports.SideEffectImports, obj.Path)
+		o.Entities.Imports.SideEffectImports = append(o.Entities.Imports.SideEffectImports, object.Path)
 	}
 	o.mutex.Unlock()
 }

@@ -2,45 +2,44 @@ package obj
 
 import (
 	"go/ast"
-	"go/token"
 )
 
-type ImportType int
+type ImpKind int
 
 const (
-	ImportTypeExternal ImportType = iota
+	ImportTypeExternal ImpKind = iota
 	ImportTypeInternal
 	ImportTypeSideEffect
 )
 
 type ImportObj struct {
-	Pos token.Pos
-	End token.Pos
-
 	Path       string
-	Alias      string // TODO: should be a Name and type Ident
-	WithAlias  bool
-	ImportType ImportType
+	Name       *IdentObj
+	ImportKind ImpKind
+	TypeKind   ObjKind
+}
+
+func (o *ImportObj) Kind() ObjKind {
+	return o.TypeKind
 }
 
 func (o *ImportObj) IsValid() bool {
-	return o.Pos != token.NoPos
+	return o.Path != ""
 }
 
 func (o *ImportObj) IsExported() bool {
 	return false
 }
 
-func NewImportObj(importSpec *ast.ImportSpec, typ ImportType) *ImportObj {
+func NewImportObj(importSpec *ast.ImportSpec, kind ImpKind) *ImportObj {
 	importObj := new(ImportObj)
 
 	if importSpec.Name != nil {
-		importObj.Alias = importSpec.Name.Name
-		importObj.WithAlias = true
+		importObj.Name = NewIdentObj(importSpec.Name)
 	}
 
 	importObj.Path = importSpec.Path.Value
-	importObj.ImportType = typ
+	importObj.ImportKind = kind
 
 	return importObj
 }
