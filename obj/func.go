@@ -8,7 +8,7 @@ import (
 type FuncTypeObj struct {
 	Params        *FieldObjList // (incoming) parameters
 	TypeParams    *FieldObjList
-	ResultParams  map[string]*FieldObj // (outgoing) results TODO: Not implemented
+	ResultParams  *FieldObjList // (outgoing) results
 	DependsParams *FieldObjList
 }
 
@@ -38,6 +38,14 @@ func NewFuncTypeObj(fobj *FileObj, funcType *ast.FuncType) (*FuncTypeObj, error)
 		funcTypeObj.TypeParams, err = ProcessFieldList(fobj, funcType.TypeParams, funcTypeObj.ImportAdder)
 		if err != nil {
 			return nil, fmt.Errorf("failed to extract func type params list: %w", err)
+		}
+	}
+
+	if funcType.Results != nil && len(funcType.Results.List) > 0 {
+		var err error
+		funcTypeObj.ResultParams, err = ProcessFieldList(fobj, funcType.Results, funcTypeObj.ImportAdder)
+		if err != nil {
+			return nil, fmt.Errorf("failed to extract func results params list: %w", err)
 		}
 	}
 
