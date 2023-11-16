@@ -98,6 +98,6 @@ func (e *Engine) processFile(fset *token.FileSet, fileAst *ast.File, fileName st
 	visitor := NewVisitor(e.group)
 	state := state.New(fileObj, e.modfile)
 
-	Walk(state, visitor, fileAst)
+	walk(state, visitor, fileAst)
 	return fileObj
 }
