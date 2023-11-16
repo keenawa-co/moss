@@ -31,13 +31,12 @@ func pickStructType(state *state.State, node ast.Node) (obj.Object, error) {
 
 	typeObj := new(obj.TypeObj)
 
-	if typeSpec.TypeParams != nil {
-		typeParams, err := obj.ProcessFieldList(state.File, typeSpec.TypeParams, typeObj.ImportAdder)
+	if typeSpec.TypeParams != nil && len(typeSpec.TypeParams.List) > 0 {
+		var err error
+		typeObj.TypeParams, err = obj.ProcessFieldList(state.File, typeSpec.TypeParams, typeObj.ImportAdder)
 		if err != nil {
 			return nil, err
 		}
-
-		typeObj.TypeParams = typeParams
 	}
 
 	structTypeObj, err := obj.NewStructTypeObj(state.File, structType)
@@ -67,13 +66,12 @@ func pickFuncType(state *state.State, node ast.Node) (obj.Object, error) {
 
 	typeObj := new(obj.TypeObj)
 
-	if ts.TypeParams != nil {
-		typeParams, err := obj.ProcessFieldList(state.File, ts.TypeParams, typeObj.ImportAdder)
+	if ts.TypeParams != nil && len(ts.TypeParams.List) > 0 {
+		var err error
+		typeObj.TypeParams, err = obj.ProcessFieldList(state.File, ts.TypeParams, typeObj.ImportAdder)
 		if err != nil {
 			return nil, err
 		}
-
-		typeObj.TypeParams = typeParams
 	}
 
 	funcTypeObj, err := obj.NewFuncTypeObj(state.File, funcType)

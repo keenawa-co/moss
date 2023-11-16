@@ -17,6 +17,7 @@ func (id *IdentObj) String() string {
 	if id != nil {
 		return id.Name
 	}
+
 	return "<nil>"
 }
 
@@ -30,31 +31,52 @@ func NewIdentObj(id *ast.Ident) *IdentObj {
 	}
 }
 
-func mapIdentAstArray(array []*ast.Ident) []*IdentObj {
-	result := make([]*IdentObj, 0, len(array))
-	for _, name := range array {
-		result = append(result, NewIdentObj(name))
+type FieldObjList struct {
+	List []*FieldObj
+}
+
+func (f *FieldObjList) FindByName(name string) []*FieldObj {
+	result := make([]*FieldObj, 0)
+
+	for _, filed := range f.List {
+		for _, filedName := range filed.Names {
+			if filedName.Name != name {
+				continue
+			}
+
+			result = append(result, filed)
+		}
 	}
 
 	return result
 }
 
-type FieldObjList struct {
-	List []*FieldObj // field list; or nil
+func (f *FieldObjList) FindByType(typ any) []*FieldObj {
+	result := make([]*FieldObj, 0)
+
+	for _, filed := range f.List {
+		if filed.Type != typ {
+			continue
+		}
+
+		result = append(result, filed)
+	}
+
+	return result
 }
 
-// NumFields returns the number of parameters or struct fields represented by a FieldList.
-func (f *FieldObjList) NumFields() int {
+// Length returns the number of parameters or struct fields represented by a FieldList.
+func (f *FieldObjList) Length() int {
 	n := 0
-	if f != nil {
-		for _, g := range f.List {
-			m := len(g.Names)
-			if m == 0 {
-				m = 1
-			}
-			n += m
+
+	for _, g := range f.List {
+		m := len(g.Names)
+		if m == 0 {
+			m = 1
 		}
+		n += m
 	}
+
 	return n
 }
 
@@ -125,8 +147,13 @@ func processField(fobj *FileObj, field *ast.Field, adder func(index int, name st
 		return nil, err
 	}
 
+	names := make([]*IdentObj, 0, len(field.Names))
+	for _, name := range field.Names {
+		names = append(names, NewIdentObj(name))
+	}
+
 	return &FieldObj{
-		Names: mapIdentAstArray(field.Names),
+		Names: names,
 		Type:  typ,
 	}, nil
 }

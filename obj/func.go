@@ -3,16 +3,13 @@ package obj
 import (
 	"fmt"
 	"go/ast"
-	"go/token"
 )
 
-// TODO: check type params for *ast.FuncType
 type FuncTypeObj struct {
-	Func         token.Pos     // position of "func" keyword (token.NoPos if there is no "func")
 	Params       *FieldObjList // (incoming) parameters
 	TypeParams   *FieldObjList
 	Results      map[string]*FieldObj // (outgoing) results TODO: Not implemented
-	Dependencies map[string]int
+	Dependencies map[string]int       // TODO: make it *FieldObjList type
 }
 
 func (o *FuncTypeObj) ImportAdder(importIndex int, element string) {
@@ -26,18 +23,22 @@ func (o *FuncTypeObj) ImportAdder(importIndex int, element string) {
 func NewFuncTypeObj(fobj *FileObj, funcType *ast.FuncType) (*FuncTypeObj, error) {
 	funcTypeObj := new(FuncTypeObj)
 
-	paramList, err := ProcessFieldList(fobj, funcType.Params, funcTypeObj.ImportAdder)
-	if err != nil {
-		return nil, fmt.Errorf("failed to extract func param list: %w", err)
+	if funcType.Params != nil && len(funcType.Params.List) > 0 {
+		var err error
+		funcTypeObj.Params, err = ProcessFieldList(fobj, funcType.Params, funcTypeObj.ImportAdder)
+		if err != nil {
+			return nil, fmt.Errorf("failed to extract func params list: %w", err)
+		}
 	}
 
-	typeParamList, err := ProcessFieldList(fobj, funcType.TypeParams, funcTypeObj.ImportAdder)
-	if err != nil {
-		return nil, fmt.Errorf("failed to extract func param list: %w", err)
+	if funcType.TypeParams != nil && len(funcType.Params.List) > 0 {
+		var err error
+		funcTypeObj.TypeParams, err = ProcessFieldList(fobj, funcType.TypeParams, funcTypeObj.ImportAdder)
+		if err != nil {
+			return nil, fmt.Errorf("failed to extract func type params list: %w", err)
+		}
 	}
 
-	funcTypeObj.Params = paramList
-	funcTypeObj.TypeParams = typeParamList
 	return funcTypeObj, nil
 }
 
@@ -149,7 +150,7 @@ func handleCallExpr(obj *FuncDeclObj, expr *ast.CallExpr) {
 }
 
 func receiverDefinition(fobj *FileObj, decl *ast.FuncDecl) (*FieldObjList, error) {
-	if decl.Recv == nil || len(decl.Recv.List) == 0 {
+	if decl.Recv == nil || len(decl.Recv.List) < 1 {
 		return nil, nil
 	}
 
