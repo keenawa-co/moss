@@ -6,18 +6,20 @@ import (
 )
 
 type FuncTypeObj struct {
-	Params       *FieldObjList // (incoming) parameters
-	TypeParams   *FieldObjList
-	Results      map[string]*FieldObj // (outgoing) results TODO: Not implemented
-	Dependencies map[string]int       // TODO: make it *FieldObjList type
+	Params        *FieldObjList // (incoming) parameters
+	TypeParams    *FieldObjList
+	ResultParams  map[string]*FieldObj // (outgoing) results TODO: Not implemented
+	DependsParams *FieldObjList
 }
 
-func (o *FuncTypeObj) ImportAdder(importIndex int, element string) {
-	if o.Dependencies == nil {
-		o.Dependencies = make(map[string]int)
+func (o *FuncTypeObj) ImportAdder(filed *FieldObj) {
+	if o.DependsParams == nil {
+		o.DependsParams = &FieldObjList{
+			List: make([]*FieldObj, 0),
+		}
 	}
 
-	o.Dependencies[element] = importIndex
+	o.DependsParams.List = append(o.DependsParams.List, filed)
 }
 
 func NewFuncTypeObj(fobj *FileObj, funcType *ast.FuncType) (*FuncTypeObj, error) {
@@ -114,8 +116,11 @@ func handleSelectorExpr(fobj *FileObj, body *FuncDeclBodyObj, obj *FuncDeclObj, 
 		return
 	}
 
-	if index, exists := fobj.Entities.Imports.InternalImportsMeta[ident.Name]; exists {
-		body.Stmt.ImportAdder(index, expr.Sel.Name)
+	if _, exists := fobj.Entities.Imports.Meta[ident.Name]; exists {
+		body.Stmt.ImportAdder(&FieldObj{
+			Names: []*IdentObj{{Name: ident.Name}},
+			Type:  expr.Sel.Name,
+		})
 		return
 	}
 }

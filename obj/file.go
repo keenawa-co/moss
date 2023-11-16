@@ -9,10 +9,10 @@ import (
 )
 
 type importTree struct {
-	InternalImports     []string
-	ExternalImports     []string
-	SideEffectImports   []string
-	InternalImportsMeta map[string]int
+	Internal   []string
+	External   []string
+	SideEffect []string
+	Meta       map[string]int
 }
 
 type FileObjEntitySet struct {
@@ -67,7 +67,7 @@ func (o *FileObj) AppendDecl(decl *DeclObj) {
 }
 
 func (o *FileObj) IsInternalDependency(name string) (int, bool) {
-	index, exists := o.Entities.Imports.InternalImportsMeta[name]
+	index, exists := o.Entities.Imports.Meta[name]
 	return index, exists
 }
 
@@ -81,12 +81,12 @@ func (o *FileObj) AppendImport(object *ImportObj) {
 			}
 		}
 
-		o.Entities.Imports.InternalImportsMeta[object.Name.String()] = len(o.Entities.Imports.InternalImports)
-		o.Entities.Imports.InternalImports = append(o.Entities.Imports.InternalImports, object.Path)
+		o.Entities.Imports.Meta[object.Name.String()] = len(o.Entities.Imports.Internal)
+		o.Entities.Imports.Internal = append(o.Entities.Imports.Internal, object.Path)
 	case External:
-		o.Entities.Imports.ExternalImports = append(o.Entities.Imports.ExternalImports, object.Path)
+		o.Entities.Imports.External = append(o.Entities.Imports.External, object.Path)
 	case SideEffect:
-		o.Entities.Imports.SideEffectImports = append(o.Entities.Imports.SideEffectImports, object.Path)
+		o.Entities.Imports.SideEffect = append(o.Entities.Imports.SideEffect, object.Path)
 	}
 	o.mutex.Unlock()
 }
@@ -97,10 +97,10 @@ func NewFileObj(fset *token.FileSet, moduleName, fileName string) *FileObj {
 		FileSet: fset,
 		Entities: &FileObjEntitySet{
 			Imports: &importTree{
-				InternalImports:     make([]string, 0),
-				ExternalImports:     make([]string, 0),
-				SideEffectImports:   make([]string, 0),
-				InternalImportsMeta: make(map[string]int),
+				Internal:   make([]string, 0),
+				External:   make([]string, 0),
+				SideEffect: make([]string, 0),
+				Meta:       make(map[string]int),
 			},
 			Types:        make([]*TypeObj, 0),
 			TypesIndexes: make(map[string]int),

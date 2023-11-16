@@ -6,17 +6,19 @@ import (
 )
 
 type StructTypeObj struct {
-	Fields       *FieldObjList
-	Dependencies map[string]int
-	Incomplete   bool
+	Fields        *FieldObjList
+	DependsParams *FieldObjList
+	Incomplete    bool
 }
 
-func (o *StructTypeObj) ImportAdder(importIndex int, element string) {
-	if o.Dependencies == nil {
-		o.Dependencies = make(map[string]int)
+func (o *StructTypeObj) ImportAdder(filed *FieldObj) {
+	if o.DependsParams == nil {
+		o.DependsParams = &FieldObjList{
+			List: make([]*FieldObj, 0),
+		}
 	}
 
-	o.Dependencies[element] = importIndex
+	o.DependsParams.List = append(o.DependsParams.List, filed)
 }
 
 func NewStructTypeObj(fobj *FileObj, structType *ast.StructType) (*StructTypeObj, error) {

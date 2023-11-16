@@ -86,18 +86,20 @@ type FieldObj struct {
 }
 
 type BlockStmtObj struct {
-	Dependencies map[string]int
+	DependsParams *FieldObjList
 }
 
-func (o *BlockStmtObj) ImportAdder(importIndex int, element string) {
-	if o.Dependencies == nil {
-		o.Dependencies = make(map[string]int)
+func (o *BlockStmtObj) ImportAdder(filed *FieldObj) {
+	if o.DependsParams == nil {
+		o.DependsParams = &FieldObjList{
+			List: make([]*FieldObj, 0),
+		}
 	}
 
-	o.Dependencies[element] = importIndex
+	o.DependsParams.List = append(o.DependsParams.List, filed)
 }
 
-func determineExprType(fobj *FileObj, expr ast.Expr, adder func(index int, name string)) (any, error) {
+func determineExprType(fobj *FileObj, expr ast.Expr, adder func(filed *FieldObj)) (any, error) {
 	switch e := expr.(type) {
 	case *ast.StructType:
 		return NewStructTypeObj(fobj, e)
@@ -108,8 +110,11 @@ func determineExprType(fobj *FileObj, expr ast.Expr, adder func(index int, name 
 			return e.Sel.Name, nil
 		}
 
-		if index, exists := fobj.Entities.Imports.InternalImportsMeta[ident.Name]; exists {
-			adder(index, e.Sel.Name)
+		if _, exists := fobj.Entities.Imports.Meta[ident.Name]; exists {
+			adder(&FieldObj{
+				Names: []*IdentObj{{Name: ident.Name}},
+				Type:  e.Sel.Name,
+			})
 		}
 
 		return e.Sel.Name, nil
@@ -141,7 +146,7 @@ func determineExprType(fobj *FileObj, expr ast.Expr, adder func(index int, name 
 	}
 }
 
-func processField(fobj *FileObj, field *ast.Field, adder func(index int, name string)) (*FieldObj, error) {
+func processField(fobj *FileObj, field *ast.Field, adder func(filed *FieldObj)) (*FieldObj, error) {
 	typ, err := determineExprType(fobj, field.Type, adder)
 	if err != nil {
 		return nil, err
@@ -158,7 +163,7 @@ func processField(fobj *FileObj, field *ast.Field, adder func(index int, name st
 	}, nil
 }
 
-func ProcessFieldList(fobj *FileObj, fieldList *ast.FieldList, adder func(index int, name string)) (*FieldObjList, error) {
+func ProcessFieldList(fobj *FileObj, fieldList *ast.FieldList, adder func(filed *FieldObj)) (*FieldObjList, error) {
 	fieldObjList := &FieldObjList{
 		List: make([]*FieldObj, 0, len(fieldList.List)),
 	}
