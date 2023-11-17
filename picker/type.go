@@ -10,11 +10,11 @@ import (
 	"github.com/4rchr4y/go-compass/state"
 )
 
-func NewFuncTypePicker() Picker[obj.Object] {
+func NewFuncTypePicker() Picker {
 	return NewPicker[obj.Object](pickFuncType)
 }
 
-func NewStructTypePicker() Picker[obj.Object] {
+func NewStructTypePicker() Picker {
 	return NewPicker[obj.Object](pickStructType)
 }
 
@@ -46,9 +46,11 @@ func pickStructType(state *state.State, node ast.Node) (obj.Object, error) {
 
 	typeObj.Pos = state.File.FileSet.Position(typeSpec.Pos()).Line
 	typeObj.End = state.File.FileSet.Position(typeSpec.End()).Line
-	typeObj.Name = obj.NewIdentObj(typeSpec.Name)
+	typeObj.Name = &obj.IdentObj{
+		Name: typeSpec.Name.Name,
+		Kind: obj.Typ,
+	}
 	typeObj.Type = structTypeObj
-	typeObj.TypeKind = obj.Typ
 
 	return typeObj, nil
 }
@@ -81,9 +83,11 @@ func pickFuncType(state *state.State, node ast.Node) (obj.Object, error) {
 
 	typeObj.Pos = state.File.FileSet.Position(ts.Pos()).Line
 	typeObj.End = state.File.FileSet.Position(ts.End()).Line
-	typeObj.Name = obj.NewIdentObj(ts.Name)
 	typeObj.Type = funcTypeObj
-	typeObj.TypeKind = obj.Typ
+	typeObj.Name = &obj.IdentObj{
+		Name: ts.Name.Name,
+		Kind: obj.Typ,
+	}
 
 	return typeObj, nil
 }

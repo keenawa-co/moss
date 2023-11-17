@@ -3,28 +3,29 @@ package picker
 import (
 	"go/ast"
 
+	"github.com/4rchr4y/go-compass/obj"
 	"github.com/4rchr4y/go-compass/state"
 )
 
-type Picker[Output any] interface {
-	Pick(state *state.State, node ast.Node) (Output, error)
+type Picker interface {
+	Pick(state *state.State, node ast.Node) (obj.Object, error)
 }
 
 type (
-	PickerFactory[Output any] func() Picker[Output]
-	PickFunc[Output any]      func(s *state.State, node ast.Node) (Output, error)
+	PickerFactory func() Picker
+	PickFunc      func(s *state.State, node ast.Node) (obj.Object, error)
 )
 
-func NewPicker[Output any](pick PickFunc[Output]) Picker[Output] {
-	return &picker[Output]{
+func NewPicker[Output any](pick PickFunc) Picker {
+	return &picker{
 		pick: pick,
 	}
 }
 
-type picker[Output any] struct {
-	pick PickFunc[Output]
+type picker struct {
+	pick PickFunc
 }
 
-func (a *picker[Output]) Pick(s *state.State, n ast.Node) (Output, error) {
+func (a *picker) Pick(s *state.State, n ast.Node) (obj.Object, error) {
 	return a.pick(s, n)
 }

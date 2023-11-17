@@ -35,7 +35,10 @@ func NewImportObj(importSpec *ast.ImportSpec, kind ImpKind) *ImportObj {
 	importObj := new(ImportObj)
 
 	if importSpec.Name != nil {
-		importObj.Name = NewIdentObj(importSpec.Name)
+		importObj.Name = &IdentObj{
+			Name: importSpec.Name.Name,
+			Kind: Imp,
+		}
 	}
 
 	importObj.Path = importSpec.Path.Value

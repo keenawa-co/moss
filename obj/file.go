@@ -15,21 +15,14 @@ type importTree struct {
 	Meta       map[string]int
 }
 
-type FileObjEntitySet struct {
-	Imports *importTree
-
-	Types        []*TypeObj
-	TypesIndexes map[string]int
-	Decls        []*DeclObj
-	DeclIndexes  map[string]int
-}
-
 type FileObj struct {
-	mutex sync.Mutex
+	mutex   sync.Mutex
+	FileSet *token.FileSet
 
-	Name     string
-	FileSet  *token.FileSet
-	Entities *FileObjEntitySet
+	Name    *IdentObj
+	Imports *importTree
+	Types   []*TypeObj
+	Decls   []*DeclObj
 }
 
 func (o *FileObj) Save(object Object) error {
@@ -53,21 +46,28 @@ func (o *FileObj) Save(object Object) error {
 
 func (o *FileObj) AppendType(typ *TypeObj) {
 	o.mutex.Lock()
-	o.Entities.TypesIndexes[typ.Name.Name] = len(o.Entities.Types)
-	o.Entities.Types = append(o.Entities.Types, typ)
+
+	if o.Types == nil {
+		o.Types = make([]*TypeObj, 0)
+	}
+
+	o.Types = append(o.Types, typ)
 	o.mutex.Unlock()
 }
 
 func (o *FileObj) AppendDecl(decl *DeclObj) {
 	o.mutex.Lock()
 
-	o.Entities.DeclIndexes[decl.Name.Name] = len(o.Entities.Decls)
-	o.Entities.Decls = append(o.Entities.Decls, decl)
+	if o.Decls == nil {
+		o.Decls = make([]*DeclObj, 0)
+	}
+
+	o.Decls = append(o.Decls, decl)
 	o.mutex.Unlock()
 }
 
 func (o *FileObj) IsInternalDependency(name string) (int, bool) {
-	index, exists := o.Entities.Imports.Meta[name]
+	index, exists := o.Imports.Meta[name]
 	return index, exists
 }
 
@@ -81,31 +81,28 @@ func (o *FileObj) AppendImport(object *ImportObj) {
 			}
 		}
 
-		o.Entities.Imports.Meta[object.Name.String()] = len(o.Entities.Imports.Internal)
-		o.Entities.Imports.Internal = append(o.Entities.Imports.Internal, object.Path)
+		o.Imports.Meta[object.Name.String()] = len(o.Imports.Internal)
+		o.Imports.Internal = append(o.Imports.Internal, object.Path)
 	case External:
-		o.Entities.Imports.External = append(o.Entities.Imports.External, object.Path)
+		o.Imports.External = append(o.Imports.External, object.Path)
 	case SideEffect:
-		o.Entities.Imports.SideEffect = append(o.Entities.Imports.SideEffect, object.Path)
+		o.Imports.SideEffect = append(o.Imports.SideEffect, object.Path)
 	}
 	o.mutex.Unlock()
 }
 
 func NewFileObj(fset *token.FileSet, moduleName, fileName string) *FileObj {
 	return &FileObj{
-		Name:    fileName,
+		Name: &IdentObj{
+			Name: fileName,
+			Kind: Fle,
+		},
 		FileSet: fset,
-		Entities: &FileObjEntitySet{
-			Imports: &importTree{
-				Internal:   make([]string, 0),
-				External:   make([]string, 0),
-				SideEffect: make([]string, 0),
-				Meta:       make(map[string]int),
-			},
-			Types:        make([]*TypeObj, 0),
-			TypesIndexes: make(map[string]int),
-			Decls:        make([]*DeclObj, 0),
-			DeclIndexes:  make(map[string]int),
+		Imports: &importTree{
+			Internal:   make([]string, 0),
+			External:   make([]string, 0),
+			SideEffect: make([]string, 0),
+			Meta:       make(map[string]int),
 		},
 	}
 }

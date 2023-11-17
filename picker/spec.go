@@ -9,7 +9,7 @@ import (
 	"github.com/4rchr4y/go-compass/state"
 )
 
-func NewImportSpecPicker() Picker[obj.Object] {
+func NewImportSpecPicker() Picker {
 	return NewPicker[obj.Object](pickImportSpec)
 }
 
