@@ -18,7 +18,7 @@ func (o *DeclObj) IsExported() bool {
 }
 
 func (o *DeclObj) IsValid() bool {
-	return o.Pos != NoPos && o.End != NoPos
+	return o.Pos != noPos && o.End != noPos
 }
 
 // ----------------------------------------------------------------------------
@@ -106,7 +106,7 @@ func handleSelectorExpr(fobj *FileObj, body *FuncDeclBodyObj, obj *FuncDeclObj, 
 		return
 	}
 
-	if _, exists := fobj.Imports.Meta[ident.Name]; exists {
+	if _, exists := fobj.Imports.Cache[ident.Name]; exists {
 		body.Stmt.ImportAdder(&FieldObj{
 			Names: []*IdentObj{{Name: ident.Name}},
 			Type:  expr.Sel.Name,

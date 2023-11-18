@@ -48,8 +48,6 @@ func determineExprType(fobj *FileObj, expr ast.Expr, adder func(filed *FieldObj)
 		return determineExprType(fobj, e.X, adder)
 
 	case *ast.IndexListExpr:
-		// This branch (in my understanding) is used only to determine the receiver of methods.
-		// Getting into this branch means that receiver have type (generic) params.
 		return determineExprType(fobj, e.X, adder)
 
 	case *ast.Ident:

@@ -12,7 +12,7 @@ type importTree struct {
 	Internal   []string
 	External   []string
 	SideEffect []string
-	Meta       map[string]int
+	Cache      map[string]int
 }
 
 type FileObj struct {
@@ -26,6 +26,7 @@ type FileObj struct {
 }
 
 func (o *FileObj) Save(object Object) error {
+
 	switch obj := object.(type) {
 	case *ImportObj:
 		o.AppendImport(obj)
@@ -66,11 +67,6 @@ func (o *FileObj) AppendDecl(decl *DeclObj) {
 	o.mutex.Unlock()
 }
 
-func (o *FileObj) IsInternalDependency(name string) (int, bool) {
-	index, exists := o.Imports.Meta[name]
-	return index, exists
-}
-
 func (o *FileObj) AppendImport(object *ImportObj) {
 	o.mutex.Lock()
 	switch object.ImportKind {
@@ -78,10 +74,11 @@ func (o *FileObj) AppendImport(object *ImportObj) {
 		if object.Name == nil {
 			object.Name = &IdentObj{
 				Name: path.Base(object.Path),
+				Kind: Imp,
 			}
 		}
 
-		o.Imports.Meta[object.Name.String()] = len(o.Imports.Internal)
+		o.Imports.Cache[object.Name.String()] = len(o.Imports.Internal)
 		o.Imports.Internal = append(o.Imports.Internal, object.Path)
 	case External:
 		o.Imports.External = append(o.Imports.External, object.Path)
@@ -102,7 +99,7 @@ func NewFileObj(fset *token.FileSet, moduleName, fileName string) *FileObj {
 			Internal:   make([]string, 0),
 			External:   make([]string, 0),
 			SideEffect: make([]string, 0),
-			Meta:       make(map[string]int),
+			Cache:      make(map[string]int),
 		},
 	}
 }
