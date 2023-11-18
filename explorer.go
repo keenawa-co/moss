@@ -1,4 +1,4 @@
-package service
+package compass
 
 import (
 	"errors"
@@ -15,7 +15,7 @@ const (
 	goFileExt     = ".go"
 )
 
-type Parser struct {
+type explorer struct {
 	RootDir     string
 	TargetDir   string
 	IgnoredList map[string]struct{}
@@ -23,7 +23,7 @@ type Parser struct {
 	Modfile     *modfile.File
 }
 
-func (c *Parser) Explore() (*modfile.File, []string, error) {
+func (c *explorer) Explore() (*modfile.File, []string, error) {
 	if err := c.explore(c.RootDir, true); err != nil {
 		return nil, nil, err
 	}
@@ -31,13 +31,13 @@ func (c *Parser) Explore() (*modfile.File, []string, error) {
 	return c.Modfile, c.PackageDirs, nil
 }
 
-func (c *Parser) explore(path string, isRoot bool) error {
+func (c *explorer) explore(path string, isRoot bool) error {
 	entries, err := os.ReadDir(path)
 	if err != nil {
 		return fmt.Errorf("failed to read directory: %w", err)
 	}
 
-	subdirs, goFilesExist, err := c.scanDir(entries, path)
+	subdirs, goFilesExist, err := c.exploreDir(entries, path)
 	if err != nil {
 		return err
 	}
@@ -61,7 +61,7 @@ func (c *Parser) explore(path string, isRoot bool) error {
 	return nil
 }
 
-func (c *Parser) scanDir(entries []os.DirEntry, root string) ([]string, bool, error) {
+func (c *explorer) exploreDir(entries []os.DirEntry, root string) ([]string, bool, error) {
 	var subdirs []string
 	goFilesExist := false
 
@@ -94,7 +94,7 @@ func (c *Parser) scanDir(entries []os.DirEntry, root string) ([]string, bool, er
 	return subdirs, goFilesExist, nil
 }
 
-func (c *Parser) exploreSubDir(subdirs []string) error {
+func (c *explorer) exploreSubDir(subdirs []string) error {
 	for _, subdir := range subdirs {
 		if err := c.explore(subdir, false); err != nil {
 			return err
@@ -104,7 +104,7 @@ func (c *Parser) exploreSubDir(subdirs []string) error {
 	return nil
 }
 
-func (c *Parser) processGoMod(root string) (*modfile.File, error) {
+func (c *explorer) processGoMod(root string) (*modfile.File, error) {
 	path := filepath.Join(root, goModFileName)
 	content, err := os.ReadFile(path)
 	if err != nil {
