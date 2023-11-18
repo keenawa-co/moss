@@ -154,7 +154,7 @@ func pickFuncDecl(state *State, node ast.Node) (obj.Object, error) {
 // ----------------------------------------------------------------------------
 // Specs pickers
 //
-// Identifying and extracting declarations from an AST
+// Identifying and extracting specs from an AST
 // (Abstract Syntax Tree) of Go source code.
 
 func NewImportSpecPicker() Picker {
