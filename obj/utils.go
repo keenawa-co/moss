@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"go/ast"
 	"go/format"
-	"reflect"
 )
 
 // objKindFromString function is necessary for cases when there is *ast.Object
@@ -31,28 +30,30 @@ func determineExprType(fobj *FileObj, expr ast.Expr, adder func(filed *FieldObj)
 			return e.Sel.Name, nil
 		}
 
-		if _, exists := fobj.Imports.Meta[ident.Name]; exists {
+		if _, exists := fobj.Imports.Cache[ident.Name]; exists {
 			adder(&FieldObj{
-				Names: []*IdentObj{{Name: ident.Name}},
-				Type:  e.Sel.Name,
+				Names: []*IdentObj{{
+					Name: ident.Name,
+					Kind: Var,
+				}},
+				Type: e.Sel.Name,
 			})
 		}
 
 		return e.Sel.Name, nil
 
 	case *ast.StarExpr:
-		// This branch, in my understanding, is used only to determine the receiver of methods.
+		// This branch (in my understanding) is used only to determine the receiver of methods.
 		// Getting into this branch means that receiver's type is a pointer.
+		return determineExprType(fobj, e.X, adder)
 
-		// attempt to get the name of the struct
-		if ident, ok := e.X.(*ast.Ident); ok {
-			return ident.Name, nil
-		}
-
-		return nil, fmt.Errorf("failed to get expr %s type", reflect.TypeOf(e.X))
+	case *ast.IndexListExpr:
+		// This branch (in my understanding) is used only to determine the receiver of methods.
+		// Getting into this branch means that receiver have type (generic) params.
+		return determineExprType(fobj, e.X, adder)
 
 	case *ast.Ident:
-		// This branch, in my understanding, is used only to determine the receiver of methods.
+		// This branch (in my understanding) is used only to determine the receiver of methods.
 		// Getting into this branch means that receiver's type is not a pointer, it's a regular struct.
 		// So return the name of the struct.
 		return e.Name, nil
