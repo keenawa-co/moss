@@ -1,4 +1,4 @@
-package picker
+package compass
 
 import (
 	"errors"
@@ -7,18 +7,17 @@ import (
 	"reflect"
 
 	"github.com/4rchr4y/go-compass/obj"
-	"github.com/4rchr4y/go-compass/state"
 )
 
 func NewFuncTypePicker() Picker {
-	return NewPicker[obj.Object](pickFuncType)
+	return NewPicker(pickFuncType)
 }
 
 func NewStructTypePicker() Picker {
-	return NewPicker[obj.Object](pickStructType)
+	return NewPicker(pickStructType)
 }
 
-func pickStructType(state *state.State, node ast.Node) (obj.Object, error) {
+func pickStructType(state *State, node ast.Node) (obj.Object, error) {
 	typeSpec, ok := node.(*ast.TypeSpec)
 	if !ok {
 		return nil, fmt.Errorf("some error from pickStructType : %s not a *ast.TypeSpec", reflect.TypeOf(node).String()) // TODO: add normal error return message
@@ -55,7 +54,7 @@ func pickStructType(state *state.State, node ast.Node) (obj.Object, error) {
 	return typeObj, nil
 }
 
-func pickFuncType(state *state.State, node ast.Node) (obj.Object, error) {
+func pickFuncType(state *State, node ast.Node) (obj.Object, error) {
 	ts, ok := node.(*ast.TypeSpec)
 	if !ok {
 		return nil, fmt.Errorf("some error from pickFuncType : %s not a *ast.TypeSpec", reflect.TypeOf(node).String()) // TODO: add normal error return message

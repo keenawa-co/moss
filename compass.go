@@ -5,24 +5,22 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/4rchr4y/go-compass/core"
 	"github.com/4rchr4y/go-compass/obj"
-	"github.com/4rchr4y/go-compass/service"
 	"golang.org/x/mod/modfile"
 )
 
-type parserClient interface {
+type exploreClient interface {
 	Explore() (*modfile.File, []string, error)
 }
 
 type Compass struct {
-	noCopy    core.NoCopy
-	noCompare core.NoCompare
+	noCopy    noCopy
+	noCompare noCompare
 
 	MaxParserConcurrency uint
 
 	engine *Engine
-	parser parserClient
+	parser exploreClient
 }
 
 func (c *Compass) Scan() error {
@@ -63,7 +61,7 @@ func New(cfg *Config) *Compass {
 			MaxEngineConcurrency: 10,
 			group:                cfg.Group,
 		},
-		parser: &service.Parser{
+		parser: &explorer{
 			RootDir:     cfg.RootDir,
 			TargetDir:   cfg.TargetDir,
 			IgnoredList: cfg.IgnoredList,

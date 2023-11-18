@@ -3,18 +3,16 @@ package compass
 import (
 	"go/ast"
 	"reflect"
-
-	"github.com/4rchr4y/go-compass/picker"
 )
 
 type (
 	// PickerFactoryGroup is a map that associates keys of a specified type (Key) with PickerFactory functions.
 	// It is used to store and retrieve PickerFactory functions that can create Pickers for various types.
-	PickerFactoryGroup map[reflect.Type]picker.PickerFactory
+	PickerFactoryGroup map[reflect.Type]PickerFactory
 
 	// PickerGroup is a map that associates keys of a specified type (Key) with Picker instances.
 	// It is used to store and retrieve Picker implementations for various types.
-	PickerGroup map[reflect.Type]picker.Picker
+	PickerGroup map[reflect.Type]Picker
 )
 
 func (pickFacGroup PickerFactoryGroup) Make() PickerGroup {
@@ -27,7 +25,7 @@ func (pickFacGroup PickerFactoryGroup) Make() PickerGroup {
 	return result
 }
 
-func (pickGroup PickerGroup) Search(node ast.Node) (picker.Picker, bool) {
+func (pickGroup PickerGroup) Search(node ast.Node) (Picker, bool) {
 	switch n := node.(type) {
 	case *ast.ImportSpec:
 		return pickGroup[reflect.TypeOf(new(ast.ImportSpec))], true

@@ -1,18 +1,17 @@
-package picker
+package compass
 
 import (
 	"errors"
 	"go/ast"
 
 	"github.com/4rchr4y/go-compass/obj"
-	"github.com/4rchr4y/go-compass/state"
 )
 
 func NewFuncDeclPicker() Picker {
-	return NewPicker[obj.Object](pickFuncDecl)
+	return NewPicker(pickFuncDecl)
 }
 
-func pickFuncDecl(state *state.State, node ast.Node) (obj.Object, error) {
+func pickFuncDecl(state *State, node ast.Node) (obj.Object, error) {
 	decl, _ := node.(*ast.FuncDecl)
 
 	funcDeclObj, err := obj.NewFuncDeclObj(state.File, decl)

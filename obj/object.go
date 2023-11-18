@@ -191,7 +191,6 @@ func determineExprType(fobj *FileObj, expr ast.Expr, adder func(filed *FieldObj)
 }
 
 func processField(fobj *FileObj, field *ast.Field, adder func(filed *FieldObj)) (*FieldObj, error) {
-
 	typ, err := determineExprType(fobj, field.Type, adder)
 	if err != nil {
 		return nil, err

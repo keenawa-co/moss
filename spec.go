@@ -1,4 +1,4 @@
-package picker
+package compass
 
 import (
 	"errors"
@@ -6,14 +6,13 @@ import (
 	"strings"
 
 	"github.com/4rchr4y/go-compass/obj"
-	"github.com/4rchr4y/go-compass/state"
 )
 
 func NewImportSpecPicker() Picker {
-	return NewPicker[obj.Object](pickImportSpec)
+	return NewPicker(pickImportSpec)
 }
 
-func pickImportSpec(state *state.State, node ast.Node) (obj.Object, error) {
+func pickImportSpec(state *State, node ast.Node) (obj.Object, error) {
 	importSpec, ok := node.(*ast.ImportSpec)
 	if !ok {
 		return nil, errors.New("node is not an ImportSpec")

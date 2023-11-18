@@ -7,15 +7,13 @@ import (
 	"path/filepath"
 	"sync"
 
-	"github.com/4rchr4y/go-compass/core"
 	"github.com/4rchr4y/go-compass/obj"
-	"github.com/4rchr4y/go-compass/state"
 	"golang.org/x/mod/modfile"
 )
 
 type Engine struct {
-	noCopy    core.NoCopy
-	noCompare core.NoCompare
+	noCopy    noCopy
+	noCompare noCompare
 
 	MaxEngineConcurrency uint
 
@@ -96,7 +94,10 @@ func (e *Engine) processPkg(fset *token.FileSet, pkgAst *ast.Package, targetDir 
 func (e *Engine) processFile(fset *token.FileSet, fileAst *ast.File, fileName string) *obj.FileObj {
 	fileObj := obj.NewFileObj(fset, e.modfile.Module.Mod.Path, filepath.Base(fileName))
 	visitor := NewVisitor(e.group)
-	state := state.New(fileObj, e.modfile)
+	state := &State{
+		File:    fileObj,
+		Modfile: e.modfile,
+	}
 
 	walk(state, visitor, fileAst)
 	return fileObj

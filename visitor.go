@@ -4,18 +4,15 @@ import (
 	"fmt"
 	"go/ast"
 	"sync"
-
-	"github.com/4rchr4y/go-compass/core"
-	"github.com/4rchr4y/go-compass/state"
 )
 
 type Visitor interface {
 	// Custom implementation of a standard ast.Walk function.
-	Visit(ctx *state.State, node ast.Node) (w Visitor)
+	Visit(ctx *State, node ast.Node) (w Visitor)
 }
 
 type visitor struct {
-	noCopy core.NoCopy
+	noCopy noCopy
 
 	// Created map of analyzers for a specific file
 	pickerGroup PickerGroup
@@ -32,7 +29,7 @@ func NewVisitor(group PickerFactoryGroup) *visitor {
 	return v
 }
 
-func (v *visitor) Visit(state *state.State, node ast.Node) Visitor {
+func (v *visitor) Visit(state *State, node ast.Node) Visitor {
 	if node == nil {
 		return v
 	}
@@ -55,7 +52,7 @@ func (v *visitor) Visit(state *state.State, node ast.Node) Visitor {
 	return v
 }
 
-func walk(state *state.State, v Visitor, node ast.Node) {
+func walk(state *State, v Visitor, node ast.Node) {
 	if v = v.Visit(state, node); v == nil {
 		return
 	}
@@ -388,25 +385,25 @@ func walk(state *state.State, v Visitor, node ast.Node) {
 	v.Visit(state, nil)
 }
 
-func walkIdentList(ctx *state.State, v Visitor, list []*ast.Ident) {
+func walkIdentList(ctx *State, v Visitor, list []*ast.Ident) {
 	for _, x := range list {
 		walk(ctx, v, x)
 	}
 }
 
-func walkExprList(ctx *state.State, v Visitor, list []ast.Expr) {
+func walkExprList(ctx *State, v Visitor, list []ast.Expr) {
 	for _, x := range list {
 		walk(ctx, v, x)
 	}
 }
 
-func walkStmtList(ctx *state.State, v Visitor, list []ast.Stmt) {
+func walkStmtList(ctx *State, v Visitor, list []ast.Stmt) {
 	for _, x := range list {
 		walk(ctx, v, x)
 	}
 }
 
-func walkDeclList(ctx *state.State, v Visitor, list []ast.Decl) {
+func walkDeclList(ctx *State, v Visitor, list []ast.Decl) {
 	for _, x := range list {
 		walk(ctx, v, x)
 	}

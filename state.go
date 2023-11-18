@@ -1,16 +1,14 @@
-package state
+package compass
 
 import (
 	"sync"
 
-	"github.com/4rchr4y/go-compass/core"
 	"github.com/4rchr4y/go-compass/obj"
 	"golang.org/x/mod/modfile"
 )
 
 type State struct {
-	noCopy    core.NoCopy
-	noCompare core.NoCompare
+	noCopy noCopy
 
 	mu   sync.RWMutex
 	once sync.Once
@@ -68,11 +66,4 @@ func (s *State) MustGetString(key string) string {
 	}
 
 	return str
-}
-
-func New(fobj *obj.FileObj, modfile *modfile.File) *State {
-	return &State{
-		File:    fobj,
-		Modfile: modfile,
-	}
 }
