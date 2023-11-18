@@ -23,7 +23,7 @@ func (o *TypeObj) IsExported() bool {
 }
 
 func (o *TypeObj) IsValid() bool {
-	return o.Pos != NoPos && o.End != NoPos
+	return o.Pos != noPos && o.End != noPos
 }
 
 func (o *TypeObj) ImportAdder(filed *FieldObj) {

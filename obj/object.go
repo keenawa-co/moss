@@ -5,7 +5,7 @@ import (
 	"go/token"
 )
 
-const NoPos int = 0
+const noPos int = 0
 
 // Custom type based on *ast.Object
 // Need for specification of collected object types
