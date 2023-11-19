@@ -138,7 +138,7 @@ func pickFuncDecl(state *State, node ast.Node) (obj.Object, error) {
 	funcDeclObj, err := obj.NewFuncDeclObj(state.File, decl)
 	if err != nil {
 
-		return nil, fmt.Errorf("some error from pickFuncDecl 1", err) // TODO: add normal error return message
+		return nil, fmt.Errorf("some error from pickFuncDecl 1 %w", err) // TODO: add normal error return message
 	}
 
 	return &obj.DeclObj{
