@@ -7,7 +7,9 @@
         "modfile",
         "rchr",
         "sema",
+        "stretchr",
         "subdir",
-        "subdirs"
+        "subdirs",
+        "testcode"
     ]
 }
