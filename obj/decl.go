@@ -1,6 +1,8 @@
 package obj
 
-import "go/ast"
+import (
+	"go/ast"
+)
 
 type DeclObj struct {
 	Pos  int
@@ -101,16 +103,20 @@ func handleSelectorExpr(fobj *FileObj, body *FuncDeclBodyObj, obj *FuncDeclObj, 
 		return
 	}
 
-	if obj.Recv.List[0].Names[0].Name == ident.Name {
-		body.FieldAdder(expr.Sel.Name)
-		return
-	}
-
 	if _, exists := fobj.Imports.Cache[ident.Name]; exists {
 		body.Stmt.ImportAdder(&FieldObj{
 			Names: []*IdentObj{{Name: ident.Name}},
 			Type:  expr.Sel.Name,
 		})
+		return
+	}
+
+	if obj.Recv == nil {
+		return
+	}
+
+	if obj.Recv.List[0].Names[0].Name == ident.Name {
+		body.FieldAdder(expr.Sel.Name)
 		return
 	}
 }
@@ -132,7 +138,7 @@ func handleCallExpr(obj *FuncDeclObj, expr *ast.CallExpr) {
 		}
 
 		// check that the called method is of the same type as the recipient
-		if obj.Recv.List[0].Names[0].Name != ident.Name {
+		if obj.Recv != nil && obj.Recv.List[0].Names[0].Name != ident.Name {
 			return
 		}
 

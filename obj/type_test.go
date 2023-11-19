@@ -11,26 +11,19 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-var (
-	testModuleName     = "github.com/4rchr4y/testcode"
-	testFileName       = "test_name.go"
+const (
 	testFuncTypeName   = "TypeFunc"
 	testStructTypeName = "TypeStruct"
-	testImportMeta     = map[string]int{
-		"api":   0,
-		"db":    1,
-		"event": 2,
-	}
 )
 
 const (
-	testFuncType = `package func_code
+	testFuncType = `package typ
 	type TypeFunc func(a string, b, c int) (float64, error)`
 
-	testFuncTypeWithDeps = `package func_code
+	testFuncTypeWithDeps = `package typ
 	type TypeFunc func(a string, b db.Connect, c, d int) (*api.Request, error)`
 
-	testEmptyFuncType = `package func_code
+	testEmptyFuncType = `package typ
 	type TypeFunc func()
 	`
 )
@@ -56,7 +49,7 @@ const (
 )
 
 func TestNewStructTypeObj(t *testing.T) {
-	t.Run("valid: test struct obj creation with fields and dependencies", func(t *testing.T) {
+	t.Run("valid: struct obj creation with fields and dependencies", func(t *testing.T) {
 		structTypeObj := createStructTypeObj(t, testStructType)
 		assert.NotNil(t, structTypeObj)
 
@@ -123,7 +116,7 @@ func TestNewStructTypeObj(t *testing.T) {
 }
 
 func TestNewFuncTypeObj(t *testing.T) {
-	t.Run("valid: test empty type func", func(t *testing.T) {
+	t.Run("valid: empty type func", func(t *testing.T) {
 		funcTypeObj := createFuncTypeObj(t, testEmptyFuncType)
 		assert.NotNil(t, funcTypeObj)
 
@@ -135,7 +128,7 @@ func TestNewFuncTypeObj(t *testing.T) {
 		})
 	})
 
-	t.Run("valid: test type func with dependencies ", func(t *testing.T) {
+	t.Run("valid: type func with dependencies ", func(t *testing.T) {
 		funcTypeObj := createFuncTypeObj(t, testFuncTypeWithDeps)
 		assert.NotNil(t, funcTypeObj)
 
@@ -195,7 +188,7 @@ func TestNewFuncTypeObj(t *testing.T) {
 		})
 	})
 
-	t.Run("valid: test type func without dependencies", func(t *testing.T) {
+	t.Run("valid: type func without dependencies", func(t *testing.T) {
 		funcTypeObj := createFuncTypeObj(t, testFuncType)
 
 		t.Run("valid: checking (incoming) function params", func(t *testing.T) {
