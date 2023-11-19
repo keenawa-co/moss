@@ -104,7 +104,7 @@ func NewFuncTypeObj(fobj *FileObj, funcType *ast.FuncType) (*FuncTypeObj, error)
 		}
 	}
 
-	if funcType.TypeParams != nil && len(funcType.Params.List) > 0 {
+	if funcType.TypeParams != nil && len(funcType.TypeParams.List) > 0 {
 		var err error
 		funcTypeObj.TypeParams, err = ProcessFieldList(fobj, funcType.TypeParams, funcTypeObj.ImportAdder)
 		if err != nil {
