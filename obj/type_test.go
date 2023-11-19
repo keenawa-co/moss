@@ -12,27 +12,131 @@ import (
 )
 
 var (
-	testModuleName = "github.com/4rchr4y/testcode"
-	testFileName   = "test_name.go"
-	testFuncType   = "TypeFunc"
-	testImportMeta = map[string]int{
+	testModuleName     = "github.com/4rchr4y/testcode"
+	testFileName       = "test_name.go"
+	testFuncTypeName   = "TypeFunc"
+	testStructTypeName = "TypeStruct"
+	testImportMeta     = map[string]int{
 		"api":   0,
 		"db":    1,
 		"event": 2,
 	}
 )
 
-var (
-	testFuncTypeCode = `package func_code
+const (
+	testFuncType = `package func_code
 	type TypeFunc func(a string, b, c int) (float64, error)`
 
-	testFuncTypeWithDepsCode = `package func_code
+	testFuncTypeWithDeps = `package func_code
 	type TypeFunc func(a string, b db.Connect, c, d int) (*api.Request, error)`
+
+	testEmptyFuncType = `package func_code
+	type TypeFunc func()
+	`
 )
 
+const (
+	testStructType = `package struct_code
+	type BuiltInStruct struct {
+		F string
+		V int
+	}
+	
+	type TypeStruct struct {
+		A    *api.Request
+		B, C int
+		d    float32
+		E    struct {
+			A1     db.Connect
+			B1, b2 string
+		}
+		BuiltInStruct
+	}
+	`
+)
+
+func TestNewStructTypeObj(t *testing.T) {
+	t.Run("valid: test struct obj creation with fields and dependencies", func(t *testing.T) {
+		structTypeObj := createStructTypeObj(t, testStructType)
+		assert.NotNil(t, structTypeObj)
+
+		t.Run("valid: checking struct fields", func(t *testing.T) {
+			assert.Equal(t, 5, len(structTypeObj.Fields.List), "field array length")
+			assert.Equal(t, 6, structTypeObj.Fields.Len(), "actual number of fields")
+
+			assert.Equal(t, 1, len(structTypeObj.Fields.List[0].Names))
+			assert.Equal(t, "A", structTypeObj.Fields.List[0].Names[0].Name)
+			assert.Equal(t, true, structTypeObj.Fields.List[0].Names[0].IsExported())
+			assert.Equal(t, "Request", structTypeObj.Fields.List[0].Type)
+
+			assert.Equal(t, 2, len(structTypeObj.Fields.List[1].Names))
+			assert.Equal(t, "B", structTypeObj.Fields.List[1].Names[0].Name)
+			assert.Equal(t, true, structTypeObj.Fields.List[1].Names[0].IsExported())
+			assert.Equal(t, "C", structTypeObj.Fields.List[1].Names[1].Name)
+			assert.Equal(t, true, structTypeObj.Fields.List[1].Names[1].IsExported())
+			assert.Equal(t, "int", structTypeObj.Fields.List[1].Type)
+
+			assert.Equal(t, 1, len(structTypeObj.Fields.List[2].Names))
+			assert.Equal(t, "d", structTypeObj.Fields.List[2].Names[0].Name)
+			assert.Equal(t, false, structTypeObj.Fields.List[2].Names[0].IsExported())
+			assert.Equal(t, "float32", structTypeObj.Fields.List[2].Type)
+
+			assert.Equal(t, 1, len(structTypeObj.Fields.List[3].Names))
+			assert.Equal(t, "E", structTypeObj.Fields.List[3].Names[0].Name)
+			assert.Equal(t, true, structTypeObj.Fields.List[3].Names[0].IsExported())
+			assert.IsType(t, new(StructTypeObj), structTypeObj.Fields.List[3].Type)
+
+			t.Run("valid: checking built-in struct", func(t *testing.T) {
+				builtInStructTypeObj, ok := structTypeObj.Fields.List[3].Type.(*StructTypeObj)
+				assert.True(t, ok)
+				assert.NotNil(t, builtInStructTypeObj)
+
+				t.Run("valid: checking struct fields", func(t *testing.T) {
+					assert.Equal(t, 1, len(builtInStructTypeObj.Fields.List[0].Names))
+					assert.Equal(t, "A1", builtInStructTypeObj.Fields.List[0].Names[0].Name)
+					assert.Equal(t, true, builtInStructTypeObj.Fields.List[0].Names[0].IsExported())
+					assert.Equal(t, "Connect", builtInStructTypeObj.Fields.List[0].Type)
+
+					assert.Equal(t, 2, len(builtInStructTypeObj.Fields.List[1].Names))
+					assert.Equal(t, "B1", builtInStructTypeObj.Fields.List[1].Names[0].Name)
+					assert.Equal(t, true, builtInStructTypeObj.Fields.List[1].Names[0].IsExported())
+					assert.Equal(t, "b2", builtInStructTypeObj.Fields.List[1].Names[1].Name)
+					assert.Equal(t, false, builtInStructTypeObj.Fields.List[1].Names[1].IsExported())
+					assert.Equal(t, "string", builtInStructTypeObj.Fields.List[1].Type)
+
+				})
+
+				t.Run("valid: checking struct dependencies", func(t *testing.T) {
+					assert.Equal(t, 1, len(builtInStructTypeObj.DependsParams.List))
+
+					assert.Equal(t, 1, len(builtInStructTypeObj.DependsParams.List[0].Names))
+					assert.Equal(t, "db", builtInStructTypeObj.DependsParams.List[0].Names[0].Name)
+					assert.Equal(t, "Connect", builtInStructTypeObj.DependsParams.List[0].Type)
+				})
+			})
+
+			assert.Equal(t, 0, len(structTypeObj.Fields.List[4].Names))
+			assert.IsType(t, "BuiltInStruct", structTypeObj.Fields.List[4].Type)
+		})
+	})
+
+}
+
 func TestNewFuncTypeObj(t *testing.T) {
+	t.Run("valid: test empty type func", func(t *testing.T) {
+		funcTypeObj := createFuncTypeObj(t, testEmptyFuncType)
+		assert.NotNil(t, funcTypeObj)
+
+		t.Run("valid: checking function params", func(t *testing.T) {
+			assert.Nil(t, funcTypeObj.Params)
+			assert.Nil(t, funcTypeObj.DependsParams)
+			assert.Nil(t, funcTypeObj.TypeParams)
+			assert.Nil(t, funcTypeObj.ResultParams)
+		})
+	})
+
 	t.Run("valid: test type func with dependencies ", func(t *testing.T) {
-		funcTypeObj := createFuncTypeObj(t, testFuncTypeWithDepsCode)
+		funcTypeObj := createFuncTypeObj(t, testFuncTypeWithDeps)
 		assert.NotNil(t, funcTypeObj)
 
 		t.Run("valid: checking (incoming) function params", func(t *testing.T) {
@@ -92,7 +196,7 @@ func TestNewFuncTypeObj(t *testing.T) {
 	})
 
 	t.Run("valid: test type func without dependencies", func(t *testing.T) {
-		funcTypeObj := createFuncTypeObj(t, testFuncTypeCode)
+		funcTypeObj := createFuncTypeObj(t, testFuncType)
 
 		t.Run("valid: checking (incoming) function params", func(t *testing.T) {
 			assert.Equal(t, 2, len(funcTypeObj.Params.List))
@@ -157,7 +261,7 @@ func createFuncType(t *testing.T, fset *token.FileSet, source string) *ast.FuncT
 				continue
 			}
 
-			if typeSpec.Name.Name == testFuncType {
+			if typeSpec.Name.Name == testFuncTypeName {
 				funcType, _ = typeSpec.Type.(*ast.FuncType)
 				break
 			}
@@ -168,6 +272,55 @@ func createFuncType(t *testing.T, fset *token.FileSet, source string) *ast.FuncT
 		return funcType
 	}
 
-	t.Fatalf("failed: cant find %s in source code", testFuncType)
+	t.Fatalf("failed: cant find %s in source code", testFuncTypeName)
+	return nil
+}
+
+func createStructTypeObj(t *testing.T, source string) *StructTypeObj {
+	t.Helper()
+
+	fset := token.NewFileSet()
+	fobj := NewFileObj(fset, testModuleName, testFileName)
+	fobj.Imports = &importTree{Cache: testImportMeta}
+	structType := createStructType(t, fset, source)
+	structTypeObj, err := NewStructTypeObj(fobj, structType)
+	assert.NoError(t, err)
+
+	return structTypeObj
+}
+
+func createStructType(t *testing.T, fset *token.FileSet, source string) *ast.StructType {
+	t.Helper()
+
+	file, err := parser.ParseFile(fset, "", strings.NewReader(source), parser.AllErrors)
+	require.NoError(t, err)
+	require.NotNil(t, file)
+
+	var structType *ast.StructType
+
+	for _, decl := range file.Decls {
+		genDecl, ok := decl.(*ast.GenDecl)
+		if !ok {
+			continue
+		}
+
+		for _, spec := range genDecl.Specs {
+			typeSpec, ok := spec.(*ast.TypeSpec)
+			if !ok {
+				continue
+			}
+
+			if typeSpec.Name.Name == testStructTypeName {
+				structType, _ = typeSpec.Type.(*ast.StructType)
+				break
+			}
+		}
+	}
+
+	if structType != nil {
+		return structType
+	}
+
+	t.Fatalf("failed: cant find %s in source code", testStructTypeName)
 	return nil
 }
