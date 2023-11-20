@@ -113,7 +113,7 @@ func main() {
 
 	compass := compass.New(&compass.Config{
 		RootDir:     ".",
-		TargetDir:   "testdata/cmd",
+		TargetDir:   "",
 		IgnoredList: compass.DefaultIgnoredList,
 		Group:       getAnalyzers(),
 	})

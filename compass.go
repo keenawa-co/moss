@@ -35,10 +35,10 @@ func (c *Compass) Scan() error {
 
 	for _, dir := range dirGroup {
 		wg.Add(1)
-		sema <- struct{}{}
 
 		go func(dir string) {
 			defer wg.Done()
+			sema <- struct{}{}
 			defer func() { <-sema }()
 
 			data, err := c.engine.ParseDir(dir)

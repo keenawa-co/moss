@@ -1,6 +1,7 @@
 package compass
 
 import (
+	"fmt"
 	"go/ast"
 	"go/parser"
 	"go/token"
@@ -49,10 +50,13 @@ func (e *Engine) processPkgGroup(fset *token.FileSet, pkg map[string]*ast.Packag
 		}(pkgAst)
 	}
 
-	wg.Wait()
-	close(resultsChan)
+	go func() {
+		wg.Wait()
+		close(resultsChan)
+	}()
 
 	var results []*obj.PackageObj
+	fmt.Println(len(pkg))
 	for r := range resultsChan {
 		results = append(results, r)
 	}
@@ -61,7 +65,7 @@ func (e *Engine) processPkgGroup(fset *token.FileSet, pkg map[string]*ast.Packag
 }
 
 func (e *Engine) processPkg(fset *token.FileSet, pkgAst *ast.Package, targetDir string) *obj.PackageObj {
-	fileObjChan := make(chan *obj.FileObj)
+	fileObjChan := make(chan *obj.FileObj, len(pkgAst.Files))
 	pkgObj := obj.NewPackageObj(pkgAst, targetDir)
 
 	var wg sync.WaitGroup
@@ -73,10 +77,11 @@ func (e *Engine) processPkg(fset *token.FileSet, pkgAst *ast.Package, targetDir 
 
 		go func(fileAst *ast.File, fileName string) {
 			defer wg.Done()
-			defer func() { <-sema }()
-
-			fileObjChan <- e.processFile(fset, fileAst, fileName)
+			fileObj := e.processFile(fset, fileAst, fileName)
+			fileObjChan <- fileObj
+			<-sema
 		}(fileAst, fileName)
+		sema <- struct{}{}
 	}
 
 	go func() {

@@ -5,7 +5,6 @@ import (
 	"go/token"
 	"path"
 	"reflect"
-	"sync"
 )
 
 type importTree struct {
@@ -16,7 +15,6 @@ type importTree struct {
 }
 
 type FileObj struct {
-	mutex   sync.Mutex
 	FileSet *token.FileSet
 
 	Name    *IdentObj
@@ -46,29 +44,23 @@ func (o *FileObj) Save(object Object) error {
 }
 
 func (o *FileObj) AppendType(typ *TypeObj) {
-	o.mutex.Lock()
-
 	if o.Types == nil {
 		o.Types = make([]*TypeObj, 0)
 	}
 
 	o.Types = append(o.Types, typ)
-	o.mutex.Unlock()
+
 }
 
 func (o *FileObj) AppendDecl(decl *DeclObj) {
-	o.mutex.Lock()
-
 	if o.Decls == nil {
 		o.Decls = make([]*DeclObj, 0)
 	}
 
 	o.Decls = append(o.Decls, decl)
-	o.mutex.Unlock()
 }
 
 func (o *FileObj) AppendImport(object *ImportObj) {
-	o.mutex.Lock()
 	switch object.ImportKind {
 	case Internal:
 		var importName string
@@ -83,7 +75,6 @@ func (o *FileObj) AppendImport(object *ImportObj) {
 	case SideEffect:
 		o.Imports.SideEffect = append(o.Imports.SideEffect, object.Path)
 	}
-	o.mutex.Unlock()
 }
 
 func NewFileObj(fset *token.FileSet, moduleName, fileName string) *FileObj {
