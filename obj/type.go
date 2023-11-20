@@ -6,8 +6,7 @@ import (
 )
 
 type TypeObj struct {
-	Pos           int
-	End           int
+	Position      Positioner
 	Name          *IdentObj
 	Type          any
 	TypeParams    *FieldObjList
@@ -23,7 +22,7 @@ func (o *TypeObj) IsExported() bool {
 }
 
 func (o *TypeObj) IsValid() bool {
-	return o.Pos != noPos && o.End != noPos
+	return o.Position.Pos() != NoPos && o.Position.End() != NoPos
 }
 
 func (o *TypeObj) ImportAdder(filed *FieldObj) {
@@ -36,8 +35,7 @@ func (o *TypeObj) ImportAdder(filed *FieldObj) {
 	o.DependsParams.List = append(o.DependsParams.List, filed)
 }
 
-// ----------------------------------------------------------------------------
-// Struct type
+// -------------------------- Struct Type -------------------------- //
 
 // StructTypeObj encapsulates the details of a Go struct type in the AST.
 // It provides a structure to hold the fields of the struct as well as any parameters
@@ -73,8 +71,7 @@ func NewStructTypeObj(fobj *FileObj, structType *ast.StructType) (*StructTypeObj
 	return structTypeObj, nil
 }
 
-// ----------------------------------------------------------------------------
-// Function type
+// ------------------------- Function Type ------------------------- //
 
 type FuncTypeObj struct {
 	Params        *FieldObjList // incoming parameters

@@ -5,10 +5,9 @@ import (
 )
 
 type DeclObj struct {
-	Pos  int
-	End  int
-	Name *IdentObj
-	Type any
+	Position Positioner
+	Name     *IdentObj
+	Type     any
 }
 
 func (o *DeclObj) Kind() ObjKind {
@@ -20,11 +19,10 @@ func (o *DeclObj) IsExported() bool {
 }
 
 func (o *DeclObj) IsValid() bool {
-	return o.Pos != noPos && o.End != noPos
+	return o.Position.Pos() != NoPos && o.Position.End() != NoPos
 }
 
-// ----------------------------------------------------------------------------
-// Function declaration
+// ---------------------- Function Declaration --------------------- //
 
 // FuncDeclObj is a custom representation of an AST function declaration.
 // It encapsulates the receiver, name, type, and body of a function

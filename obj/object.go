@@ -5,7 +5,40 @@ import (
 	"go/token"
 )
 
-const noPos int = 0
+// ---------------------------- Position --------------------------- //
+
+type (
+	// Pos is the line number position in the source code file.
+	Pos int
+
+	// Position is an array storing the start and end position of
+	// an object in the source code file.
+	Position   [2]Pos
+	Positioner interface {
+		// Start position of an object in a source code file.
+		Pos() Pos
+		// End position of an object in a source code file.
+		End() Pos
+	}
+)
+
+const (
+	// The zero value for Pos is NoPos; there is no file and line information
+	// associated with it. NoPos is always smaller than any other Pos value.
+	NoPos Pos = 0
+)
+
+func (s Position) Pos() Pos { return s[0] }
+func (s Position) End() Pos { return s[0] }
+
+func NewPosition(fset *token.FileSet, node ast.Node) *Position {
+	return &Position{
+		Pos(fset.Position(node.Pos()).Line),
+		Pos(fset.Position(node.End()).Line),
+	}
+}
+
+// ----------------------------- Object --------------------------- //
 
 // Custom type based on *ast.Object
 // Need for specification of collected object types
@@ -43,8 +76,7 @@ type Object interface {
 	IsExported() bool
 }
 
-// ----------------------------------------------------------------------------
-// Ident type
+// ------------------------------ Ident ---------------------------- //
 
 // Object represents an identifier
 type IdentObj struct {
@@ -70,8 +102,7 @@ func NewIdentObj(id *ast.Ident) *IdentObj {
 	}
 }
 
-// ----------------------------------------------------------------------------
-// Filed
+// ------------------------------ Field ---------------------------- //
 
 type FieldObj struct {
 	Names []*IdentObj
@@ -129,8 +160,7 @@ func (f *FieldObjList) Len() int {
 	return n
 }
 
-// ----------------------------------------------------------------------------
-// Block statement type
+// ------------------------- Block Statement ----------------------- //
 
 type BlockStmtObj struct {
 	DependsParams *FieldObjList

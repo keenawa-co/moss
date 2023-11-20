@@ -33,8 +33,7 @@ func (a *picker) Pick(s *State, n ast.Node) (obj.Object, error) {
 	return a.pick(s, n)
 }
 
-// ----------------------------------------------------------------------------
-// Types pickers
+// -------------------------- Types Pickers ------------------------ //
 //
 // The creation of pickers, which allow for the extraction and analysis of
 // specific data types (structures and functional types) from an AST
@@ -71,8 +70,7 @@ func pickStructType(state *State, node ast.Node) (obj.Object, error) {
 	}
 
 	typeObj.Type = structTypeObj
-	typeObj.Pos = state.File.FileSet.Position(typeSpec.Pos()).Line
-	typeObj.End = state.File.FileSet.Position(typeSpec.End()).Line
+	typeObj.Position = obj.NewPosition(state.File.FileSet, typeSpec)
 	typeObj.Name = &obj.IdentObj{
 		Name: typeSpec.Name.Name,
 		Kind: obj.Typ,
@@ -86,21 +84,21 @@ func NewFuncTypePicker() Picker {
 }
 
 func pickFuncType(state *State, node ast.Node) (obj.Object, error) {
-	ts, ok := node.(*ast.TypeSpec)
+	typeSpec, ok := node.(*ast.TypeSpec)
 	if !ok {
 		return nil, fmt.Errorf("some error from pickFuncType : %s not a *ast.TypeSpec", reflect.TypeOf(node).String()) // TODO: add normal error return message
 	}
 
-	funcType, ok := ts.Type.(*ast.FuncType)
+	funcType, ok := typeSpec.Type.(*ast.FuncType)
 	if !ok {
 		return nil, fmt.Errorf("some error from pickFuncType : %s not a *ast.StructType", reflect.TypeOf(node).String()) // TODO: add normal error return message
 	}
 
 	typeObj := new(obj.TypeObj)
 
-	if ts.TypeParams != nil && len(ts.TypeParams.List) > 0 {
+	if typeSpec.TypeParams != nil && len(typeSpec.TypeParams.List) > 0 {
 		var err error
-		typeObj.TypeParams, err = obj.ProcessFieldList(state.File, ts.TypeParams, typeObj.ImportAdder)
+		typeObj.TypeParams, err = obj.ProcessFieldList(state.File, typeSpec.TypeParams, typeObj.ImportAdder)
 		if err != nil {
 			return nil, err
 		}
@@ -111,19 +109,17 @@ func pickFuncType(state *State, node ast.Node) (obj.Object, error) {
 		return nil, errors.New("some error from pickFuncType 3") // TODO: add normal error return message
 	}
 
-	typeObj.Pos = state.File.FileSet.Position(ts.Pos()).Line
-	typeObj.End = state.File.FileSet.Position(ts.End()).Line
+	typeObj.Position = obj.NewPosition(state.File.FileSet, typeSpec)
 	typeObj.Type = funcTypeObj
 	typeObj.Name = &obj.IdentObj{
-		Name: ts.Name.Name,
+		Name: typeSpec.Name.Name,
 		Kind: obj.Typ,
 	}
 
 	return typeObj, nil
 }
 
-// ----------------------------------------------------------------------------
-// Declaration pickers
+// ---------------------- Declaration Pickers ---------------------- //
 //
 // Identifying and extracting declarations from an AST
 // (Abstract Syntax Tree) of Go source code.
@@ -142,8 +138,7 @@ func pickFuncDecl(state *State, node ast.Node) (obj.Object, error) {
 	}
 
 	return &obj.DeclObj{
-		Pos: state.File.FileSet.Position(decl.Pos()).Line,
-		End: state.File.FileSet.Position(decl.End()).Line,
+		Position: obj.NewPosition(state.File.FileSet, decl),
 		Name: &obj.IdentObj{
 			Name: decl.Name.Name,
 			Kind: obj.Fun,
@@ -152,8 +147,7 @@ func pickFuncDecl(state *State, node ast.Node) (obj.Object, error) {
 	}, nil
 }
 
-// ----------------------------------------------------------------------------
-// Specs pickers
+// -------------------------- Spec Pickers ------------------------- //
 //
 // Identifying and extracting specs from an AST
 // (Abstract Syntax Tree) of Go source code.
