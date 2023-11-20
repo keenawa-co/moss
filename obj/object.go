@@ -82,6 +82,7 @@ type FieldObjList struct {
 	List []*FieldObj
 }
 
+// TODO: add tests
 func (f *FieldObjList) FindByName(name string) []*FieldObj {
 	result := make([]*FieldObj, 0)
 
@@ -98,6 +99,7 @@ func (f *FieldObjList) FindByName(name string) []*FieldObj {
 	return result
 }
 
+// TODO: add tests
 func (f *FieldObjList) FindByType(typ any) []*FieldObj {
 	result := make([]*FieldObj, 0)
 

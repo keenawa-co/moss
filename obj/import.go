@@ -13,10 +13,9 @@ const (
 )
 
 type ImportObj struct {
-	Path       string
 	Name       *IdentObj
+	Path       string
 	ImportKind ImpKind
-	TypeKind   ObjKind
 }
 
 func (o *ImportObj) Kind() ObjKind {
