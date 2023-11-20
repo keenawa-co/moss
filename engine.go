@@ -73,15 +73,14 @@ func (e *Engine) processPkg(fset *token.FileSet, pkgAst *ast.Package, targetDir 
 
 	for fileName, fileAst := range pkgAst.Files {
 		wg.Add(1)
-		sema <- struct{}{}
-
 		go func(fileAst *ast.File, fileName string) {
+			sema <- struct{}{}
 			defer wg.Done()
+			defer func() { <-sema }()
+
 			fileObj := e.processFile(fset, fileAst, fileName)
 			fileObjChan <- fileObj
-			<-sema
 		}(fileAst, fileName)
-		sema <- struct{}{}
 	}
 
 	go func() {
