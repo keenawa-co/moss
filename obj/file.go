@@ -71,14 +71,12 @@ func (o *FileObj) AppendImport(object *ImportObj) {
 	o.mutex.Lock()
 	switch object.ImportKind {
 	case Internal:
+		var importName string
 		if object.Name == nil {
-			object.Name = &IdentObj{
-				Name: path.Base(object.Path),
-				Kind: Imp,
-			}
+			importName = path.Base(object.Path)
 		}
 
-		o.Imports.Cache[object.Name.String()] = len(o.Imports.Internal)
+		o.Imports.Cache[importName] = len(o.Imports.Internal)
 		o.Imports.Internal = append(o.Imports.Internal, object.Path)
 	case External:
 		o.Imports.External = append(o.Imports.External, object.Path)

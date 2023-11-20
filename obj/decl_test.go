@@ -26,6 +26,8 @@ const (
 	testEmptyFuncDecl = `package decl
 	func DeclFunc() {}
 	`
+
+	// TODO: test methods testFuncDeclReceiverName
 )
 
 func TestNewFuncDeclObj(t *testing.T) {
