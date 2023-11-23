@@ -3,10 +3,12 @@ package main
 import (
 	"fmt"
 	"go/ast"
-	"log/slog"
+	"log"
 	"reflect"
 
 	"github.com/4rchr4y/go-compass"
+	"golang.org/x/tools/go/analysis"
+	"golang.org/x/tools/go/packages"
 )
 
 type MyWriter struct {
@@ -19,7 +21,36 @@ func (w *MyWriter) Write(p []byte) (int, error) {
 	return len(p), nil
 }
 
+var Analyzer = &analysis.Analyzer{
+	Name: "doc",
+	Doc:  "obj",
+	Run: func(p *analysis.Pass) (interface{}, error) {
+		return nil, nil
+	},
+}
+
 func main() {
+	cfg := &packages.Config{
+		Mode:  packages.LoadAllSyntax,
+		Tests: true,
+		Dir:   "obj",
+	}
+
+	pkgs, err := packages.Load(cfg)
+	if err != nil {
+		log.Fatalf("Error: %v", err)
+	}
+
+	for _, pkg := range pkgs {
+		fmt.Println("-----", pkg.Name)
+		for _, v := range pkg.Syntax {
+			fmt.Println(v.Name)
+		}
+
+		fmt.Println(pkg.OtherFiles)
+
+	}
+
 	// ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	// defer cancel()
 	// clientOptions := options.Client().ApplyURI("mongodb://ant:password@localhost:27017")
@@ -42,14 +73,14 @@ func main() {
 	// scanRepo := mongoScannerRepo.NewSnapshotRepository(collection)
 	// scanService.Perform(ctx, "example/cmd", "github.com/g10z3r/archx")
 
-	myWriter := &MyWriter{}
+	// myWriter := &MyWriter{}
 
-	logger := slog.New(slog.NewTextHandler(myWriter, nil))
-	fmt.Println(len(myWriter.data))
-	logger.Info("Test")
-	logger.Info("Test1")
+	// logger := slog.New(slog.NewTextHandler(myWriter, nil))
+	// fmt.Println(len(myWriter.data))
+	// logger.Info("Test")
+	// logger.Info("Test1")
 
-	fmt.Printf("Записанные логи:\n%s\n", myWriter.data)
+	// fmt.Printf("Записанные логи:\n%s\n", myWriter.data)
 
 	// compass.Run(context.Background())
 
@@ -111,16 +142,16 @@ func main() {
 
 	// }
 
-	compass := compass.New(&compass.Config{
-		RootDir:     ".",
-		TargetDir:   "",
-		IgnoredList: compass.DefaultIgnoredList,
-		Group:       getAnalyzers(),
-	})
+	// compass := compass.New(&compass.Config{
+	// 	RootDir:     ".",
+	// 	TargetDir:   "",
+	// 	IgnoredList: compass.DefaultIgnoredList,
+	// 	Group:       getAnalyzers(),
+	// })
 
-	if err := compass.Scan(); err != nil {
-		fmt.Println(err)
-	}
+	// if err := compass.Scan(); err != nil {
+	// 	fmt.Println(err)
+	// }
 }
 
 // TODO: tmp func
