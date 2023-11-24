@@ -5,6 +5,7 @@ import (
 	"go/ast"
 	"log"
 	"reflect"
+	"strings"
 
 	"github.com/4rchr4y/go-compass"
 	"golang.org/x/tools/go/analysis"
@@ -24,8 +25,22 @@ func (w *MyWriter) Write(p []byte) (int, error) {
 var Analyzer = &analysis.Analyzer{
 	Name: "doc",
 	Doc:  "obj",
-	Run: func(p *analysis.Pass) (interface{}, error) {
-		return nil, nil
+	Run: func(pass *analysis.Pass) (interface{}, error) {
+		for _, file := range pass.Files {
+			ast.Inspect(file, func(n ast.Node) bool {
+
+				fn, ok := n.(*ast.FuncDecl)
+				if !ok {
+					return true
+				}
+
+				if fn.Doc == nil && strings.ToUpper(fn.Name.Name[:1]) == fn.Name.Name[:1] {
+					pass.Reportf(fn.Pos(), "экспортируемая функция %q не имеет комментария GoDoc", fn.Name.Name)
+				}
+				return false
+			})
+		}
+		return 1, nil
 	},
 }
 
@@ -42,17 +57,35 @@ func main() {
 
 	for _, pkg := range pkgs {
 
-		for _, f := range pkg.Syntax {
-			astFile := pkg.Fset.File(f.Pos())
-			if astFile != nil {
-				fmt.Println("0000 File:", astFile.Name())
-			}
-
-			for _, d := range f.Decls {
-				fmt.Println(reflect.TypeOf(d))
-			}
-			fmt.Println("-----", pkg.Name)
+		pass := &analysis.Pass{
+			Analyzer:   Analyzer,
+			Pkg:        pkg.Types,
+			TypesInfo:  pkg.TypesInfo,
+			Fset:       pkg.Fset,
+			Files:      pkg.Syntax,
+			Report:     func(diag analysis.Diagnostic) { log.Print(diag) },
+			ResultOf:   make(map[*analysis.Analyzer]interface{}),
+			OtherFiles: pkg.OtherFiles,
 		}
+
+		r, err := Analyzer.Run(pass)
+		if err != nil {
+			log.Printf(pkg.Name, err)
+		}
+
+		fmt.Println(r)
+
+		// for _, f := range pkg.Syntax {
+		// 	astFile := pkg.Fset.File(f.Pos())
+		// 	if astFile != nil {
+		// 		fmt.Println("0000 File:", astFile.Name())
+		// 	}
+
+		// 	for _, d := range f.Decls {
+		// 		fmt.Println(reflect.TypeOf(d))
+		// 	}
+		// 	fmt.Println("-----", pkg.Name)
+		// }
 
 	}
 
