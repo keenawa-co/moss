@@ -31,23 +31,28 @@ var Analyzer = &analysis.Analyzer{
 
 func main() {
 	cfg := &packages.Config{
-		Mode:  packages.LoadAllSyntax,
-		Tests: true,
-		Dir:   "obj",
+		Mode: packages.LoadAllSyntax,
+		// Dir:  "./...",
 	}
 
-	pkgs, err := packages.Load(cfg)
+	pkgs, err := packages.Load(cfg, ".")
 	if err != nil {
 		log.Fatalf("Error: %v", err)
 	}
 
 	for _, pkg := range pkgs {
-		fmt.Println("-----", pkg.Name)
-		for _, v := range pkg.Syntax {
-			fmt.Println(v.Name)
-		}
 
-		fmt.Println(pkg.OtherFiles)
+		for _, f := range pkg.Syntax {
+			astFile := pkg.Fset.File(f.Pos())
+			if astFile != nil {
+				fmt.Println("0000 File:", astFile.Name())
+			}
+
+			for _, d := range f.Decls {
+				fmt.Println(reflect.TypeOf(d))
+			}
+			fmt.Println("-----", pkg.Name)
+		}
 
 	}
 
