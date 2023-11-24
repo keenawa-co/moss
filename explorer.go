@@ -1,4 +1,4 @@
-package compass
+package goray
 
 import (
 	"errors"

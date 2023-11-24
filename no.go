@@ -1,4 +1,4 @@
-package compass
+package goray
 
 type (
 	noDirect  [0]int

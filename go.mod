@@ -1,4 +1,4 @@
-module github.com/4rchr4y/go-compass
+module github.com/4rchr4y/goray
 
 go 1.21
 

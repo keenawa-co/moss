@@ -7,7 +7,7 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/4rchr4y/go-compass"
+	"github.com/4rchr4y/goray"
 	"golang.org/x/tools/go/analysis"
 	"golang.org/x/tools/go/packages"
 )
@@ -193,11 +193,11 @@ func main() {
 }
 
 // TODO: tmp func
-func getAnalyzers() compass.PickerFactoryGroup {
-	return compass.PickerFactoryGroup{
-		reflect.TypeOf(new(ast.ImportSpec)): compass.NewImportSpecPicker,
-		reflect.TypeOf(new(ast.FuncDecl)):   compass.NewFuncDeclPicker,
-		reflect.TypeOf(new(ast.StructType)): compass.NewStructTypePicker,
-		reflect.TypeOf(new(ast.FuncType)):   compass.NewFuncTypePicker,
+func getAnalyzers() goray.PickerFactoryGroup {
+	return goray.PickerFactoryGroup{
+		reflect.TypeOf(new(ast.ImportSpec)): goray.NewImportSpecPicker,
+		reflect.TypeOf(new(ast.FuncDecl)):   goray.NewFuncDeclPicker,
+		reflect.TypeOf(new(ast.StructType)): goray.NewStructTypePicker,
+		reflect.TypeOf(new(ast.FuncType)):   goray.NewFuncTypePicker,
 	}
 }

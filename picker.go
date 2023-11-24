@@ -1,4 +1,4 @@
-package compass
+package goray
 
 import (
 	"errors"
@@ -7,7 +7,7 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/4rchr4y/go-compass/obj"
+	"github.com/4rchr4y/goray/obj"
 )
 
 type Picker interface {

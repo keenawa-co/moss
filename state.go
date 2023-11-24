@@ -1,9 +1,9 @@
-package compass
+package goray
 
 import (
 	"sync"
 
-	"github.com/4rchr4y/go-compass/obj"
+	"github.com/4rchr4y/goray/obj"
 	"golang.org/x/mod/modfile"
 )
 

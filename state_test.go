@@ -1,1 +1,1 @@
-package compass
+package goray

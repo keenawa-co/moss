@@ -1,4 +1,4 @@
-package compass
+package goray
 
 var DefaultIgnoredList = map[string]struct{}{
 	".git":    {},
