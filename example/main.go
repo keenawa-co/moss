@@ -23,7 +23,7 @@ func (w *MyWriter) Write(p []byte) (int, error) {
 }
 
 var Analyzer = &analysis.Analyzer{
-	Name: "doc",
+	Name: "doc2",
 	Doc:  "obj",
 	Run: func(pass *analysis.Pass) (interface{}, error) {
 		for _, file := range pass.Files {
