@@ -1,34 +1,139 @@
 package ason
 
-import (
-	"go/token"
+type Ason interface {
+	asonNode()
+}
+
+type Spec interface {
+	Ason
+	specNode()
+}
+
+type Decl interface {
+	Ason
+	declNode()
+}
+
+type Expr interface {
+	Ason
+	exprNode()
+}
+
+type Node struct {
+	Ref  uint   `json:"-"`
+	Type string `json:"_type"`
+}
+
+type Pos struct {
+	Filename string // filename, if any
+	Offset   int    // offset, starting at 0
+	Line     int    // line number, starting at 1
+	Column   int    // column number, starting at 1 (byte count)
+}
+
+type Loc struct {
+	Start *Pos `json:"Start,omitempty"`
+	End   *Pos `json:"End,omitempty"`
+}
+
+type File struct {
+	Doc   *CommentGroup `json:"Doc,omitempty"`  // associated documentation; or nil
+	Name  *Ident        `json:"Name,omitempty"` // package name
+	Decls []Decl        `json:"Decl"`
+	// top-level declarations; or nil
+	Loc *Loc // start and end of entire file
+
+	// Scope              *Scope          // package scope (this file only)
+	// Imports            []*ImportSpec   // imports in this file
+	// Unresolved         []*Ident        // unresolved identifiers in this file
+	Package   *Pos            `json:"Package,omitempty"`   // position of "package" keyword
+	Comments  []*CommentGroup `json:"Comments,omitempty"`  // list of all comments in the source file
+	GoVersion string          `json:"GoVersion,omitempty"` // minimum Go version required by //go:build or // +build directives
+
+	Node
+}
+
+func (*File) asonNode() {}
+
+type (
+	Comment struct {
+		Slash *Pos   `json:"Slash"`          // position of "/" starting the comment
+		Text  string `json:"Text,omitempty"` // comment text (excluding '\n' for //-style comments)
+
+		Node
+	}
+
+	// A CommentGroup represents a sequence of comments
+	// with no other tokens and no empty lines between.
+	CommentGroup struct {
+		List []*Comment
+
+		Node
+	}
 )
 
-type NodeMod struct {
-	Type string `json:"Type"`
-}
+func (*Comment) asonNode()      {}
+func (*CommentGroup) asonNode() {}
 
-type CommentMod struct {
-	NodeMod
+// --------------------------------------------
+// Expr
 
-	Slash token.Pos `json:"Slash"`          // position of "/" starting the comment
-	Text  string    `json:"Text,omitempty"` // comment text (excluding '\n' for //-style comments)
-}
+type (
+	Ident struct {
+		Loc     *Loc   `json:"Loc"`
+		NamePos *Pos   `json:"NamePos"`
+		Name    string `json:"Name,omitempty"`
 
-type ObjectMod struct {
-	NodeMod
+		Node
+	}
 
-	Kind string `json:"Kind"`
-	Name string `json:"Name,omitempty"`
-	Decl any    `json:"Decl,omitempty"`
-}
+	BasicLit struct {
+		Loc      *Loc   `json:"Loc"`
+		ValuePos *Pos   `json:"ValuePos"`
+		Kind     string `json:"Kind"`
+		Value    string `json:"Value"`
 
-type IdentMod struct {
-	NodeMod
+		Node
+	}
+)
 
-	Pos        token.Pos  `json:"Pos"`
-	End        token.Pos  `json:"End"`
-	Name       string     `json:"Name,omitempty"`
-	Obj        *ObjectMod `json:"Obj,omitempty"`
-	IsExported bool       `json:"IsExported"`
-}
+func (*Ident) asonNode()    {}
+func (*BasicLit) asonNode() {}
+
+func (*Ident) exprNode()    {}
+func (*BasicLit) exprNode() {}
+
+// --------------------------------------------
+// Spec
+
+type (
+	ValueSpec struct {
+		Loc    *Loc     `json:"Loc"`
+		Names  []*Ident `json:"Names,omitempty"`
+		Values []Expr   `json:"Values,omitempty"`
+
+		Node
+	}
+)
+
+func (*ValueSpec) asonNode() {}
+
+func (*ValueSpec) specNode() {}
+
+// --------------------------------------------
+// Decl
+
+type (
+	GenDecl struct {
+		Loc      *Loc   `json:"Loc"`
+		TokenPos *Pos   `json:"TokenPos"`
+		Lparen   *Pos   `json:"Lparen"`
+		Rparen   *Pos   `json:"Rparen"`
+		Tok      string `json:"Tok"`
+		Specs    []Spec `json:"Specs"`
+	}
+)
+
+func (*GenDecl) asonNode() {}
+
+func (*GenDecl) declNode() {}
