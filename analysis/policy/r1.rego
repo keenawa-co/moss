@@ -8,7 +8,7 @@ fail[res] {
     print("test")
 
     res := {
-        "msg": "do not use fmt.Sprintln",
+        "msg": "do1111 not use fmt.Sprintln",
         "pos": input.Node.X.Fun.X.NamePos,
         "sev": "ERROR",
     }

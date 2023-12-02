@@ -1,6 +1,6 @@
 package goray.SE
 
-deprecatedPa := {
+deprecated := {
 	"io/ioutil": true, # warning
 	"crypto/md5": true, # critical
 	"net/http/httputil": true, # warning
