@@ -67,10 +67,10 @@ func SerializeFile(pass *Pass, input *ast.File) *File {
 	}
 }
 
-func SerializePos(pass *Pass, pos token.Pos) *Pos {
+func SerializePos(pass *Pass, pos token.Pos) *Position {
 	position := pass.fset.PositionFor(pos, false)
 
-	return &Pos{
+	return &Position{
 		Filename: position.Filename,
 		Offset:   position.Offset,
 		Line:     position.Line,
@@ -78,7 +78,7 @@ func SerializePos(pass *Pass, pos token.Pos) *Pos {
 	}
 }
 
-func ProcessPos(pass *Pass, pos token.Pos) *Pos {
+func ProcessPos(pass *Pass, pos token.Pos) *Position {
 	if pos != token.NoPos {
 		return SerializePos(pass, pos)
 	}
