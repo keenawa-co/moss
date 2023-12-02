@@ -67,7 +67,7 @@ func SerializeFile(pass *Pass, input *ast.File) *File {
 	}
 }
 
-func SerializePos(pass *Pass, pos token.Pos) *Position {
+func SerializePos(pass *Pass, pos token.Pos) Pos {
 	position := pass.fset.PositionFor(pos, false)
 
 	return &Position{
@@ -78,13 +78,12 @@ func SerializePos(pass *Pass, pos token.Pos) *Position {
 	}
 }
 
-func ProcessPos(pass *Pass, pos token.Pos) *Position {
+func ProcessPos(pass *Pass, pos token.Pos) Pos {
 	if pos != token.NoPos {
 		return SerializePos(pass, pos)
 	}
 
-	// TODO: when NoPos return should be 0, now null
-	return nil
+	return new(NoPos)
 }
 
 func ProcessLoc(pass *Pass, start, end token.Pos) *Loc {

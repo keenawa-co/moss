@@ -1,15 +1,20 @@
 package ason
 
-type Pos interface{}
+type (
+	Pos      interface{ pos() }
+	NoPos    int
+	Position struct {
+		Filename string // filename, if any
+		Offset   int    // offset, starting at 0
+		Line     int    // line number, starting at 1
+		Column   int    // column number, starting at 1 (byte count)
+	}
+)
 
-type Position struct {
-	Filename string // filename, if any
-	Offset   int    // offset, starting at 0
-	Line     int    // line number, starting at 1
-	Column   int    // column number, starting at 1 (byte count)
-}
+func (NoPos) pos()     {}
+func (*Position) pos() {}
 
 type Loc struct {
-	Start *Position `json:"Start,omitempty"`
-	End   *Position `json:"End,omitempty"`
+	Start Pos `json:"Start,omitempty"`
+	End   Pos `json:"End,omitempty"`
 }

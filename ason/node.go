@@ -34,7 +34,7 @@ type File struct {
 	// Scope              *Scope          // package scope (this file only)
 	// Imports            []*ImportSpec   // imports in this file
 	// Unresolved         []*Ident        // unresolved identifiers in this file
-	Package   *Position       `json:"Package,omitempty"`   // position of "package" keyword
+	Package   Pos             `json:"Package,omitempty"`   // position of "package" keyword
 	Comments  []*CommentGroup `json:"Comments,omitempty"`  // list of all comments in the source file
 	GoVersion string          `json:"GoVersion,omitempty"` // minimum Go version required by //go:build or // +build directives
 
@@ -45,8 +45,8 @@ func (*File) asonNode() {}
 
 type (
 	Comment struct {
-		Slash *Position `json:"Slash"`          // position of "/" starting the comment
-		Text  string    `json:"Text,omitempty"` // comment text (excluding '\n' for //-style comments)
+		Slash Pos    `json:"Slash"`          // position of "/" starting the comment
+		Text  string `json:"Text,omitempty"` // comment text (excluding '\n' for //-style comments)
 
 		Node
 	}
@@ -68,18 +68,18 @@ func (*CommentGroup) asonNode() {}
 
 type (
 	Ident struct {
-		Loc     *Loc      `json:"Loc"`
-		NamePos *Position `json:"NamePos"`
-		Name    string    `json:"Name,omitempty"`
+		Loc     *Loc   `json:"Loc"`
+		NamePos Pos    `json:"NamePos"`
+		Name    string `json:"Name,omitempty"`
 
 		Node
 	}
 
 	BasicLit struct {
-		Loc      *Loc      `json:"Loc"`
-		ValuePos *Position `json:"ValuePos"`
-		Kind     string    `json:"Kind"`
-		Value    string    `json:"Value"`
+		Loc      *Loc   `json:"Loc"`
+		ValuePos Pos    `json:"ValuePos"`
+		Kind     string `json:"Kind"`
+		Value    string `json:"Value"`
 
 		Node
 	}
@@ -113,12 +113,12 @@ func (*ValueSpec) specNode() {}
 
 type (
 	GenDecl struct {
-		Loc      *Loc      `json:"Loc"`
-		TokenPos *Position `json:"TokenPos"`
-		Lparen   *Position `json:"Lparen"`
-		Rparen   *Position `json:"Rparen"`
-		Tok      string    `json:"Tok"`
-		Specs    []Spec    `json:"Specs"`
+		Loc      *Loc   `json:"Loc"`
+		TokenPos Pos    `json:"TokenPos"`
+		Lparen   Pos    `json:"Lparen"`
+		Rparen   Pos    `json:"Rparen"`
+		Tok      string `json:"Tok"`
+		Specs    []Spec `json:"Specs"`
 	}
 )
 
