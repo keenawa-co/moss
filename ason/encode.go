@@ -5,30 +5,6 @@ import (
 	"go/token"
 )
 
-const (
-	TypeInvalid      = "<invalid>"
-	TypeFile         = "File"
-	TypeComment      = "Comment"
-	TypeCommentGroup = "CommentGroup"
-	TypeIdent        = "Ident"
-	TypeBasicLit     = "BasicLit"
-	TypeValueSpec    = "ValueSpec"
-	TypeGenDecl      = "GenDecl"
-)
-
-type SerdeFunc[I ast.Node, R Ason] func(*Pass, I) R
-
-func WithRefLookup[I ast.Node, R Ason](pass *Pass, input I, serde SerdeFunc[I, R]) R {
-	if node, exists := pass.ref[input]; exists {
-		return node.(R)
-	}
-	pass.refcount++
-	node := serde(pass, input)
-	pass.ref[input] = node
-
-	return node
-}
-
 type Pass struct {
 	fset     *token.FileSet
 	ref      map[any]any
@@ -40,6 +16,34 @@ func NewPass(fset *token.FileSet) *Pass {
 		fset: fset,
 		ref:  make(map[any]any),
 	}
+}
+
+type SerdeFunc[I ast.Node, R Ason] func(*Pass, I) R
+
+func WithRefLookup[I ast.Node, R Ason](pass *Pass, input I, serde SerdeFunc[I, R]) R {
+	if node, exists := pass.ref[input]; exists {
+		return node.(R)
+	}
+
+	node := serde(pass, input)
+
+	pass.refcount++
+	pass.ref[input] = node
+
+	return node
+}
+
+func ProcessList[I ast.Node, R Ason](pass *Pass, inputList []I, serde SerdeFunc[I, R]) []R {
+	if inputList == nil {
+		return nil
+	}
+
+	result := make([]R, len(inputList))
+	for i := 0; i < len(inputList); i++ {
+		result[i] = serde(pass, inputList[i])
+	}
+
+	return result
 }
 
 func ProcessNode(node ast.Node) Node {
@@ -58,11 +62,11 @@ func ProcessNodeWithRef(node ast.Node, ref uint) Node {
 func SerializeFile(pass *Pass, input *ast.File) *File {
 	return &File{
 		Name:     SerializeIdent(pass, input.Name),
-		Decls:    ProcessDeclList(pass, input.Decls),
+		Decls:    ProcessList[ast.Decl, Decl](pass, input.Decls, ProcessDecl),
 		Doc:      ProcessCommentGroup(pass, input.Doc),
 		Package:  ProcessPos(pass, input.Package),
 		Loc:      ProcessLoc(pass, input.FileStart, input.FileEnd),
-		Comments: ProcessCommentGroupList(pass, input.Comments),
+		Comments: ProcessList[*ast.CommentGroup, *CommentGroup](pass, input.Comments, ProcessCommentGroup),
 		Node:     ProcessNode(input),
 	}
 }
@@ -108,28 +112,10 @@ func SerializeComment(pass *Pass, input *ast.Comment) *Comment {
 	}
 }
 
-func SerializeCommentList(pass *Pass, inputList []*ast.Comment) []*Comment {
-	result := make([]*Comment, len(inputList))
-
-	for i := 0; i < len(inputList); i++ {
-		result[i] = SerializeComment(pass, inputList[i])
-	}
-
-	return result
-}
-
-func ProcessCommentList(pass *Pass, list []*ast.Comment) []*Comment {
-	if list != nil {
-		return SerializeCommentList(pass, list)
-	}
-
-	return nil
-}
-
 func SerializeCommentGroup(pass *Pass, input *ast.CommentGroup) *CommentGroup {
 	return &CommentGroup{
 		Node: ProcessNode(input),
-		List: ProcessCommentList(pass, input.List),
+		List: ProcessList[*ast.Comment, *Comment](pass, input.List, SerializeComment),
 	}
 }
 
@@ -141,78 +127,44 @@ func ProcessCommentGroup(pass *Pass, group *ast.CommentGroup) *CommentGroup {
 	return nil
 }
 
-func SerializeCommentGroupList(pass *Pass, inputList []*ast.CommentGroup) []*CommentGroup {
-	result := make([]*CommentGroup, len(inputList))
-
-	for i := 0; i < len(inputList); i++ {
-		result[i] = ProcessCommentGroup(pass, inputList[i])
-	}
-
-	return result
-}
-
-func ProcessCommentGroupList(pass *Pass, list []*ast.CommentGroup) []*CommentGroup {
-	if list != nil {
-		return SerializeCommentGroupList(pass, list)
-	}
-
-	return nil
-}
-
 func SerializeIdent(pass *Pass, input *ast.Ident) *Ident {
-	if node, exists := pass.ref[input]; exists {
-		return node.(*Ident)
-	}
-	pass.refcount++
+	return WithRefLookup[*ast.Ident, *Ident](pass, input, serializeIdent)
+}
 
-	node := &Ident{
+func serializeIdent(pass *Pass, input *ast.Ident) *Ident {
+	return &Ident{
 		Loc:     ProcessLoc(pass, input.Pos(), input.End()),
 		NamePos: ProcessPos(pass, input.NamePos),
 		Name:    input.Name,
 		Node:    ProcessNodeWithRef(input, pass.refcount),
 	}
 
-	pass.ref[input] = node
-
-	return node
 }
 
 func SerializeBasicLit(pass *Pass, input *ast.BasicLit) *BasicLit {
-	if node, exists := pass.ref[input]; exists {
-		return node.(*BasicLit)
-	}
+	return WithRefLookup[*ast.BasicLit, *BasicLit](pass, input, serializeBasicLit)
+}
 
-	pass.refcount++
-
-	node := &BasicLit{
+func serializeBasicLit(pass *Pass, input *ast.BasicLit) *BasicLit {
+	return &BasicLit{
 		Loc:      ProcessLoc(pass, input.Pos(), input.End()),
 		ValuePos: ProcessPos(pass, input.ValuePos),
 		Kind:     input.Kind.String(),
 		Value:    input.Value,
 		Node:     ProcessNodeWithRef(input, pass.refcount),
 	}
-
-	pass.ref[input] = node
-
-	return node
 }
 
 func SerializeValueSpec(pass *Pass, input *ast.ValueSpec) *ValueSpec {
-	if node, exists := pass.ref[input]; exists {
-		return node.(*ValueSpec)
-	}
+	return WithRefLookup[*ast.ValueSpec, *ValueSpec](pass, input, serializeValueSpec)
+}
 
-	pass.refcount++
-
-	node := &ValueSpec{
+func serializeValueSpec(pass *Pass, input *ast.ValueSpec) *ValueSpec {
+	return &ValueSpec{
 		Loc:    ProcessLoc(pass, input.Pos(), input.End()),
-		Values: ProcessExprList(pass, input.Values),
+		Values: ProcessList[ast.Expr, Expr](pass, input.Values, ProcessExpr),
 		Node:   ProcessNode(input),
 	}
-
-	pass.ref[input] = node
-
-	return node
 }
 
 func ProcessExpr(pass *Pass, expr ast.Expr) Expr {
@@ -224,20 +176,6 @@ func ProcessExpr(pass *Pass, expr ast.Expr) Expr {
 	}
 }
 
-func ProcessExprList(pass *Pass, exprList []ast.Expr) []Expr {
-	if exprList == nil {
-		return nil
-	}
-
-	result := make([]Expr, len(exprList))
-
-	for i := 0; i < len(exprList); i++ {
-		result[i] = ProcessExpr(pass, exprList[i])
-	}
-
-	return result
-}
-
 func SerializeGenDecl(pass *Pass, input *ast.GenDecl) *GenDecl {
 	return &GenDecl{
 		Loc:      ProcessLoc(pass, input.Pos(), input.End()),
@@ -245,7 +183,7 @@ func SerializeGenDecl(pass *Pass, input *ast.GenDecl) *GenDecl {
 		Lparen:   ProcessPos(pass, input.Lparen),
 		Rparen:   ProcessPos(pass, input.Rparen),
 		Tok:      input.Tok.String(),
-		Specs:    ProcessSpecList(pass, input.Specs),
+		Specs:    ProcessList[ast.Spec, Spec](pass, input.Specs, ProcessSpec),
 	}
 }
 
@@ -258,61 +196,11 @@ func ProcessSpec(pass *Pass, spec ast.Spec) Spec {
 	}
 }
 
-func ProcessSpecList(pass *Pass, specList []ast.Spec) []Spec {
-	if specList == nil {
-		return nil
-	}
-
-	result := make([]Spec, len(specList))
-
-	for i := 0; i < len(specList); i++ {
-		result[i] = ProcessSpec(pass, specList[i])
-	}
-
-	return result
-}
-
-func ProcessDeclList(pass *Pass, declList []ast.Decl) []Decl {
-	if declList == nil {
-		return nil
-	}
-
-	result := make([]Decl, len(declList))
-
-	for i := 0; i < len(declList); i++ {
-		result[i] = ProcessDecl(pass, declList[i])
-	}
-
-	return result
-}
-
 func ProcessDecl(pass *Pass, decl ast.Decl) Decl {
 	switch d := decl.(type) {
 	case *ast.GenDecl:
 		return SerializeGenDecl(pass, d)
 	default:
 		return nil
-	}
-}
-
-func defineNodeType(node ast.Node) string {
-	// n :=
-	switch node.(type) {
-	case *ast.File:
-		return TypeFile
-	case *ast.Comment:
-		return TypeComment
-	case *ast.CommentGroup:
-		return TypeCommentGroup
-	case *ast.Ident:
-		return TypeIdent
-	case *ast.BasicLit:
-		return TypeBasicLit
-	case *ast.ValueSpec:
-		return TypeValueSpec
-	case *ast.GenDecl:
-		return TypeGenDecl
-	default:
-		return TypeInvalid
 	}
 }

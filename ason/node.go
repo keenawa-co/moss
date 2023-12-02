@@ -20,15 +20,15 @@ type Expr interface {
 }
 
 type Node struct {
-	Ref  uint   `json:"-"`
+	Ref  uint   // `json:"-"`
 	Type string `json:"_type"`
 }
 
 type File struct {
-	Doc   *CommentGroup `json:"Doc,omitempty"`  // associated documentation; or nil
+	Doc   *CommentGroup `json:"Doc,omitempty"`  // associated documentation; or empty
 	Name  *Ident        `json:"Name,omitempty"` // package name
-	Decls []Decl        `json:"Decl"`
-	// top-level declarations; or nil
+	Decls []Decl        `json:"Decl"`           // top-level declarations
+
 	Loc *Loc // start and end of entire file
 
 	// Scope              *Scope          // package scope (this file only)

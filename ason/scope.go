@@ -15,6 +15,6 @@ func (NoPos) pos()     {}
 func (*Position) pos() {}
 
 type Loc struct {
-	Start Pos `json:"Start,omitempty"`
-	End   Pos `json:"End,omitempty"`
+	Start Pos `json:"Start"`
+	End   Pos `json:"End"`
 }
