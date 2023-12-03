@@ -18,14 +18,14 @@ func NewPass(fset *token.FileSet) *Pass {
 	}
 }
 
-type SerdeFunc[I ast.Node, R Ason] func(*Pass, I) R
+type SerFn[I ast.Node, R Ason] func(*Pass, I) R
 
-func WithRefLookup[I ast.Node, R Ason](pass *Pass, input I, serde SerdeFunc[I, R]) R {
+func WithRefLookup[I ast.Node, R Ason](pass *Pass, input I, ser SerFn[I, R]) R {
 	if node, exists := pass.ref[input]; exists {
 		return node.(R)
 	}
 
-	node := serde(pass, input)
+	node := ser(pass, input)
 
 	pass.refcount++
 	pass.ref[input] = node
@@ -33,14 +33,14 @@ func WithRefLookup[I ast.Node, R Ason](pass *Pass, input I, serde SerdeFunc[I, R
 	return node
 }
 
-func ProcessList[I ast.Node, R Ason](pass *Pass, inputList []I, serde SerdeFunc[I, R]) []R {
+func ProcessList[I ast.Node, R Ason](pass *Pass, inputList []I, ser SerFn[I, R]) []R {
 	if inputList == nil {
 		return nil
 	}
 
 	result := make([]R, len(inputList))
 	for i := 0; i < len(inputList); i++ {
-		result[i] = serde(pass, inputList[i])
+		result[i] = ser(pass, inputList[i])
 	}
 
 	return result
@@ -48,14 +48,14 @@ func ProcessList[I ast.Node, R Ason](pass *Pass, inputList []I, serde SerdeFunc[
 
 func ProcessNode(node ast.Node) Node {
 	return Node{
-		Type: defineNodeType(node),
+		Type: ProcessNodeType(node),
 	}
 }
 
 func ProcessNodeWithRef(node ast.Node, ref uint) Node {
 	return Node{
 		Ref:  ref,
-		Type: defineNodeType(node),
+		Type: ProcessNodeType(node),
 	}
 }
 
@@ -202,5 +202,38 @@ func ProcessDecl(pass *Pass, decl ast.Decl) Decl {
 		return SerializeGenDecl(pass, d)
 	default:
 		return nil
+	}
+}
+
+const (
+	NodeTypeInvalid      = "<invalid>"
+	NodeTypeFile         = "File"
+	NodeTypeComment      = "Comment"
+	NodeTypeCommentGroup = "CommentGroup"
+	NodeTypeIdent        = "Ident"
+	NodeTypeBasicLit     = "BasicLit"
+	NodeTypeValueSpec    = "ValueSpec"
+	NodeTypeGenDecl      = "GenDecl"
+)
+
+func ProcessNodeType(node ast.Node) string {
+	// n :=
+	switch node.(type) {
+	case *ast.File:
+		return NodeTypeFile
+	case *ast.Comment:
+		return NodeTypeComment
+	case *ast.CommentGroup:
+		return NodeTypeCommentGroup
+	case *ast.Ident:
+		return NodeTypeIdent
+	case *ast.BasicLit:
+		return NodeTypeBasicLit
+	case *ast.ValueSpec:
+		return NodeTypeValueSpec
+	case *ast.GenDecl:
+		return NodeTypeGenDecl
+	default:
+		return NodeTypeInvalid
 	}
 }
