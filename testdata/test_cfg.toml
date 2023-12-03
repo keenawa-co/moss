@@ -1,0 +1,15 @@
+[workspace]
+version = "1.0.193"
+root= "."
+policies="./policy"
+ignore-list=[".git", ".docker"]
+go-arch="${GOARCH}"
+
+[analysis]
+KRAIL1001 = {level = "info", target= "./lambdas"}
+
+[analysis.SE]
+level = "critical"
+target = "./internal"
+
+[performance]
