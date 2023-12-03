@@ -194,7 +194,7 @@ func runRootCmd(cmd *cobra.Command, args []string) {
 		log.Fatal(err)
 	}
 
-	sf := ason.SerializeFile(ason.NewPass(fset), f)
+	sf := ason.SerializeFile(ason.NewPass(fset, ason.WithPosCompression(), ason.WithRefCounter()), f)
 
 	js, err := json.Marshal(sf)
 	if err != nil {

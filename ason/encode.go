@@ -5,22 +5,62 @@ import (
 	"go/token"
 )
 
-type Pass struct {
+type SerConfig struct {
+	// RefCounterEnable flag must be used when you carry out some manual
+	// manipulations with the source AST tree. For example, you duplicate nodes,
+	// which can create nodes that have the same references to the original object in memory.
+	//
+	// Use this flag when duplicating nodes containing many fields.
+	RefCounterEnable bool
+
+	// Standard Position structure contains fields such as `Filename`, `Offset`, `Line` and `Column`.
+	// Usually, all this information is not required for, but only the
+	// `Line` in the source code file and `Filename` is required.
+	//
+	// Use this flag when you do not need support for backward compatibility with the original AST
+	// and you do not require the fields that the standard position structure contains
+	PosCompress bool
+}
+
+// SerPassOptFn is a functional option type that allows us to configure the SerPass.
+type SerPassOptFn func(*SerPass)
+
+type SerPass struct {
 	fset     *token.FileSet
 	ref      map[any]any
 	refcount uint
+	conf     *SerConfig
 }
 
-func NewPass(fset *token.FileSet) *Pass {
-	return &Pass{
+func NewPass(fset *token.FileSet, options ...SerPassOptFn) *SerPass {
+	pass := &SerPass{
 		fset: fset,
-		ref:  make(map[any]any),
+		conf: new(SerConfig),
+	}
+
+	for _, opt := range options {
+		opt(pass)
+	}
+
+	return pass
+}
+
+func WithRefCounter() SerPassOptFn {
+	return func(pass *SerPass) {
+		pass.ref = make(map[any]any)
+		pass.conf.RefCounterEnable = true
 	}
 }
 
-type SerFn[I ast.Node, R Ason] func(*Pass, I) R
+func WithPosCompression() SerPassOptFn {
+	return func(pass *SerPass) {
+		pass.conf.PosCompress = true
+	}
+}
 
-func WithRefLookup[I ast.Node, R Ason](pass *Pass, input I, ser SerFn[I, R]) R {
+type SerFn[I ast.Node, R Ason] func(*SerPass, I) R
+
+func WithRefLookup[I ast.Node, R Ason](pass *SerPass, input I, ser SerFn[I, R]) R {
 	if node, exists := pass.ref[input]; exists {
 		return node.(R)
 	}
@@ -33,7 +73,7 @@ func WithRefLookup[I ast.Node, R Ason](pass *Pass, input I, ser SerFn[I, R]) R {
 	return node
 }
 
-func ProcessList[I ast.Node, R Ason](pass *Pass, inputList []I, ser SerFn[I, R]) []R {
+func ProcessList[I ast.Node, R Ason](pass *SerPass, inputList []I, ser SerFn[I, R]) []R {
 	if inputList == nil {
 		return nil
 	}
@@ -59,7 +99,7 @@ func ProcessNodeWithRef(node ast.Node, ref uint) Node {
 	}
 }
 
-func SerializeFile(pass *Pass, input *ast.File) *File {
+func SerializeFile(pass *SerPass, input *ast.File) *File {
 	return &File{
 		Name:     SerializeIdent(pass, input.Name),
 		Decls:    ProcessList[ast.Decl, Decl](pass, input.Decls, ProcessDecl),
@@ -71,8 +111,15 @@ func SerializeFile(pass *Pass, input *ast.File) *File {
 	}
 }
 
-func SerializePos(pass *Pass, pos token.Pos) Pos {
+func SerializePos(pass *SerPass, pos token.Pos) Pos {
 	position := pass.fset.PositionFor(pos, false)
+
+	if pass.conf.PosCompress {
+		return &PosCompressed{
+			Filename: position.Filename,
+			Line:     position.Line,
+		}
+	}
 
 	return &Position{
 		Filename: position.Filename,
@@ -82,7 +129,7 @@ func SerializePos(pass *Pass, pos token.Pos) Pos {
 	}
 }
 
-func ProcessPos(pass *Pass, pos token.Pos) Pos {
+func ProcessPos(pass *SerPass, pos token.Pos) Pos {
 	if pos != token.NoPos {
 		return SerializePos(pass, pos)
 	}
@@ -90,7 +137,7 @@ func ProcessPos(pass *Pass, pos token.Pos) Pos {
 	return new(NoPos)
 }
 
-func ProcessLoc(pass *Pass, start, end token.Pos) *Loc {
+func ProcessLoc(pass *SerPass, start, end token.Pos) *Loc {
 	loc := new(Loc)
 
 	if start != token.NoPos {
@@ -104,7 +151,7 @@ func ProcessLoc(pass *Pass, start, end token.Pos) *Loc {
 	return loc
 }
 
-func SerializeComment(pass *Pass, input *ast.Comment) *Comment {
+func SerializeComment(pass *SerPass, input *ast.Comment) *Comment {
 	return &Comment{
 		Node:  ProcessNode(input),
 		Slash: ProcessPos(pass, input.Slash),
@@ -112,14 +159,14 @@ func SerializeComment(pass *Pass, input *ast.Comment) *Comment {
 	}
 }
 
-func SerializeCommentGroup(pass *Pass, input *ast.CommentGroup) *CommentGroup {
+func SerializeCommentGroup(pass *SerPass, input *ast.CommentGroup) *CommentGroup {
 	return &CommentGroup{
 		Node: ProcessNode(input),
 		List: ProcessList[*ast.Comment, *Comment](pass, input.List, SerializeComment),
 	}
 }
 
-func ProcessCommentGroup(pass *Pass, group *ast.CommentGroup) *CommentGroup {
+func ProcessCommentGroup(pass *SerPass, group *ast.CommentGroup) *CommentGroup {
 	if group != nil {
 		return SerializeCommentGroup(pass, group)
 	}
@@ -127,11 +174,15 @@ func ProcessCommentGroup(pass *Pass, group *ast.CommentGroup) *CommentGroup {
 	return nil
 }
 
-func SerializeIdent(pass *Pass, input *ast.Ident) *Ident {
+func SerializeIdent(pass *SerPass, input *ast.Ident) *Ident {
+	if !pass.conf.RefCounterEnable {
+		return serializeIdent(pass, input)
+	}
+
 	return WithRefLookup[*ast.Ident, *Ident](pass, input, serializeIdent)
 }
 
-func serializeIdent(pass *Pass, input *ast.Ident) *Ident {
+func serializeIdent(pass *SerPass, input *ast.Ident) *Ident {
 	return &Ident{
 		Loc:     ProcessLoc(pass, input.Pos(), input.End()),
 		NamePos: ProcessPos(pass, input.NamePos),
@@ -141,11 +192,15 @@ func serializeIdent(pass *Pass, input *ast.Ident) *Ident {
 
 }
 
-func SerializeBasicLit(pass *Pass, input *ast.BasicLit) *BasicLit {
+func SerializeBasicLit(pass *SerPass, input *ast.BasicLit) *BasicLit {
+	if !pass.conf.RefCounterEnable {
+		return serializeBasicLit(pass, input)
+	}
+
 	return WithRefLookup[*ast.BasicLit, *BasicLit](pass, input, serializeBasicLit)
 }
 
-func serializeBasicLit(pass *Pass, input *ast.BasicLit) *BasicLit {
+func serializeBasicLit(pass *SerPass, input *ast.BasicLit) *BasicLit {
 	return &BasicLit{
 		Loc:      ProcessLoc(pass, input.Pos(), input.End()),
 		ValuePos: ProcessPos(pass, input.ValuePos),
@@ -155,11 +210,15 @@ func serializeBasicLit(pass *Pass, input *ast.BasicLit) *BasicLit {
 	}
 }
 
-func SerializeValueSpec(pass *Pass, input *ast.ValueSpec) *ValueSpec {
+func SerializeValueSpec(pass *SerPass, input *ast.ValueSpec) *ValueSpec {
+	if !pass.conf.RefCounterEnable {
+		return serializeValueSpec(pass, input)
+	}
+
 	return WithRefLookup[*ast.ValueSpec, *ValueSpec](pass, input, serializeValueSpec)
 }
 
-func serializeValueSpec(pass *Pass, input *ast.ValueSpec) *ValueSpec {
+func serializeValueSpec(pass *SerPass, input *ast.ValueSpec) *ValueSpec {
 	return &ValueSpec{
 		Loc:    ProcessLoc(pass, input.Pos(), input.End()),
 		Values: ProcessList[ast.Expr, Expr](pass, input.Values, ProcessExpr),
@@ -167,16 +226,15 @@ func serializeValueSpec(pass *Pass, input *ast.ValueSpec) *ValueSpec {
 	}
 }
 
-func ProcessExpr(pass *Pass, expr ast.Expr) Expr {
-	switch e := expr.(type) {
-	case *ast.BasicLit:
-		return SerializeBasicLit(pass, e)
-	default:
-		return nil
+func SerializeGenDecl(pass *SerPass, input *ast.GenDecl) *GenDecl {
+	if !pass.conf.RefCounterEnable {
+		return serializeGenDecl(pass, input)
 	}
+
+	return WithRefLookup[*ast.GenDecl, *GenDecl](pass, input, serializeGenDecl)
 }
 
-func SerializeGenDecl(pass *Pass, input *ast.GenDecl) *GenDecl {
+func serializeGenDecl(pass *SerPass, input *ast.GenDecl) *GenDecl {
 	return &GenDecl{
 		Loc:      ProcessLoc(pass, input.Pos(), input.End()),
 		TokenPos: ProcessPos(pass, input.TokPos),
@@ -187,7 +245,16 @@ func SerializeGenDecl(pass *Pass, input *ast.GenDecl) *GenDecl {
 	}
 }
 
-func ProcessSpec(pass *Pass, spec ast.Spec) Spec {
+func ProcessExpr(pass *SerPass, expr ast.Expr) Expr {
+	switch e := expr.(type) {
+	case *ast.BasicLit:
+		return SerializeBasicLit(pass, e)
+	default:
+		return nil
+	}
+}
+
+func ProcessSpec(pass *SerPass, spec ast.Spec) Spec {
 	switch s := spec.(type) {
 	case *ast.ValueSpec:
 		return SerializeValueSpec(pass, s)
@@ -196,7 +263,7 @@ func ProcessSpec(pass *Pass, spec ast.Spec) Spec {
 	}
 }
 
-func ProcessDecl(pass *Pass, decl ast.Decl) Decl {
+func ProcessDecl(pass *SerPass, decl ast.Decl) Decl {
 	switch d := decl.(type) {
 	case *ast.GenDecl:
 		return SerializeGenDecl(pass, d)
