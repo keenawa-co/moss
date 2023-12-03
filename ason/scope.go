@@ -1,14 +1,18 @@
 package ason
 
-type (
-	Pos   interface{ pos() }
-	NoPos int
+import "strconv"
 
+func _GOARCH() int {
+	return strconv.IntSize
+}
+
+type (
+	Pos           interface{ pos() }
+	NoPos         int
 	PosCompressed struct {
 		Filename string
 		Line     int // line number, starting at 1
 	}
-
 	Position struct {
 		Filename string
 		Offset   int // offset, starting at 0
