@@ -7,9 +7,69 @@ import (
 	"log"
 )
 
+// TODO List
+//
+// *ast.Field
+// *ast.FieldList
+// *ast.BadExpr
+// *ast.Ellipsis
+// *ast.FuncLit
+// *ast.CompositeLit
+// *ast.ParenExpr
+// *ast.SelectorExpr
+// *ast.IndexExpr
+// *ast.IndexListExpr
+// *ast.SliceExpr
+// *ast.TypeAssertExpr
+// *ast.CallExpr:
+// *ast.StarExpr:
+// *ast.UnaryExpr:
+// *ast.BinaryExpr
+// *ast.KeyValueExpr
+// *ast.ArrayType
+// *ast.StructType
+// *ast.FuncType
+// *ast.InterfaceType
+// *ast.MapType
+// *ast.ChanType
+// *ast.BadStmt
+// *ast.DeclStmt
+// *ast.EmptyStmt
+// *ast.LabeledStmt
+// *ast.ExprStmt
+// *ast.SendStmt
+// *ast.IncDecStmt
+// *ast.AssignStmt
+// *ast.GoStmt
+// *ast.DeferStmt
+// *ast.ReturnStmt
+// *ast.BranchStmt
+// *ast.BlockStmt
+// *ast.IfStmt
+// *ast.CaseClause
+// *ast.SwitchStmt
+// *ast.TypeSwitchStmt
+// *ast.CommClause
+// *ast.SelectStmt
+// *ast.ForStmt
+// *ast.RangeStmt
+// *ast.ImportSpec
+// *ast.TypeSpec
+// *ast.BadDecl
+// *ast.GenDecl
+// *ast.FuncDecl
+// *ast.File
+// *ast.Package
+
 type DePass struct {
 	fset *token.FileSet
 	ref  map[ast.Node]Ason
+}
+
+func NewDePass(fset *token.FileSet) *DePass {
+	return &DePass{
+		fset: fset,
+	}
 }
 
 type DeFn[I Ason, R ast.Node] func(*DePass, I) R
@@ -25,12 +85,6 @@ func DeProcessList[I Ason, R ast.Node](pass *DePass, inputList []I, de DeFn[I, R
 	}
 
 	return result
-}
-
-func NewDePass(fset *token.FileSet) *DePass {
-	return &DePass{
-		fset: fset,
-	}
 }
 
 func DeserializeFile(pass *DePass, input *File) *ast.File {

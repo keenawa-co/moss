@@ -9,6 +9,7 @@
         "modfile",
         "rchr",
         "refcount",
+        "refmap",
         "rego",
         "sema",
         "serde",

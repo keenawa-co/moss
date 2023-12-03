@@ -6,6 +6,60 @@ import (
 	"os"
 )
 
+// TODO List
+//
+// *ast.Field
+// *ast.FieldList
+// *ast.BadExpr
+// *ast.Ellipsis
+// *ast.FuncLit
+// *ast.CompositeLit
+// *ast.ParenExpr
+// *ast.SelectorExpr
+// *ast.IndexExpr
+// *ast.IndexListExpr
+// *ast.SliceExpr
+// *ast.TypeAssertExpr
+// *ast.CallExpr:
+// *ast.StarExpr:
+// *ast.UnaryExpr:
+// *ast.BinaryExpr
+// *ast.KeyValueExpr
+// *ast.ArrayType
+// *ast.StructType
+// *ast.FuncType
+// *ast.InterfaceType
+// *ast.MapType
+// *ast.ChanType
+// *ast.BadStmt
+// *ast.DeclStmt
+// *ast.EmptyStmt
+// *ast.LabeledStmt
+// *ast.ExprStmt
+// *ast.SendStmt
+// *ast.IncDecStmt
+// *ast.AssignStmt
+// *ast.GoStmt
+// *ast.DeferStmt
+// *ast.ReturnStmt
+// *ast.BranchStmt
+// *ast.BlockStmt
+// *ast.IfStmt
+// *ast.CaseClause
+// *ast.SwitchStmt
+// *ast.TypeSwitchStmt
+// *ast.CommClause
+// *ast.SelectStmt
+// *ast.ForStmt
+// *ast.RangeStmt
+// *ast.ImportSpec
+// *ast.TypeSpec
+// *ast.BadDecl
+// *ast.GenDecl
+// *ast.FuncDecl
+// *ast.File
+// *ast.Package
+
 type SerConfig struct {
 	// RefCounterEnable flag must be used when you carry out some manual
 	// manipulations with the source AST tree. For example, you duplicate nodes,
@@ -25,7 +79,7 @@ type SerConfig struct {
 
 type SerPass struct {
 	fset     *token.FileSet
-	ref      map[ast.Node]Ason
+	refmap   map[ast.Node]Ason
 	refcount uint
 	conf     *SerConfig
 }
@@ -33,7 +87,7 @@ type SerPass struct {
 // SerPassOptFn is a functional option type that allows us to configure the SerPass.
 type SerPassOptFn func(*SerPass)
 
-func NewPass(fset *token.FileSet, options ...SerPassOptFn) *SerPass {
+func NewSerPass(fset *token.FileSet, options ...SerPassOptFn) *SerPass {
 	pass := &SerPass{
 		fset: fset,
 		conf: new(SerConfig),
@@ -48,7 +102,7 @@ func NewPass(fset *token.FileSet, options ...SerPassOptFn) *SerPass {
 
 func WithRefCounter() SerPassOptFn {
 	return func(pass *SerPass) {
-		pass.ref = make(map[ast.Node]Ason)
+		pass.refmap = make(map[ast.Node]Ason)
 		pass.conf.RefCounterEnable = true
 	}
 }
@@ -62,14 +116,14 @@ func WithPosCompression() SerPassOptFn {
 type SerFn[I ast.Node, R Ason] func(*SerPass, I) R
 
 func WithRefLookup[I ast.Node, R Ason](pass *SerPass, input I, ser SerFn[I, R]) R {
-	if node, exists := pass.ref[input]; exists {
+	if node, exists := pass.refmap[input]; exists {
 		return node.(R)
 	}
 
 	node := ser(pass, input)
 
 	pass.refcount++
-	pass.ref[input] = node
+	pass.refmap[input] = node
 
 	return node
 }
