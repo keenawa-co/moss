@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"go/ast"
 	"go/parser"
+	"go/printer"
 	"go/token"
 	"log"
 	"os"
@@ -194,7 +195,7 @@ func runRootCmd(cmd *cobra.Command, args []string) {
 		log.Fatal(err)
 	}
 
-	sf := ason.SerializeFile(ason.NewPass(fset, ason.WithPosCompression(), ason.WithRefCounter()), f)
+	sf := ason.SerializeFile(ason.NewPass(fset), f)
 
 	js, err := json.Marshal(sf)
 	if err != nil {
@@ -202,6 +203,21 @@ func runRootCmd(cmd *cobra.Command, args []string) {
 	}
 
 	fmt.Println(string(js))
+
+	fmt.Println()
+	fmt.Println()
+
+	fset2 := token.NewFileSet()
+	df := ason.DeserializeFile(ason.NewDePass(fset2), sf)
+
+	code, err := GenerateCode(fset2, df)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Println(code)
+
+	// ast.Print(token.NewFileSet(), ds)
 
 	// ast.Inspect(f, func(n ast.Node) bool {
 	// 	if n == nil {
@@ -225,4 +241,20 @@ func runRootCmd(cmd *cobra.Command, args []string) {
 	if err := evaluateRegoPolicy(policyPath, data); err != nil {
 		log.Fatal("Ошибка при выполнении политики:", err)
 	}
+}
+
+func GenerateCode(fset *token.FileSet, astFile *ast.File) (string, error) {
+	var buf bytes.Buffer
+
+	cfg := printer.Config{
+		Mode:     printer.TabIndent | printer.UseSpaces,
+		Tabwidth: 2,
+	}
+
+	err := cfg.Fprint(&buf, fset, astFile)
+	if err != nil {
+		return "", err
+	}
+
+	return buf.String(), nil
 }

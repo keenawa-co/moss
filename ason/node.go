@@ -1,5 +1,17 @@
 package ason
 
+// NodeType constants define the string representation of various AST node types.
+const (
+	NodeTypeInvalid      = "Invalid"
+	NodeTypeFile         = "File"
+	NodeTypeComment      = "Comment"
+	NodeTypeCommentGroup = "CommentGroup"
+	NodeTypeIdent        = "Ident"
+	NodeTypeBasicLit     = "BasicLit"
+	NodeTypeValueSpec    = "ValueSpec"
+	NodeTypeGenDecl      = "GenDecl"
+)
+
 type Ason interface {
 	asonNode()
 }
@@ -29,14 +41,15 @@ type File struct {
 	Name  *Ident        `json:"Name,omitempty"` // package name
 	Decls []Decl        `json:"Decl"`           // top-level declarations
 
-	Loc *Loc // start and end of entire file
+	Loc  *Loc // start and end of entire file
+	Size int  // file size in bytes
 
 	// Scope              *Scope          // package scope (this file only)
 	// Imports            []*ImportSpec   // imports in this file
 	// Unresolved         []*Ident        // unresolved identifiers in this file
 	Package   Pos             `json:"Package,omitempty"`   // position of "package" keyword
 	Comments  []*CommentGroup `json:"Comments,omitempty"`  // list of all comments in the source file
-	GoVersion string          `json:"GoVersion,omitempty"` // minimum Go version required by //go:build or // +build directives
+	GoVersion string          `json:"GoVersion,omitempty"` // minimum Go version required by go:build or +build directives
 
 	Node
 }
@@ -119,6 +132,8 @@ type (
 		Rparen   Pos    `json:"Rparen"`
 		Tok      string `json:"Tok"`
 		Specs    []Spec `json:"Specs"`
+
+		Node
 	}
 )
 
