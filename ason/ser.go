@@ -79,7 +79,7 @@ type SerConfig struct {
 
 type SerPass struct {
 	fset     *token.FileSet
-	refmap   map[ast.Node]Ason
+	refcache map[ast.Node]Ason
 	refcount uint
 	conf     *SerConfig
 }
@@ -102,7 +102,7 @@ func NewSerPass(fset *token.FileSet, options ...SerPassOptFn) *SerPass {
 
 func WithRefCounter() SerPassOptFn {
 	return func(pass *SerPass) {
-		pass.refmap = make(map[ast.Node]Ason)
+		pass.refcache = make(map[ast.Node]Ason)
 		pass.conf.RefCounterEnable = true
 	}
 }
@@ -116,14 +116,14 @@ func WithPosCompression() SerPassOptFn {
 type SerFn[I ast.Node, R Ason] func(*SerPass, I) R
 
 func WithRefLookup[I ast.Node, R Ason](pass *SerPass, input I, ser SerFn[I, R]) R {
-	if node, exists := pass.refmap[input]; exists {
+	if node, exists := pass.refcache[input]; exists {
 		return node.(R)
 	}
 
 	node := ser(pass, input)
 
 	pass.refcount++
-	pass.refmap[input] = node
+	pass.refcache[input] = node
 
 	return node
 }

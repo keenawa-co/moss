@@ -32,7 +32,7 @@ type Expr interface {
 }
 
 type Node struct {
-	Ref  uint   // `json:"-"`
+	Ref  uint   `json:"_ref"`
 	Type string `json:"_type"`
 }
 

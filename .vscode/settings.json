@@ -8,6 +8,7 @@
         "goray",
         "modfile",
         "rchr",
+        "refcache",
         "refcount",
         "refmap",
         "rego",
