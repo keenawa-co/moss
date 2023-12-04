@@ -141,13 +141,13 @@ func SerProcessList[I ast.Node, R Ason](pass *SerPass, inputList []I, ser SerFn[
 	return result
 }
 
-func SerProcessNode(node ast.Node) Node {
+func SerializeNode(node ast.Node) Node {
 	return Node{
 		Type: SerProcessNodeType(node),
 	}
 }
 
-func SerProcessNodeWithRef(node ast.Node, ref uint) Node {
+func SerializeNodeWithRef(node ast.Node, ref uint) Node {
 	return Node{
 		Ref:  ref,
 		Type: SerProcessNodeType(node),
@@ -158,13 +158,13 @@ func SerializeFile(pass *SerPass, input *ast.File) *File {
 	return &File{
 		Name:      SerializeIdent(pass, input.Name),
 		Decls:     SerProcessList[ast.Decl, Decl](pass, input.Decls, SerProcessDecl),
-		Doc:       SerProcessCommentGroup(pass, input.Doc),
+		Doc:       SerializeCommentGroup(pass, input.Doc),
 		Package:   SerProcessPos(pass, input.Package),
 		Loc:       SerProcessLoc(pass, input.FileStart, input.FileEnd),
 		Size:      SerProcessFileSize(pass, input),
-		Comments:  SerProcessList[*ast.CommentGroup, *CommentGroup](pass, input.Comments, SerProcessCommentGroup),
+		Comments:  SerProcessList[*ast.CommentGroup, *CommentGroup](pass, input.Comments, SerializeCommentGroup),
 		GoVersion: input.GoVersion,
-		Node:      SerProcessNode(input),
+		Node:      SerializeNode(input),
 	}
 }
 
@@ -182,17 +182,25 @@ func SerializePos(pass *SerPass, pos token.Pos) Pos {
 	position := pass.fset.PositionFor(pos, false)
 
 	if pass.conf.PosCompress {
-		return &PosCompressed{
-			Filename: position.Filename,
-			Line:     position.Line,
-		}
+		return serializePosCompressed(&position)
 	}
 
+	return serializePos(&position)
+}
+
+func serializePos(pos *token.Position) Pos {
 	return &Position{
-		Filename: position.Filename,
-		Offset:   position.Offset,
-		Line:     position.Line,
-		Column:   position.Column,
+		Filename: pos.Filename,
+		Offset:   pos.Offset,
+		Line:     pos.Line,
+		Column:   pos.Column,
+	}
+}
+
+func serializePosCompressed(pos *token.Position) Pos {
+	return &PosCompressed{
+		Filename: pos.Filename,
+		Line:     pos.Line,
 	}
 }
 
@@ -220,25 +228,25 @@ func SerProcessLoc(pass *SerPass, start, end token.Pos) *Loc {
 
 func SerializeComment(pass *SerPass, input *ast.Comment) *Comment {
 	return &Comment{
-		Node:  SerProcessNode(input),
+		Node:  SerializeNode(input),
 		Slash: SerProcessPos(pass, input.Slash),
 		Text:  input.Text,
 	}
 }
 
-func SerializeCommentGroup(pass *SerPass, input *ast.CommentGroup) *CommentGroup {
-	return &CommentGroup{
-		Node: SerProcessNode(input),
-		List: SerProcessList[*ast.Comment, *Comment](pass, input.List, SerializeComment),
-	}
-}
-
-func SerProcessCommentGroup(pass *SerPass, group *ast.CommentGroup) *CommentGroup {
+func SerializeCommentGroup(pass *SerPass, group *ast.CommentGroup) *CommentGroup {
 	if group != nil {
-		return SerializeCommentGroup(pass, group)
+		return serializeCommentGroup(pass, group)
 	}
 
 	return nil
+}
+
+func serializeCommentGroup(pass *SerPass, input *ast.CommentGroup) *CommentGroup {
+	return &CommentGroup{
+		Node: SerializeNode(input),
+		List: SerProcessList[*ast.Comment, *Comment](pass, input.List, SerializeComment),
+	}
 }
 
 func SerializeIdent(pass *SerPass, input *ast.Ident) *Ident {
@@ -254,7 +262,7 @@ func serializeIdent(pass *SerPass, input *ast.Ident) *Ident {
 		Loc:     SerProcessLoc(pass, input.Pos(), input.End()),
 		NamePos: SerProcessPos(pass, input.NamePos),
 		Name:    input.Name,
-		Node:    SerProcessNodeWithRef(input, pass.refcount),
+		Node:    SerializeNodeWithRef(input, pass.refcount),
 	}
 
 }
@@ -273,7 +281,7 @@ func serializeBasicLit(pass *SerPass, input *ast.BasicLit) *BasicLit {
 		ValuePos: SerProcessPos(pass, input.ValuePos),
 		Kind:     input.Kind.String(),
 		Value:    input.Value,
-		Node:     SerProcessNodeWithRef(input, pass.refcount),
+		Node:     SerializeNodeWithRef(input, pass.refcount),
 	}
 }
 
@@ -290,7 +298,7 @@ func serializeValueSpec(pass *SerPass, input *ast.ValueSpec) *ValueSpec {
 		Loc:    SerProcessLoc(pass, input.Pos(), input.End()),
 		Names:  SerProcessList[*ast.Ident, *Ident](pass, input.Names, SerializeIdent),
 		Values: SerProcessList[ast.Expr, Expr](pass, input.Values, SerProcessExpr),
-		Node:   SerProcessNode(input),
+		Node:   SerializeNode(input),
 	}
 }
 
@@ -310,7 +318,7 @@ func serializeGenDecl(pass *SerPass, input *ast.GenDecl) *GenDecl {
 		Rparen:   SerProcessPos(pass, input.Rparen),
 		Tok:      input.Tok.String(),
 		Specs:    SerProcessList[ast.Spec, Spec](pass, input.Specs, SerProcessSpec),
-		Node:     SerProcessNode(input),
+		Node:     SerializeNode(input),
 	}
 }
 
