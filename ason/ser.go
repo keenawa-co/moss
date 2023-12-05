@@ -79,8 +79,9 @@ type SerConfig struct {
 
 type SerPass struct {
 	fset     *token.FileSet
-	refcache map[ast.Node]Ason
-	refcount uint
+	readFile func(string) ([]byte, error)
+	refCache map[ast.Node]*WeakRef
+	refCount uint
 	conf     *SerConfig
 }
 
@@ -89,8 +90,9 @@ type SerPassOptFn func(*SerPass)
 
 func NewSerPass(fset *token.FileSet, options ...SerPassOptFn) *SerPass {
 	pass := &SerPass{
-		fset: fset,
-		conf: new(SerConfig),
+		fset:     fset,
+		readFile: os.ReadFile,
+		conf:     new(SerConfig),
 	}
 
 	for _, opt := range options {
@@ -100,9 +102,15 @@ func NewSerPass(fset *token.FileSet, options ...SerPassOptFn) *SerPass {
 	return pass
 }
 
+func WithReadFileFn(fn func(string) ([]byte, error)) SerPassOptFn {
+	return func(pass *SerPass) {
+		pass.readFile = fn
+	}
+}
+
 func WithRefCounter() SerPassOptFn {
 	return func(pass *SerPass) {
-		pass.refcache = make(map[ast.Node]Ason)
+		pass.refCache = make(map[ast.Node]*WeakRef)
 		pass.conf.RefCounterEnable = true
 	}
 }
@@ -115,27 +123,26 @@ func WithPosCompression() SerPassOptFn {
 
 type SerFn[I ast.Node, R Ason] func(*SerPass, I) R
 
-func WithRefLookup[I ast.Node, R Ason](pass *SerPass, input I, ser SerFn[I, R]) R {
-	if node, exists := pass.refcache[input]; exists {
-		return node.(R)
+func WithRefLookup[I ast.Node, R Ason](pass *SerPass, input I, serFn SerFn[I, R]) R {
+	if weakRef, exists := pass.refCache[input]; exists {
+		return weakRef.GetTarget().(R)
 	}
 
-	node := ser(pass, input)
-
-	pass.refcount++
-	pass.refcache[input] = node
+	node := serFn(pass, input)
+	pass.refCache[input] = NewWeakRef(&node)
+	pass.refCount++
 
 	return node
 }
 
-func SerProcessList[I ast.Node, R Ason](pass *SerPass, inputList []I, ser SerFn[I, R]) []R {
+func SerProcessList[I ast.Node, R Ason](pass *SerPass, inputList []I, serFn SerFn[I, R]) []R {
 	if inputList == nil {
 		return nil
 	}
 
 	result := make([]R, len(inputList))
 	for i := 0; i < len(inputList); i++ {
-		result[i] = ser(pass, inputList[i])
+		result[i] = serFn(pass, inputList[i])
 	}
 
 	return result
@@ -170,7 +177,7 @@ func SerializeFile(pass *SerPass, input *ast.File) *File {
 
 func SerProcessFileSize(pass *SerPass, input *ast.File) int {
 	position := pass.fset.PositionFor(input.Name.NamePos, false)
-	content, err := os.ReadFile(position.Filename)
+	content, err := pass.readFile(position.Filename)
 	if err != nil {
 		return 1<<_GOARCH() - 2
 	}
@@ -262,7 +269,7 @@ func serializeIdent(pass *SerPass, input *ast.Ident) *Ident {
 		Loc:     SerProcessLoc(pass, input.Pos(), input.End()),
 		NamePos: SerProcessPos(pass, input.NamePos),
 		Name:    input.Name,
-		Node:    SerializeNodeWithRef(input, pass.refcount),
+		Node:    SerializeNodeWithRef(input, pass.refCount),
 	}
 
 }
@@ -281,7 +288,7 @@ func serializeBasicLit(pass *SerPass, input *ast.BasicLit) *BasicLit {
 		ValuePos: SerProcessPos(pass, input.ValuePos),
 		Kind:     input.Kind.String(),
 		Value:    input.Value,
-		Node:     SerializeNodeWithRef(input, pass.refcount),
+		Node:     SerializeNodeWithRef(input, pass.refCount),
 	}
 }
 
