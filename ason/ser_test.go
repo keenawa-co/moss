@@ -15,6 +15,10 @@ const (
 	pathToAsonTestDataDir = "./testdata/main.go"
 )
 
+const (
+	testIdentName = "testIdent"
+)
+
 func mockReadFileWithErr(name string) ([]byte, error) {
 	return nil, errors.New("test error")
 }
@@ -61,29 +65,34 @@ func TestNewSerPass(t *testing.T) {
 	})
 }
 
-func TestSerializeNode(t *testing.T) {
-	t.Run("valid: correct creation", func(t *testing.T) {
-		node := SerializeNode(&ast.BasicLit{})
-		assert.Equal(t, node.Type, NodeTypeBasicLit)
+func TestWithRefLookup(t *testing.T) {
+	t.Run("valid", func(t *testing.T) {
+		pass := NewSerPass(token.NewFileSet(), WithRefCounter())
+		astNode := &ast.Ident{Name: testIdentName}
+		ident := SerializeIdent(pass, astNode)
+		pass.refCache[astNode] = NewWeakRef(ident)
+
+		// Panic at this point means that inside the function there was a call
+		// to the function to the serializer, which we passed as nil.
+		//Calling this function means that the link could not be found in the cache,
+		// although it should have been there.
+		assert.NotPanics(t, func() {
+			WithRefLookup[*ast.Ident, *Ident](pass, astNode, nil)
+		}, "unexpected: should not try to call serialize func")
+
+		assert.Equal(t, ident, WithRefLookup[*ast.Ident, *Ident](pass, astNode, nil))
 	})
 
-	t.Run("invalid: correct creation but expect wrong type", func(t *testing.T) {
-		node := SerializeNode(&ast.BasicLit{})
-		assert.NotEqual(t, node.Type, NodeTypeComment)
-	})
-}
+	t.Run("invalid: searching for a link that is not in the cache", func(t *testing.T) {
+		pass := NewSerPass(token.NewFileSet(), WithRefCounter())
+		astNode := &ast.Ident{Name: testIdentName}
 
-func TestSerializeNodeWithRef(t *testing.T) {
-	t.Run("valid: correct creation", func(t *testing.T) {
-		node := SerializeNodeWithRef(&ast.BasicLit{}, uint(1))
-		assert.Equal(t, node.Type, NodeTypeBasicLit)
-		assert.Equal(t, node.Ref, uint(1))
-	})
-
-	t.Run("invalid: correct creation but expect wrong type", func(t *testing.T) {
-		node := SerializeNodeWithRef(&ast.BasicLit{}, uint(1))
-		assert.NotEqual(t, node.Type, NodeTypeComment)
-		assert.NotEqual(t, node.Ref, uint(2))
+		// The absence of panic in this case means that an unknown link was found
+		// that for some reason corresponds to the one you were looking for,
+		// although you did not save it before
+		assert.Panics(t, func() {
+			WithRefLookup[*ast.Ident, *Ident](pass, astNode, nil)
+		}, "unexpected: should call serialize func")
 	})
 }
 
@@ -91,16 +100,62 @@ func TestSerProcessFileSize(t *testing.T) {
 	t.Run("valid", func(t *testing.T) {
 		f, fset := uploadTestData(t, pathToAsonTestDataDir)
 		pass := NewSerPass(fset)
-		size := SerProcessFileSize(pass, f)
+		size := calcFileSize(pass, f)
 		assert.Greater(t, size, 0)
 	})
 
 	t.Run("invalid: with file read error", func(t *testing.T) {
 		f, fset := uploadTestData(t, pathToAsonTestDataDir)
 		pass := NewSerPass(fset, WithReadFileFn(mockReadFileWithErr))
-		size := SerProcessFileSize(pass, f)
+		size := calcFileSize(pass, f)
 		assert.Equal(t, 1<<_GOARCH()-2, size)
 	})
+}
+
+func TestSerPos(t *testing.T) {
+	t.Run("valid: without compression", func(t *testing.T) {
+		f, fset := uploadTestData(t, pathToAsonTestDataDir)
+		pass := NewSerPass(fset)
+
+		pos := SerializePos(pass, f.FileStart)
+		assert.NotNil(t, pos)
+		assert.IsType(t, &Position{}, pos)
+	})
+
+	t.Run("valid: with compression", func(t *testing.T) {
+		f, fset := uploadTestData(t, pathToAsonTestDataDir)
+		pass := NewSerPass(fset, WithPosCompression())
+
+		pos := SerializePos(pass, f.FileStart)
+		assert.NotNil(t, pos)
+		assert.IsType(t, &PosCompressed{}, pos)
+	})
+
+	t.Run("invalid: got token.NoPos", func(t *testing.T) {
+		pass := NewSerPass(token.NewFileSet())
+
+		pos := SerializePos(pass, token.NoPos)
+		assert.NotNil(t, pos)
+		assert.Equal(t, pos, new(NoPos))
+	})
+}
+
+func TestSerializeIdent(t *testing.T) {
+	t.Run("valid", func(t *testing.T) {
+		astIdent := &ast.Ident{
+			Name:    testIdentName,
+			NamePos: token.Pos(1),
+		}
+		pass := NewSerPass(token.NewFileSet())
+		ident := SerializeIdent(pass, astIdent)
+		assert.NotNil(t, ident)
+		assert.Equal(t, testIdentName, ident.Name)
+		assert.Equal(t, NodeTypeIdent, ident.Node.Type)
+	})
+}
+
+func TestSerializeBasicLit(t *testing.T) {
+
 }
 
 func uploadTestData(t *testing.T, pathToTestData string) (*ast.File, *token.FileSet) {

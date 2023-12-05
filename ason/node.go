@@ -8,8 +8,12 @@ const (
 	NodeTypeCommentGroup = "CommentGroup"
 	NodeTypeIdent        = "Ident"
 	NodeTypeBasicLit     = "BasicLit"
+	NodeTypeCompositeLit = "CompositeLit"
 	NodeTypeValueSpec    = "ValueSpec"
 	NodeTypeGenDecl      = "GenDecl"
+	NodeTypeField        = "Field"
+	NodeTypeBadExpr      = "BadExpr"
+	NodeTypeEllipsis     = "Ellipsis"
 )
 
 type Ason interface {
@@ -79,6 +83,18 @@ func (*CommentGroup) asonNode() {}
 // --------------------------------------------
 // Expr
 
+type Field struct {
+	Loc     *Loc          `json:"Loc"`
+	Names   []*Ident      `json:"Names"`
+	Type    Expr          `json:"Type"`
+	Tag     *BasicLit     `json:"Tag"`
+	Comment *CommentGroup `json:"Comment"`
+
+	Node
+}
+
+func (*Field) asonNode() {}
+
 type (
 	Ident struct {
 		Loc     *Loc   `json:"Loc"`
@@ -96,13 +112,43 @@ type (
 
 		Node
 	}
+
+	CompositeLit struct {
+		Loc        *Loc   `json:"Loc"`
+		Type       Expr   `json:"Type"`
+		Lbrace     Pos    `json:"Lbrace"`
+		Elts       []Expr `json:"Elts"`
+		Rbrace     Pos    `json:"Rbrace"`
+		Incomplete bool   `json:"Incomplete"`
+
+		Node
+	}
+
+	BadExpr struct {
+		Loc *Loc `json:"Loc"`
+
+		Node
+	}
+
+	Ellipsis struct {
+		Ellipsis Pos  `json:"Ellipsis"`
+		Elt      Expr `json:"Elt"`
+
+		Node
+	}
 )
 
-func (*Ident) asonNode()    {}
-func (*BasicLit) asonNode() {}
+func (*Ident) asonNode()        {}
+func (*BasicLit) asonNode()     {}
+func (*BadExpr) asonNode()      {}
+func (*Ellipsis) asonNode()     {}
+func (*CompositeLit) asonNode() {}
 
-func (*Ident) exprNode()    {}
-func (*BasicLit) exprNode() {}
+func (*Ident) exprNode()        {}
+func (*BasicLit) exprNode()     {}
+func (*BadExpr) exprNode()      {}
+func (*Ellipsis) exprNode()     {}
+func (*CompositeLit) exprNode() {}
 
 // --------------------------------------------
 // Spec
