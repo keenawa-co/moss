@@ -32,9 +32,9 @@ func TestWeakRef(t *testing.T) {
 		}
 
 		weakRef := NewWeakRef(node)
-		assert.NotNil(t, weakRef.GetTarget(), "unexpected: weakRef.Get() is nil")
+		assert.NotNil(t, weakRef.Load(), "unexpected: weakRef.Get() is nil")
 		assert.True(t, weakRef.IsAlive(), "unexpected: weakRef.IsAlive() is false")
-		assert.NotPanics(t, func() { t.Log(weakRef.GetTarget().(*Node)) }, "unexpected: type conversion failed")
+		assert.NotPanics(t, func() { t.Log(weakRef.Load().(*Node)) }, "unexpected: type conversion failed")
 	})
 
 	t.Run("invalid: forced cleanup by garbage collector", func(t *testing.T) {
@@ -50,7 +50,7 @@ func TestWeakRef(t *testing.T) {
 		}
 
 		assert.NotNil(t, weakRef, "weakRef is nil after GC")
-		assert.Nil(t, weakRef.GetTarget(), "unexpected: weakRef.Get() is not nil after GC")
+		assert.Nil(t, weakRef.Load(), "unexpected: weakRef.Get() is not nil after GC")
 		assert.False(t, weakRef.IsAlive(), "unexpected: weakRef.IsAlive() is true")
 	})
 
@@ -61,15 +61,15 @@ func TestWeakRef(t *testing.T) {
 		}
 
 		weakRef := NewWeakRef(node)
-		assert.NotNil(t, weakRef.GetTarget(), "unexpected: weakRef.Get() is nil")
+		assert.NotNil(t, weakRef.Load(), "unexpected: weakRef.Get() is nil")
 		assert.True(t, weakRef.IsAlive(), "unexpected: weakRef.IsAlive() is false")
-		assert.Panics(t, func() { t.Log(weakRef.GetTarget().(*Ident)) }, "unexpected: type conversion should not work with wrong type")
+		assert.Panics(t, func() { t.Log(weakRef.Load().(*Ident)) }, "unexpected: type conversion should not work with wrong type")
 	})
 
 	t.Run("invalid: creation with NIL value", func(t *testing.T) {
 		weakRef := NewWeakRef(nil)
-		assert.Panics(t, func() { weakRef.GetTarget() }, "unexpected: GetTarget() should be with panic if value was nil")
+		assert.Panics(t, func() { weakRef.Load() }, "unexpected: GetTarget() should be with panic if value was nil")
 		assert.Panics(t, func() { weakRef.IsAlive() }, "unexpected: IsAlive() should be with panic if value was nil")
-		assert.Panics(t, func() { t.Log(weakRef.GetTarget().(*Node)) }, "unexpected: type conversion should not work")
+		assert.Panics(t, func() { t.Log(weakRef.Load().(*Node)) }, "unexpected: type conversion should not work")
 	})
 }

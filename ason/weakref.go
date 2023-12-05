@@ -6,18 +6,18 @@ import (
 	"unsafe"
 )
 
-type WeakRef struct {
+type weakRef struct {
 	t uintptr // interface type
 	d uintptr // interface data
 }
 
-func NewWeakRef(v interface{}) *WeakRef {
+func NewWeakRef(v interface{}) *weakRef {
 	if v == nil {
 		return nil
 	}
 
 	i := (*[2]uintptr)(unsafe.Pointer(&v))
-	w := &WeakRef{^i[0], ^i[1]}
+	w := &weakRef{^i[0], ^i[1]}
 	runtime.SetFinalizer((*uintptr)(unsafe.Pointer(&i[1])), func(_ *uintptr) {
 		atomic.StoreUintptr(&w.d, uintptr(0))
 		atomic.StoreUintptr(&w.t, uintptr(0))
@@ -25,11 +25,11 @@ func NewWeakRef(v interface{}) *WeakRef {
 	return w
 }
 
-func (w *WeakRef) IsAlive() bool {
+func (w *weakRef) IsAlive() bool {
 	return atomic.LoadUintptr(&w.d) != 0
 }
 
-func (w *WeakRef) GetTarget() (v interface{}) {
+func (w *weakRef) Load() (v interface{}) {
 	t := atomic.LoadUintptr(&w.t)
 	d := atomic.LoadUintptr(&w.d)
 	if d != 0 {
