@@ -1,6 +1,10 @@
 package config
 
 import (
+	"fmt"
+	"regexp"
+	"strings"
+
 	"github.com/mitchellh/mapstructure"
 )
 
@@ -90,4 +94,34 @@ func newDefaultConfig() *Config {
 	return &Config{
 		Workspace: &ws,
 	}
+}
+
+const (
+	envVarString = `\$\{[A-Za-z_][A-Za-z0-9_]*\}`
+)
+
+var (
+	envVarPattern = regexp.MustCompile(envVarString)
+)
+
+func interpolate(lookup envLookupFunc, strWithEnvs string) (string, error) {
+	missingVariables := make([]string, 0)
+
+	resultStr := envVarPattern.ReplaceAllStringFunc(strWithEnvs, func(match string) string {
+		envKey := match[2 : len(match)-1]
+		if value, exists := lookup(envKey); exists {
+			return value
+		}
+
+		missingVariables = append(missingVariables, envKey)
+
+		return match
+	})
+
+	// check if there are any unresolved variables
+	if len(missingVariables) > 0 {
+		return "", fmt.Errorf("environment variables not found: %s", strings.Join(missingVariables, ", "))
+	}
+
+	return resultStr, nil
 }

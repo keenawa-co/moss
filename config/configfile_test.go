@@ -108,23 +108,26 @@ func testInterpolateErroneousMock(lookup envLookupFunc, strWithEnvs string) (str
 
 func TestReplaceEnvValues(t *testing.T) {
 	t.Run("valid: integer returned 'as-is'", func(t *testing.T) {
-		got, err := replaceEnvValues(testLookup, testInterpolateMock, 123)
+		num := 123
+		err := replaceEnvValues(testLookup, testInterpolateMock, &num)
 
-		assert.Equal(t, 123, got)
+		assert.Equal(t, 123, num)
 		assert.Nil(t, err)
 	})
 
 	t.Run("valid: string interpolated 'as-is'", func(t *testing.T) {
-		got, err := replaceEnvValues(testLookup, testInterpolateMock, "test")
+		str := "test"
+		err := replaceEnvValues(testLookup, testInterpolateMock, &str)
 
-		assert.Equal(t, interpolatedStr, got)
+		assert.Equal(t, interpolatedStr, str)
 		assert.Nil(t, err)
 	})
 
 	t.Run("valid: empty string returned 'as-is'", func(t *testing.T) {
-		got, err := replaceEnvValues(testLookup, testInterpolateMock, "")
+		str := ""
+		err := replaceEnvValues(testLookup, testInterpolateMock, &str)
 
-		assert.Equal(t, "", got)
+		assert.Equal(t, "", str)
 		assert.Nil(t, err)
 	})
 
@@ -133,26 +136,53 @@ func TestReplaceEnvValues(t *testing.T) {
 		s[0] = 5
 		s[1] = 10
 
-		got, err := replaceEnvValues(testLookup, testInterpolateMock, s)
+		expected := make([]int, len(s))
+		copy(expected, s)
 
-		assert.Equal(t, s, got)
+		err := replaceEnvValues(testLookup, testInterpolateMock, s)
+
+		assert.Equal(t, expected, s)
 		assert.Nil(t, err)
 	})
 
-	t.Run("valid: string map is interpolated", func(t *testing.T) {
+	t.Run("valid: string slice is interpolated", func(t *testing.T) {
 		const size int = 5
 
 		s := make([]string, size)
 		expected := make([]string, size)
 
-		// fill both slices with values
+		// fill slices with initial and expected values
 		const defaultStr string = "default value"
 		for i := 0; i < size; i++ {
 			s[i] = defaultStr
 			expected[i] = interpolatedStr
 		}
 
-		_, err := replaceEnvValues(testLookup, testInterpolateMock, s)
+		err := replaceEnvValues(testLookup, testInterpolateMock, s)
+
+		assert.Equal(t, expected, s)
+		assert.Nil(t, err)
+	})
+
+	t.Run("valid: nested string slice is interpolated", func(t *testing.T) {
+		const size int = 5
+
+		s := make([][]string, size)
+		expected := make([][]string, size)
+
+		// fill slices with initial and expected values
+		const defaultStr string = "default value"
+		for i := 0; i < size; i++ {
+			s[i] = make([]string, size)
+			expected[i] = make([]string, size)
+
+			for j := 0; j < size; j++ {
+				s[i][j] = defaultStr
+				expected[i][j] = interpolatedStr
+			}
+		}
+
+		err := replaceEnvValues(testLookup, testInterpolateMock, s)
 
 		assert.Equal(t, expected, s)
 		assert.Nil(t, err)
