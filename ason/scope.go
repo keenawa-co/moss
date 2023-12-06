@@ -9,25 +9,41 @@ func _GOARCH() int {
 	return strconv.IntSize
 }
 
+// Coord is a set os coordinates used to indicate a specific location in the source code.
+// The order in which the elements are stored is as follows `Offset`, `Line`, `Column`.
+type Coord [3]int
+
+// Offset is an absolute position of a character in the file text
+func (c Coord) Offset() int {
+	return c[0]
+}
+
+// Line is a line number in the file where this piece of code is located.
+func (c Coord) Line() int {
+	return c[1]
+}
+
+// Column ia s character position in a specific line, starting from zero
+func (c Coord) Column() int {
+	return c[2]
+}
+
+func NewCoord(pos *token.Position) Coord {
+	return [3]int{pos.Offset, pos.Line, pos.Column}
+}
+
+type Pos interface{ pos() }
+
 type (
-	Pos           interface{ pos() }
-	NoPos         int
-	PosCompressed struct {
-		Filename string
-		Line     int // line number, starting at 1
-	}
+	NoPos    int
 	Position struct {
-		_        [0]int
-		Filename string
-		Offset   int // offset, starting at 0
-		Line     int // line number, starting at 1
-		Column   int // column number, starting at 1 (byte count)
+		Filename    string
+		Coordinates Coord
 	}
 )
 
-func (*NoPos) pos()         {}
-func (*PosCompressed) pos() {}
-func (*Position) pos()      {}
+func (*NoPos) pos()    {}
+func (*Position) pos() {}
 
 type Loc struct {
 	_     [0]int
