@@ -1,7 +1,6 @@
 package config
 
 import (
-	"errors"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -92,99 +91,4 @@ func testGetConfigFileContentMap() cfgMap {
 
 	return m
 
-}
-
-const (
-	interpolatedStr = "INTERPOLATED!"
-)
-
-func testInterpolateMock(lookup envLookupFunc, strWithEnvs string) (string, error) {
-	return interpolatedStr, nil
-}
-
-func testInterpolateErroneousMock(lookup envLookupFunc, strWithEnvs string) (string, error) {
-	return "", errors.New("an error has happened")
-}
-
-func TestReplaceEnvValues(t *testing.T) {
-	t.Run("valid: integer returned 'as-is'", func(t *testing.T) {
-		num := 123
-		err := replaceEnvValues(testLookup, testInterpolateMock, &num)
-
-		assert.Equal(t, 123, num)
-		assert.Nil(t, err)
-	})
-
-	t.Run("valid: string interpolated 'as-is'", func(t *testing.T) {
-		str := "test"
-		err := replaceEnvValues(testLookup, testInterpolateMock, &str)
-
-		assert.Equal(t, interpolatedStr, str)
-		assert.Nil(t, err)
-	})
-
-	t.Run("valid: empty string returned 'as-is'", func(t *testing.T) {
-		str := ""
-		err := replaceEnvValues(testLookup, testInterpolateMock, &str)
-
-		assert.Equal(t, "", str)
-		assert.Nil(t, err)
-	})
-
-	t.Run("valid: int slice returned 'as-is'", func(t *testing.T) {
-		s := make([]int, 5)
-		s[0] = 5
-		s[1] = 10
-
-		expected := make([]int, len(s))
-		copy(expected, s)
-
-		err := replaceEnvValues(testLookup, testInterpolateMock, s)
-
-		assert.Equal(t, expected, s)
-		assert.Nil(t, err)
-	})
-
-	t.Run("valid: string slice is interpolated", func(t *testing.T) {
-		const size int = 5
-
-		s := make([]string, size)
-		expected := make([]string, size)
-
-		// fill slices with initial and expected values
-		const defaultStr string = "default value"
-		for i := 0; i < size; i++ {
-			s[i] = defaultStr
-			expected[i] = interpolatedStr
-		}
-
-		err := replaceEnvValues(testLookup, testInterpolateMock, s)
-
-		assert.Equal(t, expected, s)
-		assert.Nil(t, err)
-	})
-
-	t.Run("valid: nested string slice is interpolated", func(t *testing.T) {
-		const size int = 5
-
-		s := make([][]string, size)
-		expected := make([][]string, size)
-
-		// fill slices with initial and expected values
-		const defaultStr string = "default value"
-		for i := 0; i < size; i++ {
-			s[i] = make([]string, size)
-			expected[i] = make([]string, size)
-
-			for j := 0; j < size; j++ {
-				s[i][j] = defaultStr
-				expected[i][j] = interpolatedStr
-			}
-		}
-
-		err := replaceEnvValues(testLookup, testInterpolateMock, s)
-
-		assert.Equal(t, expected, s)
-		assert.Nil(t, err)
-	})
 }

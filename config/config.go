@@ -2,6 +2,7 @@ package config
 
 import (
 	"fmt"
+	"os"
 	"regexp"
 	"strings"
 
@@ -46,7 +47,7 @@ func NewFromFile(filePath string) (*Config, error) {
 
 	cfg := newDefaultConfig()
 
-	cfgMap, err := getTomlFileContents(filePath)
+	cfgMap, err := getCfgMapWithEnvsFromFile(os.LookupEnv, interpolate, filePath)
 	if err != nil {
 		return nil, err
 	}
@@ -58,14 +59,6 @@ func NewFromFile(filePath string) (*Config, error) {
 	}
 
 	return cfg, nil
-}
-
-// func copyContentMapToConfig(cfgMap configFileContentMap, cfg *Config) error {
-// 	return mapstructure.Decode(cfgMap, cfg)
-// }
-
-func Unmarshal(buffer []byte, cfg *Config) {
-
 }
 
 func (cfg *Config) validate() error {

@@ -3,10 +3,10 @@ version = "1.0.193"
 root= "."
 policies="./policy"
 ignore-list=[".git", ".docker"]
-go-arch="${GOARCH}"
+go-arch="${HOME}"
 
 [analysis]
-KRAIL1001 = {level = "info", target= "./lambdas"}
+KRAIL1001 = {level = "info", target= "./${HOME}"}
 
 [analysis.SE]
 level = "critical"
