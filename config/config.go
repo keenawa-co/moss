@@ -6,7 +6,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/mitchellh/mapstructure"
+	"github.com/mitchellh/mapstructure" // is not needed at this moment as values ca be unmarshalled via toml package and env variables are interpolated at the fileread step
 )
 
 // Strings
