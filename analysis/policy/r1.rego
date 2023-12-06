@@ -1,5 +1,7 @@
 package goray
 
+
+
 fail[res] {
     input.Kind == "ExprStmt"
     input.Node.X.Fun.X.Name == "fmt"

@@ -102,8 +102,8 @@ func DeserializeFile(pass *DePass, input *File) *ast.File {
 
 func processTokenFile(pass *DePass, input *File) error {
 	// TODO: make more simple if else condition
-	if pass.fset != nil && input.Name != nil && input.Name.Loc != nil && input.Name.Loc.Start != nil {
-		pos, ok := input.Name.Loc.Start.(*Position)
+	if pass.fset != nil && input.Name != nil {
+		pos, ok := input.Name.NamePos.(*Position)
 		if !ok {
 			return fmt.Errorf("failed to get start pos for file `%s`", input.Name.Name)
 		}
@@ -118,9 +118,9 @@ func processTokenFile(pass *DePass, input *File) error {
 func DeserializePos(pass *DePass, input Pos) token.Pos {
 	switch v := input.(type) {
 	case *Position:
-		tokFile := pass.fset.File(token.Pos(v.Offset))
+		tokFile := pass.fset.File(token.Pos(v.Coordinates.Offset()))
 		if tokFile != nil {
-			return tokFile.Pos(v.Offset)
+			return tokFile.Pos(v.Coordinates.Offset())
 		}
 
 		return token.NoPos

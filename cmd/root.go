@@ -133,29 +133,6 @@ func evaluateRegoPolicy(policyPath string, data []map[string]interface{}) error 
 		}
 
 		fmt.Println(buf.String())
-		// fmt.Println(rs)
-		// if len(rs) == 0 || len(rs[0].Expressions) == 0 {
-		// 	log.Printf("no result")
-		// 	return nil
-		// }
-
-		// var out evalOutput
-
-		// raw, err := json.Marshal(rs[0].Expressions[0].Value)
-		// if err != nil {
-		// 	return err
-
-		// }
-		// if err := json.Unmarshal(raw, &out); err != nil {
-		// 	return err
-		// }
-
-		// fmt.Println(len(out.Fail))
-
-		// for _, fail := range out.Fail {
-		// 	fmt.Println(fail.Msg)
-
-		// }
 	}
 
 	return nil
@@ -195,7 +172,7 @@ func runRootCmd(cmd *cobra.Command, args []string) {
 		log.Fatal(err)
 	}
 
-	sf := ason.SerializeFile(ason.NewSerPass(fset), f)
+	sf := ason.SerializeFile(ason.NewSerPass(fset, ason.WithSerializationConf(ason.CACHE_REF)), f)
 
 	js, err := json.Marshal(sf)
 	if err != nil {
