@@ -30,6 +30,7 @@ func getTomlFileContents(filePath string) (cfgMap, error) {
 }
 
 // Need to rethink the whole approach to env variables!!!
+// REsolve envs within a file TEXT and then parse it to a msp!
 
 // values should either be returned or modified by reference
 func replaceEnvValues(lookup envLookupFunc, interpFunc interpolateFunc, value interface{}) error {
