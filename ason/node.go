@@ -26,25 +26,50 @@ const (
 	NodeTypeUnaryExpr      = "UnaryExpr"
 	NodeTypeBinaryExpr     = "BinaryExpr"
 	NodeTypeKeyValueExpr   = "KeyValueExpr"
+	NodeTypeBadStmt        = "BadStmt"
+	NodeTypeDeclStmt       = "DeclStmt"
+	NodeTypeEmptyStmt      = "EmptyStmt"
+	NodeTypeLabeledStmt    = "LabeledStmt"
+	NodeTypeExprStmt       = "ExprStmt"
+	NodeTypeSendStmt       = "SendStmt"
+	NodeTypeIncDecStmt     = "IncDecStmt"
+	NodeTypeAssignStmt     = "AssignStmt"
+	NodeTypeGoStmt         = "GoStmt"
+	NodeTypeDeferStmt      = "DeferStmt"
+	NodeTypeReturnStmt     = "ReturnStmt"
+	NodeTypeBranchStmt     = "BranchStmt"
+	NodeTypeBlockStmt      = "BlockStmt"
+	NodeTypeIfStmt         = "IfStmt"
+	NodeTypeCaseClause     = "CaseClause"
+	NodeTypeSwitchStmt     = "SwitchStmt"
+	NodeTypeTypeSwitchStmt = "TypeSwitchStmt"
+	NodeTypeCommClause     = "CommClause"
+	NodeTypeSelectStmt     = "SelectStmt"
+	NodeTypeForStmt        = "ForStmt"
+	NodeTypeRangeStmt      = "RangeStmt"
 )
 
 type Ason interface {
 	asonNode()
 }
 
+type Expr interface {
+	Ason
+	exprNode()
+}
+
 type Spec interface {
 	Ason
 	specNode()
+}
+type Stmt interface {
+	Ason
+	stmtNode()
 }
 
 type Decl interface {
 	Ason
 	declNode()
-}
-
-type Expr interface {
-	Ason
-	exprNode()
 }
 
 type Node struct {
@@ -308,6 +333,207 @@ func (*StarExpr) exprNode()       {}
 func (*UnaryExpr) exprNode()      {}
 func (*BinaryExpr) exprNode()     {}
 func (*KeyValueExpr) exprNode()   {}
+
+// ----------------- Statements ----------------- //
+
+type (
+	// A BadStmt node is a placeholder for statements containing
+	// syntax errors for which no correct statement nodes can be created.
+	BadStmt struct {
+		From, To Pos // position range of bad statement
+	}
+
+	// A DeclStmt node represents a declaration in a statement list.
+	DeclStmt struct {
+		Decl Decl // *GenDecl with CONST, TYPE, or VAR token
+	}
+
+	// An EmptyStmt node represents an empty statement.
+	// The "position" of the empty statement is the position
+	// of the immediately following (explicit or implicit) semicolon.
+	EmptyStmt struct {
+		Semicolon Pos  // position of following ";"
+		Implicit  bool // if set, ";" was omitted in the source
+	}
+
+	// A LabeledStmt node represents a labeled statement.
+	LabeledStmt struct {
+		Label *Ident
+		Colon Pos // position of ":"
+		Stmt  Stmt
+	}
+
+	// An ExprStmt node represents a (stand-alone) expression in a statement list.
+	ExprStmt struct {
+		X Expr // expression
+	}
+
+	// A SendStmt node represents a send statement.
+	SendStmt struct {
+		Chan  Expr
+		Arrow Pos // position of "<-"
+		Value Expr
+	}
+
+	// An IncDecStmt node represents an increment or decrement statement.
+	IncDecStmt struct {
+		X      Expr
+		TokPos Pos    // position of Tok
+		Tok    string // INC or DEC
+	}
+
+	// An AssignStmt node represents an assignment or a short variable declaration.
+	AssignStmt struct {
+		Lhs    []Expr
+		TokPos Pos    // position of Tok
+		Tok    string // assignment token, DEFINE
+		Rhs    []Expr
+	}
+
+	// A GoStmt node represents a go statement.
+	GoStmt struct {
+		Go   Pos // position of "go" keyword
+		Call *CallExpr
+	}
+
+	// A DeferStmt node represents a defer statement.
+	DeferStmt struct {
+		Defer Pos // position of "defer" keyword
+		Call  *CallExpr
+	}
+
+	// A ReturnStmt node represents a return statement.
+	ReturnStmt struct {
+		Return  Pos    // position of "return" keyword
+		Results []Expr // result expressions; or nil
+	}
+
+	// A BranchStmt node represents a break, continue, goto,
+	// or fallthrough statement.
+	BranchStmt struct {
+		TokPos Pos    // position of Tok
+		Tok    string // keyword token (BREAK, CONTINUE, GOTO, FALLTHROUGH)
+		Label  *Ident // label name; or nil
+	}
+
+	// A BlockStmt node represents a braced statement list.
+	BlockStmt struct {
+		Lbrace Pos // position of "{"
+		List   []Stmt
+		Rbrace Pos // position of "}", if any (may be absent due to syntax error)
+	}
+
+	// An IfStmt node represents an if statement.
+	IfStmt struct {
+		If   Pos  // position of "if" keyword
+		Init Stmt // initialization statement; or nil
+		Cond Expr // condition
+		Body *BlockStmt
+		Else Stmt // else branch; or nil
+	}
+
+	// A CaseClause represents a case of an expression or type switch statement.
+	CaseClause struct {
+		Case  Pos    // position of "case" or "default" keyword
+		List  []Expr // list of expressions or types; nil means default case
+		Colon Pos    // position of ":"
+		Body  []Stmt // statement list; or nil
+	}
+
+	// A SwitchStmt node represents an expression switch statement.
+	SwitchStmt struct {
+		Switch Pos        // position of "switch" keyword
+		Init   Stmt       // initialization statement; or nil
+		Tag    Expr       // tag expression; or nil
+		Body   *BlockStmt // CaseClauses only
+	}
+
+	// A TypeSwitchStmt node represents a type switch statement.
+	TypeSwitchStmt struct {
+		Switch Pos        // position of "switch" keyword
+		Init   Stmt       // initialization statement; or nil
+		Assign Stmt       // x := y.(type) or y.(type)
+		Body   *BlockStmt // CaseClauses only
+	}
+
+	// A CommClause node represents a case of a select statement.
+	CommClause struct {
+		Case  Pos    // position of "case" or "default" keyword
+		Comm  Stmt   // send or receive statement; nil means default case
+		Colon Pos    // position of ":"
+		Body  []Stmt // statement list; or nil
+	}
+
+	// A SelectStmt node represents a select statement.
+	SelectStmt struct {
+		Select Pos        // position of "select" keyword
+		Body   *BlockStmt // CommClauses only
+	}
+
+	// A ForStmt represents a for statement.
+	ForStmt struct {
+		For  Pos  // position of "for" keyword
+		Init Stmt // initialization statement; or nil
+		Cond Expr // condition; or nil
+		Post Stmt // post iteration statement; or nil
+		Body *BlockStmt
+	}
+
+	// A RangeStmt represents a for statement with a range clause.
+	RangeStmt struct {
+		For        Pos    // position of "for" keyword
+		Key, Value Expr   // Key, Value may be nil
+		TokPos     Pos    // position of Tok; invalid if Key == nil
+		Tok        string // ILLEGAL if Key == nil, ASSIGN, DEFINE
+		Range      Pos    // position of "range" keyword
+		X          Expr   // value to range over
+		Body       *BlockStmt
+	}
+)
+
+func (*BadStmt) asonNode()        {}
+func (*DeclStmt) asonNode()       {}
+func (*EmptyStmt) asonNode()      {}
+func (*LabeledStmt) asonNode()    {}
+func (*ExprStmt) asonNode()       {}
+func (*SendStmt) asonNode()       {}
+func (*IncDecStmt) asonNode()     {}
+func (*AssignStmt) asonNode()     {}
+func (*GoStmt) asonNode()         {}
+func (*DeferStmt) asonNode()      {}
+func (*ReturnStmt) asonNode()     {}
+func (*BranchStmt) asonNode()     {}
+func (*BlockStmt) asonNode()      {}
+func (*IfStmt) asonNode()         {}
+func (*CaseClause) asonNode()     {}
+func (*SwitchStmt) asonNode()     {}
+func (*TypeSwitchStmt) asonNode() {}
+func (*CommClause) asonNode()     {}
+func (*SelectStmt) asonNode()     {}
+func (*ForStmt) asonNode()        {}
+func (*RangeStmt) asonNode()      {}
+
+func (*BadStmt) stmtNode()        {}
+func (*DeclStmt) stmtNode()       {}
+func (*EmptyStmt) stmtNode()      {}
+func (*LabeledStmt) stmtNode()    {}
+func (*ExprStmt) stmtNode()       {}
+func (*SendStmt) stmtNode()       {}
+func (*IncDecStmt) stmtNode()     {}
+func (*AssignStmt) stmtNode()     {}
+func (*GoStmt) stmtNode()         {}
+func (*DeferStmt) stmtNode()      {}
+func (*ReturnStmt) stmtNode()     {}
+func (*BranchStmt) stmtNode()     {}
+func (*BlockStmt) stmtNode()      {}
+func (*IfStmt) stmtNode()         {}
+func (*CaseClause) stmtNode()     {}
+func (*SwitchStmt) stmtNode()     {}
+func (*TypeSwitchStmt) stmtNode() {}
+func (*CommClause) stmtNode()     {}
+func (*SelectStmt) stmtNode()     {}
+func (*ForStmt) stmtNode()        {}
+func (*RangeStmt) stmtNode()      {}
 
 // ----------------- Types ----------------- //
 

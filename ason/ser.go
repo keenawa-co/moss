@@ -9,9 +9,6 @@ import (
 // TODO List
 //
 // *ast.FuncLit
-// *ast.UnaryExpr:
-// *ast.BinaryExpr
-// *ast.KeyValueExpr
 // *ast.ArrayType
 // *ast.StructType
 // *ast.FuncType
@@ -213,7 +210,7 @@ func serializeCommentGroup(pass *SerPass, input *ast.CommentGroup) *CommentGroup
 func SerializeIdent(pass *SerPass, input *ast.Ident) *Ident {
 	return &Ident{
 		NamePos: SerializePos(pass, input.NamePos),
-		Name:    input.Name,
+		Name:    input.String(),
 		Node:    Node{Type: NodeTypeIdent, Ref: pass.refCount},
 	}
 }
