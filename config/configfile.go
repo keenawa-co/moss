@@ -9,76 +9,21 @@ import (
 	"github.com/BurntSushi/toml"
 )
 
-// func (cf *configFile) resolveEnvs() error {
-// 	if cf == nil {
-// 		return errors.New("'cf' can't be nil, should be a valid reference")
-// 	}
-
-// 	var err error
-// 	if cf.Version, err = interpolate(os.LookupEnv, cf.Version); err != nil {
-// 		return err
-// 	}
-
-// 	if cf.General.RootDir, err = interpolate(os.LookupEnv, cf.General.RootDir); err != nil {
-// 		return err
-// 	}
-
-// 	if cf.General.TargetDir, err = interpolate(os.LookupEnv, cf.General.TargetDir); err != nil {
-// 		return err
-// 	}
-
-// 	if cf.General.MaxParserConc, err = interpolate(os.LookupEnv, cf.General.MaxParserConc); err != nil {
-// 		return err
-// 	}
-
-// 	if cf.General.MaxEngineConc, err = interpolate(os.LookupEnv, cf.General.MaxEngineConc); err != nil {
-// 		return err
-// 	}
-
-// 	for i, v := range cf.General.IgnoreList {
-// 		if cf.General.IgnoreList[i], err = interpolate(os.LookupEnv, v); err != nil {
-// 			return err
-// 		}
-// 	}
-
-// 	return nil
-// }
-
-// func newConfigFile(filePath string) (*configFile, error) {
-// 	contents, err := os.ReadFile(filePath)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-
-// 	cf := &configFile{
-// 		General: &generalFile{},
-// 	}
-
-// 	if err := yaml.Unmarshal(contents, cf); err != nil {
-// 		return nil, err
-// 	}
-
-// 	if err := cf.resolveEnvs(); err != nil {
-// 		return nil, err
-// 	}
-
-// 	return cf, nil
-// }
-
-type configFileContentMap map[string]interface{}
+type cfgMap map[string]interface{}
 type envLookupFunc func(key string) (string, bool)
+type interpolateFunc func(lookup envLookupFunc, strWithEnvs string) (string, error)
 
 const (
 	fileContentsSize uint = 32
 )
 
-func getTomlFileContents(filePath string) (configFileContentMap, error) {
+func getTomlFileContents(filePath string) (cfgMap, error) {
 	data, err := os.ReadFile(filePath)
 	if err != nil {
 		return nil, err
 	}
 
-	contents := make(configFileContentMap, fileContentsSize)
+	contents := make(cfgMap, fileContentsSize)
 
 	if err := toml.Unmarshal(data, &contents); err != nil {
 		return nil, err
@@ -87,64 +32,60 @@ func getTomlFileContents(filePath string) (configFileContentMap, error) {
 	return contents, nil
 }
 
-func replaceEnvValuesMap(lookup envLookupFunc, content configFileContentMap) error {
-	// for each value
-	// interpolate value if the field is a string
-	// make recursive call if the field is a map or an array
-	// do nothing otherwise (only string values can potentially contain env variables)
+// values should either be returned or modified by reference
+func replaceEnvValues(lookup envLookupFunc, interpFunc interpolateFunc, value interface{}) (interface{}, error) {
+	switch v := value.(type) {
+	case string:
+		if len(v) == 0 {
+			return v, nil
+		}
 
+		// ToDo optional: check for env values and only call interpolate if env values are present
+		newVal, err := interpFunc(lookup, v)
+		if err != nil {
+			return nil, err
+		}
+		return newVal, nil
+
+	case cfgMap:
+		if err := replaceEnvValuesMap(lookup, interpFunc, v); err != nil {
+			return nil, err
+		}
+		return v, nil
+
+	case []string:
+		if err := replaceEnvValuesSlice(lookup, interpFunc, v); err != nil {
+			return nil, err
+		}
+		return v, nil
+	}
+
+	return value, nil
+}
+
+func replaceEnvValuesMap(lookup envLookupFunc, interpFunc interpolateFunc, content cfgMap) error {
 	for key, val := range content {
-		switch v := val.(type) {
-		case string:
-			newVal, err := interpolate(lookup, val.(string))
-			if err != nil {
-				return err
-			}
-			content[key] = newVal
-
-		case configFileContentMap:
-			if err := replaceEnvValuesMap(lookup, v); err != nil {
-				return err
-			}
-
-		case []interface{}:
-			if err := replaceEnvValuesSlice(lookup, v); err != nil {
-				return err
-			}
+		newVal, err := replaceEnvValues(lookup, interpFunc, val)
+		if err != nil {
+			return err
 		}
+		content[key] = newVal
 	}
 
 	return nil
 }
 
-func replaceEnvValuesSlice(lookup envLookupFunc, slice []interface{}) error {
+func replaceEnvValuesSlice(lookup envLookupFunc, interpFunc interpolateFunc, slice []string) error {
 	for key, val := range slice {
-		switch v := val.(type) {
-		case string:
-			newVal, err := interpolate(lookup, val.(string))
-			if err != nil {
-				return err
-			}
-			slice[key] = newVal
-
-		case configFileContentMap:
-			if err := replaceEnvValuesMap(lookup, v); err != nil {
-				return err
-			}
-
-		case []interface{}:
-			if err := replaceEnvValuesSlice(lookup, v); err != nil {
-				return err
-			}
+		newVal, err := replaceEnvValues(lookup, interpFunc, val)
+		if err != nil {
+			return err
 		}
+		slice[key] = newVal.(string)
 	}
 
 	return nil
 }
-
-// func hasEnv(strToCheck string) bool {
-// 	return envVarPattern.MatchString(strToCheck)
-// }
 
 const (
 	envVarString = `\$\{[A-Za-z_][A-Za-z0-9_]*\}`
