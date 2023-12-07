@@ -1,6 +1,11 @@
 package main
 
+// Some doc here
 var scope = "scopeValue"
+
+/*
+Hello World
+*/
 var test2 = "test2Value"
 
 var (

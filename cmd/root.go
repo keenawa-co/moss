@@ -167,12 +167,12 @@ func runRootCmd(cmd *cobra.Command, args []string) {
 
 	fset := token.NewFileSet()
 
-	f, err := parser.ParseFile(fset, "./testdata/main.go", nil, parser.AllErrors)
+	f, err := parser.ParseFile(fset, "./ason/testdata/main.go", nil, parser.AllErrors)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	sf := ason.SerializeFile(ason.NewSerPass(fset, ason.WithSerializationConf(ason.CACHE_REF)), f)
+	sf := ason.SerializeFile(ason.NewSerPass(fset), f)
 
 	js, err := json.Marshal(sf)
 	if err != nil {
