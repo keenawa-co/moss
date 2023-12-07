@@ -8,9 +8,8 @@ const (
 	NodeTypeCommentGroup   = "CommentGroup"
 	NodeTypeIdent          = "Ident"
 	NodeTypeBasicLit       = "BasicLit"
+	NodeTypeFuncLit        = "FuncLit"
 	NodeTypeCompositeLit   = "CompositeLit"
-	NodeTypeValueSpec      = "ValueSpec"
-	NodeTypeGenDecl        = "GenDecl"
 	NodeTypeField          = "Field"
 	NodeTypeFieldList      = "FieldList"
 	NodeTypeEllipsis       = "Ellipsis"
@@ -26,6 +25,12 @@ const (
 	NodeTypeUnaryExpr      = "UnaryExpr"
 	NodeTypeBinaryExpr     = "BinaryExpr"
 	NodeTypeKeyValueExpr   = "KeyValueExpr"
+	NodeTypeArrayType      = "ArrayType"
+	NodeTypeStructType     = "StructType"
+	NodeTypeFuncType       = "FuncType"
+	NodeTypeInterfaceType  = "InterfaceType"
+	NodeTypeMapType        = "MapType"
+	NodeTypeChanType       = "ChanType"
 	NodeTypeBadStmt        = "BadStmt"
 	NodeTypeDeclStmt       = "DeclStmt"
 	NodeTypeEmptyStmt      = "EmptyStmt"
@@ -47,6 +52,12 @@ const (
 	NodeTypeSelectStmt     = "SelectStmt"
 	NodeTypeForStmt        = "ForStmt"
 	NodeTypeRangeStmt      = "RangeStmt"
+	NodeTypeImportSpec     = "ImportSpec"
+	NodeTypeValueSpec      = "ValueSpec"
+	NodeTypeTypeSpec       = "TypeSpec"
+	NodeTypeGenDecl        = "GenDecl"
+	NodeTypeBadDecl        = "BadDecl"
+	NodeTypeFuncDecl       = "FuncDecl"
 )
 
 type Ason interface {
@@ -75,22 +86,21 @@ type Decl interface {
 type Node struct {
 	Ref  uint   `json:"_ref"`
 	Type string `json:"_type"`
+	Loc  *Loc   `json:"_loc"`
 }
 
 type File struct {
-	Doc   *CommentGroup `json:"Doc,omitempty"`  // associated documentation; or empty
-	Name  *Ident        `json:"Name,omitempty"` // package name
-	Decls []Decl        `json:"Decl"`           // top-level declarations
-
-	Loc  *Loc // start and end of entire file
-	Size int  // file size in bytes
-
-	// Scope              *Scope          // package scope (this file only)
-	// Imports            []*ImportSpec   // imports in this file
-	// Unresolved         []*Ident        // unresolved identifiers in this file
-	Package   Pos             `json:"Package,omitempty"`   // position of "package" keyword
-	Comments  []*CommentGroup `json:"Comments,omitempty"`  // list of all comments in the source file
-	GoVersion string          `json:"GoVersion,omitempty"` // minimum Go version required by go:build or +build directives
+	Doc                *CommentGroup   // associated documentation; or empty
+	Name               *Ident          // package name
+	Decls              []Decl          // top-level declarations
+	Size               int             // file size in bytes
+	FileStart, FileEnd Pos             // start and end of entire file
+	Scope              *Scope          // package scope (this file only)
+	Imports            []*ImportSpec   // imports in this file
+	Unresolved         []*Ident        // unresolved identifiers in this file
+	Package            Pos             // position of "package" keyword
+	Comments           []*CommentGroup // list of all comments in the source file
+	GoVersion          string          // minimum Go version required by go:build or +build directives
 
 	Node
 }
@@ -145,8 +155,9 @@ func (*FieldList) asonNode() {}
 type (
 	// An Ident node represents an identifier.
 	Ident struct {
-		NamePos Pos    // identifier position
-		Name    string // identifier name
+		NamePos Pos     // identifier position
+		Name    string  // identifier name
+		Obj     *Object // denoted object; or nil
 
 		Node
 	}
@@ -156,6 +167,14 @@ type (
 		ValuePos Pos    // literal position
 		Kind     string // token.INT, token.FLOAT, token.IMAG, token.CHAR, or token.STRING
 		Value    string // literal string; e.g. 42, 0x7f, 3.14, 1e-9, 2.4i, 'a', '\x7f', "foo" or `\m\n\o`
+
+		Node
+	}
+
+	// A FuncLit node represents a function literal.
+	FuncLit struct {
+		Type *FuncType  // function type
+		Body *BlockStmt // function body
 
 		Node
 	}
@@ -184,7 +203,7 @@ type (
 	// syntax errors for which a correct expression node cannot be
 	// created.
 	BadExpr struct {
-		Loc *Loc
+		From, To Pos // position range of bad expression
 
 		Node
 	}
@@ -302,11 +321,75 @@ type (
 	}
 )
 
+// ----------------- Types ----------------- //
+
+// A type is represented by a tree consisting of one
+// or more of the following type-specific expression nodes.
+// Pointer types are represented via StarExpr nodes.
+type (
+	// An ArrayType node represents an array or slice type.
+	ArrayType struct {
+		Lbrack Pos  // position of "["
+		Len    Expr // Ellipsis node for [...]T array types, nil for slice types
+		Elt    Expr // element type
+
+		Node
+	}
+
+	// A StructType node represents a struct type.
+	StructType struct {
+		Struct     Pos        // position of "struct" keyword
+		Fields     *FieldList // list of field declarations
+		Incomplete bool       // true if (source) fields are missing in the Fields list
+
+		Node
+	}
+
+	// A FuncType node represents a function type.
+	FuncType struct {
+		Func       Pos        // position of "func" keyword (token.NoPos if there is no "func")
+		TypeParams *FieldList // type parameters; or nil
+		Params     *FieldList // (incoming) parameters; non-nil
+		Results    *FieldList // (outgoing) results; or nil
+
+		Node
+	}
+
+	// An InterfaceType node represents an interface type.
+	InterfaceType struct {
+		Interface  Pos        // position of "interface" keyword
+		Methods    *FieldList // list of embedded interfaces, methods, or types
+		Incomplete bool       // true if (source) methods or types are missing in the Methods list
+
+		Node
+	}
+
+	// A MapType node represents a map type.
+	MapType struct {
+		Map   Pos // position of "map" keyword
+		Key   Expr
+		Value Expr
+
+		Node
+	}
+
+	// A ChanType node represents a channel type.
+	ChanType struct {
+		Begin Pos  // position of "chan" keyword or "<-" (whichever comes first)
+		Arrow Pos  // position of "<-" (token.NoPos if there is no "<-")
+		Dir   int  // channel direction
+		Value Expr // value type
+
+		Node
+	}
+)
+
 func (*Ident) asonNode()          {}
 func (*BasicLit) asonNode()       {}
 func (*BadExpr) asonNode()        {}
 func (*Ellipsis) asonNode()       {}
 func (*CompositeLit) asonNode()   {}
+func (*SelectorExpr) asonNode()   {}
 func (*ParenExpr) asonNode()      {}
 func (*IndexExpr) asonNode()      {}
 func (*IndexListExpr) asonNode()  {}
@@ -317,12 +400,20 @@ func (*StarExpr) asonNode()       {}
 func (*UnaryExpr) asonNode()      {}
 func (*BinaryExpr) asonNode()     {}
 func (*KeyValueExpr) asonNode()   {}
+func (*ArrayType) asonNode()      {}
+func (*StructType) asonNode()     {}
+func (*FuncType) asonNode()       {}
+func (*InterfaceType) asonNode()  {}
+func (*MapType) asonNode()        {}
+func (*ChanType) asonNode()       {}
+func (*FuncLit) asonNode()        {}
 
 func (*Ident) exprNode()          {}
 func (*BasicLit) exprNode()       {}
 func (*BadExpr) exprNode()        {}
 func (*Ellipsis) exprNode()       {}
 func (*CompositeLit) exprNode()   {}
+func (*SelectorExpr) exprNode()   {}
 func (*ParenExpr) exprNode()      {}
 func (*IndexExpr) exprNode()      {}
 func (*IndexListExpr) exprNode()  {}
@@ -333,6 +424,13 @@ func (*StarExpr) exprNode()       {}
 func (*UnaryExpr) exprNode()      {}
 func (*BinaryExpr) exprNode()     {}
 func (*KeyValueExpr) exprNode()   {}
+func (*ArrayType) exprNode()      {}
+func (*StructType) exprNode()     {}
+func (*FuncType) exprNode()       {}
+func (*InterfaceType) exprNode()  {}
+func (*MapType) exprNode()        {}
+func (*ChanType) exprNode()       {}
+func (*FuncLit) exprNode()        {}
 
 // ----------------- Statements ----------------- //
 
@@ -341,11 +439,15 @@ type (
 	// syntax errors for which no correct statement nodes can be created.
 	BadStmt struct {
 		From, To Pos // position range of bad statement
+
+		Node
 	}
 
 	// A DeclStmt node represents a declaration in a statement list.
 	DeclStmt struct {
 		Decl Decl // *GenDecl with CONST, TYPE, or VAR token
+
+		Node
 	}
 
 	// An EmptyStmt node represents an empty statement.
@@ -354,6 +456,8 @@ type (
 	EmptyStmt struct {
 		Semicolon Pos  // position of following ";"
 		Implicit  bool // if set, ";" was omitted in the source
+
+		Node
 	}
 
 	// A LabeledStmt node represents a labeled statement.
@@ -361,11 +465,15 @@ type (
 		Label *Ident
 		Colon Pos // position of ":"
 		Stmt  Stmt
+
+		Node
 	}
 
 	// An ExprStmt node represents a (stand-alone) expression in a statement list.
 	ExprStmt struct {
 		X Expr // expression
+
+		Node
 	}
 
 	// A SendStmt node represents a send statement.
@@ -373,6 +481,8 @@ type (
 		Chan  Expr
 		Arrow Pos // position of "<-"
 		Value Expr
+
+		Node
 	}
 
 	// An IncDecStmt node represents an increment or decrement statement.
@@ -380,6 +490,8 @@ type (
 		X      Expr
 		TokPos Pos    // position of Tok
 		Tok    string // INC or DEC
+
+		Node
 	}
 
 	// An AssignStmt node represents an assignment or a short variable declaration.
@@ -388,24 +500,32 @@ type (
 		TokPos Pos    // position of Tok
 		Tok    string // assignment token, DEFINE
 		Rhs    []Expr
+
+		Node
 	}
 
 	// A GoStmt node represents a go statement.
 	GoStmt struct {
 		Go   Pos // position of "go" keyword
 		Call *CallExpr
+
+		Node
 	}
 
 	// A DeferStmt node represents a defer statement.
 	DeferStmt struct {
 		Defer Pos // position of "defer" keyword
 		Call  *CallExpr
+
+		Node
 	}
 
 	// A ReturnStmt node represents a return statement.
 	ReturnStmt struct {
 		Return  Pos    // position of "return" keyword
 		Results []Expr // result expressions; or nil
+
+		Node
 	}
 
 	// A BranchStmt node represents a break, continue, goto,
@@ -414,6 +534,8 @@ type (
 		TokPos Pos    // position of Tok
 		Tok    string // keyword token (BREAK, CONTINUE, GOTO, FALLTHROUGH)
 		Label  *Ident // label name; or nil
+
+		Node
 	}
 
 	// A BlockStmt node represents a braced statement list.
@@ -421,6 +543,8 @@ type (
 		Lbrace Pos // position of "{"
 		List   []Stmt
 		Rbrace Pos // position of "}", if any (may be absent due to syntax error)
+
+		Node
 	}
 
 	// An IfStmt node represents an if statement.
@@ -430,6 +554,8 @@ type (
 		Cond Expr // condition
 		Body *BlockStmt
 		Else Stmt // else branch; or nil
+
+		Node
 	}
 
 	// A CaseClause represents a case of an expression or type switch statement.
@@ -438,6 +564,8 @@ type (
 		List  []Expr // list of expressions or types; nil means default case
 		Colon Pos    // position of ":"
 		Body  []Stmt // statement list; or nil
+
+		Node
 	}
 
 	// A SwitchStmt node represents an expression switch statement.
@@ -446,6 +574,8 @@ type (
 		Init   Stmt       // initialization statement; or nil
 		Tag    Expr       // tag expression; or nil
 		Body   *BlockStmt // CaseClauses only
+
+		Node
 	}
 
 	// A TypeSwitchStmt node represents a type switch statement.
@@ -454,6 +584,8 @@ type (
 		Init   Stmt       // initialization statement; or nil
 		Assign Stmt       // x := y.(type) or y.(type)
 		Body   *BlockStmt // CaseClauses only
+
+		Node
 	}
 
 	// A CommClause node represents a case of a select statement.
@@ -462,12 +594,16 @@ type (
 		Comm  Stmt   // send or receive statement; nil means default case
 		Colon Pos    // position of ":"
 		Body  []Stmt // statement list; or nil
+
+		Node
 	}
 
 	// A SelectStmt node represents a select statement.
 	SelectStmt struct {
 		Select Pos        // position of "select" keyword
 		Body   *BlockStmt // CommClauses only
+
+		Node
 	}
 
 	// A ForStmt represents a for statement.
@@ -477,6 +613,8 @@ type (
 		Cond Expr // condition; or nil
 		Post Stmt // post iteration statement; or nil
 		Body *BlockStmt
+
+		Node
 	}
 
 	// A RangeStmt represents a for statement with a range clause.
@@ -488,6 +626,8 @@ type (
 		Range      Pos    // position of "range" keyword
 		X          Expr   // value to range over
 		Body       *BlockStmt
+
+		Node
 	}
 )
 
@@ -535,42 +675,96 @@ func (*SelectStmt) stmtNode()     {}
 func (*ForStmt) stmtNode()        {}
 func (*RangeStmt) stmtNode()      {}
 
-// ----------------- Types ----------------- //
-
-type ()
-
 // ----------------- Specifications ----------------- //
 
 type (
+
+	// An ImportSpec node represents a single package import.
+	ImportSpec struct {
+		Doc     *CommentGroup // associated documentation; or nil
+		Name    *Ident        // local package name (including "."); or nil
+		Path    *BasicLit     // import path
+		Comment *CommentGroup // line comments; or nil
+		EndPos  Pos           // end of spec (overrides Path.Pos if nonzero)
+
+		Node
+	}
+
+	// A ValueSpec node represents a constant or variable declaration
 	ValueSpec struct {
-		Loc    *Loc
-		Names  []*Ident
-		Values []Expr
+		Doc     *CommentGroup // associated documentation; or nil
+		Names   []*Ident      // value names (len(Names) > 0)
+		Type    Expr          // value type; or nil
+		Values  []Expr        // initial values; or nil
+		Comment *CommentGroup // line comments; or nil
+
+		Node
+	}
+
+	// A TypeSpec node represents a type declaration.
+	TypeSpec struct {
+		Doc        *CommentGroup // associated documentation; or nil
+		Name       *Ident        // type name
+		TypeParams *FieldList    // type parameters; or nil
+		Assign     Pos           // position of '=', if any
+		Type       Expr          // *Ident, *ParenExpr, *SelectorExpr, *StarExpr, or any of the *XxxTypes
+		Comment    *CommentGroup // line comments; or nil
 
 		Node
 	}
 )
 
-func (*ValueSpec) asonNode() {}
+func (*ImportSpec) asonNode() {}
+func (*ValueSpec) asonNode()  {}
+func (*TypeSpec) asonNode()   {}
 
-func (*ValueSpec) specNode() {}
+func (*ImportSpec) specNode() {}
+func (*ValueSpec) specNode()  {}
+func (*TypeSpec) specNode()   {}
 
-// --------------------------------------------
-// Decl
+// ----------------- Declarations ----------------- //
 
+// A declaration is represented by one of the following declaration nodes.
 type (
+	// A BadDecl node is a placeholder for a declaration containing
+	// syntax errors for which a correct declaration node cannot be
+	// created.
+	BadDecl struct {
+		From, To Pos // position range of bad declaration
+
+		Node
+	}
+
+	// A GenDecl node (generic declaration node) represents an import,
+	// constant, type or variable declaration. A valid Lparen position
+	// (Lparen.IsValid()) indicates a parenthesized declaration.
 	GenDecl struct {
-		Loc      *Loc   `json:"Loc"`
-		TokenPos Pos    `json:"TokenPos"`
-		Lparen   Pos    `json:"Lparen"`
-		Rparen   Pos    `json:"Rparen"`
-		Tok      string `json:"Tok"`
-		Specs    []Spec `json:"Specs"`
+		Doc      *CommentGroup // associated documentation; or nil
+		TokenPos Pos           // position of Tok
+		Tok      string        // IMPORT, CONST, TYPE, or VAR
+		Lparen   Pos           // position of '(', if any
+		Specs    []Spec
+		Rparen   Pos // position of ')', if any
+
+		Node
+	}
+
+	// A FuncDecl node represents a function declaration.
+	FuncDecl struct {
+		Doc  *CommentGroup // associated documentation; or nil
+		Recv *FieldList    // receiver (methods); or nil (functions)
+		Name *Ident        // function/method name
+		Type *FuncType     // function signature: type and value parameters, results, and position of "func" keyword
+		Body *BlockStmt    // function body; or nil for external (non-Go) function
 
 		Node
 	}
 )
 
-func (*GenDecl) asonNode() {}
+func (*BadDecl) asonNode()  {}
+func (*GenDecl) asonNode()  {}
+func (*FuncDecl) asonNode() {}
 
-func (*GenDecl) declNode() {}
+func (*BadDecl) declNode()  {}
+func (*GenDecl) declNode()  {}
+func (*FuncDecl) declNode() {}
