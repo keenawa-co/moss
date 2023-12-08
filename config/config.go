@@ -6,7 +6,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/mitchellh/mapstructure" // is not needed at this moment as values ca be unmarshalled via toml package and env variables are interpolated at the fileread step
+	"github.com/BurntSushi/toml"
 )
 
 // Strings
@@ -26,16 +26,16 @@ var availableVersions = map[string]struct{}{
 }
 
 type Config struct {
-	Workspace *workspace                  `mapstructure:"workspace"`
-	Analysis  map[string]analysisSettings `mapstructure:"analysis"`
+	Workspace *workspace                  `toml:"workspace"`
+	Analysis  map[string]analysisSettings `toml:"analysis"`
 }
 
 type workspace struct {
-	Version    string   `mapstructure:"version"`
-	Root       string   `mapstructure:"root"`
-	Policies   string   `mapstructure:"policies"`
-	IngoreList []string `mapstructure:"ignore-list"`
-	GoArch     string   `mapstructure:"go-arch"`
+	Version    string   `toml:"version"`
+	Root       string   `toml:"root"`
+	Policies   string   `toml:"policies"`
+	IngoreList []string `toml:"ignore-list"`
+	GoArch     string   `toml:"go-arch"`
 }
 
 type analysisSettings struct {
@@ -47,12 +47,11 @@ func NewFromFile(filePath string) (*Config, error) {
 
 	cfg := newDefaultConfig()
 
-	cfgMap, err := getCfgMapWithEnvsFromFile(os.LookupEnv, interpolate, filePath)
-	if err != nil {
+	if err := decodeWithEnvsFromFile(os.LookupEnv, interpolate, filePath, cfg); err != nil {
 		return nil, err
 	}
 
-	mapstructure.Decode(cfgMap, cfg)
+	// mapstructure.Decode(cfgMap, cfg)
 
 	if err := cfg.validate(); err != nil {
 		return nil, err
@@ -97,6 +96,9 @@ var (
 	envVarPattern = regexp.MustCompile(envVarString)
 )
 
+type envLookupFunc func(key string) (string, bool)
+type interpolateFunc func(lookup envLookupFunc, strWithEnvs string) (string, error)
+
 func interpolate(lookup envLookupFunc, strWithEnvs string) (string, error) {
 	missingVariables := make([]string, 0)
 
@@ -117,4 +119,31 @@ func interpolate(lookup envLookupFunc, strWithEnvs string) (string, error) {
 	}
 
 	return resultStr, nil
+}
+
+func decodeWithEnvsFromFile(lookup envLookupFunc, interpolate interpolateFunc, filePath string, cfg *Config) error {
+	data, err := readFile(filePath)
+	if err != nil {
+		return err
+	}
+
+	dataWithEnv, err := interpolate(lookup, data)
+	if err != nil {
+		return err
+	}
+
+	if _, err := toml.Decode(dataWithEnv, &cfg); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func readFile(filePath string) (string, error) {
+	data, err := os.ReadFile(filePath)
+	if err != nil {
+		return "", err
+	}
+
+	return string(data), nil
 }
