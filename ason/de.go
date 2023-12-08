@@ -9,16 +9,6 @@ import (
 
 // TODO List
 //
-// *ast.FuncLit
-// *ast.SelectStmt
-// *ast.ForStmt
-// *ast.RangeStmt
-// *ast.CommClause
-// *ast.ImportSpec
-// *ast.TypeSpec
-// *ast.BadDecl
-// *ast.GenDecl
-// *ast.FuncDecl
 // *ast.File
 // *ast.Package
 
@@ -64,6 +54,8 @@ func DeserializePos(pass *DePass, input Pos) token.Pos {
 
 	return tokFile.Pos(pos.Coordinates.Offset())
 }
+
+// ----------------- Comments ----------------- //
 
 func DeserializeComment(pass *DePass, input *Comment) *ast.Comment {
 	return &ast.Comment{
@@ -111,6 +103,10 @@ func DeserializeFieldList(pass *DePass, input *FieldList) *ast.FieldList {
 }
 
 func DeserializeIdent(pass *DePass, input *Ident) *ast.Ident {
+	if input == nil {
+		return nil
+	}
+
 	return &ast.Ident{
 		Name:    input.Name,
 		NamePos: DeserializePos(pass, input.NamePos),
@@ -118,6 +114,10 @@ func DeserializeIdent(pass *DePass, input *Ident) *ast.Ident {
 }
 
 func DeserializeBasicLit(pass *DePass, input *BasicLit) *ast.BasicLit {
+	if input == nil {
+		return nil
+	}
+
 	return &ast.BasicLit{
 		ValuePos: DeserializePos(pass, input.ValuePos),
 		Kind:     tokens[input.Kind],
@@ -125,13 +125,22 @@ func DeserializeBasicLit(pass *DePass, input *BasicLit) *ast.BasicLit {
 	}
 }
 
-// func DeserializeFuncLit(pass *DePass, input *FuncLit) *ast.FuncLit {
-// 	return &ast.FuncLit{
-// 		Type: DeserializeFuncType(pass, input.Type),
-// 	}
-// }
+func DeserializeFuncLit(pass *DePass, input *FuncLit) *ast.FuncLit {
+	if input == nil {
+		return nil
+	}
+
+	return &ast.FuncLit{
+		Type: DeserializeFuncType(pass, input.Type),
+		Body: DeserializeBlockStmt(pass, input.Body),
+	}
+}
 
 func DeserializeCompositeLit(pass *DePass, input *CompositeLit) *ast.CompositeLit {
+	if input == nil {
+		return nil
+	}
+
 	return &ast.CompositeLit{
 		Type:       DeserializeExpr(pass, input.Type),
 		Lbrace:     DeserializePos(pass, input.Lbrace),
@@ -142,6 +151,10 @@ func DeserializeCompositeLit(pass *DePass, input *CompositeLit) *ast.CompositeLi
 }
 
 func DeserializeEllipsis(pass *DePass, input *Ellipsis) *ast.Ellipsis {
+	if input == nil {
+		return nil
+	}
+
 	return &ast.Ellipsis{
 		Ellipsis: DeserializePos(pass, input.Ellipsis),
 		Elt:      DeserializeExpr(pass, input.Elt),
@@ -149,6 +162,10 @@ func DeserializeEllipsis(pass *DePass, input *Ellipsis) *ast.Ellipsis {
 }
 
 func DeserializeBadExpr(pass *DePass, input *BadExpr) *ast.BadExpr {
+	if input == nil {
+		return nil
+	}
+
 	return &ast.BadExpr{
 		From: DeserializePos(pass, input.From),
 		To:   DeserializePos(pass, input.To),
@@ -311,6 +328,8 @@ func DeserializeExpr(pass *DePass, expr Expr) ast.Expr {
 		return DeserializeBasicLit(pass, e)
 	case *CompositeLit:
 		return DeserializeCompositeLit(pass, e)
+	case *FuncLit:
+		return DeserializeFuncLit(pass, e)
 	case *Ellipsis:
 		return DeserializeEllipsis(pass, e)
 	case *BadExpr:
@@ -486,6 +505,45 @@ func DeserializeTypeSwitchStmt(pass *DePass, input *TypeSwitchStmt) *ast.TypeSwi
 	}
 }
 
+func DeserializeCommClause(pass *DePass, input *CommClause) *ast.CommClause {
+	return &ast.CommClause{
+		Case:  DeserializePos(pass, input.Case),
+		Comm:  DeserializeStmt(pass, input.Comm),
+		Colon: DeserializePos(pass, input.Colon),
+		Body:  DeserializeList[Stmt, ast.Stmt](pass, input.Body, DeserializeStmt),
+	}
+}
+
+func DeserializeSelectStmt(pass *DePass, input *SelectStmt) *ast.SelectStmt {
+	return &ast.SelectStmt{
+		Select: DeserializePos(pass, input.Select),
+		Body:   DeserializeBlockStmt(pass, input.Body),
+	}
+}
+
+func DeserializeForStmt(pass *DePass, input *ForStmt) *ast.ForStmt {
+	return &ast.ForStmt{
+		For:  DeserializePos(pass, input.For),
+		Init: DeserializeStmt(pass, input.Init),
+		Cond: DeserializeExpr(pass, input.Cond),
+		Post: DeserializeStmt(pass, input.Post),
+		Body: DeserializeBlockStmt(pass, input.Body),
+	}
+}
+
+func DeserializeRangeStmt(pass *DePass, input *RangeStmt) *ast.RangeStmt {
+	return &ast.RangeStmt{
+		For:    DeserializePos(pass, input.For),
+		Key:    DeserializeExpr(pass, input.Key),
+		Value:  DeserializeExpr(pass, input.Value),
+		TokPos: DeserializePos(pass, input.TokPos),
+		Tok:    tokens[input.Tok],
+		Range:  DeserializePos(pass, input.Range),
+		X:      DeserializeExpr(pass, input.X),
+		Body:   DeserializeBlockStmt(pass, input.Body),
+	}
+}
+
 func DeserializeStmt(pass *DePass, stmt Stmt) ast.Stmt {
 	switch s := stmt.(type) {
 	case *BadStmt:
@@ -522,6 +580,14 @@ func DeserializeStmt(pass *DePass, stmt Stmt) ast.Stmt {
 		return DeserializeTypeSwitchStmt(pass, s)
 	case *BlockStmt:
 		return DeserializeBlockStmt(pass, s)
+	case *CommClause:
+		return DeserializeCommClause(pass, s)
+	case *SelectStmt:
+		return DeserializeSelectStmt(pass, s)
+	case *ForStmt:
+		return DeserializeForStmt(pass, s)
+	case *RangeStmt:
+		return DeserializeRangeStmt(pass, s)
 	default:
 		return nil
 	}
@@ -529,17 +595,45 @@ func DeserializeStmt(pass *DePass, stmt Stmt) ast.Stmt {
 
 // ----------------- Specifications ----------------- //
 
+func DeserializeImportSpec(pass *DePass, input *ImportSpec) *ast.ImportSpec {
+	return &ast.ImportSpec{
+		Doc:     DeserializeCommentGroup(pass, input.Doc),
+		Name:    DeserializeIdent(pass, input.Name),
+		Path:    DeserializeBasicLit(pass, input.Path),
+		Comment: DeserializeCommentGroup(pass, input.Comment),
+		EndPos:  DeserializePos(pass, input.EndPos),
+	}
+}
+
 func DeserializeValueSpec(pass *DePass, input *ValueSpec) *ast.ValueSpec {
 	return &ast.ValueSpec{
-		Names:  DeserializeList[*Ident, *ast.Ident](pass, input.Names, DeserializeIdent),
-		Values: DeserializeList[Expr, ast.Expr](pass, input.Values, DeserializeExpr),
+		Doc:     DeserializeCommentGroup(pass, input.Doc),
+		Names:   DeserializeList[*Ident, *ast.Ident](pass, input.Names, DeserializeIdent),
+		Type:    DeserializeExpr(pass, input.Type),
+		Values:  DeserializeList[Expr, ast.Expr](pass, input.Values, DeserializeExpr),
+		Comment: DeserializeCommentGroup(pass, input.Comment),
+	}
+}
+
+func DeserializeTypeSpec(pass *DePass, input *TypeSpec) *ast.TypeSpec {
+	return &ast.TypeSpec{
+		Doc:        DeserializeCommentGroup(pass, input.Doc),
+		Name:       DeserializeIdent(pass, input.Name),
+		TypeParams: DeserializeFieldList(pass, input.TypeParams),
+		Assign:     DeserializePos(pass, input.Assign),
+		Type:       DeserializeExpr(pass, input.Type),
+		Comment:    DeserializeCommentGroup(pass, input.Comment),
 	}
 }
 
 func DeserializeSpec(pass *DePass, spec Spec) ast.Spec {
 	switch s := spec.(type) {
+	case *ImportSpec:
+		return DeserializeImportSpec(pass, s)
 	case *ValueSpec:
 		return DeserializeValueSpec(pass, s)
+	case *TypeSpec:
+		return DeserializeTypeSpec(pass, s)
 	default:
 		return nil
 	}
@@ -547,20 +641,42 @@ func DeserializeSpec(pass *DePass, spec Spec) ast.Spec {
 
 // ----------------- Declarations ----------------- //
 
+func DeserializeBadDecl(pass *DePass, input *BadDecl) *ast.BadDecl {
+	return &ast.BadDecl{
+		From: DeserializePos(pass, input.From),
+		To:   DeserializePos(pass, input.To),
+	}
+}
+
 func DeserializeGenDecl(pass *DePass, input *GenDecl) *ast.GenDecl {
 	return &ast.GenDecl{
+		Doc:    DeserializeCommentGroup(pass, input.Doc),
 		TokPos: DeserializePos(pass, input.TokenPos),
 		Tok:    tokens[input.Tok],
 		Lparen: token.NoPos,
-		Rparen: token.NoPos,
 		Specs:  DeserializeList[Spec, ast.Spec](pass, input.Specs, DeserializeSpec),
+		Rparen: token.NoPos,
+	}
+}
+
+func DeserializeFuncDecl(pass *DePass, input *FuncDecl) *ast.FuncDecl {
+	return &ast.FuncDecl{
+		Doc:  DeserializeCommentGroup(pass, input.Doc),
+		Recv: DeserializeFieldList(pass, input.Recv),
+		Name: DeserializeIdent(pass, input.Name),
+		Type: DeserializeFuncType(pass, input.Type),
+		Body: DeserializeBlockStmt(pass, input.Body),
 	}
 }
 
 func DeserializeDecl(pass *DePass, decl Decl) ast.Decl {
 	switch d := decl.(type) {
+	case *BadDecl:
+		return DeserializeBadDecl(pass, d)
 	case *GenDecl:
 		return DeserializeGenDecl(pass, d)
+	case *FuncDecl:
+		return DeserializeFuncDecl(pass, d)
 	default:
 		return nil
 	}
@@ -577,6 +693,7 @@ func DeserializeFile(pass *DePass, input *File) *ast.File {
 		Doc:        DeserializeCommentGroup(pass, input.Doc),
 		Name:       DeserializeIdent(pass, input.Name),
 		Decls:      DeserializeList[Decl, ast.Decl](pass, input.Decls, DeserializeDecl),
+		Imports:    DeserializeList[*ImportSpec, *ast.ImportSpec](pass, input.Imports, DeserializeImportSpec),
 		Unresolved: DeserializeList[*Ident, *ast.Ident](pass, input.Unresolved, DeserializeIdent),
 		Package:    DeserializePos(pass, input.Package),
 		Comments:   DeserializeList[*CommentGroup, *ast.CommentGroup](pass, input.Comments, DeserializeCommentGroup),

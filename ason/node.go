@@ -89,23 +89,7 @@ type Node struct {
 	Loc  *Loc   `json:"_loc"`
 }
 
-type File struct {
-	Doc                *CommentGroup   // associated documentation; or empty
-	Name               *Ident          // package name
-	Decls              []Decl          // top-level declarations
-	Size               int             // file size in bytes
-	FileStart, FileEnd Pos             // start and end of entire file
-	Scope              *Scope          // package scope (this file only)
-	Imports            []*ImportSpec   // imports in this file
-	Unresolved         []*Ident        // unresolved identifiers in this file
-	Package            Pos             // position of "package" keyword
-	Comments           []*CommentGroup // list of all comments in the source file
-	GoVersion          string          // minimum Go version required by go:build or +build directives
-
-	Node
-}
-
-func (*File) asonNode() {}
+// ----------------- Comments ----------------- //
 
 type (
 	Comment struct {
@@ -768,3 +752,23 @@ func (*FuncDecl) asonNode() {}
 func (*BadDecl) declNode()  {}
 func (*GenDecl) declNode()  {}
 func (*FuncDecl) declNode() {}
+
+// ----------------- Files and Packages ----------------- //
+
+type File struct {
+	Doc                *CommentGroup   // associated documentation; or empty
+	Name               *Ident          // package name
+	Decls              []Decl          // top-level declarations
+	Size               int             // file size in bytes
+	FileStart, FileEnd Pos             // start and end of entire file
+	Scope              *Scope          // package scope (this file only)
+	Imports            []*ImportSpec   // imports in this file
+	Unresolved         []*Ident        // unresolved identifiers in this file
+	Package            Pos             // position of "package" keyword
+	Comments           []*CommentGroup // list of all comments in the source file
+	GoVersion          string          // minimum Go version required by go:build or +build directives
+
+	Node
+}
+
+func (*File) asonNode() {}

@@ -21,7 +21,6 @@ func TestNewWeakRef(t *testing.T) {
 		weakRef := NewWeakRef(nil)
 		assert.Nil(t, weakRef, "unexpected: ref should be nil")
 	})
-
 }
 
 func TestWeakRef(t *testing.T) {
