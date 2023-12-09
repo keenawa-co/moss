@@ -74,7 +74,7 @@ func WithReadFileFn(fn func(string) ([]byte, error)) serPassOptFn {
 	}
 }
 
-func WithSerializationConf(options ...serConf) serPassOptFn {
+func WithSerConf(options ...serConf) serPassOptFn {
 	return func(pass *serPass) {
 		for i := 0; i < len(options); i++ {
 			opt := options[i]
@@ -129,10 +129,18 @@ func SerializeScope(pass *serPass, input *ast.Scope) *Scope {
 		return nil
 	}
 
-	var objects map[string]*Object
-	if input.Objects != nil {
-		objects = make(map[string]*Object, len(input.Objects))
-		for k, v := range input.Objects {
+	if input.Objects == nil {
+		return nil
+	}
+
+	return serializeScope(pass, input)
+}
+
+func serializeScope(pass *serPass, input *ast.Scope) *Scope {
+	objects := make(map[string]*Object, len(input.Objects))
+
+	for k, v := range input.Objects {
+		if v != nil {
 			objects[k] = SerializeObject(pass, v)
 		}
 	}
@@ -144,14 +152,6 @@ func SerializeScope(pass *serPass, input *ast.Scope) *Scope {
 }
 
 func SerializeObject(pass *serPass, input *ast.Object) *Object {
-	if input == nil {
-		return nil
-	}
-
-	if pass.conf[IDENT_OBJ] == nil {
-		return nil
-	}
-
 	return &Object{
 		Kind: input.Kind.String(),
 		Name: input.Name,
@@ -159,13 +159,11 @@ func SerializeObject(pass *serPass, input *ast.Object) *Object {
 }
 
 func SerializePos(pass *serPass, pos token.Pos) Pos {
-	if pos == token.NoPos {
-		return new(NoPos)
+	if pos != token.NoPos {
+		return NewPosition(pass.fset.PositionFor(pos, false))
 	}
 
-	position := pass.fset.PositionFor(pos, false)
-
-	return NewPosition(position)
+	return new(NoPos)
 }
 
 // ----------------- Comments ----------------- //

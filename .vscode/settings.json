@@ -20,6 +20,7 @@
         "subdir",
         "subdirs",
         "testcode",
+        "testmain",
         "TYPESWITCH"
     ]
 }
