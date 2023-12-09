@@ -777,7 +777,6 @@ func SerializeBranchStmt(pass *serPass, input *ast.BranchStmt) *BranchStmt {
 }
 
 func SerializeBlockStmt(pass *serPass, input *ast.BlockStmt) *BlockStmt {
-
 	return &BlockStmt{
 		Lbrace: SerializePos(pass, input.Lbrace),
 		List:   SerializeList(pass, input.List, SerializeStmt),
@@ -834,10 +833,6 @@ func SerializeSwitchStmt(pass *serPass, input *ast.SwitchStmt) *SwitchStmt {
 }
 
 func SerializeTypeSwitchStmt(pass *serPass, input *ast.TypeSwitchStmt) *TypeSwitchStmt {
-	if input == nil {
-		return nil
-	}
-
 	return &TypeSwitchStmt{
 		Switch: SerializePos(pass, input.Switch),
 		Init:   SerializeStmt(pass, input.Init),
@@ -940,8 +935,20 @@ func SerializeStmt(pass *serPass, stmt ast.Stmt) Stmt {
 		return SerializeBlockStmt(pass, s)
 	case *ast.IfStmt:
 		return SerializeIfStmt(pass, s)
+	case *ast.ForStmt:
+		return SerializeForStmt(pass, s)
+	case *ast.RangeStmt:
+		return SerializeRangeStmt(pass, s)
+	case *ast.SelectStmt:
+		return SerializeSelectStmt(pass, s)
 	case *ast.CaseClause:
 		return SerializeCaseClause(pass, s)
+	case *ast.CommClause:
+		return SerializeCommClause(pass, s)
+	case *ast.TypeSwitchStmt:
+		return SerializeTypeSwitchStmt(pass, s)
+	case *ast.SwitchStmt:
+		return SerializeSwitchStmt(pass, s)
 	default:
 		return nil
 	}
