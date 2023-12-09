@@ -10,41 +10,48 @@ func _GOARCH() int {
 	return strconv.IntSize
 }
 
-// Coord is a set os coordinates used to indicate a specific location in the source code.
-// The order in which the elements are stored is as follows `Offset`, `Line`, `Column`.
-type Coord [3]int
-
-// Offset is an absolute position of a character in the file text
-func (c Coord) Offset() int {
-	return c[0]
-}
-
-// Line is a line number in the file where this piece of code is located.
-func (c Coord) Line() int {
-	return c[1]
-}
-
-// Column ia s character position in a specific line, starting from zero
-func (c Coord) Column() int {
-	return c[2]
-}
-
-func NewCoord(pos *token.Position) Coord {
-	return [3]int{pos.Offset, pos.Line, pos.Column}
-}
-
 type Pos interface{ pos() }
 
 type (
 	NoPos    int
 	Position struct {
-		Filename    string
-		Coordinates Coord
+		coordinates [3]int // set of coordinates used to indicate a specific location in the source code; the order is `Offset`, `Line`, `Column`
+		filename    string
 	}
 )
 
 func (*NoPos) pos()    {}
 func (*Position) pos() {}
+
+func (p *Position) Filename() string {
+	return p.filename
+}
+
+// Offset is an absolute position of a character in the file text
+func (p *Position) Offset() int {
+	return p.coordinates[0]
+}
+
+// Line is a line number in the file where this piece of code is located.
+func (p *Position) Line() int {
+	return p.coordinates[1]
+}
+
+// Column ia s character position in a specific line, starting from zero
+func (p *Position) Column() int {
+	return p.coordinates[2]
+}
+
+func NewPosition(pos token.Position) *Position {
+	return &Position{
+		filename: pos.Filename,
+		coordinates: [3]int{
+			pos.Offset,
+			pos.Line,
+			pos.Column,
+		},
+	}
+}
 
 type Loc struct {
 	_     [0]int

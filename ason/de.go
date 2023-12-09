@@ -5,6 +5,7 @@ import (
 	"go/ast"
 	"go/token"
 	"log"
+	"unsafe"
 )
 
 // TODO List
@@ -25,14 +26,18 @@ func NewDePass(fset *token.FileSet) *DePass {
 
 type DeFn[I Ason, R ast.Node] func(*DePass, I) R
 
-func DeserializeList[I Ason, R ast.Node](pass *DePass, inputList []I, de DeFn[I, R]) []R {
-	if inputList == nil {
-		return nil
+func DeserializeOption[I Ason, R ast.Node](pass *DePass, input I, deFn DeFn[I, R]) (empty R) {
+	if *(*interface{})(unsafe.Pointer(&input)) != nil {
+		return deFn(pass, input)
 	}
 
+	return empty
+}
+
+func DeserializeList[I Ason, R ast.Node](pass *DePass, inputList []I, deFn DeFn[I, R]) []R {
 	result := make([]R, len(inputList))
 	for i := 0; i < len(inputList); i++ {
-		result[i] = de(pass, inputList[i])
+		result[i] = deFn(pass, inputList[i])
 	}
 
 	return result
@@ -46,13 +51,13 @@ func DeserializePos(pass *DePass, input Pos) token.Pos {
 		return token.NoPos
 	}
 
-	tokPos := token.Pos(pos.Coordinates.Offset())
+	tokPos := token.Pos(pos.Offset())
 	tokFile := pass.fset.File(tokPos)
 	if tokFile == nil {
 		return token.NoPos
 	}
 
-	return tokFile.Pos(pos.Coordinates.Offset())
+	return tokFile.Pos(pos.Offset())
 }
 
 // ----------------- Comments ----------------- //
@@ -690,32 +695,59 @@ func DeserializeFile(pass *DePass, input *File) *ast.File {
 	}
 
 	return &ast.File{
-		Doc:        DeserializeCommentGroup(pass, input.Doc),
-		Name:       DeserializeIdent(pass, input.Name),
-		Decls:      DeserializeList[Decl, ast.Decl](pass, input.Decls, DeserializeDecl),
-		Imports:    DeserializeList[*ImportSpec, *ast.ImportSpec](pass, input.Imports, DeserializeImportSpec),
-		Unresolved: DeserializeList[*Ident, *ast.Ident](pass, input.Unresolved, DeserializeIdent),
+		Doc:        DeserializeOption(pass, input.Doc, DeserializeCommentGroup),
 		Package:    DeserializePos(pass, input.Package),
-		Comments:   DeserializeList[*CommentGroup, *ast.CommentGroup](pass, input.Comments, DeserializeCommentGroup),
+		Name:       DeserializeOption(pass, input.Name, DeserializeIdent),
+		Decls:      DeserializeList(pass, input.Decls, DeserializeDecl),
+		FileStart:  DeserializePos(pass, input.FileStart),
+		FileEnd:    DeserializePos(pass, input.FileEnd),
+		Imports:    DeserializeList(pass, input.Imports, DeserializeImportSpec),
+		Unresolved: DeserializeList(pass, input.Unresolved, DeserializeIdent),
+		Comments:   DeserializeList(pass, input.Comments, DeserializeCommentGroup),
 		GoVersion:  input.GoVersion,
 	}
 }
 
+// func processTokenFile(pass *DePass, input *File) error {
+// 	if pass.fset != nil && input.Name != nil {
+// 		pos, ok := input.Name.NamePos.(*Position)
+// 		if !ok {
+// 			return fmt.Errorf("failed to get start pos for file `%s`", input.Name.Name)
+// 		}
+
+// 		fileSize := input.Size
+// 		if fileSize <= 0 {
+// 			fileSize = _GOARCH()
+// 		}
+
+// 		tokFile := pass.fset.AddFile(pos.Filename, -1, fileSize)
+// 		tokFile.SetLinesForContent([]byte{})
+// 	}
+
+// 	return nil
+// }
+
 func processTokenFile(pass *DePass, input *File) error {
-	if pass.fset != nil && input.Name != nil {
-		pos, ok := input.Name.NamePos.(*Position)
-		if !ok {
-			return fmt.Errorf("failed to get start pos for file `%s`", input.Name.Name)
-		}
-
-		fileSize := input.Size
-		if fileSize <= 0 {
-			fileSize = _GOARCH()
-		}
-
-		tokFile := pass.fset.AddFile(pos.Filename, -1, fileSize)
-		tokFile.SetLinesForContent([]byte{})
+	if input == nil || input.Name == nil {
+		return fmt.Errorf("input or input.Name is nil")
 	}
 
+	pos, ok := input.Name.NamePos.(*Position)
+	if !ok {
+		// pos := &Position{0, 0, 0}
+		return fmt.Errorf("failed to get start pos for file `%s`", input.Name.Name)
+	}
+
+	fileSize := input.Size
+	if fileSize <= 0 {
+		fileSize = _GOARCH()
+	}
+
+	tokFile := pass.fset.AddFile(pos.Filename(), pos.Offset(), fileSize)
+	if tokFile == nil {
+		return fmt.Errorf("failed to add file to file set")
+	}
+
+	tokFile.SetLinesForContent([]byte{})
 	return nil
 }

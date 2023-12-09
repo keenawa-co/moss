@@ -152,14 +152,7 @@ func SerializePos(pass *SerPass, pos token.Pos) Pos {
 
 	position := pass.fset.PositionFor(pos, false)
 
-	return &Position{
-		Filename: position.Filename,
-		Coordinates: [3]int{
-			position.Offset,
-			position.Line,
-			position.Column,
-		},
-	}
+	return NewPosition(position)
 }
 
 // ----------------- Comments ----------------- //
