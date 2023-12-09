@@ -305,6 +305,8 @@ func DeserializeExpr(pass *dePass, expr Expr) ast.Expr {
 		return DeserializeEllipsis(pass, e)
 	case *BadExpr:
 		return DeserializeBadExpr(pass, e)
+	case *ParenExpr:
+		return DeserializeParenExpr(pass, e)
 	case *SelectorExpr:
 		return DeserializeSelectorExpr(pass, e)
 	case *IndexExpr:
