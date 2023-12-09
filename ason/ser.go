@@ -38,10 +38,11 @@ const (
 
 type serPass struct {
 	fset     *token.FileSet
-	readFile func(string) ([]byte, error)
-	refCache map[ast.Node]*weakRef
-	refCount uint
-	conf     map[serConf]interface{}
+	tailNode Ason                         // last node that was serialized
+	readFile func(string) ([]byte, error) // function to OS read a file into a buffer
+	refCache map[ast.Node]*weakRef        // cache of weak refs to already serialized nodes
+	refCount uint                         // serialized nodes counter
+	conf     map[serConf]interface{}      // set of serialization parameters
 }
 
 // serPassOptFn is a functional option type that allows us to configure the SerPass.
@@ -984,15 +985,53 @@ func SerializeValueSpec(pass *serPass, input *ast.ValueSpec) *ValueSpec {
 		return WithRefLookup(pass, input, serializeValueSpec)
 	}
 
-	return serializeValueSpec(pass, input)
+	output := serializeValueSpec(pass, input)
+	// Save this as a tail node in case it is a set of variables
+	// or constants that are declared as an enumeration. Since in
+	// the case of an enumeration with the iota type, all constants
+	// except the first will not receive a type and value, since
+	// it is simply not specified directly in the code.
+	//
+	// const (
+	//	CACHE_REF serConf = iota
+	// 	FILE_SCOPE
+	// 	PKG_SCOPE
+	// 	IDENT_OBJ
+	//	LOC
+	// )
+	//
+	// When trying to deserialize it will look like this:
+	//
+	// const (
+	//	CACHE_REF  serConf = iota
+	//	FILE_SCOPE         =		<- invalid syntax
+	//	PKG_SCOPE          =		<- invalid syntax
+	//	IDENT_OBJ          =		<- invalid syntax
+	//	LOC                =		<- invalid syntax
+	// )
+	pass.tailNode = output
+	return output
 }
 
 func serializeValueSpec(pass *serPass, input *ast.ValueSpec) *ValueSpec {
+	var (
+		typ    Expr
+		values []Expr
+	)
+
+	if len(input.Values) > 0 {
+		typ = SerializeOption(pass, input.Type, SerializeExpr)
+		values = SerializeList(pass, input.Values, SerializeExpr)
+	} else if spec, ok := pass.tailNode.(*ValueSpec); ok && pass.tailNode != nil {
+		typ = spec.Type
+		values = spec.Values
+	}
+
 	return &ValueSpec{
 		Doc:     SerializeOption(pass, input.Doc, SerializeCommentGroup),
 		Names:   SerializeList(pass, input.Names, SerializeIdent),
-		Type:    SerializeOption(pass, input.Type, SerializeExpr),
-		Values:  SerializeList(pass, input.Values, SerializeExpr),
+		Type:    typ,
+		Values:  values,
 		Comment: SerializeOption(pass, input.Comment, SerializeCommentGroup),
 		Node: Node{
 			Type: NodeTypeValueSpec,
