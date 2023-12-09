@@ -22,12 +22,25 @@ const (
 	//
 	// Use this flag when duplicating nodes containing many fields.
 	CACHE_REF serConf = iota
-
 	// FILE_SCOPE enable serialization of `Scope` field in `*ast.File`.
 	FILE_SCOPE
-
 	// IDENT_OBJ enable serialization of `Obj` field in `*ast.Ident`.
 	IDENT_OBJ
+
+	// Nodes that may have difficulty calculating their start and end positions
+	// have special flags that allow this information to be inserted
+	// into the serialization object.
+
+	// Include `start` and `end` position for `*ast.FuncDecl`.
+	LOC_FUNC_DECL
+	// Include `start` and `end` position for `*ast.GenDecl`.
+	LOC_GEN_DECL
+	// Include `start` and `end` position for `*ast.TypeSpec`.
+	LOC_TYPE_SPEC
+	// Include `start` and `end` position for `*ast.ValueSpec`.
+	LOC_VALUE_SPEC
+	// Include `start` and `end` position for `*ast.ImportSpec`.
+	LOC_IMPORT_SPEC
 )
 
 type serPass struct {

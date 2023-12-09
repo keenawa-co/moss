@@ -188,7 +188,7 @@ func runRootCmd(cmd *cobra.Command, args []string) {
 	fmt.Println()
 
 	fset2 := token.NewFileSet()
-	df := ason.DeserializeFile(ason.NewDePass(fset2), sf)
+	df, _ := ason.DeserializeFile(ason.NewDePass(fset2), sf)
 
 	code, err := GenerateCode(fset2, df)
 	if err != nil {

@@ -2,6 +2,8 @@
     "cSpell.words": [
         "Arity",
         "ason",
+        "CASECLAUSE",
+        "COMMCLAUSE",
         "Elts",
         "fobj",
         "fset",
@@ -17,6 +19,7 @@
         "stretchr",
         "subdir",
         "subdirs",
-        "testcode"
+        "testcode",
+        "TYPESWITCH"
     ]
 }
