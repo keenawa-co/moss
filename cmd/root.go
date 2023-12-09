@@ -13,6 +13,7 @@ import (
 	"os"
 	"path/filepath"
 	"reflect"
+	"time"
 
 	"github.com/4rchr4y/goray/ason"
 	regoAst "github.com/open-policy-agent/opa/ast"
@@ -172,7 +173,9 @@ func runRootCmd(cmd *cobra.Command, args []string) {
 		log.Fatal(err)
 	}
 
+	startTime := time.Now()
 	sf := ason.SerializeFile(ason.NewSerPass(fset), f)
+	fmt.Println("Function execution time:", time.Since(startTime))
 
 	js, err := json.Marshal(sf)
 	if err != nil {

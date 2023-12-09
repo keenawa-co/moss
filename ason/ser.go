@@ -14,8 +14,11 @@ import (
 type SerializationConf int
 
 const (
-	// CACHE_REF flag must be used when you carry out some manual manipulations with the source AST tree.
-	// For example, you duplicate nodes, which can create nodes that have the same references to the original object in memory.
+	// CACHE_REF flag must be used when you carry out some manual manipulations
+	// with the source AST tree. For example, you duplicate nodes, which can create
+	// nodes that have the same references to the original object in memory.
+	// In order to reduce the number of checks that reduce performance,
+	// only large nodes can be cached, such as specifications, types and declarations.
 	//
 	// Use this flag when duplicating nodes containing many fields.
 	CACHE_REF SerializationConf = iota
@@ -35,10 +38,10 @@ type SerPass struct {
 	conf     map[SerializationConf]interface{}
 }
 
-// SerPassOptFn is a functional option type that allows us to configure the SerPass.
-type SerPassOptFn func(*SerPass)
+// serPassOptFn is a functional option type that allows us to configure the SerPass.
+type serPassOptFn func(*SerPass)
 
-func NewSerPass(fset *token.FileSet, options ...SerPassOptFn) *SerPass {
+func NewSerPass(fset *token.FileSet, options ...serPassOptFn) *SerPass {
 	pass := &SerPass{
 		fset:     fset,
 		readFile: os.ReadFile,
@@ -52,13 +55,13 @@ func NewSerPass(fset *token.FileSet, options ...SerPassOptFn) *SerPass {
 	return pass
 }
 
-func WithReadFileFn(fn func(string) ([]byte, error)) SerPassOptFn {
+func WithReadFileFn(fn func(string) ([]byte, error)) serPassOptFn {
 	return func(pass *SerPass) {
 		pass.readFile = fn
 	}
 }
 
-func WithSerializationConf(options ...SerializationConf) SerPassOptFn {
+func WithSerializationConf(options ...SerializationConf) serPassOptFn {
 	return func(pass *SerPass) {
 		for i := 0; i < len(options); i++ {
 			opt := options[i]
@@ -93,12 +96,8 @@ func SerializeOption[I ast.Node, R Ason](pass *SerPass, input I, serFn SerFn[I, 
 	return empty
 }
 
-func SerializeList[I ast.Node, R Ason](pass *SerPass, inputList []I, serFn SerFn[I, R]) []R {
-	if inputList == nil {
-		return nil
-	}
-
-	result := make([]R, len(inputList))
+func SerializeList[I ast.Node, R Ason](pass *SerPass, inputList []I, serFn SerFn[I, R]) (result []R) {
+	result = make([]R, len(inputList))
 	for i := 0; i < len(inputList); i++ {
 		result[i] = serFn(pass, inputList[i])
 	}
@@ -167,10 +166,6 @@ func SerializePos(pass *SerPass, pos token.Pos) Pos {
 
 // TODO: add tests
 func SerializeComment(pass *SerPass, input *ast.Comment) *Comment {
-	if input == nil {
-		return nil
-	}
-
 	return &Comment{
 		Slash: SerializePos(pass, input.Slash),
 		Text:  input.Text,
@@ -203,10 +198,6 @@ func SerializeIdent(pass *SerPass, input *ast.Ident) *Ident {
 //
 
 func SerializeBasicLit(pass *SerPass, input *ast.BasicLit) *BasicLit {
-	if input == nil {
-		return nil
-	}
-
 	return &BasicLit{
 		ValuePos: SerializePos(pass, input.ValuePos),
 		Kind:     input.Kind.String(),
@@ -216,75 +207,51 @@ func SerializeBasicLit(pass *SerPass, input *ast.BasicLit) *BasicLit {
 }
 
 func SerializeFuncLit(pass *SerPass, input *ast.FuncLit) *FuncLit {
-	if input == nil {
-		return nil
-	}
-
 	return &FuncLit{
-		Type: SerializeFuncType(pass, input.Type),
-		Body: SerializeBlockStmt(pass, input.Body),
+		Type: SerializeOption(pass, input.Type, SerializeFuncType),
+		Body: SerializeOption(pass, input.Body, SerializeBlockStmt),
 		Node: Node{Type: NodeTypeFuncLit, Ref: pass.refCount},
 	}
 }
 
 func SerializeCompositeLit(pass *SerPass, input *ast.CompositeLit) *CompositeLit {
-	if input == nil {
-		return nil
-	}
-
 	return &CompositeLit{
-		Type:   SerializeExpr(pass, input.Type),
+		Type:   SerializeOption(pass, input.Type, SerializeExpr),
 		Lbrace: SerializePos(pass, input.Lbrace),
-		Elts:   SerializeList[ast.Expr, Expr](pass, input.Elts, SerializeExpr),
+		Elts:   SerializeList(pass, input.Elts, SerializeExpr),
 		Node:   Node{Type: NodeTypeCompositeLit, Ref: pass.refCount},
 	}
 }
 
 func SerializeField(pass *SerPass, input *ast.Field) *Field {
-	if input == nil {
-		return nil
-	}
-
 	return &Field{
-		Doc:     SerializeOption[*ast.CommentGroup, *CommentGroup](pass, input.Doc, SerializeCommentGroup),
-		Names:   SerializeList[*ast.Ident, *Ident](pass, input.Names, SerializeIdent),
-		Type:    SerializeExpr(pass, input.Type),
-		Tag:     SerializeBasicLit(pass, input.Tag),
-		Comment: SerializeOption[*ast.CommentGroup, *CommentGroup](pass, input.Comment, SerializeCommentGroup),
+		Doc:     SerializeOption(pass, input.Doc, SerializeCommentGroup),
+		Names:   SerializeList(pass, input.Names, SerializeIdent),
+		Type:    SerializeOption(pass, input.Type, SerializeExpr),
+		Tag:     SerializeOption(pass, input.Tag, SerializeBasicLit),
+		Comment: SerializeOption(pass, input.Comment, SerializeCommentGroup),
 		Node:    Node{Type: NodeTypeField, Ref: pass.refCount},
 	}
 }
 
 func SerializeFieldList(pass *SerPass, input *ast.FieldList) *FieldList {
-	if input == nil {
-		return nil
-	}
-
 	return &FieldList{
 		Opening: SerializePos(pass, input.Opening),
-		List:    SerializeList[*ast.Field, *Field](pass, input.List, SerializeField),
+		List:    SerializeList(pass, input.List, SerializeField),
 		Closing: SerializePos(pass, input.Closing),
 		Node:    Node{Type: NodeTypeFieldList, Ref: pass.refCount},
 	}
 }
 
 func SerializeEllipsis(pass *SerPass, input *ast.Ellipsis) *Ellipsis {
-	if input == nil {
-		return nil
-	}
-
 	return &Ellipsis{
 		Ellipsis: SerializePos(pass, input.Ellipsis),
-		Elt:      SerializeExpr(pass, input.Elt),
+		Elt:      SerializeOption(pass, input.Elt, SerializeExpr),
 		Node:     Node{Type: NodeTypeEllipsis, Ref: pass.refCount},
 	}
 }
 
 func SerializeBadExpr(pass *SerPass, input *ast.BadExpr) *BadExpr {
-	if input == nil {
-		return nil
-	}
-
 	return &BadExpr{
 		From: SerializePos(pass, input.From),
 		To:   SerializePos(pass, input.To),
@@ -293,69 +260,49 @@ func SerializeBadExpr(pass *SerPass, input *ast.BadExpr) *BadExpr {
 }
 
 func SerializeParenExpr(pass *SerPass, input *ast.ParenExpr) *ParenExpr {
-	if input == nil {
-		return nil
-	}
-
 	return &ParenExpr{
 		Lparen: SerializePos(pass, input.Lparen),
-		X:      SerializeExpr(pass, input.X),
+		X:      SerializeOption(pass, input.X, SerializeExpr),
 		Rparen: SerializePos(pass, input.Rparen),
 		Node:   Node{Type: NodeTypeParenExpr, Ref: pass.refCount},
 	}
 }
 
 func SerializeSelectorExpr(pass *SerPass, input *ast.SelectorExpr) *SelectorExpr {
-	if input == nil {
-		return nil
-	}
-
 	return &SelectorExpr{
-		X:    SerializeExpr(pass, input.X),
-		Sel:  SerializeIdent(pass, input.Sel),
+		X:    SerializeOption(pass, input.X, SerializeExpr),
+		Sel:  SerializeOption(pass, input.Sel, SerializeIdent),
 		Node: Node{Type: NodeTypeSelectorExpr, Ref: pass.refCount},
 	}
 }
 
 func SerializeIndexExpr(pass *SerPass, input *ast.IndexExpr) *IndexExpr {
-	if input == nil {
-		return nil
-	}
-
 	return &IndexExpr{
-		X:      SerializeExpr(pass, input.X),
+		X:      SerializeOption(pass, input.X, SerializeExpr),
 		Lbrack: SerializePos(pass, input.Lbrack),
-		Index:  SerializeExpr(pass, input.Index),
+		Index:  SerializeOption(pass, input.Index, SerializeExpr),
 		Rbrack: SerializePos(pass, input.Rbrack),
 		Node:   Node{Type: NodeTypeIndexExpr, Ref: pass.refCount},
 	}
 }
 
 func SerializeIndexListExpr(pass *SerPass, input *ast.IndexListExpr) *IndexListExpr {
-	if input == nil {
-		return nil
-	}
-
 	return &IndexListExpr{
-		X:       SerializeExpr(pass, input.X),
+		X:       SerializeOption(pass, input.X, SerializeExpr),
 		Lbrack:  SerializePos(pass, input.Lbrack),
-		Indices: SerializeList[ast.Expr, Expr](pass, input.Indices, SerializeExpr),
+		Indices: SerializeList(pass, input.Indices, SerializeExpr),
 		Rbrack:  SerializePos(pass, input.Rbrack),
 		Node:    Node{Type: NodeTypeIndexListExpr, Ref: pass.refCount},
 	}
 }
 
 func SerializeSliceExpr(pass *SerPass, input *ast.SliceExpr) *SliceExpr {
-	if input == nil {
-		return nil
-	}
-
 	return &SliceExpr{
-		X:      SerializeExpr(pass, input.X),
+		X:      SerializeOption(pass, input.X, SerializeExpr),
 		Lbrack: SerializePos(pass, input.Lbrack),
-		Low:    SerializeExpr(pass, input.Low),
-		High:   SerializeExpr(pass, input.High),
-		Max:    SerializeExpr(pass, input.Max),
+		Low:    SerializeOption(pass, input.Low, SerializeExpr),
+		High:   SerializeOption(pass, input.High, SerializeExpr),
+		Max:    SerializeOption(pass, input.Max, SerializeExpr),
 		Slice3: input.Slice3,
 		Rbrack: SerializePos(pass, input.Rbrack),
 		Node:   Node{Type: NodeTypeSliceExpr, Ref: pass.refCount},
@@ -363,28 +310,20 @@ func SerializeSliceExpr(pass *SerPass, input *ast.SliceExpr) *SliceExpr {
 }
 
 func SerializeTypeAssertExpr(pass *SerPass, input *ast.TypeAssertExpr) *TypeAssertExpr {
-	if input == nil {
-		return nil
-	}
-
 	return &TypeAssertExpr{
-		X:      SerializeExpr(pass, input.X),
+		X:      SerializeOption(pass, input.X, SerializeExpr),
 		Lparen: SerializePos(pass, input.Lparen),
-		Type:   SerializeExpr(pass, input.Type),
+		Type:   SerializeOption(pass, input.Type, SerializeExpr),
 		Rparen: SerializePos(pass, input.Rparen),
 		Node:   Node{Type: NodeTypeTypeAssertExpr, Ref: pass.refCount},
 	}
 }
 
 func SerializeCallExpr(pass *SerPass, input *ast.CallExpr) *CallExpr {
-	if input == nil {
-		return nil
-	}
-
 	return &CallExpr{
-		Fun:      SerializeExpr(pass, input.Fun),
+		Fun:      SerializeOption(pass, input.Fun, SerializeExpr),
 		Lparen:   SerializePos(pass, input.Lparen),
-		Args:     SerializeList[ast.Expr, Expr](pass, input.Args, SerializeExpr),
+		Args:     SerializeList(pass, input.Args, SerializeExpr),
 		Ellipsis: SerializePos(pass, input.Ellipsis),
 		Rparen:   SerializePos(pass, input.Rparen),
 		Node:     Node{Type: NodeTypeCallExpr, Ref: pass.refCount},
@@ -392,53 +331,37 @@ func SerializeCallExpr(pass *SerPass, input *ast.CallExpr) *CallExpr {
 }
 
 func SerializeStarExpr(pass *SerPass, input *ast.StarExpr) *StarExpr {
-	if input == nil {
-		return nil
-	}
-
 	return &StarExpr{
 		Star: SerializePos(pass, input.Star),
-		X:    SerializeExpr(pass, input.X),
+		X:    SerializeOption(pass, input.X, SerializeExpr),
 		Node: Node{Type: NodeTypeStarExpr, Ref: pass.refCount},
 	}
 }
 
 func SerializeUnaryExpr(pass *SerPass, input *ast.UnaryExpr) *UnaryExpr {
-	if input == nil {
-		return nil
-	}
-
 	return &UnaryExpr{
 		OpPos: SerializePos(pass, input.OpPos),
 		Op:    input.Op.String(),
-		X:     SerializeExpr(pass, input.X),
+		X:     SerializeOption(pass, input.X, SerializeExpr),
 		Node:  Node{Type: NodeTypeUnaryExpr, Ref: pass.refCount},
 	}
 }
 
 func SerializeBinaryExpr(pass *SerPass, input *ast.BinaryExpr) *BinaryExpr {
-	if input == nil {
-		return nil
-	}
-
 	return &BinaryExpr{
-		X:     SerializeExpr(pass, input.X),
+		X:     SerializeOption(pass, input.X, SerializeExpr),
 		OpPos: SerializePos(pass, input.OpPos),
 		Op:    input.Op.String(),
-		Y:     SerializeExpr(pass, input.Y),
+		Y:     SerializeOption(pass, input.Y, SerializeExpr),
 		Node:  Node{Type: NodeTypeBinaryExpr, Ref: pass.refCount},
 	}
 }
 
 func SerializeKeyValueExpr(pass *SerPass, input *ast.KeyValueExpr) *KeyValueExpr {
-	if input == nil {
-		return nil
-	}
-
 	return &KeyValueExpr{
-		Key:   SerializeExpr(pass, input.Key),
+		Key:   SerializeOption(pass, input.Key, SerializeExpr),
 		Colon: SerializePos(pass, input.Colon),
-		Value: SerializeExpr(pass, input.Value),
+		Value: SerializeOption(pass, input.Value, SerializeExpr),
 		Node:  Node{Type: NodeTypeKeyValueExpr, Ref: pass.refCount},
 	}
 }
@@ -446,82 +369,58 @@ func SerializeKeyValueExpr(pass *SerPass, input *ast.KeyValueExpr) *KeyValueExpr
 // ----------------- Types ----------------- //
 
 func SerializeArrayType(pass *SerPass, input *ast.ArrayType) *ArrayType {
-	if input == nil {
-		return nil
-	}
-
 	return &ArrayType{
 		Lbrack: SerializePos(pass, input.Lbrack),
-		Len:    SerializeExpr(pass, input.Len),
-		Elt:    SerializeExpr(pass, input.Elt),
+		Len:    SerializeOption(pass, input.Len, SerializeExpr),
+		Elt:    SerializeOption(pass, input.Elt, SerializeExpr),
 		Node:   Node{Type: NodeTypeArrayType, Ref: pass.refCount},
 	}
 }
 
 func SerializeStructType(pass *SerPass, input *ast.StructType) *StructType {
-	if input == nil {
-		return nil
-	}
-
 	return &StructType{
 		Struct:     SerializePos(pass, input.Struct),
-		Fields:     SerializeFieldList(pass, input.Fields),
+		Fields:     SerializeOption(pass, input.Fields, SerializeFieldList),
 		Incomplete: input.Incomplete,
 		Node:       Node{Type: NodeTypeStructType, Ref: pass.refCount},
 	}
 }
 
 func SerializeFuncType(pass *SerPass, input *ast.FuncType) *FuncType {
-	if input == nil {
-		return nil
-	}
-
 	return &FuncType{
 		Func:       SerializePos(pass, input.Func),
-		TypeParams: SerializeFieldList(pass, input.TypeParams),
-		Params:     SerializeFieldList(pass, input.Params),
-		Results:    SerializeFieldList(pass, input.Results),
+		TypeParams: SerializeOption(pass, input.TypeParams, SerializeFieldList),
+		Params:     SerializeOption(pass, input.Params, SerializeFieldList),
+		Results:    SerializeOption(pass, input.Results, SerializeFieldList),
 		Node:       Node{Type: NodeTypeFuncType, Ref: pass.refCount},
 	}
 }
 
 func SerializeInterfaceType(pass *SerPass, input *ast.InterfaceType) *InterfaceType {
-	if input == nil {
-		return nil
-	}
-
 	return &InterfaceType{
 		Interface:  SerializePos(pass, input.Interface),
-		Methods:    SerializeFieldList(pass, input.Methods),
+		Methods:    SerializeOption(pass, input.Methods, SerializeFieldList),
 		Incomplete: input.Incomplete,
 		Node:       Node{Type: NodeTypeInterfaceType, Ref: pass.refCount},
 	}
 }
 
 func SerializeMapType(pass *SerPass, input *ast.MapType) *MapType {
-	if input == nil {
-		return nil
-	}
-
 	return &MapType{
 		Map:   SerializePos(pass, input.Map),
-		Key:   SerializeExpr(pass, input.Key),
-		Value: SerializeExpr(pass, input.Value),
+		Key:   SerializeOption(pass, input.Key, SerializeExpr),
+		Value: SerializeOption(pass, input.Value, SerializeExpr),
 		Node:  Node{Type: NodeTypeMapType, Ref: pass.refCount},
 	}
 }
 
 func SerializeChanType(pass *SerPass, input *ast.ChanType) *ChanType {
-	if input == nil {
-		return nil
-	}
-
 	return &ChanType{
 		Begin: SerializePos(pass, input.Begin),
 		Arrow: SerializePos(pass, input.Arrow),
 		Dir:   int(input.Dir),
-		Value: SerializeExpr(pass, input.Value),
-		Node:  Node{Type: NodeTypeStarExpr, Ref: pass.refCount},
+		Value: SerializeOption(pass, input.Value, SerializeExpr),
+		Node:  Node{Type: NodeTypeChanType, Ref: pass.refCount},
 	}
 }
 
@@ -818,10 +717,14 @@ func SerializeStmt(pass *SerPass, stmt ast.Stmt) Stmt {
 // ----------------- Specifications ----------------- //
 
 func SerializeImportSpec(pass *SerPass, input *ast.ImportSpec) *ImportSpec {
-	if input == nil {
-		return nil
+	if pass.conf[CACHE_REF] != nil {
+		return WithRefLookup(pass, input, serializeImportSpec)
 	}
 
+	return serializeImportSpec(pass, input)
+}
+
+func serializeImportSpec(pass *SerPass, input *ast.ImportSpec) *ImportSpec {
 	return &ImportSpec{
 		Doc:     SerializeOption(pass, input.Doc, SerializeCommentGroup),
 		Name:    SerializeOption(pass, input.Name, SerializeIdent),
@@ -833,6 +736,14 @@ func SerializeImportSpec(pass *SerPass, input *ast.ImportSpec) *ImportSpec {
 }
 
 func SerializeValueSpec(pass *SerPass, input *ast.ValueSpec) *ValueSpec {
+	if pass.conf[CACHE_REF] != nil {
+		return WithRefLookup(pass, input, serializeValueSpec)
+	}
+
+	return serializeValueSpec(pass, input)
+}
+
+func serializeValueSpec(pass *SerPass, input *ast.ValueSpec) *ValueSpec {
 	return &ValueSpec{
 		Doc:     SerializeOption(pass, input.Doc, SerializeCommentGroup),
 		Names:   SerializeList(pass, input.Names, SerializeIdent),
@@ -844,6 +755,14 @@ func SerializeValueSpec(pass *SerPass, input *ast.ValueSpec) *ValueSpec {
 }
 
 func SerializeTypeSpec(pass *SerPass, input *ast.TypeSpec) *TypeSpec {
+	if pass.conf[CACHE_REF] != nil {
+		return WithRefLookup(pass, input, serializeTypeSpec)
+	}
+
+	return serializeTypeSpec(pass, input)
+}
+
+func serializeTypeSpec(pass *SerPass, input *ast.TypeSpec) *TypeSpec {
 	return &TypeSpec{
 		Doc:        SerializeOption(pass, input.Doc, SerializeCommentGroup),
 		Name:       SerializeOption(pass, input.Name, SerializeIdent),
@@ -871,10 +790,14 @@ func SerializeSpec(pass *SerPass, spec ast.Spec) Spec {
 // ----------------- Declarations ----------------- //
 
 func SerializeBadDecl(pass *SerPass, input *ast.BadDecl) *BadDecl {
-	if input == nil {
-		return nil
+	if pass.conf[CACHE_REF] != nil {
+		return WithRefLookup(pass, input, serializeBadDecl)
 	}
 
+	return serializeBadDecl(pass, input)
+}
+
+func serializeBadDecl(pass *SerPass, input *ast.BadDecl) *BadDecl {
 	return &BadDecl{
 		From: SerializePos(pass, input.From),
 		To:   SerializePos(pass, input.To),
@@ -884,7 +807,7 @@ func SerializeBadDecl(pass *SerPass, input *ast.BadDecl) *BadDecl {
 
 func SerializeGenDecl(pass *SerPass, input *ast.GenDecl) *GenDecl {
 	if pass.conf[CACHE_REF] != nil {
-		return WithRefLookup[*ast.GenDecl, *GenDecl](pass, input, serializeGenDecl)
+		return WithRefLookup(pass, input, serializeGenDecl)
 	}
 
 	return serializeGenDecl(pass, input)
@@ -900,6 +823,14 @@ func serializeGenDecl(pass *SerPass, input *ast.GenDecl) *GenDecl {
 		Specs:    SerializeList(pass, input.Specs, SerializeSpec),
 		Node:     Node{Type: NodeTypeGenDecl, Ref: pass.refCount},
 	}
+}
+
+func SerializeFuncDecl(pass *SerPass, input *ast.FuncDecl) *FuncDecl {
+	if pass.conf[CACHE_REF] != nil {
+		return WithRefLookup(pass, input, serializeFuncDecl)
+	}
+
+	return serializeFuncDecl(pass, input)
 }
 
 func serializeFuncDecl(pass *SerPass, input *ast.FuncDecl) *FuncDecl {
@@ -920,7 +851,7 @@ func SerializeDecl(pass *SerPass, decl ast.Decl) Decl {
 	case *ast.GenDecl:
 		return SerializeGenDecl(pass, d)
 	case *ast.FuncDecl:
-		return serializeFuncDecl(pass, d)
+		return SerializeFuncDecl(pass, d)
 	default:
 		return nil
 	}
