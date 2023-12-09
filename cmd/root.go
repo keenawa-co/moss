@@ -3,7 +3,6 @@ package main
 import (
 	"bytes"
 	"context"
-	"encoding/json"
 	"fmt"
 	"go/ast"
 	"go/parser"
@@ -160,29 +159,23 @@ func StructToMap(v interface{}) map[string]interface{} {
 func runRootCmd(cmd *cobra.Command, args []string) {
 	// regoClient.ParsePolicyDir("analysis/policy")
 
-	// mr := ason.NewMarshaller(ason.Options{
-	// 	WithImports:   true,
-	// 	WithPositions: true,
-	// 	WithComments:  true,
-	// })
-
 	fset := token.NewFileSet()
 
-	f, err := parser.ParseFile(fset, "./ason/testdata/main.go", nil, parser.AllErrors)
+	f, err := parser.ParseFile(fset, "./ason/ser.go", nil, parser.AllErrors)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	startTime := time.Now()
-	sf := ason.SerializeFile(ason.NewSerPass(fset), f)
+	sf := ason.SerializeFile(ason.NewSerPass(fset, ason.WithSerConf(ason.LOC)), f)
 	fmt.Println("Function execution time:", time.Since(startTime))
 
-	js, err := json.Marshal(sf)
-	if err != nil {
-		log.Fatal(err)
-	}
+	// js, err := json.Marshal(sf)
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
 
-	fmt.Println(string(js))
+	// fmt.Println(string(js))
 
 	fmt.Println()
 	fmt.Println()
@@ -196,24 +189,6 @@ func runRootCmd(cmd *cobra.Command, args []string) {
 	}
 
 	fmt.Println(code)
-
-	// ast.Print(token.NewFileSet(), ds)
-
-	// ast.Inspect(f, func(n ast.Node) bool {
-	// 	if n == nil {
-	// 		return true
-	// 	}
-	// 	if ident, ok := n.(*ast.Ident); ok && ident.Obj != nil {
-
-	// 		js, err := json.Marshal(o)
-	// 		if err != nil {
-	// 			log.Fatal(err)
-	// 		}
-
-	// 		fmt.Println(string(js))
-	// 	}
-	// 	return true
-	// })
 
 	data := inspectFile(fset, f)
 

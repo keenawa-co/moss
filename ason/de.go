@@ -33,6 +33,10 @@ func DeserializeOption[I Ason, R ast.Node](pass *dePass, input I, deFn DeFn[I, R
 }
 
 func DeserializeList[I Ason, R ast.Node](pass *dePass, inputList []I, deFn DeFn[I, R]) []R {
+	if inputList == nil {
+		return nil
+	}
+
 	result := make([]R, len(inputList))
 	for i := 0; i < len(inputList); i++ {
 		result[i] = deFn(pass, inputList[i])

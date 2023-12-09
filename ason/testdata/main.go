@@ -1,5 +1,7 @@
 package main
 
+import "fmt"
+
 // Some doc here
 var scope = "scopeValue"
 
@@ -14,3 +16,14 @@ var (
 )
 
 var testArray = [5]int{1, 2, 3, 4, 5}
+
+func main() {
+	cs := ast.ClassSpec{
+		Name:       "Hello",
+		Visibility: types.Private,
+	}
+
+	ts := cs.Tokenify()
+
+	fmt.Println(cs.Plantify(ts))
+}
