@@ -11,7 +11,7 @@ import (
 //
 // *ast.Package
 
-type SerializationConf int
+type serConf int
 
 const (
 	// CACHE_REF flag must be used when you carry out some manual manipulations
@@ -21,7 +21,7 @@ const (
 	// only large nodes can be cached, such as specifications, types and declarations.
 	//
 	// Use this flag when duplicating nodes containing many fields.
-	CACHE_REF SerializationConf = iota
+	CACHE_REF serConf = iota
 
 	// FILE_SCOPE enable serialization of `Scope` field in `*ast.File`.
 	FILE_SCOPE
@@ -30,22 +30,22 @@ const (
 	IDENT_OBJ
 )
 
-type SerPass struct {
+type serPass struct {
 	fset     *token.FileSet
 	readFile func(string) ([]byte, error)
 	refCache map[ast.Node]*weakRef
 	refCount uint
-	conf     map[SerializationConf]interface{}
+	conf     map[serConf]interface{}
 }
 
 // serPassOptFn is a functional option type that allows us to configure the SerPass.
-type serPassOptFn func(*SerPass)
+type serPassOptFn func(*serPass)
 
-func NewSerPass(fset *token.FileSet, options ...serPassOptFn) *SerPass {
-	pass := &SerPass{
+func NewSerPass(fset *token.FileSet, options ...serPassOptFn) *serPass {
+	pass := &serPass{
 		fset:     fset,
 		readFile: os.ReadFile,
-		conf:     make(map[SerializationConf]interface{}),
+		conf:     make(map[serConf]interface{}),
 	}
 
 	for _, opt := range options {
@@ -56,13 +56,13 @@ func NewSerPass(fset *token.FileSet, options ...serPassOptFn) *SerPass {
 }
 
 func WithReadFileFn(fn func(string) ([]byte, error)) serPassOptFn {
-	return func(pass *SerPass) {
+	return func(pass *serPass) {
 		pass.readFile = fn
 	}
 }
 
-func WithSerializationConf(options ...SerializationConf) serPassOptFn {
-	return func(pass *SerPass) {
+func WithSerializationConf(options ...serConf) serPassOptFn {
+	return func(pass *serPass) {
 		for i := 0; i < len(options); i++ {
 			opt := options[i]
 			pass.conf[opt] = struct{}{}
@@ -74,9 +74,9 @@ func WithSerializationConf(options ...SerializationConf) serPassOptFn {
 	}
 }
 
-type SerFn[I ast.Node, R Ason] func(*SerPass, I) R
+type SerFn[I ast.Node, R Ason] func(*serPass, I) R
 
-func WithRefLookup[I ast.Node, R Ason](pass *SerPass, input I, serFn SerFn[I, R]) R {
+func WithRefLookup[I ast.Node, R Ason](pass *serPass, input I, serFn SerFn[I, R]) R {
 	if weakRef, exists := pass.refCache[input]; exists {
 		return weakRef.Load().(R)
 	}
@@ -88,7 +88,7 @@ func WithRefLookup[I ast.Node, R Ason](pass *SerPass, input I, serFn SerFn[I, R]
 	return node
 }
 
-func SerializeOption[I ast.Node, R Ason](pass *SerPass, input I, serFn SerFn[I, R]) (empty R) {
+func SerializeOption[I ast.Node, R Ason](pass *serPass, input I, serFn SerFn[I, R]) (empty R) {
 	if *(*interface{})(unsafe.Pointer(&input)) != nil {
 		return serFn(pass, input)
 	}
@@ -96,7 +96,7 @@ func SerializeOption[I ast.Node, R Ason](pass *SerPass, input I, serFn SerFn[I, 
 	return empty
 }
 
-func SerializeList[I ast.Node, R Ason](pass *SerPass, inputList []I, serFn SerFn[I, R]) (result []R) {
+func SerializeList[I ast.Node, R Ason](pass *serPass, inputList []I, serFn SerFn[I, R]) (result []R) {
 	result = make([]R, len(inputList))
 	for i := 0; i < len(inputList); i++ {
 		result[i] = serFn(pass, inputList[i])
@@ -107,7 +107,7 @@ func SerializeList[I ast.Node, R Ason](pass *SerPass, inputList []I, serFn SerFn
 
 // ----------------- Scope ----------------- //
 
-func SerializeScope(pass *SerPass, input *ast.Scope) *Scope {
+func SerializeScope(pass *serPass, input *ast.Scope) *Scope {
 	if input == nil {
 		return nil
 	}
@@ -130,7 +130,7 @@ func SerializeScope(pass *SerPass, input *ast.Scope) *Scope {
 	}
 }
 
-func SerializeObject(pass *SerPass, input *ast.Object) *Object {
+func SerializeObject(pass *serPass, input *ast.Object) *Object {
 	if input == nil {
 		return nil
 	}
@@ -145,7 +145,7 @@ func SerializeObject(pass *SerPass, input *ast.Object) *Object {
 	}
 }
 
-func SerializePos(pass *SerPass, pos token.Pos) Pos {
+func SerializePos(pass *serPass, pos token.Pos) Pos {
 	if pos == token.NoPos {
 		return new(NoPos)
 	}
@@ -158,7 +158,7 @@ func SerializePos(pass *SerPass, pos token.Pos) Pos {
 // ----------------- Comments ----------------- //
 
 // TODO: add tests
-func SerializeComment(pass *SerPass, input *ast.Comment) *Comment {
+func SerializeComment(pass *serPass, input *ast.Comment) *Comment {
 	return &Comment{
 		Slash: SerializePos(pass, input.Slash),
 		Text:  input.Text,
@@ -167,7 +167,7 @@ func SerializeComment(pass *SerPass, input *ast.Comment) *Comment {
 }
 
 // TODO: add tests
-func SerializeCommentGroup(pass *SerPass, input *ast.CommentGroup) *CommentGroup {
+func SerializeCommentGroup(pass *serPass, input *ast.CommentGroup) *CommentGroup {
 	return &CommentGroup{
 		List: SerializeList[*ast.Comment, *Comment](pass, input.List, SerializeComment),
 		Node: Node{Type: NodeTypeCommentGroup, Ref: pass.refCount},
@@ -176,7 +176,7 @@ func SerializeCommentGroup(pass *SerPass, input *ast.CommentGroup) *CommentGroup
 
 // ----------------- Expressions ----------------- //
 
-func SerializeIdent(pass *SerPass, input *ast.Ident) *Ident {
+func SerializeIdent(pass *serPass, input *ast.Ident) *Ident {
 	return &Ident{
 		NamePos: SerializePos(pass, input.NamePos),
 		Name:    input.String(),
@@ -190,7 +190,7 @@ func SerializeIdent(pass *SerPass, input *ast.Ident) *Ident {
 // <---- TESTED CURSOR
 //
 
-func SerializeBasicLit(pass *SerPass, input *ast.BasicLit) *BasicLit {
+func SerializeBasicLit(pass *serPass, input *ast.BasicLit) *BasicLit {
 	return &BasicLit{
 		ValuePos: SerializePos(pass, input.ValuePos),
 		Kind:     input.Kind.String(),
@@ -199,7 +199,7 @@ func SerializeBasicLit(pass *SerPass, input *ast.BasicLit) *BasicLit {
 	}
 }
 
-func SerializeFuncLit(pass *SerPass, input *ast.FuncLit) *FuncLit {
+func SerializeFuncLit(pass *serPass, input *ast.FuncLit) *FuncLit {
 	return &FuncLit{
 		Type: SerializeOption(pass, input.Type, SerializeFuncType),
 		Body: SerializeOption(pass, input.Body, SerializeBlockStmt),
@@ -207,7 +207,7 @@ func SerializeFuncLit(pass *SerPass, input *ast.FuncLit) *FuncLit {
 	}
 }
 
-func SerializeCompositeLit(pass *SerPass, input *ast.CompositeLit) *CompositeLit {
+func SerializeCompositeLit(pass *serPass, input *ast.CompositeLit) *CompositeLit {
 	return &CompositeLit{
 		Type:   SerializeOption(pass, input.Type, SerializeExpr),
 		Lbrace: SerializePos(pass, input.Lbrace),
@@ -216,7 +216,7 @@ func SerializeCompositeLit(pass *SerPass, input *ast.CompositeLit) *CompositeLit
 	}
 }
 
-func SerializeField(pass *SerPass, input *ast.Field) *Field {
+func SerializeField(pass *serPass, input *ast.Field) *Field {
 	return &Field{
 		Doc:     SerializeOption(pass, input.Doc, SerializeCommentGroup),
 		Names:   SerializeList(pass, input.Names, SerializeIdent),
@@ -227,7 +227,7 @@ func SerializeField(pass *SerPass, input *ast.Field) *Field {
 	}
 }
 
-func SerializeFieldList(pass *SerPass, input *ast.FieldList) *FieldList {
+func SerializeFieldList(pass *serPass, input *ast.FieldList) *FieldList {
 	return &FieldList{
 		Opening: SerializePos(pass, input.Opening),
 		List:    SerializeList(pass, input.List, SerializeField),
@@ -236,7 +236,7 @@ func SerializeFieldList(pass *SerPass, input *ast.FieldList) *FieldList {
 	}
 }
 
-func SerializeEllipsis(pass *SerPass, input *ast.Ellipsis) *Ellipsis {
+func SerializeEllipsis(pass *serPass, input *ast.Ellipsis) *Ellipsis {
 	return &Ellipsis{
 		Ellipsis: SerializePos(pass, input.Ellipsis),
 		Elt:      SerializeOption(pass, input.Elt, SerializeExpr),
@@ -244,7 +244,7 @@ func SerializeEllipsis(pass *SerPass, input *ast.Ellipsis) *Ellipsis {
 	}
 }
 
-func SerializeBadExpr(pass *SerPass, input *ast.BadExpr) *BadExpr {
+func SerializeBadExpr(pass *serPass, input *ast.BadExpr) *BadExpr {
 	return &BadExpr{
 		From: SerializePos(pass, input.From),
 		To:   SerializePos(pass, input.To),
@@ -252,7 +252,7 @@ func SerializeBadExpr(pass *SerPass, input *ast.BadExpr) *BadExpr {
 	}
 }
 
-func SerializeParenExpr(pass *SerPass, input *ast.ParenExpr) *ParenExpr {
+func SerializeParenExpr(pass *serPass, input *ast.ParenExpr) *ParenExpr {
 	return &ParenExpr{
 		Lparen: SerializePos(pass, input.Lparen),
 		X:      SerializeOption(pass, input.X, SerializeExpr),
@@ -261,7 +261,7 @@ func SerializeParenExpr(pass *SerPass, input *ast.ParenExpr) *ParenExpr {
 	}
 }
 
-func SerializeSelectorExpr(pass *SerPass, input *ast.SelectorExpr) *SelectorExpr {
+func SerializeSelectorExpr(pass *serPass, input *ast.SelectorExpr) *SelectorExpr {
 	return &SelectorExpr{
 		X:    SerializeOption(pass, input.X, SerializeExpr),
 		Sel:  SerializeOption(pass, input.Sel, SerializeIdent),
@@ -269,7 +269,7 @@ func SerializeSelectorExpr(pass *SerPass, input *ast.SelectorExpr) *SelectorExpr
 	}
 }
 
-func SerializeIndexExpr(pass *SerPass, input *ast.IndexExpr) *IndexExpr {
+func SerializeIndexExpr(pass *serPass, input *ast.IndexExpr) *IndexExpr {
 	return &IndexExpr{
 		X:      SerializeOption(pass, input.X, SerializeExpr),
 		Lbrack: SerializePos(pass, input.Lbrack),
@@ -279,7 +279,7 @@ func SerializeIndexExpr(pass *SerPass, input *ast.IndexExpr) *IndexExpr {
 	}
 }
 
-func SerializeIndexListExpr(pass *SerPass, input *ast.IndexListExpr) *IndexListExpr {
+func SerializeIndexListExpr(pass *serPass, input *ast.IndexListExpr) *IndexListExpr {
 	return &IndexListExpr{
 		X:       SerializeOption(pass, input.X, SerializeExpr),
 		Lbrack:  SerializePos(pass, input.Lbrack),
@@ -289,7 +289,7 @@ func SerializeIndexListExpr(pass *SerPass, input *ast.IndexListExpr) *IndexListE
 	}
 }
 
-func SerializeSliceExpr(pass *SerPass, input *ast.SliceExpr) *SliceExpr {
+func SerializeSliceExpr(pass *serPass, input *ast.SliceExpr) *SliceExpr {
 	return &SliceExpr{
 		X:      SerializeOption(pass, input.X, SerializeExpr),
 		Lbrack: SerializePos(pass, input.Lbrack),
@@ -302,7 +302,7 @@ func SerializeSliceExpr(pass *SerPass, input *ast.SliceExpr) *SliceExpr {
 	}
 }
 
-func SerializeTypeAssertExpr(pass *SerPass, input *ast.TypeAssertExpr) *TypeAssertExpr {
+func SerializeTypeAssertExpr(pass *serPass, input *ast.TypeAssertExpr) *TypeAssertExpr {
 	return &TypeAssertExpr{
 		X:      SerializeOption(pass, input.X, SerializeExpr),
 		Lparen: SerializePos(pass, input.Lparen),
@@ -312,7 +312,7 @@ func SerializeTypeAssertExpr(pass *SerPass, input *ast.TypeAssertExpr) *TypeAsse
 	}
 }
 
-func SerializeCallExpr(pass *SerPass, input *ast.CallExpr) *CallExpr {
+func SerializeCallExpr(pass *serPass, input *ast.CallExpr) *CallExpr {
 	return &CallExpr{
 		Fun:      SerializeOption(pass, input.Fun, SerializeExpr),
 		Lparen:   SerializePos(pass, input.Lparen),
@@ -323,7 +323,7 @@ func SerializeCallExpr(pass *SerPass, input *ast.CallExpr) *CallExpr {
 	}
 }
 
-func SerializeStarExpr(pass *SerPass, input *ast.StarExpr) *StarExpr {
+func SerializeStarExpr(pass *serPass, input *ast.StarExpr) *StarExpr {
 	return &StarExpr{
 		Star: SerializePos(pass, input.Star),
 		X:    SerializeOption(pass, input.X, SerializeExpr),
@@ -331,7 +331,7 @@ func SerializeStarExpr(pass *SerPass, input *ast.StarExpr) *StarExpr {
 	}
 }
 
-func SerializeUnaryExpr(pass *SerPass, input *ast.UnaryExpr) *UnaryExpr {
+func SerializeUnaryExpr(pass *serPass, input *ast.UnaryExpr) *UnaryExpr {
 	return &UnaryExpr{
 		OpPos: SerializePos(pass, input.OpPos),
 		Op:    input.Op.String(),
@@ -340,7 +340,7 @@ func SerializeUnaryExpr(pass *SerPass, input *ast.UnaryExpr) *UnaryExpr {
 	}
 }
 
-func SerializeBinaryExpr(pass *SerPass, input *ast.BinaryExpr) *BinaryExpr {
+func SerializeBinaryExpr(pass *serPass, input *ast.BinaryExpr) *BinaryExpr {
 	return &BinaryExpr{
 		X:     SerializeOption(pass, input.X, SerializeExpr),
 		OpPos: SerializePos(pass, input.OpPos),
@@ -350,7 +350,7 @@ func SerializeBinaryExpr(pass *SerPass, input *ast.BinaryExpr) *BinaryExpr {
 	}
 }
 
-func SerializeKeyValueExpr(pass *SerPass, input *ast.KeyValueExpr) *KeyValueExpr {
+func SerializeKeyValueExpr(pass *serPass, input *ast.KeyValueExpr) *KeyValueExpr {
 	return &KeyValueExpr{
 		Key:   SerializeOption(pass, input.Key, SerializeExpr),
 		Colon: SerializePos(pass, input.Colon),
@@ -361,7 +361,7 @@ func SerializeKeyValueExpr(pass *SerPass, input *ast.KeyValueExpr) *KeyValueExpr
 
 // ----------------- Types ----------------- //
 
-func SerializeArrayType(pass *SerPass, input *ast.ArrayType) *ArrayType {
+func SerializeArrayType(pass *serPass, input *ast.ArrayType) *ArrayType {
 	return &ArrayType{
 		Lbrack: SerializePos(pass, input.Lbrack),
 		Len:    SerializeOption(pass, input.Len, SerializeExpr),
@@ -370,7 +370,7 @@ func SerializeArrayType(pass *SerPass, input *ast.ArrayType) *ArrayType {
 	}
 }
 
-func SerializeStructType(pass *SerPass, input *ast.StructType) *StructType {
+func SerializeStructType(pass *serPass, input *ast.StructType) *StructType {
 	return &StructType{
 		Struct:     SerializePos(pass, input.Struct),
 		Fields:     SerializeOption(pass, input.Fields, SerializeFieldList),
@@ -379,7 +379,7 @@ func SerializeStructType(pass *SerPass, input *ast.StructType) *StructType {
 	}
 }
 
-func SerializeFuncType(pass *SerPass, input *ast.FuncType) *FuncType {
+func SerializeFuncType(pass *serPass, input *ast.FuncType) *FuncType {
 	return &FuncType{
 		Func:       SerializePos(pass, input.Func),
 		TypeParams: SerializeOption(pass, input.TypeParams, SerializeFieldList),
@@ -389,7 +389,7 @@ func SerializeFuncType(pass *SerPass, input *ast.FuncType) *FuncType {
 	}
 }
 
-func SerializeInterfaceType(pass *SerPass, input *ast.InterfaceType) *InterfaceType {
+func SerializeInterfaceType(pass *serPass, input *ast.InterfaceType) *InterfaceType {
 	return &InterfaceType{
 		Interface:  SerializePos(pass, input.Interface),
 		Methods:    SerializeOption(pass, input.Methods, SerializeFieldList),
@@ -398,7 +398,7 @@ func SerializeInterfaceType(pass *SerPass, input *ast.InterfaceType) *InterfaceT
 	}
 }
 
-func SerializeMapType(pass *SerPass, input *ast.MapType) *MapType {
+func SerializeMapType(pass *serPass, input *ast.MapType) *MapType {
 	return &MapType{
 		Map:   SerializePos(pass, input.Map),
 		Key:   SerializeOption(pass, input.Key, SerializeExpr),
@@ -407,7 +407,7 @@ func SerializeMapType(pass *SerPass, input *ast.MapType) *MapType {
 	}
 }
 
-func SerializeChanType(pass *SerPass, input *ast.ChanType) *ChanType {
+func SerializeChanType(pass *serPass, input *ast.ChanType) *ChanType {
 	return &ChanType{
 		Begin: SerializePos(pass, input.Begin),
 		Arrow: SerializePos(pass, input.Arrow),
@@ -417,7 +417,7 @@ func SerializeChanType(pass *SerPass, input *ast.ChanType) *ChanType {
 	}
 }
 
-func SerializeExpr(pass *SerPass, expr ast.Expr) Expr {
+func SerializeExpr(pass *serPass, expr ast.Expr) Expr {
 	switch e := expr.(type) {
 	case *ast.Ident:
 		return SerializeIdent(pass, e)
@@ -473,7 +473,7 @@ func SerializeExpr(pass *SerPass, expr ast.Expr) Expr {
 
 // ----------------- Statements ----------------- //
 
-func SerializeBadStmt(pass *SerPass, input *ast.BadStmt) *BadStmt {
+func SerializeBadStmt(pass *serPass, input *ast.BadStmt) *BadStmt {
 	return &BadStmt{
 		From: SerializePos(pass, input.From),
 		To:   SerializePos(pass, input.To),
@@ -481,14 +481,14 @@ func SerializeBadStmt(pass *SerPass, input *ast.BadStmt) *BadStmt {
 	}
 }
 
-func SerializeDeclStmt(pass *SerPass, input *ast.DeclStmt) *DeclStmt {
+func SerializeDeclStmt(pass *serPass, input *ast.DeclStmt) *DeclStmt {
 	return &DeclStmt{
 		Decl: SerializeOption(pass, input.Decl, SerializeDecl),
 		Node: Node{Type: NodeTypeDeclStmt, Ref: pass.refCount},
 	}
 }
 
-func SerializeEmptyStmt(pass *SerPass, input *ast.EmptyStmt) *EmptyStmt {
+func SerializeEmptyStmt(pass *serPass, input *ast.EmptyStmt) *EmptyStmt {
 	return &EmptyStmt{
 		Semicolon: SerializePos(pass, input.Semicolon),
 		Implicit:  input.Implicit,
@@ -496,7 +496,7 @@ func SerializeEmptyStmt(pass *SerPass, input *ast.EmptyStmt) *EmptyStmt {
 	}
 }
 
-func SerializeLabeledStmt(pass *SerPass, input *ast.LabeledStmt) *LabeledStmt {
+func SerializeLabeledStmt(pass *serPass, input *ast.LabeledStmt) *LabeledStmt {
 	return &LabeledStmt{
 		Label: SerializeOption(pass, input.Label, SerializeIdent),
 		Colon: SerializePos(pass, input.Colon),
@@ -505,14 +505,14 @@ func SerializeLabeledStmt(pass *SerPass, input *ast.LabeledStmt) *LabeledStmt {
 	}
 }
 
-func SerializeExprStmt(pass *SerPass, input *ast.ExprStmt) *ExprStmt {
+func SerializeExprStmt(pass *serPass, input *ast.ExprStmt) *ExprStmt {
 	return &ExprStmt{
 		X:    SerializeOption(pass, input.X, SerializeExpr),
 		Node: Node{Type: NodeTypeExprStmt, Ref: pass.refCount},
 	}
 }
 
-func SerializeSendStmt(pass *SerPass, input *ast.SendStmt) *SendStmt {
+func SerializeSendStmt(pass *serPass, input *ast.SendStmt) *SendStmt {
 	return &SendStmt{
 		Chan:  SerializeOption(pass, input.Chan, SerializeExpr),
 		Arrow: SerializePos(pass, input.Arrow),
@@ -521,7 +521,7 @@ func SerializeSendStmt(pass *SerPass, input *ast.SendStmt) *SendStmt {
 	}
 }
 
-func SerializeIncDecStmt(pass *SerPass, input *ast.IncDecStmt) *IncDecStmt {
+func SerializeIncDecStmt(pass *serPass, input *ast.IncDecStmt) *IncDecStmt {
 	return &IncDecStmt{
 		X:      SerializeOption(pass, input.X, SerializeExpr),
 		TokPos: SerializePos(pass, input.TokPos),
@@ -530,7 +530,7 @@ func SerializeIncDecStmt(pass *SerPass, input *ast.IncDecStmt) *IncDecStmt {
 	}
 }
 
-func SerializeAssignStmt(pass *SerPass, input *ast.AssignStmt) *AssignStmt {
+func SerializeAssignStmt(pass *serPass, input *ast.AssignStmt) *AssignStmt {
 	return &AssignStmt{
 		Lhs:    SerializeList(pass, input.Lhs, SerializeExpr),
 		TokPos: SerializePos(pass, input.TokPos),
@@ -540,7 +540,7 @@ func SerializeAssignStmt(pass *SerPass, input *ast.AssignStmt) *AssignStmt {
 	}
 }
 
-func SerializeGoStmt(pass *SerPass, input *ast.GoStmt) *GoStmt {
+func SerializeGoStmt(pass *serPass, input *ast.GoStmt) *GoStmt {
 	return &GoStmt{
 		Go:   SerializePos(pass, input.Go),
 		Call: SerializeOption(pass, input.Call, SerializeCallExpr),
@@ -548,7 +548,7 @@ func SerializeGoStmt(pass *SerPass, input *ast.GoStmt) *GoStmt {
 	}
 }
 
-func SerializeDeferStmt(pass *SerPass, input *ast.DeferStmt) *DeferStmt {
+func SerializeDeferStmt(pass *serPass, input *ast.DeferStmt) *DeferStmt {
 	return &DeferStmt{
 		Defer: SerializePos(pass, input.Defer),
 		Call:  SerializeOption(pass, input.Call, SerializeCallExpr),
@@ -556,7 +556,7 @@ func SerializeDeferStmt(pass *SerPass, input *ast.DeferStmt) *DeferStmt {
 	}
 }
 
-func SerializeReturnStmt(pass *SerPass, input *ast.ReturnStmt) *ReturnStmt {
+func SerializeReturnStmt(pass *serPass, input *ast.ReturnStmt) *ReturnStmt {
 	return &ReturnStmt{
 		Return:  SerializePos(pass, input.Return),
 		Results: SerializeList(pass, input.Results, SerializeExpr),
@@ -564,7 +564,7 @@ func SerializeReturnStmt(pass *SerPass, input *ast.ReturnStmt) *ReturnStmt {
 	}
 }
 
-func SerializeBranchStmt(pass *SerPass, input *ast.BranchStmt) *BranchStmt {
+func SerializeBranchStmt(pass *serPass, input *ast.BranchStmt) *BranchStmt {
 	return &BranchStmt{
 		TokPos: SerializePos(pass, input.TokPos),
 		Tok:    input.Tok.String(),
@@ -573,7 +573,7 @@ func SerializeBranchStmt(pass *SerPass, input *ast.BranchStmt) *BranchStmt {
 	}
 }
 
-func SerializeBlockStmt(pass *SerPass, input *ast.BlockStmt) *BlockStmt {
+func SerializeBlockStmt(pass *serPass, input *ast.BlockStmt) *BlockStmt {
 	return &BlockStmt{
 		Lbrace: SerializePos(pass, input.Lbrace),
 		List:   SerializeList(pass, input.List, SerializeStmt),
@@ -582,7 +582,7 @@ func SerializeBlockStmt(pass *SerPass, input *ast.BlockStmt) *BlockStmt {
 	}
 }
 
-func SerializeIfStmt(pass *SerPass, input *ast.IfStmt) *IfStmt {
+func SerializeIfStmt(pass *serPass, input *ast.IfStmt) *IfStmt {
 	return &IfStmt{
 		If:   SerializePos(pass, input.If),
 		Init: SerializeOption(pass, input.Init, SerializeStmt),
@@ -593,7 +593,7 @@ func SerializeIfStmt(pass *SerPass, input *ast.IfStmt) *IfStmt {
 	}
 }
 
-func SerializeCaseClause(pass *SerPass, input *ast.CaseClause) *CaseClause {
+func SerializeCaseClause(pass *serPass, input *ast.CaseClause) *CaseClause {
 	return &CaseClause{
 		Case:  SerializePos(pass, input.Case),
 		List:  SerializeList(pass, input.List, SerializeExpr),
@@ -603,7 +603,7 @@ func SerializeCaseClause(pass *SerPass, input *ast.CaseClause) *CaseClause {
 	}
 }
 
-func SerializeSwitchStmt(pass *SerPass, input *ast.SwitchStmt) *SwitchStmt {
+func SerializeSwitchStmt(pass *serPass, input *ast.SwitchStmt) *SwitchStmt {
 	return &SwitchStmt{
 		Switch: SerializePos(pass, input.Switch),
 		Init:   SerializeOption(pass, input.Init, SerializeStmt),
@@ -613,7 +613,7 @@ func SerializeSwitchStmt(pass *SerPass, input *ast.SwitchStmt) *SwitchStmt {
 	}
 }
 
-func SerializeTypeSwitchStmt(pass *SerPass, input *ast.TypeSwitchStmt) *TypeSwitchStmt {
+func SerializeTypeSwitchStmt(pass *serPass, input *ast.TypeSwitchStmt) *TypeSwitchStmt {
 	if input == nil {
 		return nil
 	}
@@ -627,7 +627,7 @@ func SerializeTypeSwitchStmt(pass *SerPass, input *ast.TypeSwitchStmt) *TypeSwit
 	}
 }
 
-func SerializeCommClause(pass *SerPass, input *ast.CommClause) *CommClause {
+func SerializeCommClause(pass *serPass, input *ast.CommClause) *CommClause {
 	return &CommClause{
 		Case:  SerializePos(pass, input.Case),
 		Comm:  SerializeOption(pass, input.Comm, SerializeStmt),
@@ -637,7 +637,7 @@ func SerializeCommClause(pass *SerPass, input *ast.CommClause) *CommClause {
 	}
 }
 
-func SerializeSelectStmt(pass *SerPass, input *ast.SelectStmt) *SelectStmt {
+func SerializeSelectStmt(pass *serPass, input *ast.SelectStmt) *SelectStmt {
 	return &SelectStmt{
 		Select: SerializePos(pass, input.Select),
 		Body:   SerializeOption(pass, input.Body, SerializeBlockStmt),
@@ -645,7 +645,7 @@ func SerializeSelectStmt(pass *SerPass, input *ast.SelectStmt) *SelectStmt {
 	}
 }
 
-func SerializeForStmt(pass *SerPass, input *ast.ForStmt) *ForStmt {
+func SerializeForStmt(pass *serPass, input *ast.ForStmt) *ForStmt {
 	return &ForStmt{
 		For:  SerializePos(pass, input.For),
 		Init: SerializeOption(pass, input.Init, SerializeStmt),
@@ -656,7 +656,7 @@ func SerializeForStmt(pass *SerPass, input *ast.ForStmt) *ForStmt {
 	}
 }
 
-func SerializeRangeStmt(pass *SerPass, input *ast.RangeStmt) *RangeStmt {
+func SerializeRangeStmt(pass *serPass, input *ast.RangeStmt) *RangeStmt {
 	return &RangeStmt{
 		For:    SerializePos(pass, input.For),
 		Key:    SerializeOption(pass, input.Key, SerializeExpr),
@@ -670,7 +670,7 @@ func SerializeRangeStmt(pass *SerPass, input *ast.RangeStmt) *RangeStmt {
 	}
 }
 
-func SerializeStmt(pass *SerPass, stmt ast.Stmt) Stmt {
+func SerializeStmt(pass *serPass, stmt ast.Stmt) Stmt {
 	switch s := stmt.(type) {
 	case *ast.BadStmt:
 		return SerializeBadStmt(pass, s)
@@ -709,7 +709,7 @@ func SerializeStmt(pass *SerPass, stmt ast.Stmt) Stmt {
 
 // ----------------- Specifications ----------------- //
 
-func SerializeImportSpec(pass *SerPass, input *ast.ImportSpec) *ImportSpec {
+func SerializeImportSpec(pass *serPass, input *ast.ImportSpec) *ImportSpec {
 	if pass.conf[CACHE_REF] != nil {
 		return WithRefLookup(pass, input, serializeImportSpec)
 	}
@@ -717,7 +717,7 @@ func SerializeImportSpec(pass *SerPass, input *ast.ImportSpec) *ImportSpec {
 	return serializeImportSpec(pass, input)
 }
 
-func serializeImportSpec(pass *SerPass, input *ast.ImportSpec) *ImportSpec {
+func serializeImportSpec(pass *serPass, input *ast.ImportSpec) *ImportSpec {
 	return &ImportSpec{
 		Doc:     SerializeOption(pass, input.Doc, SerializeCommentGroup),
 		Name:    SerializeOption(pass, input.Name, SerializeIdent),
@@ -728,7 +728,7 @@ func serializeImportSpec(pass *SerPass, input *ast.ImportSpec) *ImportSpec {
 	}
 }
 
-func SerializeValueSpec(pass *SerPass, input *ast.ValueSpec) *ValueSpec {
+func SerializeValueSpec(pass *serPass, input *ast.ValueSpec) *ValueSpec {
 	if pass.conf[CACHE_REF] != nil {
 		return WithRefLookup(pass, input, serializeValueSpec)
 	}
@@ -736,7 +736,7 @@ func SerializeValueSpec(pass *SerPass, input *ast.ValueSpec) *ValueSpec {
 	return serializeValueSpec(pass, input)
 }
 
-func serializeValueSpec(pass *SerPass, input *ast.ValueSpec) *ValueSpec {
+func serializeValueSpec(pass *serPass, input *ast.ValueSpec) *ValueSpec {
 	return &ValueSpec{
 		Doc:     SerializeOption(pass, input.Doc, SerializeCommentGroup),
 		Names:   SerializeList(pass, input.Names, SerializeIdent),
@@ -747,7 +747,7 @@ func serializeValueSpec(pass *SerPass, input *ast.ValueSpec) *ValueSpec {
 	}
 }
 
-func SerializeTypeSpec(pass *SerPass, input *ast.TypeSpec) *TypeSpec {
+func SerializeTypeSpec(pass *serPass, input *ast.TypeSpec) *TypeSpec {
 	if pass.conf[CACHE_REF] != nil {
 		return WithRefLookup(pass, input, serializeTypeSpec)
 	}
@@ -755,7 +755,7 @@ func SerializeTypeSpec(pass *SerPass, input *ast.TypeSpec) *TypeSpec {
 	return serializeTypeSpec(pass, input)
 }
 
-func serializeTypeSpec(pass *SerPass, input *ast.TypeSpec) *TypeSpec {
+func serializeTypeSpec(pass *serPass, input *ast.TypeSpec) *TypeSpec {
 	return &TypeSpec{
 		Doc:        SerializeOption(pass, input.Doc, SerializeCommentGroup),
 		Name:       SerializeOption(pass, input.Name, SerializeIdent),
@@ -767,7 +767,7 @@ func serializeTypeSpec(pass *SerPass, input *ast.TypeSpec) *TypeSpec {
 	}
 }
 
-func SerializeSpec(pass *SerPass, spec ast.Spec) Spec {
+func SerializeSpec(pass *serPass, spec ast.Spec) Spec {
 	switch s := spec.(type) {
 	case *ast.ImportSpec:
 		return SerializeImportSpec(pass, s)
@@ -782,7 +782,7 @@ func SerializeSpec(pass *SerPass, spec ast.Spec) Spec {
 
 // ----------------- Declarations ----------------- //
 
-func SerializeBadDecl(pass *SerPass, input *ast.BadDecl) *BadDecl {
+func SerializeBadDecl(pass *serPass, input *ast.BadDecl) *BadDecl {
 	if pass.conf[CACHE_REF] != nil {
 		return WithRefLookup(pass, input, serializeBadDecl)
 	}
@@ -790,7 +790,7 @@ func SerializeBadDecl(pass *SerPass, input *ast.BadDecl) *BadDecl {
 	return serializeBadDecl(pass, input)
 }
 
-func serializeBadDecl(pass *SerPass, input *ast.BadDecl) *BadDecl {
+func serializeBadDecl(pass *serPass, input *ast.BadDecl) *BadDecl {
 	return &BadDecl{
 		From: SerializePos(pass, input.From),
 		To:   SerializePos(pass, input.To),
@@ -798,7 +798,7 @@ func serializeBadDecl(pass *SerPass, input *ast.BadDecl) *BadDecl {
 	}
 }
 
-func SerializeGenDecl(pass *SerPass, input *ast.GenDecl) *GenDecl {
+func SerializeGenDecl(pass *serPass, input *ast.GenDecl) *GenDecl {
 	if pass.conf[CACHE_REF] != nil {
 		return WithRefLookup(pass, input, serializeGenDecl)
 	}
@@ -806,7 +806,7 @@ func SerializeGenDecl(pass *SerPass, input *ast.GenDecl) *GenDecl {
 	return serializeGenDecl(pass, input)
 }
 
-func serializeGenDecl(pass *SerPass, input *ast.GenDecl) *GenDecl {
+func serializeGenDecl(pass *serPass, input *ast.GenDecl) *GenDecl {
 	return &GenDecl{
 		Doc:      SerializeOption(pass, input.Doc, SerializeCommentGroup),
 		TokenPos: SerializePos(pass, input.TokPos),
@@ -818,7 +818,7 @@ func serializeGenDecl(pass *SerPass, input *ast.GenDecl) *GenDecl {
 	}
 }
 
-func SerializeFuncDecl(pass *SerPass, input *ast.FuncDecl) *FuncDecl {
+func SerializeFuncDecl(pass *serPass, input *ast.FuncDecl) *FuncDecl {
 	if pass.conf[CACHE_REF] != nil {
 		return WithRefLookup(pass, input, serializeFuncDecl)
 	}
@@ -826,7 +826,7 @@ func SerializeFuncDecl(pass *SerPass, input *ast.FuncDecl) *FuncDecl {
 	return serializeFuncDecl(pass, input)
 }
 
-func serializeFuncDecl(pass *SerPass, input *ast.FuncDecl) *FuncDecl {
+func serializeFuncDecl(pass *serPass, input *ast.FuncDecl) *FuncDecl {
 	return &FuncDecl{
 		Doc:  SerializeOption(pass, input.Doc, SerializeCommentGroup),
 		Recv: SerializeOption(pass, input.Recv, SerializeFieldList),
@@ -837,7 +837,7 @@ func serializeFuncDecl(pass *SerPass, input *ast.FuncDecl) *FuncDecl {
 	}
 }
 
-func SerializeDecl(pass *SerPass, decl ast.Decl) Decl {
+func SerializeDecl(pass *serPass, decl ast.Decl) Decl {
 	switch d := decl.(type) {
 	case *ast.BadDecl:
 		return SerializeBadDecl(pass, d)
@@ -852,7 +852,7 @@ func SerializeDecl(pass *SerPass, decl ast.Decl) Decl {
 
 // ----------------- Files and Packages ----------------- //
 
-func SerializeFile(pass *SerPass, input *ast.File) *File {
+func SerializeFile(pass *serPass, input *ast.File) *File {
 	return &File{
 		Doc:        SerializeOption(pass, input.Doc, SerializeCommentGroup),
 		Name:       SerializeOption(pass, input.Name, SerializeIdent),
@@ -870,7 +870,7 @@ func SerializeFile(pass *SerPass, input *ast.File) *File {
 	}
 }
 
-func calcFileSize(pass *SerPass, input *ast.File) int {
+func calcFileSize(pass *serPass, input *ast.File) int {
 	position := pass.fset.PositionFor(input.Name.NamePos, false)
 	content, err := pass.readFile(position.Filename)
 	if err != nil {
