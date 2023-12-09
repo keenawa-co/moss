@@ -755,6 +755,7 @@ func (*FuncDecl) declNode() {}
 
 // ----------------- Files and Packages ----------------- //
 
+// A File node represents a Go source file.
 type File struct {
 	Doc                *CommentGroup   // associated documentation; or empty
 	Name               *Ident          // package name
@@ -771,4 +772,14 @@ type File struct {
 	Node
 }
 
-func (*File) asonNode() {}
+// A Package node represents a set of source files
+// collectively building a Go package.
+type Package struct {
+	Name    string             // package name
+	Scope   *Scope             // package scope across all files
+	Imports map[string]*Object // map of package id -> package object
+	Files   map[string]*File   // Go source files by filename
+}
+
+func (*File) asonNode()    {}
+func (*Package) asonNode() {}
