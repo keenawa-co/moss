@@ -18,9 +18,17 @@ package main
 type serConf int
 
 const (
-	CACHE_REF  serConf = iota
-	FILE_SCOPE serConf = iota
-	PKG_SCOPE  serConf = iota
-	IDENT_OBJ  serConf = iota
-	LOC        serConf = iota
+	CACHE_REF serConf = iota << 2
+	FILE_SCOPE
+	PKG_SCOPE
+	IDENT_OBJ
+	LOC
+)
+
+const (
+	CACHE_REF = 1
+	FILE_SCOPE
+	PKG_SCOPE
+	IDENT_OBJ
+	LOC
 )

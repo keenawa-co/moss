@@ -985,32 +985,7 @@ func SerializeValueSpec(pass *serPass, input *ast.ValueSpec) *ValueSpec {
 		return WithRefLookup(pass, input, serializeValueSpec)
 	}
 
-	output := serializeValueSpec(pass, input)
-	// Save this as a tail node in case it is a set of variables
-	// or constants that are declared as an enumeration. Since in
-	// the case of an enumeration with the iota type, all constants
-	// except the first will not receive a type and value, since
-	// it is simply not specified directly in the code.
-	//
-	// const (
-	//	CACHE_REF serConf = iota
-	// 	FILE_SCOPE
-	// 	PKG_SCOPE
-	// 	IDENT_OBJ
-	//	LOC
-	// )
-	//
-	// When trying to deserialize it will look like this:
-	//
-	// const (
-	//	CACHE_REF  serConf = iota
-	//	FILE_SCOPE         =		<- invalid syntax
-	//	PKG_SCOPE          =		<- invalid syntax
-	//	IDENT_OBJ          =		<- invalid syntax
-	//	LOC                =		<- invalid syntax
-	// )
-	pass.tailNode = output
-	return output
+	return serializeValueSpec(pass, input)
 }
 
 func serializeValueSpec(pass *serPass, input *ast.ValueSpec) *ValueSpec {
@@ -1070,7 +1045,32 @@ func SerializeSpec(pass *serPass, spec ast.Spec) Spec {
 	case *ast.ImportSpec:
 		return SerializeImportSpec(pass, s)
 	case *ast.ValueSpec:
-		return SerializeValueSpec(pass, s)
+		output := serializeValueSpec(pass, s)
+		// Save this as a tail node in case it is a set of variables
+		// or constants that are declared as an enumeration. Since in
+		// the case of an enumeration with the iota type, all constants
+		// except the first will not receive a type and value, since
+		// it is simply not specified directly in the code.
+		//
+		// const (
+		//	CACHE_REF serConf = iota
+		// 	FILE_SCOPE
+		// 	PKG_SCOPE
+		// 	IDENT_OBJ
+		//	LOC
+		// )
+		//
+		// When trying to deserialize it will look like this:
+		//
+		// const (
+		//	CACHE_REF  serConf = iota
+		//	FILE_SCOPE         =		<- invalid syntax
+		//	PKG_SCOPE          =		<- invalid syntax
+		//	IDENT_OBJ          =		<- invalid syntax
+		//	LOC                =		<- invalid syntax
+		// )
+		pass.tailNode = output
+		return output
 	case *ast.TypeSpec:
 		return SerializeTypeSpec(pass, s)
 	default:

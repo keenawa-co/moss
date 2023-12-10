@@ -17,6 +17,27 @@ const (
 
 const (
 	testIdentName = "testIdent"
+	testIdentType = "testType"
+)
+
+var (
+	testValueSpecs = []*ast.ValueSpec{
+		{
+			Names: []*ast.Ident{{Name: testIdentName}},
+			Type:  &ast.Ident{Name: testIdentType},
+			Values: []ast.Expr{
+				&ast.BinaryExpr{
+					X: &ast.Ident{Name: "iota"},
+					Y: &ast.BasicLit{Kind: token.INT, Value: "2"},
+				},
+			},
+		},
+		{
+			Names:  []*ast.Ident{{Name: testIdentName}},
+			Type:   nil,
+			Values: nil,
+		},
+	}
 )
 
 func mockReadFileWithErr(name string) ([]byte, error) {
@@ -41,6 +62,34 @@ func TestNewSerPass(t *testing.T) {
 		assert.NotNil(t, pass.fset)
 		assert.NotNil(t, pass.refCache)
 		assert.NotNil(t, true, pass.conf[CACHE_REF])
+	})
+
+	t.Run("valid: use tailNode", func(t *testing.T) {
+
+		pass := NewSerPass(token.NewFileSet())
+		serSpecs := make([]*ValueSpec, len(testValueSpecs))
+		for i, s := range testValueSpecs {
+			serSpecs[i] = SerializeValueSpec(pass, s)
+			// tail saving
+			pass.tailNode = serSpecs[i]
+		}
+
+		assert.NotNil(t, serSpecs[1].Type)
+		assert.Equal(t, serSpecs[1].Type.(*Ident).Name, testIdentType)
+		assert.Equal(t, "iota", serSpecs[1].Values[0].(*BinaryExpr).X.(*Ident).Name)
+		assert.Equal(t, token.INT.String(), serSpecs[1].Values[0].(*BinaryExpr).Y.(*BasicLit).Kind)
+		assert.Equal(t, "2", serSpecs[1].Values[0].(*BinaryExpr).Y.(*BasicLit).Value)
+	})
+
+	t.Run("invalid: not saving the tail", func(t *testing.T) {
+		pass := NewSerPass(token.NewFileSet())
+		serSpecs := make([]*ValueSpec, len(testValueSpecs))
+		for i, s := range testValueSpecs {
+			serSpecs[i] = SerializeValueSpec(pass, s)
+		}
+
+		assert.Nil(t, serSpecs[1].Type)
+		assert.Nil(t, serSpecs[1].Values)
 	})
 }
 

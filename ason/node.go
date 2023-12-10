@@ -662,7 +662,6 @@ func (*RangeStmt) stmtNode()      {}
 // ----------------- Specifications ----------------- //
 
 type (
-
 	// An ImportSpec node represents a single package import.
 	ImportSpec struct {
 		Doc     *CommentGroup // associated documentation; or nil
