@@ -49,18 +49,17 @@ func DeserializeList[I Ason, R ast.Node](pass *dePass, inputList []I, deFn DeFn[
 // ----------------- Scope ----------------- //
 
 func DeserializePos(pass *dePass, input Pos) token.Pos {
-	pos, ok := input.(*Position)
-	if !ok {
+	if valid := IsPosValid(input); !valid {
 		return token.NoPos
 	}
 
-	tokPos := token.Pos(pos.Offset())
+	tokPos := token.Pos(input.Offset())
 	tokFile := pass.fset.File(tokPos)
 	if tokFile == nil {
 		return token.NoPos
 	}
 
-	return tokFile.Pos(pos.Offset())
+	return tokFile.Pos(input.Offset())
 }
 
 // ----------------- Comments ----------------- //
@@ -74,7 +73,7 @@ func DeserializeComment(pass *dePass, input *Comment) *ast.Comment {
 
 func DeserializeCommentGroup(pass *dePass, input *CommentGroup) *ast.CommentGroup {
 	return &ast.CommentGroup{
-		List: DeserializeList[*Comment, *ast.Comment](pass, input.List, DeserializeComment),
+		List: DeserializeList(pass, input.List, DeserializeComment),
 	}
 }
 

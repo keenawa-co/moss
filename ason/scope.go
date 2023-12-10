@@ -10,7 +10,14 @@ func _GOARCH() int {
 	return strconv.IntSize
 }
 
-type Pos interface{ pos() }
+type Pos interface {
+	// Offset is an absolute position of a character in the file text.
+	Offset() int
+	// Line is a line number in the file where this piece of code is located.
+	Line() int
+	// Column ia s character position in a specific line, starting from zero.
+	Column() int
+}
 
 type (
 	NoPos    int
@@ -20,22 +27,25 @@ type (
 	}
 )
 
-func (*NoPos) pos()    {}
-func (*Position) pos() {}
+func (*NoPos) Offset() int { return 0 }
+func (*NoPos) Line() int   { return 0 }
+func (*NoPos) Column() int { return 0 }
 
-// Offset is an absolute position of a character in the file text
-func (p *Position) Offset() int {
-	return p.Location[0]
-}
+func (p *Position) Offset() int { return p.Location[0] }
+func (p *Position) Line() int   { return p.Location[1] }
+func (p *Position) Column() int { return p.Location[2] }
 
-// Line is a line number in the file where this piece of code is located.
-func (p *Position) Line() int {
-	return p.Location[1]
-}
+// Checking whether the position exists.
+func IsPosValid(pos Pos) bool {
+	if pos == nil {
+		return false
+	}
 
-// Column ia s character position in a specific line, starting from zero
-func (p *Position) Column() int {
-	return p.Location[2]
+	if pos.Offset() == 0 {
+		return false
+	}
+
+	return true
 }
 
 func NewPosition(pos token.Position) *Position {
