@@ -161,7 +161,7 @@ func runRootCmd(cmd *cobra.Command, args []string) {
 
 	fset := token.NewFileSet()
 
-	f, err := parser.ParseFile(fset, "./ason/ser.go", nil, parser.AllErrors)
+	f, err := parser.ParseFile(fset, "./ason/ser.go", nil, parser.ParseComments)
 	if err != nil {
 		log.Fatal(err)
 	}
