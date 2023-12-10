@@ -20,11 +20,16 @@ func init() {
 }
 
 func runCfgCmd(cmd *cobra.Command, args []string) {
-	const filepath string = "./testdata/test_cfg.toml"
-	cfg, err := config.NewFromFile(filepath)
+	const filepath = "./testdata/test_cfg.toml"
+	// conf := config.New(
+	// 	config.WithRootDir("./testdata"),
+	// 	config.WithRootDir("./testdata"),
+	// )
+
+	conf, err := config.NewConfigFromFile(filepath)
 	if err != nil {
 		log.Fatalf(err.Error())
 	}
 
-	fmt.Printf("%v", cfg.Analysis)
+	fmt.Printf("%#v", conf.Workspace)
 }

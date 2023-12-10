@@ -9,58 +9,97 @@ import (
 	"github.com/BurntSushi/toml"
 )
 
-// Strings
-const (
-	defaultVersion  = ""
-	defaultRoot     = "./"
-	defaultPolicies = "./"
-	defaultGoArch   = "${GOARCH}"
-)
-
-// Integers
-const ()
-
-var availableVersions = map[string]struct{}{
-	"1.0": {},
-	"1.1": {},
-}
+type LookupFn func(key string) (string, bool)
 
 type Config struct {
-	Workspace *workspace                  `toml:"workspace"`
-	Analysis  map[string]analysisSettings `toml:"analysis"`
+	Workspace *workspace               `toml:"workspace"`
+	Analysis  map[string]*AnalysisConf `toml:"analysis"`
 }
 
 type workspace struct {
 	Version    string   `toml:"version"`
-	Root       string   `toml:"root"`
-	Policies   string   `toml:"policies"`
-	IngoreList []string `toml:"ignore-list"`
+	RootDir    string   `toml:"root"`
+	PolicyDir  string   `toml:"policies"`
+	IgnoreList []string `toml:"ignore-list"`
 	GoArch     string   `toml:"go-arch"`
 }
 
-type analysisSettings struct {
+type AnalysisConf struct {
 	Level  string
 	Target string
 }
 
-func NewFromFile(filePath string) (*Config, error) {
+type ConfOptFn func(*Config)
 
-	cfg := newDefaultConfig()
-
-	if err := decodeWithEnvsFromFile(os.LookupEnv, interpolate, filePath, cfg); err != nil {
-		return nil, err
+func NewConfig(options ...ConfOptFn) *Config {
+	conf := &Config{
+		Workspace: &workspace{
+			Version:    defaultVersion,
+			RootDir:    defaultRoot,
+			PolicyDir:  defaultPolicies,
+			IgnoreList: nil,
+			GoArch:     defaultGoArch,
+		},
 	}
 
-	// mapstructure.Decode(cfgMap, cfg)
-
-	if err := cfg.validate(); err != nil {
-		return nil, err
+	for i := 0; i < len(options); i++ {
+		options[i](conf)
 	}
 
-	return cfg, nil
+	return conf
 }
 
-func (cfg *Config) validate() error {
+type ConfReadFileOptFn func(*ReadConf)
+
+type ReadConf struct {
+	lookup      func(key string) (string, bool)
+	readFile    func(name string) ([]byte, error)
+	readToml    func(data string, v interface{}) (toml.MetaData, error)
+	interpolate func(lookup LookupFn, strWithEnvs string) (string, error)
+}
+
+func NewFromFileOpt(options ...ConfReadFileOptFn) *ReadConf {
+	readConf := &ReadConf{
+		lookup:      os.LookupEnv,
+		readFile:    os.ReadFile,
+		readToml:    toml.Decode,
+		interpolate: interpolate,
+	}
+
+	for i := 0; i < len(options); i++ {
+		options[i](readConf)
+	}
+
+	return readConf
+}
+
+func NewConfigFromFile(filePath string, options ...ConfReadFileOptFn) (*Config, error) {
+	readConf := NewFromFileOpt()
+	conf := NewConfig()
+	data, err := readConf.readFile(filePath)
+	if err != nil {
+		return nil, err
+	}
+
+	dataWithEnv, err := readConf.interpolate(readConf.lookup, string(data))
+	if err != nil {
+		return nil, err
+	}
+
+	if _, err := readConf.readToml(dataWithEnv, &conf); err != nil {
+		return nil, err
+	}
+
+	return conf, nil
+}
+
+func WithRootDir(dirPath string) ConfOptFn {
+	return func(c *Config) {
+		c.Workspace.RootDir = dirPath
+	}
+}
+
+func (cfg *Config) Validate() error {
 	// if cfg.Version == defaultVersion {
 	// 	return errors.New("version field must be set")
 	// }
@@ -74,20 +113,6 @@ func (cfg *Config) validate() error {
 	return nil
 }
 
-func newDefaultConfig() *Config {
-	ws := workspace{
-		Version:    defaultVersion,
-		Root:       defaultRoot,
-		Policies:   defaultPolicies,
-		IngoreList: nil,
-		GoArch:     defaultGoArch,
-	}
-
-	return &Config{
-		Workspace: &ws,
-	}
-}
-
 const (
 	envVarString = `\$\{[A-Za-z_][A-Za-z0-9_]*\}`
 )
@@ -96,12 +121,8 @@ var (
 	envVarPattern = regexp.MustCompile(envVarString)
 )
 
-type envLookupFunc func(key string) (string, bool)
-type interpolateFunc func(lookup envLookupFunc, strWithEnvs string) (string, error)
-
-func interpolate(lookup envLookupFunc, strWithEnvs string) (string, error) {
+func interpolate(lookup LookupFn, strWithEnvs string) (string, error) {
 	missingVariables := make([]string, 0)
-
 	resultStr := envVarPattern.ReplaceAllStringFunc(strWithEnvs, func(match string) string {
 		envKey := match[2 : len(match)-1]
 		if value, exists := lookup(envKey); exists {
@@ -119,31 +140,4 @@ func interpolate(lookup envLookupFunc, strWithEnvs string) (string, error) {
 	}
 
 	return resultStr, nil
-}
-
-func decodeWithEnvsFromFile(lookup envLookupFunc, interpolate interpolateFunc, filePath string, cfg *Config) error {
-	data, err := readFile(filePath)
-	if err != nil {
-		return err
-	}
-
-	dataWithEnv, err := interpolate(lookup, data)
-	if err != nil {
-		return err
-	}
-
-	if _, err := toml.Decode(dataWithEnv, &cfg); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func readFile(filePath string) (string, error) {
-	data, err := os.ReadFile(filePath)
-	if err != nil {
-		return "", err
-	}
-
-	return string(data), nil
 }
