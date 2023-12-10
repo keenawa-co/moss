@@ -14,6 +14,7 @@ import (
 type dePass struct {
 	fset     *token.FileSet
 	refCache map[ast.Node]*weakRef
+	errors   map[string][]error // map of package id -> errors
 }
 
 func NewDePass(fset *token.FileSet) *dePass {
@@ -657,9 +658,9 @@ func DeserializeDecl(pass *dePass, decl Decl) ast.Decl {
 
 // ----------------- Files and Packages ----------------- //
 
-func DeserializeFile(pass *dePass, input *File) (*ast.File, error) {
+func DeserializeFile(pass *dePass, input *File) *ast.File {
 	if err := processTokenFile(pass, input); err != nil {
-		return nil, err
+		pass.errors[input.Name.Name] = append(pass.errors[input.Name.Name], err)
 	}
 
 	return &ast.File{
@@ -673,7 +674,7 @@ func DeserializeFile(pass *dePass, input *File) (*ast.File, error) {
 		Unresolved: DeserializeList(pass, input.Unresolved, DeserializeIdent),
 		Comments:   DeserializeList(pass, input.Comments, DeserializeCommentGroup),
 		GoVersion:  input.GoVersion,
-	}, nil
+	}
 }
 
 func processTokenFile(pass *dePass, input *File) error {

@@ -3,7 +3,6 @@ package main
 import (
 	"bytes"
 	"context"
-	"encoding/json"
 	"fmt"
 	"go/ast"
 	"go/parser"
@@ -162,7 +161,7 @@ func runRootCmd(cmd *cobra.Command, args []string) {
 
 	fset := token.NewFileSet()
 
-	f, err := parser.ParseFile(fset, "./ason/testdata/main.go", nil, parser.AllErrors)
+	f, err := parser.ParseFile(fset, "./ason/ser.go", nil, parser.AllErrors)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -171,18 +170,18 @@ func runRootCmd(cmd *cobra.Command, args []string) {
 	sf := ason.SerializeFile(ason.NewSerPass(fset), f)
 	fmt.Println("Function execution time:", time.Since(startTime))
 
-	js, err := json.Marshal(sf)
-	if err != nil {
-		log.Fatal(err)
-	}
+	// js, err := json.Marshal(sf)
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
 
-	fmt.Println(string(js))
+	// fmt.Println(string(js))
 
 	fmt.Println()
 	fmt.Println()
 
 	fset2 := token.NewFileSet()
-	df, _ := ason.DeserializeFile(ason.NewDePass(fset2), sf)
+	df := ason.DeserializeFile(ason.NewDePass(fset2), sf)
 
 	code, err := GenerateCode(fset2, df)
 	if err != nil {

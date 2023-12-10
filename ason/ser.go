@@ -4,7 +4,6 @@ import (
 	"go/ast"
 	"go/token"
 	"os"
-	"sync"
 	"unsafe"
 )
 
@@ -107,40 +106,6 @@ func SerializeList[I ast.Node, R Ason](pass *serPass, inputList []I, serFn SerFn
 	result := make([]R, len(inputList))
 	for i := 0; i < len(inputList); i++ {
 		result[i] = serFn(pass, inputList[i])
-	}
-
-	return result
-}
-
-func SerializeListParallel[I ast.Node, R Ason](pass *serPass, inputList []I, serFn SerFn[I, R]) []R {
-	var wg sync.WaitGroup
-
-	result := make([]R, len(inputList))
-	resultChan := make(chan struct {
-		index int
-		value R
-	}, len(inputList))
-
-	for i, input := range inputList {
-		wg.Add(1)
-		go func(i int, input I) {
-			serialized := serFn(pass, input)
-			resultChan <- struct {
-				index int
-				value R
-			}{index: i, value: serialized}
-
-			wg.Done()
-		}(i, input)
-	}
-
-	go func() {
-		wg.Wait()
-		close(resultChan)
-	}()
-
-	for res := range resultChan {
-		result[res.index] = res.value
 	}
 
 	return result
@@ -1208,8 +1173,7 @@ func SerializePackage(pass *serPass, input *ast.Package) *Package {
 	return &Package{
 		Name:  input.Name,
 		Scope: scope,
-		// cant use SerializeMap, because `*ast.Object`
-		// does not satisfy the interface `ast.Node`
+		// cant use SerializeMap func, because `*ast.Object` does not satisfy the interface `ast.Node`.
 		Imports: serializeImports(pass, input.Imports),
 		Files:   SerializeMap(pass, input.Files, SerializeFile),
 	}
