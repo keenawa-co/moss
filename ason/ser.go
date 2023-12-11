@@ -7,37 +7,8 @@ import (
 	"unsafe"
 )
 
-// TODO List
-//
-// *ast.Package
-
-type serConf int
-
-const (
-	// CACHE_REF flag must be used when you carry out some manual
-	// manipulations with the source AST tree. For example, you
-	// duplicate nodes, which can create nodes that have the same
-	// references to the original object in memory. In order to
-	// reduce the number of checks that reduce performance, only
-	// large nodes can be cached, such as specifications,
-	// types and declarations.
-	//
-	// Use this flag when duplicating nodes containing many fields.
-	CACHE_REF serConf = iota
-	// FILE_SCOPE enable serialization of `Scope` field in `*ast.File`.
-	FILE_SCOPE
-	// PKG_SCOPE enable serialization of `Scope` field in `*ast.Package`.
-	PKG_SCOPE
-	// IDENT_OBJ enable serialization of `Obj` field in `*ast.Ident`.
-	IDENT_OBJ
-	// LOC allow to include `start` and `end` position for
-	// all AST Nodes in the final serialization object.
-	LOC
-)
-
 type serPass struct {
 	fset     *token.FileSet
-	tailNode Ason                         // last node that was serialized
 	readFile func(string) ([]byte, error) // function to OS read a file into a buffer
 	refCache map[ast.Node]*weakRef        // cache of weak refs to already serialized nodes
 	refCount uint                         // serialized nodes counter
@@ -80,11 +51,11 @@ func WithSerConf(options ...serConf) serPassOptFn {
 	}
 }
 
-type SerFn[I ast.Node, R Ason] func(*serPass, I) R
+type SerFn[I ast.Node, O Ason] func(*serPass, I) O
 
-func WithRefLookup[I ast.Node, R Ason](pass *serPass, input I, serFn SerFn[I, R]) R {
+func SerRefLookup[I ast.Node, O Ason](pass *serPass, input I, serFn SerFn[I, O]) O {
 	if weakRef, exists := pass.refCache[input]; exists {
-		return weakRef.Load().(R)
+		return weakRef.Load().(O)
 	}
 
 	node := serFn(pass, input)
@@ -103,6 +74,10 @@ func SerializeOption[I ast.Node, R Ason](pass *serPass, input I, serFn SerFn[I, 
 }
 
 func SerializeList[I ast.Node, R Ason](pass *serPass, inputList []I, serFn SerFn[I, R]) []R {
+	if len(inputList) < 1 {
+		return nil
+	}
+
 	result := make([]R, len(inputList))
 	for i := 0; i < len(inputList); i++ {
 		result[i] = serFn(pass, inputList[i])
@@ -924,7 +899,7 @@ func SerializeStmt(pass *serPass, stmt ast.Stmt) Stmt {
 
 func SerializeImportSpec(pass *serPass, input *ast.ImportSpec) *ImportSpec {
 	if pass.conf[CACHE_REF] != nil {
-		return WithRefLookup(pass, input, serializeImportSpec)
+		return SerRefLookup(pass, input, serializeImportSpec)
 	}
 
 	return serializeImportSpec(pass, input)
@@ -946,32 +921,11 @@ func serializeImportSpec(pass *serPass, input *ast.ImportSpec) *ImportSpec {
 }
 
 func SerializeValueSpec(pass *serPass, input *ast.ValueSpec) *ValueSpec {
-	if pass.conf[CACHE_REF] != nil {
-		return WithRefLookup(pass, input, serializeValueSpec)
-	}
-
-	return serializeValueSpec(pass, input)
-}
-
-func serializeValueSpec(pass *serPass, input *ast.ValueSpec) *ValueSpec {
-	var (
-		typ    Expr
-		values []Expr
-	)
-
-	if len(input.Values) > 0 {
-		typ = SerializeOption(pass, input.Type, SerializeExpr)
-		values = SerializeList(pass, input.Values, SerializeExpr)
-	} else if spec, ok := pass.tailNode.(*ValueSpec); ok && pass.tailNode != nil {
-		typ = spec.Type
-		values = spec.Values
-	}
-
 	return &ValueSpec{
 		Doc:     SerializeOption(pass, input.Doc, SerializeCommentGroup),
 		Names:   SerializeList(pass, input.Names, SerializeIdent),
-		Type:    typ,
-		Values:  values,
+		Type:    SerializeOption(pass, input.Type, SerializeExpr),
+		Values:  SerializeList(pass, input.Values, SerializeExpr),
 		Comment: SerializeOption(pass, input.Comment, SerializeCommentGroup),
 		Node: Node{
 			Type: NodeTypeValueSpec,
@@ -982,14 +936,6 @@ func serializeValueSpec(pass *serPass, input *ast.ValueSpec) *ValueSpec {
 }
 
 func SerializeTypeSpec(pass *serPass, input *ast.TypeSpec) *TypeSpec {
-	if pass.conf[CACHE_REF] != nil {
-		return WithRefLookup(pass, input, serializeTypeSpec)
-	}
-
-	return serializeTypeSpec(pass, input)
-}
-
-func serializeTypeSpec(pass *serPass, input *ast.TypeSpec) *TypeSpec {
 	return &TypeSpec{
 		Doc:        SerializeOption(pass, input.Doc, SerializeCommentGroup),
 		Name:       SerializeOption(pass, input.Name, SerializeIdent),
@@ -1008,35 +954,22 @@ func serializeTypeSpec(pass *serPass, input *ast.TypeSpec) *TypeSpec {
 func SerializeSpec(pass *serPass, spec ast.Spec) Spec {
 	switch s := spec.(type) {
 	case *ast.ImportSpec:
+		if pass.conf[CACHE_REF] != nil {
+			return SerRefLookup(pass, s, SerializeImportSpec)
+		}
+
 		return SerializeImportSpec(pass, s)
 	case *ast.ValueSpec:
-		output := serializeValueSpec(pass, s)
-		// Save this as a tail node in case it is a set of variables
-		// or constants that are declared as an enumeration. Since in
-		// the case of an enumeration with the iota type, all constants
-		// except the first will not receive a type and value, since
-		// it is simply not specified directly in the code.
-		//
-		// const (
-		//	CACHE_REF serConf = iota
-		// 	FILE_SCOPE
-		// 	PKG_SCOPE
-		// 	IDENT_OBJ
-		//	LOC
-		// )
-		//
-		// When trying to deserialize it will look like this:
-		//
-		// const (
-		//	CACHE_REF  serConf = iota
-		//	FILE_SCOPE         =		<- invalid syntax
-		//	PKG_SCOPE          =		<- invalid syntax
-		//	IDENT_OBJ          =		<- invalid syntax
-		//	LOC                =		<- invalid syntax
-		// )
-		pass.tailNode = output
-		return output
+		if pass.conf[CACHE_REF] != nil {
+			return SerRefLookup(pass, s, SerializeValueSpec)
+		}
+
+		return SerializeValueSpec(pass, s)
 	case *ast.TypeSpec:
+		if pass.conf[CACHE_REF] != nil {
+			return SerRefLookup(pass, s, SerializeTypeSpec)
+		}
+
 		return SerializeTypeSpec(pass, s)
 	default:
 		return nil
@@ -1046,14 +979,6 @@ func SerializeSpec(pass *serPass, spec ast.Spec) Spec {
 // ----------------- Declarations ----------------- //
 
 func SerializeBadDecl(pass *serPass, input *ast.BadDecl) *BadDecl {
-	if pass.conf[CACHE_REF] != nil {
-		return WithRefLookup(pass, input, serializeBadDecl)
-	}
-
-	return serializeBadDecl(pass, input)
-}
-
-func serializeBadDecl(pass *serPass, input *ast.BadDecl) *BadDecl {
 	return &BadDecl{
 		From: SerializePos(pass, input.From),
 		To:   SerializePos(pass, input.To),
@@ -1066,14 +991,6 @@ func serializeBadDecl(pass *serPass, input *ast.BadDecl) *BadDecl {
 }
 
 func SerializeGenDecl(pass *serPass, input *ast.GenDecl) *GenDecl {
-	if pass.conf[CACHE_REF] != nil {
-		return WithRefLookup(pass, input, serializeGenDecl)
-	}
-
-	return serializeGenDecl(pass, input)
-}
-
-func serializeGenDecl(pass *serPass, input *ast.GenDecl) *GenDecl {
 	return &GenDecl{
 		Doc:      SerializeOption(pass, input.Doc, SerializeCommentGroup),
 		TokenPos: SerializePos(pass, input.TokPos),
@@ -1090,14 +1007,6 @@ func serializeGenDecl(pass *serPass, input *ast.GenDecl) *GenDecl {
 }
 
 func SerializeFuncDecl(pass *serPass, input *ast.FuncDecl) *FuncDecl {
-	if pass.conf[CACHE_REF] != nil {
-		return WithRefLookup(pass, input, serializeFuncDecl)
-	}
-
-	return serializeFuncDecl(pass, input)
-}
-
-func serializeFuncDecl(pass *serPass, input *ast.FuncDecl) *FuncDecl {
 	return &FuncDecl{
 		Doc:  SerializeOption(pass, input.Doc, SerializeCommentGroup),
 		Recv: SerializeOption(pass, input.Recv, SerializeFieldList),
@@ -1117,8 +1026,16 @@ func SerializeDecl(pass *serPass, decl ast.Decl) Decl {
 	case *ast.BadDecl:
 		return SerializeBadDecl(pass, d)
 	case *ast.GenDecl:
+		if pass.conf[CACHE_REF] != nil {
+			return SerRefLookup(pass, d, SerializeGenDecl)
+		}
+
 		return SerializeGenDecl(pass, d)
 	case *ast.FuncDecl:
+		if pass.conf[CACHE_REF] != nil {
+			return SerRefLookup(pass, d, SerializeFuncDecl)
+		}
+
 		return SerializeFuncDecl(pass, d)
 	default:
 		return nil
