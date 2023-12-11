@@ -1,7 +1,6 @@
 package ason
 
 import (
-	"errors"
 	"fmt"
 	"go/ast"
 	"go/token"
@@ -12,7 +11,6 @@ type dePass struct {
 	fset     *token.FileSet
 	refCache map[Ason]*weakRef
 	refCount uint
-	errors   map[string][]error // map of package id -> errors
 	conf     map[Mode]interface{}
 }
 
@@ -580,34 +578,58 @@ func DeserializeStmt(pass *dePass, stmt Stmt) ast.Stmt {
 // ----------------- Specifications ----------------- //
 
 func DeserializeImportSpec(pass *dePass, input *ImportSpec) *ast.ImportSpec {
-	return &ast.ImportSpec{
-		Doc:     DeserializeOption(pass, input.Doc, DeserializeCommentGroup),
-		Name:    DeserializeOption(pass, input.Name, DeserializeIdent),
-		Path:    DeserializeOption(pass, input.Path, DeserializeBasicLit),
-		Comment: DeserializeOption(pass, input.Comment, DeserializeCommentGroup),
-		EndPos:  DeserializePos(pass, input.EndPos),
+	deserializeImportSpec := func(pass *dePass, input *ImportSpec) *ast.ImportSpec {
+		return &ast.ImportSpec{
+			Doc:     DeserializeOption(pass, input.Doc, DeserializeCommentGroup),
+			Name:    DeserializeOption(pass, input.Name, DeserializeIdent),
+			Path:    DeserializeOption(pass, input.Path, DeserializeBasicLit),
+			Comment: DeserializeOption(pass, input.Comment, DeserializeCommentGroup),
+			EndPos:  DeserializePos(pass, input.EndPos),
+		}
 	}
+
+	if pass.conf[CacheRef] != nil {
+		return DeRefLookup(pass, input, deserializeImportSpec)
+	}
+
+	return deserializeImportSpec(pass, input)
 }
 
 func DeserializeValueSpec(pass *dePass, input *ValueSpec) *ast.ValueSpec {
-	return &ast.ValueSpec{
-		Doc:     DeserializeOption(pass, input.Doc, DeserializeCommentGroup),
-		Names:   DeserializeList(pass, input.Names, DeserializeIdent),
-		Type:    DeserializeOption(pass, input.Type, DeserializeExpr),
-		Values:  DeserializeList(pass, input.Values, DeserializeExpr),
-		Comment: DeserializeOption(pass, input.Comment, DeserializeCommentGroup),
+	deserializeValueSpec := func(pass *dePass, input *ValueSpec) *ast.ValueSpec {
+		return &ast.ValueSpec{
+			Doc:     DeserializeOption(pass, input.Doc, DeserializeCommentGroup),
+			Names:   DeserializeList(pass, input.Names, DeserializeIdent),
+			Type:    DeserializeOption(pass, input.Type, DeserializeExpr),
+			Values:  DeserializeList(pass, input.Values, DeserializeExpr),
+			Comment: DeserializeOption(pass, input.Comment, DeserializeCommentGroup),
+		}
 	}
+
+	if pass.conf[CacheRef] != nil {
+		return DeRefLookup(pass, input, deserializeValueSpec)
+	}
+
+	return deserializeValueSpec(pass, input)
 }
 
 func DeserializeTypeSpec(pass *dePass, input *TypeSpec) *ast.TypeSpec {
-	return &ast.TypeSpec{
-		Doc:        DeserializeOption(pass, input.Doc, DeserializeCommentGroup),
-		Name:       DeserializeOption(pass, input.Name, DeserializeIdent),
-		TypeParams: DeserializeOption(pass, input.TypeParams, DeserializeFieldList),
-		Assign:     DeserializePos(pass, input.Assign),
-		Type:       DeserializeOption(pass, input.Type, DeserializeExpr),
-		Comment:    DeserializeOption(pass, input.Comment, DeserializeCommentGroup),
+	deserializeTypeSpec := func(pass *dePass, input *TypeSpec) *ast.TypeSpec {
+		return &ast.TypeSpec{
+			Doc:        DeserializeOption(pass, input.Doc, DeserializeCommentGroup),
+			Name:       DeserializeOption(pass, input.Name, DeserializeIdent),
+			TypeParams: DeserializeOption(pass, input.TypeParams, DeserializeFieldList),
+			Assign:     DeserializePos(pass, input.Assign),
+			Type:       DeserializeOption(pass, input.Type, DeserializeExpr),
+			Comment:    DeserializeOption(pass, input.Comment, DeserializeCommentGroup),
+		}
 	}
+
+	if pass.conf[CacheRef] != nil {
+		return DeRefLookup(pass, input, deserializeTypeSpec)
+	}
+
+	return deserializeTypeSpec(pass, input)
 }
 
 func DeserializeSpec(pass *dePass, spec Spec) ast.Spec {
@@ -633,24 +655,40 @@ func DeserializeBadDecl(pass *dePass, input *BadDecl) *ast.BadDecl {
 }
 
 func DeserializeGenDecl(pass *dePass, input *GenDecl) *ast.GenDecl {
-	return &ast.GenDecl{
-		Doc:    DeserializeOption(pass, input.Doc, DeserializeCommentGroup),
-		TokPos: DeserializePos(pass, input.TokenPos),
-		Tok:    tokens[input.Tok],
-		Lparen: DeserializePos(pass, input.Lparen),
-		Specs:  DeserializeList(pass, input.Specs, DeserializeSpec),
-		Rparen: DeserializePos(pass, input.Rparen),
+	deserializeGenDecl := func(pass *dePass, input *GenDecl) *ast.GenDecl {
+		return &ast.GenDecl{
+			Doc:    DeserializeOption(pass, input.Doc, DeserializeCommentGroup),
+			TokPos: DeserializePos(pass, input.TokenPos),
+			Tok:    tokens[input.Tok],
+			Lparen: DeserializePos(pass, input.Lparen),
+			Specs:  DeserializeList(pass, input.Specs, DeserializeSpec),
+			Rparen: DeserializePos(pass, input.Rparen),
+		}
 	}
+
+	if pass.conf[CacheRef] != nil {
+		return DeRefLookup(pass, input, deserializeGenDecl)
+	}
+
+	return deserializeGenDecl(pass, input)
 }
 
 func DeserializeFuncDecl(pass *dePass, input *FuncDecl) *ast.FuncDecl {
-	return &ast.FuncDecl{
-		Doc:  DeserializeOption(pass, input.Doc, DeserializeCommentGroup),
-		Recv: DeserializeOption(pass, input.Recv, DeserializeFieldList),
-		Name: DeserializeOption(pass, input.Name, DeserializeIdent),
-		Type: DeserializeOption(pass, input.Type, DeserializeFuncType),
-		Body: DeserializeOption(pass, input.Body, DeserializeBlockStmt),
+	deserializeFuncDecl := func(pass *dePass, input *FuncDecl) *ast.FuncDecl {
+		return &ast.FuncDecl{
+			Doc:  DeserializeOption(pass, input.Doc, DeserializeCommentGroup),
+			Recv: DeserializeOption(pass, input.Recv, DeserializeFieldList),
+			Name: DeserializeOption(pass, input.Name, DeserializeIdent),
+			Type: DeserializeOption(pass, input.Type, DeserializeFuncType),
+			Body: DeserializeOption(pass, input.Body, DeserializeBlockStmt),
+		}
 	}
+
+	if pass.conf[CacheRef] != nil {
+		return DeRefLookup(pass, input, deserializeFuncDecl)
+	}
+
+	return deserializeFuncDecl(pass, input)
 }
 
 func DeserializeDecl(pass *dePass, decl Decl) ast.Decl {
@@ -658,16 +696,8 @@ func DeserializeDecl(pass *dePass, decl Decl) ast.Decl {
 	case *BadDecl:
 		return DeserializeBadDecl(pass, d)
 	case *GenDecl:
-		if pass.conf[CacheRef] != nil {
-			return DeRefLookup(pass, d, DeserializeGenDecl)
-		}
-
 		return DeserializeGenDecl(pass, d)
 	case *FuncDecl:
-		if pass.conf[CacheRef] != nil {
-			return DeRefLookup(pass, d, DeserializeFuncDecl)
-		}
-
 		return DeserializeFuncDecl(pass, d)
 	default:
 		return nil
@@ -676,12 +706,10 @@ func DeserializeDecl(pass *dePass, decl Decl) ast.Decl {
 
 // ----------------- Files and Packages ----------------- //
 
-func DeserializeFile(pass *dePass, input *File) *ast.File {
+func DeserializeFile(pass *dePass, input *File) (*ast.File, error) {
 	if err := processTokenFile(pass, input); err != nil {
-		pass.errors[input.Name.Name] = append(pass.errors[input.Name.Name], err)
+		return nil, err
 	}
-
-	pass.errors[input.Name.Name] = append(pass.errors[input.Name.Name], errors.New("some error"))
 
 	return &ast.File{
 		Doc:        DeserializeOption(pass, input.Doc, DeserializeCommentGroup),
@@ -694,7 +722,7 @@ func DeserializeFile(pass *dePass, input *File) *ast.File {
 		Unresolved: DeserializeList(pass, input.Unresolved, DeserializeIdent),
 		Comments:   DeserializeList(pass, input.Comments, DeserializeCommentGroup),
 		GoVersion:  input.GoVersion,
-	}
+	}, nil
 }
 
 func processTokenFile(pass *dePass, input *File) error {
