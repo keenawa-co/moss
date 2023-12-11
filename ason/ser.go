@@ -7,48 +7,31 @@ import (
 	"unsafe"
 )
 
+// ignoredNodes
+
 type serPass struct {
 	fset     *token.FileSet
-	readFile func(string) ([]byte, error) // function to OS read a file into a buffer
-	refCache map[ast.Node]*weakRef        // cache of weak refs to already serialized nodes
-	refCount uint                         // serialized nodes counter
-	conf     map[serConf]interface{}      // set of serialization parameters
+	refCache map[ast.Node]*weakRef // cache of weak refs to already serialized nodes
+	refCount uint                  // serialized nodes counter
+	conf     map[Mode]interface{}  // set of serialization parameters
 }
 
-// serPassOptFn is a functional option type that allows us to configure the SerPass.
-type serPassOptFn func(*serPass)
-
-func NewSerPass(fset *token.FileSet, options ...serPassOptFn) *serPass {
+func NewSerPass(fset *token.FileSet, options ...Mode) *serPass {
 	pass := &serPass{
-		fset:     fset,
-		readFile: os.ReadFile,
-		conf:     make(map[serConf]interface{}),
+		fset: fset,
+		conf: make(map[Mode]interface{}),
 	}
 
-	for _, opt := range options {
-		opt(pass)
+	for i := 0; i < len(options); i++ {
+		opt := options[i]
+		pass.conf[opt] = struct{}{}
+
+		if opt == CacheRef {
+			pass.refCache = make(map[ast.Node]*weakRef)
+		}
 	}
 
 	return pass
-}
-
-func WithReadFileFn(fn func(string) ([]byte, error)) serPassOptFn {
-	return func(pass *serPass) {
-		pass.readFile = fn
-	}
-}
-
-func WithSerConf(options ...serConf) serPassOptFn {
-	return func(pass *serPass) {
-		for i := 0; i < len(options); i++ {
-			opt := options[i]
-			pass.conf[opt] = struct{}{}
-
-			if opt == CACHE_REF {
-				pass.refCache = make(map[ast.Node]*weakRef)
-			}
-		}
-	}
 }
 
 type SerFn[I ast.Node, O Ason] func(*serPass, I) O
@@ -98,7 +81,7 @@ func SerializeMap[K comparable, V ast.Node, R Ason](pass *serPass, inputMap map[
 // ----------------- Scope ----------------- //
 
 func SerializeScope(pass *serPass, input *ast.Scope) *Scope {
-	if pass.conf[FILE_SCOPE] == nil {
+	if pass.conf[ResolveScope] == nil {
 		return nil
 	}
 
@@ -135,7 +118,7 @@ func SerializePos(pass *serPass, pos token.Pos) Pos {
 }
 
 func SerializeLoc(pass *serPass, input ast.Node) *Loc {
-	if pass.conf[LOC] == nil {
+	if pass.conf[ResolveLoc] == nil {
 		return nil
 	}
 
@@ -174,7 +157,7 @@ func SerializeCommentGroup(pass *serPass, input *ast.CommentGroup) *CommentGroup
 
 func SerializeIdent(pass *serPass, input *ast.Ident) *Ident {
 	var obj *Object
-	if pass.conf[IDENT_OBJ] != nil && input.Obj != nil {
+	if pass.conf[ResolveObject] != nil && input.Obj != nil {
 		obj = SerializeObject(pass, input.Obj)
 	}
 
@@ -898,7 +881,7 @@ func SerializeStmt(pass *serPass, stmt ast.Stmt) Stmt {
 // ----------------- Specifications ----------------- //
 
 func SerializeImportSpec(pass *serPass, input *ast.ImportSpec) *ImportSpec {
-	if pass.conf[CACHE_REF] != nil {
+	if pass.conf[CacheRef] != nil {
 		return SerRefLookup(pass, input, serializeImportSpec)
 	}
 
@@ -954,19 +937,19 @@ func SerializeTypeSpec(pass *serPass, input *ast.TypeSpec) *TypeSpec {
 func SerializeSpec(pass *serPass, spec ast.Spec) Spec {
 	switch s := spec.(type) {
 	case *ast.ImportSpec:
-		if pass.conf[CACHE_REF] != nil {
+		if pass.conf[CacheRef] != nil {
 			return SerRefLookup(pass, s, SerializeImportSpec)
 		}
 
 		return SerializeImportSpec(pass, s)
 	case *ast.ValueSpec:
-		if pass.conf[CACHE_REF] != nil {
+		if pass.conf[CacheRef] != nil {
 			return SerRefLookup(pass, s, SerializeValueSpec)
 		}
 
 		return SerializeValueSpec(pass, s)
 	case *ast.TypeSpec:
-		if pass.conf[CACHE_REF] != nil {
+		if pass.conf[CacheRef] != nil {
 			return SerRefLookup(pass, s, SerializeTypeSpec)
 		}
 
@@ -1026,13 +1009,13 @@ func SerializeDecl(pass *serPass, decl ast.Decl) Decl {
 	case *ast.BadDecl:
 		return SerializeBadDecl(pass, d)
 	case *ast.GenDecl:
-		if pass.conf[CACHE_REF] != nil {
+		if pass.conf[CacheRef] != nil {
 			return SerRefLookup(pass, d, SerializeGenDecl)
 		}
 
 		return SerializeGenDecl(pass, d)
 	case *ast.FuncDecl:
-		if pass.conf[CACHE_REF] != nil {
+		if pass.conf[CacheRef] != nil {
 			return SerRefLookup(pass, d, SerializeFuncDecl)
 		}
 
@@ -1046,7 +1029,7 @@ func SerializeDecl(pass *serPass, decl ast.Decl) Decl {
 
 func SerializeFile(pass *serPass, input *ast.File) *File {
 	var scope *Scope
-	if pass.conf[FILE_SCOPE] != nil && input.Scope != nil {
+	if pass.conf[ResolveScope] != nil && input.Scope != nil {
 		scope = SerializeScope(pass, input.Scope)
 	}
 
@@ -1073,7 +1056,7 @@ func SerializeFile(pass *serPass, input *ast.File) *File {
 
 func calcFileSize(pass *serPass, input *ast.File) int {
 	position := pass.fset.PositionFor(input.Name.NamePos, false)
-	content, err := pass.readFile(position.Filename)
+	content, err := os.ReadFile(position.Filename)
 	if err != nil {
 		return 1<<_GOARCH() - 2
 	}
@@ -1083,7 +1066,7 @@ func calcFileSize(pass *serPass, input *ast.File) int {
 
 func SerializePackage(pass *serPass, input *ast.Package) *Package {
 	var scope *Scope
-	if pass.conf[PKG_SCOPE] != nil && input.Scope != nil {
+	if pass.conf[ResolveScope] != nil && input.Scope != nil {
 		scope = SerializeScope(pass, input.Scope)
 	}
 

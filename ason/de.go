@@ -1,6 +1,7 @@
 package ason
 
 import (
+	"errors"
 	"fmt"
 	"go/ast"
 	"go/token"
@@ -12,7 +13,7 @@ type dePass struct {
 	refCache map[Ason]*weakRef
 	refCount uint
 	errors   map[string][]error // map of package id -> errors
-	conf     map[serConf]interface{}
+	conf     map[Mode]interface{}
 }
 
 func NewDePass(fset *token.FileSet) *dePass {
@@ -657,13 +658,13 @@ func DeserializeDecl(pass *dePass, decl Decl) ast.Decl {
 	case *BadDecl:
 		return DeserializeBadDecl(pass, d)
 	case *GenDecl:
-		if pass.conf[CACHE_REF] != nil {
+		if pass.conf[CacheRef] != nil {
 			return DeRefLookup(pass, d, DeserializeGenDecl)
 		}
 
 		return DeserializeGenDecl(pass, d)
 	case *FuncDecl:
-		if pass.conf[CACHE_REF] != nil {
+		if pass.conf[CacheRef] != nil {
 			return DeRefLookup(pass, d, DeserializeFuncDecl)
 		}
 
@@ -679,6 +680,8 @@ func DeserializeFile(pass *dePass, input *File) *ast.File {
 	if err := processTokenFile(pass, input); err != nil {
 		pass.errors[input.Name.Name] = append(pass.errors[input.Name.Name], err)
 	}
+
+	pass.errors[input.Name.Name] = append(pass.errors[input.Name.Name], errors.New("some error"))
 
 	return &ast.File{
 		Doc:        DeserializeOption(pass, input.Doc, DeserializeCommentGroup),

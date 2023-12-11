@@ -167,7 +167,8 @@ func runRootCmd(cmd *cobra.Command, args []string) {
 	}
 
 	startTime := time.Now()
-	sf := ason.SerializeFile(ason.NewSerPass(fset), f)
+	pass := ason.NewSerPass(fset)
+	sf := ason.SerializeFile(pass, f)
 	fmt.Println("Function execution time:", time.Since(startTime))
 
 	// js, err := json.Marshal(sf)

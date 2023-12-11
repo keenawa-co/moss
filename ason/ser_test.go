@@ -56,18 +56,18 @@ func TestNewSerPass(t *testing.T) {
 
 	t.Run("valid: creation of pass with CACHE_REF", func(t *testing.T) {
 		fset := token.NewFileSet()
-		pass := NewSerPass(fset, WithSerConf(CACHE_REF))
+		pass := NewSerPass(fset, CacheRef)
 
 		assert.NotNil(t, pass)
 		assert.NotNil(t, pass.fset)
 		assert.NotNil(t, pass.refCache)
-		assert.NotNil(t, true, pass.conf[CACHE_REF])
+		assert.NotNil(t, true, pass.conf[CacheRef])
 	})
 }
 
 func TestWithRefLookup(t *testing.T) {
 	t.Run("valid", func(t *testing.T) {
-		pass := NewSerPass(token.NewFileSet(), WithSerConf(CACHE_REF))
+		pass := NewSerPass(token.NewFileSet(), CacheRef)
 		astNode := &ast.Ident{Name: testName}
 		ident := SerializeIdent(pass, astNode)
 		pass.refCache[astNode] = NewWeakRef(ident)
@@ -84,7 +84,7 @@ func TestWithRefLookup(t *testing.T) {
 	})
 
 	t.Run("invalid: searching for a link that is not in the cache", func(t *testing.T) {
-		pass := NewSerPass(token.NewFileSet(), WithSerConf(CACHE_REF))
+		pass := NewSerPass(token.NewFileSet(), CacheRef)
 		astNode := &ast.Ident{Name: testName}
 
 		// The absence of panic in this case means that an unknown link was found
@@ -124,13 +124,6 @@ func TestCalcFileSize(t *testing.T) {
 		pass := NewSerPass(fset)
 		size := calcFileSize(pass, f)
 		assert.Greater(t, size, 0)
-	})
-
-	t.Run("invalid: with file read error", func(t *testing.T) {
-		f, fset := uploadTestData(t, pathToAsonTestDataDir)
-		pass := NewSerPass(fset, WithReadFileFn(mockReadFileWithErr))
-		size := calcFileSize(pass, f)
-		assert.Equal(t, 1<<_GOARCH()-2, size)
 	})
 }
 
