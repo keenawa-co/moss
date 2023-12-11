@@ -63,34 +63,6 @@ func TestNewSerPass(t *testing.T) {
 		assert.NotNil(t, pass.refCache)
 		assert.NotNil(t, true, pass.conf[CACHE_REF])
 	})
-
-	t.Run("valid: use tailNode", func(t *testing.T) {
-
-		pass := NewSerPass(token.NewFileSet())
-		serSpecs := make([]*ValueSpec, len(testValueSpecs))
-		for i, s := range testValueSpecs {
-			serSpecs[i] = SerializeValueSpec(pass, s)
-			// tail saving
-			pass.tailNode = serSpecs[i]
-		}
-
-		assert.NotNil(t, serSpecs[1].Type)
-		assert.Equal(t, serSpecs[1].Type.(*Ident).Name, testType)
-		assert.Equal(t, "iota", serSpecs[1].Values[0].(*BinaryExpr).X.(*Ident).Name)
-		assert.Equal(t, token.INT.String(), serSpecs[1].Values[0].(*BinaryExpr).Y.(*BasicLit).Kind)
-		assert.Equal(t, "2", serSpecs[1].Values[0].(*BinaryExpr).Y.(*BasicLit).Value)
-	})
-
-	t.Run("invalid: not saving the tail", func(t *testing.T) {
-		pass := NewSerPass(token.NewFileSet())
-		serSpecs := make([]*ValueSpec, len(testValueSpecs))
-		for i, s := range testValueSpecs {
-			serSpecs[i] = SerializeValueSpec(pass, s)
-		}
-
-		assert.Nil(t, serSpecs[1].Type)
-		assert.Nil(t, serSpecs[1].Values)
-	})
 }
 
 func TestWithRefLookup(t *testing.T) {
@@ -105,10 +77,10 @@ func TestWithRefLookup(t *testing.T) {
 		//Calling this function means that the link could not be found in the cache,
 		// although it should have been there.
 		assert.NotPanics(t, func() {
-			WithRefLookup[*ast.Ident, *Ident](pass, astNode, nil)
+			SerRefLookup[*ast.Ident, *Ident](pass, astNode, nil)
 		}, "unexpected: should not try to call serialize func")
 
-		assert.Equal(t, ident, WithRefLookup[*ast.Ident, *Ident](pass, astNode, nil))
+		assert.Equal(t, ident, SerRefLookup[*ast.Ident, *Ident](pass, astNode, nil))
 	})
 
 	t.Run("invalid: searching for a link that is not in the cache", func(t *testing.T) {
@@ -119,7 +91,7 @@ func TestWithRefLookup(t *testing.T) {
 		// that for some reason corresponds to the one you were looking for,
 		// although you did not save it before
 		assert.Panics(t, func() {
-			WithRefLookup[*ast.Ident, *Ident](pass, astNode, nil)
+			SerRefLookup[*ast.Ident, *Ident](pass, astNode, nil)
 		}, "unexpected: should call serialize func")
 	})
 }

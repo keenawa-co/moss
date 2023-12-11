@@ -13,8 +13,10 @@ import (
 
 type dePass struct {
 	fset     *token.FileSet
-	refCache map[ast.Node]*weakRef
+	refCache map[Ason]*weakRef
+	refCount uint
 	errors   map[string][]error // map of package id -> errors
+	conf     map[serConf]interface{}
 }
 
 func NewDePass(fset *token.FileSet) *dePass {
@@ -23,7 +25,19 @@ func NewDePass(fset *token.FileSet) *dePass {
 	}
 }
 
-type DeFn[I Ason, R ast.Node] func(*dePass, I) R
+type DeFn[I Ason, O ast.Node] func(*dePass, I) O
+
+func DeRefLookup[I Ason, O ast.Node](pass *dePass, input I, deFn DeFn[I, O]) O {
+	if weakRef, exists := pass.refCache[input]; exists {
+		return weakRef.Load().(O)
+	}
+
+	node := deFn(pass, input)
+	pass.refCache[input] = NewWeakRef(&node)
+	pass.refCount++
+
+	return node
+}
 
 func DeserializeOption[I Ason, R ast.Node](pass *dePass, input I, deFn DeFn[I, R]) (empty R) {
 	if *(*interface{})(unsafe.Pointer(&input)) != nil {
@@ -647,8 +661,16 @@ func DeserializeDecl(pass *dePass, decl Decl) ast.Decl {
 	case *BadDecl:
 		return DeserializeBadDecl(pass, d)
 	case *GenDecl:
+		if pass.conf[CACHE_REF] != nil {
+			return DeRefLookup(pass, d, DeserializeGenDecl)
+		}
+
 		return DeserializeGenDecl(pass, d)
 	case *FuncDecl:
+		if pass.conf[CACHE_REF] != nil {
+			return DeRefLookup(pass, d, DeserializeFuncDecl)
+		}
+
 		return DeserializeFuncDecl(pass, d)
 	default:
 		return nil
