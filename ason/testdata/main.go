@@ -1,6 +1,9 @@
 package main
 
-import "go/ast"
+import (
+	"fmt"
+	"go/ast"
+)
 
 /*
 Hello World
@@ -49,10 +52,13 @@ func SerializePackage(pass *serPass, input *ast.Package) *Package {
 }
 
 func serializeImports(pass *serPass, inputMap map[string]*ast.Object) map[string]*Object {
+
 	result := make(map[string]*Object, len(inputMap))
 	for k, v := range inputMap {
 		result[k] = SerializeObject(pass, v)
 	}
+
+	fmt.Println("test")
 
 	return result
 }

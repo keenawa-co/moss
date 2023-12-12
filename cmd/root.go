@@ -12,9 +12,7 @@ import (
 	"os"
 	"path/filepath"
 	"reflect"
-	"time"
 
-	"github.com/4rchr4y/goray/ason"
 	regoAst "github.com/open-policy-agent/opa/ast"
 	"github.com/open-policy-agent/opa/rego"
 	"github.com/open-policy-agent/opa/topdown"
@@ -26,24 +24,6 @@ var rootCmd = &cobra.Command{
 	Short: "",
 	Long:  "",
 	Run:   runRootCmd,
-}
-
-func init() {
-	// a1, err := plugin.LoadPlugin("./analysis/a001/a001.so")
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-
-	// a2, err := plugin.LoadPlugin("./analysis/a002/a002.so")
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-
-	// multichecker.Main(
-	// 	a1,
-	// )
-
-	// rootCmd.Flags().BoolP("output", "o", false, "Help message for output")
 }
 
 type failCase struct {
@@ -96,20 +76,30 @@ func inspectFile(fset *token.FileSet, f *ast.File) []map[string]interface{} {
 }
 
 func evaluateRegoPolicy(policyPath string, data []map[string]interface{}) error {
+	policies := make(map[string]string)
+
+	raw, err := os.ReadFile(filepath.Clean(policyPath))
+	if err != nil {
+		return err
+	}
+
+	policies[policyPath] = string(raw)
+
+	compiler, err := regoAst.CompileModulesWithOpt(policies, regoAst.CompileOpts{
+		EnablePrintStatements: true,
+	})
+
+	as := compiler.GetAnnotationSet()
+	fmt.Println(len(as.Flatten()))
+	for _, entry := range as.Flatten() {
+		fmt.Printf("%#v", entry)
+		fmt.Printf("%v at %v has annotations %v\n",
+			entry.Path,
+			entry.Location,
+			entry.Annotations)
+	}
+
 	for _, item := range data {
-
-		policies := make(map[string]string)
-
-		raw, err := os.ReadFile(filepath.Clean(policyPath))
-		if err != nil {
-			return err
-		}
-
-		policies[policyPath] = string(raw)
-
-		compiler, err := regoAst.CompileModulesWithOpt(policies, regoAst.CompileOpts{
-			EnablePrintStatements: true,
-		})
 
 		var buf bytes.Buffer
 
@@ -166,10 +156,10 @@ func runRootCmd(cmd *cobra.Command, args []string) {
 		log.Fatal(err)
 	}
 
-	startTime := time.Now()
-	pass := ason.NewSerPass(fset)
-	sf := ason.SerializeFile(pass, f)
-	fmt.Println("Function execution time:", time.Since(startTime))
+	// startTime := time.Now()
+	// pass := ason.NewSerPass(fset)
+	// sf := ason.SerializeFile(pass, f)
+	// fmt.Println("Function execution time:", time.Since(startTime))
 
 	// js, err := json.Marshal(sf)
 	// if err != nil {
@@ -178,18 +168,18 @@ func runRootCmd(cmd *cobra.Command, args []string) {
 
 	// fmt.Println(string(js))
 
-	fmt.Println()
-	fmt.Println()
+	// fmt.Println()
+	// fmt.Println()
 
-	fset2 := token.NewFileSet()
-	df, _ := ason.DeserializeFile(ason.NewDePass(fset2), sf)
+	// fset2 := token.NewFileSet()
+	// df, _ := ason.DeserializeFile(ason.NewDePass(fset2), sf)
 
-	code, err := GenerateCode(fset2, df)
-	if err != nil {
-		log.Fatal(err)
-	}
+	// code, err := GenerateCode(fset2, df)
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
 
-	fmt.Println(code)
+	// fmt.Println(code)
 
 	data := inspectFile(fset, f)
 

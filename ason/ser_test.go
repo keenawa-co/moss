@@ -793,3 +793,140 @@ func TestSerializeExpr(t *testing.T) {
 		assert.True(t, ok)
 	})
 }
+
+// ----------------- Statements ----------------- //
+
+func TestSerializeBadStmt(t *testing.T) {
+	t.Run("valid: ast.BadStmt serialization", func(t *testing.T) {
+		input := &ast.BadStmt{
+			From: token.Pos(1),
+			To:   token.Pos(5),
+		}
+
+		fset := token.NewFileSet()
+		pass := NewSerPass(fset)
+		actual := SerializeBadStmt(pass, input)
+
+		assert.Equal(t, NodeTypeBadStmt, actual.Node.Type)
+	})
+}
+
+func TestSerializeDeclStmt(t *testing.T) {
+	t.Run("valid: ast.DeclStmt serialization", func(t *testing.T) {
+		input := &ast.DeclStmt{
+			Decl: &ast.GenDecl{
+				Specs: []ast.Spec{&ast.ImportSpec{Path: &ast.BasicLit{Value: "\"fmt\""}}},
+			},
+		}
+
+		fset := token.NewFileSet()
+		pass := NewSerPass(fset)
+		actual := SerializeDeclStmt(pass, input)
+
+		assert.Equal(t, NodeTypeDeclStmt, actual.Node.Type)
+		assert.IsType(t, new(GenDecl), actual.Decl)
+	})
+}
+
+func TestSerializeEmptyStmt(t *testing.T) {
+	t.Run("valid: ast.EmptyStmt serialization", func(t *testing.T) {
+		input := &ast.EmptyStmt{
+			Semicolon: token.Pos(1),
+			Implicit:  true,
+		}
+
+		fset := token.NewFileSet()
+		pass := NewSerPass(fset)
+		actual := SerializeEmptyStmt(pass, input)
+
+		assert.Equal(t, NodeTypeEmptyStmt, actual.Node.Type)
+		// Дополнительные проверки для Semicolon и Implicit
+	})
+}
+
+func TestSerializeLabeledStmt(t *testing.T) {
+	t.Run("valid: ast.LabeledStmt serialization", func(t *testing.T) {
+		input := &ast.LabeledStmt{
+			Label: &ast.Ident{Name: "label"},
+			Stmt:  &ast.EmptyStmt{},
+		}
+
+		fset := token.NewFileSet()
+		pass := NewSerPass(fset)
+		actual := SerializeLabeledStmt(pass, input)
+
+		assert.Equal(t, "label", actual.Label.Name)
+		assert.Equal(t, NodeTypeLabeledStmt, actual.Node.Type)
+		assert.IsType(t, new(EmptyStmt), actual.Stmt)
+	})
+}
+
+func TestSerializeExprStmt(t *testing.T) {
+	t.Run("valid: ast.ExprStmt serialization", func(t *testing.T) {
+		input := &ast.ExprStmt{
+			X: &ast.BasicLit{Kind: token.INT, Value: "42"},
+		}
+
+		fset := token.NewFileSet()
+		pass := NewSerPass(fset)
+		actual := SerializeExprStmt(pass, input)
+
+		assert.Equal(t, "42", actual.X.(*BasicLit).Value)
+		assert.Equal(t, NodeTypeExprStmt, actual.Node.Type)
+	})
+}
+
+func TestSerializeSendStmt(t *testing.T) {
+	t.Run("valid: ast.SendStmt serialization", func(t *testing.T) {
+		input := &ast.SendStmt{
+			Chan:  &ast.Ident{Name: "ch"},
+			Value: &ast.BasicLit{Kind: token.INT, Value: "42"},
+		}
+
+		fset := token.NewFileSet()
+		pass := NewSerPass(fset)
+		actual := SerializeSendStmt(pass, input)
+
+		assert.Equal(t, "ch", actual.Chan.(*Ident).Name)
+		assert.Equal(t, "42", actual.Value.(*BasicLit).Value)
+		assert.Equal(t, NodeTypeSendStmt, actual.Node.Type)
+	})
+}
+
+func TestSerializeIncDecStmt(t *testing.T) {
+	t.Run("valid: ast.IncDecStmt serialization", func(t *testing.T) {
+		input := &ast.IncDecStmt{
+			X:   &ast.Ident{Name: "counter"},
+			Tok: token.INC,
+		}
+
+		fset := token.NewFileSet()
+		pass := NewSerPass(fset)
+		actual := SerializeIncDecStmt(pass, input)
+
+		assert.Equal(t, "counter", actual.X.(*Ident).Name)
+		assert.Equal(t, "++", actual.Tok)
+		assert.Equal(t, NodeTypeIncDecStmt, actual.Node.Type)
+	})
+}
+
+func TestSerializeAssignStmt(t *testing.T) {
+	t.Run("valid: ast.AssignStmt serialization", func(t *testing.T) {
+		input := &ast.AssignStmt{
+			Lhs: []ast.Expr{&ast.Ident{Name: "x"}},
+			Rhs: []ast.Expr{&ast.BasicLit{Kind: token.INT, Value: "42"}},
+			Tok: token.ASSIGN,
+		}
+
+		fset := token.NewFileSet()
+		pass := NewSerPass(fset)
+		actual := SerializeAssignStmt(pass, input)
+
+		assert.Len(t, actual.Lhs, 1)
+		assert.Equal(t, "x", actual.Lhs[0].(*Ident).Name)
+		assert.Len(t, actual.Rhs, 1)
+		assert.Equal(t, "42", actual.Rhs[0].(*BasicLit).Value)
+		assert.Equal(t, "=", actual.Tok)
+		assert.Equal(t, NodeTypeAssignStmt, actual.Node.Type)
+	})
+}

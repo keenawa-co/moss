@@ -1,6 +1,13 @@
 package goray
 
-
+# METADATA
+# title: Allow Ones
+# description: |
+#  The 'allow' rule...
+#  Is about allowing things.
+#  Not denying them.
+# authors:
+# - Jane Doe <jane@example.com>
 
 fail[res] {
     input.Kind == "ExprStmt"
