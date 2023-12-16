@@ -128,7 +128,7 @@ func runOldCmd(cmd *cobra.Command, args []string) {
 
 	// policyGroup := []*openpolicy.Policy{testPolicy}
 
-	policyPath := "./analysis/policy/r1.rego"
+	policyPath := "./2analysis/policy/r1.rego"
 	if err := evaluateRegoPolicy(policyPath, sf); err != nil {
 		log.Fatal("Ошибка при выполнении политики:", err)
 	}

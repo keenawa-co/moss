@@ -4,36 +4,31 @@ import (
 	"io"
 
 	"github.com/open-policy-agent/opa/ast"
-	"github.com/open-policy-agent/opa/rego"
 )
 
 const (
 	defaultTarget = "*"
 	defaultQuery  = "data.goray"
+	defaultOpaDir = "opa"
 )
 
 type PolicyGroup struct {
-	Name   string
-	List   []*rego.PreparedEvalQuery
-	Target string
+	Name     string
+	Target   string
+	Source   *ast.Module
+	Requires map[string]*ast.Module
 }
 
 type Policy struct {
-	_        [0]int
-	Name     string
-	Content  []byte
-	Target   string
-	Query    string
-	Requires []*Policy
+	Name    string
+	Content []byte
 }
 
 type PolicyOptFn func(*Policy)
 
 func NewPolicy(reader io.Reader, name string, options ...PolicyOptFn) (policy *Policy, err error) {
 	policy = &Policy{
-		Name:   name,
-		Target: defaultTarget,
-		Query:  defaultQuery,
+		Name: name,
 	}
 
 	policy.Content, err = io.ReadAll(reader)
@@ -47,12 +42,6 @@ func NewPolicy(reader io.Reader, name string, options ...PolicyOptFn) (policy *P
 
 	return policy, nil
 
-}
-
-func WithTarget(target string) PolicyOptFn {
-	return func(p *Policy) {
-		p.Target = target
-	}
 }
 
 func ParseModule(policy *Policy) (*ast.Module, error) {

@@ -1,8 +1,6 @@
 package openpolicy
 
-import (
-	"github.com/open-policy-agent/opa/ast"
-)
+import "github.com/open-policy-agent/opa/ast"
 
 type CompileOptFn func(*ast.Compiler)
 

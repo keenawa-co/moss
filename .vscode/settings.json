@@ -15,6 +15,7 @@
         "refcount",
         "refmap",
         "rego",
+        "regoimport",
         "sema",
         "serde",
         "stretchr",
