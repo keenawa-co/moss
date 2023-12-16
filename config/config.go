@@ -20,7 +20,7 @@ type workspace struct {
 	Version    string   `toml:"version"`
 	RootDir    string   `toml:"root"`
 	PolicyDir  string   `toml:"policies"`
-	IgnoreList []string `toml:"ignore-list"`
+	IgnoreList []string `toml:"ignore-list"` // change type to map[string]struct{}
 	GoArch     string   `toml:"go-arch"`
 }
 
@@ -47,6 +47,36 @@ func NewConfig(options ...ConfOptFn) *Config {
 	}
 
 	return conf
+}
+
+func WithRootDir(dirPath string) ConfOptFn {
+	return func(c *Config) {
+		c.Workspace.RootDir = dirPath
+	}
+}
+
+func WithPolicyDir(dirPath string) ConfOptFn {
+	return func(c *Config) {
+		c.Workspace.PolicyDir = dirPath
+	}
+}
+
+func WithIgnoreList(ignoreList []string) ConfOptFn {
+	return func(c *Config) {
+		c.Workspace.IgnoreList = ignoreList
+	}
+}
+
+func WithGoArch(goArch string) ConfOptFn {
+	return func(c *Config) {
+		c.Workspace.GoArch = goArch
+	}
+}
+
+func WithAnalysis(analysis map[string]*AnalysisConf) ConfOptFn {
+	return func(c *Config) {
+		c.Analysis = analysis
+	}
 }
 
 type ConfReadFileOptFn func(*ReadConf)
@@ -93,12 +123,6 @@ func NewConfigFromFile(filePath string, options ...ConfReadFileOptFn) (*Config, 
 	}
 
 	return conf, nil
-}
-
-func WithRootDir(dirPath string) ConfOptFn {
-	return func(c *Config) {
-		c.Workspace.RootDir = dirPath
-	}
 }
 
 func (cfg *Config) Validate() error {
