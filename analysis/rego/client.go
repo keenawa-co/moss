@@ -1,19 +1,29 @@
-package rego
+package openpolicy
 
 import (
-	"fmt"
-	"io/fs"
-	"path/filepath"
+	"github.com/open-policy-agent/opa/ast"
 )
 
-func ParsePolicyDir(dir string) {
-	filepath.WalkDir(dir, func(path string, d fs.DirEntry, err error) error {
-		i, err := d.Info()
-		if err != nil {
-			return err
-		}
+type CompileOptFn func(*ast.Compiler)
 
-		fmt.Println(i.Sys())
-		return nil
-	})
+func Compile(parsed map[string]*ast.Module, options ...CompileOptFn) (*ast.Compiler, error) {
+	compiler := ast.NewCompiler()
+
+	for i := 0; i < len(options); i++ {
+		options[i](compiler)
+	}
+
+	compiler.Compile(parsed)
+	if compiler.Failed() {
+		return nil, compiler.Errors
+
+	}
+
+	return compiler, nil
+}
+
+func WithEnablePrintStatements(value bool) CompileOptFn {
+	return func(c *ast.Compiler) {
+		c.WithEnablePrintStatements(value)
+	}
 }

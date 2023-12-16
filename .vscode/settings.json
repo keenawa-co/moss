@@ -9,6 +9,7 @@
         "fset",
         "goray",
         "modfile",
+        "openpolicy",
         "rchr",
         "refcache",
         "refcount",
