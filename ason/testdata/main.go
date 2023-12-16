@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"go/ast"
 )
 
@@ -36,21 +35,6 @@ const (
 	LOC
 )
 
-func SerializePackage(pass *serPass, input *ast.Package) *Package {
-	var scope *Scope
-	if pass.conf[PKG_SCOPE] != nil && input.Scope != nil {
-		scope = SerializeScope(pass, input.Scope)
-	}
-
-	return &Package{
-		Name:  input.Name,
-		Scope: scope,
-		// cant use SerializeMap func, because `*ast.Object` does not satisfy the interface `ast.Node`.
-		Imports: serializeImports(pass, input.Imports),
-		Files:   SerializeMap(pass, input.Files, SerializeFile),
-	}
-}
-
 func serializeImports(pass *serPass, inputMap map[string]*ast.Object) map[string]*Object {
 
 	result := make(map[string]*Object, len(inputMap))
@@ -58,7 +42,7 @@ func serializeImports(pass *serPass, inputMap map[string]*ast.Object) map[string
 		result[k] = SerializeObject(pass, v)
 	}
 
-	fmt.Println("test")
+	// fmt.Println("test")
 
 	return result
 }

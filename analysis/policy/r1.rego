@@ -9,30 +9,31 @@ package goray
 # authors:
 # - Jane Doe <jane@example.com>
 
-fail[res] {
-    input.Kind == "ExprStmt"
-    input.Node.X.Fun.X.Name == "fmt"
-    input.Node.X.Fun.Sel.Name == "Sprintln"
+# fail[res] {
+#     input.Kind == "ExprStmt"
+#     input.Node.X.Fun.X.Name == "fmt"
+#     input.Node.X.Fun.Sel.Name == "Sprintln"
 
-    print("test")
+#     print("test")
 
-    res := {
-        "msg": "do1111 not use fmt.Sprintln",
-        "pos": input.Node.X.Fun.X.NamePos,
-        "sev": "ERROR",
-    }
-}
+#     res := {
+#         "msg": "do1111 not use fmt.Sprintln",
+#         "pos": input.Node.X.Fun.X.NamePos,
+#         "sev": "ERROR",
+#     }
+# }
 
 warning[res] {
-    input.Kind == "ExprStmt"
-    input.Node.X.Fun.X.Name == "fmt"
-    input.Node.X.Fun.Sel.Name == "Println"
+    input.Decls[_]._type == "FuncDecl2"
+    #input.Decls.Body._type == "ExprStmt"
+    # input.Decls.Body.X.Fun.X.Name == "fmt"
+    # input.Decls.Body.X.Fun.Sel.Name == "Println"
 
-    print("test2")
+    print("input")
 
     res := {
         "msg": "do not use fmt.Println",
-        "pos": input.Node.X.Fun.X.NamePos,
+        "pos": "input.Node.X.Fun.X.NamePos",
         "sev": "WARN",
     }
 }
