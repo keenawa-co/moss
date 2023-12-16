@@ -3,7 +3,7 @@ version = "1.0.193"
 root= "."
 policies="./policy"
 ignore-list=[".git", ".docker"]
-go-arch="${HOME}"
+go-arch="HOME: ${HOME}"
 
 [analysis]
 KRAIL1001 = {level = "info", target= "./${HOME}"}

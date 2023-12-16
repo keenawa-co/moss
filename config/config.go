@@ -74,8 +74,10 @@ func NewFromFileOpt(options ...ConfReadFileOptFn) *ReadConf {
 }
 
 func NewConfigFromFile(filePath string, options ...ConfReadFileOptFn) (*Config, error) {
-	readConf := NewFromFileOpt()
+	readConf := NewFromFileOpt(options...)
+
 	conf := NewConfig()
+
 	data, err := readConf.readFile(filePath)
 	if err != nil {
 		return nil, err
