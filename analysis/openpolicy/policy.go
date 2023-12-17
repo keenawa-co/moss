@@ -1,51 +1,36 @@
 package openpolicy
 
 import (
-	"io"
-
 	"github.com/open-policy-agent/opa/ast"
 )
 
 const (
 	defaultTarget = "*"
 	defaultQuery  = "data.goray"
-	defaultOpaDir = "opa"
 )
-
-type PolicyGroup struct {
-	Name     string
-	Target   string
-	Source   *ast.Module
-	Requires map[string]*ast.Module
-}
 
 type Policy struct {
 	Name    string
-	Content []byte
+	Target  string
+	Source  *ast.Module
+	Vendors map[string]*ast.Module
 }
 
-type PolicyOptFn func(*Policy)
-
-func NewPolicy(reader io.Reader, name string, options ...PolicyOptFn) (policy *Policy, err error) {
-	policy = &Policy{
-		Name: name,
-	}
-
-	policy.Content, err = io.ReadAll(reader)
-	if err != nil {
-		return nil, err
-	}
-
-	for i := 0; i < len(options); i++ {
-		options[i](policy)
-	}
-
-	return policy, nil
-
+type QueryPass struct {
+	Query    string
+	Compiler *ast.Compiler
+	Target   interface{}
 }
 
-func ParseModule(policy *Policy) (*ast.Module, error) {
-	parsed, err := ast.ParseModule(policy.Name, string(policy.Content))
+type Group struct {
+	Target   string
+	Modules  map[string]*ast.Module
+	Requires []*Group
+	Query    func(pass *QueryPass)
+}
+
+func ParseModule(name string, content []byte) (*ast.Module, error) {
+	parsed, err := ast.ParseModule(name, string(content))
 	if err != nil {
 		// TODO add err msg
 		return nil, err

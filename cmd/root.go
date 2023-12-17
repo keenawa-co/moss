@@ -9,8 +9,6 @@ import (
 	"go/token"
 	"log"
 	"os"
-	"path/filepath"
-	"strings"
 
 	"github.com/4rchr4y/goray/analysis/openpolicy"
 	"github.com/4rchr4y/goray/ason"
@@ -37,42 +35,63 @@ type evalOutput struct {
 	Fail []*failCase `json:"fail"`
 }
 
-var policies = []map[string]interface{}{
+// var policies = []map[string]interface{}{
+// 	{
+// 		"Source": "opa/r1.rego",
+// 		"Target": "testdata/main.go",
+// 	},
+
+// }
+
+type Policy struct {
+	Source       string
+	Description  string
+	Version      string
+	Target       []string
+	Dependencies map[string]string
+}
+
+var policies = []*Policy{
 	{
-		"Source": "opa/r1.rego",
+		Source:      "opa/r1.rego",
+		Description: "some short description here",
+		Version:     "0.0.1",
+		Target:      []string{"testdata/main.go"},
+		Dependencies: map[string]string{
+			"go.ast.types": "opa/go/ast/types",
+		},
 	},
 }
 
 func runRootCmd(cmd *cobra.Command, args []string) {
+	std, err := openpolicy.DefineStdLib("opa/std")
+	if err != nil {
+		log.Fatal(err)
+		return
+	}
+
 	parsed := make(map[string]*ast.Module, len(policies))
 	for _, p := range policies {
-		policyPath := filepath.Clean(p["Source"].(string))
-		file, err := os.Open(policyPath)
+
+		raw, err := os.ReadFile(p.Source)
 		if err != nil {
 			log.Fatal(err)
 			return
 		}
 
-		policy, err := openpolicy.NewPolicy(file, policyPath)
+		module, err := openpolicy.ParseModule(p.Source, raw)
 		if err != nil {
 			log.Fatal(err)
 			return
 		}
 
-		module, err := openpolicy.ParseModule(policy)
+		imports, err := processModuleImports(std, module)
 		if err != nil {
 			log.Fatal(err)
 			return
 		}
 
-		parsed[policyPath] = module
-
-		imports, err := processModuleImports(module)
-		if err != nil {
-			log.Fatal(err)
-			return
-		}
-
+		parsed[p.Source] = module
 		parsed = mergeMaps(parsed, imports)
 	}
 
@@ -112,7 +131,7 @@ func runRootCmd(cmd *cobra.Command, args []string) {
 	fmt.Println(buf.String())
 }
 
-func processModuleImports(module *ast.Module) (map[string]*ast.Module, error) {
+func processModuleImports(std map[string]string, module *ast.Module) (map[string]*ast.Module, error) {
 	if len(module.Imports) < 1 {
 		return nil, nil
 	}
@@ -120,29 +139,25 @@ func processModuleImports(module *ast.Module) (map[string]*ast.Module, error) {
 	result := make(map[string]*ast.Module, len(module.Imports))
 
 	for _, moduleImport := range module.Imports {
-		importModulePath, ok := defineImportPath(moduleImport.Path.String())
+
+		importPath, ok := openpolicy.IsStdImport(std, moduleImport)
 		if !ok {
 			continue
 		}
 
-		importFile, err := os.Open(importModulePath)
+		raw, err := os.ReadFile(importPath)
 		if err != nil {
 			return nil, err
 		}
 
-		importPolicy, err := openpolicy.NewPolicy(importFile, importModulePath)
+		importModule, err := openpolicy.ParseModule(importPath, raw)
 		if err != nil {
 			return nil, err
 		}
 
-		importModule, err := openpolicy.ParseModule(importPolicy)
-		if err != nil {
-			return nil, err
-		}
+		result[importPath] = importModule
 
-		result[importModulePath] = importModule
-
-		imports, err := processModuleImports(importModule)
+		imports, err := processModuleImports(std, importModule)
 		if err != nil {
 			return nil, err
 		}
@@ -168,16 +183,6 @@ func mergeMaps(m1, m2 map[string]*ast.Module) map[string]*ast.Module {
 	}
 
 	return combined
-}
-
-func defineImportPath(moduleImport string) (string, bool) {
-	if !strings.HasPrefix(moduleImport, "data") {
-		return "", false
-	}
-
-	slashPath := strings.ReplaceAll(moduleImport, ".", "/")
-	path := fmt.Sprintf("opa/%s.rego", strings.Clone(slashPath[5:]))
-	return path, true
 }
 
 func tmpGetFileAstAsMap(filePath string) (map[string]interface{}, error) {
