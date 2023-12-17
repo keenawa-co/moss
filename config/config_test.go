@@ -81,7 +81,21 @@ func withTestReadFile(rc *ReadConf) {
 }
 
 func testReadFile(name string) ([]byte, error) {
-	return []byte("read fide"), nil
+	return []byte(`
+		[workspace]
+		version = "1.0.193"
+		root= "."
+		policies="./policy"
+		ignore-list=[".git", ".docker"]
+		go-arch="HOME: ${GORAY}"
+		
+		[analysis]
+		KRAIL1001 = {level = "info", target= "./${GORAY}"}
+		
+		[analysis.SE]
+		level = "critical"
+		target = "./internal"
+	`), nil
 }
 
 func withTestReadFileErr(rc *ReadConf) {
@@ -133,12 +147,48 @@ func testLookup(key string) (string, bool) {
 	return "", false
 }
 
+func withTestLookupEnv(rc *ReadConf) {
+	rc.lookup = testLookupEnv
+}
+
 func TestNewConfigFromFile(t *testing.T) {
 
 	t.Run("valid: default config is returned", func(t *testing.T) {
 		got, err := NewConfigFromFile("", withTestReadFile, withTestInterpolate, withTestReadToml, withTestLookup)
 
 		expected := NewConfig()
+		assert.Equal(t, expected, got)
+		assert.Nil(t, err)
+	})
+
+	t.Run("valid: content gets parsed and interpolated correctly", func(t *testing.T) {
+		got, err := NewConfigFromFile("", withTestReadFile, withTestLookupEnv)
+
+		expected := NewConfig()
+		expected.Workspace.Version = "1.0.193"
+		expected.Workspace.RootDir = "."
+		expected.Workspace.PolicyDir = "./policy"
+		expected.Workspace.IgnoreList = []string{".git", ".docker"}
+		// expected.Workspace.IgnoreList = map[string]struct{}{
+		// ".git":    {},
+		// ".docker": {},
+		// }
+
+		expected.Workspace.GoArch = "HOME: some_value"
+
+		analysis := make(map[string]*AnalysisConf)
+		analysis["KRAIL1001"] = &AnalysisConf{
+			Level:  "info",
+			Target: "./some_value",
+		}
+
+		analysis["SE"] = &AnalysisConf{
+			Level:  "critical",
+			Target: "./internal",
+		}
+
+		expected.Analysis = analysis
+
 		assert.Equal(t, expected, got)
 		assert.Nil(t, err)
 	})
@@ -162,5 +212,24 @@ func TestNewConfigFromFile(t *testing.T) {
 
 		assert.Nil(t, got)
 		assert.Equal(t, "read toml error", err.Error())
+	})
+}
+
+func TestNewConfig(t *testing.T) {
+
+	t.Run("all default values are applied", func(t *testing.T) {
+		got := NewConfig()
+
+		expected := &Config{
+			Workspace: &workspace{
+				Version:    defaultVersion,
+				RootDir:    defaultRoot,
+				PolicyDir:  defaultPolicies,
+				IgnoreList: defaultIgnoredList,
+				GoArch:     defaultGoArch,
+			},
+		}
+
+		assert.Equal(t, expected, got)
 	})
 }

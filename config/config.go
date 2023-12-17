@@ -20,7 +20,7 @@ type workspace struct {
 	Version    string   `toml:"version"`
 	RootDir    string   `toml:"root"`
 	PolicyDir  string   `toml:"policies"`
-	IgnoreList []string `toml:"ignore-list"` // change type to map[string]struct{}
+	IgnoreList []string `toml:"ignore-list"`
 	GoArch     string   `toml:"go-arch"`
 }
 
@@ -37,7 +37,7 @@ func NewConfig(options ...ConfOptFn) *Config {
 			Version:    defaultVersion,
 			RootDir:    defaultRoot,
 			PolicyDir:  defaultPolicies,
-			IgnoreList: nil,
+			IgnoreList: defaultIgnoredList,
 			GoArch:     defaultGoArch,
 		},
 	}
