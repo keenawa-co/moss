@@ -1,9 +1,7 @@
-# METADATA
-# scope: document
-# description: A set of rules that determines if x is allowed.
 package goray
 
 import data.go.ast.types
+
 
 is_function_used(decls, pkg_name, func_name) {
     some i
@@ -14,9 +12,9 @@ is_function_used(decls, pkg_name, func_name) {
 }
 
 warning[res] {
-    is_function_used(input.Decls, "fmt", "Println")
+    is_function_used(input.Decls, "fmt", "Sprintln")
     res := {
-        "msg": "do not use fmt.Println",
+        "msg": "do not use fmt.Sprintln",
         "sev": types.func_decl
     }
 }
