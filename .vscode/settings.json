@@ -10,6 +10,7 @@
         "goray",
         "modfile",
         "openpolicy",
+        "oscli",
         "rchr",
         "refcache",
         "refcount",
@@ -21,6 +22,7 @@
         "stretchr",
         "subdir",
         "subdirs",
+        "syswrap",
         "testcode",
         "testmain",
         "TYPESWITCH"
