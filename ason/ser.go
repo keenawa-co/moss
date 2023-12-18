@@ -135,7 +135,7 @@ func SerializeLoc(pass *serPass, input ast.Node) *Loc {
 // ----------------- Comments ----------------- //
 
 func SerializeComment(pass *serPass, input *ast.Comment) *Comment {
-	if pass.conf[SkipComments] != nil {
+	if pass.conf[SkipComments] == nil {
 		return nil
 	}
 
@@ -151,7 +151,7 @@ func SerializeComment(pass *serPass, input *ast.Comment) *Comment {
 }
 
 func SerializeCommentGroup(pass *serPass, input *ast.CommentGroup) *CommentGroup {
-	if pass.conf[SkipComments] != nil {
+	if pass.conf[SkipComments] == nil {
 		return nil
 	}
 
