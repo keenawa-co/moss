@@ -4,6 +4,7 @@
 package goray
 
 import data.go.ast.types
+import data.test.something
 
 is_function_used(decls, pkg_name, func_name) {
     some i
@@ -17,6 +18,6 @@ warning[res] {
     is_function_used(input.Decls, "fmt", "Println")
     res := {
         "msg": "do not use fmt.Println",
-        "sev": types.func_decl
+        "sev": "something.some_test_var"
     }
 }

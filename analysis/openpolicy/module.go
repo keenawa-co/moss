@@ -15,22 +15,23 @@ type Module struct {
 	Dependencies map[string]*Module
 }
 
-func LoadModule(regoCli *RegoClient, path string) (*Module, error) {
-	if module, exists := regoCli.cache[path]; exists {
+func LoadModule(regoCli *RegoClient, importDef string, policyDef *config.PolicyDef) (*Module, error) {
+	if module, exists := regoCli.cache[importDef]; exists {
 		return module, nil
 	}
 
-	content, err := regoCli.system.ReadFile(path)
+	content, err := regoCli.system.ReadFile(policyDef.Path)
 	if err != nil {
 		return nil, err
 	}
 
-	source, err := ast.ParseModule(path, string(content))
+	source, err := ast.ParseModule(importDef, string(content))
 	if err != nil {
 		return nil, err
 	}
 
 	module := &Module{
+		Name:         importDef,
 		Source:       source,
 		Dependencies: make(map[string]*Module, len(source.Imports)),
 	}
@@ -70,19 +71,20 @@ func (moduleList *ModuleList) Len() int {
 	return moduleList.Length
 }
 
-func NewModuleList(regoCli *RegoClient, policyList []*config.Policy) (*ModuleList, error) {
-	moduleList := &ModuleList{List: make([]*Module, len(policyList))}
+func NewModuleList(regoCli *RegoClient, policyDefMap map[string]*config.PolicyDef) (*ModuleList, error) {
+	moduleList := &ModuleList{List: make([]*Module, len(policyDefMap))}
 
-	for i := 0; i < len(policyList); i++ {
-		rawPolicy := policyList[i]
-
-		module, err := LoadModule(regoCli, rawPolicy.Source)
+	var index int
+	for importDef, policyDef := range policyDefMap {
+		module, err := LoadModule(regoCli, importDef, policyDef)
 		if err != nil {
 			return nil, err
 		}
 
-		moduleList.List[i] = module
+		moduleList.List[index] = module
 		moduleList.Length += len(module.Dependencies) + 1
+
+		index++
 	}
 
 	return moduleList, nil
