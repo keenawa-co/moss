@@ -4,12 +4,11 @@
 package goray
 
 import data.go.ast.types
-import data.test.something
 
 is_function_used(decls, pkg_name, func_name) {
     some i
     decl := decls[i]
-    decl._type == "FuncDecl"
+    decl._type == types.FuncDecl # "FuncDecl"
     decl.Body.List[_].X.Fun.X.Name == pkg_name     
     decl.Body.List[_].X.Fun.Sel.Name == func_name           
 }

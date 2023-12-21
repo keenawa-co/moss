@@ -12,6 +12,7 @@ import (
 	"github.com/4rchr4y/goray/analysis/openpolicy"
 	"github.com/4rchr4y/goray/ason"
 	"github.com/4rchr4y/goray/config"
+	"github.com/open-policy-agent/opa/loader"
 	"github.com/open-policy-agent/opa/rego"
 	"github.com/open-policy-agent/opa/topdown"
 	"github.com/spf13/cobra"
@@ -34,16 +35,26 @@ type evalOutput struct {
 	Fail []*failCase `json:"fail"`
 }
 
-var policies = []*config.Policy{
+var policies = []*config.PolicyDef{
 	{
-		Source:      "opa/r1.rego",
-		Description: "some short description here",
-		Version:     "0.0.1",
-		Target:      []string{"testdata/main.go"},
-		Dependencies: map[string]string{
-			"go.ast.types": "opa/go/ast/types",
+		Path:   "opa/r1.rego",
+		Target: []string{"testdata/main.go"},
+		Include: map[string]*config.PolicyDef{
+			// "test.something": {Path: "testdata/test.rego"},
+			// "go.ast.kinds":  {Path: "opa/go/ast/kinds.rego"},
+			// "go.ast.tokens": {Path: "opa/go/ast/tokens.rego"},
+			"data.go.ast.types": {Path: "opa/go/ast/types.rego"},
+			"data.goray":        {Path: "opa/r1.rego"},
 		},
 	},
+	// {
+	// 	Path: "opa/genesis.rego",
+	// 	Include: map[string]*config.PolicyDef{
+	// 		"go.ast.kinds":  {Path: "opa/go/ast/kinds.rego"},
+	// 		"go.ast.tokens": {Path: "opa/go/ast/tokens.rego"},
+	// 		"go.ast.types":  {Path: "opa/go/ast/types.rego"},
+	// 	},
+	// },
 }
 
 func runRootCmd(cmd *cobra.Command, args []string) {
@@ -53,6 +64,16 @@ func runRootCmd(cmd *cobra.Command, args []string) {
 		return
 	}
 
+	b, err := loader.AsBundle("bundle.tar.gz")
+	if err != nil {
+		log.Fatal(err)
+		return
+	}
+
+	for _, mf := range b.Modules {
+		fmt.Println(mf.Parsed.Package.Path.String())
+	}
+
 	moduleList, err := openpolicy.NewModuleList(regoCli, policies)
 	if err != nil {
 		log.Fatal(err)
@@ -60,6 +81,10 @@ func runRootCmd(cmd *cobra.Command, args []string) {
 	}
 
 	merged := openpolicy.MergeList(moduleList)
+
+	// d, _ := json.Marshal(merged)
+
+	// fmt.Println(string(d))
 
 	compiler, err := openpolicy.Compile(merged, openpolicy.WithEnablePrintStatements(true))
 	if err != nil {

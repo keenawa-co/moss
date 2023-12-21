@@ -14,3 +14,5 @@ func (Client) ReadFile(name string) ([]byte, error) {
 func (Client) Walk(root string, fn filepath.WalkFunc) error {
 	return filepath.Walk(root, fn)
 }
+
+// func (Client)
