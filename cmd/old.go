@@ -21,10 +21,15 @@ import (
 )
 
 var oldCmd = &cobra.Command{
-	Use:   "goray",
+	Use:   "old",
 	Short: "",
 	Long:  "",
 	Run:   runOldCmd,
+}
+
+func init() {
+	rootCmd.AddCommand(oldCmd)
+
 }
 
 func evaluateRegoPolicy(policyPath string, data ason.Ason) error {
@@ -107,15 +112,17 @@ func runOldCmd(cmd *cobra.Command, args []string) {
 	// regoClient.ParsePolicyDir("analysis/policy")
 
 	fset := token.NewFileSet()
-
 	f, err := parser.ParseFile(fset, "./ason/testdata/main.go", nil, parser.ParseComments)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	// startTime := time.Now()
-	pass := ason.NewSerPass(fset)
+	pass := ason.NewSerPass(fset, ason.SkipComments)
 	sf := ason.SerializeFile(pass, f)
+
+	js, _ := json.Marshal(sf)
+	fmt.Println(string(js))
 	// fmt.Println("Function execution time:", time.Since(startTime))
 
 	// file, err := os.Open(filepath.Clean("./analysis/policy/r1.rego"))
@@ -123,6 +130,19 @@ func runOldCmd(cmd *cobra.Command, args []string) {
 	// 	fmt.Println("Ошибка при открытии файла:", err)
 	// 	return
 	// }
+
+	fset2 := token.NewFileSet()
+	d, err := ason.DeserializeFile(ason.NewDePass(fset2), sf)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	code, err := GenerateCode(fset2, d)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Println(code)
 
 	// testPolicy, err := openpolicy.NewPolicy(file)
 

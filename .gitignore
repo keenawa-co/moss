@@ -2,3 +2,4 @@
 .docker
 .idea
 .eclipse
+.test
