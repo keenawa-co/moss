@@ -2,4 +2,5 @@
 .docker
 .idea
 .eclipse
-.test
+
+*.tar.gz

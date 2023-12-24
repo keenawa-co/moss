@@ -25,6 +25,7 @@
         "syswrap",
         "testcode",
         "testmain",
+        "Typeflag",
         "TYPESWITCH"
     ]
 }
