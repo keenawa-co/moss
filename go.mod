@@ -3,6 +3,7 @@ module github.com/4rchr4y/goray
 go 1.21
 
 require (
+	github.com/BurntSushi/toml v1.3.2
 	github.com/open-policy-agent/opa v0.49.2
 	github.com/spf13/cobra v1.8.0
 	github.com/stretchr/testify v1.8.4
