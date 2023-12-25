@@ -12,7 +12,7 @@ import (
 	"github.com/4rchr4y/goray/analysis/openpolicy"
 	"github.com/4rchr4y/goray/ason"
 	"github.com/4rchr4y/goray/config"
-	"github.com/open-policy-agent/opa/loader"
+	"github.com/4rchr4y/goray/internal/syswrap"
 	"github.com/open-policy-agent/opa/rego"
 	"github.com/open-policy-agent/opa/topdown"
 	"github.com/spf13/cobra"
@@ -37,60 +37,65 @@ type evalOutput struct {
 
 var policies = []*config.PolicyDef{
 	{
-		Path:   "opa/r1.rego",
-		Target: []string{"testdata/main.go"},
-		Include: map[string]*config.PolicyDef{
-			// "test.something": {Path: "testdata/test.rego"},
-			// "go.ast.kinds":  {Path: "opa/go/ast/kinds.rego"},
-			// "go.ast.tokens": {Path: "opa/go/ast/tokens.rego"},
-			"data.go.ast.types": {Path: "opa/go/ast/types.rego"},
-			"data.goray":        {Path: "opa/r1.rego"},
-		},
+		Path:    "opa/policy/r1.rego",
+		Target:  []string{"testdata/main.go"},
+		Include: []string{"testdata/test.rego"},
 	},
+
 	// {
-	// 	Path: "opa/genesis.rego",
-	// 	Include: map[string]*config.PolicyDef{
-	// 		"go.ast.kinds":  {Path: "opa/go/ast/kinds.rego"},
-	// 		"go.ast.tokens": {Path: "opa/go/ast/tokens.rego"},
-	// 		"go.ast.types":  {Path: "opa/go/ast/types.rego"},
-	// 	},
+	// 	Path:    "opa/policy/r2.rego",
+	// 	Target:  []string{"testdata/main.go"},
+	// 	Include: []string{"testdata/test.rego"},
 	// },
 }
 
+// func ProcessPolicyDef(policyDef *config.PolicyDef) (*openpolicy.Policy, error) {
+// 	content, err := os.ReadFile(policyDef.Path)
+// 	if err != nil {
+// 		return nil, err
+// 	}
+
+// 	regoFile, err := openpolicy.NewRegoFile(policyDef.Path, content)
+// 	if err != nil {
+// 		return nil, err
+// 	}
+
+// 	return &openpolicy.Policy{
+// 		Targets: policyDef.Target,
+// 		File:    regoFile,
+// 	}, nil
+// }
+
 func runRootCmd(cmd *cobra.Command, args []string) {
-	regoCli, err := openpolicy.NewRegoClient("opa/std")
+	loader := openpolicy.NewLoader(new(syswrap.FsClient))
+	machine := openpolicy.NewMachine(loader)
+
+	b, err := loader.LoadBundle("bundle.tar.gz")
 	if err != nil {
 		log.Fatal(err)
 		return
 	}
 
-	b, err := loader.AsBundle("bundle.tar.gz")
-	if err != nil {
-		log.Fatal(err)
-		return
+	machine.RegisterBundle(b)
+
+	for i, v := range policies {
+		file, err := loader.LoadRegoFile(v.Path)
+		if err != nil {
+			log.Fatal(err)
+			return
+		}
+
+		if err := machine.RegisterPolicy(&openpolicy.Policy{
+			File:    file,
+			Targets: policies[i].Target,
+			Vendors: policies[i].Include,
+		}); err != nil {
+			log.Fatal(err)
+			return
+		}
 	}
 
-	for _, mf := range b.Modules {
-		fmt.Println(mf.Parsed.Package.Path.String())
-	}
-
-	moduleList, err := openpolicy.NewModuleList(regoCli, policies)
-	if err != nil {
-		log.Fatal(err)
-		return
-	}
-
-	merged := openpolicy.MergeList(moduleList)
-
-	// d, _ := json.Marshal(merged)
-
-	// fmt.Println(string(d))
-
-	compiler, err := openpolicy.Compile(merged, openpolicy.WithEnablePrintStatements(true))
-	if err != nil {
-		log.Fatal(err)
-		return
-	}
+	compilers, err := machine.Compile()
 
 	fileMap, err := tmpGetFileAstAsMap("testdata/main.go")
 	if err != nil {
@@ -98,10 +103,17 @@ func runRootCmd(cmd *cobra.Command, args []string) {
 		return
 	}
 
+	fmt.Println()
+	// for _, v := range compilers[0].Modules {
+	// 	fmt.Println(v.Package)
+	// }
+
+	// fmt.Println(compilers[0].Modules)
+
 	var buf bytes.Buffer
 	r := rego.New(
 		rego.Query("data.goray"),
-		rego.Compiler(compiler),
+		rego.Compiler(compilers[0]),
 		rego.Input(fileMap),
 		rego.EnablePrintStatements(true),
 		rego.PrintHook(topdown.NewPrintHook(&buf)),
@@ -112,6 +124,8 @@ func runRootCmd(cmd *cobra.Command, args []string) {
 		log.Fatal(err)
 		return
 	}
+
+	fmt.Println()
 
 	for _, result := range rs {
 		for _, r := range result.Expressions {

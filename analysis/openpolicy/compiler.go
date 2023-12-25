@@ -2,26 +2,35 @@ package openpolicy
 
 import "github.com/open-policy-agent/opa/ast"
 
-type CompileOptFn func(*ast.Compiler)
+type compileFn func(options ...compileOptFn) Compiler
+type compileOptFn func(*ast.Compiler)
 
-func Compile(parsed map[string]*ast.Module, options ...CompileOptFn) (*ast.Compiler, error) {
-	compiler := ast.NewCompiler()
-
-	for i := 0; i < len(options); i++ {
-		options[i](compiler)
-	}
-
-	compiler.Compile(parsed)
-	if compiler.Failed() {
-		return nil, compiler.Errors
-
-	}
-
-	return compiler, nil
+type compiler struct {
+	Rc    *ast.Compiler
+	ghash string // group hash
 }
 
-func WithEnablePrintStatements(value bool) CompileOptFn {
+func (c *compiler) Compile(files map[string]*ast.Module) (*compiler, error) {
+	c.Rc.Compile(files)
+	if c.Rc.Failed() {
+		return nil, c.Rc.Errors
+	}
+
+	return c, nil
+}
+
+func WithEnablePrintStatements(value bool) compileOptFn {
 	return func(c *ast.Compiler) {
 		c.WithEnablePrintStatements(value)
 	}
+}
+
+func NewCompiler(options ...compileOptFn) *compiler {
+	regoCompiler := ast.NewCompiler()
+
+	for i := range options {
+		options[i](regoCompiler)
+	}
+
+	return &compiler{Rc: regoCompiler}
 }

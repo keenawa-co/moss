@@ -45,5 +45,7 @@ func serializeImports(pass *serPass, inputMap map[string]*ast.Object) map[string
 
 	fmt.Println("test")
 
+	// fmt.Sprintln("")
+
 	return result
 }

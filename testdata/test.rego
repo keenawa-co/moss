@@ -1,3 +1,3 @@
 package test.something
 
-default some_test_var = "some_value"
+some_test_var := "some_value"

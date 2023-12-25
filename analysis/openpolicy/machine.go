@@ -10,6 +10,7 @@ import (
 	"github.com/open-policy-agent/opa/ast"
 )
 
+// Linker
 type metaSet struct {
 	set map[string]map[string]struct{}
 }
@@ -40,36 +41,55 @@ func (ms *metaSet) saveVendor(groupHash, vendor string) {
 	ms.set[groupHash][vendor] = struct{}{}
 }
 
+// type Registry struct {
+// 	ibp   *radix.Tree[int] // index by path
+// 	ibi   *radix.Tree[int] // index by import
+// 	store []*RegoFile
+// }
+
 type registry struct {
-	indexByPath    map[string]int
-	indexByPackage map[string]int
-	bucket         []*RegoFile
+	IndexByPath    map[string]int
+	IndexByPackage map[string]int
+	Bucket         []*RegoFile
 }
 
 func (r *registry) store(file *RegoFile) {
-	r.indexByPath[file.Path] = len(r.bucket)
-	r.indexByPackage[file.Parsed.Package.Path.String()] = len(r.bucket)
+	r.IndexByPath[file.Path] = len(r.Bucket)
+	r.IndexByPackage[file.Parsed.Package.Path.String()] = len(r.Bucket)
 
-	r.bucket = append(r.bucket, file)
+	r.Bucket = append(r.Bucket, file)
 }
 
 func (r *registry) load(key string) (*RegoFile, bool) {
+
 	if strings.Contains(key, "/") {
-		index, exists := r.indexByPath[key]
+		index, exists := r.IndexByPath[key]
 		if !exists {
 			return nil, false
 		}
 
-		return r.bucket[index], true
+		fmt.Println(key, "|", r.Bucket[index].Path)
+		// js, _ := json.Marshal(r)
+		// fmt.Println(string(js))
+		// fmt.Println()
+		// fmt.Println()
+
+		return r.Bucket[index], true
 	}
 
 	if strings.Contains(key, ".") {
-		index, exists := r.indexByPackage[key]
+		index, exists := r.IndexByPackage[key]
 		if !exists {
 			return nil, false
 		}
 
-		return r.bucket[index], true
+		fmt.Println(key, "|", r.Bucket[index].Path)
+		// js, _ := json.Marshal(r)
+		// fmt.Println(string(js))
+		// fmt.Println()
+		// fmt.Println()
+
+		return r.Bucket[index], true
 	}
 
 	return nil, false
@@ -81,9 +101,9 @@ type Compiler interface {
 
 func newRegistry() *registry {
 	return &registry{
-		indexByPath:    make(map[string]int),
-		indexByPackage: make(map[string]int),
-		bucket:         make([]*RegoFile, 0),
+		IndexByPath:    make(map[string]int),
+		IndexByPackage: make(map[string]int),
+		Bucket:         make([]*RegoFile, 0),
 	}
 }
 
@@ -123,7 +143,6 @@ func (m *Machine) compileGroup(compiler *compiler, group map[string]struct{}) (*
 	files := make(map[string]*ast.Module, len(group))
 
 	for k := range group {
-		fmt.Println(k)
 		file, _ := m.registry.load(k)
 		files[k] = file.Parsed
 	}
@@ -161,6 +180,7 @@ func (m *Machine) RegisterPolicy(p *Policy) error {
 	}
 
 	for _, i := range p.File.Parsed.Imports {
+
 		file, exists := m.registry.load(i.Path.String())
 		if !exists {
 			return fmt.Errorf("import %s is undefined", i.Path.String())

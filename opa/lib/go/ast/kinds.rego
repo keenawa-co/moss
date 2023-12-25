@@ -1,4 +1,4 @@
-package go.ast.kinds
+package lib.go.ast.kinds
 
 bad :="bad"
 _package :="package"
