@@ -148,10 +148,10 @@ func runOldCmd(cmd *cobra.Command, args []string) {
 
 	// policyGroup := []*openpolicy.Policy{testPolicy}
 
-	policyPath := "./2analysis/policy/r1.rego"
-	if err := evaluateRegoPolicy(policyPath, sf); err != nil {
-		log.Fatal("Ошибка при выполнении политики:", err)
-	}
+	// policyPath := "./analysis/policy/r1.rego"
+	// if err := evaluateRegoPolicy(policyPath, sf); err != nil {
+	// 	log.Fatal("Ошибка при выполнении политики:", err)
+	// }
 }
 
 func GenerateCode(fset *token.FileSet, astFile *ast.File) (string, error) {

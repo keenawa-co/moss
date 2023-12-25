@@ -171,7 +171,6 @@ func TestSerializeComment(t *testing.T) {
 		fset := token.NewFileSet()
 		pass := NewSerPass(fset)
 		actual := SerializeComment(pass, input)
-
 		assert.Equal(t, "Example comment", actual.Text)
 		assert.Equal(t, NodeTypeComment, actual.Node.Type)
 	})

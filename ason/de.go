@@ -42,14 +42,17 @@ func DeserializeOption[I Ason, R ast.Node](pass *dePass, input I, deFn DeFn[I, R
 	return empty
 }
 
-func DeserializeList[I Ason, R ast.Node](pass *dePass, inputList []I, deFn DeFn[I, R]) []R {
+func DeserializeList[I Ason, R ast.Node](pass *dePass, inputList []I, deFn DeFn[I, R]) (result []R) {
 	if len(inputList) < 1 {
 		return nil
 	}
 
-	result := make([]R, len(inputList))
 	for i := 0; i < len(inputList); i++ {
-		result[i] = deFn(pass, inputList[i])
+		val := DeserializeOption(pass, inputList[i], deFn)
+
+		if *(*interface{})(unsafe.Pointer(&val)) != nil {
+			result = append(result, val)
+		}
 	}
 
 	return result
@@ -74,6 +77,10 @@ func DeserializePos(pass *dePass, input Pos) token.Pos {
 // ----------------- Comments ----------------- //
 
 func DeserializeComment(pass *dePass, input *Comment) *ast.Comment {
+	if pass.conf[SkipComments] != nil {
+		return nil
+	}
+
 	return &ast.Comment{
 		Slash: DeserializePos(pass, input.Slash),
 		Text:  input.Text,
@@ -81,6 +88,10 @@ func DeserializeComment(pass *dePass, input *Comment) *ast.Comment {
 }
 
 func DeserializeCommentGroup(pass *dePass, input *CommentGroup) *ast.CommentGroup {
+	if pass.conf[SkipComments] != nil {
+		return nil
+	}
+
 	return &ast.CommentGroup{
 		List: DeserializeList(pass, input.List, DeserializeComment),
 	}

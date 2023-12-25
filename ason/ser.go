@@ -56,14 +56,17 @@ func SerializeOption[I ast.Node, R Ason](pass *serPass, input I, serFn SerFn[I, 
 	return empty
 }
 
-func SerializeList[I ast.Node, R Ason](pass *serPass, inputList []I, serFn SerFn[I, R]) []R {
+func SerializeList[I ast.Node, R Ason](pass *serPass, inputList []I, serFn SerFn[I, R]) (result []R) {
 	if len(inputList) < 1 {
 		return nil
 	}
 
-	result := make([]R, len(inputList))
 	for i := 0; i < len(inputList); i++ {
-		result[i] = serFn(pass, inputList[i])
+		val := SerializeOption(pass, inputList[i], serFn)
+
+		if *(*interface{})(unsafe.Pointer(&val)) != nil {
+			result = append(result, val)
+		}
 	}
 
 	return result
@@ -135,7 +138,7 @@ func SerializeLoc(pass *serPass, input ast.Node) *Loc {
 // ----------------- Comments ----------------- //
 
 func SerializeComment(pass *serPass, input *ast.Comment) *Comment {
-	if pass.conf[SkipComments] == nil {
+	if pass.conf[SkipComments] != nil {
 		return nil
 	}
 
@@ -151,7 +154,7 @@ func SerializeComment(pass *serPass, input *ast.Comment) *Comment {
 }
 
 func SerializeCommentGroup(pass *serPass, input *ast.CommentGroup) *CommentGroup {
-	if pass.conf[SkipComments] == nil {
+	if pass.conf[SkipComments] != nil {
 		return nil
 	}
 
