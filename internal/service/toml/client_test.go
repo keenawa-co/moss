@@ -1,22 +1,30 @@
 package toml
 
 import (
+	"errors"
 	"fmt"
 	"testing"
 
+	"github.com/BurntSushi/toml"
 	"github.com/stretchr/testify/assert"
 )
 
-const testTomlData = `
-user = "${USER}"
-[owner]
-terminal = "${TERM}"
-`
+const (
+	testCorrectTomlData   = `user = "${USER}"`
+	testIncorrectTomlData = `user = "${MISSING_ENV_VAR}"`
+	testInvalidTomlData   = `Invalid TOML file`
+)
 
-var testEnv = map[string]string{
-	"USER": "g10z3r",
-	"TERM": "xterm-256color",
-}
+var (
+	testEnv = map[string]string{
+		"USER": "g10z3r",
+		"TERM": "xterm-256color",
+	}
+
+	testDecoderResp = map[string]interface{}{
+		"user": testEnv["USER"],
+	}
+)
 
 type mockOsWrapper struct {
 	env map[string]string
@@ -25,6 +33,55 @@ type mockOsWrapper struct {
 func (m *mockOsWrapper) LookupEnv(key string) (string, bool) {
 	value, exists := m.env[key]
 	return value, exists
+}
+
+type mockDecoderClient struct {
+	resp map[string]interface{}
+	err  error
+}
+
+func (m *mockDecoderClient) Decode(data string, v interface{}) (toml.MetaData, error) {
+	v = m.resp
+	return toml.MetaData{}, m.err
+}
+
+func TestDecode(t *testing.T) {
+	t.Run("Successful decode", func(t *testing.T) {
+		service := TomlService{
+			os: &mockOsWrapper{env: testEnv},
+			decoder: &mockDecoderClient{
+				resp: testDecoderResp,
+			},
+		}
+
+		var result map[string]interface{}
+		err := service.Decode(testCorrectTomlData, &result)
+		assert.NoError(t, err, "Decode should succeed without error")
+	})
+
+	t.Run("Interpolation error", func(t *testing.T) {
+		service := TomlService{
+			os: &mockOsWrapper{env: make(map[string]string)},
+			decoder: &mockDecoderClient{
+				resp: testDecoderResp,
+			},
+		}
+
+		err := service.Decode(testIncorrectTomlData, &map[string]interface{}{})
+		assert.Error(t, err, "Decode should fail due to missing environment variable")
+	})
+
+	t.Run("Decoding error", func(t *testing.T) {
+		service := TomlService{
+			os: &mockOsWrapper{env: testEnv},
+			decoder: &mockDecoderClient{
+				err: errors.New("decoding error"),
+			},
+		}
+
+		err := service.Decode(testInvalidTomlData, &map[string]interface{}{})
+		assert.Error(t, err, "Decode should fail due to decoding error")
+	})
 }
 
 func TestInterpolate(t *testing.T) {
