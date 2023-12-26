@@ -2,20 +2,30 @@
     "cSpell.words": [
         "Arity",
         "ason",
+        "CASECLAUSE",
+        "COMMCLAUSE",
         "Elts",
         "fobj",
         "fset",
         "goray",
         "modfile",
+        "openpolicy",
+        "oscli",
         "rchr",
+        "refcache",
         "refcount",
+        "refmap",
         "rego",
+        "regoimport",
         "sema",
         "serde",
         "stretchr",
         "subdir",
         "subdirs",
+        "syswrap",
         "testcode",
-        "rayfile"
+        "testmain",
+        "Typeflag",
+        "TYPESWITCH"
     ]
 }
