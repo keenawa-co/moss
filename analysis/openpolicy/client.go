@@ -1,14 +1,5 @@
 package openpolicy
 
-import (
-	"strings"
-)
-
-const (
-	regoFileExt    = ".rego"
-	localImportSuf = "data."
-)
-
 // type sysWrapper interface {
 // 	ReadFile(name string) ([]byte, error)
 // 	Walk(root string, fn filepath.WalkFunc) error
@@ -16,14 +7,14 @@ const (
 
 // type LazyLoaderFn = func() (*Module, error)
 
-type RegoClient struct {
-	// cache  map[string]*Module      // paths to already processed files
-	// lazy   map[string]LazyLoaderFn // rego import -> loader func
-	// system sysWrapper              // OS client
+// type RegoClient struct {
+// 	// cache  map[string]*Module      // paths to already processed files
+// 	// lazy   map[string]LazyLoaderFn // rego import -> loader func
+// 	// system sysWrapper              // OS client
 
-}
+// }
 
-type regoCliOptFn func(*RegoClient)
+// type regoCliOptFn func(*RegoClient)
 
 // func NewRegoClient(pathToStd string, options ...regoCliOptFn) (client *RegoClient, err error) {
 // 	client = &RegoClient{
@@ -59,6 +50,6 @@ type regoCliOptFn func(*RegoClient)
 // 	return lazy, err
 // }
 
-func formatPath(path string) string {
-	return strings.ReplaceAll(path, "/", ".")
-}
+// func formatPath(path string) string {
+// 	return strings.ReplaceAll(path, "/", ".")
+// }
