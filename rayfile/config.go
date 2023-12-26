@@ -1,4 +1,4 @@
-package config
+package rayfile
 
 import (
 	"fmt"
@@ -8,6 +8,9 @@ import (
 
 	"github.com/BurntSushi/toml"
 )
+
+// ToDos:
+// Implement Validate function
 
 type LookupFn func(key string) (string, bool)
 
@@ -37,8 +40,8 @@ func NewConfig(options ...ConfOptFn) *Config {
 			Version:    defaultVersion,
 			RootDir:    defaultRoot,
 			PolicyDir:  defaultPolicies,
-			IgnoreList: defaultIgnoredList,
 			GoArch:     defaultGoArch,
+			IgnoreList: defaultIgnoreList,
 		},
 	}
 
@@ -58,12 +61,6 @@ func WithRootDir(dirPath string) ConfOptFn {
 func WithPolicyDir(dirPath string) ConfOptFn {
 	return func(c *Config) {
 		c.Workspace.PolicyDir = dirPath
-	}
-}
-
-func WithIgnoreList(ignoreList []string) ConfOptFn {
-	return func(c *Config) {
-		c.Workspace.IgnoreList = ignoreList
 	}
 }
 
@@ -88,7 +85,7 @@ type ReadConf struct {
 	interpolate func(lookup LookupFn, strWithEnvs string) (string, error)
 }
 
-func NewFromFileOpt(options ...ConfReadFileOptFn) *ReadConf {
+func NewFromFile(options ...ConfReadFileOptFn) *ReadConf {
 	readConf := &ReadConf{
 		lookup:      os.LookupEnv,
 		readFile:    os.ReadFile,
@@ -104,7 +101,7 @@ func NewFromFileOpt(options ...ConfReadFileOptFn) *ReadConf {
 }
 
 func NewConfigFromFile(filePath string, options ...ConfReadFileOptFn) (*Config, error) {
-	readConf := NewFromFileOpt(options...)
+	readConf := NewFromFile(options...)
 
 	conf := NewConfig()
 
@@ -126,16 +123,6 @@ func NewConfigFromFile(filePath string, options ...ConfReadFileOptFn) (*Config, 
 }
 
 func (cfg *Config) Validate() error {
-	// if cfg.Version == defaultVersion {
-	// 	return errors.New("version field must be set")
-	// }
-
-	// if _, versionAvailable := availableVersions[cfg.Version]; !versionAvailable {
-	// 	return errors.New("specified version is not available")
-	// }
-
-	// ToDo: implement validate function
-
 	return nil
 }
 
@@ -150,7 +137,7 @@ var (
 func interpolate(lookup LookupFn, strWithEnvs string) (string, error) {
 	missingVariables := make([]string, 0)
 	resultStr := envVarPattern.ReplaceAllStringFunc(strWithEnvs, func(match string) string {
-		envKey := match[2 : len(match)-1]
+		envKey := strings.Clone(match[2 : len(match)-1])
 		if value, exists := lookup(envKey); exists {
 			return value
 		}

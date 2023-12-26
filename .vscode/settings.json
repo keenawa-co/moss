@@ -15,6 +15,7 @@
         "stretchr",
         "subdir",
         "subdirs",
-        "testcode"
+        "testcode",
+        "rayfile"
     ]
 }

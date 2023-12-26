@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/4rchr4y/goray/config"
+	"github.com/4rchr4y/goray/rayfile"
 	"github.com/spf13/cobra"
 )
 
@@ -21,12 +21,8 @@ func init() {
 
 func runCfgCmd(cmd *cobra.Command, args []string) {
 	const filepath = "./testdata/test_cfg.toml"
-	// conf := config.New(
-	// 	config.WithRootDir("./testdata"),
-	// 	config.WithRootDir("./testdata"),
-	// )
 
-	conf, err := config.NewConfigFromFile(filepath)
+	conf, err := rayfile.NewConfigFromFile(filepath)
 	if err != nil {
 		log.Fatalf(err.Error())
 	}

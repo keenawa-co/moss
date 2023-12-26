@@ -2,7 +2,7 @@
 version = "1.0.193"
 root= "."
 policies="./policy"
-ignore-list=[".git", ".docker"]
+ignore-list={".git"=, ".docker"=}
 go-arch="HOME: ${HOME}"
 
 [analysis]
