@@ -7,28 +7,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-// func TestTree(t *testing.T) {
-// 	tree := NewTree[string]()
-
-// 	tree.Store([]byte("home"), "Policy 1 Data")
-// 	tree.Store([]byte("opa/lib/go/ast/types.go"), "Types Data")
-// 	tree.Store([]byte("opa/lib/go/ast/tokens.go"), "Tokens Data")
-// 	tree.Store([]byte("opa/lib/go/ast/kinds.go"), "Kinds Data")
-// 	tree.Store([]byte("opa/policy/r1.go"), "Policy 1 Data")
-// 	tree.Store([]byte("opa/policy/r2.go"), "Policy 1 Data")
-
-// 	// js, _ := json.Marshal(tree)
-
-// 	// fmt.Println(string(js))
-
-// 	data, found := tree.LoadPrefix([]byte("opa/lib/go/ast"))
-// 	fmt.Println(found)
-// 	for _, v := range data {
-// 		fmt.Println(string(v.Key))
-// 	}
-// 	t.Fail()
-// }
-
 func TestStore(t *testing.T) {
 	t.Run("Adding a new key to the tree", func(t *testing.T) {
 		tree := NewTree[string]()

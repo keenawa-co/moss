@@ -49,23 +49,6 @@ var policies = []*config.PolicyDef{
 	// },
 }
 
-// func ProcessPolicyDef(policyDef *config.PolicyDef) (*openpolicy.Policy, error) {
-// 	content, err := os.ReadFile(policyDef.Path)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-
-// 	regoFile, err := openpolicy.NewRegoFile(policyDef.Path, content)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-
-// 	return &openpolicy.Policy{
-// 		Targets: policyDef.Target,
-// 		File:    regoFile,
-// 	}, nil
-// }
-
 func runRootCmd(cmd *cobra.Command, args []string) {
 	loader := openpolicy.NewLoader(new(syswrap.FsClient))
 	machine := openpolicy.NewMachine(loader)
@@ -97,18 +80,15 @@ func runRootCmd(cmd *cobra.Command, args []string) {
 
 	compilers, err := machine.Compile()
 
+	for _, v := range compilers[0].Modules {
+		fmt.Println(v.Package)
+	}
+
 	fileMap, err := tmpGetFileAstAsMap("testdata/main.go")
 	if err != nil {
 		log.Fatal(err)
 		return
 	}
-
-	fmt.Println()
-	// for _, v := range compilers[0].Modules {
-	// 	fmt.Println(v.Package)
-	// }
-
-	// fmt.Println(compilers[0].Modules)
 
 	var buf bytes.Buffer
 	r := rego.New(
@@ -124,8 +104,6 @@ func runRootCmd(cmd *cobra.Command, args []string) {
 		log.Fatal(err)
 		return
 	}
-
-	fmt.Println()
 
 	for _, result := range rs {
 		for _, r := range result.Expressions {

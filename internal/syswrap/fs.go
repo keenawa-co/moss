@@ -4,6 +4,7 @@ import (
 	"archive/tar"
 	"compress/gzip"
 	"io"
+	"io/fs"
 	"os"
 	"path/filepath"
 )
@@ -32,4 +33,8 @@ func (FsClient) ReadAll(reader io.Reader) ([]byte, error) {
 
 func (FsClient) Walk(root string, fn filepath.WalkFunc) error {
 	return filepath.Walk(root, fn)
+}
+
+func (FsClient) Stat(name string) (fs.FileInfo, error) {
+	return os.Stat(name)
 }

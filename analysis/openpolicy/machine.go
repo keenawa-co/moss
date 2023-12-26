@@ -7,6 +7,7 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/4rchr4y/goray/pkg/radix"
 	"github.com/open-policy-agent/opa/ast"
 )
 
@@ -41,70 +42,59 @@ func (ms *metaSet) saveVendor(groupHash, vendor string) {
 	ms.set[groupHash][vendor] = struct{}{}
 }
 
-// type Registry struct {
-// 	ibp   *radix.Tree[int] // index by path
-// 	ibi   *radix.Tree[int] // index by import
-// 	store []*RegoFile
-// }
-
 type registry struct {
-	IndexByPath    map[string]int
-	IndexByPackage map[string]int
-	Bucket         []*RegoFile
+	idxByPath    *radix.Tree[int]
+	idxByPackage *radix.Tree[int]
+	store        []*RegoFile
 }
 
-func (r *registry) store(file *RegoFile) {
-	r.IndexByPath[file.Path] = len(r.Bucket)
-	r.IndexByPackage[file.Parsed.Package.Path.String()] = len(r.Bucket)
-
-	r.Bucket = append(r.Bucket, file)
+func (r *registry) insert(file *RegoFile) {
+	r.idxByPath.Store([]byte(file.Path), len(r.store))
+	r.idxByPackage.Store([]byte(file.Parsed.Package.Path.String()), len(r.store))
+	r.store = append(r.store, file)
 }
 
-func (r *registry) load(key string) (*RegoFile, bool) {
-
+func (r *registry) load(key string) ([]*RegoFile, bool) {
 	if strings.Contains(key, "/") {
-		index, exists := r.IndexByPath[key]
+		idxList, exists := r.idxByPath.LoadPrefix([]byte(key))
 		if !exists {
 			return nil, false
 		}
 
-		fmt.Println(key, "|", r.Bucket[index].Path)
-		// js, _ := json.Marshal(r)
-		// fmt.Println(string(js))
-		// fmt.Println()
-		// fmt.Println()
+		result := make([]*RegoFile, len(idxList))
+		for idx := range idxList {
+			result[idx] = r.store[idxList[idx].Value]
+		}
 
-		return r.Bucket[index], true
+		return result, true
 	}
 
 	if strings.Contains(key, ".") {
-		index, exists := r.IndexByPackage[key]
+		idxList, exists := r.idxByPackage.LoadPrefix([]byte(key))
 		if !exists {
 			return nil, false
 		}
+		result := make([]*RegoFile, len(idxList))
+		for idx := range idxList {
+			result[idx] = r.store[idxList[idx].Value]
+		}
 
-		fmt.Println(key, "|", r.Bucket[index].Path)
-		// js, _ := json.Marshal(r)
-		// fmt.Println(string(js))
-		// fmt.Println()
-		// fmt.Println()
-
-		return r.Bucket[index], true
+		return result, true
 	}
 
-	return nil, false
-}
-
-type Compiler interface {
-	Compile(map[string]*ast.Module) (Compiler, error)
+	return nil, true
 }
 
 func newRegistry() *registry {
 	return &registry{
-		IndexByPath:    make(map[string]int),
-		IndexByPackage: make(map[string]int),
-		Bucket:         make([]*RegoFile, 0),
+		idxByPath:    radix.NewTree[int](),
+		idxByPackage: radix.NewTree[int](),
+		store:        make([]*RegoFile, 0),
 	}
+}
+
+type Compiler interface {
+	Compile(map[string]*ast.Module) (Compiler, error)
 }
 
 type Machine struct {
@@ -140,14 +130,18 @@ func (m *Machine) Compile() ([]*ast.Compiler, error) {
 }
 
 func (m *Machine) compileGroup(compiler *compiler, group map[string]struct{}) (*compiler, error) {
-	files := make(map[string]*ast.Module, len(group))
+	modules := make(map[string]*ast.Module, len(group))
 
 	for k := range group {
-		file, _ := m.registry.load(k)
-		files[k] = file.Parsed
+		files, _ := m.registry.load(k)
+
+		for _, f := range files {
+			modules[k] = f.Parsed
+		}
+
 	}
 
-	c, err := compiler.Compile(files)
+	c, err := compiler.Compile(modules)
 	if err != nil {
 		return nil, err
 	}
@@ -156,11 +150,14 @@ func (m *Machine) compileGroup(compiler *compiler, group map[string]struct{}) (*
 }
 
 func (m *Machine) RegisterPolicy(p *Policy) error {
-	tgh := hash(p.Targets)   // creating target group hash
-	m.registry.store(p.File) // file registration
+	tgh := hash(p.Targets)    // creating target group hash
+	m.registry.insert(p.File) // file registration
 	m.meta.saveVendor(tgh, p.File.Path)
 
+	fmt.Println(p.Vendors)
+
 	for i := range p.Vendors {
+
 		if exists := m.meta.hasVendor(tgh, p.Vendors[i]); exists {
 			continue
 		}
@@ -170,23 +167,44 @@ func (m *Machine) RegisterPolicy(p *Policy) error {
 			continue
 		}
 
-		file, err := m.loader.LoadRegoFile(p.Vendors[i])
+		info, err := m.loader.fs.Stat(p.Vendors[i])
 		if err != nil {
 			return err
 		}
 
-		m.registry.store(file)
-		m.meta.saveVendor(tgh, p.Vendors[i])
+		if !info.IsDir() {
+			file, err := m.loader.LoadRegoFile(p.Vendors[i])
+			if err != nil {
+				return err
+			}
+
+			m.registry.insert(file)
+			m.meta.saveVendor(tgh, p.Vendors[i])
+
+			continue
+		}
+
+		files, err := m.loader.LoadDir(p.Vendors[i])
+		if err != nil {
+			return err
+		}
+
+		for f := range files {
+			m.registry.insert(files[f])
+			m.meta.saveVendor(tgh, files[f].Path)
+		}
 	}
 
 	for _, i := range p.File.Parsed.Imports {
-
-		file, exists := m.registry.load(i.Path.String())
+		files, exists := m.registry.load(i.Path.String())
 		if !exists {
 			return fmt.Errorf("import %s is undefined", i.Path.String())
 		}
 
-		m.meta.saveVendor(tgh, file.Path)
+		for _, f := range files {
+			m.meta.saveVendor(tgh, f.Path)
+		}
+
 	}
 
 	return nil
@@ -198,7 +216,7 @@ func (m *Machine) RegisterBundle(b *Bundle) {
 			continue
 		}
 
-		m.registry.store(b.Files[i])
+		m.registry.insert(b.Files[i])
 	}
 }
 

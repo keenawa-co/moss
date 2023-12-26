@@ -5,6 +5,7 @@ import (
 	"compress/gzip"
 	"fmt"
 	"io"
+	"io/fs"
 	"os"
 	"path/filepath"
 	"strings"
@@ -33,6 +34,7 @@ type fsWrapper interface {
 	TarReader(reader io.Reader) *tar.Reader
 	ReadFile(name string) ([]byte, error)
 	ReadAll(reader io.Reader) ([]byte, error)
+	Stat(name string) (fs.FileInfo, error)
 }
 
 type Loader struct {
@@ -43,6 +45,32 @@ func NewLoader(fs fsWrapper) *Loader {
 	return &Loader{
 		fs: fs,
 	}
+}
+
+func (loader *Loader) LoadDir(root string) ([]*RegoFile, error) {
+	result := make([]*RegoFile, 0)
+	walker := func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return fmt.Errorf("error accessing path %q: %v", path, err)
+		}
+
+		if !info.IsDir() && strings.HasSuffix(info.Name(), ".rego") {
+			f, err := loader.LoadRegoFile(path)
+			if err != nil {
+				return err
+			}
+
+			result = append(result, f)
+		}
+
+		return nil
+	}
+
+	if err := filepath.Walk(root, walker); err != nil {
+		return nil, err
+	}
+
+	return result, nil
 }
 
 func (loader *Loader) LoadRegoFile(path string) (*RegoFile, error) {
