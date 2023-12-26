@@ -87,57 +87,120 @@ func (t *Tree[T]) Store(key []byte, value T) (old T, updated bool) {
 	}
 }
 
+func (t *Tree[V]) Load(key []byte) (value V, found bool) {
+	n := t.Root
+	search := key
+
+	for n != nil {
+		if len(search) == 0 {
+			if n.isLeaf() {
+				return n.Leaf.Value, true // Return immediately if a leaf node is found.
+			}
+
+			return // key is exhausted but not a leaf node.
+		}
+
+		n = n.getEdge(search[0])
+		if n == nil {
+			return // no further edge is found.
+		}
+
+		if !bytes.HasPrefix(search, n.Prefix) {
+			return // current node's prefix does not match.
+		}
+
+		search = bytes.Clone(search[len(n.Prefix):]) // proceed with the remaining part of the key.
+	}
+	return
+}
+
+func (t *Tree[T]) LoadPrefix(prefix []byte) ([]*Leaf[T], bool) {
+	n := t.Root
+	search := prefix
+
+	for len(search) > 0 {
+		if n == nil {
+			return nil, false
+		}
+
+		// getting the next node by label
+		n = n.getEdge(search[0])
+		if n == nil {
+			return nil, false
+		}
+
+		// node prefix matches the one we are looking for, continue the search inside this node
+		if bytes.HasPrefix(search, n.Prefix) {
+			search = bytes.Clone(search[len(n.Prefix):])
+			continue
+		}
+
+		// the searched prefix coincides with the beginning of the node prefix
+		if bytes.HasPrefix(n.Prefix, search) {
+			break
+		}
+
+		return nil, false
+	}
+
+	walker := func(key []byte, value T) bool { return bytes.HasPrefix(key, prefix) }
+	leaves := collectLeaves(n, walker)
+
+	if len(leaves) > 0 {
+		return leaves, true
+	}
+
+	return nil, false
+}
+
+// Delete removes a key from the tree and returns the deleted
+// value and a boolean indicating successful deletion
 func (t *Tree[T]) Delete(key []byte) (value T, deleted bool) {
 	var parent *Node[T]
 	var label byte
 	n := t.Root
+	search := key
 
-	for {
-		if len(key) == 0 {
-			if !n.isLeaf() {
-				// node is not a leaf, the key was not found
-				return value, false
-			}
-
-			// delete a leaf
-			value = n.Leaf.Value
-			n.Leaf = nil
-			t.Size--
-			deleted = true
-			break
+	// traverse down the tree to find the node matching the key
+	for len(search) > 0 {
+		if n == nil {
+			return value, false // node not found
 		}
 
 		parent = n
-		label = key[0]
-		n = n.getEdge(label)
+		label = search[0]
+		n = n.getEdge(label) // get the next node based on the edge label
 		if n == nil {
-			// edge for next key byte not found
-			return value, false
+			return value, false // edge not found
 		}
 
-		if bytes.HasPrefix(key, n.Prefix) {
-			key = key[len(n.Prefix):]
-		} else {
-			// node prefix does not match key
-			return value, false
+		if !bytes.HasPrefix(search, n.Prefix) {
+			return value, false // prefix doesn't match
 		}
+
+		search = bytes.Clone(search[len(n.Prefix):]) // update the search term
 	}
 
-	if deleted {
-		// deleting an edge from its parent if the node has no more children
-		if parent != nil && len(n.Edges) == 0 {
-			parent.delEdge(label)
-		}
+	if !n.isLeaf() {
+		return value, false // node is not a leaf, can't delete non-leaf nodes
+	}
 
-		// merge nodes if the node has one child left
-		if n != t.Root && len(n.Edges) == 1 {
-			n.mergeChild()
-		}
+	// perform deletion
+	value = n.Leaf.Value
+	n.Leaf = nil
+	t.Size--
+	deleted = true
 
-		// merge a parent node if it is not the root and has one child left
-		if parent != nil && parent != t.Root && len(parent.Edges) == 1 && !parent.isLeaf() {
-			parent.mergeChild()
-		}
+	if parent != nil && len(n.Edges) == 0 {
+		parent.delEdge(label) // remove the edge from the parent if the current node has no more children
+	}
+
+	if n != t.Root && len(n.Edges) == 1 {
+		n.mergeChild() // merge the node with its single child
+	}
+
+	if parent != nil && parent != t.Root && len(parent.Edges) == 1 && !parent.isLeaf() {
+		parent.mergeChild() // merge the parent with its single child
 	}
 
 	return value, deleted
@@ -149,69 +212,46 @@ func (t *Tree[T]) DeletePrefix(prefix []byte) int {
 
 func (t *Tree[T]) deletePrefix(parent, node *Node[T], prefix []byte) int {
 	if len(prefix) == 0 {
-		subTreeSize := 0
-
-		recursiveWalk(node, func(s []byte, v T) bool {
-			subTreeSize++
-			return false
-		})
-		if node.isLeaf() {
-			node.Leaf = nil
-		}
-		node.Edges = nil
-
-		if parent != nil && parent != t.Root && len(parent.Edges) == 1 && !parent.isLeaf() {
-			parent.mergeChild()
-		}
-		t.Size -= subTreeSize
-		return subTreeSize
+		return t.handleFullPrefixDeletion(node, parent)
 	}
 
 	label := prefix[0]
-	child := node.getEdge(label)
+	child := node.getEdge(label) // retrieve next node in the path
 	if child == nil || (!bytes.HasPrefix(child.Prefix, prefix) && !bytes.HasPrefix(prefix, child.Prefix)) {
-		return 0
+		return 0 // no matching child is found
 	}
 
+	// adjust the prefix for deeper recursion based on the matched child node's prefix
 	if len(child.Prefix) > len(prefix) {
 		prefix = prefix[len(prefix):]
 	} else {
 		prefix = prefix[len(child.Prefix):]
 	}
-	return t.deletePrefix(node, child, prefix)
+	return t.deletePrefix(node, child, prefix) // recursive call to continue deletion process
 }
 
-func (n *Node[T]) mergeChild() {
-	e := n.Edges[0]
-	child := e.Node
-	n.Prefix = append(n.Prefix, child.Prefix...)
-	n.Leaf = child.Leaf
-	n.Edges = child.Edges
-}
+func (t *Tree[T]) handleFullPrefixDeletion(node, parent *Node[T]) int {
+	counter := 0 // number of nodes to be deleted
 
-func (t *Tree[V]) Load(key []byte) (value V, found bool) {
-	n := t.Root
+	// walk the subtree to count and delete nodes
+	recursiveWalk(node, func(s []byte, v T) bool {
+		counter++
+		return false
+	})
 
-	for {
-		if len(key) == 0 {
-			if n.isLeaf() {
-				return n.Leaf.Value, true
-			}
-			break
-		}
-
-		n = n.getEdge(key[0])
-		if n == nil {
-			break
-		}
-
-		if bytes.HasPrefix(key, n.Prefix) {
-			key = key[len(n.Prefix):]
-		} else {
-			break
-		}
+	// clear the current node's data and links
+	if node.isLeaf() {
+		node.Leaf = nil
 	}
-	return value, found
+
+	node.Edges = nil
+
+	// merge parent's child node if certain conditions are met
+	if parent != nil && parent != t.Root && len(parent.Edges) == 1 && !parent.isLeaf() {
+		parent.mergeChild()
+	}
+	t.Size -= counter // update tree size.
+	return counter
 }
 
 func (t *Tree[T]) Minimum() (*Node[T], bool) {
@@ -276,6 +316,7 @@ func (t *Tree[T]) WalkPrefix(prefix []byte, fn WalkFn[T]) {
 func (t *Tree[T]) WalkPath(path []byte, fn WalkFn[T]) {
 	n := t.Root
 	search := path
+
 	for {
 		if n.Leaf != nil && fn(n.Leaf.Key, n.Leaf.Value) {
 			return
@@ -335,10 +376,10 @@ func recursiveWalk[T any](node *Node[T], fn WalkFn[T]) bool {
 		return true
 	}
 
-	i := 0
-	k := len(node.Edges)
+	i, k := 0, len(node.Edges)
 	for i < k {
 		e := node.Edges[i]
+
 		if recursiveWalk[T](e.Node, fn) {
 			return true
 		}
@@ -350,9 +391,24 @@ func recursiveWalk[T any](node *Node[T], fn WalkFn[T]) bool {
 		if len(node.Edges) >= k {
 			i++
 		}
+
 		k = len(node.Edges)
 	}
 	return false
+}
+
+func collectLeaves[T any](node *Node[T], walk WalkFn[T]) []*Leaf[T] {
+	var leaves []*Leaf[T]
+
+	if node.Leaf != nil && walk(node.Leaf.Key, node.Leaf.Value) {
+		leaves = append(leaves, node.Leaf)
+	}
+
+	for _, e := range node.Edges {
+		leaves = append(leaves, collectLeaves(e.Node, walk)...)
+	}
+
+	return leaves
 }
 
 func longestPrefix(k1, k2 []byte) int {
@@ -360,6 +416,7 @@ func longestPrefix(k1, k2 []byte) int {
 	if l := len(k2); l < max {
 		max = l
 	}
+
 	var i int
 	for i = 0; i < max; i++ {
 		if k1[i] != k2[i] {

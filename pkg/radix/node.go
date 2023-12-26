@@ -116,3 +116,11 @@ func (n *Node[T]) delEdge(label byte) {
 		n.Edges = n.Edges[:len(n.Edges)-1]
 	}
 }
+
+func (n *Node[T]) mergeChild() {
+	e := n.Edges[0]
+	child := e.Node
+	n.Prefix = append(n.Prefix, child.Prefix...)
+	n.Leaf = child.Leaf
+	n.Edges = child.Edges
+}
