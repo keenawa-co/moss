@@ -55,19 +55,13 @@ func NewBloomFilter(size uint64) BloomFilter {
 	}
 }
 
-type FilterConfig struct {
-	_                        [0]int
-	ExpectedItemCount        uint64
-	DesiredFalsePositiveRate float64
-}
-
-func CalcFilterParams(n uint64, p float64) (uint64, int) {
-	if n == 0 || p <= 0 || p >= 1 {
+func CalcFilterParams(expectedItemCount uint64, desiredFalsePositivity float64) (uint64, int) {
+	if expectedItemCount == 0 || desiredFalsePositivity <= 0 || desiredFalsePositivity >= 1 {
 		return 0, 0
 	}
 
-	m := uint64(-float64(n) * math.Log(p) / math.Pow(math.Log(2), 2))
-	k := int(math.Round(math.Log(2) * float64(m) / float64(n)))
+	m := uint64(-float64(expectedItemCount) * math.Log(desiredFalsePositivity) / math.Pow(math.Log(2), 2))
+	k := int(math.Round(math.Log(2) * float64(m) / float64(expectedItemCount)))
 
 	// Round up m to the nearest multiple of 64 using bitwise operation
 	remainder := m % 64
