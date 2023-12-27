@@ -2,15 +2,18 @@
     "cSpell.words": [
         "Arity",
         "ason",
+        "bfilter",
         "CASECLAUSE",
         "COMMCLAUSE",
         "Elts",
         "fobj",
         "fset",
+        "ghash",
         "goray",
         "modfile",
         "openpolicy",
         "oscli",
+        "rayfile",
         "rchr",
         "refcache",
         "refcount",
@@ -25,6 +28,7 @@
         "syswrap",
         "testcode",
         "testmain",
+        "tgroups",
         "Typeflag",
         "TYPESWITCH"
     ]
