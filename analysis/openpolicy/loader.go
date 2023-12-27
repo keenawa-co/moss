@@ -14,15 +14,6 @@ import (
 	"github.com/open-policy-agent/opa/ast"
 )
 
-type RegoFile struct {
-	Path   string
-	Parsed *ast.Module
-}
-
-func (rf *RegoFile) Hash() string {
-	return hash([]string{rf.Path, rf.Parsed.Package.String()})
-}
-
 type Bundle struct {
 	Name  string
 	Files []*RegoFile

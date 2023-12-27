@@ -46,26 +46,26 @@ type Compiler interface {
 }
 
 type Machine struct {
-	loader   *Loader
-	meta     *metaSet
+	loader *Loader
+	// meta   *metaSet
+	groups   map[string][]*Policy
 	registry *registry
-	cgroup   map[string]Compiler
 }
 
-func NewMachine(loader *Loader) *Machine {
+func NewMachine(loader *Loader, numberOfPolicies int) *Machine {
 	return &Machine{
-		loader:   loader,
-		meta:     newMetaSet(),
-		registry: newRegistry(),
-		cgroup:   make(map[string]Compiler),
+		loader: loader,
+		// meta:     newMetaSet(),
+		registry: newRegistry(numberOfPolicies),
+		groups:   make(map[string][]*Policy),
 	}
 }
 
 // compFn compileFn, options ...compileOptFn
 func (m *Machine) Compile() ([]*ast.Compiler, error) {
-	r := make([]*ast.Compiler, 0, len(m.meta.set))
+	r := make([]*ast.Compiler, 0, len(m.groups))
 
-	for _, v := range m.meta.set {
+	for _, v := range m.groups {
 		c, err := m.compileGroup(NewCompiler(), v)
 		if err != nil {
 			return nil, err
@@ -77,14 +77,15 @@ func (m *Machine) Compile() ([]*ast.Compiler, error) {
 	return r, nil
 }
 
-func (m *Machine) compileGroup(compiler *compiler, group map[string]struct{}) (*compiler, error) {
+func (m *Machine) compileGroup(compiler *compiler, group []*Policy) (*compiler, error) {
 	modules := make(map[string]*ast.Module, len(group))
 
-	for k := range group {
-		files, _ := m.registry.load(k)
+	for i := range group {
+		modules[group[i].File.Path] = group[i].File.Parsed
+		// files, _ := m.registry.loadRegoFileSet(k)
 
-		for _, f := range files {
-			modules[k] = f.Parsed
+		for _, v := range group[i].Vendors {
+			modules[v.Path] = v.Parsed
 		}
 
 	}
@@ -97,78 +98,79 @@ func (m *Machine) compileGroup(compiler *compiler, group map[string]struct{}) (*
 	return c, nil
 }
 
-func (m *Machine) RegisterPolicy(p *Policy) error {
-	tgh := hash(p.Targets)    // creating target group hash
-	m.registry.insert(p.File) // file registration
-	m.meta.saveVendor(tgh, p.File.Path)
+func (m *Machine) RegisterPolicy(pd *PolicyDescription) error {
+	policy, exists, err := m.registry.loadPolicy(pd.File.Path)
+	if err != nil {
+		return err
+	}
+	if exists {
+		// TODO
+		return nil
+	}
 
-	fmt.Println(p.Vendors)
+	policy = &Policy{
+		File:    pd.File,
+		Vendors: make([]*RegoFile, 0),
+		Targets: &TargetGroup{
+			Hash: sortAndHash(pd.Targets),
+		},
+	}
 
-	for i := range p.Vendors {
-
-		if exists := m.meta.hasVendor(tgh, p.Vendors[i]); exists {
+	for i := range pd.Vendors {
+		files, exists := m.registry.loadRegoFileSet(pd.Vendors[i].Path)
+		if exists {
+			policy.Vendors = append(policy.Vendors, files...)
 			continue
 		}
 
-		if _, exists := m.registry.load(p.Vendors[i]); exists {
-			m.meta.saveVendor(tgh, p.Vendors[i])
-			continue
-		}
+		// if there is nothing in the registry, then the dependency
+		// needs to be loaded
 
-		info, err := m.loader.fs.Stat(p.Vendors[i])
-		if err != nil {
-			return err
-		}
-
-		if !info.IsDir() {
-			file, err := m.loader.LoadRegoFile(p.Vendors[i])
+		if !pd.Vendors[i].IsDir() {
+			file, err := m.loader.LoadRegoFile(pd.Vendors[i].Path)
 			if err != nil {
 				return err
 			}
 
-			m.registry.insert(file)
-			m.meta.saveVendor(tgh, p.Vendors[i])
-
+			policy.Vendors = append(policy.Vendors, file)
+			m.registry.insertRegoFile(file)
 			continue
 		}
 
-		files, err := m.loader.LoadDir(p.Vendors[i])
+		files, err := m.loader.LoadDir(pd.Vendors[i].Path)
 		if err != nil {
 			return err
 		}
 
-		for f := range files {
-			m.registry.insert(files[f])
-			m.meta.saveVendor(tgh, files[f].Path)
-		}
+		policy.Vendors = append(policy.Vendors, files...)
+		m.registry.insertRegoFile(files...)
 	}
 
-	for _, i := range p.File.Parsed.Imports {
-		files, exists := m.registry.load(i.Path.String())
+	for _, i := range pd.File.Parsed.Imports {
+		files, exists := m.registry.loadRegoFileSet(i.Path.String())
 		if !exists {
 			return fmt.Errorf("import %s is undefined", i.Path.String())
 		}
 
-		for _, f := range files {
-			m.meta.saveVendor(tgh, f.Path)
-		}
-
+		policy.Vendors = append(policy.Vendors, files...)
 	}
+
+	m.groups[policy.Targets.Hash] = append(m.groups[policy.Targets.Hash], policy)
 
 	return nil
 }
 
 func (m *Machine) RegisterBundle(b *Bundle) {
 	for i := range b.Files {
-		if _, exists := m.registry.load(b.Files[i].Path); exists {
+		if _, exists := m.registry.loadRegoFileSet(b.Files[i].Path); exists {
 			continue
 		}
 
-		m.registry.insert(b.Files[i])
+		m.registry.insertRegoFile(b.Files[i])
 	}
 }
 
-func hash(data []string) string {
+func sortAndHash(data []string) string {
 	sort.Strings(data)
 	concatenated := strings.Join(data, "")
 	hash := sha256.Sum256([]byte(concatenated))

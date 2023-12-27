@@ -11,8 +11,8 @@ import (
 
 	"github.com/4rchr4y/goray/analysis/openpolicy"
 	"github.com/4rchr4y/goray/ason"
-	"github.com/4rchr4y/goray/config"
 	"github.com/4rchr4y/goray/internal/syswrap"
+	"github.com/4rchr4y/goray/rayfile"
 	"github.com/open-policy-agent/opa/rego"
 	"github.com/open-policy-agent/opa/topdown"
 	"github.com/spf13/cobra"
@@ -35,7 +35,7 @@ type evalOutput struct {
 	Fail []*failCase `json:"fail"`
 }
 
-var policies = []*config.PolicyDef{
+var policies = []*rayfile.PolicyDef{
 	{
 		Path:    "opa/policy/r1.rego",
 		Target:  []string{"testdata/main.go"},
@@ -49,9 +49,22 @@ var policies = []*config.PolicyDef{
 	// },
 }
 
+func mapIncludeToVendorDesc(includes []string) []*openpolicy.VendorDescription {
+	result := make([]*openpolicy.VendorDescription, len(includes))
+
+	for i := range includes {
+		result[i] = &openpolicy.VendorDescription{
+			Path: includes[i],
+			Type: openpolicy.TypeRegoFile,
+		}
+	}
+
+	return result
+}
+
 func runRootCmd(cmd *cobra.Command, args []string) {
 	loader := openpolicy.NewLoader(new(syswrap.FsClient))
-	machine := openpolicy.NewMachine(loader)
+	machine := openpolicy.NewMachine(loader, len(policies))
 
 	b, err := loader.LoadBundle("bundle.tar.gz")
 	if err != nil {
@@ -68,10 +81,10 @@ func runRootCmd(cmd *cobra.Command, args []string) {
 			return
 		}
 
-		if err := machine.RegisterPolicy(&openpolicy.Policy{
+		if err := machine.RegisterPolicy(&openpolicy.PolicyDescription{
 			File:    file,
 			Targets: policies[i].Target,
-			Vendors: policies[i].Include,
+			Vendors: mapIncludeToVendorDesc(policies[i].Include),
 		}); err != nil {
 			log.Fatal(err)
 			return

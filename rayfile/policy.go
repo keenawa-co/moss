@@ -1,4 +1,4 @@
-package config
+package rayfile
 
 type Def interface{}
 
