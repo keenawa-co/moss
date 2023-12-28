@@ -5,6 +5,7 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/4rchr4y/goray/internal/syswrap"
 	"github.com/BurntSushi/toml"
 )
 
@@ -19,6 +20,13 @@ type decoderClient interface {
 type TomlService struct {
 	os      osWrapper
 	decoder decoderClient
+}
+
+func NewTomlService() *TomlService {
+	return &TomlService{
+		os:      new(syswrap.OsClient),
+		decoder: new(Decoder),
+	}
 }
 
 const envVarString = `\$\{[A-Za-z_][A-Za-z0-9_]*\}`
