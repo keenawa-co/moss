@@ -9,7 +9,7 @@ import (
 	"github.com/BurntSushi/toml"
 )
 
-type osWrapper interface {
+type osClient interface {
 	LookupEnv(key string) (string, bool)
 }
 
@@ -18,7 +18,7 @@ type decoderClient interface {
 }
 
 type TomlService struct {
-	os      osWrapper
+	os      osClient
 	decoder decoderClient
 }
 
