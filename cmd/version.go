@@ -8,9 +8,10 @@ import (
 
 var versionCmd = &cobra.Command{
 	Use:   "version",
-	Short: "",
-	Long:  "",
-	Run:   runVersionCmd,
+	Short: "Display the version of the application",
+	Long: `The version command is used to display the current version of the application.
+It provides the detailed version information including the major, minor, and patch numbers.`,
+	Run: runVersionCmd,
 }
 
 func init() {
