@@ -10,6 +10,9 @@ import (
 	"github.com/open-policy-agent/opa/ast"
 )
 
+// TODO
+// Use a concept os STORAGE and split compiling process and linking
+
 // Linker
 type metaSet struct {
 	set map[string]map[string]struct{}
