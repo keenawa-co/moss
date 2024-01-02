@@ -1,14 +1,10 @@
 {
     "cSpell.words": [
-        "Arity",
         "ason",
         "bfilter",
-        "CASECLAUSE",
-        "COMMCLAUSE",
         "Elts",
         "fobj",
         "fset",
-        "ghash",
         "goray",
         "modfile",
         "openpolicy",
@@ -28,7 +24,6 @@
         "syswrap",
         "testcode",
         "testmain",
-        "tgroups",
         "Typeflag",
         "TYPESWITCH"
     ]
