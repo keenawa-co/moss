@@ -5,6 +5,8 @@ import (
 
 	"reflect"
 	"strings"
+
+	"github.com/4rchr4y/goray/pkg/maps"
 )
 
 type Mode int
@@ -16,6 +18,10 @@ const (
 	// want to simplify the setting of fields that are expected to be slices but are common to
 	// have a single value, avoiding the need to manually wrap the value in a slice.
 	Autocomplete Mode = iota + 1
+)
+
+const (
+	defaultTag = "json"
 )
 
 type origin struct {
@@ -32,43 +38,61 @@ func (o *origin) isSupportedType(field *Field) bool {
 	return assignable(o.refval.Type().Elem(), reflect.TypeOf(field.Value))
 }
 
-type Builder struct {
-	value       any
-	tag         string             // e.g. 'json', 'xml', 'toml'
-	destCache   map[string]*origin // cache of paths to structure fields
-	sourceCache map[string]*origin // cache of paths in source map
-	mode        Mode
+type indexTable struct {
+	table map[string]*origin
 }
 
-func (b *Builder) updateDestCache(path, fieldName string, field reflect.Value) {
-	b.destCache[path] = &origin{
-		name:   fieldName,
-		path:   path,
-		refval: field,
+func (idx *indexTable) store(key string, value *origin) {
+	idx.table[key] = value
+}
+
+func (idx *indexTable) load(key string) (*origin, bool) {
+	value, exists := idx.table[key]
+	return value, exists
+}
+
+func newIndexTable() *indexTable {
+	return &indexTable{
+		table: make(map[string]*origin),
 	}
+}
+
+type idxTable interface {
+	store(key string, value *origin)
+	load(key string) (*origin, bool)
+}
+
+type Builder struct {
+	value any      // destination struct where data will be written
+	tag   string   // e.g. 'json', 'xml', 'toml'
+	dit   idxTable // destination index table of paths to structure fields
+	sit   idxTable // source index table of paths in source map
+	mode  Mode
 }
 
 type BuilderOptFn func(*Builder)
 
-func NewBuilder(value any, source map[string]any, options ...BuilderOptFn) (*Builder, error) {
+func NewBuilder(value any, source map[string]any, options ...BuilderOptFn) (b *Builder, err error) {
 	v := reflect.ValueOf(value).Elem()
-	b := &Builder{
-		value:       value,
-		tag:         "json",
-		destCache:   make(map[string]*origin),
-		sourceCache: make(map[string]*origin),
-		mode:        0,
+	b = &Builder{
+		value: value,
+		tag:   defaultTag,
+		dit:   newIndexTable(),
+		sit:   newIndexTable(),
+		mode:  0,
 	}
 
 	for i := range options {
 		options[i](b)
 	}
 
-	if err := b.buildSourceCache(reflect.ValueOf(source), ""); err != nil {
+	b.sit, err = sourceIndexing(reflect.ValueOf(source), "")
+	if err != nil {
 		return nil, fmt.Errorf("failed to build source cache: %v", err)
 	}
 
-	if err := b.buildDestCache(v, ""); err != nil {
+	b.dit, err = destIndexing(b.sit, v, "", b.tag)
+	if err != nil {
 		return nil, fmt.Errorf("failed to build destination cache: %v", err)
 	}
 
@@ -87,109 +111,150 @@ func WithMode(mode Mode) BuilderOptFn {
 	}
 }
 
-func (b *Builder) buildSourceCache(v reflect.Value, path string) error {
+func sourceIndexing(v reflect.Value, path string) (*indexTable, error) {
 	if v.Kind() != reflect.Map {
-		return fmt.Errorf("source value type should be a map, got %s", v.Kind().String())
+		return nil, fmt.Errorf("source value type should be a map, got %s", v.Kind().String())
+	}
+
+	sit := &indexTable{
+		table: make(map[string]*origin, len(v.MapKeys())),
 	}
 
 	for _, key := range v.MapKeys() {
 		val := v.MapIndex(key)
 
 		currentPath := buildPath(path, key.String())
-		b.processSourceValue(val, currentPath)
-
-		b.sourceCache[currentPath] = &origin{
+		sit.store(currentPath, &origin{
 			name:   key.String(),
 			path:   currentPath,
 			refval: val,
+		})
+
+		embed, err := processSourceValue(val, currentPath)
+		if err != nil {
+			return nil, err
+		}
+		if embed != nil {
+			sit.table = maps.Merge(sit.table, embed.table)
 		}
 	}
 
-	return nil
+	return sit, nil
 }
 
-func (b *Builder) processSourceValue(val reflect.Value, currentPath string) {
-	if val.Elem().Kind() == reflect.Map {
-		b.buildSourceCache(val.Elem(), currentPath)
-		return
+func processSourceValue(val reflect.Value, currentPath string) (*indexTable, error) {
+	if !val.IsValid() {
+		return nil, fmt.Errorf("invalid value provided")
 	}
 
-	if val.Elem().Kind() == reflect.Slice {
-		for i := 0; i < val.Elem().Len(); i++ {
-			elem := val.Elem().Index(i)
+	elem := val.Elem()
+	switch elem.Kind() {
+	case reflect.Map:
+		return sourceIndexing(elem, currentPath)
 
-			if elem.Kind() == reflect.Map {
-				b.buildSourceCache(elem, fmt.Sprintf("%s.[%d]", currentPath, i))
+	case reflect.Slice:
+		for i := 0; i < elem.Len(); i++ {
+			sliceElem := elem.Index(i)
+			if sliceElem.Kind() == reflect.Map {
+				indexedPath := fmt.Sprintf("%s.[%d]", currentPath, i)
+				return sourceIndexing(sliceElem, indexedPath)
 			}
 		}
+
+		return nil, nil
 	}
+
+	return nil, nil
 }
 
-func (b *Builder) buildDestCache(v reflect.Value, path string) error {
+func destIndexing(sit idxTable, v reflect.Value, path string, tag string) (*indexTable, error) {
 	v = deRefPtr(v)
 
 	if v.Kind() != reflect.Struct {
-		return fmt.Errorf("destination value type should be a struct or pointer to struct, got %s", v.Kind().String())
+		return nil, fmt.Errorf("destination value type should be a struct or pointer to struct, got %s", v.Kind().String())
+	}
+
+	dit := &indexTable{
+		table: make(map[string]*origin, v.NumField()),
 	}
 
 	for i := 0; i < v.NumField(); i++ {
 		field := v.Field(i)
 		typeField := v.Type().Field(i)
-		currentPath := buildPath(path, getFieldTag(typeField, b.tag))
+		currentPath := buildPath(path, getFieldTag(typeField, tag))
 
 		effectiveField := getEffectiveField(field)
-		b.updateDestCache(currentPath, typeField.Name, effectiveField)
-		b.processField(effectiveField, currentPath)
+		dit.store(currentPath, &origin{
+			name:   typeField.Name,
+			path:   currentPath,
+			refval: field,
+		})
+
+		embed, err := processField(sit, effectiveField, currentPath, tag)
+		if err != nil {
+			return nil, err
+		}
+		if embed != nil {
+			dit.table = maps.Merge(dit.table, embed.table)
+		}
 	}
 
-	return nil
+	return dit, nil
 }
 
-func (b *Builder) processField(field reflect.Value, currentPath string) {
+func processField(sit idxTable, field reflect.Value, currentPath string, tag string) (*indexTable, error) {
 	switch field.Kind() {
 	case reflect.Slice:
-		b.processSlice(field, currentPath)
+		return processSlice(sit, field, currentPath, tag)
 	case reflect.Struct:
-		b.buildDestCache(field, currentPath)
+		return destIndexing(sit, field, currentPath, tag)
+	default:
+		return nil, nil
 	}
 }
 
-func (b *Builder) processSlice(field reflect.Value, currentPath string) {
+func initializeSliceElement(slice reflect.Value, index int, elemType reflect.Type, isPtr bool) reflect.Value {
+	if !isPtr {
+		return reflect.New(elemType).Elem()
+	}
+
+	return reflect.New(elemType.Elem())
+}
+
+func processSlice(sit idxTable, field reflect.Value, currentPath string, tag string) (*indexTable, error) {
 	elemType := field.Type().Elem()
 	isStructPtr := elemType.Kind() == reflect.Ptr && elemType.Elem().Kind() == reflect.Struct
 
-	if elemType.Kind() == reflect.Struct || isStructPtr {
-		sce := b.sourceCache[currentPath]
-
-		if sce == nil {
-			return
-		}
-
-		for j := 0; j < sce.refval.Elem().Len(); j++ {
-			if j == 0 {
-				amount := sce.refval.Elem().Len()
-				field.Set(reflect.MakeSlice(reflect.SliceOf(elemType), amount, amount))
-			}
-
-			// working with pointers to structures in a slice
-			var elem reflect.Value
-			if isStructPtr {
-				elem = reflect.New(elemType.Elem())
-				field.Index(j).Set(elem)
-			} else {
-				elem = reflect.New(elemType).Elem()
-				field.Index(j).Set(elem)
-			}
-
-			b.buildDestCache(field.Index(j), fmt.Sprintf("%s.[%d]", currentPath, j))
-		}
+	if elemType.Kind() != reflect.Struct && !isStructPtr {
+		return nil, nil
 	}
+
+	loadedElem, ok := sit.load(currentPath)
+	if !ok {
+		return nil, nil
+	}
+
+	amount := loadedElem.refval.Elem().Len()
+	if amount == 0 {
+		return nil, nil
+	}
+
+	field.Set(reflect.MakeSlice(reflect.SliceOf(elemType), amount, amount))
+
+	for j := 0; j < loadedElem.refval.Elem().Len(); j++ {
+		elem := initializeSliceElement(field, j, elemType, isStructPtr)
+		field.Index(j).Set(elem)
+
+		return destIndexing(sit, field.Index(j), fmt.Sprintf("%s.[%d]", currentPath, j), tag)
+	}
+
+	return nil, nil
 }
 
 func (b *Builder) Handle(field *Field) {
 	path := strings.Join(field.Path, ".")
-	origin, exists := b.destCache[path]
-	if !exists {
+	origin, ok := b.dit.load(path)
+	if !ok {
 		return
 	}
 
@@ -325,7 +390,7 @@ func adjustSliceElementTypes(destIsPtrSlice bool, destElem, srcElem reflect.Valu
 }
 
 func deRefPtr(v reflect.Value) reflect.Value {
-	if v.Kind() == reflect.Ptr {
+	if v.Kind() == reflect.Ptr && !v.IsNil() {
 		return v.Elem()
 	}
 
