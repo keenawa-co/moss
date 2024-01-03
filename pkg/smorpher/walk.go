@@ -17,30 +17,38 @@ type Handler interface {
 }
 
 func Walk(h Handler, field *Field) {
-
 	val := reflect.ValueOf(field.Value)
 
 	switch val.Kind() {
-
 	case reflect.Map:
 		for _, key := range val.MapKeys() {
+			mapVal := val.MapIndex(key)
+			kind := mapVal.Kind()
+			if kind == reflect.Ptr || kind == reflect.Interface {
+				mapVal = mapVal.Elem()
+			}
+
 			Walk(h, &Field{
 				Parent: field,
-				Value:  val.MapIndex(key).Interface(),
+				Value:  mapVal.Interface(),
 				Path:   append(append([]string(nil), field.Path...), key.String()),
-				Kind:   val.MapIndex(key).Elem().Kind(),
+				Kind:   mapVal.Kind(),
 			})
 		}
-
 	case reflect.Slice, reflect.Array:
 		for i := 0; i < val.Len(); i++ {
+			sliceVal := val.Index(i)
+			kind := sliceVal.Kind()
+			if kind == reflect.Ptr || kind == reflect.Interface {
+				sliceVal = sliceVal.Elem()
+			}
+
 			Walk(h, &Field{
 				Parent: field,
-				Value:  val.Index(i).Interface(),
+				Value:  sliceVal.Interface(),
 				Path:   append(append([]string(nil), field.Path...), fmt.Sprintf("[%d]", i)),
-				Kind:   val.Index(i).Kind(),
+				Kind:   sliceVal.Kind(),
 			})
-
 		}
 	}
 
