@@ -18,6 +18,7 @@
         "regoimport",
         "sema",
         "serde",
+        "smorpher",
         "stretchr",
         "subdir",
         "subdirs",
