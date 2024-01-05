@@ -39,7 +39,7 @@ var (
 		"normal_set": testDataSet,
 		"embed_array_two": []map[string]interface{}{
 			{
-				"path": "not-root",
+				"field_one": testDataFieldOne,
 			},
 		},
 	}
@@ -98,28 +98,110 @@ func TestBuilder(t *testing.T) {
 		})
 
 		assert.NotNil(t, destStruct)
-		assert.Equal(t, destStruct.FieldOne, testDataFieldOne)
-		assert.Equal(t, destStruct.FieldTwo, testDataFieldTwo)
+		assert.Equal(t, testDataFieldOne, destStruct.FieldOne)
+		assert.Equal(t, testDataFieldTwo, destStruct.FieldTwo)
 		assert.NotNil(t, destStruct.Embed)
 
-		assert.Equal(t, destStruct.Embed.FieldOne, testDataFieldOne)
-		assert.Equal(t, destStruct.Embed.FieldTwo, testDataFieldTwo)
+		assert.Equal(t, testDataFieldOne, destStruct.Embed.FieldOne)
+		assert.Equal(t, testDataFieldTwo, destStruct.Embed.FieldTwo)
 		assert.NotNil(t, destStruct.Embed.NormalSet)
-		assert.Equal(t, destStruct.Embed.NormalSet, testDataSet)
-		assert.Equal(t, destStruct.Embed.AutocompletedSet, []string(nil))
+		assert.Equal(t, testDataSet, destStruct.Embed.NormalSet)
+		assert.Equal(t, []string(nil), destStruct.Embed.AutocompletedSet)
 		assert.NotNil(t, destStruct.Embed.EmbedArrayOne)
 		assert.Len(t, destStruct.Embed.EmbedArrayOne, len(testDataEmbedArray))
 
-		assert.Equal(t, destStruct.Embed.EmbedArrayOne[0].FieldOne, testDataFieldOne)
-		assert.Equal(t, destStruct.Embed.EmbedArrayOne[0].FieldTwo, testDataFieldTwo)
+		assert.Equal(t, testDataFieldOne, destStruct.Embed.EmbedArrayOne[0].FieldOne)
+		assert.Equal(t, testDataFieldTwo, destStruct.Embed.EmbedArrayOne[0].FieldTwo)
 		assert.NotNil(t, destStruct.Embed.EmbedArrayOne[0].NormalSet)
-		assert.Equal(t, destStruct.Embed.EmbedArrayOne[0].NormalSet, testDataSet)
+		assert.Equal(t, testDataSet, destStruct.Embed.EmbedArrayOne[0].NormalSet)
 		assert.NotNil(t, destStruct.Embed.EmbedArrayOne[0].EmbedArrayTwo)
 		assert.Len(t, destStruct.Embed.EmbedArrayOne[0].EmbedArrayTwo, len(testDataEmbedArrayItemOne["embed_array_two"].([]map[string]interface{})))
 
-		fmt.Println(destStruct.Embed.EmbedArrayOne[1])
-		assert.Equal(t, destStruct.Embed.EmbedArrayOne[1].FieldOne, testDataFieldOne)
-		// assert.Equal(t, destStruct.Embed.EmbedArrayOne[1].FieldTwo, testDataFieldTwo)
+		assert.Equal(t, testDataFieldOne, destStruct.Embed.EmbedArrayOne[1].FieldOne)
+		assert.Equal(t, testDataFieldTwo, destStruct.Embed.EmbedArrayOne[1].FieldTwo)
+		assert.Nil(t, destStruct.Embed.EmbedArrayOne[1].NormalSet)
+
+		assert.Equal(t, testDataFieldOne, destStruct.Embed.EmbedArrayOne[2].FieldOne)
+		assert.Empty(t, destStruct.Embed.EmbedArrayOne[2].FieldTwo)
+		assert.Nil(t, destStruct.Embed.EmbedArrayOne[2].NormalSet)
+	})
+
+	t.Run("Build destination struct without autocomplete", func(t *testing.T) {
+		destStruct := testStruct{}
+		b, _ := NewBuilder(destStruct, testData)
+
+		Walk(b, &Field{
+			Path:  nil,
+			Value: testData,
+			Kind:  reflect.ValueOf(testData).Kind(),
+		})
+
+		assert.NotNil(t, destStruct)
+		assert.Equal(t, testDataFieldOne, destStruct.FieldOne)
+		assert.Equal(t, testDataFieldTwo, destStruct.FieldTwo)
+		assert.NotNil(t, destStruct.Embed)
+
+		assert.Equal(t, testDataFieldOne, destStruct.Embed.FieldOne)
+		assert.Equal(t, testDataFieldTwo, destStruct.Embed.FieldTwo)
+		assert.NotNil(t, destStruct.Embed.NormalSet)
+		assert.Equal(t, testDataSet, destStruct.Embed.NormalSet)
+		assert.Equal(t, []string(nil), destStruct.Embed.AutocompletedSet)
+		assert.NotNil(t, destStruct.Embed.EmbedArrayOne)
+		assert.Len(t, destStruct.Embed.EmbedArrayOne, len(testDataEmbedArray))
+
+		assert.Equal(t, testDataFieldOne, destStruct.Embed.EmbedArrayOne[0].FieldOne)
+		assert.Equal(t, testDataFieldTwo, destStruct.Embed.EmbedArrayOne[0].FieldTwo)
+		assert.NotNil(t, destStruct.Embed.EmbedArrayOne[0].NormalSet)
+		assert.Equal(t, testDataSet, destStruct.Embed.EmbedArrayOne[0].NormalSet)
+		assert.NotNil(t, destStruct.Embed.EmbedArrayOne[0].EmbedArrayTwo)
+		assert.Len(t, destStruct.Embed.EmbedArrayOne[0].EmbedArrayTwo, len(testDataEmbedArrayItemOne["embed_array_two"].([]map[string]interface{})))
+
+		assert.Equal(t, testDataFieldOne, destStruct.Embed.EmbedArrayOne[1].FieldOne)
+		assert.Equal(t, testDataFieldTwo, destStruct.Embed.EmbedArrayOne[1].FieldTwo)
+		assert.Nil(t, destStruct.Embed.EmbedArrayOne[1].NormalSet)
+
+		assert.Equal(t, testDataFieldOne, destStruct.Embed.EmbedArrayOne[2].FieldOne)
+		assert.Empty(t, destStruct.Embed.EmbedArrayOne[2].FieldTwo)
+		assert.Nil(t, destStruct.Embed.EmbedArrayOne[2].NormalSet)
+	})
+
+	t.Run("Build destination pointer struct with autocomplete", func(t *testing.T) {
+		destStruct := new(testStruct)
+		b, _ := NewBuilder(destStruct, testData, WithMode(Autocomplete))
+
+		Walk(b, &Field{
+			Path:  nil,
+			Value: testData,
+			Kind:  reflect.ValueOf(testData).Kind(),
+		})
+
+		assert.NotNil(t, destStruct)
+		assert.Equal(t, testDataFieldOne, destStruct.FieldOne)
+		assert.Equal(t, testDataFieldTwo, destStruct.FieldTwo)
+		assert.NotNil(t, destStruct.Embed)
+
+		assert.Equal(t, testDataFieldOne, destStruct.Embed.FieldOne)
+		assert.Equal(t, testDataFieldTwo, destStruct.Embed.FieldTwo)
+		assert.NotNil(t, destStruct.Embed.NormalSet)
+		assert.Equal(t, testDataSet, destStruct.Embed.NormalSet)
+		assert.Equal(t, []string{testDataFieldOne}, destStruct.Embed.AutocompletedSet)
+		assert.NotNil(t, destStruct.Embed.EmbedArrayOne)
+		assert.Len(t, destStruct.Embed.EmbedArrayOne, len(testDataEmbedArray))
+
+		assert.Equal(t, testDataFieldOne, destStruct.Embed.EmbedArrayOne[0].FieldOne)
+		assert.Equal(t, testDataFieldTwo, destStruct.Embed.EmbedArrayOne[0].FieldTwo)
+		assert.NotNil(t, destStruct.Embed.EmbedArrayOne[0].NormalSet)
+		assert.Equal(t, testDataSet, destStruct.Embed.EmbedArrayOne[0].NormalSet)
+		assert.NotNil(t, destStruct.Embed.EmbedArrayOne[0].EmbedArrayTwo)
+		assert.Len(t, destStruct.Embed.EmbedArrayOne[0].EmbedArrayTwo, len(testDataEmbedArrayItemOne["embed_array_two"].([]map[string]interface{})))
+
+		assert.Equal(t, testDataFieldOne, destStruct.Embed.EmbedArrayOne[1].FieldOne)
+		assert.Equal(t, testDataFieldTwo, destStruct.Embed.EmbedArrayOne[1].FieldTwo)
+		assert.Nil(t, destStruct.Embed.EmbedArrayOne[1].NormalSet)
+
+		assert.Equal(t, testDataFieldOne, destStruct.Embed.EmbedArrayOne[2].FieldOne)
+		assert.Empty(t, destStruct.Embed.EmbedArrayOne[2].FieldTwo)
+		assert.Nil(t, destStruct.Embed.EmbedArrayOne[2].NormalSet)
 	})
 }
 
@@ -130,17 +212,18 @@ func TestBuilder2(t *testing.T) {
 		"version": &version,
 		"user":    user,
 
-		"data": map[string]interface{}{
+		"embed": map[string]interface{}{
 			"term":       "xterm-256color",
 			"path":       "src/dir",
 			"normal_set": []string{"foo", "bar", "zip", "zap"},
-			"workspace": []map[string]interface{}{
+			"embed_array_one": []map[string]interface{}{
 				{
-					"path":    "root",
-					"targets": []string{"t1", "t2", "t3"},
-					"emm": []map[string]interface{}{
+					"field_one":  testDataFieldOne,
+					"field_two":  &testDataFieldTwo,
+					"normal_set": testDataSet,
+					"embed_array_two": []map[string]interface{}{
 						{
-							"k1": "v1",
+							"path": "not-root",
 						},
 					},
 				},
@@ -166,11 +249,11 @@ func TestBuilder2(t *testing.T) {
 		Kind:  reflect.ValueOf(m).Kind(),
 	})
 
-	// fmt.Println("version", ts.FieldOne)
-	// fmt.Println("user", ts.FieldTwo)
-	// fmt.Println("set, pointer to string", ts.Embed.NormalSet)
-	// fmt.Println(ts.Embed.EmbedArrayOne[0].Emm[0].K1)
-	// fmt.Println("targets, string to pointer", ts.Embed.EmbedArrayOne[0].Targets)
-
+	fmt.Println("version", ts.FieldOne)
+	fmt.Println("user", ts.FieldTwo)
+	fmt.Println("set, pointer to string", ts.Embed.NormalSet)
+	fmt.Println(ts.Embed.EmbedArrayOne[0].EmbedArrayTwo[0].FieldOne)
+	fmt.Println("targets, string to pointer", ts.Embed.EmbedArrayOne[0].NormalSet)
+	fmt.Println(ts.Embed.EmbedArrayOne[1])
 	t.Fail()
 }
