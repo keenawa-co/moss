@@ -5,8 +5,6 @@ import (
 
 	"reflect"
 	"strings"
-
-	"github.com/4rchr4y/goray/pkg/maps"
 )
 
 type Mode int
@@ -38,28 +36,10 @@ func (o *origin) isSupportedType(field *Field) bool {
 	return assignable(o.refval.Type().Elem(), reflect.TypeOf(field.Value))
 }
 
-type indexTable struct {
-	table map[string]*origin
-}
-
-func (idx *indexTable) store(key string, value *origin) {
-	idx.table[key] = value
-}
-
-func (idx *indexTable) load(key string) (*origin, bool) {
-	value, exists := idx.table[key]
-	return value, exists
-}
-
-func newIndexTable() *indexTable {
-	return &indexTable{
-		table: make(map[string]*origin),
-	}
-}
-
 type idxTable interface {
 	store(key string, value *origin)
 	load(key string) (*origin, bool)
+	debug() string
 }
 
 type Builder struct {
@@ -73,7 +53,7 @@ type Builder struct {
 type BuilderOptFn func(*Builder)
 
 func NewBuilder(value any, source map[string]any, options ...BuilderOptFn) (b *Builder, err error) {
-	v := reflect.ValueOf(value).Elem()
+	v := deRef(reflect.ValueOf(value))
 	b = &Builder{
 		value: value,
 		tag:   defaultTag,
@@ -86,15 +66,17 @@ func NewBuilder(value any, source map[string]any, options ...BuilderOptFn) (b *B
 		options[i](b)
 	}
 
-	b.sit, err = sourceIndexing(reflect.ValueOf(source), "")
-	if err != nil {
-		return nil, fmt.Errorf("failed to build source cache: %v", err)
+	sourceValue := reflect.ValueOf(source)
+	if sourceValue.Kind() != reflect.Map {
+		return nil, fmt.Errorf("source value type should be a map, got %s", v.Kind().String())
 	}
 
-	b.dit, err = destIndexing(b.sit, v, "", b.tag)
-	if err != nil {
-		return nil, fmt.Errorf("failed to build destination cache: %v", err)
+	if v.Kind() != reflect.Struct {
+		return nil, fmt.Errorf("destination value type should be a struct or pointer to struct, got %s", v.Kind().String())
 	}
+
+	b.sit = sourceMapIndexing(sourceValue, "")
+	b.dit = destStructIndexing(b.sit, v, "", b.tag)
 
 	return b, nil
 }
@@ -111,146 +93,6 @@ func WithMode(mode Mode) BuilderOptFn {
 	}
 }
 
-func sourceIndexing(v reflect.Value, path string) (*indexTable, error) {
-	if v.Kind() != reflect.Map {
-		return nil, fmt.Errorf("source value type should be a map, got %s", v.Kind().String())
-	}
-
-	sit := &indexTable{
-		table: make(map[string]*origin, len(v.MapKeys())),
-	}
-
-	for _, key := range v.MapKeys() {
-		val := v.MapIndex(key)
-
-		currentPath := buildPath(path, key.String())
-		sit.store(currentPath, &origin{
-			name:   key.String(),
-			path:   currentPath,
-			refval: val,
-		})
-
-		embed, err := processSourceValue(val, currentPath)
-		if err != nil {
-			return nil, err
-		}
-		if embed != nil {
-			sit.table = maps.Merge(sit.table, embed.table)
-		}
-	}
-
-	return sit, nil
-}
-
-func processSourceValue(val reflect.Value, currentPath string) (*indexTable, error) {
-	if !val.IsValid() {
-		return nil, fmt.Errorf("invalid value provided")
-	}
-
-	elem := val.Elem()
-	switch elem.Kind() {
-	case reflect.Map:
-		return sourceIndexing(elem, currentPath)
-
-	case reflect.Slice:
-		for i := 0; i < elem.Len(); i++ {
-			sliceElem := elem.Index(i)
-			if sliceElem.Kind() == reflect.Map {
-				indexedPath := fmt.Sprintf("%s.[%d]", currentPath, i)
-				return sourceIndexing(sliceElem, indexedPath)
-			}
-		}
-
-		return nil, nil
-	}
-
-	return nil, nil
-}
-
-func destIndexing(sit idxTable, v reflect.Value, path string, tag string) (*indexTable, error) {
-	v = deRefPtr(v)
-
-	if v.Kind() != reflect.Struct {
-		return nil, fmt.Errorf("destination value type should be a struct or pointer to struct, got %s", v.Kind().String())
-	}
-
-	dit := &indexTable{
-		table: make(map[string]*origin, v.NumField()),
-	}
-
-	for i := 0; i < v.NumField(); i++ {
-		field := v.Field(i)
-		typeField := v.Type().Field(i)
-		currentPath := buildPath(path, getFieldTag(typeField, tag))
-
-		effectiveField := getEffectiveField(field)
-		dit.store(currentPath, &origin{
-			name:   typeField.Name,
-			path:   currentPath,
-			refval: field,
-		})
-
-		embed, err := processField(sit, effectiveField, currentPath, tag)
-		if err != nil {
-			return nil, err
-		}
-		if embed != nil {
-			dit.table = maps.Merge(dit.table, embed.table)
-		}
-	}
-
-	return dit, nil
-}
-
-func processField(sit idxTable, field reflect.Value, currentPath string, tag string) (*indexTable, error) {
-	switch field.Kind() {
-	case reflect.Slice:
-		return processSlice(sit, field, currentPath, tag)
-	case reflect.Struct:
-		return destIndexing(sit, field, currentPath, tag)
-	default:
-		return nil, nil
-	}
-}
-
-func initializeSliceElement(slice reflect.Value, index int, elemType reflect.Type, isPtr bool) reflect.Value {
-	if !isPtr {
-		return reflect.New(elemType).Elem()
-	}
-
-	return reflect.New(elemType.Elem())
-}
-
-func processSlice(sit idxTable, field reflect.Value, currentPath string, tag string) (*indexTable, error) {
-	elemType := field.Type().Elem()
-	isStructPtr := elemType.Kind() == reflect.Ptr && elemType.Elem().Kind() == reflect.Struct
-
-	if elemType.Kind() != reflect.Struct && !isStructPtr {
-		return nil, nil
-	}
-
-	loadedElem, ok := sit.load(currentPath)
-	if !ok {
-		return nil, nil
-	}
-
-	amount := loadedElem.refval.Elem().Len()
-	if amount == 0 {
-		return nil, nil
-	}
-
-	field.Set(reflect.MakeSlice(reflect.SliceOf(elemType), amount, amount))
-
-	for j := 0; j < loadedElem.refval.Elem().Len(); j++ {
-		elem := initializeSliceElement(field, j, elemType, isStructPtr)
-		field.Index(j).Set(elem)
-
-		return destIndexing(sit, field.Index(j), fmt.Sprintf("%s.[%d]", currentPath, j), tag)
-	}
-
-	return nil, nil
-}
-
 func (b *Builder) Handle(field *Field) {
 	path := strings.Join(field.Path, ".")
 	origin, ok := b.dit.load(path)
@@ -263,28 +105,18 @@ func (b *Builder) Handle(field *Field) {
 	}
 
 	fieldVal := reflect.ValueOf(field.Value)
-
 	switch {
 	case assignable(origin.refval.Type(), fieldVal.Type()):
 		assign(origin.refval, fieldVal)
+		return
 
 	case b.mode == Autocomplete && origin.refval.Kind() == reflect.Slice && origin.isSupportedType(field):
 		sliceType := origin.refval.Type()
 		slice := reflect.MakeSlice(sliceType, 1, 1)
-
 		assign(slice.Index(0), fieldVal)
-
 		origin.refval.Set(slice)
 		return
 	}
-}
-
-func buildPath(basePath, key string) string {
-	if basePath != "" {
-		return basePath + "." + key
-	}
-
-	return key
 }
 
 func assignable(destType, valType reflect.Type) bool {
@@ -387,34 +219,4 @@ func adjustSliceElementTypes(destIsPtrSlice bool, destElem, srcElem reflect.Valu
 		destElem.Set(srcElem.Elem())
 		return
 	}
-}
-
-func deRefPtr(v reflect.Value) reflect.Value {
-	if v.Kind() == reflect.Ptr && !v.IsNil() {
-		return v.Elem()
-	}
-
-	return v
-}
-
-func getFieldTag(field reflect.StructField, tag string) string {
-	fieldTag := strings.Split(field.Tag.Get(tag), ",")[0]
-	if fieldTag == "" {
-		return field.Name
-	}
-
-	return fieldTag
-}
-
-func getEffectiveField(field reflect.Value) reflect.Value {
-	if field.Kind() == reflect.Ptr && field.Type().Elem().Kind() == reflect.Struct {
-		if field.IsNil() {
-			// set the pointer of a new structure
-			field.Set(reflect.New(field.Type().Elem()))
-		}
-
-		return field.Elem()
-	}
-
-	return field
 }
