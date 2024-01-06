@@ -1,4 +1,4 @@
-package smorpher
+package mts
 
 import (
 	"reflect"
