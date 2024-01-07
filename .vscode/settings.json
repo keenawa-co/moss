@@ -2,6 +2,7 @@
     "cSpell.words": [
         "ason",
         "bfilter",
+        "dgraph",
         "Elts",
         "fobj",
         "fset",
@@ -18,6 +19,8 @@
         "refval",
         "rego",
         "regoimport",
+        "regom",
+        "ropa",
         "sema",
         "serde",
         "smorpher",

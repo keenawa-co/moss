@@ -3,4 +3,6 @@
 .idea
 .eclipse
 
+/tmp
+
 *.tar.gz
