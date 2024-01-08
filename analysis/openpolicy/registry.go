@@ -1,8 +1,6 @@
 package openpolicy
 
 import (
-	"strings"
-
 	"github.com/4rchr4y/goray/pkg/bloom"
 	"github.com/4rchr4y/goray/pkg/radix"
 )
@@ -56,37 +54,37 @@ func (r *registry) loadPolicy(policyFilePath string) (*Policy, bool, error) {
 	return nil, false, nil
 }
 
-func (r *registry) loadRegoFileSet(targetPath string) ([]*RegoFile, bool) {
-	if strings.Contains(targetPath, "/") {
-		files, exists := r.fileReg.idxByPath.LoadPrefix([]byte(targetPath))
-		if !exists {
-			return nil, false
-		}
+// func (r *registry) loadRegoFileSet(targetPath string) ([]*RegoFile, bool) {
+// 	if strings.Contains(targetPath, "/") {
+// 		files, exists := r.fileReg.idxByPath.LoadPrefix([]byte(targetPath))
+// 		if !exists {
+// 			return nil, false
+// 		}
 
-		result := make([]*RegoFile, len(files))
-		for i := range files {
-			result[i] = files[i].Value
-		}
+// 		result := make([]*RegoFile, len(files))
+// 		for i := range files {
+// 			result[i] = files[i].Value
+// 		}
 
-		return result, true
-	}
+// 		return result, true
+// 	}
 
-	if strings.Contains(targetPath, ".") {
-		files, exists := r.fileReg.idxByPackage.LoadPrefix([]byte(targetPath))
-		if !exists {
-			return nil, false
-		}
+// 	if strings.Contains(targetPath, ".") {
+// 		files, exists := r.fileReg.idxByPackage.LoadPrefix([]byte(targetPath))
+// 		if !exists {
+// 			return nil, false
+// 		}
 
-		result := make([]*RegoFile, len(files))
-		for i := range files {
-			result[i] = files[i].Value
-		}
+// 		result := make([]*RegoFile, len(files))
+// 		for i := range files {
+// 			result[i] = files[i].Value
+// 		}
 
-		return result, true
-	}
+// 		return result, true
+// 	}
 
-	return nil, true
-}
+// 	return nil, true
+// }
 
 func newRegistry(numberOfPolicies int) *registry {
 	size, _ := bloom.CalcFilterParams(uint64(numberOfPolicies), 0.01)

@@ -5,4 +5,4 @@ count:
 
 .PHONY: pack
 pack:
-	tar -czvf bundle.tar.gz -C ./opa/lib .
+	tar -czvf bundle.tar.gz -C ./builtin/opa/lib/ .
