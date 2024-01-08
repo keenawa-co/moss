@@ -11,7 +11,9 @@ import (
 	"github.com/4rchr4y/goray/ason"
 	"github.com/4rchr4y/goray/internal/infra/db/badger"
 	"github.com/4rchr4y/goray/internal/infra/syswrap"
+	"github.com/4rchr4y/goray/internal/ropa"
 	"github.com/4rchr4y/goray/internal/ropa/loader"
+	"github.com/4rchr4y/goray/pkg/radix"
 	"github.com/4rchr4y/goray/rayfile"
 	"github.com/spf13/cobra"
 )
@@ -86,13 +88,35 @@ func runRootCmd(cmd *cobra.Command, args []string) {
 		}
 	}
 
-	f, err := policyRepo.Load("go/ast/kinds.rego")
-	if err != nil {
-		log.Fatal(err)
-		return
+	linker := ropa.NewLinker(policyRepo, radix.NewTree[*ropa.LinkerOutput]())
+
+	for _, f := range bundle.Files {
+		fileMeta, err := linker.ProcessRegoFileMeta(f)
+		if err != nil {
+			log.Fatal(err)
+			return
+		}
+
+		input := &ropa.LinkerInput{
+			Parent:  f,
+			Imports: fileMeta.Dependencies,
+		}
+
+		output, err := linker.Link(input)
+		if err != nil {
+			log.Fatal(err)
+			return
+		}
+
+		fmt.Println(f.Path, len(output.Imports))
 	}
 
-	fmt.Println(f.Parsed.Package)
+	// f, err := policyRepo.Load("go/ast/kinds.rego")
+	// if err != nil {
+	// 	log.Fatal(err)
+	// 	return
+	// }
+
 }
 
 // func runRootCmd(cmd *cobra.Command, args []string) {
