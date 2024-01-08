@@ -114,7 +114,7 @@ func (t *Tree[V]) Load(key []byte) (value V, found bool) {
 	return
 }
 
-func (t *Tree[T]) LoadPrefix(prefix []byte) ([]*Leaf[T], bool) {
+func (t *Tree[T]) LoadPrefix(prefix []byte) (map[string]T, bool) {
 	n := t.Root
 	search := prefix
 
@@ -147,7 +147,13 @@ func (t *Tree[T]) LoadPrefix(prefix []byte) ([]*Leaf[T], bool) {
 	leaves := collectLeaves(n, walker)
 
 	if len(leaves) > 0 {
-		return leaves, true
+		result := make(map[string]T, len(leaves))
+
+		for _, leaf := range leaves {
+			result[string(leaf.Key)] = leaf.Value
+		}
+
+		return result, true
 	}
 
 	return nil, false

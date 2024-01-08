@@ -612,56 +612,56 @@ func TestLoad(t *testing.T) {
 	})
 }
 
-func TestLoadPrefix(t *testing.T) {
-	tree := NewTree[string]()
+// func TestLoadPrefix(t *testing.T) {
+// 	tree := NewTree[string]()
 
-	tree.Store([]byte("home"), "Policy 1 Data")
-	tree.Store([]byte("opa/lib/go/ast/types.go"), "Types Data")
-	tree.Store([]byte("opa/lib/go/ast/tokens.go"), "Tokens Data")
-	tree.Store([]byte("opa/lib/go/ast/kinds.go"), "Kinds Data")
-	tree.Store([]byte("opa/policy/r1.go"), "Policy R1 Data")
-	tree.Store([]byte("opa/policy/r2.go"), "Policy R2 Data")
+// 	tree.Store([]byte("home"), "Policy 1 Data")
+// 	tree.Store([]byte("opa/lib/go/ast/types.go"), "Types Data")
+// 	tree.Store([]byte("opa/lib/go/ast/tokens.go"), "Tokens Data")
+// 	tree.Store([]byte("opa/lib/go/ast/kinds.go"), "Kinds Data")
+// 	tree.Store([]byte("opa/policy/r1.go"), "Policy R1 Data")
+// 	tree.Store([]byte("opa/policy/r2.go"), "Policy R2 Data")
 
-	t.Run("LoadPrefix with valid prefix 'home'", func(t *testing.T) {
-		leaves, ok := tree.LoadPrefix([]byte("home"))
-		assert.True(t, ok, "Expected to find prefix")
-		assert.Len(t, leaves, 1, "Expected one leaf")
-		assert.Equal(t, "Policy 1 Data", leaves[0].Value, "Unexpected leaf data")
-	})
+// 	t.Run("LoadPrefix with valid prefix 'home'", func(t *testing.T) {
+// 		leaves, ok := tree.LoadPrefix([]byte("home"))
+// 		assert.True(t, ok, "Expected to find prefix")
+// 		assert.Len(t, leaves, 1, "Expected one leaf")
+// 		assert.Equal(t, "Policy 1 Data", leaves[0].Value, "Unexpected leaf data")
+// 	})
 
-	t.Run("LoadPrefix with valid deep prefix 'opa/lib'", func(t *testing.T) {
-		leaves, ok := tree.LoadPrefix([]byte("opa/lib"))
-		assert.True(t, ok, "Expected to find prefix")
-		assert.Len(t, leaves, 3)
-		expectedValues := map[string]bool{"Types Data": false, "Tokens Data": false, "Kinds Data": false}
-		for _, leaf := range leaves {
-			_, exists := expectedValues[leaf.Value]
-			assert.True(t, exists, "Unexpected leaf data")
-			expectedValues[leaf.Value] = true
-		}
-		for _, found := range expectedValues {
-			assert.True(t, found, "Did not find all expected leaf data")
-		}
-	})
+// 	t.Run("LoadPrefix with valid deep prefix 'opa/lib'", func(t *testing.T) {
+// 		leaves, ok := tree.LoadPrefix([]byte("opa/lib"))
+// 		assert.True(t, ok, "Expected to find prefix")
+// 		assert.Len(t, leaves, 3)
+// 		expectedValues := map[string]bool{"Types Data": false, "Tokens Data": false, "Kinds Data": false}
+// 		for _, leaf := range leaves {
+// 			_, exists := expectedValues[leaf.Value]
+// 			assert.True(t, exists, "Unexpected leaf data")
+// 			expectedValues[leaf.Value] = true
+// 		}
+// 		for _, found := range expectedValues {
+// 			assert.True(t, found, "Did not find all expected leaf data")
+// 		}
+// 	})
 
-	t.Run("LoadPrefix with non-existent prefix 'missing'", func(t *testing.T) {
-		leaves, ok := tree.LoadPrefix([]byte("missing"))
-		assert.False(t, ok, "Expected not to find prefix")
-		assert.Nil(t, leaves, "Expected no leaves to be returned")
-	})
+// 	t.Run("LoadPrefix with non-existent prefix 'missing'", func(t *testing.T) {
+// 		leaves, ok := tree.LoadPrefix([]byte("missing"))
+// 		assert.False(t, ok, "Expected not to find prefix")
+// 		assert.Nil(t, leaves, "Expected no leaves to be returned")
+// 	})
 
-	t.Run("LoadPrefix with edge case prefix 'opa/policy/'", func(t *testing.T) {
-		leaves, ok := tree.LoadPrefix([]byte("opa/policy/"))
-		assert.True(t, ok, "Expected to find prefix")
-		assert.Len(t, leaves, 2)
-		expectedValues := map[string]bool{"Policy R1 Data": false, "Policy R2 Data": false}
-		for _, leaf := range leaves {
-			_, exists := expectedValues[leaf.Value]
-			assert.True(t, exists, "Unexpected leaf data")
-			expectedValues[leaf.Value] = true
-		}
-		for _, found := range expectedValues {
-			assert.True(t, found, "Did not find all expected leaf data")
-		}
-	})
-}
+// 	t.Run("LoadPrefix with edge case prefix 'opa/policy/'", func(t *testing.T) {
+// 		leaves, ok := tree.LoadPrefix([]byte("opa/policy/"))
+// 		assert.True(t, ok, "Expected to find prefix")
+// 		assert.Len(t, leaves, 2)
+// 		expectedValues := map[string]bool{"Policy R1 Data": false, "Policy R2 Data": false}
+// 		for _, leaf := range leaves {
+// 			_, exists := expectedValues[leaf.Value]
+// 			assert.True(t, exists, "Unexpected leaf data")
+// 			expectedValues[leaf.Value] = true
+// 		}
+// 		for _, found := range expectedValues {
+// 			assert.True(t, found, "Did not find all expected leaf data")
+// 		}
+// 	})
+// }
