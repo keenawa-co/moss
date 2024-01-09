@@ -70,7 +70,7 @@ func NewLinker(db repoCli, rdxTree radixTree) *Linker {
 	}
 }
 
-func (linker *Linker) Load(importPath string) (*IndexedRegoFile, error) {
+func (linker *Linker) Loading(importPath string) (*IndexedRegoFile, error) {
 	filePath, ok := linker.storage.lookup(importPath)
 	if !ok {
 		return nil, fmt.Errorf("import '%s' is undefined", importPath)
@@ -113,7 +113,7 @@ func (linker *Linker) Linking(file *IndexedRegoFile) (*LinkedRegoFile, error) {
 	deps := make(map[string]*IndexedRegoFile)
 
 	for i := range file.WantList {
-		indexedFile, err := linker.Load(file.WantList[i])
+		indexedFile, err := linker.Loading(file.WantList[i])
 		if err != nil {
 			return nil, err
 		}
