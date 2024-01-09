@@ -2,13 +2,12 @@ package regom
 
 import "github.com/open-policy-agent/opa/ast"
 
-type (
-	RegoFile struct {
-		Path   string
-		Raw    []byte
-		Parsed *ast.Module
-	}
+type RawRegoFile struct {
+	Path   string
+	Parsed *ast.Module
+}
 
+type (
 	RegoFileMeta struct {
 		Dependencies []Path
 	}
@@ -16,7 +15,7 @@ type (
 
 type Bundle struct {
 	Name  string
-	Files []*RegoFile
+	Files []*RawRegoFile
 }
 
 type DepType int
@@ -43,14 +42,14 @@ type TargetGroup struct {
 
 type (
 	PolicySpec struct {
-		File    *RegoFile
+		File    *RawRegoFile
 		Targets []Path
 		Deps    []Path
 	}
 
 	Policy struct {
-		File    *RegoFile
+		File    *RawRegoFile
 		Targets TargetGroup
-		Deps    []*RegoFile
+		Deps    []*RawRegoFile
 	}
 )
