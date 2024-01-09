@@ -34,7 +34,7 @@ func NewFsLoader(fs fileSystem) *FsLoader {
 	}
 }
 
-func (loader *FsLoader) LoadRegoFile(path string) (*regom.RegoFile, error) {
+func (loader *FsLoader) LoadRegoFile(path string) (*regom.RawRegoFile, error) {
 	content, err := loader.fs.ReadFile(path)
 	if err != nil {
 		return nil, fmt.Errorf("error opening file: %v", err)
@@ -45,9 +45,8 @@ func (loader *FsLoader) LoadRegoFile(path string) (*regom.RegoFile, error) {
 		return nil, fmt.Errorf("error parsing file contents: %w", err)
 	}
 
-	return &regom.RegoFile{
+	return &regom.RawRegoFile{
 		Path:   path,
-		Raw:    content,
 		Parsed: parsed,
 	}, nil
 }
@@ -72,7 +71,7 @@ func (loader *FsLoader) LoadBundle(path string) (*regom.Bundle, error) {
 
 	bundle := &regom.Bundle{
 		Name:  filepath.Clean(path),
-		Files: make([]*regom.RegoFile, len(files)),
+		Files: make([]*regom.RawRegoFile, len(files)),
 	}
 
 	var i uint
@@ -82,9 +81,8 @@ func (loader *FsLoader) LoadBundle(path string) (*regom.Bundle, error) {
 			return nil, fmt.Errorf("error parsing file contents: %v", err)
 		}
 
-		bundle.Files[i] = &regom.RegoFile{
+		bundle.Files[i] = &regom.RawRegoFile{
 			Path:   path,
-			Raw:    content,
 			Parsed: parsed,
 		}
 

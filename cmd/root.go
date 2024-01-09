@@ -71,9 +71,10 @@ func runRootCmd(cmd *cobra.Command, args []string) {
 	defer badgerDb.Close()
 
 	dbClient := badger.NewBadgerClient(badgerDb)
-	policyRepo := dbClient.MakePolicyRepo("goray")
+	linkerRepo := dbClient.MakePolicyRepo("goray")
 
 	loader := loader.NewFsLoader(new(syswrap.FsClient))
+	linker := ropa.NewLinker(linkerRepo, radix.NewTree[*ropa.IndexedRegoFile]())
 
 	bundle, err := loader.LoadBundle("bundle.tar.gz")
 	if err != nil {
@@ -81,42 +82,31 @@ func runRootCmd(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	for _, f := range bundle.Files {
-		if err := policyRepo.Store(f); err != nil {
-			log.Fatal(err)
-			return
-		}
-	}
-
-	linker := ropa.NewLinker(policyRepo, radix.NewTree[*ropa.LinkerOutput]())
-
-	for _, f := range bundle.Files {
-		fileMeta, err := linker.ProcessRegoFileMeta(f)
+	indexedList := make([]*ropa.IndexedRegoFile, len(bundle.Files))
+	for i, f := range bundle.Files {
+		indexed, err := linker.Indexing(f)
 		if err != nil {
 			log.Fatal(err)
 			return
 		}
 
-		input := &ropa.LinkerInput{
-			Parent:  f,
-			Imports: fileMeta.Dependencies,
-		}
+		indexedList[i] = indexed
+	}
 
-		output, err := linker.Link(input)
+	linkedList := make([]*ropa.LinkedRegoFile, len(indexedList))
+	for i, f := range indexedList {
+		linked, err := linker.Linking(f)
 		if err != nil {
 			log.Fatal(err)
 			return
 		}
 
-		fmt.Println(f.Path, len(output.Imports))
+		linkedList[i] = linked
 	}
 
-	// f, err := policyRepo.Load("go/ast/kinds.rego")
-	// if err != nil {
-	// 	log.Fatal(err)
-	// 	return
-	// }
-
+	for _, f := range linkedList {
+		fmt.Println(f.Path, f.Parsed.Package.Path.String(), len(f.Dependencies))
+	}
 }
 
 // func runRootCmd(cmd *cobra.Command, args []string) {

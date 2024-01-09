@@ -15,8 +15,8 @@ func NewBadgerClient(client badgerClient) *BadgerClient {
 	return &BadgerClient{db: client}
 }
 
-func (client *BadgerClient) MakePolicyRepo(prefix string) *PolicyRepo {
-	return &PolicyRepo{
+func (client *BadgerClient) MakePolicyRepo(prefix string) *LinkerRepo {
+	return &LinkerRepo{
 		projPrefix: prefix,
 		db:         client.db,
 	}
