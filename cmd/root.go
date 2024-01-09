@@ -12,7 +12,6 @@ import (
 	"github.com/4rchr4y/goray/internal/infra/db/badger"
 	"github.com/4rchr4y/goray/internal/infra/syswrap"
 	"github.com/4rchr4y/goray/internal/ropa"
-	"github.com/4rchr4y/goray/internal/ropa/loader"
 	"github.com/4rchr4y/goray/pkg/radix"
 	"github.com/4rchr4y/goray/rayfile"
 	"github.com/spf13/cobra"
@@ -73,7 +72,7 @@ func runRootCmd(cmd *cobra.Command, args []string) {
 	dbClient := badger.NewBadgerClient(badgerDb)
 	linkerRepo := dbClient.MakePolicyRepo("goray")
 
-	loader := loader.NewFsLoader(new(syswrap.FsClient))
+	loader := ropa.NewFsLoader(new(syswrap.FsClient))
 	linker := ropa.NewLinker(linkerRepo, radix.NewTree[*ropa.IndexedRegoFile]())
 
 	bundle, err := loader.LoadBundle("bundle.tar.gz")

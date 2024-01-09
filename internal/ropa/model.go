@@ -1,4 +1,4 @@
-package regom
+package ropa
 
 import "github.com/open-policy-agent/opa/ast"
 

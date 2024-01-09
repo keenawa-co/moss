@@ -1,4 +1,4 @@
-package loader
+package ropa
 
 import (
 	"archive/tar"
@@ -11,7 +11,6 @@ import (
 	"strings"
 	"unicode/utf8"
 
-	"github.com/4rchr4y/goray/internal/ropa/regom"
 	"github.com/open-policy-agent/opa/ast"
 )
 
@@ -34,7 +33,7 @@ func NewFsLoader(fs fileSystem) *FsLoader {
 	}
 }
 
-func (loader *FsLoader) LoadRegoFile(path string) (*regom.RawRegoFile, error) {
+func (loader *FsLoader) LoadRegoFile(path string) (*RawRegoFile, error) {
 	content, err := loader.fs.ReadFile(path)
 	if err != nil {
 		return nil, fmt.Errorf("error opening file: %v", err)
@@ -45,13 +44,13 @@ func (loader *FsLoader) LoadRegoFile(path string) (*regom.RawRegoFile, error) {
 		return nil, fmt.Errorf("error parsing file contents: %w", err)
 	}
 
-	return &regom.RawRegoFile{
+	return &RawRegoFile{
 		Path:   path,
 		Parsed: parsed,
 	}, nil
 }
 
-func (loader *FsLoader) LoadBundle(path string) (*regom.Bundle, error) {
+func (loader *FsLoader) LoadBundle(path string) (*Bundle, error) {
 	file, err := loader.fs.OpenFile(path)
 	if err != nil {
 		return nil, fmt.Errorf("error opening file: %v", err)
@@ -69,9 +68,9 @@ func (loader *FsLoader) LoadBundle(path string) (*regom.Bundle, error) {
 		return nil, fmt.Errorf("error extracting tar content: %v", err)
 	}
 
-	bundle := &regom.Bundle{
+	bundle := &Bundle{
 		Name:  filepath.Clean(path),
-		Files: make([]*regom.RawRegoFile, len(files)),
+		Files: make([]*RawRegoFile, len(files)),
 	}
 
 	var i uint
@@ -81,7 +80,7 @@ func (loader *FsLoader) LoadBundle(path string) (*regom.Bundle, error) {
 			return nil, fmt.Errorf("error parsing file contents: %v", err)
 		}
 
-		bundle.Files[i] = &regom.RawRegoFile{
+		bundle.Files[i] = &RawRegoFile{
 			Path:   path,
 			Parsed: parsed,
 		}
