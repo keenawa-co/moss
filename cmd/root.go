@@ -36,9 +36,10 @@ type evalOutput struct {
 
 var policies = []*rayfile.PolicyDef{
 	{
-		Path:    "builtin/opa/policy/r1.rego",
-		Target:  []string{"testdata/main.go"},
-		Include: []string{"testdata/test.rego"},
+		Path:   "builtin/opa/policy/r1.rego",
+		Target: []string{"testdata/main.go"},
+		// Dependencies: []string{"testdata/test.rego"},
+		Dependencies: []string{"testdata"},
 	},
 
 	// {
@@ -62,7 +63,7 @@ func mapIncludeToVendorDesc(includes []string) []*openpolicy.VendorDescription {
 }
 
 func runRootCmd(cmd *cobra.Command, args []string) {
-	badgerDb, err := badger.NewBadgerDB("tmp/badger")
+	badgerDb, err := badger.NewBadgerDB(".goray/cache/badger")
 	if err != nil {
 		log.Fatal(err)
 		return
@@ -70,7 +71,7 @@ func runRootCmd(cmd *cobra.Command, args []string) {
 	defer badgerDb.Close()
 
 	dbClient := badger.NewBadgerClient(badgerDb)
-	linkerRepo := dbClient.MakePolicyRepo("goray")
+	linkerRepo := dbClient.MakeLinkerRepo("goray")
 
 	loader := ropa.NewFsLoader(new(syswrap.FsClient))
 	linker := ropa.NewLinker(linkerRepo, radix.NewTree[*ropa.IndexedRegoFile]())
@@ -81,15 +82,39 @@ func runRootCmd(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	indexedList := make([]*ropa.IndexedRegoFile, len(bundle.Files))
-	for i, f := range bundle.Files {
+	rawRegoFiles := make([]*ropa.RawRegoFile, 0)
+	rawRegoFiles = append(rawRegoFiles, bundle.Files...)
+
+	for _, pd := range policies {
+		file, err := loader.LoadRegoFile(pd.Path)
+		if err != nil {
+			log.Fatal(err)
+			return
+		}
+
+		rawRegoFiles = append(rawRegoFiles, file)
+
+		for _, path := range pd.Dependencies {
+			depFile, err := loader.LoadRegoFile(path)
+			if err != nil {
+				log.Fatal(err)
+				return
+			}
+
+			rawRegoFiles = append(rawRegoFiles, depFile)
+		}
+	}
+
+	indexedList := make([]*ropa.IndexedRegoFile, 0)
+
+	for _, f := range rawRegoFiles {
 		indexed, err := linker.Indexing(f)
 		if err != nil {
 			log.Fatal(err)
 			return
 		}
 
-		indexedList[i] = indexed
+		indexedList = append(indexedList, indexed)
 	}
 
 	linkedList := make([]*ropa.LinkedRegoFile, len(indexedList))
@@ -219,76 +244,3 @@ func tmpGetFileAstAsMap(filePath string) (map[string]interface{}, error) {
 
 	return fileMap, nil
 }
-
-// type Command struct {
-// 	key   []byte
-// 	value []byte
-// }
-
-// type Repository interface {
-// 	GetAll() ([]Command, error) // TODO ask about this
-// 	GetValue([]byte) []byte
-// 	SetValue(key, value []byte)
-// 	EditValue([]byte)
-// 	DeleteValue([]byte) bool // might change this
-// }
-
-// type CommandsRepository struct {
-// 	db *badger.DB
-// }
-
-// func (c *CommandsRepository) GetAll() ([]Command, error) {
-// 	var cmds []Command
-// 	err := c.db.View(func(txn *badger.Txn) error {
-// 		opts := badger.DefaultIteratorOptions
-// 		opts.PrefetchSize = 10
-// 		it := txn.NewIterator(opts)
-// 		defer it.Close()
-// 		for it.Rewind(); it.Valid(); it.Next() {
-// 			item := it.Item()
-// 			k := item.Key()
-// 			err := item.Value(func(v []byte) error {
-// 				cmds = append(cmds, Command{key: k, value: v})
-// 				return nil
-// 			})
-// 			if err != nil {
-// 				return err
-// 			}
-// 		}
-// 		return nil
-// 	})
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	return cmds, nil
-// }
-
-// func (c *CommandsRepository) SetValue(k, v []byte) error {
-// 	err := c.db.Update(func(txn *badger.Txn) error {
-// 		err := txn.Set(k, v)
-// 		return err
-// 	})
-// 	return err
-// }
-
-// func (c *CommandsRepository) GetValue(k []byte) ([]byte, error) {
-// 	var v []byte
-// 	err := c.db.View(func(txn *badger.Txn) error {
-// 		i, err := txn.Get(k)
-// 		if err != nil {
-// 			v = []byte("this command does not exist")
-// 			return nil
-// 		}
-// 		v, err = i.ValueCopy(v)
-// 		return err
-// 	})
-// 	return v, err
-// }
-
-// func (c *CommandsRepository) DeleteValue(k []byte) error {
-// 	err := c.db.Update(func(txn *badger.Txn) error {
-// 		err := txn.Delete(k)
-// 		return err
-// 	})
-// 	return err
-// }

@@ -15,19 +15,6 @@ type radixTree interface {
 	LoadPrefix(prefix []byte) (map[string]*IndexedRegoFile, bool)
 }
 
-// func (o *LoadingOutput) merge() []*regom.RegoFile {
-// 	result := make([]*regom.RegoFile, len(o.Dependencies)+1)
-// 	result[0] = o.Parent
-
-// 	for i := 1; i < len(o.Dependencies); i++ {
-// 		result[i] = o.Dependencies[i]
-// 	}
-
-// 	return result
-// }
-
-type LoaderFn func(pkgPath string) (*IndexedRegoFile, error)
-
 type IndexedRegoFile struct {
 	*RawRegoFile
 	WantList []string
@@ -40,9 +27,8 @@ type LinkedRegoFile struct {
 
 type storage struct {
 	repo      repoCli
-	pathCache map[string]string   // package name -> file path
-	loaded    radixTree           // file path -> file
-	wantList  map[string]struct{} // package name -> empty struct
+	pathCache map[string]string // package name -> file path
+	loaded    radixTree         // file path -> file
 }
 
 func (s *storage) cache(file *RawRegoFile) {
@@ -65,7 +51,6 @@ func NewLinker(db repoCli, rdxTree radixTree) *Linker {
 			repo:      db,
 			pathCache: make(map[string]string),
 			loaded:    rdxTree,
-			wantList:  make(map[string]struct{}),
 		},
 	}
 }
@@ -126,25 +111,3 @@ func (linker *Linker) Linking(file *IndexedRegoFile) (*LinkedRegoFile, error) {
 		Dependencies: deps,
 	}, nil
 }
-
-// func (lkr *Linker) ProcessRegoFileMeta(file *regom.RegoFile) (*regom.RegoFileMeta, error) {
-// 	deps := make([]regom.Path, len(file.Parsed.Imports))
-// 	// fmt.Println(file.Parsed.Package.Path.String())
-
-// 	fmt.Println("lookup", lkr.cache)
-// 	for i, imp := range file.Parsed.Imports {
-// 		path, ok := lkr.cache[imp.Path.String()]
-// 		if !ok {
-// 			return nil, fmt.Errorf("import '%s' is undefined", imp.Path.String())
-// 		}
-
-// 		deps[i] = regom.Path{
-// 			Path: path,
-// 			Type: regom.File,
-// 		}
-// 	}
-
-// 	return &regom.RegoFileMeta{
-// 		Dependencies: deps,
-// 	}, nil
-// }

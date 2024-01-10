@@ -14,6 +14,31 @@ import (
 	"github.com/open-policy-agent/opa/ast"
 )
 
+type PathType int
+
+const (
+	Unknown PathType = iota
+	RegoFile
+	DataFile
+	Dir
+	TarGzArchive
+)
+
+type RawRegoFile struct {
+	Path   string
+	Parsed *ast.Module
+}
+
+type RawDataFile struct {
+	Path    string
+	Content []byte
+}
+
+type Bundle struct {
+	Name  string
+	Files []*RawRegoFile
+}
+
 type fileSystem interface {
 	OpenFile(name string) (*os.File, error)
 	GzipReader(reader io.Reader) (*gzip.Reader, error)
@@ -27,10 +52,57 @@ type FsLoader struct {
 	fs fileSystem
 }
 
+type LoaderInput struct {
+	Paths  []string
+	Filter func(path string, info fs.FileInfo) error
+}
+
+type LoaderResult struct {
+	RegoFiles map[string]*RawRegoFile
+	DataFiles map[string]*RawDataFile
+	Bundles   map[string]*Bundle
+}
+
 func NewFsLoader(fs fileSystem) *FsLoader {
 	return &FsLoader{
 		fs: fs,
 	}
+}
+
+func (loader *FsLoader) Load(input *LoaderInput) (*LoaderResult, error) {
+	result := new(LoaderResult)
+
+	for i := range input.Paths {
+		switch determinePathType(input.Paths[i]) {
+		case RegoFile:
+			file, err := loader.LoadRegoFile(input.Paths[i])
+			if err != nil {
+				return nil, err
+			}
+
+			result.RegoFiles[input.Paths[i]] = file
+
+		case DataFile:
+			// TODO
+
+		case TarGzArchive:
+			bundle, err := loader.LoadBundle(input.Paths[i])
+			if err != nil {
+				return nil, err
+			}
+
+			result.Bundles[input.Paths[i]] = bundle
+
+		case Dir:
+			// TODO
+
+		case Unknown:
+			return nil, fmt.Errorf("'%s' destination value type is unknown", input.Paths[i])
+
+		}
+	}
+
+	return result, nil
 }
 
 func (loader *FsLoader) LoadRegoFile(path string) (*RawRegoFile, error) {
@@ -168,4 +240,29 @@ func validatePath(path string) error {
 	}
 
 	return nil
+}
+
+func determinePathType(path string) PathType {
+	fileInfo, err := os.Stat(path)
+	if err != nil {
+		return Unknown
+	}
+
+	if fileInfo.IsDir() {
+		return Dir
+	}
+
+	if strings.HasSuffix(path, ".tar.gz") {
+		return TarGzArchive
+	}
+
+	if strings.HasSuffix(path, ".rego") {
+		return RegoFile
+	}
+
+	if strings.HasSuffix(path, ".json") {
+		return RegoFile
+	}
+
+	return Unknown
 }
