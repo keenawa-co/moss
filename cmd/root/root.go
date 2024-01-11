@@ -1,4 +1,4 @@
-package main
+package root
 
 import (
 	"encoding/json"
@@ -17,7 +17,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var rootCmd = &cobra.Command{
+var RootCmd = &cobra.Command{
 	Use:   "goray",
 	Short: "",
 	Long:  "",

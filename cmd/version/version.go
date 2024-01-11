@@ -1,8 +1,9 @@
-package main
+package version
 
 import (
 	"fmt"
 
+	"github.com/4rchr4y/goray/cmd/root"
 	"github.com/spf13/cobra"
 )
 
@@ -15,7 +16,7 @@ It provides the detailed version information including the major, minor, and pat
 }
 
 func init() {
-	rootCmd.AddCommand(versionCmd)
+	root.RootCmd.AddCommand(versionCmd)
 }
 
 func runVersionCmd(cmd *cobra.Command, args []string) {
