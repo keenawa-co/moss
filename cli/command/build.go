@@ -10,7 +10,7 @@ var buildCmd = &cobra.Command{
 }
 
 func init() {
-	RpmCmd.AddCommand(addCmd)
+	rpmCmd.AddCommand(addCmd)
 
 }
 

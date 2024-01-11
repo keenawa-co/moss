@@ -1,0 +1,6 @@
+[package]
+name = "go.ast"
+version = 1.0
+author = ["g10z3r <g10z3r@duck.com>"]
+description = "Some description here"
+keywords = ["std", "go", "ast"]

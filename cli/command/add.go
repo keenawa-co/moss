@@ -12,7 +12,7 @@ var addCmd = &cobra.Command{
 }
 
 func init() {
-	RpmCmd.AddCommand(addCmd)
+	rpmCmd.AddCommand(addCmd)
 
 	addCmd.Flags().BoolP("global", "g", false, "global install")
 }

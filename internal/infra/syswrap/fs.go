@@ -19,8 +19,16 @@ func (FsClient) GzipReader(reader io.Reader) (*gzip.Reader, error) {
 	return gzip.NewReader(reader)
 }
 
+func (FsClient) GzipWriter(writer io.Writer) *gzip.Writer {
+	return gzip.NewWriter(writer)
+}
+
 func (FsClient) TarReader(reader io.Reader) *tar.Reader {
 	return tar.NewReader(reader)
+}
+
+func (FsClient) TarWriter(writer io.Writer) *tar.Writer {
+	return tar.NewWriter(writer)
 }
 
 func (FsClient) ReadFile(name string) ([]byte, error) {
