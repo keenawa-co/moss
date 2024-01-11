@@ -1,4 +1,4 @@
-package cmd
+package command
 
 import (
 	"bytes"
@@ -14,7 +14,7 @@ import (
 	"path/filepath"
 
 	"github.com/4rchr4y/goray/ason"
-	"github.com/4rchr4y/goray/cmd/root"
+
 	regoAst "github.com/open-policy-agent/opa/ast"
 	"github.com/open-policy-agent/opa/rego"
 	"github.com/open-policy-agent/opa/topdown"
@@ -29,7 +29,7 @@ var oldCmd = &cobra.Command{
 }
 
 func init() {
-	root.RootCmd.AddCommand(oldCmd)
+	RootCmd.AddCommand(oldCmd)
 
 }
 

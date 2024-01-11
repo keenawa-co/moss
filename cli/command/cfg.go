@@ -1,10 +1,9 @@
-package cmd
+package command
 
 import (
 	"fmt"
 	"log"
 
-	"github.com/4rchr4y/goray/cmd/root"
 	"github.com/4rchr4y/goray/rayfile"
 	"github.com/spf13/cobra"
 )
@@ -17,7 +16,7 @@ var cfgCmd = &cobra.Command{
 }
 
 func init() {
-	root.RootCmd.AddCommand(cfgCmd)
+	RootCmd.AddCommand(cfgCmd)
 }
 
 func runCfgCmd(cmd *cobra.Command, args []string) {

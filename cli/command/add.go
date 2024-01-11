@@ -1,11 +1,10 @@
-package rpm
+package command
 
 import (
-	"github.com/4rchr4y/goray/cmd/root"
 	"github.com/spf13/cobra"
 )
 
-var AddCmd = &cobra.Command{
+var addCmd = &cobra.Command{
 	Use:   "add",
 	Short: "Add a new dependency",
 	Long:  ``,
@@ -13,9 +12,9 @@ var AddCmd = &cobra.Command{
 }
 
 func init() {
-	root.RootCmd.AddCommand(AddCmd)
+	RpmCmd.AddCommand(addCmd)
 
-	AddCmd.Flags().BoolP("global", "g", false, "global install")
+	addCmd.Flags().BoolP("global", "g", false, "global install")
 }
 
 func runAddCmd(cmd *cobra.Command, args []string) error {

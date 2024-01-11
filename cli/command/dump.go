@@ -1,4 +1,4 @@
-package dump
+package command
 
 import (
 	"bytes"
@@ -10,7 +10,6 @@ import (
 	"path/filepath"
 
 	"github.com/4rchr4y/goray/ason"
-	"github.com/4rchr4y/goray/cmd/root"
 	"github.com/spf13/cobra"
 )
 
@@ -23,7 +22,7 @@ You need to provide the path and an optional flag for pretty print.`,
 }
 
 func init() {
-	root.RootCmd.AddCommand(dumpCmd)
+	RootCmd.AddCommand(dumpCmd)
 
 	dumpCmd.Flags().StringP("path", "p", "", "Path to the AST file")
 	dumpCmd.Flags().BoolP("pretty", "", false, "Pretty print JSON output")
