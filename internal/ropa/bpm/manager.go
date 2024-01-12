@@ -17,20 +17,26 @@ type ioWrapper interface {
 	ReadAll(r io.Reader) ([]byte, error)
 }
 
+type validateClient interface {
+	ValidateStruct(s interface{}) error
+}
+
 type Bpm struct {
-	toml   tomlClient
-	tar    tarClient
-	iowrap ioWrapper
+	toml     tomlClient
+	tar      tarClient
+	iowrap   ioWrapper
+	validate validateClient
 }
 
 type BpmConf struct {
 }
 
-func NewBpm(ts tomlClient, tar tarClient, io ioWrapper) *Bpm {
+func NewBpm(ts tomlClient, tar tarClient, io ioWrapper, v validateClient) *Bpm {
 	return &Bpm{
-		toml:   ts,
-		tar:    tar,
-		iowrap: io,
+		toml:     ts,
+		tar:      tar,
+		iowrap:   io,
+		validate: v,
 	}
 }
 
@@ -40,18 +46,4 @@ func (bpm *Bpm) Pack(sourcePath string, destPath string, bundleName string) erro
 	}
 
 	return nil
-}
-
-func (bpm *Bpm) ParseBundleFile(reader io.Reader) (*BundleFile, error) {
-	content, err := bpm.iowrap.ReadAll(reader)
-	if err != nil {
-		return nil, err
-	}
-
-	var bundlefile BundleFile
-	if err := bpm.toml.Decode(string(content), &bundlefile); err != nil {
-		return nil, err
-	}
-
-	return &bundlefile, nil
 }

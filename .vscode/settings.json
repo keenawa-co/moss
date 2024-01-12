@@ -30,6 +30,7 @@
         "stretchr",
         "subdir",
         "subdirs",
+        "svalidator",
         "syswrap",
         "testcode",
         "testmain",

@@ -3,12 +3,15 @@ package command
 import (
 	"errors"
 	"fmt"
+	"log"
 
 	"github.com/4rchr4y/goray/internal/domain/service/tar"
 	"github.com/4rchr4y/goray/internal/domain/service/toml"
+	svalidator "github.com/4rchr4y/goray/internal/domain/service/validator"
 	"github.com/4rchr4y/goray/internal/infra/syswrap"
 	"github.com/4rchr4y/goray/internal/ropa/bpm"
 	"github.com/4rchr4y/goray/pkg/gvalidate"
+	"github.com/go-playground/validator/v10"
 	"github.com/spf13/cobra"
 )
 
@@ -31,7 +34,7 @@ var BuildCmd = &cobra.Command{
 	Short: "Add a new dependency",
 	Long:  ``,
 	Args:  validateArgs,
-	RunE:  runBuildCmd,
+	Run:   runBuildCmd,
 }
 
 func validateArgs(cmd *cobra.Command, args []string) error {
@@ -50,29 +53,35 @@ func validateArgs(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
-func runBuildCmd(cmd *cobra.Command, args []string) error {
+func runBuildCmd(cmd *cobra.Command, args []string) {
 	sourcePath, destPath := args[0], args[1]
 
-	os := new(syswrap.OsClient)
-
+	osWrap := new(syswrap.OsClient)
+	ioWrap := new(syswrap.IoClient)
+	validateClient := svalidator.NewValidatorService(validator.New())
 	ts := toml.NewTomlService()
-	tarClient := tar.NewTarService(os, new(syswrap.FsClient), new(syswrap.IoClient))
-	bpm := bpm.NewBpm(ts, tarClient, new(syswrap.IoClient))
+	tarClient := tar.NewTarService(osWrap, new(syswrap.FsClient), ioWrap)
+	bpmClient := bpm.NewBpm(ts, tarClient, new(syswrap.IoClient), validateClient)
 
-	file, err := os.Open(fmt.Sprintf("%s/bundle.toml", args[0]))
+	file, err := osWrap.Open(fmt.Sprintf("%s/bundle.toml", args[0]))
 	if err != nil {
-		return err
+		log.Fatal(err)
+		return
 	}
 
-	bundlefile, err := bpm.ParseBundleFile(file)
+	bundlefile, err := bpm.DecodeBundleFile(ioWrap, ts, file)
 	if err != nil {
-		return err
+		log.Fatal(err)
+		return
 	}
 
-	fmt.Println(bundlefile.Package.Name)
+	if err := bundlefile.Validate(validateClient); err != nil {
+		log.Fatal(err)
+		return
+	}
 
-	bpm.Pack(sourcePath, destPath, "test.bundle")
-	return nil
+	bpmClient.Pack(sourcePath, destPath, "test.bundle")
+
 }
 
 var InstallCmd = &cobra.Command{
