@@ -10,7 +10,7 @@ import (
 	"github.com/BurntSushi/toml"
 )
 
-type osClient interface {
+type osWrapper interface {
 	LookupEnv(key string) (string, bool)
 }
 
@@ -23,14 +23,14 @@ type encoder interface {
 }
 
 type TomlService struct {
-	os  osClient
+	os  osWrapper
 	dec decoder
 	en  encoder
 }
 
 func NewTomlService() *TomlService {
 	return &TomlService{
-		os:  new(syswrap.OsClient),
+		os:  new(syswrap.OsWrapper),
 		dec: new(Decoder),
 		en:  new(Encoder),
 	}

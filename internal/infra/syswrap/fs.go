@@ -9,41 +9,40 @@ import (
 	"path/filepath"
 )
 
-// TODO: FsWrapper
-type FsClient struct{}
+type FsWrapper struct{}
 
-func (FsClient) OpenFile(name string) (*os.File, error) {
+func (FsWrapper) OpenFile(name string) (*os.File, error) {
 	return os.Open(name)
 }
 
-func (FsClient) GzipReader(reader io.Reader) (*gzip.Reader, error) {
+func (FsWrapper) GzipReader(reader io.Reader) (*gzip.Reader, error) {
 	return gzip.NewReader(reader)
 }
 
-func (FsClient) GzipWriter(writer io.Writer) *gzip.Writer {
+func (FsWrapper) GzipWriter(writer io.Writer) *gzip.Writer {
 	return gzip.NewWriter(writer)
 }
 
-func (FsClient) TarReader(reader io.Reader) *tar.Reader {
+func (FsWrapper) TarReader(reader io.Reader) *tar.Reader {
 	return tar.NewReader(reader)
 }
 
-func (FsClient) TarWriter(writer io.Writer) *tar.Writer {
+func (FsWrapper) TarWriter(writer io.Writer) *tar.Writer {
 	return tar.NewWriter(writer)
 }
 
-func (FsClient) ReadFile(name string) ([]byte, error) {
+func (FsWrapper) ReadFile(name string) ([]byte, error) {
 	return os.ReadFile(name)
 }
 
-func (FsClient) ReadAll(reader io.Reader) ([]byte, error) {
+func (FsWrapper) ReadAll(reader io.Reader) ([]byte, error) {
 	return io.ReadAll(reader)
 }
 
-func (FsClient) Walk(root string, fn filepath.WalkFunc) error {
+func (FsWrapper) Walk(root string, fn filepath.WalkFunc) error {
 	return filepath.Walk(root, fn)
 }
 
-func (FsClient) Stat(name string) (fs.FileInfo, error) {
+func (FsWrapper) Stat(name string) (fs.FileInfo, error) {
 	return os.Stat(name)
 }

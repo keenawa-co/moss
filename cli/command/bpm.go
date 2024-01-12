@@ -56,12 +56,12 @@ func validateArgs(cmd *cobra.Command, args []string) error {
 func runBuildCmd(cmd *cobra.Command, args []string) {
 	sourcePath, destPath := args[0], args[1]
 
-	osWrap := new(syswrap.OsClient)
-	ioWrap := new(syswrap.IoClient)
+	osWrap := new(syswrap.OsWrapper)
+	ioWrap := new(syswrap.IoWrapper)
 	validateClient := svalidator.NewValidatorService(validator.New())
 	ts := toml.NewTomlService()
-	tarClient := tar.NewTarService(osWrap, new(syswrap.FsClient), ioWrap)
-	bpmClient := bpm.NewBpm(ts, tarClient, new(syswrap.IoClient), validateClient)
+	tarClient := tar.NewTarService(osWrap, new(syswrap.FsWrapper), ioWrap)
+	bpmClient := bpm.NewBpm(ts, tarClient, new(syswrap.IoWrapper), validateClient)
 
 	file, err := osWrap.Open(fmt.Sprintf("%s/bundle.toml", args[0]))
 	if err != nil {

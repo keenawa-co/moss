@@ -73,7 +73,7 @@ func runRootCmd(cmd *cobra.Command, args []string) {
 	dbClient := badger.NewBadgerClient(badgerDb)
 	linkerRepo := dbClient.MakeLinkerRepo("goray")
 
-	loader := ropa.NewFsLoader(new(syswrap.FsClient))
+	loader := ropa.NewFsLoader(new(syswrap.FsWrapper))
 	linker := ropa.NewLinker(linkerRepo, radix.NewTree[*ropa.IndexedRegoFile]())
 
 	bundle, err := loader.LoadBundle("test.bundle")
