@@ -49,7 +49,7 @@ func TestDecode(t *testing.T) {
 	t.Run("Successful decode", func(t *testing.T) {
 		service := TomlService{
 			os: &mockOsWrapper{env: testEnv},
-			decoder: &mockDecoderClient{
+			dec: &mockDecoderClient{
 				resp: testDecoderResp,
 			},
 		}
@@ -62,7 +62,7 @@ func TestDecode(t *testing.T) {
 	t.Run("Interpolation error", func(t *testing.T) {
 		service := TomlService{
 			os: &mockOsWrapper{env: make(map[string]string)},
-			decoder: &mockDecoderClient{
+			dec: &mockDecoderClient{
 				resp: testDecoderResp,
 			},
 		}
@@ -74,7 +74,7 @@ func TestDecode(t *testing.T) {
 	t.Run("Decoding error", func(t *testing.T) {
 		service := TomlService{
 			os: &mockOsWrapper{env: testEnv},
-			decoder: &mockDecoderClient{
+			dec: &mockDecoderClient{
 				err: errors.New("decoding error"),
 			},
 		}
