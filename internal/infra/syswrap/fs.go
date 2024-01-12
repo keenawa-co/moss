@@ -9,6 +9,7 @@ import (
 	"path/filepath"
 )
 
+// TODO: FsWrapper
 type FsClient struct{}
 
 func (FsClient) OpenFile(name string) (*os.File, error) {

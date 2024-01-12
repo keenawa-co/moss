@@ -2,6 +2,7 @@ package syswrap
 
 import "os"
 
+// TODO: OsWrapper
 type OsClient struct{}
 
 func (OsClient) Create(name string) (*os.File, error) {
