@@ -9,8 +9,8 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-	"unicode/utf8"
 
+	"github.com/4rchr4y/goray/pkg/gvalidate"
 	"github.com/open-policy-agent/opa/ast"
 )
 
@@ -142,22 +142,21 @@ func (loader *FsLoader) LoadBundle(path string) (*Bundle, error) {
 
 	bundle := &Bundle{
 		Name:  filepath.Clean(path),
-		Files: make([]*RawRegoFile, len(files)),
+		Files: make([]*RawRegoFile, 0),
 	}
 
-	var i uint
-	for path, content := range files {
-		parsed, err := ast.ParseModule(path, string(content))
-		if err != nil {
-			return nil, fmt.Errorf("error parsing file contents: %v", err)
-		}
+	for filePath, content := range files {
+		if filepath.Ext(filePath) == ".rego" {
+			parsed, err := ast.ParseModule(filePath, string(content))
+			if err != nil {
+				return nil, fmt.Errorf("error parsing file contents: %v", err)
+			}
 
-		bundle.Files[i] = &RawRegoFile{
-			Path:   path,
-			Parsed: parsed,
+			bundle.Files = append(bundle.Files, &RawRegoFile{
+				Path:   filePath,
+				Parsed: parsed,
+			})
 		}
-
-		i++
 	}
 
 	return bundle, nil
@@ -181,7 +180,7 @@ func (loader *FsLoader) extractTarContent(tr *tar.Reader) (map[string][]byte, er
 		}
 
 		cleanName := filepath.Clean(header.Name)
-		if err := validatePath(cleanName); err != nil {
+		if err := gvalidate.ValidatePath(cleanName); err != nil {
 			return nil, fmt.Errorf("path '%s' is not valid: %v", header.Name, err)
 		}
 
@@ -194,52 +193,6 @@ func (loader *FsLoader) extractTarContent(tr *tar.Reader) (map[string][]byte, er
 	}
 
 	return result, nil
-}
-
-func validatePath(path string) error {
-	const (
-		minPathLength = 1
-		maxPathLength = 255
-	)
-
-	if len(path) < minPathLength || len(path) > maxPathLength {
-		return fmt.Errorf("length is not within the valid")
-	}
-
-	if !utf8.ValidString(path) {
-		return fmt.Errorf("contains invalid UTF-8 characters")
-	}
-
-	invalidPatterns := []string{"..", "://", "\x00"}
-	for _, pattern := range invalidPatterns {
-		if strings.Contains(path, pattern) {
-			return fmt.Errorf("contains invalid pattern '%s'", pattern)
-		}
-	}
-
-	if strings.Trim(path, " \t\n\r\x00") != path {
-		return fmt.Errorf("begins or ends with whitespace or control characters")
-	}
-
-	cleanedPath := filepath.Clean(path)
-
-	if cleanedPath != path {
-		return fmt.Errorf("potential directory traversal attempt detected")
-	}
-
-	if strings.HasPrefix(cleanedPath, "../") {
-		return fmt.Errorf("attempts to navigate upwards in the directory hierarchy")
-	}
-
-	if filepath.IsAbs(cleanedPath) {
-		return fmt.Errorf("absolute paths are not allowed")
-	}
-
-	if strings.HasPrefix(cleanedPath, "/") {
-		return fmt.Errorf("appears to be an absolute path which is not allowed")
-	}
-
-	return nil
 }
 
 func determinePathType(path string) PathType {

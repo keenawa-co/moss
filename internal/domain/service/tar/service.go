@@ -3,6 +3,7 @@ package tar
 import (
 	"archive/tar"
 	"compress/gzip"
+	"fmt"
 	"io"
 	"os"
 	"path/filepath"
@@ -28,7 +29,15 @@ type TarService struct {
 	ioCli ioClient
 }
 
-func (ts *TarService) Compress(files []string, targetDir string, archiveName string) error {
+func NewTarService(osCli osClient, fsCli fsClient, ioCli ioClient) *TarService {
+	return &TarService{
+		osCli: osCli,
+		fsCli: fsCli,
+		ioCli: ioCli,
+	}
+}
+
+func (ts *TarService) Compress(dirPath string, targetDir string, archiveName string) error {
 	archiveFile, err := ts.osCli.Create(filepath.Join(targetDir, archiveName))
 	if err != nil {
 		return err
@@ -41,16 +50,49 @@ func (ts *TarService) Compress(files []string, targetDir string, archiveName str
 	tarWriter := ts.fsCli.TarWriter(gzipWriter)
 	defer tarWriter.Close()
 
-	for _, file := range files {
-		if err := ts.processFileToTar(file, tarWriter); err != nil {
+	err = filepath.Walk(dirPath, func(filePath string, fi os.FileInfo, err error) error {
+		if err != nil {
 			return err
 		}
+
+		relativePath, err := filepath.Rel(dirPath, filePath)
+		if err != nil {
+			return err
+		}
+
+		if fi.IsDir() {
+			if err := ts.processDirToTar(fi, tarWriter, relativePath); err != nil {
+				return fmt.Errorf("failed to process directory '%s' into archive: %v", relativePath, err)
+			}
+
+			return nil
+		}
+
+		if err := ts.processFileToTar(filePath, tarWriter, relativePath); err != nil {
+			return fmt.Errorf("failed to process file '%s' into archive: %v", relativePath, err)
+		}
+
+		return nil
+	})
+
+	if err != nil {
+		return fmt.Errorf("error occurred while walking through the directory '%s': %v", dirPath, err)
 	}
 
 	return nil
 }
 
-func (ts *TarService) processFileToTar(filePath string, writer *tar.Writer) error {
+func (ts *TarService) processDirToTar(fi os.FileInfo, writer *tar.Writer, relativePath string) error {
+	header := &tar.Header{
+		Name:    relativePath + "/",
+		Mode:    int64(fi.Mode()),
+		ModTime: fi.ModTime(),
+	}
+
+	return writer.WriteHeader(header)
+}
+
+func (ts *TarService) processFileToTar(filePath string, writer *tar.Writer, relativePath string) error {
 	file, err := ts.osCli.Open(filePath)
 	if err != nil {
 		return err
@@ -63,7 +105,7 @@ func (ts *TarService) processFileToTar(filePath string, writer *tar.Writer) erro
 	}
 
 	header := &tar.Header{
-		Name:    filepath.Base(filePath),
+		Name:    relativePath,
 		Size:    stat.Size(),
 		Mode:    int64(stat.Mode()),
 		ModTime: stat.ModTime(),

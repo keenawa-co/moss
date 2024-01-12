@@ -36,10 +36,10 @@ type evalOutput struct {
 
 var policies = []*rayfile.PolicyDef{
 	{
-		Path:   "builtin/opa/policy/r1.rego",
-		Target: []string{"testdata/main.go"},
-		// Dependencies: []string{"testdata/test.rego"},
-		Dependencies: []string{"testdata"},
+		Path:         "builtin/opa/policy/r1.rego",
+		Target:       []string{"testdata/main.go"},
+		Dependencies: []string{"testdata/test.rego"},
+		// Dependencies: []string{"testdata"},
 	},
 
 	// {
@@ -76,7 +76,7 @@ func runRootCmd(cmd *cobra.Command, args []string) {
 	loader := ropa.NewFsLoader(new(syswrap.FsClient))
 	linker := ropa.NewLinker(linkerRepo, radix.NewTree[*ropa.IndexedRegoFile]())
 
-	bundle, err := loader.LoadBundle("bundle.tar.gz")
+	bundle, err := loader.LoadBundle("test.bundle")
 	if err != nil {
 		log.Fatal(err)
 		return

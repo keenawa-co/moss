@@ -13,7 +13,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var dumpCmd = &cobra.Command{
+var DumpCmd = &cobra.Command{
 	Use:   "dump",
 	Short: "Dump AST file in JSON format",
 	Long: `Dump AST file in JSON format. 
@@ -22,12 +22,12 @@ You need to provide the path and an optional flag for pretty print.`,
 }
 
 func init() {
-	RootCmd.AddCommand(dumpCmd)
+	RootCmd.AddCommand(DumpCmd)
 
-	dumpCmd.Flags().StringP("path", "p", "", "Path to the AST file")
-	dumpCmd.Flags().BoolP("pretty", "", false, "Pretty print JSON output")
+	DumpCmd.Flags().StringP("path", "p", "", "Path to the AST file")
+	DumpCmd.Flags().BoolP("pretty", "", false, "Pretty print JSON output")
 
-	dumpCmd.MarkFlagRequired("path")
+	DumpCmd.MarkFlagRequired("path")
 }
 
 func runDumpCmd(cmd *cobra.Command, args []string) error {
