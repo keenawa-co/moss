@@ -1,19 +1,19 @@
-version = 0
+version = 1
 
 [[modules]]
-  name = "data.lib.go.ast.kinds"
+  name = "data.go.ast.kinds"
   source = "builtin/opa/lib/go/ast/kinds.rego"
-  checksum = ""
-  dependencies = ["data.lib.go.ast.tokens"]
+  checksum = "a7085971403bd25f53618c0082b19fa3"
+  dependencies = ["data.go.ast.tokens"]
 
 [[modules]]
-  name = "data.lib.go.ast.tokens"
+  name = "data.go.ast.tokens"
   source = "builtin/opa/lib/go/ast/tokens.rego"
-  checksum = ""
+  checksum = "bab77683b9af5db3f409e361580ee04a"
   dependencies = []
 
 [[modules]]
-  name = "data.lib.go.ast.types"
+  name = "data.go.ast.types"
   source = "builtin/opa/lib/go/ast/types.rego"
-  checksum = ""
+  checksum = "77360cfbe92ab46a5fb1689d41d81542"
   dependencies = []

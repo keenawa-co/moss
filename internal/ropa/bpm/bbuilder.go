@@ -1,6 +1,8 @@
 package bpm
 
 import (
+	"crypto/md5"
+	"encoding/hex"
 	"fmt"
 	"io"
 	"os"
@@ -8,6 +10,7 @@ import (
 	"strings"
 
 	"github.com/4rchr4y/goray/internal/ropa/loader"
+	"github.com/4rchr4y/goray/version"
 )
 
 type fsWrapper interface {
@@ -75,6 +78,7 @@ func (bb *BundleBuilder) createBundleLockFile(dirPath string) (*BundleLock, erro
 	}
 
 	return &BundleLock{
+		Version: version.BPM,
 		Modules: modules,
 	}, nil
 }
@@ -85,9 +89,11 @@ func (bb *BundleBuilder) processRegoFile(path string) (*ModuleDef, error) {
 		return nil, err
 	}
 
+	hash := md5.Sum([]byte(rawRegoFile.Parsed.String()))
 	modDef := &ModuleDef{
 		Name:         rawRegoFile.Parsed.Package.Path.String(),
 		Source:       path,
+		Checksum:     hex.EncodeToString(hash[:]),
 		Dependencies: getImportsList(rawRegoFile),
 	}
 
