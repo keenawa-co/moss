@@ -1,4 +1,4 @@
-package lib.go.ast.types
+package go.ast.types
 
 invalid := "Invalid"
 file := "File"

@@ -1,4 +1,4 @@
-package lib.go.ast.tokens
+package go.ast.tokens
 
 illegal := "ILLEGAL"
 eof := "EOF"

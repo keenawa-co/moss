@@ -1,6 +1,6 @@
-package lib.go.ast.kinds
+package go.ast.kinds
 
-import data.lib.go.ast.tokens
+import data.go.ast.tokens
 
 bad :="bad"
 _package :="package"
