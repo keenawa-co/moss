@@ -1,6 +1,6 @@
 package constant
 
 const (
-	RegoPackageManagerFile     = "judge.toml"
-	RegoPackageManagerFileLock = "judge.lock"
+	RegoPackageManagerFile     = "bundle.toml"
+	RegoPackageManagerFileLock = "bundle.lock"
 )

@@ -5,45 +5,63 @@ import (
 	"io"
 )
 
-type tomlClient interface {
-	Decode(data string, v interface{}) error
-}
-
-type tarClient interface {
-	Compress(dirPath string, targetDir string, archiveName string) error
-}
-
 type ioWrapper interface {
 	ReadAll(r io.Reader) ([]byte, error)
 }
 
-type validateClient interface {
-	ValidateStruct(s interface{}) error
-}
+type cmdRegistry map[string]Command
 
-type Bpm struct {
-	toml     tomlClient
-	tar      tarClient
-	iowrap   ioWrapper
-	validate validateClient
-}
-
-type BpmConf struct {
-}
-
-func NewBpm(ts tomlClient, tar tarClient, io ioWrapper, v validateClient) *Bpm {
-	return &Bpm{
-		toml:     ts,
-		tar:      tar,
-		iowrap:   io,
-		validate: v,
+func (cr cmdRegistry) get(name string) (Command, error) {
+	cmd, ok := cr[name]
+	if !ok {
+		return nil, fmt.Errorf("command '%s' is doesn't exists", name)
 	}
+
+	return cmd, nil
 }
 
-func (bpm *Bpm) Pack(sourcePath string, destPath string, bundleName string) error {
-	if err := bpm.tar.Compress(sourcePath, destPath, bundleName); err != nil {
-		return fmt.Errorf("error occurred while packing '%s' bundle: %v", bundleName, err)
+func (cr cmdRegistry) set(command Command) error {
+	_, ok := cr[command.Name()]
+	if ok {
+		return fmt.Errorf("command '%s' is already exists", command.Name())
+	}
+
+	// register command
+	cr[command.Name()] = command
+
+	for i := range command.Requires() {
+		cmd, ok := cr[command.Requires()[i]]
+		if !ok {
+			return fmt.Errorf("command '%s' is doesn't exists", command.Requires()[i])
+		}
+
+		// register nested command
+		cr[command.Name()].setCommand(cmd)
 	}
 
 	return nil
+}
+
+type Bpm struct {
+	registry cmdRegistry
+}
+
+func NewBpm() *Bpm {
+	return &Bpm{
+		registry: make(cmdRegistry),
+	}
+}
+
+func (bpm *Bpm) RegisterCommand(commands ...Command) error {
+	for i := range commands {
+		if err := bpm.registry.set(commands[i]); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (bpm *Bpm) Command(cmdName string) (Command, error) {
+	return bpm.registry.get(cmdName)
 }
