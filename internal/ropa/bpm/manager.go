@@ -36,7 +36,7 @@ func (cr cmdRegistry) set(command Command) error {
 		}
 
 		// register nested command
-		cr[command.Name()].setCommand(cmd)
+		cr[command.Name()].SetCommand(cmd)
 	}
 
 	return nil

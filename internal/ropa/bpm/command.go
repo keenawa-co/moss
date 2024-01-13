@@ -12,10 +12,10 @@ import (
 type Command interface {
 	Name() string
 	Requires() []string
+	SetCommand(cmd Command) error
 	Execute(input interface{}) error
 
 	bpmCmd()
-	setCommand(cmd Command) error
 }
 
 const (
@@ -46,11 +46,8 @@ type buildCommand struct {
 	subregistry cmdRegistry
 }
 
-func (cmd *buildCommand) bpmCmd() {}
-
-func (cmd *buildCommand) Name() string {
-	return cmd.cmdName
-}
+func (cmd *buildCommand) bpmCmd()      {}
+func (cmd *buildCommand) Name() string { return cmd.cmdName }
 
 func (cmd *buildCommand) Requires() []string {
 	return []string{
@@ -58,7 +55,7 @@ func (cmd *buildCommand) Requires() []string {
 	}
 }
 
-func (cmd *buildCommand) setCommand(c Command) error {
+func (cmd *buildCommand) SetCommand(c Command) error {
 	_, ok := cmd.subregistry[c.Name()]
 	if ok {
 		return fmt.Errorf("command '%s' in '%s' command is already exists", c.Name(), cmd.cmdName)
@@ -92,13 +89,13 @@ func (cmd *buildCommand) Execute(input interface{}) error {
 	return nil
 }
 
-type BuildCommandInput struct {
+type BuildCmdInput struct {
 	FsWrap fsWrapper
 	Tar    tarClient
 	Toml   tomlClient
 }
 
-func NewBuildCommand(input *BuildCommandInput) Command {
+func NewBuildCommand(input *BuildCmdInput) Command {
 	return &buildCommand{
 		cmdName:     BuildCommandName,
 		fswrap:      input.FsWrap,
@@ -148,20 +145,10 @@ type validateCommand struct {
 	validate validateClient
 }
 
-func (cmd *validateCommand) bpmCmd() {}
-
-func (cmd *validateCommand) Name() string {
-	return cmd.cmdName
-}
-
-func (cmd *validateCommand) Requires() []string {
-	// No nested commands required
-	return nil
-}
-
-func (cmd *validateCommand) setCommand(c Command) error {
-	return nil
-}
+func (cmd *validateCommand) bpmCmd()                  {}
+func (cmd *validateCommand) Name() string             { return cmd.cmdName }
+func (cmd *validateCommand) Requires() []string       { return nil }
+func (cmd *validateCommand) SetCommand(Command) error { return nil }
 
 type ValidateCmdExecuteInput struct {
 	BundleFile *BundleFile
@@ -180,11 +167,11 @@ func (cmd *validateCommand) Execute(input interface{}) error {
 	return nil
 }
 
-type ValidateCommandInput struct {
+type ValidateCmdInput struct {
 	Validate validateClient
 }
 
-func NewValidateCommand(input *ValidateCommandInput) Command {
+func NewValidateCommand(input *ValidateCmdInput) Command {
 	return &validateCommand{
 		cmdName:  ValidateCommandName,
 		validate: input.Validate,

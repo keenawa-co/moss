@@ -64,11 +64,11 @@ func runBuildCmd(cmd *cobra.Command, args []string) {
 	tarClient := tar.NewTarService(osWrap, fsWrap, ioWrap)
 	bpmClient := bpm.NewBpm()
 	bpmClient.RegisterCommand(
-		bpm.NewValidateCommand(&bpm.ValidateCommandInput{
+		bpm.NewValidateCommand(&bpm.ValidateCmdInput{
 			Validate: validateClient,
 		}),
 
-		bpm.NewBuildCommand(&bpm.BuildCommandInput{
+		bpm.NewBuildCommand(&bpm.BuildCmdInput{
 			FsWrap: fsWrap,
 			Tar:    tarClient,
 			Toml:   tomlClient,
