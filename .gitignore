@@ -5,3 +5,6 @@
 .goray
 
 *.tar.gz
+*.bundle
+
+.DS_Store
