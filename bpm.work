@@ -1,0 +1,5 @@
+[workspace]
+path="builtint/opa"
+packages=[
+    "lib/go/ast"
+]
