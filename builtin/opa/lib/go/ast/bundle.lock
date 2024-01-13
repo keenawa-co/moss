@@ -1,8 +1,19 @@
-version = 1
+version = 0
 
-[[module]]
-name = ""
-source = ""
-checksum = ""
-dependencies = []
+[[modules]]
+  name = "data.lib.go.ast.kinds"
+  source = "builtin/opa/lib/go/ast/kinds.rego"
+  checksum = ""
+  dependencies = ["data.lib.go.ast.tokens"]
 
+[[modules]]
+  name = "data.lib.go.ast.tokens"
+  source = "builtin/opa/lib/go/ast/tokens.rego"
+  checksum = ""
+  dependencies = []
+
+[[modules]]
+  name = "data.lib.go.ast.types"
+  source = "builtin/opa/lib/go/ast/types.rego"
+  checksum = ""
+  dependencies = []

@@ -3,10 +3,7 @@ package bpm
 import (
 	"fmt"
 	"io"
-	"os"
-	"path/filepath"
 	"reflect"
-	"strings"
 )
 
 type Command interface {
@@ -25,24 +22,19 @@ const (
 
 // ----------------- Build Command ----------------- //
 
-type fsWrapper interface {
-	Walk(root string, fn filepath.WalkFunc) error
-}
-
-type tarClient interface {
-	Compress(dirPath string, targetDir string, archiveName string) error
-}
-
 type tomlClient interface {
 	Decode(data string, v interface{}) error
 	Encode(w io.Writer, v interface{}) error
 }
 
+type bundleBuilder interface {
+	Build(input *BundleBuildInput) error
+}
+
 type buildCommand struct {
 	cmdName     string
-	fswrap      fsWrapper
-	tar         tarClient
 	toml        tomlClient
+	bbuilder    bundleBuilder
 	subregistry cmdRegistry
 }
 
@@ -68,8 +60,10 @@ func (cmd *buildCommand) SetCommand(c Command) error {
 type BuildCmdExecuteInput struct {
 	*ValidateCmdExecuteInput
 
+	_          [0]int
 	SourcePath string
 	DestPath   string
+	BLWriter   io.Writer
 }
 
 func (cmd *buildCommand) Execute(input interface{}) error {
@@ -78,11 +72,18 @@ func (cmd *buildCommand) Execute(input interface{}) error {
 		return fmt.Errorf("type '%s' is invalid input type for '%s' command", reflect.TypeOf(input).Elem().Kind().String(), cmd.cmdName)
 	}
 
-	if err := cmd.subregistry[ValidateCommandName].Execute(typedInput.ValidateCmdExecuteInput); err != nil {
+	validateCmd := cmd.subregistry[ValidateCommandName]
+	if err := validateCmd.Execute(typedInput.ValidateCmdExecuteInput); err != nil {
 		return err
 	}
 
-	if err := cmd.buildBundle(typedInput.SourcePath, typedInput.DestPath, "test.bundle"); err != nil {
+	bbInput := &BundleBuildInput{
+		SourcePath: typedInput.SourcePath,
+		DestPath:   typedInput.DestPath,
+		BundleName: "test.bundle",
+		BLWriter:   typedInput.BLWriter,
+	}
+	if err := cmd.bbuilder.Build(bbInput); err != nil {
 		return err
 	}
 
@@ -90,48 +91,27 @@ func (cmd *buildCommand) Execute(input interface{}) error {
 }
 
 type BuildCmdInput struct {
-	FsWrap fsWrapper
-	Tar    tarClient
-	Toml   tomlClient
+	FsWrap           fsWrapper
+	Tar              tarClient
+	Toml             tomlClient
+	RegoFileLoader   regoFileLoader
+	BundleLockWriter io.Writer
 }
 
 func NewBuildCommand(input *BuildCmdInput) Command {
+	bbuilder := &BundleBuilder{
+		fswrap: input.FsWrap,
+		tar:    input.Tar,
+		toml:   input.Toml,
+		loader: input.RegoFileLoader,
+	}
+
 	return &buildCommand{
 		cmdName:     BuildCommandName,
-		fswrap:      input.FsWrap,
-		tar:         input.Tar,
 		toml:        input.Toml,
+		bbuilder:    bbuilder,
 		subregistry: make(cmdRegistry),
 	}
-}
-
-func (cmd *buildCommand) createBundleLockFile(dirPath string) (*BundleLock, error) {
-	walkFunc := func(path string, info os.FileInfo, err error) error {
-		if err != nil {
-			fmt.Printf("prevent panic by handling failure accessing a path %q: %v\n", path, err)
-			return err
-		}
-
-		if !info.IsDir() && strings.HasSuffix(info.Name(), ".rego") {
-			fmt.Println(path)
-		}
-		return nil
-	}
-
-	err := cmd.fswrap.Walk(dirPath, walkFunc)
-	if err != nil {
-		fmt.Printf("error walking the path %q: %v\n", dirPath, err)
-	}
-
-	return nil, nil
-}
-
-func (cmd *buildCommand) buildBundle(sourcePath string, destPath string, bundleName string) error {
-	if err := cmd.tar.Compress(sourcePath, destPath, bundleName); err != nil {
-		return fmt.Errorf("error occurred while building '%s' bundle: %v", bundleName, err)
-	}
-
-	return nil
 }
 
 // ----------------- Validate Command ----------------- //

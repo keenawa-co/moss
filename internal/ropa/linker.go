@@ -2,6 +2,8 @@ package ropa
 
 import (
 	"fmt"
+
+	"github.com/4rchr4y/goray/internal/ropa/loader"
 )
 
 type repoCli interface {
@@ -16,12 +18,12 @@ type radixTree interface {
 }
 
 type IndexedRegoFile struct {
-	*RawRegoFile
+	*loader.RawRegoFile
 	WantList []string
 }
 
 type LinkedRegoFile struct {
-	*RawRegoFile
+	*loader.RawRegoFile
 	Dependencies map[string]*IndexedRegoFile
 }
 
@@ -31,7 +33,7 @@ type storage struct {
 	loaded    radixTree         // file path -> file
 }
 
-func (s *storage) cache(file *RawRegoFile) {
+func (s *storage) cache(file *loader.RawRegoFile) {
 	packagePath := file.Parsed.Package.Path.String()
 	s.pathCache[packagePath] = file.Path
 }
@@ -73,7 +75,7 @@ func (linker *Linker) Loading(importPath string) (*IndexedRegoFile, error) {
 	return file, nil
 }
 
-func (linker *Linker) Indexing(rawFile *RawRegoFile) (*IndexedRegoFile, error) {
+func (linker *Linker) Indexing(rawFile *loader.RawRegoFile) (*IndexedRegoFile, error) {
 	linker.storage.cache(rawFile)
 
 	wantList := make([]string, len(rawFile.Parsed.Imports))

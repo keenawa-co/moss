@@ -1,4 +1,4 @@
-package ropa
+package loader
 
 import (
 	"archive/tar"

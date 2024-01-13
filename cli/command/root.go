@@ -12,6 +12,7 @@ import (
 	"github.com/4rchr4y/goray/internal/infra/db/badger"
 	"github.com/4rchr4y/goray/internal/infra/syswrap"
 	"github.com/4rchr4y/goray/internal/ropa"
+	"github.com/4rchr4y/goray/internal/ropa/loader"
 	"github.com/4rchr4y/goray/pkg/radix"
 	"github.com/4rchr4y/goray/rayfile"
 	"github.com/spf13/cobra"
@@ -73,20 +74,20 @@ func runRootCmd(cmd *cobra.Command, args []string) {
 	dbClient := badger.NewBadgerClient(badgerDb)
 	linkerRepo := dbClient.MakeLinkerRepo("goray")
 
-	loader := ropa.NewFsLoader(new(syswrap.FsWrapper))
+	rfl := loader.NewFsLoader(new(syswrap.FsWrapper))
 	linker := ropa.NewLinker(linkerRepo, radix.NewTree[*ropa.IndexedRegoFile]())
 
-	bundle, err := loader.LoadBundle("test.bundle")
+	bundle, err := rfl.LoadBundle("test.bundle")
 	if err != nil {
 		log.Fatal(err)
 		return
 	}
 
-	rawRegoFiles := make([]*ropa.RawRegoFile, 0)
+	rawRegoFiles := make([]*loader.RawRegoFile, 0)
 	rawRegoFiles = append(rawRegoFiles, bundle.Files...)
 
 	for _, pd := range policies {
-		file, err := loader.LoadRegoFile(pd.Path)
+		file, err := rfl.LoadRegoFile(pd.Path)
 		if err != nil {
 			log.Fatal(err)
 			return
@@ -95,7 +96,7 @@ func runRootCmd(cmd *cobra.Command, args []string) {
 		rawRegoFiles = append(rawRegoFiles, file)
 
 		for _, path := range pd.Dependencies {
-			depFile, err := loader.LoadRegoFile(path)
+			depFile, err := rfl.LoadRegoFile(path)
 			if err != nil {
 				log.Fatal(err)
 				return

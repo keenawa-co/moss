@@ -10,6 +10,7 @@ import (
 	svalidator "github.com/4rchr4y/goray/internal/domain/service/validator"
 	"github.com/4rchr4y/goray/internal/infra/syswrap"
 	"github.com/4rchr4y/goray/internal/ropa/bpm"
+	"github.com/4rchr4y/goray/internal/ropa/loader"
 	"github.com/4rchr4y/goray/pkg/gvalidate"
 	"github.com/go-playground/validator/v10"
 	"github.com/spf13/cobra"
@@ -69,9 +70,10 @@ func runBuildCmd(cmd *cobra.Command, args []string) {
 		}),
 
 		bpm.NewBuildCommand(&bpm.BuildCmdInput{
-			FsWrap: fsWrap,
-			Tar:    tarClient,
-			Toml:   tomlClient,
+			FsWrap:         fsWrap,
+			Tar:            tarClient,
+			Toml:           tomlClient,
+			RegoFileLoader: loader.NewFsLoader(fsWrap),
 		}),
 	)
 
@@ -87,12 +89,13 @@ func runBuildCmd(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	// if err := bundlefile.Validate(validateClient); err != nil {
-	// 	log.Fatal(err)
-	// 	return
-	// }
-
 	buildCommand, err := bpmClient.Command(bpm.BuildCommandName)
+	if err != nil {
+		log.Fatal(err)
+		return
+	}
+
+	bundlelock, err := osWrap.Create(fmt.Sprintf("%s/bundle.lock", args[0]))
 	if err != nil {
 		log.Fatal(err)
 		return
@@ -101,6 +104,7 @@ func runBuildCmd(cmd *cobra.Command, args []string) {
 	if err := buildCommand.Execute(&bpm.BuildCmdExecuteInput{
 		SourcePath: sourcePath,
 		DestPath:   destPath,
+		BLWriter:   bundlelock,
 		ValidateCmdExecuteInput: &bpm.ValidateCmdExecuteInput{
 			BundleFile: bundlefile,
 		},
@@ -108,10 +112,6 @@ func runBuildCmd(cmd *cobra.Command, args []string) {
 		log.Fatal(err)
 		return
 	}
-
-	// bpmClient.CreateBundleLockFile(sourcePath)
-	// bpmClient.BuildBundle(sourcePath, destPath, "test.bundle")
-
 }
 
 var InstallCmd = &cobra.Command{
