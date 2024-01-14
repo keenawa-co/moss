@@ -25,7 +25,7 @@ func init() {
 }
 
 var RpmCmd = &cobra.Command{
-	Use:   "rpm",
+	Use:   "bpm",
 	Short: "Add a new dependency",
 	Long:  ``,
 }

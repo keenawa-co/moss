@@ -1,5 +1,5 @@
 [workspace]
-path="builtint/opa"
+path="builtin/opa"
 author = ["g10z3r <g10z3r@duck.com>"]
 packages=[
     "lib/go/ast"

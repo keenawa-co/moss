@@ -4,6 +4,9 @@ import (
 	"fmt"
 	"io"
 	"reflect"
+	"strings"
+
+	"github.com/4rchr4y/goray/constant"
 )
 
 type Command interface {
@@ -77,10 +80,13 @@ func (cmd *buildCommand) Execute(input interface{}) error {
 		return err
 	}
 
+	fmt.Println(typedInput.SourcePath)
+
+	bundleName := strings.ReplaceAll(typedInput.ValidateCmdExecuteInput.BundleFile.Package.Name, ".", "_")
 	bbInput := &BundleBuildInput{
 		SourcePath: typedInput.SourcePath,
 		DestPath:   typedInput.DestPath,
-		BundleName: "test.bundle",
+		BundleName: fmt.Sprintf("%s%s", bundleName, constant.BPMBundleExt),
 		BLWriter:   typedInput.BLWriter,
 	}
 	if err := cmd.bbuilder.Build(bbInput); err != nil {
