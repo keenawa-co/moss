@@ -9,7 +9,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/4rchr4y/goray/internal/ropa/loader"
+	"github.com/4rchr4y/goray/internal/ropa/types"
 	"github.com/4rchr4y/goray/version"
 )
 
@@ -22,7 +22,7 @@ type tarClient interface {
 }
 
 type regoFileLoader interface {
-	LoadRegoFile(path string) (*loader.RawRegoFile, error)
+	LoadRegoFile(path string) (*types.RawRegoFile, error)
 }
 
 type BundleBuilder struct {
@@ -46,15 +46,15 @@ func (bb *BundleBuilder) Build(input *BundleBuildInput) error {
 		return fmt.Errorf("failed to create %s/bundle.lock: %v", input.SourcePath, err)
 	}
 
-	if err := EncodeBundleLock(bb.toml, input.BLWriter, bundlelock); err != nil {
+	if err := types.EncodeBundleLock(bb.toml, input.BLWriter, bundlelock); err != nil {
 		return fmt.Errorf("error occurred while writing to %s/bundle.lock: %v", input.SourcePath, err)
 	}
 
 	return bb.buildBundle(input)
 }
 
-func (bb *BundleBuilder) createBundleLockFile(dirPath string) (*BundleLock, error) {
-	modules := make([]*ModuleDef, 0)
+func (bb *BundleBuilder) createBundleLockFile(dirPath string) (*types.BundleLockFile, error) {
+	modules := make([]*types.ModuleDef, 0)
 
 	walkFunc := func(path string, info os.FileInfo, err error) error {
 		if err != nil {
@@ -77,20 +77,20 @@ func (bb *BundleBuilder) createBundleLockFile(dirPath string) (*BundleLock, erro
 		return nil, fmt.Errorf("error walking the path %s: %v", dirPath, err)
 	}
 
-	return &BundleLock{
+	return &types.BundleLockFile{
 		Version: version.BPM,
 		Modules: modules,
 	}, nil
 }
 
-func (bb *BundleBuilder) processRegoFile(path string) (*ModuleDef, error) {
+func (bb *BundleBuilder) processRegoFile(path string) (*types.ModuleDef, error) {
 	rawRegoFile, err := bb.loader.LoadRegoFile(path)
 	if err != nil {
 		return nil, err
 	}
 
 	hash := md5.Sum([]byte(rawRegoFile.Parsed.String()))
-	modDef := &ModuleDef{
+	modDef := &types.ModuleDef{
 		Name:         rawRegoFile.Parsed.Package.Path.String(),
 		Source:       path,
 		Checksum:     hex.EncodeToString(hash[:]),
@@ -108,7 +108,7 @@ func (bb *BundleBuilder) buildBundle(input *BundleBuildInput) error {
 	return nil
 }
 
-func getImportsList(file *loader.RawRegoFile) []string {
+func getImportsList(file *types.RawRegoFile) []string {
 	result := make([]string, len(file.Parsed.Imports))
 
 	for i, _import := range file.Parsed.Imports {

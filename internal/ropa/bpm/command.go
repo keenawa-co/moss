@@ -3,10 +3,13 @@ package bpm
 import (
 	"fmt"
 	"io"
+	"io/fs"
+	"os"
 	"reflect"
 	"strings"
 
 	"github.com/4rchr4y/goray/constant"
+	"github.com/4rchr4y/goray/internal/ropa/types"
 )
 
 type Command interface {
@@ -21,6 +24,7 @@ type Command interface {
 const (
 	BuildCommandName    = "build"
 	ValidateCommandName = "validate"
+	GetCommandName      = "get"
 )
 
 // ----------------- Build Command ----------------- //
@@ -80,8 +84,6 @@ func (cmd *buildCommand) Execute(input interface{}) error {
 		return err
 	}
 
-	fmt.Println(typedInput.SourcePath)
-
 	bundleName := strings.ReplaceAll(typedInput.ValidateCmdExecuteInput.BundleFile.Package.Name, ".", "_")
 	bbInput := &BundleBuildInput{
 		SourcePath: typedInput.SourcePath,
@@ -137,7 +139,7 @@ func (cmd *validateCommand) Requires() []string       { return nil }
 func (cmd *validateCommand) SetCommand(Command) error { return nil }
 
 type ValidateCmdExecuteInput struct {
-	BundleFile *BundleFile
+	BundleFile *types.BundleFile
 }
 
 func (cmd *validateCommand) Execute(input interface{}) error {
@@ -161,5 +163,60 @@ func NewValidateCommand(input *ValidateCmdInput) Command {
 	return &validateCommand{
 		cmdName:  ValidateCommandName,
 		validate: input.Validate,
+	}
+}
+
+// ----------------- Get Command ----------------- //
+
+type osWrapper interface {
+	Mkdir(name string, perm fs.FileMode) error
+	Stat(name string) (fs.FileInfo, error)
+}
+
+type getCommand struct {
+	cmdName string
+	os      osWrapper
+}
+
+func (cmd *getCommand) bpmCmd()                  {}
+func (cmd *getCommand) Name() string             { return cmd.cmdName }
+func (cmd *getCommand) Requires() []string       { return nil }
+func (cmd *getCommand) SetCommand(Command) error { return nil }
+
+type GetCmdInput struct {
+	HomeDir    string
+	BundleFile *types.BundleFile
+}
+
+func (cmd *getCommand) Execute(input interface{}) error {
+	typedInput, ok := input.(*GetCmdInput)
+	if !ok {
+		return fmt.Errorf("type '%s' is invalid input type for '%s' command", reflect.TypeOf(input), cmd.cmdName)
+	}
+
+	bpmDirPath := fmt.Sprintf("%s/%s", typedInput.HomeDir, constant.BPMDir)
+	if err := cmd.prepareBpmDir(bpmDirPath); err != nil {
+		return fmt.Errorf("error occurred while creating '%s' directory: %v", bpmDirPath, err)
+	}
+
+	return nil
+}
+
+func (cmd *getCommand) prepareBpmDir(bpmDirPath string) error {
+	if _, err := cmd.os.Stat(bpmDirPath); !os.IsNotExist(err) {
+		return err
+	}
+
+	if err := cmd.os.Mkdir(bpmDirPath, 0755); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func NewGetCommand(osWrap osWrapper) Command {
+	return &getCommand{
+		cmdName: GetCommandName,
+		os:      osWrap,
 	}
 }

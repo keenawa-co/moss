@@ -13,6 +13,7 @@ import (
 	"github.com/4rchr4y/goray/internal/infra/syswrap"
 	"github.com/4rchr4y/goray/internal/ropa"
 	"github.com/4rchr4y/goray/internal/ropa/loader"
+	"github.com/4rchr4y/goray/internal/ropa/types"
 	"github.com/4rchr4y/goray/pkg/radix"
 	"github.com/4rchr4y/goray/rayfile"
 	"github.com/spf13/cobra"
@@ -83,8 +84,11 @@ func runRootCmd(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	rawRegoFiles := make([]*loader.RawRegoFile, 0)
-	rawRegoFiles = append(rawRegoFiles, bundle.Files...)
+	rawRegoFiles := make([]*types.RawRegoFile, 0)
+
+	for _, f := range bundle.RegoFiles {
+		rawRegoFiles = append(rawRegoFiles, f)
+	}
 
 	for _, pd := range policies {
 		file, err := rfl.LoadRegoFile(pd.Path)

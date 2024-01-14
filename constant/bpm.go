@@ -5,4 +5,7 @@ const (
 	BPMLockFile  = "bundle.lock"
 	BPMWorkFile  = "bpm.work"
 	BPMBundleExt = ".bundle"
+
+	BPMDir  = ".bpm"
+	RegoExt = ".rego"
 )

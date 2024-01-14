@@ -11,6 +11,7 @@ import (
 	"github.com/4rchr4y/goray/internal/infra/syswrap"
 	"github.com/4rchr4y/goray/internal/ropa/bpm"
 	"github.com/4rchr4y/goray/internal/ropa/loader"
+	"github.com/4rchr4y/goray/internal/ropa/types"
 	"github.com/4rchr4y/goray/pkg/gvalidate"
 	"github.com/go-playground/validator/v10"
 	"github.com/spf13/cobra"
@@ -18,10 +19,10 @@ import (
 
 func init() {
 	RootCmd.AddCommand(RpmCmd)
-	RpmCmd.AddCommand(InstallCmd)
+	RpmCmd.AddCommand(GetCmd)
 	RpmCmd.AddCommand(BuildCmd)
 
-	InstallCmd.Flags().BoolP("global", "g", false, "global install")
+	GetCmd.Flags().BoolP("global", "g", false, "global install")
 }
 
 var RpmCmd = &cobra.Command{
@@ -30,15 +31,17 @@ var RpmCmd = &cobra.Command{
 	Long:  ``,
 }
 
+// ----------------- Build Command ----------------- //
+
 var BuildCmd = &cobra.Command{
 	Use:   "build",
 	Short: "Add a new dependency",
 	Long:  ``,
-	Args:  validateArgs,
+	Args:  validateBuildCmdArgs,
 	Run:   runBuildCmd,
 }
 
-func validateArgs(cmd *cobra.Command, args []string) error {
+func validateBuildCmdArgs(cmd *cobra.Command, args []string) error {
 	if len(args) != 2 {
 		return errors.New("wrong number of arguments")
 	}
@@ -83,7 +86,7 @@ func runBuildCmd(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	bundlefile, err := bpm.DecodeBundleFile(ioWrap, tomlClient, file)
+	bundlefile, err := types.DecodeBundleFile(ioWrap, tomlClient, file)
 	if err != nil {
 		log.Fatal(err)
 		return
@@ -114,15 +117,29 @@ func runBuildCmd(cmd *cobra.Command, args []string) {
 	}
 }
 
-var InstallCmd = &cobra.Command{
-	Use:   "install",
+// ----------------- Get Command ----------------- //
+
+var GetCmd = &cobra.Command{
+	Use:   "get",
 	Short: "Install a new dependency",
 	Long:  ``,
-	RunE:  runAddCmd,
+	Args:  validateGetCmdArgs,
+	Run:   runGetCmd,
 }
 
-func runAddCmd(cmd *cobra.Command, args []string) error {
-	// path := args[0]
+func validateGetCmdArgs(cmd *cobra.Command, args []string) error {
+	if len(args) != 1 {
+		return errors.New("wrong number of arguments")
+	}
 
 	return nil
+}
+
+func runGetCmd(cmd *cobra.Command, args []string) {
+	bpmClient := bpm.NewBpm()
+	osWrap := new(syswrap.OsWrapper)
+
+	bpmClient.RegisterCommand(
+		bpm.NewGetCommand(osWrap),
+	)
 }
