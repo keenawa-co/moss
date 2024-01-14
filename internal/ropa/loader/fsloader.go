@@ -23,11 +23,14 @@ const (
 	TarGzArchive
 )
 
-type fsWrapper interface {
-	OpenFile(name string) (*os.File, error)
+type osWrapper interface {
+	Open(name string) (*os.File, error)
 	GzipReader(reader io.Reader) (*gzip.Reader, error)
 	TarReader(reader io.Reader) *tar.Reader
 	ReadFile(name string) ([]byte, error)
+}
+
+type ioWrapper interface {
 	ReadAll(reader io.Reader) ([]byte, error)
 }
 
@@ -36,18 +39,19 @@ type bundleProcessor interface {
 }
 
 type FsLoader struct {
-	fs         fsWrapper
+	os         osWrapper
+	io         ioWrapper
 	bProcessor bundleProcessor
 }
 
 type FsLoaderConf struct {
-	FsWrap      fsWrapper
+	OsWrap      osWrapper
 	TomlDecoder tomlDecoder
 }
 
 func NewFsLoader(conf *FsLoaderConf) *FsLoader {
 	return &FsLoader{
-		fs: conf.FsWrap,
+		os: conf.OsWrap,
 		bProcessor: &BundleProcessor{
 			toml: conf.TomlDecoder,
 		},
@@ -55,7 +59,7 @@ func NewFsLoader(conf *FsLoaderConf) *FsLoader {
 }
 
 func (loader *FsLoader) LoadRegoFile(path string) (*types.RawRegoFile, error) {
-	content, err := loader.fs.ReadFile(path)
+	content, err := loader.os.ReadFile(path)
 	if err != nil {
 		return nil, fmt.Errorf("error opening file: %v", err)
 	}
@@ -72,19 +76,19 @@ func (loader *FsLoader) LoadRegoFile(path string) (*types.RawRegoFile, error) {
 }
 
 func (loader *FsLoader) LoadBundle(path string) (*types.Bundle, error) {
-	file, err := loader.fs.OpenFile(path)
+	file, err := loader.os.Open(path)
 	if err != nil {
 		return nil, fmt.Errorf("error opening file: %v", err)
 	}
 	defer file.Close()
 
-	gr, err := loader.fs.GzipReader(file)
+	gr, err := loader.os.GzipReader(file)
 	if err != nil {
 		return nil, fmt.Errorf("error creating gzip reader: %v", err)
 	}
 	defer gr.Close()
 
-	files, err := loader.extractTarContent(loader.fs.TarReader(gr))
+	files, err := loader.extractTarContent(loader.os.TarReader(gr))
 	if err != nil {
 		return nil, fmt.Errorf("error extracting tar content: %v", err)
 	}
@@ -117,7 +121,7 @@ func (loader *FsLoader) extractTarContent(tr *tar.Reader) (map[string][]byte, er
 			return nil, fmt.Errorf("path '%s' is not valid: %v", header.Name, err)
 		}
 
-		buf, err := loader.fs.ReadAll(tr)
+		buf, err := loader.io.ReadAll(tr)
 		if err != nil {
 			return nil, fmt.Errorf("error reading file contents: %v", err)
 		}

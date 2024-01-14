@@ -9,6 +9,7 @@ import (
 
 	"github.com/4rchr4y/goray/analysis/openpolicy"
 	"github.com/4rchr4y/goray/ason"
+	"github.com/4rchr4y/goray/internal/domain/service/toml"
 	"github.com/4rchr4y/goray/internal/infra/db/badger"
 	"github.com/4rchr4y/goray/internal/infra/syswrap"
 	"github.com/4rchr4y/goray/internal/ropa"
@@ -75,7 +76,10 @@ func runRootCmd(cmd *cobra.Command, args []string) {
 	dbClient := badger.NewBadgerClient(badgerDb)
 	linkerRepo := dbClient.MakeLinkerRepo("goray")
 
-	rfl := loader.NewFsLoader(new(syswrap.FsWrapper))
+	rfl := loader.NewFsLoader(&loader.FsLoaderConf{
+		OsWrap:      new(syswrap.OsWrapper),
+		TomlDecoder: toml.NewTomlService(),
+	})
 	linker := ropa.NewLinker(linkerRepo, radix.NewTree[*ropa.IndexedRegoFile]())
 
 	bundle, err := rfl.LoadBundle("test.bundle")

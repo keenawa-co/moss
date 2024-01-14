@@ -62,21 +62,26 @@ func runBuildCmd(cmd *cobra.Command, args []string) {
 
 	osWrap := new(syswrap.OsWrapper)
 	ioWrap := new(syswrap.IoWrapper)
-	fsWrap := new(syswrap.FsWrapper)
 	validateClient := svalidator.NewValidatorService(validator.New())
 	tomlClient := toml.NewTomlService()
-	tarClient := tar.NewTarService(osWrap, fsWrap, ioWrap)
+	tarClient := tar.NewTarService(osWrap, osWrap, ioWrap)
 	bpmClient := bpm.NewBpm()
+
+	fsLoaderConf := &loader.FsLoaderConf{
+		OsWrap:      osWrap,
+		TomlDecoder: tomlClient,
+	}
+
 	bpmClient.RegisterCommand(
 		bpm.NewValidateCommand(&bpm.ValidateCmdInput{
 			Validate: validateClient,
 		}),
 
 		bpm.NewBuildCommand(&bpm.BuildCmdInput{
-			FsWrap:         fsWrap,
+			FsWrap:         osWrap,
 			Tar:            tarClient,
 			Toml:           tomlClient,
-			RegoFileLoader: loader.NewFsLoader(fsWrap),
+			RegoFileLoader: loader.NewFsLoader(fsLoaderConf),
 		}),
 	)
 
