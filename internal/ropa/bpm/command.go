@@ -29,7 +29,7 @@ const (
 
 // ----------------- Build Command ----------------- //
 
-type tomlClient interface {
+type tomlCoder interface {
 	Decode(data string, v interface{}) error
 	Encode(w io.Writer, v interface{}) error
 }
@@ -40,7 +40,7 @@ type bundleBuilder interface {
 
 type buildCommand struct {
 	cmdName     string
-	toml        tomlClient
+	toml        tomlCoder
 	bbuilder    bundleBuilder
 	subregistry commandRegistry
 }
@@ -98,17 +98,17 @@ func (cmd *buildCommand) Execute(input interface{}) error {
 	return nil
 }
 
-type BuildCmdInput struct {
-	FsWrap           fsWrapper
+type BuildCmdConf struct {
+	OsWrap           bbOsWrapper
 	Tar              tarClient
-	Toml             tomlClient
+	Toml             tomlCoder
 	RegoFileLoader   regoFileLoader
 	BundleLockWriter io.Writer
 }
 
-func NewBuildCommand(input *BuildCmdInput) Command {
+func NewBuildCommand(input *BuildCmdConf) Command {
 	bbuilder := &BundleBuilder{
-		fswrap: input.FsWrap,
+		osWrap: input.OsWrap,
 		tar:    input.Tar,
 		toml:   input.Toml,
 		loader: input.RegoFileLoader,
@@ -155,27 +155,23 @@ func (cmd *validateCommand) Execute(input interface{}) error {
 	return nil
 }
 
-type ValidateCmdInput struct {
-	Validate validateClient
-}
-
-func NewValidateCommand(input *ValidateCmdInput) Command {
+func NewValidateCommand(validate validateClient) Command {
 	return &validateCommand{
 		cmdName:  ValidateCommandName,
-		validate: input.Validate,
+		validate: validate,
 	}
 }
 
 // ----------------- Get Command ----------------- //
 
-type osWrapper interface {
+type getCmdOsWrapper interface {
 	Mkdir(name string, perm fs.FileMode) error
 	Stat(name string) (fs.FileInfo, error)
 }
 
 type getCommand struct {
 	cmdName string
-	os      osWrapper
+	os      getCmdOsWrapper
 }
 
 func (cmd *getCommand) bpmCmd()                  {}
@@ -185,7 +181,7 @@ func (cmd *getCommand) SetCommand(Command) error { return nil }
 
 type GetCmdInput struct {
 	HomeDir    string
-	BundleFile *types.BundleFile
+	BundleFile *types.Bundle
 }
 
 func (cmd *getCommand) Execute(input interface{}) error {
@@ -214,7 +210,7 @@ func (cmd *getCommand) prepareBpmDir(bpmDirPath string) error {
 	return nil
 }
 
-func NewGetCommand(osWrap osWrapper) Command {
+func NewGetCommand(osWrap getCmdOsWrapper) Command {
 	return &getCommand{
 		cmdName: GetCommandName,
 		os:      osWrap,

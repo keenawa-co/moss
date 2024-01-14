@@ -76,13 +76,13 @@ func runRootCmd(cmd *cobra.Command, args []string) {
 	dbClient := badger.NewBadgerClient(badgerDb)
 	linkerRepo := dbClient.MakeLinkerRepo("goray")
 
-	rfl := loader.NewFsLoader(&loader.FsLoaderConf{
+	fsLoader := loader.NewFsLoader(&loader.FsLoaderConf{
 		OsWrap:      new(syswrap.OsWrapper),
 		TomlDecoder: toml.NewTomlService(),
 	})
 	linker := ropa.NewLinker(linkerRepo, radix.NewTree[*ropa.IndexedRegoFile]())
 
-	bundle, err := rfl.LoadBundle("test.bundle")
+	bundle, err := fsLoader.LoadBundle("test.bundle")
 	if err != nil {
 		log.Fatal(err)
 		return
@@ -95,7 +95,7 @@ func runRootCmd(cmd *cobra.Command, args []string) {
 	}
 
 	for _, pd := range policies {
-		file, err := rfl.LoadRegoFile(pd.Path)
+		file, err := fsLoader.LoadRegoFile(pd.Path)
 		if err != nil {
 			log.Fatal(err)
 			return
@@ -104,7 +104,7 @@ func runRootCmd(cmd *cobra.Command, args []string) {
 		rawRegoFiles = append(rawRegoFiles, file)
 
 		for _, path := range pd.Dependencies {
-			depFile, err := rfl.LoadRegoFile(path)
+			depFile, err := fsLoader.LoadRegoFile(path)
 			if err != nil {
 				log.Fatal(err)
 				return

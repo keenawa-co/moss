@@ -13,7 +13,7 @@ import (
 	"github.com/4rchr4y/goray/version"
 )
 
-type fsWrapper interface {
+type bbOsWrapper interface {
 	Walk(root string, fn filepath.WalkFunc) error
 }
 
@@ -26,9 +26,9 @@ type regoFileLoader interface {
 }
 
 type BundleBuilder struct {
-	fswrap fsWrapper
+	osWrap bbOsWrapper
 	tar    tarClient
-	toml   tomlClient
+	toml   tomlCoder
 	loader regoFileLoader
 }
 
@@ -72,7 +72,7 @@ func (bb *BundleBuilder) createBundleLockFile(dirPath string) (*types.BundleLock
 		return nil
 	}
 
-	err := bb.fswrap.Walk(dirPath, walkFunc)
+	err := bb.osWrap.Walk(dirPath, walkFunc)
 	if err != nil {
 		return nil, fmt.Errorf("error walking the path %s: %v", dirPath, err)
 	}

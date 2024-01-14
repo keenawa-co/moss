@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/4rchr4y/goray/constant"
 	"github.com/4rchr4y/goray/internal/domain/service/tar"
 	"github.com/4rchr4y/goray/internal/domain/service/toml"
 	svalidator "github.com/4rchr4y/goray/internal/domain/service/validator"
@@ -18,16 +19,16 @@ import (
 )
 
 func init() {
-	RootCmd.AddCommand(RpmCmd)
-	RpmCmd.AddCommand(GetCmd)
-	RpmCmd.AddCommand(BuildCmd)
+	RootCmd.AddCommand(BpmCmd)
+	BpmCmd.AddCommand(GetCmd)
+	BpmCmd.AddCommand(BuildCmd)
 
 	GetCmd.Flags().BoolP("global", "g", false, "global install")
 }
 
-var RpmCmd = &cobra.Command{
+var BpmCmd = &cobra.Command{
 	Use:   "bpm",
-	Short: "Add a new dependency",
+	Short: "Bundle Package Manager",
 	Long:  ``,
 }
 
@@ -35,7 +36,7 @@ var RpmCmd = &cobra.Command{
 
 var BuildCmd = &cobra.Command{
 	Use:   "build",
-	Short: "Add a new dependency",
+	Short: "Build a new bundle",
 	Long:  ``,
 	Args:  validateBuildCmdArgs,
 	Run:   runBuildCmd,
@@ -43,15 +44,15 @@ var BuildCmd = &cobra.Command{
 
 func validateBuildCmdArgs(cmd *cobra.Command, args []string) error {
 	if len(args) != 2 {
-		return errors.New("wrong number of arguments")
+		return fmt.Errorf("wrong number of arguments, expect %d got %d", 2, len(args))
 	}
 
 	if err := gvalidate.ValidatePath(args[0]); err != nil {
-		return fmt.Errorf("invalid path to the package argument: %v", err)
+		return fmt.Errorf("'%s' is invalid path to the source folder: %v", args[1], err)
 	}
 
 	if err := gvalidate.ValidatePath(args[1]); err != nil {
-		return fmt.Errorf("invalid destination path argument: %v", err)
+		return fmt.Errorf("'%s' is invalid path to the destination folder: %v", args[1], err)
 	}
 
 	return nil
@@ -67,25 +68,20 @@ func runBuildCmd(cmd *cobra.Command, args []string) {
 	tarClient := tar.NewTarService(osWrap, osWrap, ioWrap)
 	bpmClient := bpm.NewBpm()
 
-	fsLoaderConf := &loader.FsLoaderConf{
-		OsWrap:      osWrap,
-		TomlDecoder: tomlClient,
-	}
-
 	bpmClient.RegisterCommand(
-		bpm.NewValidateCommand(&bpm.ValidateCmdInput{
-			Validate: validateClient,
-		}),
-
-		bpm.NewBuildCommand(&bpm.BuildCmdInput{
-			FsWrap:         osWrap,
-			Tar:            tarClient,
-			Toml:           tomlClient,
-			RegoFileLoader: loader.NewFsLoader(fsLoaderConf),
+		bpm.NewValidateCommand(validateClient),
+		bpm.NewBuildCommand(&bpm.BuildCmdConf{
+			OsWrap: osWrap,
+			Tar:    tarClient,
+			Toml:   tomlClient,
+			RegoFileLoader: loader.NewFsLoader(&loader.FsLoaderConf{
+				OsWrap:      osWrap,
+				TomlDecoder: tomlClient,
+			}),
 		}),
 	)
 
-	file, err := osWrap.Open(fmt.Sprintf("%s/bundle.toml", args[0]))
+	file, err := osWrap.Open(fmt.Sprintf("%s/%s", args[0], constant.BPMFile))
 	if err != nil {
 		log.Fatal(err)
 		return
@@ -103,7 +99,7 @@ func runBuildCmd(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	bundlelock, err := osWrap.Create(fmt.Sprintf("%s/bundle.lock", args[0]))
+	bundlelock, err := osWrap.Create(fmt.Sprintf("%s/%s", args[0], constant.BPMLockFile))
 	if err != nil {
 		log.Fatal(err)
 		return
@@ -137,14 +133,35 @@ func validateGetCmdArgs(cmd *cobra.Command, args []string) error {
 		return errors.New("wrong number of arguments")
 	}
 
+	if err := gvalidate.ValidatePath(args[0]); err != nil {
+		return fmt.Errorf("'%s' is invalid path to the bundle file: %v", args[0], err)
+	}
+
 	return nil
 }
 
 func runGetCmd(cmd *cobra.Command, args []string) {
+	pathToBundle := args[0]
 	bpmClient := bpm.NewBpm()
 	osWrap := new(syswrap.OsWrapper)
+	ioWrap := new(syswrap.IoWrapper)
 
 	bpmClient.RegisterCommand(
 		bpm.NewGetCommand(osWrap),
 	)
+
+	fsLoader := loader.NewFsLoader(&loader.FsLoaderConf{
+		OsWrap:      osWrap,
+		IoWrap:      ioWrap,
+		TomlDecoder: toml.NewTomlService(),
+	})
+
+	bundle, err := fsLoader.LoadBundle(pathToBundle)
+	if err != nil {
+		log.Fatal(err)
+		return
+	}
+
+	fmt.Println(bundle.BundleFile.Package.Name)
+
 }

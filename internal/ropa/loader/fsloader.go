@@ -36,12 +36,14 @@ type FsLoader struct {
 
 type FsLoaderConf struct {
 	OsWrap      osWrapper
+	IoWrap      ioWrapper
 	TomlDecoder tomlDecoder
 }
 
 func NewFsLoader(conf *FsLoaderConf) *FsLoader {
 	return &FsLoader{
 		osWrap: conf.OsWrap,
+		ioWrap: conf.IoWrap,
 		bProcessor: &BundleProcessor{
 			toml: conf.TomlDecoder,
 		},
