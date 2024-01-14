@@ -1,11 +1,11 @@
 package constant
 
 const (
-	BPMFile      = "bundle.toml"
-	BPMLockFile  = "bundle.lock"
-	BPMWorkFile  = "bpm.work"
-	BPMBundleExt = ".bundle"
+	BPMFile     = "bundle.toml"
+	BPMLockFile = "bundle.lock"
+	BPMWorkFile = "bpm.work"
 
-	BPMDir  = ".bpm"
-	RegoExt = ".rego"
+	BPMBundleExt = ".bundle"
+	BPMDir       = ".bpm"
+	RegoExt      = ".rego"
 )

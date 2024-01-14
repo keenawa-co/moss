@@ -13,16 +13,6 @@ import (
 	"github.com/open-policy-agent/opa/ast"
 )
 
-type PathType int
-
-const (
-	Unknown PathType = iota
-	RegoFile
-	DataFile
-	Dir
-	TarGzArchive
-)
-
 type osWrapper interface {
 	Open(name string) (*os.File, error)
 	GzipReader(reader io.Reader) (*gzip.Reader, error)
@@ -39,8 +29,8 @@ type bundleProcessor interface {
 }
 
 type FsLoader struct {
-	os         osWrapper
-	io         ioWrapper
+	osWrap     osWrapper
+	ioWrap     ioWrapper
 	bProcessor bundleProcessor
 }
 
@@ -51,7 +41,7 @@ type FsLoaderConf struct {
 
 func NewFsLoader(conf *FsLoaderConf) *FsLoader {
 	return &FsLoader{
-		os: conf.OsWrap,
+		osWrap: conf.OsWrap,
 		bProcessor: &BundleProcessor{
 			toml: conf.TomlDecoder,
 		},
@@ -59,7 +49,7 @@ func NewFsLoader(conf *FsLoaderConf) *FsLoader {
 }
 
 func (loader *FsLoader) LoadRegoFile(path string) (*types.RawRegoFile, error) {
-	content, err := loader.os.ReadFile(path)
+	content, err := loader.osWrap.ReadFile(path)
 	if err != nil {
 		return nil, fmt.Errorf("error opening file: %v", err)
 	}
@@ -76,19 +66,19 @@ func (loader *FsLoader) LoadRegoFile(path string) (*types.RawRegoFile, error) {
 }
 
 func (loader *FsLoader) LoadBundle(path string) (*types.Bundle, error) {
-	file, err := loader.os.Open(path)
+	file, err := loader.osWrap.Open(path)
 	if err != nil {
 		return nil, fmt.Errorf("error opening file: %v", err)
 	}
 	defer file.Close()
 
-	gr, err := loader.os.GzipReader(file)
+	gr, err := loader.osWrap.GzipReader(file)
 	if err != nil {
 		return nil, fmt.Errorf("error creating gzip reader: %v", err)
 	}
 	defer gr.Close()
 
-	files, err := loader.extractTarContent(loader.os.TarReader(gr))
+	files, err := loader.extractTarContent(loader.osWrap.TarReader(gr))
 	if err != nil {
 		return nil, fmt.Errorf("error extracting tar content: %v", err)
 	}
@@ -121,7 +111,7 @@ func (loader *FsLoader) extractTarContent(tr *tar.Reader) (map[string][]byte, er
 			return nil, fmt.Errorf("path '%s' is not valid: %v", header.Name, err)
 		}
 
-		buf, err := loader.io.ReadAll(tr)
+		buf, err := loader.ioWrap.ReadAll(tr)
 		if err != nil {
 			return nil, fmt.Errorf("error reading file contents: %v", err)
 		}

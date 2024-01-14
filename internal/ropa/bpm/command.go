@@ -42,7 +42,7 @@ type buildCommand struct {
 	cmdName     string
 	toml        tomlClient
 	bbuilder    bundleBuilder
-	subregistry cmdRegistry
+	subregistry commandRegistry
 }
 
 func (cmd *buildCommand) bpmCmd()      {}
@@ -118,7 +118,7 @@ func NewBuildCommand(input *BuildCmdInput) Command {
 		cmdName:     BuildCommandName,
 		toml:        input.Toml,
 		bbuilder:    bbuilder,
-		subregistry: make(cmdRegistry),
+		subregistry: make(commandRegistry),
 	}
 }
 
