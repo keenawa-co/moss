@@ -15,6 +15,10 @@ func (OsWrapper) Create(name string) (*os.File, error) {
 	return os.Create(name)
 }
 
+func (OsWrapper) WriteFile(name string, data []byte, perm fs.FileMode) error {
+	return os.WriteFile(name, data, perm)
+}
+
 func (OsWrapper) Open(name string) (*os.File, error) {
 	return os.Open(name)
 }
@@ -29,6 +33,10 @@ func (OsWrapper) UserHomeDir() (string, error) {
 
 func (OsWrapper) Mkdir(name string, perm fs.FileMode) error {
 	return os.Mkdir(name, perm)
+}
+
+func (OsWrapper) MkdirAll(path string, perm fs.FileMode) error {
+	return os.MkdirAll(path, perm)
 }
 
 func (OsWrapper) Stat(name string) (fs.FileInfo, error) {

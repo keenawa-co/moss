@@ -1,15 +1,15 @@
 package bpm
 
 import (
-	"crypto/md5"
-	"encoding/hex"
 	"fmt"
 	"io"
 	"os"
 	"path/filepath"
 	"strings"
 
+	"github.com/4rchr4y/goray/constant"
 	"github.com/4rchr4y/goray/internal/ropa/types"
+	"github.com/4rchr4y/goray/internal/ropa/utils"
 	"github.com/4rchr4y/goray/version"
 )
 
@@ -17,7 +17,7 @@ type bbOsWrapper interface {
 	Walk(root string, fn filepath.WalkFunc) error
 }
 
-type tarClient interface {
+type tarCompressor interface {
 	Compress(dirPath string, targetDir string, archiveName string) error
 }
 
@@ -26,10 +26,10 @@ type regoFileLoader interface {
 }
 
 type BundleBuilder struct {
-	osWrap bbOsWrapper
-	tar    tarClient
-	toml   tomlCoder
-	loader regoFileLoader
+	osWrap     bbOsWrapper
+	compressor tarCompressor
+	coder      tomlCoder
+	loader     regoFileLoader
 }
 
 type BundleBuildInput struct {
@@ -43,11 +43,11 @@ type BundleBuildInput struct {
 func (bb *BundleBuilder) Build(input *BundleBuildInput) error {
 	bundlelock, err := bb.createBundleLockFile(input.SourcePath)
 	if err != nil {
-		return fmt.Errorf("failed to create %s/bundle.lock: %v", input.SourcePath, err)
+		return fmt.Errorf("failed to create %s/%s: %v", input.SourcePath, constant.BPMLockFile, err)
 	}
 
-	if err := types.EncodeBundleLock(bb.toml, input.BLWriter, bundlelock); err != nil {
-		return fmt.Errorf("error occurred while writing to %s/bundle.lock: %v", input.SourcePath, err)
+	if err := utils.EncodeBPMFile(bb.coder, input.BLWriter, bundlelock); err != nil {
+		return fmt.Errorf("error occurred while writing to %s/%s: %v", input.SourcePath, constant.BPMLockFile, err)
 	}
 
 	return bb.buildBundle(input)
@@ -89,11 +89,10 @@ func (bb *BundleBuilder) processRegoFile(path string) (*types.ModuleDef, error) 
 		return nil, err
 	}
 
-	hash := md5.Sum([]byte(rawRegoFile.Parsed.String()))
 	modDef := &types.ModuleDef{
 		Name:         rawRegoFile.Parsed.Package.Path.String(),
 		Source:       path,
-		Checksum:     hex.EncodeToString(hash[:]),
+		Checksum:     rawRegoFile.Sum(),
 		Dependencies: getImportsList(rawRegoFile),
 	}
 
@@ -101,7 +100,7 @@ func (bb *BundleBuilder) processRegoFile(path string) (*types.ModuleDef, error) 
 }
 
 func (bb *BundleBuilder) buildBundle(input *BundleBuildInput) error {
-	if err := bb.tar.Compress(input.SourcePath, input.DestPath, input.BundleName); err != nil {
+	if err := bb.compressor.Compress(input.SourcePath, input.DestPath, input.BundleName); err != nil {
 		return fmt.Errorf("error occurred while building '%s' bundle: %v", input.BundleName, err)
 	}
 

@@ -19,7 +19,6 @@ func (cr commandRegistry) set(command Command) error {
 		return fmt.Errorf("command '%s' is already exists", command.Name())
 	}
 
-	// register command
 	cr[command.Name()] = command
 
 	for i := range command.Requires() {
@@ -28,7 +27,6 @@ func (cr commandRegistry) set(command Command) error {
 			return fmt.Errorf("command '%s' is doesn't exists", command.Requires()[i])
 		}
 
-		// register nested command
 		cr[command.Name()].SetCommand(cmd)
 	}
 

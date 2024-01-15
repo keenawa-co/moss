@@ -24,7 +24,7 @@ type ProcessInput struct {
 
 func (bp *BundleProcessor) Process(input *ProcessInput) (*types.Bundle, error) {
 	bundle := &types.Bundle{
-		Name:      filepath.Clean(input.BundlePath),
+		FileName:  filepath.Clean(input.BundlePath),
 		RegoFiles: make(map[string]*types.RawRegoFile),
 	}
 

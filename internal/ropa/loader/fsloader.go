@@ -63,6 +63,7 @@ func (loader *FsLoader) LoadRegoFile(path string) (*types.RawRegoFile, error) {
 
 	return &types.RawRegoFile{
 		Path:   path,
+		Raw:    content,
 		Parsed: parsed,
 	}, nil
 }

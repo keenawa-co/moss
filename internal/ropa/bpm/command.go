@@ -40,7 +40,7 @@ type bundleBuilder interface {
 
 type buildCommand struct {
 	cmdName     string
-	toml        tomlCoder
+	coder       tomlCoder
 	bbuilder    bundleBuilder
 	subregistry commandRegistry
 }
@@ -64,7 +64,7 @@ func (cmd *buildCommand) SetCommand(c Command) error {
 	return nil
 }
 
-type BuildCmdExecuteInput struct {
+type BuildCmdInput struct {
 	*ValidateCmdExecuteInput
 
 	_          [0]int
@@ -74,7 +74,7 @@ type BuildCmdExecuteInput struct {
 }
 
 func (cmd *buildCommand) Execute(input interface{}) error {
-	typedInput, ok := input.(*BuildCmdExecuteInput)
+	typedInput, ok := input.(*BuildCmdInput)
 	if !ok {
 		return fmt.Errorf("type '%s' is invalid input type for '%s' command", reflect.TypeOf(input).Elem().Kind().String(), cmd.cmdName)
 	}
@@ -100,23 +100,23 @@ func (cmd *buildCommand) Execute(input interface{}) error {
 
 type BuildCmdConf struct {
 	OsWrap           bbOsWrapper
-	Tar              tarClient
-	Toml             tomlCoder
+	Tar              tarCompressor
+	TomlCoder        tomlCoder
 	RegoFileLoader   regoFileLoader
 	BundleLockWriter io.Writer
 }
 
 func NewBuildCommand(input *BuildCmdConf) Command {
 	bbuilder := &BundleBuilder{
-		osWrap: input.OsWrap,
-		tar:    input.Tar,
-		toml:   input.Toml,
-		loader: input.RegoFileLoader,
+		osWrap:     input.OsWrap,
+		compressor: input.Tar,
+		coder:      input.TomlCoder,
+		loader:     input.RegoFileLoader,
 	}
 
 	return &buildCommand{
 		cmdName:     BuildCommandName,
-		toml:        input.Toml,
+		coder:       input.TomlCoder,
 		bbuilder:    bbuilder,
 		subregistry: make(commandRegistry),
 	}
@@ -164,14 +164,27 @@ func NewValidateCommand(validate validateClient) Command {
 
 // ----------------- Get Command ----------------- //
 
-type getCmdOsWrapper interface {
+type osWrapper interface {
 	Mkdir(name string, perm fs.FileMode) error
 	Stat(name string) (fs.FileInfo, error)
+	MkdirAll(path string, perm fs.FileMode) error
+	Create(name string) (*os.File, error)
+	WriteFile(name string, data []byte, perm fs.FileMode) error
+}
+
+type tomlEncoder interface {
+	Encode(w io.Writer, v interface{}) error
+}
+
+type bundleInstaller interface {
+	Install(input *BundleInstallInput) error
 }
 
 type getCommand struct {
-	cmdName string
-	os      getCmdOsWrapper
+	cmdName   string
+	encoder   tomlEncoder
+	installer bundleInstaller
+	osWrap    osWrapper
 }
 
 func (cmd *getCommand) bpmCmd()                  {}
@@ -180,8 +193,8 @@ func (cmd *getCommand) Requires() []string       { return nil }
 func (cmd *getCommand) SetCommand(Command) error { return nil }
 
 type GetCmdInput struct {
-	HomeDir    string
-	BundleFile *types.Bundle
+	HomeDir string
+	Bundle  *types.Bundle
 }
 
 func (cmd *getCommand) Execute(input interface{}) error {
@@ -191,28 +204,48 @@ func (cmd *getCommand) Execute(input interface{}) error {
 	}
 
 	bpmDirPath := fmt.Sprintf("%s/%s", typedInput.HomeDir, constant.BPMDir)
-	if err := cmd.prepareBpmDir(bpmDirPath); err != nil {
-		return fmt.Errorf("error occurred while creating '%s' directory: %v", bpmDirPath, err)
+	bundleName := typedInput.Bundle.BundleFile.Package.Name
+	bundleVersion := typedInput.Bundle.BundleFile.Package.Version
+	bundleVersionDir := fmt.Sprintf("%s/%s/%s", bpmDirPath, bundleName, bundleVersion)
+
+	if !cmd.isAlreadyInstalled(bundleVersionDir) {
+		fmt.Printf("Bundle '%s' with version '%s' is already installed\n", bundleName, bundleVersion)
+		return nil
+	}
+
+	// creating all the directories that are necessary to save files
+	if err := cmd.osWrap.MkdirAll(bundleVersionDir, 0755); err != nil {
+		return err
+	}
+
+	if err := cmd.installer.Install(&BundleInstallInput{
+		Dir:    bundleVersionDir,
+		Bundle: typedInput.Bundle,
+	}); err != nil {
+		return fmt.Errorf("can't install bundle '%s': %v", typedInput.Bundle.BundleFile.Package.Name, err)
 	}
 
 	return nil
 }
 
-func (cmd *getCommand) prepareBpmDir(bpmDirPath string) error {
-	if _, err := cmd.os.Stat(bpmDirPath); !os.IsNotExist(err) {
-		return err
-	}
-
-	if err := cmd.os.Mkdir(bpmDirPath, 0755); err != nil {
-		return err
-	}
-
-	return nil
+func (cmd *getCommand) isAlreadyInstalled(bundleVersionDir string) bool {
+	_, err := cmd.osWrap.Stat(bundleVersionDir)
+	return os.IsNotExist(err)
 }
 
-func NewGetCommand(osWrap getCmdOsWrapper) Command {
+type GetCmdConf struct {
+	OsWrap      osWrapper
+	TomlEncoder tomlEncoder
+}
+
+func NewGetCommand(conf *GetCmdConf) Command {
 	return &getCommand{
 		cmdName: GetCommandName,
-		os:      osWrap,
+		osWrap:  conf.OsWrap,
+		encoder: conf.TomlEncoder,
+		installer: &BundleInstaller{
+			osWrap:  conf.OsWrap,
+			encoder: conf.TomlEncoder,
+		},
 	}
 }

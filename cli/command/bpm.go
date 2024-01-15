@@ -71,9 +71,9 @@ func runBuildCmd(cmd *cobra.Command, args []string) {
 	bpmClient.RegisterCommand(
 		bpm.NewValidateCommand(validateClient),
 		bpm.NewBuildCommand(&bpm.BuildCmdConf{
-			OsWrap: osWrap,
-			Tar:    tarClient,
-			Toml:   tomlClient,
+			OsWrap:    osWrap,
+			Tar:       tarClient,
+			TomlCoder: tomlClient,
 			RegoFileLoader: loader.NewFsLoader(&loader.FsLoaderConf{
 				OsWrap:      osWrap,
 				TomlDecoder: tomlClient,
@@ -87,8 +87,14 @@ func runBuildCmd(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	bundlefile, err := types.DecodeBundleFile(ioWrap, tomlClient, file)
+	content, err := ioWrap.ReadAll(file)
 	if err != nil {
+		log.Fatal(err)
+		return
+	}
+
+	bundlefile := new(types.BundleFile)
+	if err := tomlClient.Decode(string(content), bundlefile); err != nil {
 		log.Fatal(err)
 		return
 	}
@@ -105,7 +111,7 @@ func runBuildCmd(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	if err := buildCommand.Execute(&bpm.BuildCmdExecuteInput{
+	if err := buildCommand.Execute(&bpm.BuildCmdInput{
 		SourcePath: sourcePath,
 		DestPath:   destPath,
 		BLWriter:   bundlelock,
@@ -145,9 +151,13 @@ func runGetCmd(cmd *cobra.Command, args []string) {
 	bpmClient := bpm.NewBpm()
 	osWrap := new(syswrap.OsWrapper)
 	ioWrap := new(syswrap.IoWrapper)
+	tomlCoder := toml.NewTomlService()
 
 	bpmClient.RegisterCommand(
-		bpm.NewGetCommand(osWrap),
+		bpm.NewGetCommand(&bpm.GetCmdConf{
+			OsWrap:      osWrap,
+			TomlEncoder: tomlCoder,
+		}),
 	)
 
 	fsLoader := loader.NewFsLoader(&loader.FsLoaderConf{
@@ -162,6 +172,23 @@ func runGetCmd(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	fmt.Println(bundle.BundleFile.Package.Name)
+	getCmd, err := bpmClient.Command(bpm.GetCommandName)
+	if err != nil {
+		log.Fatal(err)
+		return
+	}
 
+	homeDir, err := osWrap.UserHomeDir()
+	if err != nil {
+		log.Fatal(err)
+		return
+	}
+
+	if err := getCmd.Execute(&bpm.GetCmdInput{
+		HomeDir: homeDir,
+		Bundle:  bundle,
+	}); err != nil {
+		log.Fatal(err)
+		return
+	}
 }
