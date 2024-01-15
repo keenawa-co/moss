@@ -2,62 +2,52 @@ package types
 
 import (
 	"fmt"
-	"io"
+	"regexp"
+
+	"github.com/4rchr4y/goray/constant"
 )
 
+type BPMFile interface {
+	Name() string
+
+	bpmFile()
+}
+
 // ----------------- Bundle File ----------------- //
+
+type PackageDef struct {
+	Name        string   `toml:"name" validate:"required"`
+	Version     string   `toml:"version" validate:"required"`
+	Author      []string `toml:"author"`
+	Description string   `toml:"description"`
+}
 
 type BundleFile struct {
 	Package *PackageDef `toml:"package" validate:"required"`
 }
 
-type PackageDef struct {
-	Name        string   `toml:"name" validate:"required"`
-	Version     float64  `toml:"version" validate:"required"`
-	Author      []string `toml:"author"`
-	Description string   `toml:"description"`
-}
+func (*BundleFile) bpmFile()     {}
+func (*BundleFile) Name() string { return constant.BPMFile }
 
 type validateClient interface {
 	ValidateStruct(s interface{}) error
 }
 
+var versionRegex = regexp.MustCompile(`^\d+\.\d+\.\d+$`)
+
 func (bf *BundleFile) Validate(validator validateClient) error {
+	if ok := versionRegex.MatchString(bf.Package.Version); !ok {
+		return fmt.Errorf("failed to validate '%s' file, expected version X.Y.Z (Major.Minor.Patch) format ", bf.Package.Version)
+	}
+
 	if err := validator.ValidateStruct(bf); err != nil {
-		return fmt.Errorf("failed to validate bundle.toml file: %v", err)
+		return fmt.Errorf("failed to validate %s file: %v", bf.Name(), err)
 	}
 
 	return nil
 }
 
-type ioWrapper interface {
-	ReadAll(r io.Reader) ([]byte, error)
-}
-
-type tomlDecoder interface {
-	Decode(data string, v interface{}) error
-}
-
-func DecodeBundleFile(iowrap ioWrapper, toml tomlDecoder, reader io.Reader) (*BundleFile, error) {
-	content, err := iowrap.ReadAll(reader)
-	if err != nil {
-		return nil, err
-	}
-
-	var bundlefile BundleFile
-	if err := toml.Decode(string(content), &bundlefile); err != nil {
-		return nil, err
-	}
-
-	return &bundlefile, nil
-}
-
 // ----------------- Bundle Lock File ----------------- //
-
-type BundleLockFile struct {
-	Version int          `toml:"version"`
-	Modules []*ModuleDef `toml:"modules"`
-}
 
 type ModuleDef struct {
 	Name         string   `toml:"name"`
@@ -66,26 +56,37 @@ type ModuleDef struct {
 	Dependencies []string `toml:"dependencies"`
 }
 
-type tomlEncoder interface {
-	Encode(w io.Writer, v interface{}) error
+type BundleLockFile struct {
+	Version int          `toml:"version"`
+	Modules []*ModuleDef `toml:"modules"`
 }
 
-func EncodeBundleLock(ts tomlEncoder, w io.Writer, bl *BundleLockFile) error {
-	if err := ts.Encode(w, bl); err != nil {
-		return fmt.Errorf("failed to encode bundle.lock file: %v", err)
-	}
+func (*BundleLockFile) bpmFile()     {}
+func (*BundleLockFile) Name() string { return constant.BPMLockFile }
 
-	return nil
-}
+// func (blf *BundleLockFile) Validate(files map[string]*RawRegoFile) error {
+// 	actualSumSet := make(map[string]string, len(blf.Modules))
+
+// 	for _, m := range blf.Modules {
+// 		actualSumSet[m.Source] = m.Checksum
+// 	}
+
+// 	// for filePath, file := range files {
+
+// 	// }
+// }
 
 // ----------------- Bundle Work File ----------------- //
-
-type BpmWorkFile struct {
-	Workspace *WorkspaceDef `toml:"workspace"`
-}
 
 type WorkspaceDef struct {
 	Path     string   `toml:"path"`
 	Author   []string `toml:"author"`
 	Packages []string `toml:"packages"`
 }
+
+type BpmWorkFile struct {
+	Workspace *WorkspaceDef `toml:"workspace"`
+}
+
+func (*BpmWorkFile) bpmFile()     {}
+func (*BpmWorkFile) Name() string { return constant.BPMWorkFile }
