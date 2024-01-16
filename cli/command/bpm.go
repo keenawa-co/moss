@@ -153,24 +153,19 @@ func runGetCmd(cmd *cobra.Command, args []string) {
 	ioWrap := new(syswrap.IoWrapper)
 	tomlCoder := toml.NewTomlService()
 
-	bpmClient.RegisterCommand(
-		bpm.NewGetCommand(&bpm.GetCmdConf{
-			OsWrap:      osWrap,
-			TomlEncoder: tomlCoder,
-		}),
-	)
-
 	fsLoader := loader.NewFsLoader(&loader.FsLoaderConf{
 		OsWrap:      osWrap,
 		IoWrap:      ioWrap,
 		TomlDecoder: toml.NewTomlService(),
 	})
 
-	bundle, err := fsLoader.LoadBundle(pathToBundle)
-	if err != nil {
-		log.Fatal(err)
-		return
-	}
+	bpmClient.RegisterCommand(
+		bpm.NewGetCommand(&bpm.GetCmdConf{
+			OsWrap:      osWrap,
+			TomlEncoder: tomlCoder,
+			FileLoader:  fsLoader,
+		}),
+	)
 
 	getCmd, err := bpmClient.Command(bpm.GetCommandName)
 	if err != nil {
@@ -178,15 +173,8 @@ func runGetCmd(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	homeDir, err := osWrap.UserHomeDir()
-	if err != nil {
-		log.Fatal(err)
-		return
-	}
-
 	if err := getCmd.Execute(&bpm.GetCmdInput{
-		HomeDir: homeDir,
-		Bundle:  bundle,
+		BundlePath: pathToBundle,
 	}); err != nil {
 		log.Fatal(err)
 		return

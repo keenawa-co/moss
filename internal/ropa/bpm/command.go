@@ -1,5 +1,8 @@
 package bpm
 
+// --- Temporary documentation ---
+// The same principles as in installer.
+
 import (
 	"fmt"
 	"io"
@@ -169,6 +172,7 @@ type osWrapper interface {
 	Stat(name string) (fs.FileInfo, error)
 	MkdirAll(path string, perm fs.FileMode) error
 	Create(name string) (*os.File, error)
+	UserHomeDir() (string, error)
 	WriteFile(name string, data []byte, perm fs.FileMode) error
 }
 
@@ -180,10 +184,15 @@ type bundleInstaller interface {
 	Install(input *BundleInstallInput) error
 }
 
+type fsLoader interface {
+	LoadBundle(path string) (*types.Bundle, error)
+}
+
 type getCommand struct {
 	cmdName   string
 	encoder   tomlEncoder
 	installer bundleInstaller
+	loader    fsLoader
 	osWrap    osWrapper
 }
 
@@ -193,8 +202,7 @@ func (cmd *getCommand) Requires() []string       { return nil }
 func (cmd *getCommand) SetCommand(Command) error { return nil }
 
 type GetCmdInput struct {
-	HomeDir string
-	Bundle  *types.Bundle
+	BundlePath string
 }
 
 func (cmd *getCommand) Execute(input interface{}) error {
@@ -203,9 +211,19 @@ func (cmd *getCommand) Execute(input interface{}) error {
 		return fmt.Errorf("type '%s' is invalid input type for '%s' command", reflect.TypeOf(input), cmd.cmdName)
 	}
 
-	bpmDirPath := fmt.Sprintf("%s/%s", typedInput.HomeDir, constant.BPMDir)
-	bundleName := typedInput.Bundle.BundleFile.Package.Name
-	bundleVersion := typedInput.Bundle.BundleFile.Package.Version
+	homeDir, err := cmd.osWrap.UserHomeDir()
+	if err != nil {
+		return err
+	}
+
+	bundle, err := cmd.loader.LoadBundle(typedInput.BundlePath)
+	if err != nil {
+		return err
+	}
+
+	bpmDirPath := fmt.Sprintf("%s/%s", homeDir, constant.BPMDir)
+	bundleName := bundle.BundleFile.Package.Name
+	bundleVersion := bundle.BundleFile.Package.Version
 	bundleVersionDir := fmt.Sprintf("%s/%s/%s", bpmDirPath, bundleName, bundleVersion)
 
 	if !cmd.isAlreadyInstalled(bundleVersionDir) {
@@ -220,9 +238,9 @@ func (cmd *getCommand) Execute(input interface{}) error {
 
 	if err := cmd.installer.Install(&BundleInstallInput{
 		Dir:    bundleVersionDir,
-		Bundle: typedInput.Bundle,
+		Bundle: bundle,
 	}); err != nil {
-		return fmt.Errorf("can't install bundle '%s': %v", typedInput.Bundle.BundleFile.Package.Name, err)
+		return fmt.Errorf("can't install bundle '%s': %v", bundleName, err)
 	}
 
 	return nil
@@ -236,6 +254,7 @@ func (cmd *getCommand) isAlreadyInstalled(bundleVersionDir string) bool {
 type GetCmdConf struct {
 	OsWrap      osWrapper
 	TomlEncoder tomlEncoder
+	FileLoader  fsLoader
 }
 
 func NewGetCommand(conf *GetCmdConf) Command {
@@ -243,6 +262,7 @@ func NewGetCommand(conf *GetCmdConf) Command {
 		cmdName: GetCommandName,
 		osWrap:  conf.OsWrap,
 		encoder: conf.TomlEncoder,
+		loader:  conf.FileLoader,
 		installer: &BundleInstaller{
 			osWrap:  conf.OsWrap,
 			encoder: conf.TomlEncoder,
