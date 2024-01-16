@@ -9,11 +9,11 @@ import (
 
 	"github.com/4rchr4y/goray/analysis/openpolicy"
 	"github.com/4rchr4y/goray/ason"
+	"github.com/4rchr4y/goray/internal/domain/rayfile"
 	"github.com/4rchr4y/goray/internal/infra/db/badger"
 	"github.com/4rchr4y/goray/internal/infra/syswrap"
 	"github.com/4rchr4y/goray/internal/ropa"
 	"github.com/4rchr4y/goray/pkg/radix"
-	"github.com/4rchr4y/goray/rayfile"
 	"github.com/spf13/cobra"
 )
 
