@@ -1,5 +1,12 @@
 package bpm
 
+// --- Temporary documentation ---
+// So, the main task of this 'service' it to install the bundle.
+// Installer should not care about the place where this should be installed,
+// also he is not a right place to resolve a conflicts with other versions e.g.
+// He just parse the passed bundle, validate correctness of all files.
+// Basically this is the last stage of installing process.
+
 import (
 	"fmt"
 	"io"
