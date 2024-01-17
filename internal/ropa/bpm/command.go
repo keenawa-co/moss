@@ -32,11 +32,6 @@ const (
 
 // ----------------- Build Command ----------------- //
 
-type tomlCoder interface {
-	Decode(data string, v interface{}) error
-	Encode(w io.Writer, v interface{}) error
-}
-
 type buildCmdTarCompressor interface {
 	Compress(dirPath string, targetDir string, archiveName string) error
 }
@@ -159,7 +154,7 @@ type ValidateCmdInput struct {
 }
 
 type ValidateCmdResult struct {
-	Bundle *types.Bundle // valid bundle
+	Bundle *types.Bundle
 }
 
 func (cmd *validateCommand) Execute(input interface{}) (interface{}, error) {
@@ -281,7 +276,7 @@ func NewValidateCommand(conf *ValidateCmdConf) Command {
 
 // ----------------- Get Command ----------------- //
 
-type osWrapper interface {
+type getCmdOSWrapper interface {
 	Mkdir(name string, perm fs.FileMode) error
 	Stat(name string) (fs.FileInfo, error)
 	MkdirAll(path string, perm fs.FileMode) error
@@ -290,24 +285,24 @@ type osWrapper interface {
 	WriteFile(name string, data []byte, perm fs.FileMode) error
 }
 
-type tomlEncoder interface {
+type getCmdTomler interface {
 	Encode(w io.Writer, v interface{}) error
 }
 
-type bundleInstaller interface {
+type getCmdBundleInstaller interface {
 	Install(input *BundleInstallInput) error
 }
 
-type fsLoader interface {
+type getCmdLoader interface {
 	LoadBundle(path string) (*types.Bundle, error)
 }
 
 type getCommand struct {
 	cmdName   string
-	encoder   tomlEncoder
-	installer bundleInstaller
-	loader    fsLoader
-	osWrap    osWrapper
+	encoder   getCmdTomler
+	installer getCmdBundleInstaller
+	loader    getCmdLoader
+	osWrap    getCmdOSWrapper
 }
 
 func (cmd *getCommand) bpmCmd()                  {}
@@ -366,9 +361,9 @@ func (cmd *getCommand) isAlreadyInstalled(bundleVersionDir string) bool {
 }
 
 type GetCmdConf struct {
-	OsWrap      osWrapper
-	TomlEncoder tomlEncoder
-	FileLoader  fsLoader
+	OsWrap      getCmdOSWrapper
+	TomlEncoder getCmdTomler
+	FileLoader  getCmdLoader
 }
 
 func NewGetCommand(conf *GetCmdConf) Command {
