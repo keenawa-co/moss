@@ -81,21 +81,19 @@ func (cmd *BundleInstaller) processBundleFile(bundleFile *types.BundleFile, bund
 
 func (cmd *BundleInstaller) processRegoFiles(files map[string]*types.RawRegoFile, bundleVersionDir string) error {
 	for filePath, file := range files {
-		dirPath := filepath.Dir(filePath)
-		absPath, err := filepath.Abs(dirPath)
-		if err != nil {
-			return fmt.Errorf("failed to get absolute path for '%s': %v", dirPath, err)
-		}
+		pathToSave := filepath.Join(bundleVersionDir, filePath)
+		dirToSave := filepath.Dir(pathToSave)
 
-		if absPath != filepath.Dir(absPath) {
-			if err := os.MkdirAll(dirPath, 0755); err != nil {
-				return fmt.Errorf("failed to create bundle subfolder '%s': %v", dirPath, err)
+		if _, err := os.Stat(dirToSave); os.IsNotExist(err) {
+			if err := os.MkdirAll(dirToSave, 0755); err != nil {
+				return fmt.Errorf("failed to create directory '%s': %v", dirToSave, err)
 			}
+		} else if err != nil {
+			return fmt.Errorf("error checking directory '%s': %v", dirToSave, err)
 		}
 
-		pathToSave := fmt.Sprintf("%s/%s", bundleVersionDir, filePath)
 		if err := cmd.osWrap.WriteFile(pathToSave, file.Raw, 0644); err != nil {
-			return err
+			return fmt.Errorf("failed to write file '%s': %v", pathToSave, err)
 		}
 	}
 
