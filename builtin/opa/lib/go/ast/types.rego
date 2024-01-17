@@ -1,4 +1,4 @@
-package go.ast.types
+package goray.go.ast.types
 
 invalid := "Invalid"
 file := "File"

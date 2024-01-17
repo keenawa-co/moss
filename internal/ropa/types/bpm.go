@@ -22,8 +22,13 @@ type PackageDef struct {
 	Description string   `toml:"description"`
 }
 
+type DependencyDef struct {
+	Version string
+}
+
 type BundleFile struct {
-	Package *PackageDef `toml:"package" validate:"required"`
+	Package      *PackageDef            `toml:"package" validate:"required"`
+	Dependencies map[string]interface{} `toml:"dependencies"`
 }
 
 func (*BundleFile) bpmFile()     {}

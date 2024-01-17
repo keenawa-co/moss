@@ -1,4 +1,4 @@
-package go.ast.kinds
+package goray.go.ast.kinds
 
 import data.go.ast.tokens
 
