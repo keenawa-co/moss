@@ -64,18 +64,6 @@ type BundleLockFile struct {
 func (*BundleLockFile) bpmFile()     {}
 func (*BundleLockFile) Name() string { return constant.BPMLockFile }
 
-// func (blf *BundleLockFile) Validate(files map[string]*RawRegoFile) error {
-// 	actualSumSet := make(map[string]string, len(blf.Modules))
-
-// 	for _, m := range blf.Modules {
-// 		actualSumSet[m.Source] = m.Checksum
-// 	}
-
-// 	// for filePath, file := range files {
-
-// 	// }
-// }
-
 // ----------------- Bundle Work File ----------------- //
 
 type WorkspaceDef struct {

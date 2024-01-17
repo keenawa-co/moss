@@ -1,25 +1,25 @@
 package bpm
 
-// --- Temporary documentation ---
-// The same principles as in installer.
-
 import (
 	"fmt"
 	"io"
 	"io/fs"
 	"os"
+	"path/filepath"
 	"reflect"
 	"strings"
 
 	"github.com/4rchr4y/goray/constant"
+	"github.com/4rchr4y/goray/internal/ropa/loader"
 	"github.com/4rchr4y/goray/internal/ropa/types"
+	"github.com/4rchr4y/goray/version"
 )
 
 type Command interface {
 	Name() string
 	Requires() []string
 	SetCommand(cmd Command) error
-	Execute(input interface{}) error
+	Execute(input interface{}) (interface{}, error)
 
 	bpmCmd()
 }
@@ -37,14 +37,13 @@ type tomlCoder interface {
 	Encode(w io.Writer, v interface{}) error
 }
 
-type bundleBuilder interface {
-	Build(input *BundleBuildInput) error
+type buildCmdTarCompressor interface {
+	Compress(dirPath string, targetDir string, archiveName string) error
 }
 
 type buildCommand struct {
 	cmdName     string
-	coder       tomlCoder
-	bbuilder    bundleBuilder
+	compressor  buildCmdTarCompressor
 	subregistry commandRegistry
 }
 
@@ -68,72 +67,86 @@ func (cmd *buildCommand) SetCommand(c Command) error {
 }
 
 type BuildCmdInput struct {
-	*ValidateCmdExecuteInput
-
 	_          [0]int
 	SourcePath string
 	DestPath   string
 	BLWriter   io.Writer
 }
 
-func (cmd *buildCommand) Execute(input interface{}) error {
+func (cmd *buildCommand) Execute(input interface{}) (interface{}, error) {
 	typedInput, ok := input.(*BuildCmdInput)
 	if !ok {
-		return fmt.Errorf("type '%s' is invalid input type for '%s' command", reflect.TypeOf(input).Elem().Kind().String(), cmd.cmdName)
+		return nil, fmt.Errorf("type '%s' is invalid input type for '%s' command", reflect.TypeOf(input).Elem().Kind().String(), cmd.cmdName)
 	}
 
 	validateCmd := cmd.subregistry[ValidateCommandName]
-	if err := validateCmd.Execute(typedInput.ValidateCmdExecuteInput); err != nil {
-		return err
-	}
-
-	bundleName := strings.ReplaceAll(typedInput.ValidateCmdExecuteInput.BundleFile.Package.Name, ".", "_")
-	bbInput := &BundleBuildInput{
+	validateCmdInput := &ValidateCmdInput{
 		SourcePath: typedInput.SourcePath,
-		DestPath:   typedInput.DestPath,
-		BundleName: fmt.Sprintf("%s%s", bundleName, constant.BPMBundleExt),
-		BLWriter:   typedInput.BLWriter,
-	}
-	if err := cmd.bbuilder.Build(bbInput); err != nil {
-		return err
 	}
 
-	return nil
+	rawResult, err := validateCmd.Execute(validateCmdInput)
+	if err != nil {
+		return nil, err
+	}
+
+	result, ok := rawResult.(*ValidateCmdResult)
+	if !ok {
+		return nil, fmt.Errorf("type '%s' is invalid input type for '%s' command", reflect.TypeOf(input).Elem().Kind().String(), cmd.cmdName)
+	}
+
+	bundlePkgName := strings.ReplaceAll(result.Bundle.BundleFile.Package.Name, ".", "_")
+	bundleFileName := fmt.Sprintf("%s%s", bundlePkgName, constant.BPMBundleExt)
+	if err := cmd.compressor.Compress(typedInput.SourcePath, typedInput.DestPath, bundleFileName); err != nil {
+		return nil, fmt.Errorf("error occurred while building '%s' bundle: %v", bundleFileName, err)
+	}
+
+	return nil, nil
 }
 
 type BuildCmdConf struct {
-	OsWrap           bbOsWrapper
-	Tar              tarCompressor
-	TomlCoder        tomlCoder
-	RegoFileLoader   regoFileLoader
-	BundleLockWriter io.Writer
+	TarCompressor buildCmdTarCompressor
 }
 
-func NewBuildCommand(input *BuildCmdConf) Command {
-	bbuilder := &BundleBuilder{
-		osWrap:     input.OsWrap,
-		compressor: input.Tar,
-		coder:      input.TomlCoder,
-		loader:     input.RegoFileLoader,
-	}
-
+func NewBuildCommand(conf *BuildCmdConf) Command {
 	return &buildCommand{
 		cmdName:     BuildCommandName,
-		coder:       input.TomlCoder,
-		bbuilder:    bbuilder,
+		compressor:  conf.TarCompressor,
 		subregistry: make(commandRegistry),
 	}
 }
 
 // ----------------- Validate Command ----------------- //
 
-type validateClient interface {
+type validateCmdValidator interface {
 	ValidateStruct(s interface{}) error
+}
+
+type validateCmdOSWrapper interface {
+	Create(name string) (*os.File, error)
+	Walk(root string, fn filepath.WalkFunc) error
+	Open(name string) (*os.File, error)
+}
+
+type validateCmdIOWrapper interface {
+	ReadAll(reader io.Reader) ([]byte, error)
+}
+
+type validateCmdTomler interface {
+	Encode(writer io.Writer, value interface{}) error
+	Decode(data string, value interface{}) error
+}
+
+type validateCmdBundleParser interface {
+	Parse(input *loader.ParseInput) (*types.Bundle, error)
 }
 
 type validateCommand struct {
 	cmdName  string
-	validate validateClient
+	osWrap   validateCmdOSWrapper
+	ioWrap   validateCmdIOWrapper
+	tomler   validateCmdTomler
+	bparser  validateCmdBundleParser
+	validate validateCmdValidator
 }
 
 func (cmd *validateCommand) bpmCmd()                  {}
@@ -141,27 +154,128 @@ func (cmd *validateCommand) Name() string             { return cmd.cmdName }
 func (cmd *validateCommand) Requires() []string       { return nil }
 func (cmd *validateCommand) SetCommand(Command) error { return nil }
 
-type ValidateCmdExecuteInput struct {
-	BundleFile *types.BundleFile
+type ValidateCmdInput struct {
+	SourcePath string
 }
 
-func (cmd *validateCommand) Execute(input interface{}) error {
-	typedInput, ok := input.(*ValidateCmdExecuteInput)
+type ValidateCmdResult struct {
+	Bundle *types.Bundle // valid bundle
+}
+
+func (cmd *validateCommand) Execute(input interface{}) (interface{}, error) {
+	typedInput, ok := input.(*ValidateCmdInput)
 	if !ok {
-		return fmt.Errorf("type '%s' is invalid input type for '%s' command", reflect.TypeOf(input), cmd.cmdName)
+		return nil, fmt.Errorf("type '%s' is invalid input type for '%s' command", reflect.TypeOf(input), cmd.cmdName)
 	}
 
-	if err := typedInput.BundleFile.Validate(cmd.validate); err != nil {
-		return fmt.Errorf("failed to execute '%s' command: %v", cmd.cmdName, err)
+	files, err := cmd.loadBundleDir(typedInput.SourcePath)
+	if err != nil {
+		return nil, err
 	}
 
-	return nil
+	parserInput := &loader.ParseInput{
+		BundlePath: typedInput.SourcePath,
+		Files:      files,
+	}
+
+	bundle, err := cmd.bparser.Parse(parserInput)
+	if err != nil {
+		return nil, err
+	}
+
+	bundle.UpdateLock()
+	bundleLockFile, err := cmd.osWrap.Create(fmt.Sprintf("%s/%s", typedInput.SourcePath, constant.BPMLockFile))
+	if err != nil {
+		return nil, err
+	}
+
+	if err := cmd.tomler.Encode(bundleLockFile, bundle.BundleLockFile); err != nil {
+		return nil, err
+	}
+
+	return &ValidateCmdResult{
+		Bundle: bundle,
+	}, nil
 }
 
-func NewValidateCommand(validate validateClient) Command {
+func (cmd *validateCommand) createBundleLockFile(files map[string]*types.RawRegoFile) (*types.BundleLockFile, error) {
+	bundlelock := &types.BundleLockFile{
+		Version: version.BPM,
+		Modules: make([]*types.ModuleDef, len(files)),
+	}
+
+	var i uint
+	for path, file := range files {
+		bundlelock.Modules[i] = &types.ModuleDef{
+			Name:     file.Parsed.Package.Path.String(),
+			Source:   path,
+			Checksum: file.Sum(),
+			Dependencies: func() []string {
+				result := make([]string, len(file.Parsed.Imports))
+				for i, _import := range file.Parsed.Imports {
+					result[i] = _import.Path.String()
+				}
+
+				return result
+			}(),
+		}
+
+		i++
+	}
+
+	return bundlelock, nil
+}
+
+func (cmd *validateCommand) loadBundleDir(dirPath string) (map[string][]byte, error) {
+	files := make(map[string][]byte)
+
+	walkFunc := func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return fmt.Errorf("error occurred while accessing a path %s: %v", path, err)
+		}
+
+		if !info.IsDir() {
+			file, err := cmd.osWrap.Open(path)
+			if err != nil {
+				return err
+			}
+
+			content, err := cmd.ioWrap.ReadAll(file)
+			if err != nil {
+				return err
+			}
+
+			localPath := strings.Clone(path[len(dirPath)+1:])
+			files[localPath] = content
+		}
+
+		return nil
+	}
+
+	err := cmd.osWrap.Walk(dirPath, walkFunc)
+	if err != nil {
+		return nil, fmt.Errorf("error walking the path %s: %v", dirPath, err)
+	}
+
+	return files, nil
+}
+
+type ValidateCmdConf struct {
+	OsWrap       validateCmdOSWrapper
+	IoWrap       validateCmdIOWrapper
+	Tomler       validateCmdTomler
+	BundleParser validateCmdBundleParser
+	Validator    validateCmdValidator
+}
+
+func NewValidateCommand(conf *ValidateCmdConf) Command {
 	return &validateCommand{
 		cmdName:  ValidateCommandName,
-		validate: validate,
+		osWrap:   conf.OsWrap,
+		ioWrap:   conf.IoWrap,
+		tomler:   conf.Tomler,
+		bparser:  conf.BundleParser,
+		validate: conf.Validator,
 	}
 }
 
@@ -205,20 +319,20 @@ type GetCmdInput struct {
 	BundlePath string
 }
 
-func (cmd *getCommand) Execute(input interface{}) error {
+func (cmd *getCommand) Execute(input interface{}) (interface{}, error) {
 	typedInput, ok := input.(*GetCmdInput)
 	if !ok {
-		return fmt.Errorf("type '%s' is invalid input type for '%s' command", reflect.TypeOf(input), cmd.cmdName)
+		return nil, fmt.Errorf("type '%s' is invalid input type for '%s' command", reflect.TypeOf(input), cmd.cmdName)
 	}
 
 	homeDir, err := cmd.osWrap.UserHomeDir()
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	bundle, err := cmd.loader.LoadBundle(typedInput.BundlePath)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	bpmDirPath := fmt.Sprintf("%s/%s", homeDir, constant.BPMDir)
@@ -228,22 +342,22 @@ func (cmd *getCommand) Execute(input interface{}) error {
 
 	if !cmd.isAlreadyInstalled(bundleVersionDir) {
 		fmt.Printf("Bundle '%s' with version '%s' is already installed\n", bundleName, bundleVersion)
-		return nil
+		return nil, nil
 	}
 
 	// creating all the directories that are necessary to save files
 	if err := cmd.osWrap.MkdirAll(bundleVersionDir, 0755); err != nil {
-		return err
+		return nil, err
 	}
 
 	if err := cmd.installer.Install(&BundleInstallInput{
 		Dir:    bundleVersionDir,
 		Bundle: bundle,
 	}); err != nil {
-		return fmt.Errorf("can't install bundle '%s': %v", bundleName, err)
+		return nil, fmt.Errorf("can't install bundle '%s': %v", bundleName, err)
 	}
 
-	return nil
+	return nil, nil
 }
 
 func (cmd *getCommand) isAlreadyInstalled(bundleVersionDir string) bool {

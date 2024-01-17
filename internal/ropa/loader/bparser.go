@@ -9,20 +9,26 @@ import (
 	"github.com/open-policy-agent/opa/ast"
 )
 
-type tomlDecoder interface {
+type bpTOMLDecoder interface {
 	Decode(data string, v interface{}) error
 }
 
-type BundleProcessor struct {
-	toml tomlDecoder
+type BundleParser struct {
+	decoder bpTOMLDecoder
 }
 
-type ProcessInput struct {
+func NewBundleParser(decoder bpTOMLDecoder) *BundleParser {
+	return &BundleParser{
+		decoder: decoder,
+	}
+}
+
+type ParseInput struct {
 	BundlePath string
 	Files      map[string][]byte
 }
 
-func (bp *BundleProcessor) Process(input *ProcessInput) (*types.Bundle, error) {
+func (bp *BundleParser) Parse(input *ParseInput) (*types.Bundle, error) {
 	bundle := &types.Bundle{
 		FileName:  filepath.Clean(input.BundlePath),
 		RegoFiles: make(map[string]*types.RawRegoFile),
@@ -31,7 +37,7 @@ func (bp *BundleProcessor) Process(input *ProcessInput) (*types.Bundle, error) {
 	for filePath, content := range input.Files {
 		switch {
 		case isRegoFile(filePath):
-			parsed, err := bp.processRegoFile(content, filePath)
+			parsed, err := bp.parseRegoFile(content, filePath)
 			if err != nil {
 				return nil, err
 			}
@@ -42,7 +48,7 @@ func (bp *BundleProcessor) Process(input *ProcessInput) (*types.Bundle, error) {
 			}
 
 		case isBPMFile(filePath):
-			bundlefile, err := bp.processBPMFile(content)
+			bundlefile, err := bp.parseBPMFile(content)
 			if err != nil {
 				return nil, err
 			}
@@ -50,7 +56,7 @@ func (bp *BundleProcessor) Process(input *ProcessInput) (*types.Bundle, error) {
 			bundle.BundleFile = bundlefile
 
 		case isBPMLockFile(filePath):
-			bundlelock, err := bp.processBPMLockFile(content)
+			bundlelock, err := bp.parseBPMLockFile(content)
 			if err != nil {
 				return nil, err
 			}
@@ -58,7 +64,7 @@ func (bp *BundleProcessor) Process(input *ProcessInput) (*types.Bundle, error) {
 			bundle.BundleLockFile = bundlelock
 
 		case isBPMWorkFile(filePath):
-			bpmwork, err := bp.processBPMWorkFile(content)
+			bpmwork, err := bp.parseBPMWorkFile(content)
 			if err != nil {
 				return nil, err
 			}
@@ -70,7 +76,7 @@ func (bp *BundleProcessor) Process(input *ProcessInput) (*types.Bundle, error) {
 	return bundle, nil
 }
 
-func (bp *BundleProcessor) processRegoFile(fileContent []byte, filePath string) (*ast.Module, error) {
+func (bp *BundleParser) parseRegoFile(fileContent []byte, filePath string) (*ast.Module, error) {
 	parsed, err := ast.ParseModule(filePath, string(fileContent))
 	if err != nil {
 		return nil, fmt.Errorf("error parsing file contents: %v", err)
@@ -79,27 +85,27 @@ func (bp *BundleProcessor) processRegoFile(fileContent []byte, filePath string) 
 	return parsed, nil
 }
 
-func (bp *BundleProcessor) processBPMWorkFile(fileContent []byte) (*types.BpmWorkFile, error) {
+func (bp *BundleParser) parseBPMWorkFile(fileContent []byte) (*types.BpmWorkFile, error) {
 	var bpmwork types.BpmWorkFile
-	if err := bp.toml.Decode(string(fileContent), &bpmwork); err != nil {
+	if err := bp.decoder.Decode(string(fileContent), &bpmwork); err != nil {
 		return nil, fmt.Errorf("error parsing bpm.work content: %v", err)
 	}
 
 	return &bpmwork, nil
 }
 
-func (bp *BundleProcessor) processBPMLockFile(fileContent []byte) (*types.BundleLockFile, error) {
+func (bp *BundleParser) parseBPMLockFile(fileContent []byte) (*types.BundleLockFile, error) {
 	var bundlelock types.BundleLockFile
-	if err := bp.toml.Decode(string(fileContent), &bundlelock); err != nil {
+	if err := bp.decoder.Decode(string(fileContent), &bundlelock); err != nil {
 		return nil, fmt.Errorf("error parsing bundle.lock content: %v", err)
 	}
 
 	return &bundlelock, nil
 }
 
-func (bp *BundleProcessor) processBPMFile(fileContent []byte) (*types.BundleFile, error) {
+func (bp *BundleParser) parseBPMFile(fileContent []byte) (*types.BundleFile, error) {
 	var bundlefile types.BundleFile
-	if err := bp.toml.Decode(string(fileContent), &bundlefile); err != nil {
+	if err := bp.decoder.Decode(string(fileContent), &bundlefile); err != nil {
 		return nil, fmt.Errorf("error parsing bundle.toml content: %v", err)
 	}
 

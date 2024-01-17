@@ -25,27 +25,27 @@ type ioWrapper interface {
 }
 
 type bundleProcessor interface {
-	Process(input *ProcessInput) (*types.Bundle, error)
+	Parse(input *ParseInput) (*types.Bundle, error)
 }
 
 type FsLoader struct {
-	osWrap     osWrapper
-	ioWrap     ioWrapper
-	bProcessor bundleProcessor
+	osWrap  osWrapper
+	ioWrap  ioWrapper
+	bParser bundleProcessor
 }
 
 type FsLoaderConf struct {
 	OsWrap      osWrapper
 	IoWrap      ioWrapper
-	TomlDecoder tomlDecoder
+	TomlDecoder bpTOMLDecoder
 }
 
 func NewFsLoader(conf *FsLoaderConf) *FsLoader {
 	return &FsLoader{
 		osWrap: conf.OsWrap,
 		ioWrap: conf.IoWrap,
-		bProcessor: &BundleProcessor{
-			toml: conf.TomlDecoder,
+		bParser: &BundleParser{
+			decoder: conf.TomlDecoder,
 		},
 	}
 }
@@ -86,7 +86,7 @@ func (loader *FsLoader) LoadBundle(path string) (*types.Bundle, error) {
 		return nil, fmt.Errorf("error extracting tar content: %v", err)
 	}
 
-	return loader.bProcessor.Process(&ProcessInput{
+	return loader.bParser.Parse(&ParseInput{
 		BundlePath: path,
 		Files:      files,
 	})

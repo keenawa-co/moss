@@ -5,14 +5,12 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/4rchr4y/goray/constant"
 	"github.com/4rchr4y/goray/internal/domain/service/tar"
 	"github.com/4rchr4y/goray/internal/domain/service/toml"
 	svalidator "github.com/4rchr4y/goray/internal/domain/service/validator"
 	"github.com/4rchr4y/goray/internal/infra/syswrap"
 	"github.com/4rchr4y/goray/internal/ropa/bpm"
 	"github.com/4rchr4y/goray/internal/ropa/loader"
-	"github.com/4rchr4y/goray/internal/ropa/types"
 	"github.com/4rchr4y/goray/pkg/gvalidate"
 	"github.com/go-playground/validator/v10"
 	"github.com/spf13/cobra"
@@ -64,40 +62,47 @@ func runBuildCmd(cmd *cobra.Command, args []string) {
 	osWrap := new(syswrap.OsWrapper)
 	ioWrap := new(syswrap.IoWrapper)
 	validateClient := svalidator.NewValidatorService(validator.New())
-	tomlClient := toml.NewTomlService()
+	tomler := toml.NewTomlService()
 	tarClient := tar.NewTarService(osWrap, osWrap, ioWrap)
 	bpmClient := bpm.NewBpm()
 
 	bpmClient.RegisterCommand(
-		bpm.NewValidateCommand(validateClient),
+		bpm.NewValidateCommand(&bpm.ValidateCmdConf{
+			OsWrap:       osWrap,
+			IoWrap:       ioWrap,
+			Tomler:       tomler,
+			BundleParser: loader.NewBundleParser(tomler),
+			Validator:    validateClient,
+		}),
 		bpm.NewBuildCommand(&bpm.BuildCmdConf{
-			OsWrap:    osWrap,
-			Tar:       tarClient,
-			TomlCoder: tomlClient,
-			RegoFileLoader: loader.NewFsLoader(&loader.FsLoaderConf{
-				OsWrap:      osWrap,
-				TomlDecoder: tomlClient,
-			}),
+			// OsWrap:        osWrap,
+			TarCompressor: tarClient,
+
+			// TomlCoder:     tomlClient,
+			// RegoFileLoader: loader.NewFsLoader(&loader.FsLoaderConf{
+			// 	OsWrap:      osWrap,
+			// 	TomlDecoder: tomlClient,
+			// }),
 		}),
 	)
 
-	file, err := osWrap.Open(fmt.Sprintf("%s/%s", args[0], constant.BPMFile))
-	if err != nil {
-		log.Fatal(err)
-		return
-	}
+	// file, err := osWrap.Open(fmt.Sprintf("%s/%s", args[0], constant.BPMFile))
+	// if err != nil {
+	// 	log.Fatal(err)
+	// 	return
+	// }
 
-	content, err := ioWrap.ReadAll(file)
-	if err != nil {
-		log.Fatal(err)
-		return
-	}
+	// content, err := ioWrap.ReadAll(file)
+	// if err != nil {
+	// 	log.Fatal(err)
+	// 	return
+	// }
 
-	bundlefile := new(types.BundleFile)
-	if err := tomlClient.Decode(string(content), bundlefile); err != nil {
-		log.Fatal(err)
-		return
-	}
+	// bundlefile := new(types.BundleFile)
+	// if err := tomlClient.Decode(string(content), bundlefile); err != nil {
+	// 	log.Fatal(err)
+	// 	return
+	// }
 
 	buildCommand, err := bpmClient.Command(bpm.BuildCommandName)
 	if err != nil {
@@ -105,19 +110,12 @@ func runBuildCmd(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	bundlelock, err := osWrap.Create(fmt.Sprintf("%s/%s", args[0], constant.BPMLockFile))
-	if err != nil {
-		log.Fatal(err)
-		return
-	}
-
-	if err := buildCommand.Execute(&bpm.BuildCmdInput{
+	if _, err := buildCommand.Execute(&bpm.BuildCmdInput{
 		SourcePath: sourcePath,
 		DestPath:   destPath,
-		BLWriter:   bundlelock,
-		ValidateCmdExecuteInput: &bpm.ValidateCmdExecuteInput{
-			BundleFile: bundlefile,
-		},
+		// ValidateCmdExecuteInput: &bpm.ValidateCmdExecuteInput{
+		// 	BundleFile: bundlefile,
+		// },
 	}); err != nil {
 		log.Fatal(err)
 		return
@@ -173,7 +171,7 @@ func runGetCmd(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	if err := getCmd.Execute(&bpm.GetCmdInput{
+	if _, err := getCmd.Execute(&bpm.GetCmdInput{
 		BundlePath: pathToBundle,
 	}); err != nil {
 		log.Fatal(err)

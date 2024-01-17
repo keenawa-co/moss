@@ -3,6 +3,7 @@
         "ason",
         "bbuilder",
         "bfilter",
+        "bparser",
         "bpmwork",
         "bundlefile",
         "bundlelock",
@@ -40,6 +41,7 @@
         "syswrap",
         "testcode",
         "testmain",
+        "tomler",
         "Typeflag",
         "TYPESWITCH"
     ]
