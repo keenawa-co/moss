@@ -31,9 +31,10 @@ type Bundle struct {
 	RegoFiles      map[string]*RawRegoFile
 }
 
-func (b *Bundle) UpdateLock() {
+func (b *Bundle) UpdateLock() bool {
 	if len(b.RegoFiles) < 1 {
-		return
+		// no rego files, then nothing to update
+		return false
 	}
 
 	if b.BundleLockFile == nil {
@@ -61,6 +62,8 @@ func (b *Bundle) UpdateLock() {
 
 		i++
 	}
+
+	return true
 }
 
 func (b *Bundle) Validation() error {

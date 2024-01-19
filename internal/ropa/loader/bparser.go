@@ -24,13 +24,14 @@ func NewBundleParser(decoder bpTOMLDecoder) *BundleParser {
 }
 
 type ParseInput struct {
-	BundlePath string
-	Files      map[string][]byte
+	FileName string
+	Files    map[string][]byte
 }
 
+// TODO: check that file is not empty; isEmpty(content)
 func (bp *BundleParser) Parse(input *ParseInput) (*types.Bundle, error) {
 	bundle := &types.Bundle{
-		FileName:  filepath.Clean(input.BundlePath),
+		FileName:  filepath.Clean(input.FileName),
 		RegoFiles: make(map[string]*types.RawRegoFile),
 	}
 

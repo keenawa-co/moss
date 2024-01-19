@@ -87,8 +87,8 @@ func (loader *FsLoader) LoadBundle(path string) (*types.Bundle, error) {
 	}
 
 	return loader.bParser.Parse(&ParseInput{
-		BundlePath: path,
-		Files:      files,
+		FileName: path,
+		Files:    files,
 	})
 }
 

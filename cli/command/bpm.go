@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 
+	gitService "github.com/4rchr4y/goray/internal/domain/service/git"
 	"github.com/4rchr4y/goray/internal/domain/service/tar"
 	"github.com/4rchr4y/goray/internal/domain/service/toml"
 	svalidator "github.com/4rchr4y/goray/internal/domain/service/validator"
@@ -21,7 +22,7 @@ func init() {
 	BpmCmd.AddCommand(GetCmd)
 	BpmCmd.AddCommand(BuildCmd)
 
-	GetCmd.Flags().BoolP("global", "g", false, "global install")
+	GetCmd.Flags().StringP("version", "v", "", "Bundle version")
 }
 
 var BpmCmd = &cobra.Command{
@@ -128,8 +129,8 @@ var GetCmd = &cobra.Command{
 	Use:   "get",
 	Short: "Install a new dependency",
 	Long:  ``,
-	Args:  validateGetCmdArgs,
-	Run:   runGetCmd,
+	// Args:  validateGetCmdArgs,
+	Run: runGetCmd,
 }
 
 func validateGetCmdArgs(cmd *cobra.Command, args []string) error {
@@ -145,23 +146,28 @@ func validateGetCmdArgs(cmd *cobra.Command, args []string) error {
 }
 
 func runGetCmd(cmd *cobra.Command, args []string) {
+
 	pathToBundle := args[0]
 	bpmClient := bpm.NewBpm()
 	osWrap := new(syswrap.OsWrapper)
-	ioWrap := new(syswrap.IoWrapper)
+	// ioWrap := new(syswrap.IoWrapper)
 	tomlCoder := toml.NewTomlService()
 
-	fsLoader := loader.NewFsLoader(&loader.FsLoaderConf{
-		OsWrap:      osWrap,
-		IoWrap:      ioWrap,
-		TomlDecoder: toml.NewTomlService(),
-	})
+	// fsLoader := loader.NewFsLoader(&loader.FsLoaderConf{
+	// 	OsWrap:      osWrap,
+	// 	IoWrap:      ioWrap,
+	// 	TomlDecoder: toml.NewTomlService(),
+	// })
+
+	bundleParser := loader.NewBundleParser(tomlCoder)
+	gitService := gitService.NewGitService()
+	gitLoader := loader.NewGitLoader(gitService, bundleParser)
 
 	bpmClient.RegisterCommand(
 		bpm.NewGetCommand(&bpm.GetCmdConf{
 			OsWrap:      osWrap,
 			TomlEncoder: tomlCoder,
-			FileLoader:  fsLoader,
+			FileLoader:  gitLoader,
 		}),
 	)
 
@@ -171,8 +177,15 @@ func runGetCmd(cmd *cobra.Command, args []string) {
 		return
 	}
 
+	version, err := cmd.Flags().GetString("version")
+	if err != nil {
+		log.Fatal(err)
+		return
+	}
+
 	if _, err := getCmd.Execute(&bpm.GetCmdInput{
-		BundlePath: pathToBundle,
+		URL:     pathToBundle,
+		Version: version,
 	}); err != nil {
 		log.Fatal(err)
 		return

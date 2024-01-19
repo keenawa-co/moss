@@ -86,16 +86,37 @@ func (cmd *buildCommand) Execute(input interface{}) (interface{}, error) {
 
 	result, ok := rawResult.(*ValidateCmdResult)
 	if !ok {
-		return nil, fmt.Errorf("type '%s' is invalid input type for '%s' command", reflect.TypeOf(input).Elem().Kind().String(), cmd.cmdName)
+		return nil, fmt.Errorf("type '%s' is invalid type for '%s' command result", reflect.TypeOf(input).Elem().Kind().String(), ValidateCommandName)
 	}
 
-	bundlePkgName := strings.ReplaceAll(result.Bundle.BundleFile.Package.Name, ".", "_")
-	bundleFileName := fmt.Sprintf("%s%s", bundlePkgName, constant.BPMBundleExt)
+	if err := cmd.collectVendors(result.Bundle.BundleFile); err != nil {
+		return nil, err
+	}
+
+	fmt.Println(filepath.Abs(typedInput.SourcePath))
+
+	bundleFileName := fmt.Sprintf("%s%s", result.Bundle.BundleFile.Package.Name, constant.BPMBundleExt)
 	if err := cmd.compressor.Compress(typedInput.SourcePath, typedInput.DestPath, bundleFileName); err != nil {
 		return nil, fmt.Errorf("error occurred while building '%s' bundle: %v", bundleFileName, err)
 	}
 
 	return nil, nil
+}
+
+func (cmd *buildCommand) collectVendors(bundlefile *types.BundleFile) error {
+	for name, d := range bundlefile.Dependencies {
+		fmt.Println(name, d.Source)
+
+		absolutePath, err := filepath.Abs(d.Source)
+		if err != nil {
+			return err
+		}
+
+		fmt.Println(absolutePath)
+
+	}
+
+	return nil
 }
 
 type BuildCmdConf struct {
@@ -169,8 +190,8 @@ func (cmd *validateCommand) Execute(input interface{}) (interface{}, error) {
 	}
 
 	parserInput := &loader.ParseInput{
-		BundlePath: typedInput.SourcePath,
-		Files:      files,
+		FileName: typedInput.SourcePath,
+		Files:    files,
 	}
 
 	bundle, err := cmd.bparser.Parse(parserInput)
@@ -178,7 +199,13 @@ func (cmd *validateCommand) Execute(input interface{}) (interface{}, error) {
 		return nil, err
 	}
 
-	bundle.UpdateLock()
+	updated := bundle.UpdateLock()
+	if !updated {
+		return &ValidateCmdResult{
+			Bundle: bundle,
+		}, nil
+	}
+
 	bundleLockFile, err := cmd.osWrap.Create(fmt.Sprintf("%s/%s", typedInput.SourcePath, constant.BPMLockFile))
 	if err != nil {
 		return nil, err
@@ -294,7 +321,7 @@ type getCmdBundleInstaller interface {
 }
 
 type getCmdLoader interface {
-	LoadBundle(path string) (*types.Bundle, error)
+	DownloadBundle(url string, tag string) (*loader.DownloadResult, error)
 }
 
 type getCommand struct {
@@ -311,46 +338,54 @@ func (cmd *getCommand) Requires() []string       { return nil }
 func (cmd *getCommand) SetCommand(Command) error { return nil }
 
 type GetCmdInput struct {
-	BundlePath string
+	Version string // bundle package version
+	URL     string // url to download bundle
 }
 
-func (cmd *getCommand) Execute(input interface{}) (interface{}, error) {
-	typedInput, ok := input.(*GetCmdInput)
+func (cmd *getCommand) Execute(rawInput interface{}) (interface{}, error) {
+	input, ok := rawInput.(*GetCmdInput)
 	if !ok {
-		return nil, fmt.Errorf("type '%s' is invalid input type for '%s' command", reflect.TypeOf(input), cmd.cmdName)
+		return nil, fmt.Errorf("type '%s' is invalid input type for '%s' command", reflect.TypeOf(rawInput), cmd.cmdName)
 	}
 
-	homeDir, err := cmd.osWrap.UserHomeDir()
+	bundle, err := cmd.loader.DownloadBundle(input.URL, input.Version)
 	if err != nil {
 		return nil, err
 	}
 
-	bundle, err := cmd.loader.LoadBundle(typedInput.BundlePath)
-	if err != nil {
-		return nil, err
-	}
+	fmt.Println(bundle.Bundle.BundleFile.Package.Name)
 
-	bpmDirPath := fmt.Sprintf("%s/%s", homeDir, constant.BPMDir)
-	bundleName := bundle.BundleFile.Package.Name
-	bundleVersion := bundle.BundleFile.Package.Version
-	bundleVersionDir := fmt.Sprintf("%s/%s/%s", bpmDirPath, bundleName, bundleVersion)
+	// homeDir, err := cmd.osWrap.UserHomeDir()
+	// if err != nil {
+	// 	return nil, err
+	// }
 
-	if !cmd.isAlreadyInstalled(bundleVersionDir) {
-		fmt.Printf("Bundle '%s' with version '%s' is already installed\n", bundleName, bundleVersion)
-		return nil, nil
-	}
+	// bundle, err := cmd.loader.LoadBundle(typedInput.BundlePath)
+	// if err != nil {
+	// 	return nil, err
+	// }
 
-	// creating all the directories that are necessary to save files
-	if err := cmd.osWrap.MkdirAll(bundleVersionDir, 0755); err != nil {
-		return nil, err
-	}
+	// bpmDirPath := fmt.Sprintf("%s/%s", homeDir, constant.BPMDir)
+	// bundleName := bundle.BundleFile.Package.Name
+	// bundleVersion := bundle.BundleFile.Package.Version
+	// bundleVersionDir := fmt.Sprintf("%s/%s/%s", bpmDirPath, bundleName, bundleVersion)
 
-	if err := cmd.installer.Install(&BundleInstallInput{
-		Dir:    bundleVersionDir,
-		Bundle: bundle,
-	}); err != nil {
-		return nil, fmt.Errorf("can't install bundle '%s': %v", bundleName, err)
-	}
+	// if !cmd.isAlreadyInstalled(bundleVersionDir) {
+	// 	fmt.Printf("Bundle '%s' with version '%s' is already installed\n", bundleName, bundleVersion)
+	// 	return nil, nil
+	// }
+
+	// // creating all the directories that are necessary to save files
+	// if err := cmd.osWrap.MkdirAll(bundleVersionDir, 0755); err != nil {
+	// 	return nil, err
+	// }
+
+	// if err := cmd.installer.Install(&BundleInstallInput{
+	// 	Dir:    bundleVersionDir,
+	// 	Bundle: bundle,
+	// }); err != nil {
+	// 	return nil, fmt.Errorf("can't install bundle '%s': %v", bundleName, err)
+	// }
 
 	return nil, nil
 }

@@ -43,6 +43,7 @@
         "testmain",
         "tomler",
         "Typeflag",
-        "TYPESWITCH"
+        "TYPESWITCH",
+        "Worktree"
     ]
 }

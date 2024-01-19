@@ -23,12 +23,14 @@ type PackageDef struct {
 }
 
 type DependencyDef struct {
-	Version string
+	Version string   `toml:"version"`
+	Source  string   `toml:"source"`
+	Include []string `toml:"include"`
 }
 
 type BundleFile struct {
-	Package      *PackageDef            `toml:"package" validate:"required"`
-	Dependencies map[string]interface{} `toml:"dependencies"`
+	Package      *PackageDef               `toml:"package" validate:"required"`
+	Dependencies map[string]*DependencyDef `toml:"dependencies"`
 }
 
 func (*BundleFile) bpmFile()     {}
@@ -41,9 +43,9 @@ type validateClient interface {
 var versionRegex = regexp.MustCompile(`^\d+\.\d+\.\d+$`)
 
 func (bf *BundleFile) Validate(validator validateClient) error {
-	if ok := versionRegex.MatchString(bf.Package.Version); !ok {
-		return fmt.Errorf("failed to validate '%s' file, expected version X.Y.Z (Major.Minor.Patch) format ", bf.Package.Version)
-	}
+	// if ok := versionRegex.MatchString(bf.Package.Version); !ok {
+	// 	return fmt.Errorf("failed to validate '%s' file, expected version X.Y.Z (Major.Minor.Patch) format ", bf.Package.Version)
+	// }
 
 	if err := validator.ValidateStruct(bf); err != nil {
 		return fmt.Errorf("failed to validate %s file: %v", bf.Name(), err)
