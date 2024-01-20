@@ -1,4 +1,4 @@
 version = "1.0.193"
 
 [workspace]
-root = "./some/root/dir"
+root = "./some/root/dir/${LOGNAME}"

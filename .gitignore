@@ -5,3 +5,5 @@
 .goray
 
 *.tar.gz
+
+.vscode/launch.json

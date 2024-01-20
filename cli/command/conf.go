@@ -3,6 +3,8 @@ package command
 import (
 	"fmt"
 	"log"
+	"path/filepath"
+	"runtime"
 
 	"github.com/4rchr4y/goray/internal/domain/rayfile"
 	"github.com/4rchr4y/goray/internal/domain/service/toml"
@@ -21,10 +23,15 @@ func init() {
 	RootCmd.AddCommand(confCmd)
 }
 
+var (
+	_, b, _, _ = runtime.Caller(0)
+	basepath   = filepath.Dir(b)
+)
+
 func runConfCmd(cmd *cobra.Command, args []string) {
 	osWrap := new(syswrap.OsWrapper)
 
-	file, err := osWrap.Open("./internal/domain/rayfile/testdata/test_rayfile.toml")
+	file, err := osWrap.Open(fmt.Sprintf("%s/../../internal/domain/rayfile/testdata/test_rayfile.toml", basepath))
 	if err != nil {
 		log.Fatal(err)
 		return

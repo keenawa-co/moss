@@ -1,12 +1,12 @@
 package rayfile
 
 type Rayfile struct {
-	Version   string `json:"version"`
-	Workspace *workspace
+	Version   string     `toml:"version"`
+	Workspace *workspace `toml:"workspace"`
 }
 
 type workspace struct {
-	RootDir string `json:"root"`
+	RootDir string `toml:"root"`
 }
 
 type RayfileOptFn func(*Rayfile)
