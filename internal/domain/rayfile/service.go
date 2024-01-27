@@ -4,7 +4,7 @@ import (
 	"io"
 )
 
-type tomlService interface {
+type rayfileTOMLDecoder interface {
 	Decode(data string, v interface{}) error
 }
 
@@ -13,7 +13,7 @@ type ioWrapper interface {
 }
 
 type RayfileService struct {
-	toml tomlService
+	toml rayfileTOMLDecoder
 }
 
 func (rs *RayfileService) Parse(iowrap ioWrapper, reader io.Reader) (*Rayfile, error) {
@@ -31,7 +31,7 @@ func (rs *RayfileService) Parse(iowrap ioWrapper, reader io.Reader) (*Rayfile, e
 	return rayfile, nil
 }
 
-func NewRayfileService(ts tomlService) *RayfileService {
+func NewRayfileService(ts rayfileTOMLDecoder) *RayfileService {
 	return &RayfileService{
 		toml: ts,
 	}

@@ -1,11 +1,11 @@
 package rayfile
 
 type Rayfile struct {
-	Version   string     `toml:"version"`
-	Workspace *workspace `toml:"workspace"`
+	Version   string        `toml:"version"`
+	Workspace *WorkspaceDef `toml:"workspace"`
 }
 
-type workspace struct {
+type WorkspaceDef struct {
 	RootDir string `toml:"root"`
 }
 
@@ -14,7 +14,7 @@ type RayfileOptFn func(*Rayfile)
 func New(options ...RayfileOptFn) *Rayfile {
 	conf := &Rayfile{
 		Version: defaultVersion,
-		Workspace: &workspace{
+		Workspace: &WorkspaceDef{
 			RootDir: defaultRoot,
 		},
 	}
