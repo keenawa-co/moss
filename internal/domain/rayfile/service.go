@@ -8,7 +8,7 @@ type rayfileTOMLDecoder interface {
 	Decode(data string, v interface{}) error
 }
 
-type ioWrapper interface {
+type rayfileIoWrapper interface {
 	ReadAll(reader io.Reader) ([]byte, error)
 }
 
@@ -16,7 +16,7 @@ type RayfileService struct {
 	toml rayfileTOMLDecoder
 }
 
-func (rs *RayfileService) Parse(iowrap ioWrapper, reader io.Reader) (*Rayfile, error) {
+func (rs *RayfileService) Parse(iowrap rayfileIoWrapper, reader io.Reader) (*Rayfile, error) {
 	content, err := iowrap.ReadAll(reader)
 	if err != nil {
 		return nil, err
