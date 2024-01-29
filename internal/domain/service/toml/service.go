@@ -40,10 +40,6 @@ const envVarString = `\$\{[A-Za-z_][A-Za-z0-9_]*\}`
 
 var envVarPattern = regexp.MustCompile(envVarString)
 
-func (ts *TomlService) Encode(writer io.Writer, value interface{}) error {
-	return ts.en.Encode(writer, value)
-}
-
 func (ts *TomlService) Decode(data string, value interface{}) error {
 	content, err := ts.interpolate(data)
 	if err != nil {
@@ -81,4 +77,8 @@ func (ts *TomlService) interpolate(data string) (string, error) {
 	}
 
 	return result, nil
+}
+
+func (ts *TomlService) Encode(writer io.Writer, value interface{}) error {
+	return ts.en.Encode(writer, value)
 }

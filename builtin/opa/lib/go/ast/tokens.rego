@@ -1,4 +1,6 @@
-package lib.go.ast.tokens
+package goray.go.ast.tokens
+
+import data.go.utils.ast
 
 illegal := "ILLEGAL"
 eof := "EOF"

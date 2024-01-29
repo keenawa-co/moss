@@ -1,12 +1,18 @@
 {
     "cSpell.words": [
         "ason",
+        "bbuilder",
         "bfilter",
+        "bparser",
+        "bpmwork",
         "bundlefile",
+        "bundlelock",
+        "cmds",
         "dgraph",
         "Elts",
         "fobj",
         "fset",
+        "fswrap",
         "goray",
         "gvalidate",
         "idxt",
@@ -30,11 +36,14 @@
         "stretchr",
         "subdir",
         "subdirs",
+        "subregistry",
         "svalidator",
         "syswrap",
         "testcode",
         "testmain",
+        "tomler",
         "Typeflag",
-        "TYPESWITCH"
+        "TYPESWITCH",
+        "Worktree"
     ]
 }

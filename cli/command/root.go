@@ -10,9 +10,12 @@ import (
 	"github.com/4rchr4y/goray/analysis/openpolicy"
 	"github.com/4rchr4y/goray/ason"
 	"github.com/4rchr4y/goray/internal/domain/rayfile"
+	"github.com/4rchr4y/goray/internal/domain/service/toml"
 	"github.com/4rchr4y/goray/internal/infra/db/badger"
 	"github.com/4rchr4y/goray/internal/infra/syswrap"
 	"github.com/4rchr4y/goray/internal/ropa"
+	"github.com/4rchr4y/goray/internal/ropa/loader"
+	"github.com/4rchr4y/goray/internal/ropa/types"
 	"github.com/4rchr4y/goray/pkg/radix"
 	"github.com/spf13/cobra"
 )
@@ -73,20 +76,26 @@ func runRootCmd(cmd *cobra.Command, args []string) {
 	dbClient := badger.NewBadgerClient(badgerDb)
 	linkerRepo := dbClient.MakeLinkerRepo("goray")
 
-	loader := ropa.NewFsLoader(new(syswrap.FsWrapper))
+	fsLoader := loader.NewFsLoader(&loader.FsLoaderConf{
+		OsWrap:      new(syswrap.OsWrapper),
+		TomlDecoder: toml.NewTomlService(),
+	})
 	linker := ropa.NewLinker(linkerRepo, radix.NewTree[*ropa.IndexedRegoFile]())
 
-	bundle, err := loader.LoadBundle("test.bundle")
+	bundle, err := fsLoader.LoadBundle("test.bundle")
 	if err != nil {
 		log.Fatal(err)
 		return
 	}
 
-	rawRegoFiles := make([]*ropa.RawRegoFile, 0)
-	rawRegoFiles = append(rawRegoFiles, bundle.Files...)
+	rawRegoFiles := make([]*types.RawRegoFile, 0)
+
+	for _, f := range bundle.RegoFiles {
+		rawRegoFiles = append(rawRegoFiles, f)
+	}
 
 	for _, pd := range policies {
-		file, err := loader.LoadRegoFile(pd.Path)
+		file, err := fsLoader.LoadRegoFile(pd.Path)
 		if err != nil {
 			log.Fatal(err)
 			return
@@ -95,7 +104,7 @@ func runRootCmd(cmd *cobra.Command, args []string) {
 		rawRegoFiles = append(rawRegoFiles, file)
 
 		for _, path := range pd.Dependencies {
-			depFile, err := loader.LoadRegoFile(path)
+			depFile, err := fsLoader.LoadRegoFile(path)
 			if err != nil {
 				log.Fatal(err)
 				return
