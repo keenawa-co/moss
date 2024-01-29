@@ -112,12 +112,38 @@ func TestInterpolate(t *testing.T) {
 		}
 	})
 
-	t.Run("String with multiple environment variables", func(t *testing.T) {
+	t.Run("String with existing and missing environment variables", func(t *testing.T) {
 		input := "Path is ${EXISTING_VAR}/bin:${MISSING_VAR}/bin"
 		_, err := service.interpolate(input)
 		assert.Error(t, err, "An error should occur when at least one variable is missing")
 		if err != nil {
 			assert.Contains(t, err.Error(), "MISSING_VAR", "The error message should contain the name of the missing variable")
 		}
+	})
+
+	t.Run("String with multiple existing environment variable", func(t *testing.T) {
+		input := "Path is ${USER}/bin/${TERM}"
+		expected := fmt.Sprintf("Path is %s/bin/%s", testEnv["USER"], testEnv["TERM"])
+		result, err := service.interpolate(input)
+		assert.NoError(t, err, "No error should occur for existing environment variables")
+		assert.Equal(t, expected, result, "All environment variables should be replaced correctly")
+	})
+
+	t.Run("String with multiple non-existing environment variables", func(t *testing.T) {
+		input := "Path is ${MISSING_VAR1}/bin:${MISSING_VAR2}/bin"
+		_, err := service.interpolate(input)
+		assert.Error(t, err, "An error should occur when at least one variable is missing")
+		if err != nil {
+			assert.Contains(t, err.Error(), "MISSING_VAR1", "The error message should contain the name of the missing variable")
+			assert.Contains(t, err.Error(), "MISSING_VAR2", "The error message should contain the name of the missing variable")
+		}
+	})
+
+	t.Run("String with misspelled placeholder", func(t *testing.T) {
+		input := "Path is ${USER/bin"
+		expected := "Path is ${USER/bin"
+		result, err := service.interpolate(input)
+		assert.NoError(t, err, "No error should occur for string with misspelled placeholder")
+		assert.Equal(t, expected, result, "The input string should be returned as is")
 	})
 }

@@ -9,6 +9,7 @@ import (
 
 	"github.com/4rchr4y/goray/analysis/openpolicy"
 	"github.com/4rchr4y/goray/ason"
+	"github.com/4rchr4y/goray/internal/domain/rayfile"
 	"github.com/4rchr4y/goray/internal/domain/service/toml"
 	"github.com/4rchr4y/goray/internal/infra/db/badger"
 	"github.com/4rchr4y/goray/internal/infra/syswrap"
@@ -16,7 +17,6 @@ import (
 	"github.com/4rchr4y/goray/internal/ropa/loader"
 	"github.com/4rchr4y/goray/internal/ropa/types"
 	"github.com/4rchr4y/goray/pkg/radix"
-	"github.com/4rchr4y/goray/rayfile"
 	"github.com/spf13/cobra"
 )
 
