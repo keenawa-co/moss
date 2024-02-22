@@ -1,37 +1,30 @@
 package validator
 
-import (
-	"fmt"
-	"strings"
+// type validate interface {
+// 	Struct(s interface{}) error
+// }
 
-	"github.com/go-playground/validator/v10"
-)
+// type ValidatorService struct {
+// 	v validate
+// }
 
-type validate interface {
-	Struct(s interface{}) error
-}
+// func NewValidatorService(v validate) *ValidatorService {
+// 	return &ValidatorService{
+// 		v: v,
+// 	}
+// }
 
-type ValidatorService struct {
-	v validate
-}
+// func (vs *ValidatorService) ValidateStruct(s interface{}) error {
+// 	if err := vs.v.Struct(s); err != nil {
+// 		if validationErrors, ok := err.(validator.ValidationErrors); ok {
+// 			var errMessages []string
+// 			for _, valErr := range validationErrors {
+// 				errMessages = append(errMessages, fmt.Sprintf("field '%s' with condition: '%s'", valErr.Field(), valErr.ActualTag()))
+// 			}
 
-func NewValidatorService(v validate) *ValidatorService {
-	return &ValidatorService{
-		v: v,
-	}
-}
+// 			return fmt.Errorf(strings.Join(errMessages, ", "))
+// 		}
+// 	}
 
-func (vs *ValidatorService) ValidateStruct(s interface{}) error {
-	if err := vs.v.Struct(s); err != nil {
-		if validationErrors, ok := err.(validator.ValidationErrors); ok {
-			var errMessages []string
-			for _, valErr := range validationErrors {
-				errMessages = append(errMessages, fmt.Sprintf("field '%s' with condition: '%s'", valErr.Field(), valErr.ActualTag()))
-			}
-
-			return fmt.Errorf(strings.Join(errMessages, ", "))
-		}
-	}
-
-	return nil
-}
+// 	return nil
+// }

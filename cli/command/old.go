@@ -5,17 +5,11 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"go/ast"
-	"go/parser"
-	"go/printer"
-	"go/token"
-	"log"
 	"os"
 	"path/filepath"
 
 	"github.com/4rchr4y/goray/ason"
-
-	regoAst "github.com/open-policy-agent/opa/ast"
+	"github.com/open-policy-agent/opa/ast"
 	"github.com/open-policy-agent/opa/rego"
 	"github.com/open-policy-agent/opa/topdown"
 	"github.com/spf13/cobra"
@@ -43,7 +37,7 @@ func evaluateRegoPolicy(policyPath string, data ason.Ason) error {
 
 	policies[policyPath] = string(raw)
 
-	compiler, err := regoAst.CompileModulesWithOpt(policies, regoAst.CompileOpts{
+	compiler, err := ast.CompileModulesWithOpt(policies, ast.CompileOpts{
 		EnablePrintStatements: true,
 	})
 
@@ -112,61 +106,61 @@ func evaluateRegoPolicy(policyPath string, data ason.Ason) error {
 func runOldCmd(cmd *cobra.Command, args []string) {
 	// regoClient.ParsePolicyDir("analysis/policy")
 
-	fset := token.NewFileSet()
-	f, err := parser.ParseFile(fset, "./ason/testdata/main.go", nil, parser.ParseComments)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	// startTime := time.Now()
-	pass := ason.NewSerPass(fset, ason.SkipComments)
-	sf := ason.SerializeFile(pass, f)
-
-	js, _ := json.Marshal(sf)
-	fmt.Println(string(js))
-	// fmt.Println("Function execution time:", time.Since(startTime))
-
-	// file, err := os.Open(filepath.Clean("./analysis/policy/r1.rego"))
+	// fset := token.NewFileSet()
+	// f, err := parser.ParseFile(fset, "./ason/testdata/main.go", nil, parser.ParseComments)
 	// if err != nil {
-	// 	fmt.Println("Ошибка при открытии файла:", err)
-	// 	return
+	// 	log.Fatal(err)
 	// }
 
-	fset2 := token.NewFileSet()
-	d, err := ason.DeserializeFile(ason.NewDePass(fset2), sf)
-	if err != nil {
-		log.Fatal(err)
-	}
+	// // startTime := time.Now()
+	// pass := ason.NewSerPass(fset, ason.SkipComments)
+	// sf := ason.SerializeFile(pass, f)
 
-	code, err := GenerateCode(fset2, d)
-	if err != nil {
-		log.Fatal(err)
-	}
+	// js, _ := json.Marshal(sf)
+	// fmt.Println(string(js))
+	// // fmt.Println("Function execution time:", time.Since(startTime))
 
-	fmt.Println(code)
+	// // file, err := os.Open(filepath.Clean("./analysis/policy/r1.rego"))
+	// // if err != nil {
+	// // 	fmt.Println("Ошибка при открытии файла:", err)
+	// // 	return
+	// // }
 
-	// testPolicy, err := openpolicy.NewPolicy(file)
-
-	// policyGroup := []*openpolicy.Policy{testPolicy}
-
-	// policyPath := "./analysis/policy/r1.rego"
-	// if err := evaluateRegoPolicy(policyPath, sf); err != nil {
-	// 	log.Fatal("Ошибка при выполнении политики:", err)
+	// fset2 := token.NewFileSet()
+	// d, err := ason.DeserializeFile(ason.NewDePass(fset2), sf)
+	// if err != nil {
+	// 	log.Fatal(err)
 	// }
+
+	// // code, err := GenerateCode(fset2, d)
+	// // if err != nil {
+	// // 	log.Fatal(err)
+	// // }
+
+	// // fmt.Println(code)
+
+	// // testPolicy, err := openpolicy.NewPolicy(file)
+
+	// // policyGroup := []*openpolicy.Policy{testPolicy}
+
+	// // policyPath := "./analysis/policy/r1.rego"
+	// // if err := evaluateRegoPolicy(policyPath, sf); err != nil {
+	// // 	log.Fatal("Ошибка при выполнении политики:", err)
+	// // }
 }
 
-func GenerateCode(fset *token.FileSet, astFile *ast.File) (string, error) {
-	var buf bytes.Buffer
+// func GenerateCode(fset *token.FileSet, astFile *ast.File) (string, error) {
+// 	var buf bytes.Buffer
 
-	cfg := printer.Config{
-		Mode:     printer.TabIndent | printer.UseSpaces,
-		Tabwidth: 2,
-	}
+// 	cfg := printer.Config{
+// 		Mode:     printer.TabIndent | printer.UseSpaces,
+// 		Tabwidth: 2,
+// 	}
 
-	err := cfg.Fprint(&buf, fset, astFile)
-	if err != nil {
-		return "", err
-	}
+// 	err := cfg.Fprint(&buf, fset, astFile)
+// 	if err != nil {
+// 		return "", err
+// 	}
 
-	return buf.String(), nil
-}
+// 	return buf.String(), nil
+// }

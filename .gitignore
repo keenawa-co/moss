@@ -4,8 +4,7 @@
 .eclipse
 .goray
 
-*.tar.gz
-*.bundle
+testdata
 
 .DS_Store
 

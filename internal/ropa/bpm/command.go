@@ -321,7 +321,7 @@ type getCmdBundleInstaller interface {
 }
 
 type getCmdLoader interface {
-	DownloadBundle(url string, tag string) (*loader.DownloadResult, error)
+	// DownloadBundle(url string, tag string) (*loader.DownloadResult, error)
 }
 
 type getCommand struct {
@@ -343,17 +343,17 @@ type GetCmdInput struct {
 }
 
 func (cmd *getCommand) Execute(rawInput interface{}) (interface{}, error) {
-	input, ok := rawInput.(*GetCmdInput)
-	if !ok {
-		return nil, fmt.Errorf("type '%s' is invalid input type for '%s' command", reflect.TypeOf(rawInput), cmd.cmdName)
-	}
+	// input, ok := rawInput.(*GetCmdInput)
+	// if !ok {
+	// 	return nil, fmt.Errorf("type '%s' is invalid input type for '%s' command", reflect.TypeOf(rawInput), cmd.cmdName)
+	// }
 
-	bundle, err := cmd.loader.DownloadBundle(input.URL, input.Version)
-	if err != nil {
-		return nil, err
-	}
+	// bundle, err := cmd.loader.DownloadBundle(input.URL, input.Version)
+	// if err != nil {
+	// 	return nil, err
+	// }
 
-	fmt.Println(bundle.Bundle.BundleFile.Package.Name)
+	// fmt.Println(bundle.Bundle.BundleFile.Package.Name)
 
 	// homeDir, err := cmd.osWrap.UserHomeDir()
 	// if err != nil {
