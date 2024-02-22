@@ -5,7 +5,6 @@ go 1.21.3
 require (
 	github.com/4rchr4y/bpm v0.0.2
 	github.com/4rchr4y/godevkit/v3 v3.2.0
-	github.com/BurntSushi/toml v1.3.2
 	github.com/open-policy-agent/opa v0.61.0
 	github.com/spf13/cobra v1.8.0
 	github.com/stretchr/testify v1.8.4

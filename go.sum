@@ -1,15 +1,9 @@
 dario.cat/mergo v1.0.0 h1:AGCNq9Evsj31mOgNPcLyXc+4PNABt905YmuqPYYpBWk=
 dario.cat/mergo v1.0.0/go.mod h1:uNxQE+84aUszobStD9th8a29P2fMDhsBdgRYvZOxGmk=
-github.com/4rchr4y/bpm v0.0.0-20240221162922-18d1f8b6ed1d h1:goj9x0wIcHjOzIF+DnXO1uxsYAeKoLEKYT7rDfnKT6A=
-github.com/4rchr4y/bpm v0.0.0-20240221162922-18d1f8b6ed1d/go.mod h1:7vxefulXA/dlGNFQtBW9Mf46X5tPMz2w1Xi5A5VG5fE=
-github.com/4rchr4y/bpm v0.0.1 h1:cqzwYJt1kyw1uLC6NmMIwBgv8lrkYeaIieuhU83JS8c=
-github.com/4rchr4y/bpm v0.0.1/go.mod h1:7vxefulXA/dlGNFQtBW9Mf46X5tPMz2w1Xi5A5VG5fE=
 github.com/4rchr4y/bpm v0.0.2 h1:P8ZWEZWEoUSHxKhEucMQsHb0aX5HdOQ1nr9aI7QZUNU=
 github.com/4rchr4y/bpm v0.0.2/go.mod h1:7vxefulXA/dlGNFQtBW9Mf46X5tPMz2w1Xi5A5VG5fE=
 github.com/4rchr4y/godevkit/v3 v3.2.0 h1:7+aGoL+NmUPbutWRVSteMaH8M8/6/9/ql4QmsEm1Zog=
 github.com/4rchr4y/godevkit/v3 v3.2.0/go.mod h1:WhBwyCgaV4B5gmoSYDF+QLsBH4kgzB8+OHKDk3vrEbI=
-github.com/BurntSushi/toml v1.3.2 h1:o7IhLm0Msx3BaB+n3Ag7L8EVlByGnpq14C4YWiu/gL8=
-github.com/BurntSushi/toml v1.3.2/go.mod h1:CxXYINrC8qIiEnFrOxCa7Jy5BFHlXnUU2pbicEuybxQ=
 github.com/Microsoft/go-winio v0.5.2/go.mod h1:WpS1mjBmmwHBEWmogvA2mj8546UReBk4v8QkMxJ6pZY=
 github.com/Microsoft/go-winio v0.6.1 h1:9/kr64B9VUZrLm5YYwbGtUJnMgqWVOdUAXu6Migciow=
 github.com/Microsoft/go-winio v0.6.1/go.mod h1:LRdKpFKfdobln8UmuiYcKPot9D2v6svN5+sAH+4kjUM=

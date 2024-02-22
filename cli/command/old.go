@@ -40,6 +40,9 @@ func evaluateRegoPolicy(policyPath string, data ason.Ason) error {
 	compiler, err := ast.CompileModulesWithOpt(policies, ast.CompileOpts{
 		EnablePrintStatements: true,
 	})
+	if err != nil {
+		return err
+	}
 
 	var buf bytes.Buffer
 

@@ -1,8 +1,0 @@
-[package]
-name = "testdata"
-version = "0.1.0"
-author = ["g10z3r <g10z3r@duck.com>"]
-description = "Some description here."
-
-[dependencies]
-goray = { version = "1", source = "../lib" }
