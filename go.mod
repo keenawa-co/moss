@@ -3,19 +3,17 @@ module github.com/4rchr4y/goray
 go 1.21.3
 
 require (
-	github.com/4rchr4y/bpm v0.0.2
+	github.com/4rchr4y/bpm v0.0.3
 	github.com/4rchr4y/godevkit/v3 v3.2.0
+	github.com/g10z3r/ason v0.0.1
 	github.com/open-policy-agent/opa v0.61.0
 	github.com/spf13/cobra v1.8.0
-	github.com/stretchr/testify v1.8.4
 )
 
 require (
 	github.com/OneOfOne/xxhash v1.2.8 // indirect
 	github.com/agnivade/levenshtein v1.1.1 // indirect
-	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/gobwas/glob v0.2.3 // indirect
-	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/rcrowley/go-metrics v0.0.0-20201227073835-cf1acfcdf475 // indirect
 	github.com/tchap/go-patricia/v2 v2.3.1 // indirect
 	github.com/xeipuuv/gojsonpointer v0.0.0-20190905194746-02993c407bfb // indirect
@@ -24,7 +22,6 @@ require (
 	golang.org/x/net v0.21.0 // indirect
 	golang.org/x/sys v0.17.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
-	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
 
 require (

@@ -1,7 +1,0 @@
-[workspace]
-path="builtin/opa"
-author = ["g10z3r <g10z3r@duck.com>"]
-packages=[
-    "lib/go/ast"
-    "lib/go/utils"
-]

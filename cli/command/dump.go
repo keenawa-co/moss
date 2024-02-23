@@ -9,7 +9,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/4rchr4y/goray/ason"
+	"github.com/g10z3r/ason"
 	"github.com/spf13/cobra"
 )
 

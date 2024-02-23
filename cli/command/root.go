@@ -18,7 +18,7 @@ import (
 	"github.com/4rchr4y/bpm/storage"
 	"github.com/4rchr4y/godevkit/v3/env"
 	"github.com/4rchr4y/godevkit/v3/syswrap"
-	"github.com/4rchr4y/goray/ason"
+	"github.com/g10z3r/ason"
 	"github.com/open-policy-agent/opa/ast"
 	"github.com/open-policy-agent/opa/rego"
 	"github.com/open-policy-agent/opa/topdown"
