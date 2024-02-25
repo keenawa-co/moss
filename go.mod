@@ -3,7 +3,7 @@ module github.com/4rchr4y/goray
 go 1.21.3
 
 require (
-	github.com/4rchr4y/bpm v0.0.3
+	github.com/4rchr4y/bpm v0.0.5-0.20240224143418-a74133c57105
 	github.com/4rchr4y/godevkit/v3 v3.2.0
 	github.com/g10z3r/ason v0.0.1
 	github.com/open-policy-agent/opa v0.61.0
