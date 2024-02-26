@@ -6,8 +6,10 @@ require (
 	github.com/4rchr4y/bpm v0.0.5-0.20240224143418-a74133c57105
 	github.com/4rchr4y/godevkit/v3 v3.2.0
 	github.com/g10z3r/ason v0.0.1
+	github.com/hashicorp/hcl/v2 v2.19.1
 	github.com/open-policy-agent/opa v0.61.0
 	github.com/spf13/cobra v1.8.0
+	github.com/zclconf/go-cty v1.14.2
 )
 
 require (
@@ -49,7 +51,6 @@ require (
 	github.com/hashicorp/errwrap v1.0.0 // indirect
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
 	github.com/hashicorp/go-version v1.6.0 // indirect
-	github.com/hashicorp/hcl/v2 v2.19.1 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/jbenet/go-context v0.0.0-20150711004518-d14ea06fba99 // indirect
 	github.com/kevinburke/ssh_config v1.2.0 // indirect
@@ -71,7 +72,6 @@ require (
 	github.com/skeema/knownhosts v1.2.1 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/xanzy/ssh-agent v0.3.3 // indirect
-	github.com/zclconf/go-cty v1.14.2 // indirect
 	go.opentelemetry.io/otel v1.21.0 // indirect
 	go.opentelemetry.io/otel/metric v1.21.0 // indirect
 	go.opentelemetry.io/otel/sdk v1.21.0 // indirect
