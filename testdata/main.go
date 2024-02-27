@@ -1,7 +1,9 @@
 package main
 
 import (
+	"fmt"
 	"go/ast"
+	"os"
 )
 
 /*
@@ -42,9 +44,11 @@ func serializeImports(pass *serPass, inputMap map[string]*ast.Object) map[string
 		result[k] = SerializeObject(pass, v)
 	}
 
+	os.LookupEnv("TEST")
+
 	// fmt.Println("test")
 
-	// fmt.Sprintln("")
+	fmt.Sprintln("")
 
 	return result
 }
