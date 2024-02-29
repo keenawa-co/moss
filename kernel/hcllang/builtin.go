@@ -1,4 +1,4 @@
-package kernel
+package hcllang
 
 import (
 	"github.com/zclconf/go-cty/cty/function"
@@ -7,33 +7,33 @@ import (
 
 const (
 	LocalNamespace           = "kernel"
-	DefaultExternalNamespace = "plugin"
+	DefaultExternalNamespace = "addon"
 	IdentSeparator           = "::"
 )
 
 type NameIdent struct {
 	namespace string
-	plugin    string
+	addon     string
 	name      string
 }
 
 func NewNameIdent(plugin, name string) NameIdent {
 	return NameIdent{
 		namespace: DefaultExternalNamespace,
-		plugin:    plugin,
+		addon:     plugin,
 		name:      name,
 	}
 }
 
 func (ident NameIdent) Namespace() string { return ident.namespace }
-func (ident NameIdent) Plugin() string    { return ident.plugin }
+func (ident NameIdent) Addon() string     { return ident.addon }
 func (ident NameIdent) Name() string      { return ident.name }
 
 func (ident NameIdent) String() (name string) {
 	name = ident.namespace + IdentSeparator
 
-	if ident.plugin != "" {
-		name += ident.plugin + IdentSeparator
+	if ident.addon != "" {
+		name += ident.addon + IdentSeparator
 	}
 
 	return name + ident.name

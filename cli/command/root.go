@@ -8,27 +8,24 @@ import (
 	"go/parser"
 	"go/token"
 	"log"
+	"os"
 
 	"github.com/4rchr4y/bpm/bundleutil/encode"
 	"github.com/4rchr4y/bpm/bundleutil/inspect"
 	"github.com/4rchr4y/bpm/bundleutil/manifest"
-	"github.com/4rchr4y/bpm/constant"
 	"github.com/4rchr4y/bpm/fetch"
 	"github.com/4rchr4y/bpm/iostream"
 	"github.com/4rchr4y/bpm/pkg/linker"
 	"github.com/4rchr4y/bpm/storage"
 	"github.com/4rchr4y/godevkit/v3/env"
 	"github.com/4rchr4y/godevkit/v3/syswrap"
-	"github.com/4rchr4y/goray/ray"
-	"github.com/4rchr4y/goray/ray/kernel"
 	"github.com/g10z3r/ason"
 	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/hcl/v2/hclsimple"
+	"github.com/hashicorp/hcl/v2/hclparse"
 	"github.com/open-policy-agent/opa/ast"
 	"github.com/open-policy-agent/opa/rego"
 	"github.com/open-policy-agent/opa/topdown"
 	"github.com/spf13/cobra"
-	"github.com/zclconf/go-cty/cty"
 )
 
 var RootCmd = &cobra.Command{
@@ -42,6 +39,41 @@ type failCase struct {
 	Msg string `json:"msg"`
 	Pos int    `json:"pos"`
 	Sev string `json:"sev"`
+}
+
+func expWithSchema(body hcl.Body) {
+	// block := hcllang.Block{
+	// 	Attributes: map[string]*hcllang.Attribute{
+	// 		"watch": &hcllang.Attribute{
+	// 			Description: "Path or pattern to watch",
+	// 			Type:        cty.String,
+	// 			Required:    true,
+	// 		},
+	// 		"comment": &hcllang.Attribute{
+	// 			Description: "Optional step description",
+	// 			Type:        cty.String,
+	// 			Required:    false,
+	// 		},
+	// 	},
+	// 	// BlockTypes: map[string]*kernel.NestedBlock{
+	// 	// 	"include": &kernel.NestedBlock{
+	// 	// 		Block: kernel.Block{
+	// 	// 			Attributes: map[string]*kernel.Attribute{
+	// 	// 				"comment": &kernel.Attribute{
+	// 	// 					Description: "Optional step description",
+	// 	// 					Type:        cty.String,
+	// 	// 					Required:    false,
+	// 	// 				},
+	// 	// 			},
+	// 	// 			Description: "Include policy block",
+	// 	// 		},
+	// 	// 	},
+	// 	// },
+	// 	Description: "Defines a job with specific actions",
+	// }
+
+	// givenRawSchema := hcldec.ImpliedSchema(schema.DecoderSpec())
+
 }
 
 func runRootCmd(cmd *cobra.Command, args []string) {
@@ -64,39 +96,39 @@ func runRootCmd(cmd *cobra.Command, args []string) {
 		Encoder: encoder,
 	}
 
-	// parser := hclparse.NewParser()
-	// file, diags := parser.ParseHCLFile("rayfile.hcl")
-	// if diags.HasErrors() {
-	// 	fmt.Fprintf(os.Stderr, "Errors encountered while parsing HCL file: %s", diags.Error())
-	// 	return
-	// }
-
-	// fmt.Println(file)
-
-	content, err := osWrap.ReadFile(".ray/workflow/security.hcl")
+	content, err := osWrap.ReadFile(".ray/workflow/security.h.hcl")
 	if err != nil {
 		log.Fatal(err)
 		return
 	}
 
-	scope := kernel.NewParserScope()
-
-	ctx := &hcl.EvalContext{
-		Variables: map[string]cty.Value{
-			"var": cty.ObjectVal(map[string]cty.Value{
-				"name": cty.StringVal("Example"),
-			}),
-		},
-		Functions: scope.Functions(),
-	}
-
-	schema := new(ray.WorkflowFileSchema)
-	if err := hclsimple.Decode(constant.BundleFileName, content, ctx, schema); err != nil {
-		log.Fatal(err)
+	parser := hclparse.NewParser()
+	file, diags := parser.ParseHCL(content, "filename.hcl")
+	if diags.HasErrors() {
+		fmt.Fprintf(os.Stderr, "Errors encountered while parsing HCL file: %s", diags.Error())
 		return
 	}
 
-	fmt.Println(schema.Name)
+	expWithSchema(file.Body)
+
+	// fmt.Println(file)
+
+	// scope := kernel.NewParserScope()
+
+	// ctx := &hcl.EvalContext{
+	// 	Variables: map[string]cty.Value{
+	// 		"var": cty.ObjectVal(map[string]cty.Value{
+	// 			"name": cty.StringVal("Example"),
+	// 		}),
+	// 	},
+	// 	Functions: scope.Functions(),
+	// }
+
+	// schema := new(ray.WorkflowFileSchema)
+	// if err := hclsimple.Decode(constant.BundleFileName, content, ctx, schema); err != nil {
+	// 	log.Fatal(err)
+	// 	return
+	// }
 
 	b, err := s.LoadFromAbs("./testdata", nil)
 	if err != nil {
