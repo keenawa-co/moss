@@ -1,7 +1,12 @@
-name = getenv("TERM")
+import {
+    source = "security.h.hcl"
+}
+
+name = var.name
 
 
 job "define your job description here" {
+    provider = "golang"
     watch = ["*"]
 
     include "github.com/4rchr4y/gst" "latest" {
