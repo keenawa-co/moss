@@ -19,8 +19,8 @@ import (
 	"github.com/4rchr4y/bpm/storage"
 	"github.com/4rchr4y/godevkit/v3/env"
 	"github.com/4rchr4y/godevkit/v3/syswrap"
+	"github.com/4rchr4y/goray/ray"
 	"github.com/g10z3r/ason"
-	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/hclparse"
 	"github.com/open-policy-agent/opa/ast"
 	"github.com/open-policy-agent/opa/rego"
@@ -39,41 +39,6 @@ type failCase struct {
 	Msg string `json:"msg"`
 	Pos int    `json:"pos"`
 	Sev string `json:"sev"`
-}
-
-func expWithSchema(body hcl.Body) {
-	// block := hcllang.Block{
-	// 	Attributes: map[string]*hcllang.Attribute{
-	// 		"watch": &hcllang.Attribute{
-	// 			Description: "Path or pattern to watch",
-	// 			Type:        cty.String,
-	// 			Required:    true,
-	// 		},
-	// 		"comment": &hcllang.Attribute{
-	// 			Description: "Optional step description",
-	// 			Type:        cty.String,
-	// 			Required:    false,
-	// 		},
-	// 	},
-	// 	// BlockTypes: map[string]*kernel.NestedBlock{
-	// 	// 	"include": &kernel.NestedBlock{
-	// 	// 		Block: kernel.Block{
-	// 	// 			Attributes: map[string]*kernel.Attribute{
-	// 	// 				"comment": &kernel.Attribute{
-	// 	// 					Description: "Optional step description",
-	// 	// 					Type:        cty.String,
-	// 	// 					Required:    false,
-	// 	// 				},
-	// 	// 			},
-	// 	// 			Description: "Include policy block",
-	// 	// 		},
-	// 	// 	},
-	// 	// },
-	// 	Description: "Defines a job with specific actions",
-	// }
-
-	// givenRawSchema := hcldec.ImpliedSchema(schema.DecoderSpec())
-
 }
 
 func runRootCmd(cmd *cobra.Command, args []string) {
@@ -96,7 +61,7 @@ func runRootCmd(cmd *cobra.Command, args []string) {
 		Encoder: encoder,
 	}
 
-	content, err := osWrap.ReadFile(".ray/workflow/security.h.hcl")
+	content, err := osWrap.ReadFile(".ray/main.ray")
 	if err != nil {
 		log.Fatal(err)
 		return
@@ -109,20 +74,17 @@ func runRootCmd(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	expWithSchema(file.Body)
+	f, diags := ray.DecodeFile(file.Body)
+
+	for _, v := range f.Ray.RequiredProviders {
+		fmt.Println(v.Source)
+	}
+
+	for _, d := range diags {
+		fmt.Println(d.Summary)
+	}
 
 	// fmt.Println(file)
-
-	// scope := kernel.NewParserScope()
-
-	// ctx := &hcl.EvalContext{
-	// 	Variables: map[string]cty.Value{
-	// 		"var": cty.ObjectVal(map[string]cty.Value{
-	// 			"name": cty.StringVal("Example"),
-	// 		}),
-	// 	},
-	// 	Functions: scope.Functions(),
-	// }
 
 	// schema := new(ray.WorkflowFileSchema)
 	// if err := hclsimple.Decode(constant.BundleFileName, content, ctx, schema); err != nil {

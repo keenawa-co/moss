@@ -18,6 +18,7 @@
         "goray",
         "gvalidate",
         "hcllang",
+        "hclparse",
         "hclsyntax",
         "idxt",
         "iowrap",
