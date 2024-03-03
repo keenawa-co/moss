@@ -4,9 +4,18 @@ import (
 	"github.com/hashicorp/hcl/v2"
 )
 
+// Reserved for future expansion
 var (
 	configFileReservedAttributeList = [...]string{}
-	configFileReservedBlockList     = [...]string{}
+	configFileReservedBlockList     = [...]string{
+		"package",
+		"mod",
+		"import",
+		"include",
+		"use",
+		"data",
+		"var",
+	}
 )
 
 var configFileSchema = &hcl.BodySchema{

@@ -6,9 +6,12 @@ import (
 	"github.com/hashicorp/hcl/v2"
 )
 
+// Reserved for future expansion
 var (
-	rayBlockReservedAttributeList = [...]string{}
-	rayBlockReservedBlockList     = [...]string{}
+	rayBlockReservedAttributeList = [...]string{
+		"version",
+	}
+	rayBlockReservedBlockList = [...]string{}
 )
 
 var rayBlockSchema = &hcl.BodySchema{

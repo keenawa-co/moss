@@ -8,6 +8,7 @@ import (
 	"github.com/hashicorp/hcl/v2/hclsyntax"
 )
 
+// Reserved for future expansion
 var (
 	requiredProviderBlockReservedAttributeList = [...]string{
 		"aliases",
