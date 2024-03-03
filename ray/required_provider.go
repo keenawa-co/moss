@@ -22,12 +22,19 @@ var requiredProviderBlockSchema = &hcl.BodySchema{
 			Required: true,
 		},
 		hcl.AttributeSchema{
+			Name:     "path",
+			Required: false,
+		},
+		hcl.AttributeSchema{
 			Name:     "version",
-			Required: true,
+			Required: false,
 		},
 	)(requiredProviderBlockReservedAttributeList[:]...),
 	Blocks: NewBlockList(
-		hcl.BlockHeaderSchema{Type: "_"},
+		hcl.BlockHeaderSchema{
+			Type:       "_",
+			LabelNames: []string{},
+		},
 	)(requiredProviderBlockReservedBlockList[:]...),
 }
 
@@ -35,6 +42,7 @@ type RequiredProvider struct {
 	_       [0]int
 	Name    string
 	Source  string
+	Path    string
 	Version string
 	Body    hcl.Body
 	Content *hcl.BodyContent
@@ -65,8 +73,15 @@ func DecodeRequiredProviderBlock(block *hcl.Block) (provider *RequiredProvider, 
 		// TODO: source validation
 	}
 
+	if attr, exists := content.Attributes["path"]; exists {
+		diags := gohcl.DecodeExpression(attr.Expr, nil, &provider.Path)
+		diagnostics = append(diagnostics, diags...)
+
+		// TODO: source validation
+	}
+
 	if attr, exists := content.Attributes["version"]; exists {
-		diags := gohcl.DecodeExpression(attr.Expr, nil, &provider.Source)
+		diags := gohcl.DecodeExpression(attr.Expr, nil, &provider.Version)
 		diagnostics = append(diagnostics, diags...)
 
 		// TODO: source validation
