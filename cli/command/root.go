@@ -42,7 +42,6 @@ type failCase struct {
 }
 
 func runRootCmd(cmd *cobra.Command, args []string) {
-
 	dir := env.MustGetString("BPM_PATH")
 
 	io := iostream.NewIOStream()

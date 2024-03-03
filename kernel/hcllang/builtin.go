@@ -7,33 +7,33 @@ import (
 
 const (
 	LocalNamespace           = "kernel"
-	DefaultExternalNamespace = "addon"
+	DefaultExternalNamespace = "provider"
 	IdentSeparator           = "::"
 )
 
 type NameIdent struct {
 	namespace string
-	addon     string
+	provider  string
 	name      string
 }
 
-func NewNameIdent(plugin, name string) NameIdent {
+func NewNameIdent(provider, name string) NameIdent {
 	return NameIdent{
 		namespace: DefaultExternalNamespace,
-		addon:     plugin,
+		provider:  provider,
 		name:      name,
 	}
 }
 
 func (ident NameIdent) Namespace() string { return ident.namespace }
-func (ident NameIdent) Addon() string     { return ident.addon }
+func (ident NameIdent) Addon() string     { return ident.provider }
 func (ident NameIdent) Name() string      { return ident.name }
 
 func (ident NameIdent) String() (name string) {
 	name = ident.namespace + IdentSeparator
 
-	if ident.addon != "" {
-		name += ident.addon + IdentSeparator
+	if ident.provider != "" {
+		name += ident.provider + IdentSeparator
 	}
 
 	return name + ident.name

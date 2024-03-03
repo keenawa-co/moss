@@ -11,7 +11,9 @@ var (
 	rayBlockReservedAttributeList = [...]string{
 		"version",
 	}
-	rayBlockReservedBlockList = [...]string{}
+	rayBlockReservedBlockList = [...]string{
+		"required_addon",
+	}
 )
 
 var rayBlockSchema = &hcl.BodySchema{

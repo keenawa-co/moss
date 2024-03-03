@@ -13,8 +13,9 @@ var (
 		"import",
 		"include",
 		"use",
-		"data",
 		"var",
+		"data",
+		"addon",
 	}
 )
 
