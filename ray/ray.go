@@ -74,11 +74,12 @@ func DecodeRayBlock(block *hcl.Block) (ray *Ray, diagnostics hcl.Diagnostics) {
 
 			if _, exists := ray.RequiredProviders[b.Labels[0]]; exists {
 				diagnostics = append(diagnostics, &hcl.Diagnostic{
-					Severity: hcl.DiagWarning,
+					Severity: hcl.DiagError,
 					Summary:  "Duplicated provider",
 					// TODO: Detail:   fmt.Sprintf("Provider name is invalid. %s", badIdentDetail),
 				})
-				continue
+
+				return nil, diagnostics
 			}
 
 			provider, decodeDiag := DecodeRequiredProviderBlock(b)

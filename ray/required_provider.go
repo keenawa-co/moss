@@ -49,10 +49,14 @@ type RequiredProvider struct {
 	Content *hcl.BodyContent
 }
 
-func DecodeRequiredProviderBlock(block *hcl.Block) (provider *RequiredProvider, diagnostics hcl.Diagnostics) {
+func DecodeRequiredProviderBlock(block *hcl.Block) (requiredProvider *RequiredProvider, diagnostics hcl.Diagnostics) {
 	content, body, partialContentDiag := block.Body.PartialContent(requiredProviderBlockSchema)
 	diagnostics = append(diagnostics, partialContentDiag...)
+	if diagnostics.HasErrors() {
+		return nil, diagnostics
+	}
 
+	// existence of a label is checked when a block is detected
 	if !hclsyntax.ValidIdentifier(block.Labels[0]) {
 		diagnostics = append(diagnostics, &hcl.Diagnostic{
 			Severity: hcl.DiagError,
@@ -61,34 +65,43 @@ func DecodeRequiredProviderBlock(block *hcl.Block) (provider *RequiredProvider, 
 		})
 	}
 
-	provider = &RequiredProvider{
+	requiredProvider = &RequiredProvider{
 		Name:    block.Labels[0],
 		Content: content,
 		Body:    body,
 	}
 
 	if attr, exists := content.Attributes["source"]; exists {
-		diags := gohcl.DecodeExpression(attr.Expr, nil, &provider.Source)
+		diags := gohcl.DecodeExpression(attr.Expr, nil, &requiredProvider.Source)
 		diagnostics = append(diagnostics, diags...)
+		if diagnostics.HasErrors() {
+			return nil, diagnostics
+		}
 
 		// TODO: source validation
 	}
 
 	if attr, exists := content.Attributes["path"]; exists {
-		diags := gohcl.DecodeExpression(attr.Expr, nil, &provider.Path)
+		diags := gohcl.DecodeExpression(attr.Expr, nil, &requiredProvider.Path)
 		diagnostics = append(diagnostics, diags...)
+		if diagnostics.HasErrors() {
+			return nil, diagnostics
+		}
 
 		// TODO: source validation
 	}
 
 	if attr, exists := content.Attributes["version"]; exists {
-		diags := gohcl.DecodeExpression(attr.Expr, nil, &provider.Version)
+		diags := gohcl.DecodeExpression(attr.Expr, nil, &requiredProvider.Version)
 		diagnostics = append(diagnostics, diags...)
+		if diagnostics.HasErrors() {
+			return nil, diagnostics
+		}
 
 		// TODO: source validation
 	}
 
-	return provider, diagnostics
+	return requiredProvider, diagnostics
 }
 
 func NewAttributeList(attributes ...hcl.AttributeSchema) func(reserved ...string) []hcl.AttributeSchema {

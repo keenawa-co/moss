@@ -74,13 +74,13 @@ func runRootCmd(cmd *cobra.Command, args []string) {
 	}
 
 	f, diags := ray.DecodeFile(file.Body)
-
-	for _, v := range f.Ray.RequiredProviders {
-		fmt.Println(v.Source)
-	}
-
 	for _, d := range diags {
 		fmt.Println(d.Summary)
+	}
+	if f != nil {
+		for _, v := range f.Ray.RequiredProviders {
+			fmt.Println(v.Source)
+		}
 	}
 
 	// fmt.Println(file)
