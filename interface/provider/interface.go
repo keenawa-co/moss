@@ -1,15 +1,18 @@
 package provider
 
+import "github.com/4rchr4y/goray/internal/schematica"
+
 type Interface interface {
-	GetSchema() *GetGetSchemaOutput
+	DescribeSchema() *DescribeSchemaOutput
 	ReadResource(*ReadResourceInput) *ReadResourceOutput
-	DescribeResource(*DescribeResourceInput) *DescribeResourceOutput
 	Stop() error
 	Shutdown() error
 }
 
 type (
-	GetGetSchemaOutput struct{}
+	DescribeSchemaOutput struct {
+		Schema *schematica.Block
+	}
 )
 
 type (

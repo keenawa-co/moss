@@ -13,9 +13,6 @@ var (
 		"package",
 		"mod",
 		"import",
-		"include",
-		"use",
-		"var",
 		"data",
 		"addon",
 	}

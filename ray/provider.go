@@ -19,6 +19,7 @@ var providerBlockSchema = &hcl.BodySchema{
 }
 
 type Provider struct {
+	_       [0]int
 	Name    string
 	Content *hcl.BodyContent
 }
