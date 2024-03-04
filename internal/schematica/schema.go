@@ -1,4 +1,4 @@
-package hcllang
+package schematica
 
 import "github.com/zclconf/go-cty/cty"
 
