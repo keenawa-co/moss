@@ -54,5 +54,14 @@
         "Typeflag",
         "TYPESWITCH",
         "Worktree"
-    ]
+    ],
+    "material-icon-theme.files.associations": {
+        "*.ray": "hcl"
+    },
+    "files.associations": {
+        "*.ray": "hcl"
+    },  
+    "cSpell.enableFiletypes": [
+        "hcl"
+    ],
 }
