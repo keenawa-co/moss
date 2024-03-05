@@ -9,13 +9,13 @@ job "define your job description here" {
     provider = "golang"
     watch = ["*"]
 
-    include "github.com/4rchr4y/gst" "latest" {
+    include "../policy" "latest" {
         comment = "Step decription here (optional)"
         use = {
             "goray.*": "ERROR"
         }
         rules = [
-            "$CI_PIPELINE_SOURCE" == "push" 
+            getenv("CI_PIPELINE_SOURCE") == "push" 
         ]
     }
 

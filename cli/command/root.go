@@ -9,6 +9,7 @@ import (
 	"go/token"
 	"log"
 	"os"
+	"os/exec"
 
 	"github.com/4rchr4y/bpm/bundleutil/encode"
 	"github.com/4rchr4y/bpm/bundleutil/inspect"
@@ -19,8 +20,13 @@ import (
 	"github.com/4rchr4y/bpm/storage"
 	"github.com/4rchr4y/godevkit/v3/env"
 	"github.com/4rchr4y/godevkit/v3/syswrap"
+	noop_provider "github.com/4rchr4y/goray/example/noop-provider"
+
+	"github.com/4rchr4y/goray/internal/plugin"
+	"github.com/4rchr4y/goray/internal/proto/pluginproto"
 	"github.com/4rchr4y/goray/ray"
 	"github.com/g10z3r/ason"
+	pluginHCL "github.com/hashicorp/go-plugin"
 	"github.com/hashicorp/hcl/v2/hclparse"
 	"github.com/open-policy-agent/opa/ast"
 	"github.com/open-policy-agent/opa/rego"
@@ -83,13 +89,14 @@ func runRootCmd(cmd *cobra.Command, args []string) {
 		}
 	}
 
-	// fmt.Println(file)
+	client := startPlugin("./example/noop-provider/main/main")
 
-	// schema := new(ray.WorkflowFileSchema)
-	// if err := hclsimple.Decode(constant.BundleFileName, content, ctx, schema); err != nil {
-	// 	log.Fatal(err)
-	// 	return
-	// }
+	schema, err := client.DescribeSchema(context.TODO(), &pluginproto.DescribeSchema_Request{})
+	if err != nil {
+		log.Fatal(err)
+		return
+	}
+	log.Printf("Received schema: %+v\n", schema.Provider.Block.Description)
 
 	b, err := s.LoadFromAbs("./testdata", nil)
 	if err != nil {
@@ -153,7 +160,7 @@ func runRootCmd(cmd *cobra.Command, args []string) {
 
 	var buf bytes.Buffer
 	r := rego.New(
-		rego.Query("data.tb2.file1"),
+		rego.Query("data.testbundle.policy1"),
 		rego.Compiler(compiler),
 		rego.Input(fileMap),
 		rego.EnablePrintStatements(true),
@@ -197,4 +204,31 @@ func tmpGetFileAstAsMap(filePath string) (map[string]interface{}, error) {
 	}
 
 	return fileMap, nil
+}
+
+func startPlugin(pluginPath string) pluginproto.ProviderClient {
+	plugins := map[int]pluginHCL.PluginSet{
+		1: map[string]pluginHCL.Plugin{
+			"noop_provider": &noop_provider.NoopProviderPlugin{},
+		},
+	}
+
+	client := pluginHCL.NewClient(&pluginHCL.ClientConfig{
+		HandshakeConfig:  plugin.Handshake,
+		VersionedPlugins: plugins,
+		Cmd:              exec.Command(pluginPath),
+		AllowedProtocols: []pluginHCL.Protocol{pluginHCL.ProtocolGRPC},
+	})
+
+	rpcClient, err := client.Client()
+	if err != nil {
+		log.Fatalf("Failed to connect to plugin: %s", err)
+	}
+
+	raw, err := rpcClient.Dispense("noop_provider")
+	if err != nil {
+		log.Fatalf("Failed to dispense plugin: %s", err)
+	}
+
+	return raw.(pluginproto.ProviderClient)
 }

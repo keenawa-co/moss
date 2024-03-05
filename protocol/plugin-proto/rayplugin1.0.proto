@@ -1,0 +1,56 @@
+syntax = "proto3";
+
+option go_package = "github.com/4rchr4y/goray/internal/proto/pluginproto";
+
+package pluginproto;
+
+message Schema {
+    message Block {
+        repeated Attribute attributes = 1;
+        repeated NestedBlock block_types = 2;
+        string description = 3;
+        bool deprecated = 4;
+    }
+
+    message Attribute {
+        bytes type = 1;
+        Object embedded_type = 2;
+        string description = 3;
+        bool required = 4;
+        bool optional = 5;
+        bool deprecated = 6;
+    }
+
+    message NestedBlock {
+        enum EmbeddedMode {
+            INVALID = 0;
+        }
+
+        Block block = 2;
+        EmbeddedMode nesting = 3;
+    }
+
+    message Object {
+        enum EmbeddedMode {
+            INVALID = 0;
+        }
+
+        repeated Attribute attributes = 1;
+        EmbeddedMode nesting = 3;
+    }
+
+
+    Block block = 1;
+}
+
+service Provider {
+    rpc DescribeSchema(DescribeSchema.Request) returns (DescribeSchema.Response);
+}
+
+message DescribeSchema {
+    message Request {}
+
+    message Response {
+        Schema provider = 1;
+    }
+}

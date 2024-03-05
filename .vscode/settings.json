@@ -27,6 +27,7 @@
         "modfile",
         "openpolicy",
         "oscli",
+        "pluginproto",
         "provideriface",
         "rayfile",
         "rchr",

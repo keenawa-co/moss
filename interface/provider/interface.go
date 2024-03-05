@@ -11,7 +11,7 @@ type Interface interface {
 
 type (
 	DescribeSchemaOutput struct {
-		Schema *schematica.Block
+		Schema *schematica.BlockSpec
 	}
 )
 
