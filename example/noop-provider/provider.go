@@ -15,7 +15,12 @@ type NoopProviderServer struct {
 func (s *NoopProviderServer) DescribeSchema(ctx context.Context, req *pluginproto.DescribeSchema_Request) (*pluginproto.DescribeSchema_Response, error) {
 	return &pluginproto.DescribeSchema_Response{
 		Provider: &pluginproto.Schema{
-			Block: &pluginproto.Schema_Block{
+			Root: &pluginproto.Schema_Block{
+				Attributes: []*pluginproto.Schema_Attribute{
+					{
+						Name: "go_version",
+					},
+				},
 				Description: "Hello, World!",
 			},
 		},

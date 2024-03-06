@@ -20,11 +20,12 @@ import (
 	"github.com/4rchr4y/bpm/storage"
 	"github.com/4rchr4y/godevkit/v3/env"
 	"github.com/4rchr4y/godevkit/v3/syswrap"
+	"github.com/4rchr4y/goray/builtin/rck/rcschema"
 	noop_provider "github.com/4rchr4y/goray/example/noop-provider"
 
 	"github.com/4rchr4y/goray/internal/plugin"
 	"github.com/4rchr4y/goray/internal/proto/pluginproto"
-	"github.com/4rchr4y/goray/ray"
+
 	"github.com/g10z3r/ason"
 	pluginHCL "github.com/hashicorp/go-plugin"
 	"github.com/hashicorp/hcl/v2/hclparse"
@@ -79,7 +80,7 @@ func runRootCmd(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	f, diags := ray.DecodeFile(file.Body)
+	f, diags := rcschema.DecodeFile(file.Body)
 	for _, d := range diags {
 		fmt.Println(d.Summary)
 	}
@@ -89,14 +90,14 @@ func runRootCmd(cmd *cobra.Command, args []string) {
 		}
 	}
 
-	client := startPlugin("./example/noop-provider/main/main")
+	client := startPlugin(".ray/provider/github.com/4rchr4y/ray-noop-provider@v0.0.1")
 
 	schema, err := client.DescribeSchema(context.TODO(), &pluginproto.DescribeSchema_Request{})
 	if err != nil {
 		log.Fatal(err)
 		return
 	}
-	log.Printf("Received schema: %+v\n", schema.Provider.Block.Description)
+	log.Printf("Received schema: %+v\n", schema.Provider.Root.Description)
 
 	b, err := s.LoadFromAbs("./testdata", nil)
 	if err != nil {

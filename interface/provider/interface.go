@@ -1,7 +1,5 @@
 package provider
 
-import "github.com/4rchr4y/goray/internal/schematica"
-
 type Interface interface {
 	DescribeSchema() *DescribeSchemaOutput
 	ReadResource(*ReadResourceInput) *ReadResourceOutput
@@ -11,7 +9,7 @@ type Interface interface {
 
 type (
 	DescribeSchemaOutput struct {
-		Schema *schematica.BlockSpec
+		Schema *Schema
 	}
 )
 

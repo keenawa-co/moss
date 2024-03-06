@@ -1,8 +1,9 @@
-package ray
+package rcschema
 
 import (
 	"fmt"
 
+	"github.com/4rchr4y/goray/kernel/hcllang"
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/gohcl"
 	"github.com/hashicorp/hcl/v2/hclsyntax"
@@ -61,7 +62,7 @@ func DecodeRequiredProviderBlock(block *hcl.Block) (requiredProvider *RequiredPr
 		diagnostics = append(diagnostics, &hcl.Diagnostic{
 			Severity: hcl.DiagError,
 			Summary:  "Invalid provider name",
-			Detail:   fmt.Sprintf("Provider name is invalid. %s", badIdentDetail),
+			Detail:   fmt.Sprintf("Provider name is invalid. %s", hcllang.BadIdentDetail),
 		})
 	}
 

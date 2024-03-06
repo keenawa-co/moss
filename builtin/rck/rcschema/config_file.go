@@ -1,4 +1,4 @@
-package ray
+package rcschema
 
 import (
 	"fmt"
