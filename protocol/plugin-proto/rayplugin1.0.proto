@@ -7,27 +7,29 @@ package pluginproto;
 message Schema {
     message Block {
         repeated Attribute attributes = 1;
-        repeated NestedBlock block_types = 2;
+        repeated EmbeddedBlock block_types = 2;
         string description = 3;
         bool deprecated = 4;
     }
 
     message Attribute {
-        bytes type = 1;
-        Object embedded_type = 2;
-        string description = 3;
-        bool required = 4;
-        bool optional = 5;
-        bool deprecated = 6;
+        string name = 1;
+        bytes type = 2;
+        Object embedded_type = 3;
+        string description = 4;
+        bool required = 5;
+        bool optional = 6;
+        bool deprecated = 7;
     }
 
-    message NestedBlock {
+    message EmbeddedBlock {
         enum EmbeddedMode {
             INVALID = 0;
         }
 
+        string name = 1;
         Block block = 2;
-        EmbeddedMode nesting = 3;
+        EmbeddedMode embedding = 3;
     }
 
     message Object {
@@ -36,11 +38,12 @@ message Schema {
         }
 
         repeated Attribute attributes = 1;
-        EmbeddedMode nesting = 3;
+        EmbeddedMode embedding = 3;
     }
 
 
-    Block block = 1;
+    int64 version = 1;
+    Block root = 2;
 }
 
 service Provider {
