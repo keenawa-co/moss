@@ -24,6 +24,8 @@ import (
 	noop_provider "github.com/4rchr4y/goray/example/noop-provider"
 
 	"github.com/4rchr4y/goray/internal/plugin"
+	"github.com/4rchr4y/goray/internal/proto/convert"
+	_ "github.com/4rchr4y/goray/internal/proto/convert"
 	"github.com/4rchr4y/goray/internal/proto/pluginproto"
 
 	"github.com/g10z3r/ason"
@@ -79,6 +81,8 @@ func runRootCmd(cmd *cobra.Command, args []string) {
 		fmt.Fprintf(os.Stderr, "Errors encountered while parsing HCL file: %s", diags.Error())
 		return
 	}
+
+	convert.ProtoSchema(nil)
 
 	f, diags := rcschema.DecodeFile(file.Body)
 	for _, d := range diags {

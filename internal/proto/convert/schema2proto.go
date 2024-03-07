@@ -9,6 +9,8 @@ import (
 	"github.com/4rchr4y/goray/internal/schematica"
 )
 
+var nestingModeMap = map[schematica.NestingMode]pluginproto.Schema_NestingMode{}
+
 func MustProviderSchema(s *provider.Schema) *pluginproto.Schema {
 	return &pluginproto.Schema{
 		Version: s.Version,
@@ -18,7 +20,7 @@ func MustProviderSchema(s *provider.Schema) *pluginproto.Schema {
 
 func MustSchemaBlock(block *schematica.Block) *pluginproto.Schema_Block {
 	result := &pluginproto.Schema_Block{
-		BlockTypes:  make([]*pluginproto.Schema_EmbeddedBlock, 0, len(block.BlockTypes)),
+		BlockTypes:  make([]*pluginproto.Schema_NestedBlock, 0, len(block.BlockTypes)),
 		Attributes:  make([]*pluginproto.Schema_Attribute, 0, len(block.Attributes)),
 		Description: block.Description,
 		Deprecated:  block.Deprecated,
@@ -29,17 +31,11 @@ func MustSchemaBlock(block *schematica.Block) *pluginproto.Schema_Block {
 	}
 
 	for name, b := range block.BlockTypes {
-		eb := &pluginproto.Schema_EmbeddedBlock{
-			Name:  name,
-			Block: MustSchemaBlock(b.Block),
-		}
-
-		switch b.Embedding {
-		default:
-			eb.Embedding = pluginproto.Schema_EmbeddedBlock_INVALID
-		}
-
-		result.BlockTypes = append(result.BlockTypes, eb)
+		result.BlockTypes = append(result.BlockTypes, &pluginproto.Schema_NestedBlock{
+			Name:    name,
+			Block:   MustSchemaBlock(b.Block),
+			Nesting: nestingModeMap[b.Nesting],
+		})
 	}
 
 	return result
@@ -48,11 +44,7 @@ func MustSchemaBlock(block *schematica.Block) *pluginproto.Schema_Block {
 func SchemaObject(obj *schematica.Object) *pluginproto.Schema_Object {
 	result := &pluginproto.Schema_Object{
 		Attributes: make([]*pluginproto.Schema_Attribute, 0, len(obj.Attributes)),
-	}
-
-	switch obj.Embedding {
-	default:
-		result.Embedding = pluginproto.Schema_Object_INVALID
+		Nesting:    nestingModeMap[obj.Nesting],
 	}
 
 	for name, a := range obj.Attributes {
@@ -64,13 +56,13 @@ func SchemaObject(obj *schematica.Object) *pluginproto.Schema_Object {
 
 func processSchemaAttribute(name string, a *schematica.Attribute) *pluginproto.Schema_Attribute {
 	attr := &pluginproto.Schema_Attribute{
-		Name:         name,
-		Type:         must.Must(json.Marshal(a.Type)),
-		EmbeddedType: SchemaObject(a.EmbeddedType),
-		Description:  a.Description,
-		Deprecated:   a.Deprecated,
-		Optional:     a.Optional,
-		Required:     a.Required,
+		Name:        name,
+		Type:        must.Must(json.Marshal(a.Type)),
+		NestedType:  SchemaObject(a.NestingType),
+		Description: a.Description,
+		Deprecated:  a.Deprecated,
+		Optional:    a.Optional,
+		Required:    a.Required,
 	}
 
 	return attr

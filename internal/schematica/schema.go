@@ -2,17 +2,18 @@ package schematica
 
 import "github.com/zclconf/go-cty/cty"
 
-type EmbeddedMode int
+type NestingMode int
 
 const (
-	INVALID EmbeddedMode = iota
+	INVALID NestingMode = iota
 )
 
-var EmbeddedModeNames = [...]string{
+var NestingModeToString = [...]string{
 	INVALID: "invalid",
+	1:       "invalid",
 }
 
-func (m EmbeddedMode) String() string { return EmbeddedModeNames[m] }
+func (m NestingMode) String() string { return NestingModeToString[m] }
 
 type Block struct {
 	Attributes  map[string]*Attribute
@@ -22,20 +23,20 @@ type Block struct {
 }
 
 type Attribute struct {
-	Type         cty.Type
-	EmbeddedType *Object
-	Description  string
-	Required     bool
-	Optional     bool
-	Deprecated   bool
+	Type        cty.Type
+	NestingType *Object
+	Description string
+	Required    bool
+	Optional    bool
+	Deprecated  bool
 }
 
 type Object struct {
 	Attributes map[string]*Attribute
-	Embedding  EmbeddedMode
+	Nesting    NestingMode
 }
 
 type NestedBlock struct {
 	*Block
-	Embedding EmbeddedMode
+	Nesting NestingMode
 }

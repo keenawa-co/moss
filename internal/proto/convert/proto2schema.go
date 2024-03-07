@@ -8,7 +8,16 @@ import (
 	"github.com/4rchr4y/goray/internal/schematica"
 )
 
+var protoNestingModeMap = map[pluginproto.Schema_NestingMode]schematica.NestingMode{}
+
+// The panic here indicates a mismatch between the types in the
+// protocol and the code. Should never happen.
+var _ = [1]int{}[len(pluginproto.Schema_NestingMode_name)-len(schematica.NestingModeToString)]
+
 func ProtoSchema(s *pluginproto.Schema) *provider.Schema {
+	if s == nil {
+		return nil
+	}
 	return &provider.Schema{
 		Version: s.Version,
 		Root:    ProtoSchemaBlock(s.Root),
@@ -28,18 +37,10 @@ func ProtoSchemaBlock(block *pluginproto.Schema_Block) *schematica.Block {
 	}
 
 	for _, b := range block.BlockTypes {
-		result.BlockTypes[b.Name] = func() *schematica.NestedBlock {
-			eb := &schematica.NestedBlock{
-				Block: ProtoSchemaBlock(b.Block),
-			}
-
-			switch b.Embedding {
-			default:
-				eb.Embedding = schematica.INVALID
-			}
-
-			return eb
-		}()
+		result.BlockTypes[b.Name] = &schematica.NestedBlock{
+			Block:   ProtoSchemaBlock(b.Block),
+			Nesting: protoNestingModeMap[b.Nesting],
+		}
 	}
 
 	return result
@@ -48,11 +49,7 @@ func ProtoSchemaBlock(block *pluginproto.Schema_Block) *schematica.Block {
 func ProtoSchemaObject(obj *pluginproto.Schema_Object) *schematica.Object {
 	result := &schematica.Object{
 		Attributes: make(map[string]*schematica.Attribute, len(obj.Attributes)),
-	}
-
-	switch obj.Embedding {
-	default:
-		result.Embedding = schematica.INVALID
+		Nesting:    protoNestingModeMap[obj.Nesting],
 	}
 
 	for _, a := range obj.Attributes {
@@ -64,11 +61,11 @@ func ProtoSchemaObject(obj *pluginproto.Schema_Object) *schematica.Object {
 
 func processProtoSchemaAttribute(a *pluginproto.Schema_Attribute) *schematica.Attribute {
 	attr := &schematica.Attribute{
-		Description:  a.Description,
-		Required:     a.Required,
-		Optional:     a.Optional,
-		EmbeddedType: ProtoSchemaObject(a.EmbeddedType),
-		Deprecated:   a.Deprecated,
+		Description: a.Description,
+		Required:    a.Required,
+		Optional:    a.Optional,
+		NestingType: ProtoSchemaObject(a.NestedType),
+		Deprecated:  a.Deprecated,
 	}
 
 	if err := json.Unmarshal(a.Type, &attr.Type); err != nil {
