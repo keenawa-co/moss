@@ -22,21 +22,17 @@ message Schema {
         bool deprecated = 7;
     }
 
-    message EmbeddedBlock {
-        enum EmbeddedMode {
-            INVALID = 0;
-        }
+    enum EmbeddedMode {
+        INVALID = 0;
+    }
 
+    message EmbeddedBlock {
         string name = 1;
         Block block = 2;
         EmbeddedMode embedding = 3;
     }
 
     message Object {
-        enum EmbeddedMode {
-            INVALID = 0;
-        }
-
         repeated Attribute attributes = 1;
         EmbeddedMode embedding = 3;
     }
