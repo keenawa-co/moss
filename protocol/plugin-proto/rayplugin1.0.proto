@@ -7,7 +7,7 @@ package pluginproto;
 message Schema {
     message Block {
         repeated Attribute attributes = 1;
-        repeated EmbeddedBlock block_types = 2;
+        repeated NestedBlock block_types = 2;
         string description = 3;
         bool deprecated = 4;
     }
@@ -15,26 +15,26 @@ message Schema {
     message Attribute {
         string name = 1;
         bytes type = 2;
-        Object embedded_type = 3;
+        Object nested_type = 3;
         string description = 4;
         bool required = 5;
         bool optional = 6;
         bool deprecated = 7;
     }
 
-    enum EmbeddedMode {
+    enum NestingMode {
         INVALID = 0;
     }
 
-    message EmbeddedBlock {
+    message NestedBlock {
         string name = 1;
         Block block = 2;
-        EmbeddedMode embedding = 3;
+        NestingMode nesting = 3;
     }
 
     message Object {
         repeated Attribute attributes = 1;
-        EmbeddedMode embedding = 3;
+        NestingMode nesting = 3;
     }
 
 
