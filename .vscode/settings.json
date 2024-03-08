@@ -17,6 +17,7 @@
         "getenv",
         "gohcl",
         "goray",
+        "grpcwrap",
         "gvalidate",
         "hcllang",
         "hclparse",

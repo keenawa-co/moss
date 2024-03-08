@@ -22,10 +22,10 @@ import (
 	"github.com/4rchr4y/godevkit/v3/syswrap"
 	"github.com/4rchr4y/goray/builtin/rck/rcschema"
 	noop_provider "github.com/4rchr4y/goray/example/noop-provider"
+	"github.com/4rchr4y/goray/interface/provider"
 
+	"github.com/4rchr4y/goray/internal/domain/grpcwrap"
 	"github.com/4rchr4y/goray/internal/plugin"
-	"github.com/4rchr4y/goray/internal/proto/convert"
-	_ "github.com/4rchr4y/goray/internal/proto/convert"
 	"github.com/4rchr4y/goray/internal/proto/pluginproto"
 
 	"github.com/g10z3r/ason"
@@ -82,8 +82,6 @@ func runRootCmd(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	convert.ProtoSchema(nil)
-
 	f, diags := rcschema.DecodeFile(file.Body)
 	for _, d := range diags {
 		fmt.Println(d.Summary)
@@ -95,13 +93,12 @@ func runRootCmd(cmd *cobra.Command, args []string) {
 	}
 
 	client := startPlugin(".ray/provider/github.com/4rchr4y/ray-noop-provider@v0.0.1")
-
-	schema, err := client.DescribeSchema(context.TODO(), &pluginproto.DescribeSchema_Request{})
+	schema := client.DescribeSchema()
 	if err != nil {
 		log.Fatal(err)
 		return
 	}
-	log.Printf("Received schema: %+v\n", schema.Provider.Root.Description)
+	log.Printf("Received schema: %+v\n", schema.Schema.Root.Description)
 
 	b, err := s.LoadFromAbs("./testdata", nil)
 	if err != nil {
@@ -211,10 +208,14 @@ func tmpGetFileAstAsMap(filePath string) (map[string]interface{}, error) {
 	return fileMap, nil
 }
 
-func startPlugin(pluginPath string) pluginproto.ProviderClient {
+func startPlugin(pluginPath string) provider.Interface {
 	plugins := map[int]pluginHCL.PluginSet{
-		1: map[string]pluginHCL.Plugin{
-			"noop_provider": &noop_provider.NoopProviderPlugin{},
+		1: {
+			"provider": &plugin.GRPCProviderPlugin{
+				GRPCProvider: func() pluginproto.ProviderServer {
+					return grpcwrap.Successor(noop_provider.Provider())
+				},
+			},
 		},
 	}
 
@@ -223,6 +224,7 @@ func startPlugin(pluginPath string) pluginproto.ProviderClient {
 		VersionedPlugins: plugins,
 		Cmd:              exec.Command(pluginPath),
 		AllowedProtocols: []pluginHCL.Protocol{pluginHCL.ProtocolGRPC},
+		Managed:          true,
 	})
 
 	rpcClient, err := client.Client()
@@ -230,10 +232,12 @@ func startPlugin(pluginPath string) pluginproto.ProviderClient {
 		log.Fatalf("Failed to connect to plugin: %s", err)
 	}
 
-	raw, err := rpcClient.Dispense("noop_provider")
+	raw, err := rpcClient.Dispense("provider")
 	if err != nil {
 		log.Fatalf("Failed to dispense plugin: %s", err)
 	}
 
-	return raw.(pluginproto.ProviderClient)
+	fmt.Println(client.NegotiatedVersion())
+
+	return raw.(*plugin.GRPCProvider)
 }

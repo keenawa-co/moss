@@ -10,14 +10,7 @@ import (
 
 var protoNestingModeMap = map[pluginproto.Schema_NestingMode]schematica.NestingMode{}
 
-// The panic here indicates a mismatch between the types in the
-// protocol and the code. Should never happen.
-var _ = [1]int{}[len(pluginproto.Schema_NestingMode_name)-len(schematica.NestingModeToString)]
-
 func ProtoSchema(s *pluginproto.Schema) *provider.Schema {
-	if s == nil {
-		return nil
-	}
 	return &provider.Schema{
 		Version: s.Version,
 		Root:    ProtoSchemaBlock(s.Root),
