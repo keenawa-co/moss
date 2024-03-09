@@ -93,11 +93,10 @@ func runRootCmd(cmd *cobra.Command, args []string) {
 	}
 
 	client := startPlugin(".ray/provider/github.com/4rchr4y/ray-noop-provider@v0.0.1")
+	defer client.Stop()
+	defer client.Shutdown()
+
 	schema := client.DescribeSchema()
-	if err != nil {
-		log.Fatal(err)
-		return
-	}
 	log.Printf("Received schema: %+v\n", schema.Schema.Root.Description)
 
 	b, err := s.LoadFromAbs("./testdata", nil)
@@ -237,7 +236,8 @@ func startPlugin(pluginPath string) provider.Interface {
 		log.Fatalf("Failed to dispense plugin: %s", err)
 	}
 
-	fmt.Println(client.NegotiatedVersion())
+	p := raw.(*plugin.GRPCProvider)
+	p.PluginClient = client
 
-	return raw.(*plugin.GRPCProvider)
+	return p
 }

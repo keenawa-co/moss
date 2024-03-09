@@ -44,6 +44,7 @@ message Schema {
 
 service Provider {
     rpc DescribeSchema(DescribeSchema.Request) returns (DescribeSchema.Response);
+    rpc Stop(Stop.Request) returns (Stop.Response);
 }
 
 message DescribeSchema {
@@ -51,5 +52,13 @@ message DescribeSchema {
 
     message Response {
         Schema provider = 1;
+    }
+}
+
+message Stop {
+    message Request {}
+
+    message Response {
+        string error = 1;
     }
 }

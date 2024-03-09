@@ -20,6 +20,7 @@ const _ = grpc.SupportPackageIsVersion7
 
 const (
 	Provider_DescribeSchema_FullMethodName = "/pluginproto.Provider/DescribeSchema"
+	Provider_Stop_FullMethodName           = "/pluginproto.Provider/Stop"
 )
 
 // ProviderClient is the client API for Provider service.
@@ -27,6 +28,7 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type ProviderClient interface {
 	DescribeSchema(ctx context.Context, in *DescribeSchema_Request, opts ...grpc.CallOption) (*DescribeSchema_Response, error)
+	Stop(ctx context.Context, in *Stop_Request, opts ...grpc.CallOption) (*Stop_Response, error)
 }
 
 type providerClient struct {
@@ -46,11 +48,21 @@ func (c *providerClient) DescribeSchema(ctx context.Context, in *DescribeSchema_
 	return out, nil
 }
 
+func (c *providerClient) Stop(ctx context.Context, in *Stop_Request, opts ...grpc.CallOption) (*Stop_Response, error) {
+	out := new(Stop_Response)
+	err := c.cc.Invoke(ctx, Provider_Stop_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ProviderServer is the server API for Provider service.
 // All implementations must embed UnimplementedProviderServer
 // for forward compatibility
 type ProviderServer interface {
 	DescribeSchema(context.Context, *DescribeSchema_Request) (*DescribeSchema_Response, error)
+	Stop(context.Context, *Stop_Request) (*Stop_Response, error)
 	mustEmbedUnimplementedProviderServer()
 }
 
@@ -60,6 +72,9 @@ type UnimplementedProviderServer struct {
 
 func (UnimplementedProviderServer) DescribeSchema(context.Context, *DescribeSchema_Request) (*DescribeSchema_Response, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DescribeSchema not implemented")
+}
+func (UnimplementedProviderServer) Stop(context.Context, *Stop_Request) (*Stop_Response, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Stop not implemented")
 }
 func (UnimplementedProviderServer) mustEmbedUnimplementedProviderServer() {}
 
@@ -92,6 +107,24 @@ func _Provider_DescribeSchema_Handler(srv interface{}, ctx context.Context, dec 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Provider_Stop_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Stop_Request)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ProviderServer).Stop(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Provider_Stop_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ProviderServer).Stop(ctx, req.(*Stop_Request))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Provider_ServiceDesc is the grpc.ServiceDesc for Provider service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -102,6 +135,10 @@ var Provider_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DescribeSchema",
 			Handler:    _Provider_DescribeSchema_Handler,
+		},
+		{
+			MethodName: "Stop",
+			Handler:    _Provider_Stop_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

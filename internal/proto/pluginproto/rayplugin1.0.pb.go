@@ -156,6 +156,44 @@ func (*DescribeSchema) Descriptor() ([]byte, []int) {
 	return file_rayplugin1_0_proto_rawDescGZIP(), []int{1}
 }
 
+type Stop struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+}
+
+func (x *Stop) Reset() {
+	*x = Stop{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_rayplugin1_0_proto_msgTypes[2]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *Stop) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Stop) ProtoMessage() {}
+
+func (x *Stop) ProtoReflect() protoreflect.Message {
+	mi := &file_rayplugin1_0_proto_msgTypes[2]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Stop.ProtoReflect.Descriptor instead.
+func (*Stop) Descriptor() ([]byte, []int) {
+	return file_rayplugin1_0_proto_rawDescGZIP(), []int{2}
+}
+
 type Schema_Block struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -170,7 +208,7 @@ type Schema_Block struct {
 func (x *Schema_Block) Reset() {
 	*x = Schema_Block{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_rayplugin1_0_proto_msgTypes[2]
+		mi := &file_rayplugin1_0_proto_msgTypes[3]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -183,7 +221,7 @@ func (x *Schema_Block) String() string {
 func (*Schema_Block) ProtoMessage() {}
 
 func (x *Schema_Block) ProtoReflect() protoreflect.Message {
-	mi := &file_rayplugin1_0_proto_msgTypes[2]
+	mi := &file_rayplugin1_0_proto_msgTypes[3]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -244,7 +282,7 @@ type Schema_Attribute struct {
 func (x *Schema_Attribute) Reset() {
 	*x = Schema_Attribute{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_rayplugin1_0_proto_msgTypes[3]
+		mi := &file_rayplugin1_0_proto_msgTypes[4]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -257,7 +295,7 @@ func (x *Schema_Attribute) String() string {
 func (*Schema_Attribute) ProtoMessage() {}
 
 func (x *Schema_Attribute) ProtoReflect() protoreflect.Message {
-	mi := &file_rayplugin1_0_proto_msgTypes[3]
+	mi := &file_rayplugin1_0_proto_msgTypes[4]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -335,7 +373,7 @@ type Schema_NestedBlock struct {
 func (x *Schema_NestedBlock) Reset() {
 	*x = Schema_NestedBlock{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_rayplugin1_0_proto_msgTypes[4]
+		mi := &file_rayplugin1_0_proto_msgTypes[5]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -348,7 +386,7 @@ func (x *Schema_NestedBlock) String() string {
 func (*Schema_NestedBlock) ProtoMessage() {}
 
 func (x *Schema_NestedBlock) ProtoReflect() protoreflect.Message {
-	mi := &file_rayplugin1_0_proto_msgTypes[4]
+	mi := &file_rayplugin1_0_proto_msgTypes[5]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -397,7 +435,7 @@ type Schema_Object struct {
 func (x *Schema_Object) Reset() {
 	*x = Schema_Object{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_rayplugin1_0_proto_msgTypes[5]
+		mi := &file_rayplugin1_0_proto_msgTypes[6]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -410,7 +448,7 @@ func (x *Schema_Object) String() string {
 func (*Schema_Object) ProtoMessage() {}
 
 func (x *Schema_Object) ProtoReflect() protoreflect.Message {
-	mi := &file_rayplugin1_0_proto_msgTypes[5]
+	mi := &file_rayplugin1_0_proto_msgTypes[6]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -449,7 +487,7 @@ type DescribeSchema_Request struct {
 func (x *DescribeSchema_Request) Reset() {
 	*x = DescribeSchema_Request{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_rayplugin1_0_proto_msgTypes[6]
+		mi := &file_rayplugin1_0_proto_msgTypes[7]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -462,7 +500,7 @@ func (x *DescribeSchema_Request) String() string {
 func (*DescribeSchema_Request) ProtoMessage() {}
 
 func (x *DescribeSchema_Request) ProtoReflect() protoreflect.Message {
-	mi := &file_rayplugin1_0_proto_msgTypes[6]
+	mi := &file_rayplugin1_0_proto_msgTypes[7]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -489,7 +527,7 @@ type DescribeSchema_Response struct {
 func (x *DescribeSchema_Response) Reset() {
 	*x = DescribeSchema_Response{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_rayplugin1_0_proto_msgTypes[7]
+		mi := &file_rayplugin1_0_proto_msgTypes[8]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -502,7 +540,7 @@ func (x *DescribeSchema_Response) String() string {
 func (*DescribeSchema_Response) ProtoMessage() {}
 
 func (x *DescribeSchema_Response) ProtoReflect() protoreflect.Message {
-	mi := &file_rayplugin1_0_proto_msgTypes[7]
+	mi := &file_rayplugin1_0_proto_msgTypes[8]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -523,6 +561,91 @@ func (x *DescribeSchema_Response) GetProvider() *Schema {
 		return x.Provider
 	}
 	return nil
+}
+
+type Stop_Request struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+}
+
+func (x *Stop_Request) Reset() {
+	*x = Stop_Request{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_rayplugin1_0_proto_msgTypes[9]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *Stop_Request) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Stop_Request) ProtoMessage() {}
+
+func (x *Stop_Request) ProtoReflect() protoreflect.Message {
+	mi := &file_rayplugin1_0_proto_msgTypes[9]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Stop_Request.ProtoReflect.Descriptor instead.
+func (*Stop_Request) Descriptor() ([]byte, []int) {
+	return file_rayplugin1_0_proto_rawDescGZIP(), []int{2, 0}
+}
+
+type Stop_Response struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Error string `protobuf:"bytes,1,opt,name=error,proto3" json:"error,omitempty"`
+}
+
+func (x *Stop_Response) Reset() {
+	*x = Stop_Response{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_rayplugin1_0_proto_msgTypes[10]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *Stop_Response) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Stop_Response) ProtoMessage() {}
+
+func (x *Stop_Response) ProtoReflect() protoreflect.Message {
+	mi := &file_rayplugin1_0_proto_msgTypes[10]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Stop_Response.ProtoReflect.Descriptor instead.
+func (*Stop_Response) Descriptor() ([]byte, []int) {
+	return file_rayplugin1_0_proto_rawDescGZIP(), []int{2, 1}
+}
+
+func (x *Stop_Response) GetError() string {
+	if x != nil {
+		return x.Error
+	}
+	return ""
 }
 
 var File_rayplugin1_0_proto protoreflect.FileDescriptor
@@ -587,18 +710,25 @@ var file_rayplugin1_0_proto_rawDesc = []byte{
 	0x08, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x2f, 0x0a, 0x08, 0x70, 0x72, 0x6f,
 	0x76, 0x69, 0x64, 0x65, 0x72, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x13, 0x2e, 0x70, 0x6c,
 	0x75, 0x67, 0x69, 0x6e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2e, 0x53, 0x63, 0x68, 0x65, 0x6d, 0x61,
-	0x52, 0x08, 0x70, 0x72, 0x6f, 0x76, 0x69, 0x64, 0x65, 0x72, 0x32, 0x67, 0x0a, 0x08, 0x50, 0x72,
-	0x6f, 0x76, 0x69, 0x64, 0x65, 0x72, 0x12, 0x5b, 0x0a, 0x0e, 0x44, 0x65, 0x73, 0x63, 0x72, 0x69,
-	0x62, 0x65, 0x53, 0x63, 0x68, 0x65, 0x6d, 0x61, 0x12, 0x23, 0x2e, 0x70, 0x6c, 0x75, 0x67, 0x69,
-	0x6e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2e, 0x44, 0x65, 0x73, 0x63, 0x72, 0x69, 0x62, 0x65, 0x53,
-	0x63, 0x68, 0x65, 0x6d, 0x61, 0x2e, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x24, 0x2e,
-	0x70, 0x6c, 0x75, 0x67, 0x69, 0x6e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2e, 0x44, 0x65, 0x73, 0x63,
-	0x72, 0x69, 0x62, 0x65, 0x53, 0x63, 0x68, 0x65, 0x6d, 0x61, 0x2e, 0x52, 0x65, 0x73, 0x70, 0x6f,
-	0x6e, 0x73, 0x65, 0x42, 0x35, 0x5a, 0x33, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f,
-	0x6d, 0x2f, 0x34, 0x72, 0x63, 0x68, 0x72, 0x34, 0x79, 0x2f, 0x67, 0x6f, 0x72, 0x61, 0x79, 0x2f,
-	0x69, 0x6e, 0x74, 0x65, 0x72, 0x6e, 0x61, 0x6c, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x70,
-	0x6c, 0x75, 0x67, 0x69, 0x6e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74,
-	0x6f, 0x33,
+	0x52, 0x08, 0x70, 0x72, 0x6f, 0x76, 0x69, 0x64, 0x65, 0x72, 0x22, 0x33, 0x0a, 0x04, 0x53, 0x74,
+	0x6f, 0x70, 0x1a, 0x09, 0x0a, 0x07, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x20, 0x0a,
+	0x08, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x14, 0x0a, 0x05, 0x65, 0x72, 0x72,
+	0x6f, 0x72, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x65, 0x72, 0x72, 0x6f, 0x72, 0x32,
+	0xa6, 0x01, 0x0a, 0x08, 0x50, 0x72, 0x6f, 0x76, 0x69, 0x64, 0x65, 0x72, 0x12, 0x5b, 0x0a, 0x0e,
+	0x44, 0x65, 0x73, 0x63, 0x72, 0x69, 0x62, 0x65, 0x53, 0x63, 0x68, 0x65, 0x6d, 0x61, 0x12, 0x23,
+	0x2e, 0x70, 0x6c, 0x75, 0x67, 0x69, 0x6e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2e, 0x44, 0x65, 0x73,
+	0x63, 0x72, 0x69, 0x62, 0x65, 0x53, 0x63, 0x68, 0x65, 0x6d, 0x61, 0x2e, 0x52, 0x65, 0x71, 0x75,
+	0x65, 0x73, 0x74, 0x1a, 0x24, 0x2e, 0x70, 0x6c, 0x75, 0x67, 0x69, 0x6e, 0x70, 0x72, 0x6f, 0x74,
+	0x6f, 0x2e, 0x44, 0x65, 0x73, 0x63, 0x72, 0x69, 0x62, 0x65, 0x53, 0x63, 0x68, 0x65, 0x6d, 0x61,
+	0x2e, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x3d, 0x0a, 0x04, 0x53, 0x74, 0x6f,
+	0x70, 0x12, 0x19, 0x2e, 0x70, 0x6c, 0x75, 0x67, 0x69, 0x6e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2e,
+	0x53, 0x74, 0x6f, 0x70, 0x2e, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x1a, 0x2e, 0x70,
+	0x6c, 0x75, 0x67, 0x69, 0x6e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2e, 0x53, 0x74, 0x6f, 0x70, 0x2e,
+	0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x42, 0x35, 0x5a, 0x33, 0x67, 0x69, 0x74, 0x68,
+	0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x34, 0x72, 0x63, 0x68, 0x72, 0x34, 0x79, 0x2f, 0x67,
+	0x6f, 0x72, 0x61, 0x79, 0x2f, 0x69, 0x6e, 0x74, 0x65, 0x72, 0x6e, 0x61, 0x6c, 0x2f, 0x70, 0x72,
+	0x6f, 0x74, 0x6f, 0x2f, 0x70, 0x6c, 0x75, 0x67, 0x69, 0x6e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62,
+	0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -614,32 +744,37 @@ func file_rayplugin1_0_proto_rawDescGZIP() []byte {
 }
 
 var file_rayplugin1_0_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_rayplugin1_0_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
+var file_rayplugin1_0_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
 var file_rayplugin1_0_proto_goTypes = []interface{}{
 	(Schema_NestingMode)(0),         // 0: pluginproto.Schema.NestingMode
 	(*Schema)(nil),                  // 1: pluginproto.Schema
 	(*DescribeSchema)(nil),          // 2: pluginproto.DescribeSchema
-	(*Schema_Block)(nil),            // 3: pluginproto.Schema.Block
-	(*Schema_Attribute)(nil),        // 4: pluginproto.Schema.Attribute
-	(*Schema_NestedBlock)(nil),      // 5: pluginproto.Schema.NestedBlock
-	(*Schema_Object)(nil),           // 6: pluginproto.Schema.Object
-	(*DescribeSchema_Request)(nil),  // 7: pluginproto.DescribeSchema.Request
-	(*DescribeSchema_Response)(nil), // 8: pluginproto.DescribeSchema.Response
+	(*Stop)(nil),                    // 3: pluginproto.Stop
+	(*Schema_Block)(nil),            // 4: pluginproto.Schema.Block
+	(*Schema_Attribute)(nil),        // 5: pluginproto.Schema.Attribute
+	(*Schema_NestedBlock)(nil),      // 6: pluginproto.Schema.NestedBlock
+	(*Schema_Object)(nil),           // 7: pluginproto.Schema.Object
+	(*DescribeSchema_Request)(nil),  // 8: pluginproto.DescribeSchema.Request
+	(*DescribeSchema_Response)(nil), // 9: pluginproto.DescribeSchema.Response
+	(*Stop_Request)(nil),            // 10: pluginproto.Stop.Request
+	(*Stop_Response)(nil),           // 11: pluginproto.Stop.Response
 }
 var file_rayplugin1_0_proto_depIdxs = []int32{
-	3,  // 0: pluginproto.Schema.root:type_name -> pluginproto.Schema.Block
-	4,  // 1: pluginproto.Schema.Block.attributes:type_name -> pluginproto.Schema.Attribute
-	5,  // 2: pluginproto.Schema.Block.block_types:type_name -> pluginproto.Schema.NestedBlock
-	6,  // 3: pluginproto.Schema.Attribute.nested_type:type_name -> pluginproto.Schema.Object
-	3,  // 4: pluginproto.Schema.NestedBlock.block:type_name -> pluginproto.Schema.Block
+	4,  // 0: pluginproto.Schema.root:type_name -> pluginproto.Schema.Block
+	5,  // 1: pluginproto.Schema.Block.attributes:type_name -> pluginproto.Schema.Attribute
+	6,  // 2: pluginproto.Schema.Block.block_types:type_name -> pluginproto.Schema.NestedBlock
+	7,  // 3: pluginproto.Schema.Attribute.nested_type:type_name -> pluginproto.Schema.Object
+	4,  // 4: pluginproto.Schema.NestedBlock.block:type_name -> pluginproto.Schema.Block
 	0,  // 5: pluginproto.Schema.NestedBlock.nesting:type_name -> pluginproto.Schema.NestingMode
-	4,  // 6: pluginproto.Schema.Object.attributes:type_name -> pluginproto.Schema.Attribute
+	5,  // 6: pluginproto.Schema.Object.attributes:type_name -> pluginproto.Schema.Attribute
 	0,  // 7: pluginproto.Schema.Object.nesting:type_name -> pluginproto.Schema.NestingMode
 	1,  // 8: pluginproto.DescribeSchema.Response.provider:type_name -> pluginproto.Schema
-	7,  // 9: pluginproto.Provider.DescribeSchema:input_type -> pluginproto.DescribeSchema.Request
-	8,  // 10: pluginproto.Provider.DescribeSchema:output_type -> pluginproto.DescribeSchema.Response
-	10, // [10:11] is the sub-list for method output_type
-	9,  // [9:10] is the sub-list for method input_type
+	8,  // 9: pluginproto.Provider.DescribeSchema:input_type -> pluginproto.DescribeSchema.Request
+	10, // 10: pluginproto.Provider.Stop:input_type -> pluginproto.Stop.Request
+	9,  // 11: pluginproto.Provider.DescribeSchema:output_type -> pluginproto.DescribeSchema.Response
+	11, // 12: pluginproto.Provider.Stop:output_type -> pluginproto.Stop.Response
+	11, // [11:13] is the sub-list for method output_type
+	9,  // [9:11] is the sub-list for method input_type
 	9,  // [9:9] is the sub-list for extension type_name
 	9,  // [9:9] is the sub-list for extension extendee
 	0,  // [0:9] is the sub-list for field type_name
@@ -676,7 +811,7 @@ func file_rayplugin1_0_proto_init() {
 			}
 		}
 		file_rayplugin1_0_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Schema_Block); i {
+			switch v := v.(*Stop); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -688,7 +823,7 @@ func file_rayplugin1_0_proto_init() {
 			}
 		}
 		file_rayplugin1_0_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Schema_Attribute); i {
+			switch v := v.(*Schema_Block); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -700,7 +835,7 @@ func file_rayplugin1_0_proto_init() {
 			}
 		}
 		file_rayplugin1_0_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Schema_NestedBlock); i {
+			switch v := v.(*Schema_Attribute); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -712,7 +847,7 @@ func file_rayplugin1_0_proto_init() {
 			}
 		}
 		file_rayplugin1_0_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Schema_Object); i {
+			switch v := v.(*Schema_NestedBlock); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -724,7 +859,7 @@ func file_rayplugin1_0_proto_init() {
 			}
 		}
 		file_rayplugin1_0_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*DescribeSchema_Request); i {
+			switch v := v.(*Schema_Object); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -736,7 +871,43 @@ func file_rayplugin1_0_proto_init() {
 			}
 		}
 		file_rayplugin1_0_proto_msgTypes[7].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*DescribeSchema_Request); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_rayplugin1_0_proto_msgTypes[8].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*DescribeSchema_Response); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_rayplugin1_0_proto_msgTypes[9].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*Stop_Request); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_rayplugin1_0_proto_msgTypes[10].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*Stop_Response); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -754,7 +925,7 @@ func file_rayplugin1_0_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_rayplugin1_0_proto_rawDesc,
 			NumEnums:      1,
-			NumMessages:   8,
+			NumMessages:   11,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

@@ -56,9 +56,15 @@ func SchemaObject(obj *schematica.Object) *pluginproto.Schema_Object {
 
 func processSchemaAttribute(name string, a *schematica.Attribute) *pluginproto.Schema_Attribute {
 	attr := &pluginproto.Schema_Attribute{
-		Name:        name,
-		Type:        must.Must(json.Marshal(a.Type)),
-		NestedType:  SchemaObject(a.NestingType),
+		Name: name,
+		Type: must.Must(json.Marshal(a.Type)),
+		NestedType: func() *pluginproto.Schema_Object {
+			if a.NestingType == nil {
+				return nil
+			}
+
+			return SchemaObject(a.NestingType)
+		}(),
 		Description: a.Description,
 		Deprecated:  a.Deprecated,
 		Optional:    a.Optional,

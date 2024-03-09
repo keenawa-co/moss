@@ -1,5 +1,7 @@
 package provider
 
+import "github.com/hashicorp/hcl/v2"
+
 type Interface interface {
 	DescribeSchema() *DescribeSchemaOutput
 	ReadResource(*ReadResourceInput) *ReadResourceOutput
@@ -9,7 +11,8 @@ type Interface interface {
 
 type (
 	DescribeSchemaOutput struct {
-		Schema *Schema
+		Schema      *Schema
+		Diagnostics hcl.Diagnostics
 	}
 )
 

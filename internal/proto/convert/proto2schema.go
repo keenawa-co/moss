@@ -40,6 +40,10 @@ func ProtoSchemaBlock(block *pluginproto.Schema_Block) *schematica.Block {
 }
 
 func ProtoSchemaObject(obj *pluginproto.Schema_Object) *schematica.Object {
+	if obj == nil {
+		return nil
+	}
+
 	result := &schematica.Object{
 		Attributes: make(map[string]*schematica.Attribute, len(obj.Attributes)),
 		Nesting:    protoNestingModeMap[obj.Nesting],
