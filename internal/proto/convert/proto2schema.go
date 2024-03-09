@@ -3,21 +3,21 @@ package convert
 import (
 	"encoding/json"
 
-	"github.com/4rchr4y/goray/interface/provider"
-	"github.com/4rchr4y/goray/internal/proto/pluginproto"
+	"github.com/4rchr4y/goray/interface/driver"
+	"github.com/4rchr4y/goray/internal/proto/protoschema"
 	"github.com/4rchr4y/goray/internal/schematica"
 )
 
-var protoNestingModeMap = map[pluginproto.Schema_NestingMode]schematica.NestingMode{}
+var protoNestingModeMap = map[protoschema.Schema_NestingMode]schematica.NestingMode{}
 
-func ProtoSchema(s *pluginproto.Schema) *provider.Schema {
-	return &provider.Schema{
+func ProtoSchema(s *protoschema.Schema) *driver.Schema {
+	return &driver.Schema{
 		Version: s.Version,
 		Root:    ProtoSchemaBlock(s.Root),
 	}
 }
 
-func ProtoSchemaBlock(block *pluginproto.Schema_Block) *schematica.Block {
+func ProtoSchemaBlock(block *protoschema.Schema_Block) *schematica.Block {
 	result := &schematica.Block{
 		BlockTypes:  make(map[string]*schematica.NestedBlock, len(block.BlockTypes)),
 		Attributes:  make(map[string]*schematica.Attribute, len(block.Attributes)),
@@ -39,7 +39,7 @@ func ProtoSchemaBlock(block *pluginproto.Schema_Block) *schematica.Block {
 	return result
 }
 
-func ProtoSchemaObject(obj *pluginproto.Schema_Object) *schematica.Object {
+func ProtoSchemaObject(obj *protoschema.Schema_Object) *schematica.Object {
 	if obj == nil {
 		return nil
 	}
@@ -56,7 +56,7 @@ func ProtoSchemaObject(obj *pluginproto.Schema_Object) *schematica.Object {
 	return result
 }
 
-func processProtoSchemaAttribute(a *pluginproto.Schema_Attribute) *schematica.Attribute {
+func processProtoSchemaAttribute(a *protoschema.Schema_Attribute) *schematica.Attribute {
 	attr := &schematica.Attribute{
 		Description: a.Description,
 		Required:    a.Required,

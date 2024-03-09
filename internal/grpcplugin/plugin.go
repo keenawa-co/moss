@@ -1,7 +1,7 @@
-package plugin
+package grpcplugin
 
 import (
-	"github.com/4rchr4y/goray/internal/proto/pluginproto"
+	"github.com/4rchr4y/goray/internal/proto/protodriver"
 	pluginHCL "github.com/hashicorp/go-plugin"
 )
 
@@ -16,7 +16,7 @@ var Handshake = pluginHCL.HandshakeConfig{
 }
 
 type ServeConf struct {
-	GRPCProviderFn func() pluginproto.ProviderServer
+	GRPCDriverFn func() protodriver.DriverServer
 }
 
 func Serve(conf *ServeConf) {
@@ -24,8 +24,8 @@ func Serve(conf *ServeConf) {
 		HandshakeConfig: Handshake,
 		VersionedPlugins: map[int]pluginHCL.PluginSet{
 			1: {
-				"provider": &GRPCProviderPlugin{
-					GRPCProvider: conf.GRPCProviderFn,
+				"driver": &GRPCDriverPlugin{
+					GRPCDriverFn: conf.GRPCDriverFn,
 				},
 			},
 		},

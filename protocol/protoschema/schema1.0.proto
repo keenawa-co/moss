@@ -1,8 +1,7 @@
 syntax = "proto3";
 
-option go_package = "github.com/4rchr4y/goray/internal/proto/pluginproto";
-
-package pluginproto;
+package protoschema;
+option go_package = "github.com/4rchr4y/goray/internal/proto/protoschema";
 
 message Schema {
     message Block {
@@ -40,25 +39,4 @@ message Schema {
 
     int64 version = 1;
     Block root = 2;
-}
-
-service Provider {
-    rpc DescribeSchema(DescribeSchema.Request) returns (DescribeSchema.Response);
-    rpc Stop(Stop.Request) returns (Stop.Response);
-}
-
-message DescribeSchema {
-    message Request {}
-
-    message Response {
-        Schema provider = 1;
-    }
-}
-
-message Stop {
-    message Request {}
-
-    message Response {
-        string error = 1;
-    }
 }

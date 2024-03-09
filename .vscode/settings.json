@@ -17,6 +17,7 @@
         "getenv",
         "gohcl",
         "goray",
+        "grpcplugin",
         "grpcwrap",
         "gvalidate",
         "hcllang",
@@ -24,12 +25,14 @@
         "hclsyntax",
         "idxt",
         "iface",
+        "iostream",
         "iowrap",
         "modfile",
         "openpolicy",
         "oscli",
         "pluginproto",
-        "provideriface",
+        "protodriver",
+        "protoschema",
         "rayfile",
         "rchr",
         "rcschema",
@@ -60,8 +63,13 @@
     ],
     "files.associations": {
         "*.ray": "hcl"
-    },  
+    },
     "cSpell.enableFiletypes": [
         "hcl"
     ],
+    "protoc": {
+        "options": [
+            "-I./protocol/protoschema/schema1.0.proto",
+        ]
+    }
 }

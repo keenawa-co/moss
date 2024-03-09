@@ -1,4 +1,4 @@
-package provider
+package driver
 
 import (
 	"github.com/4rchr4y/goray/internal/schematica"

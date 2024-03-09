@@ -1,4 +1,4 @@
-package provider
+package driver
 
 import "github.com/hashicorp/hcl/v2"
 
@@ -12,7 +12,7 @@ type Interface interface {
 type (
 	DescribeSchemaOutput struct {
 		Schema      *Schema
-		Diagnostics hcl.Diagnostics
+		Diagnostics hcl.Diagnostics // TODO: use local diagnostics type
 	}
 )
 
