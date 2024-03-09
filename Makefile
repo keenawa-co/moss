@@ -3,6 +3,7 @@ PROTOCOL_VERSION := 1.0
 
 .PHONY: protoc
 protoc:
+	@export PATH="${PATH}:$(shell go env GOPATH)/bin" ; \
 	protoc -I ./protocol/plugin-proto/ \
 		--go_out=./internal/proto/pluginproto/ --go_opt=paths=source_relative \
 		--go-grpc_out=./internal/proto/pluginproto/ --go-grpc_opt=paths=source_relative \
