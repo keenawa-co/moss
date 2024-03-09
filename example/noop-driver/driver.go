@@ -6,13 +6,13 @@ import (
 	"github.com/zclconf/go-cty/cty"
 )
 
-type NoopDriverServer struct{}
+type NoopDriver struct{}
 
 func Driver() driver.Interface {
-	return &NoopDriverServer{}
+	return &NoopDriver{}
 }
 
-func (s *NoopDriverServer) DescribeSchema() *driver.DescribeSchemaOutput {
+func (s *NoopDriver) DescribeSchema() *driver.DescribeSchemaOutput {
 	return &driver.DescribeSchemaOutput{
 		Schema: &driver.Schema{
 			Version: 1,
@@ -23,20 +23,20 @@ func (s *NoopDriverServer) DescribeSchema() *driver.DescribeSchemaOutput {
 						Type:     cty.String,
 					},
 				},
-				Description: "Hello, Ray!",
+				Description: "Hello, Ray from 'noop-driver'!",
 			},
 		},
 	}
 }
 
-func (s *NoopDriverServer) ReadResource(*driver.ReadResourceInput) *driver.ReadResourceOutput {
+func (s *NoopDriver) ReadResource(*driver.ReadResourceInput) *driver.ReadResourceOutput {
 	return &driver.ReadResourceOutput{}
 }
 
-func (s *NoopDriverServer) Stop() error {
+func (s *NoopDriver) Stop() error {
 	return nil
 }
 
-func (s *NoopDriverServer) Shutdown() error {
+func (s *NoopDriver) Shutdown() error {
 	return nil
 }

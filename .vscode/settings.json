@@ -31,6 +31,7 @@
         "openpolicy",
         "oscli",
         "pluginproto",
+        "protocomponent",
         "protodriver",
         "protoschema",
         "rayfile",

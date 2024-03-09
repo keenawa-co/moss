@@ -3,6 +3,7 @@ package convert
 import (
 	"encoding/json"
 
+	"github.com/4rchr4y/goray/interface/component"
 	"github.com/4rchr4y/goray/interface/driver"
 	"github.com/4rchr4y/goray/internal/proto/protoschema"
 	"github.com/4rchr4y/goray/internal/schematica"
@@ -10,14 +11,21 @@ import (
 
 var protoNestingModeMap = map[protoschema.Schema_NestingMode]schematica.NestingMode{}
 
-func ProtoSchema(s *protoschema.Schema) *driver.Schema {
+func MustProtoDriverSchema(s *protoschema.Schema) *driver.Schema {
 	return &driver.Schema{
 		Version: s.Version,
-		Root:    ProtoSchemaBlock(s.Root),
+		Root:    MustProtoSchemaBlock(s.Root),
 	}
 }
 
-func ProtoSchemaBlock(block *protoschema.Schema_Block) *schematica.Block {
+func MustProtoComponentSchema(s *protoschema.Schema) *component.Schema {
+	return &component.Schema{
+		Version: s.Version,
+		Root:    MustProtoSchemaBlock(s.Root),
+	}
+}
+
+func MustProtoSchemaBlock(block *protoschema.Schema_Block) *schematica.Block {
 	result := &schematica.Block{
 		BlockTypes:  make(map[string]*schematica.NestedBlock, len(block.BlockTypes)),
 		Attributes:  make(map[string]*schematica.Attribute, len(block.Attributes)),
@@ -31,7 +39,7 @@ func ProtoSchemaBlock(block *protoschema.Schema_Block) *schematica.Block {
 
 	for _, b := range block.BlockTypes {
 		result.BlockTypes[b.Name] = &schematica.NestedBlock{
-			Block:   ProtoSchemaBlock(b.Block),
+			Block:   MustProtoSchemaBlock(b.Block),
 			Nesting: protoNestingModeMap[b.Nesting],
 		}
 	}

@@ -28,3 +28,8 @@ noop_driver:
 	go build -o ./.ray/driver/github.com/4rchr4y/ray-noop-driver@v0.0.1 ./example/noop-driver/main
 
 
+.PHONY: dummy_component
+dummy_component:
+	go build -o ./.ray/component/github.com/4rchr4y/ray-dummy-component@v0.0.1 ./example/dummy-component/main
+
+

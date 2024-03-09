@@ -21,11 +21,14 @@ import (
 	"github.com/4rchr4y/godevkit/v3/env"
 	"github.com/4rchr4y/godevkit/v3/syswrap"
 	"github.com/4rchr4y/goray/builtin/rck/rcschema"
+	dummy_component "github.com/4rchr4y/goray/example/dummy-component"
 	noop_driver "github.com/4rchr4y/goray/example/noop-driver"
+	"github.com/4rchr4y/goray/interface/component"
 	"github.com/4rchr4y/goray/interface/driver"
 
 	"github.com/4rchr4y/goray/internal/domain/grpcwrap"
 	"github.com/4rchr4y/goray/internal/grpcplugin"
+	"github.com/4rchr4y/goray/internal/proto/protocomponent"
 	"github.com/4rchr4y/goray/internal/proto/protodriver"
 
 	"github.com/g10z3r/ason"
@@ -92,7 +95,8 @@ func runRootCmd(cmd *cobra.Command, args []string) {
 		}
 	}
 
-	client := startPlugin(".ray/driver/github.com/4rchr4y/ray-noop-driver@v0.0.1")
+	// client := startDriver(".ray/driver/github.com/4rchr4y/ray-noop-driver@v0.0.1")
+	client := startComponent(".ray/component/github.com/4rchr4y/ray-dummy-component@v0.0.1")
 	defer client.Stop()
 	defer client.Shutdown()
 
@@ -209,12 +213,47 @@ func tmpGetFileAstAsMap(filePath string) (map[string]interface{}, error) {
 	return fileMap, nil
 }
 
-func startPlugin(pluginPath string) driver.Interface {
+func startComponent(pluginPath string) component.Interface {
+	plugins := map[int]pluginHCL.PluginSet{
+		1: {
+			"component": &grpcplugin.GRPCComponentPlugin{
+				ServeFn: func() protocomponent.ComponentServer {
+					return grpcwrap.ComponentWrapper(dummy_component.Component())
+				},
+			},
+		},
+	}
+
+	client := pluginHCL.NewClient(&pluginHCL.ClientConfig{
+		HandshakeConfig:  grpcplugin.Handshake,
+		VersionedPlugins: plugins,
+		Cmd:              exec.Command(pluginPath),
+		AllowedProtocols: []pluginHCL.Protocol{pluginHCL.ProtocolGRPC},
+		Managed:          true,
+	})
+
+	rpcClient, err := client.Client()
+	if err != nil {
+		log.Fatalf("Failed to connect to plugin: %s", err)
+	}
+
+	raw, err := rpcClient.Dispense("component")
+	if err != nil {
+		log.Fatalf("Failed to dispense plugin: %s", err)
+	}
+
+	p := raw.(*grpcplugin.GRPCComponent)
+	p.PluginClient = client
+
+	return p
+}
+
+func startDriver(pluginPath string) driver.Interface {
 	plugins := map[int]pluginHCL.PluginSet{
 		1: {
 			"driver": &grpcplugin.GRPCDriverPlugin{
-				GRPCDriverFn: func() protodriver.DriverServer {
-					return grpcwrap.Successor(noop_driver.Driver())
+				ServeFn: func() protodriver.DriverServer {
+					return grpcwrap.DriverWrapper(noop_driver.Driver())
 				},
 			},
 		},

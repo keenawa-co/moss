@@ -11,20 +11,20 @@ import (
 
 // schema -> proto
 
-type successor struct {
+type driverWrapper struct {
 	protodriver.UnimplementedDriverServer
 	origin driver.Interface
 	schema *driver.DescribeSchemaOutput
 }
 
-func Successor(p driver.Interface) protodriver.DriverServer {
-	return &successor{
+func DriverWrapper(p driver.Interface) protodriver.DriverServer {
+	return &driverWrapper{
 		origin: p,
 		schema: p.DescribeSchema(),
 	}
 }
 
-func (p *successor) DescribeSchema(_ context.Context, req *protodriver.DescribeSchema_Request) (*protodriver.DescribeSchema_Response, error) {
+func (p *driverWrapper) DescribeSchema(_ context.Context, req *protodriver.DescribeSchema_Request) (*protodriver.DescribeSchema_Response, error) {
 	resp := &protodriver.DescribeSchema_Response{
 		Driver: &protoschema.Schema{
 			Root: &protoschema.Schema_Block{},
@@ -32,13 +32,13 @@ func (p *successor) DescribeSchema(_ context.Context, req *protodriver.DescribeS
 	}
 
 	if p.schema.Schema.Root != nil {
-		resp.Driver = convert.MustProviderSchema(p.schema.Schema)
+		resp.Driver = convert.MustDriverSchema(p.schema.Schema)
 	}
 
 	return resp, nil
 }
 
-func (s *successor) Stop(ctx context.Context, req *protodriver.Stop_Request) (*protodriver.Stop_Response, error) {
+func (s *driverWrapper) Stop(ctx context.Context, req *protodriver.Stop_Request) (*protodriver.Stop_Response, error) {
 	resp := &protodriver.Stop_Response{}
 	if err := s.origin.Stop(); err != nil {
 		resp.Error = err.Error()

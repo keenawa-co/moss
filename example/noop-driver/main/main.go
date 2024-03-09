@@ -8,9 +8,9 @@ import (
 )
 
 func main() {
-	grpcplugin.Serve(&grpcplugin.ServeConf{
-		GRPCDriverFn: func() protodriver.DriverServer {
-			return grpcwrap.Successor(noop_driver.Driver())
+	grpcplugin.ServeDriver(&grpcplugin.ServeDriverConf{
+		GRPCServeFn: func() protodriver.DriverServer {
+			return grpcwrap.DriverWrapper(noop_driver.Driver())
 		},
 	})
 }

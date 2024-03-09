@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 
 	"github.com/4rchr4y/godevkit/v3/must"
+	"github.com/4rchr4y/goray/interface/component"
 	"github.com/4rchr4y/goray/interface/driver"
 	"github.com/4rchr4y/goray/internal/proto/protoschema"
 	"github.com/4rchr4y/goray/internal/schematica"
@@ -11,7 +12,14 @@ import (
 
 var nestingModeMap = map[schematica.NestingMode]protoschema.Schema_NestingMode{}
 
-func MustProviderSchema(s *driver.Schema) *protoschema.Schema {
+func MustDriverSchema(s *driver.Schema) *protoschema.Schema {
+	return &protoschema.Schema{
+		Version: s.Version,
+		Root:    MustSchemaBlock(s.Root),
+	}
+}
+
+func MustComponentSchema(s *component.Schema) *protoschema.Schema {
 	return &protoschema.Schema{
 		Version: s.Version,
 		Root:    MustSchemaBlock(s.Root),

@@ -15,7 +15,7 @@ import (
 
 type GRPCDriverPlugin struct {
 	pluginHCL.Plugin
-	GRPCDriverFn func() protodriver.DriverServer
+	ServeFn DriverServeFn
 }
 
 func (p *GRPCDriverPlugin) GRPCClient(ctx context.Context, broker *pluginHCL.GRPCBroker, c *grpc.ClientConn) (interface{}, error) {
@@ -26,7 +26,7 @@ func (p *GRPCDriverPlugin) GRPCClient(ctx context.Context, broker *pluginHCL.GRP
 }
 
 func (p *GRPCDriverPlugin) GRPCServer(broker *pluginHCL.GRPCBroker, s *grpc.Server) error {
-	protodriver.RegisterDriverServer(s, p.GRPCDriverFn())
+	protodriver.RegisterDriverServer(s, p.ServeFn())
 	return nil
 }
 
@@ -54,7 +54,7 @@ func (p *GRPCDriver) DescribeSchema() *driver.DescribeSchemaOutput {
 		return output
 	}
 
-	output.Schema = convert.ProtoSchema(descSchemaResp.Driver)
+	output.Schema = convert.MustProtoDriverSchema(descSchemaResp.Driver)
 
 	return output
 }
@@ -80,3 +80,5 @@ func (p *GRPCDriver) Shutdown() error {
 	p.PluginClient.Kill()
 	return nil
 }
+
+var _ driver.Interface = (*GRPCDriver)(nil)
