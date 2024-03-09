@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package protocomponent;
+option go_package = "github.com/4rchr4y/goray/internal/proto/protocomponent";
+
+import "protoschema/schema1.0.proto";
+
+service Component {
+    rpc DescribeSchema(DescribeSchema.Request) returns (DescribeSchema.Response);
+    rpc Stop(Stop.Request) returns (Stop.Response);
+}
+
+message DescribeSchema {
+    message Request {}
+
+    message Response {
+        protoschema.Schema driver = 1;
+    }
+}
+
+message Stop {
+    message Request {}
+
+    message Response {
+        string error = 1;
+    }
+}
