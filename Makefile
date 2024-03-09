@@ -1,14 +1,20 @@
 RAY_DIR := .ray
-PROTOCOL_VERSION := 1.0
+
+PROTO_GO_PKG := "./internal/proto/"
+PROTO_DIR := "protocol"
+PROTO_DRIVER_VERSION := 1.0
+PROTO_SCHEMA_VERSION := 1.0
+
 
 .PHONY: protoc
 protoc:
 	@export PATH="${PATH}:$(shell go env GOPATH)/bin" ; \
-	protoc -I ./protocol/ \
-		--go_out=./internal/proto/ --go_opt=paths=source_relative \
-		--go-grpc_out=./internal/proto/ --go-grpc_opt=paths=source_relative \
-		protocol/protodriver/driver${PROTOCOL_VERSION}.proto \
-		protocol/protoschema/schema1.0.proto
+	protoc -I ./${PROTO_DIR}/ \
+		--go_out=${PROTO_GO_PKG} --go_opt=paths=source_relative \
+		--go-grpc_out=${PROTO_GO_PKG} --go-grpc_opt=paths=source_relative \
+		${PROTO_DIR}/protodriver/driver${PROTO_DRIVER_VERSION}.proto \
+		${PROTO_DIR}/protoschema/schema${PROTO_SCHEMA_VERSION}.proto
+
 
 .PHONY: count
 count:
