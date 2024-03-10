@@ -35,25 +35,36 @@ type GRPCComponent struct {
 	client       protocomponent.ComponentClient
 }
 
-func (p *GRPCComponent) DescribeSchema() *component.DescribeSchemaOutput {
-	output := &component.DescribeSchemaOutput{}
+func (p *GRPCComponent) Heartbeat() *component.HeartbeatOutput {
+	heartbeatResp, err := p.client.Heartbeat(p.ctx, new(protocomponent.Heartbeat_Request))
+	if err != nil {
+		//TODO:
+		fmt.Println(err)
+		return nil
+	}
 
+	return &component.HeartbeatOutput{
+		Status: heartbeatResp.Status,
+	}
+}
+
+func (p *GRPCComponent) DescribeSchema() *component.DescribeSchemaOutput {
 	descSchemaResp, err := p.client.DescribeSchema(p.ctx, new(protocomponent.DescribeSchema_Request))
 	if err != nil {
 		//TODO: response.Diagnostics.Append() <- error
 		fmt.Println(err)
-		return output
+		return nil
 	}
 
 	if descSchemaResp.Driver == nil {
 		fmt.Println("missing provider schema")
 		// output.Diagnostics = output.Diagnostics.Append(errors.New("missing provider schema"))
-		return output
+		return nil
 	}
 
-	output.Schema = convert.MustProtoComponentSchema(descSchemaResp.Driver)
-
-	return output
+	return &component.DescribeSchemaOutput{
+		Schema: convert.MustProtoComponentSchema(descSchemaResp.Driver),
+	}
 }
 
 func (p *GRPCComponent) Stop() error {

@@ -22,6 +22,12 @@ func ComponentWrapper(c component.Interface) protocomponent.ComponentServer {
 	}
 }
 
+func (p *componentWrapper) Heartbeat(_ context.Context, req *protocomponent.Heartbeat_Request) (*protocomponent.Heartbeat_Response, error) {
+	return &protocomponent.Heartbeat_Response{
+		Status: p.origin.Heartbeat().Status,
+	}, nil
+}
+
 func (p *componentWrapper) DescribeSchema(_ context.Context, req *protocomponent.DescribeSchema_Request) (*protocomponent.DescribeSchema_Response, error) {
 	resp := &protocomponent.DescribeSchema_Response{
 		Driver: &protoschema.Schema{

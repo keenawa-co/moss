@@ -19,6 +19,7 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
+	Component_Heartbeat_FullMethodName      = "/protocomponent.Component/Heartbeat"
 	Component_DescribeSchema_FullMethodName = "/protocomponent.Component/DescribeSchema"
 	Component_Stop_FullMethodName           = "/protocomponent.Component/Stop"
 )
@@ -27,6 +28,7 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type ComponentClient interface {
+	Heartbeat(ctx context.Context, in *Heartbeat_Request, opts ...grpc.CallOption) (*Heartbeat_Response, error)
 	DescribeSchema(ctx context.Context, in *DescribeSchema_Request, opts ...grpc.CallOption) (*DescribeSchema_Response, error)
 	Stop(ctx context.Context, in *Stop_Request, opts ...grpc.CallOption) (*Stop_Response, error)
 }
@@ -37,6 +39,15 @@ type componentClient struct {
 
 func NewComponentClient(cc grpc.ClientConnInterface) ComponentClient {
 	return &componentClient{cc}
+}
+
+func (c *componentClient) Heartbeat(ctx context.Context, in *Heartbeat_Request, opts ...grpc.CallOption) (*Heartbeat_Response, error) {
+	out := new(Heartbeat_Response)
+	err := c.cc.Invoke(ctx, Component_Heartbeat_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 func (c *componentClient) DescribeSchema(ctx context.Context, in *DescribeSchema_Request, opts ...grpc.CallOption) (*DescribeSchema_Response, error) {
@@ -61,6 +72,7 @@ func (c *componentClient) Stop(ctx context.Context, in *Stop_Request, opts ...gr
 // All implementations must embed UnimplementedComponentServer
 // for forward compatibility
 type ComponentServer interface {
+	Heartbeat(context.Context, *Heartbeat_Request) (*Heartbeat_Response, error)
 	DescribeSchema(context.Context, *DescribeSchema_Request) (*DescribeSchema_Response, error)
 	Stop(context.Context, *Stop_Request) (*Stop_Response, error)
 	mustEmbedUnimplementedComponentServer()
@@ -70,6 +82,9 @@ type ComponentServer interface {
 type UnimplementedComponentServer struct {
 }
 
+func (UnimplementedComponentServer) Heartbeat(context.Context, *Heartbeat_Request) (*Heartbeat_Response, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Heartbeat not implemented")
+}
 func (UnimplementedComponentServer) DescribeSchema(context.Context, *DescribeSchema_Request) (*DescribeSchema_Response, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DescribeSchema not implemented")
 }
@@ -87,6 +102,24 @@ type UnsafeComponentServer interface {
 
 func RegisterComponentServer(s grpc.ServiceRegistrar, srv ComponentServer) {
 	s.RegisterService(&Component_ServiceDesc, srv)
+}
+
+func _Component_Heartbeat_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Heartbeat_Request)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ComponentServer).Heartbeat(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Component_Heartbeat_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ComponentServer).Heartbeat(ctx, req.(*Heartbeat_Request))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 func _Component_DescribeSchema_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -132,6 +165,10 @@ var Component_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "protocomponent.Component",
 	HandlerType: (*ComponentServer)(nil),
 	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "Heartbeat",
+			Handler:    _Component_Heartbeat_Handler,
+		},
 		{
 			MethodName: "DescribeSchema",
 			Handler:    _Component_DescribeSchema_Handler,

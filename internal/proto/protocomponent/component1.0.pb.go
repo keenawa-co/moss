@@ -21,6 +21,44 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+type Heartbeat struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+}
+
+func (x *Heartbeat) Reset() {
+	*x = Heartbeat{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_protocomponent_component1_0_proto_msgTypes[0]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *Heartbeat) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Heartbeat) ProtoMessage() {}
+
+func (x *Heartbeat) ProtoReflect() protoreflect.Message {
+	mi := &file_protocomponent_component1_0_proto_msgTypes[0]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Heartbeat.ProtoReflect.Descriptor instead.
+func (*Heartbeat) Descriptor() ([]byte, []int) {
+	return file_protocomponent_component1_0_proto_rawDescGZIP(), []int{0}
+}
+
 type DescribeSchema struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -30,7 +68,7 @@ type DescribeSchema struct {
 func (x *DescribeSchema) Reset() {
 	*x = DescribeSchema{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_protocomponent_component1_0_proto_msgTypes[0]
+		mi := &file_protocomponent_component1_0_proto_msgTypes[1]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -43,7 +81,7 @@ func (x *DescribeSchema) String() string {
 func (*DescribeSchema) ProtoMessage() {}
 
 func (x *DescribeSchema) ProtoReflect() protoreflect.Message {
-	mi := &file_protocomponent_component1_0_proto_msgTypes[0]
+	mi := &file_protocomponent_component1_0_proto_msgTypes[1]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -56,7 +94,7 @@ func (x *DescribeSchema) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DescribeSchema.ProtoReflect.Descriptor instead.
 func (*DescribeSchema) Descriptor() ([]byte, []int) {
-	return file_protocomponent_component1_0_proto_rawDescGZIP(), []int{0}
+	return file_protocomponent_component1_0_proto_rawDescGZIP(), []int{1}
 }
 
 type Stop struct {
@@ -68,7 +106,7 @@ type Stop struct {
 func (x *Stop) Reset() {
 	*x = Stop{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_protocomponent_component1_0_proto_msgTypes[1]
+		mi := &file_protocomponent_component1_0_proto_msgTypes[2]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -81,7 +119,7 @@ func (x *Stop) String() string {
 func (*Stop) ProtoMessage() {}
 
 func (x *Stop) ProtoReflect() protoreflect.Message {
-	mi := &file_protocomponent_component1_0_proto_msgTypes[1]
+	mi := &file_protocomponent_component1_0_proto_msgTypes[2]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -94,7 +132,92 @@ func (x *Stop) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Stop.ProtoReflect.Descriptor instead.
 func (*Stop) Descriptor() ([]byte, []int) {
-	return file_protocomponent_component1_0_proto_rawDescGZIP(), []int{1}
+	return file_protocomponent_component1_0_proto_rawDescGZIP(), []int{2}
+}
+
+type Heartbeat_Request struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+}
+
+func (x *Heartbeat_Request) Reset() {
+	*x = Heartbeat_Request{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_protocomponent_component1_0_proto_msgTypes[3]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *Heartbeat_Request) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Heartbeat_Request) ProtoMessage() {}
+
+func (x *Heartbeat_Request) ProtoReflect() protoreflect.Message {
+	mi := &file_protocomponent_component1_0_proto_msgTypes[3]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Heartbeat_Request.ProtoReflect.Descriptor instead.
+func (*Heartbeat_Request) Descriptor() ([]byte, []int) {
+	return file_protocomponent_component1_0_proto_rawDescGZIP(), []int{0, 0}
+}
+
+type Heartbeat_Response struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Status string `protobuf:"bytes,1,opt,name=status,proto3" json:"status,omitempty"`
+}
+
+func (x *Heartbeat_Response) Reset() {
+	*x = Heartbeat_Response{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_protocomponent_component1_0_proto_msgTypes[4]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *Heartbeat_Response) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Heartbeat_Response) ProtoMessage() {}
+
+func (x *Heartbeat_Response) ProtoReflect() protoreflect.Message {
+	mi := &file_protocomponent_component1_0_proto_msgTypes[4]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Heartbeat_Response.ProtoReflect.Descriptor instead.
+func (*Heartbeat_Response) Descriptor() ([]byte, []int) {
+	return file_protocomponent_component1_0_proto_rawDescGZIP(), []int{0, 1}
+}
+
+func (x *Heartbeat_Response) GetStatus() string {
+	if x != nil {
+		return x.Status
+	}
+	return ""
 }
 
 type DescribeSchema_Request struct {
@@ -106,7 +229,7 @@ type DescribeSchema_Request struct {
 func (x *DescribeSchema_Request) Reset() {
 	*x = DescribeSchema_Request{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_protocomponent_component1_0_proto_msgTypes[2]
+		mi := &file_protocomponent_component1_0_proto_msgTypes[5]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -119,7 +242,7 @@ func (x *DescribeSchema_Request) String() string {
 func (*DescribeSchema_Request) ProtoMessage() {}
 
 func (x *DescribeSchema_Request) ProtoReflect() protoreflect.Message {
-	mi := &file_protocomponent_component1_0_proto_msgTypes[2]
+	mi := &file_protocomponent_component1_0_proto_msgTypes[5]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -132,7 +255,7 @@ func (x *DescribeSchema_Request) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DescribeSchema_Request.ProtoReflect.Descriptor instead.
 func (*DescribeSchema_Request) Descriptor() ([]byte, []int) {
-	return file_protocomponent_component1_0_proto_rawDescGZIP(), []int{0, 0}
+	return file_protocomponent_component1_0_proto_rawDescGZIP(), []int{1, 0}
 }
 
 type DescribeSchema_Response struct {
@@ -146,7 +269,7 @@ type DescribeSchema_Response struct {
 func (x *DescribeSchema_Response) Reset() {
 	*x = DescribeSchema_Response{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_protocomponent_component1_0_proto_msgTypes[3]
+		mi := &file_protocomponent_component1_0_proto_msgTypes[6]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -159,7 +282,7 @@ func (x *DescribeSchema_Response) String() string {
 func (*DescribeSchema_Response) ProtoMessage() {}
 
 func (x *DescribeSchema_Response) ProtoReflect() protoreflect.Message {
-	mi := &file_protocomponent_component1_0_proto_msgTypes[3]
+	mi := &file_protocomponent_component1_0_proto_msgTypes[6]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -172,7 +295,7 @@ func (x *DescribeSchema_Response) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DescribeSchema_Response.ProtoReflect.Descriptor instead.
 func (*DescribeSchema_Response) Descriptor() ([]byte, []int) {
-	return file_protocomponent_component1_0_proto_rawDescGZIP(), []int{0, 1}
+	return file_protocomponent_component1_0_proto_rawDescGZIP(), []int{1, 1}
 }
 
 func (x *DescribeSchema_Response) GetDriver() *protoschema.Schema {
@@ -191,7 +314,7 @@ type Stop_Request struct {
 func (x *Stop_Request) Reset() {
 	*x = Stop_Request{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_protocomponent_component1_0_proto_msgTypes[4]
+		mi := &file_protocomponent_component1_0_proto_msgTypes[7]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -204,7 +327,7 @@ func (x *Stop_Request) String() string {
 func (*Stop_Request) ProtoMessage() {}
 
 func (x *Stop_Request) ProtoReflect() protoreflect.Message {
-	mi := &file_protocomponent_component1_0_proto_msgTypes[4]
+	mi := &file_protocomponent_component1_0_proto_msgTypes[7]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -217,7 +340,7 @@ func (x *Stop_Request) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Stop_Request.ProtoReflect.Descriptor instead.
 func (*Stop_Request) Descriptor() ([]byte, []int) {
-	return file_protocomponent_component1_0_proto_rawDescGZIP(), []int{1, 0}
+	return file_protocomponent_component1_0_proto_rawDescGZIP(), []int{2, 0}
 }
 
 type Stop_Response struct {
@@ -231,7 +354,7 @@ type Stop_Response struct {
 func (x *Stop_Response) Reset() {
 	*x = Stop_Response{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_protocomponent_component1_0_proto_msgTypes[5]
+		mi := &file_protocomponent_component1_0_proto_msgTypes[8]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -244,7 +367,7 @@ func (x *Stop_Response) String() string {
 func (*Stop_Response) ProtoMessage() {}
 
 func (x *Stop_Response) ProtoReflect() protoreflect.Message {
-	mi := &file_protocomponent_component1_0_proto_msgTypes[5]
+	mi := &file_protocomponent_component1_0_proto_msgTypes[8]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -257,7 +380,7 @@ func (x *Stop_Response) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Stop_Response.ProtoReflect.Descriptor instead.
 func (*Stop_Response) Descriptor() ([]byte, []int) {
-	return file_protocomponent_component1_0_proto_rawDescGZIP(), []int{1, 1}
+	return file_protocomponent_component1_0_proto_rawDescGZIP(), []int{2, 1}
 }
 
 func (x *Stop_Response) GetError() string {
@@ -275,16 +398,25 @@ var file_protocomponent_component1_0_proto_rawDesc = []byte{
 	0x6f, 0x74, 0x6f, 0x12, 0x0e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x63, 0x6f, 0x6d, 0x70, 0x6f, 0x6e,
 	0x65, 0x6e, 0x74, 0x1a, 0x1b, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x73, 0x63, 0x68, 0x65, 0x6d, 0x61,
 	0x2f, 0x73, 0x63, 0x68, 0x65, 0x6d, 0x61, 0x31, 0x2e, 0x30, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f,
-	0x22, 0x54, 0x0a, 0x0e, 0x44, 0x65, 0x73, 0x63, 0x72, 0x69, 0x62, 0x65, 0x53, 0x63, 0x68, 0x65,
-	0x6d, 0x61, 0x1a, 0x09, 0x0a, 0x07, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x37, 0x0a,
-	0x08, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x2b, 0x0a, 0x06, 0x64, 0x72, 0x69,
-	0x76, 0x65, 0x72, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x13, 0x2e, 0x70, 0x72, 0x6f, 0x74,
-	0x6f, 0x73, 0x63, 0x68, 0x65, 0x6d, 0x61, 0x2e, 0x53, 0x63, 0x68, 0x65, 0x6d, 0x61, 0x52, 0x06,
-	0x64, 0x72, 0x69, 0x76, 0x65, 0x72, 0x22, 0x33, 0x0a, 0x04, 0x53, 0x74, 0x6f, 0x70, 0x1a, 0x09,
-	0x0a, 0x07, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x20, 0x0a, 0x08, 0x52, 0x65, 0x73,
-	0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x14, 0x0a, 0x05, 0x65, 0x72, 0x72, 0x6f, 0x72, 0x18, 0x01,
-	0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x65, 0x72, 0x72, 0x6f, 0x72, 0x32, 0xb3, 0x01, 0x0a, 0x09,
-	0x43, 0x6f, 0x6d, 0x70, 0x6f, 0x6e, 0x65, 0x6e, 0x74, 0x12, 0x61, 0x0a, 0x0e, 0x44, 0x65, 0x73,
+	0x22, 0x3a, 0x0a, 0x09, 0x48, 0x65, 0x61, 0x72, 0x74, 0x62, 0x65, 0x61, 0x74, 0x1a, 0x09, 0x0a,
+	0x07, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x22, 0x0a, 0x08, 0x52, 0x65, 0x73, 0x70,
+	0x6f, 0x6e, 0x73, 0x65, 0x12, 0x16, 0x0a, 0x06, 0x73, 0x74, 0x61, 0x74, 0x75, 0x73, 0x18, 0x01,
+	0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x73, 0x74, 0x61, 0x74, 0x75, 0x73, 0x22, 0x54, 0x0a, 0x0e,
+	0x44, 0x65, 0x73, 0x63, 0x72, 0x69, 0x62, 0x65, 0x53, 0x63, 0x68, 0x65, 0x6d, 0x61, 0x1a, 0x09,
+	0x0a, 0x07, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x37, 0x0a, 0x08, 0x52, 0x65, 0x73,
+	0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x2b, 0x0a, 0x06, 0x64, 0x72, 0x69, 0x76, 0x65, 0x72, 0x18,
+	0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x13, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x73, 0x63, 0x68,
+	0x65, 0x6d, 0x61, 0x2e, 0x53, 0x63, 0x68, 0x65, 0x6d, 0x61, 0x52, 0x06, 0x64, 0x72, 0x69, 0x76,
+	0x65, 0x72, 0x22, 0x33, 0x0a, 0x04, 0x53, 0x74, 0x6f, 0x70, 0x1a, 0x09, 0x0a, 0x07, 0x52, 0x65,
+	0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x20, 0x0a, 0x08, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73,
+	0x65, 0x12, 0x14, 0x0a, 0x05, 0x65, 0x72, 0x72, 0x6f, 0x72, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09,
+	0x52, 0x05, 0x65, 0x72, 0x72, 0x6f, 0x72, 0x32, 0x87, 0x02, 0x0a, 0x09, 0x43, 0x6f, 0x6d, 0x70,
+	0x6f, 0x6e, 0x65, 0x6e, 0x74, 0x12, 0x52, 0x0a, 0x09, 0x48, 0x65, 0x61, 0x72, 0x74, 0x62, 0x65,
+	0x61, 0x74, 0x12, 0x21, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x63, 0x6f, 0x6d, 0x70, 0x6f, 0x6e,
+	0x65, 0x6e, 0x74, 0x2e, 0x48, 0x65, 0x61, 0x72, 0x74, 0x62, 0x65, 0x61, 0x74, 0x2e, 0x52, 0x65,
+	0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x22, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x63, 0x6f, 0x6d,
+	0x70, 0x6f, 0x6e, 0x65, 0x6e, 0x74, 0x2e, 0x48, 0x65, 0x61, 0x72, 0x74, 0x62, 0x65, 0x61, 0x74,
+	0x2e, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x61, 0x0a, 0x0e, 0x44, 0x65, 0x73,
 	0x63, 0x72, 0x69, 0x62, 0x65, 0x53, 0x63, 0x68, 0x65, 0x6d, 0x61, 0x12, 0x26, 0x2e, 0x70, 0x72,
 	0x6f, 0x74, 0x6f, 0x63, 0x6f, 0x6d, 0x70, 0x6f, 0x6e, 0x65, 0x6e, 0x74, 0x2e, 0x44, 0x65, 0x73,
 	0x63, 0x72, 0x69, 0x62, 0x65, 0x53, 0x63, 0x68, 0x65, 0x6d, 0x61, 0x2e, 0x52, 0x65, 0x71, 0x75,
@@ -314,24 +446,29 @@ func file_protocomponent_component1_0_proto_rawDescGZIP() []byte {
 	return file_protocomponent_component1_0_proto_rawDescData
 }
 
-var file_protocomponent_component1_0_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
+var file_protocomponent_component1_0_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
 var file_protocomponent_component1_0_proto_goTypes = []interface{}{
-	(*DescribeSchema)(nil),          // 0: protocomponent.DescribeSchema
-	(*Stop)(nil),                    // 1: protocomponent.Stop
-	(*DescribeSchema_Request)(nil),  // 2: protocomponent.DescribeSchema.Request
-	(*DescribeSchema_Response)(nil), // 3: protocomponent.DescribeSchema.Response
-	(*Stop_Request)(nil),            // 4: protocomponent.Stop.Request
-	(*Stop_Response)(nil),           // 5: protocomponent.Stop.Response
-	(*protoschema.Schema)(nil),      // 6: protoschema.Schema
+	(*Heartbeat)(nil),               // 0: protocomponent.Heartbeat
+	(*DescribeSchema)(nil),          // 1: protocomponent.DescribeSchema
+	(*Stop)(nil),                    // 2: protocomponent.Stop
+	(*Heartbeat_Request)(nil),       // 3: protocomponent.Heartbeat.Request
+	(*Heartbeat_Response)(nil),      // 4: protocomponent.Heartbeat.Response
+	(*DescribeSchema_Request)(nil),  // 5: protocomponent.DescribeSchema.Request
+	(*DescribeSchema_Response)(nil), // 6: protocomponent.DescribeSchema.Response
+	(*Stop_Request)(nil),            // 7: protocomponent.Stop.Request
+	(*Stop_Response)(nil),           // 8: protocomponent.Stop.Response
+	(*protoschema.Schema)(nil),      // 9: protoschema.Schema
 }
 var file_protocomponent_component1_0_proto_depIdxs = []int32{
-	6, // 0: protocomponent.DescribeSchema.Response.driver:type_name -> protoschema.Schema
-	2, // 1: protocomponent.Component.DescribeSchema:input_type -> protocomponent.DescribeSchema.Request
-	4, // 2: protocomponent.Component.Stop:input_type -> protocomponent.Stop.Request
-	3, // 3: protocomponent.Component.DescribeSchema:output_type -> protocomponent.DescribeSchema.Response
-	5, // 4: protocomponent.Component.Stop:output_type -> protocomponent.Stop.Response
-	3, // [3:5] is the sub-list for method output_type
-	1, // [1:3] is the sub-list for method input_type
+	9, // 0: protocomponent.DescribeSchema.Response.driver:type_name -> protoschema.Schema
+	3, // 1: protocomponent.Component.Heartbeat:input_type -> protocomponent.Heartbeat.Request
+	5, // 2: protocomponent.Component.DescribeSchema:input_type -> protocomponent.DescribeSchema.Request
+	7, // 3: protocomponent.Component.Stop:input_type -> protocomponent.Stop.Request
+	4, // 4: protocomponent.Component.Heartbeat:output_type -> protocomponent.Heartbeat.Response
+	6, // 5: protocomponent.Component.DescribeSchema:output_type -> protocomponent.DescribeSchema.Response
+	8, // 6: protocomponent.Component.Stop:output_type -> protocomponent.Stop.Response
+	4, // [4:7] is the sub-list for method output_type
+	1, // [1:4] is the sub-list for method input_type
 	1, // [1:1] is the sub-list for extension type_name
 	1, // [1:1] is the sub-list for extension extendee
 	0, // [0:1] is the sub-list for field type_name
@@ -344,7 +481,7 @@ func file_protocomponent_component1_0_proto_init() {
 	}
 	if !protoimpl.UnsafeEnabled {
 		file_protocomponent_component1_0_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*DescribeSchema); i {
+			switch v := v.(*Heartbeat); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -356,7 +493,7 @@ func file_protocomponent_component1_0_proto_init() {
 			}
 		}
 		file_protocomponent_component1_0_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Stop); i {
+			switch v := v.(*DescribeSchema); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -368,7 +505,7 @@ func file_protocomponent_component1_0_proto_init() {
 			}
 		}
 		file_protocomponent_component1_0_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*DescribeSchema_Request); i {
+			switch v := v.(*Stop); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -380,7 +517,7 @@ func file_protocomponent_component1_0_proto_init() {
 			}
 		}
 		file_protocomponent_component1_0_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*DescribeSchema_Response); i {
+			switch v := v.(*Heartbeat_Request); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -392,7 +529,7 @@ func file_protocomponent_component1_0_proto_init() {
 			}
 		}
 		file_protocomponent_component1_0_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Stop_Request); i {
+			switch v := v.(*Heartbeat_Response); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -404,6 +541,42 @@ func file_protocomponent_component1_0_proto_init() {
 			}
 		}
 		file_protocomponent_component1_0_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*DescribeSchema_Request); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_protocomponent_component1_0_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*DescribeSchema_Response); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_protocomponent_component1_0_proto_msgTypes[7].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*Stop_Request); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_protocomponent_component1_0_proto_msgTypes[8].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*Stop_Response); i {
 			case 0:
 				return &v.state
@@ -422,7 +595,7 @@ func file_protocomponent_component1_0_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_protocomponent_component1_0_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   6,
+			NumMessages:   9,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

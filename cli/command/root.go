@@ -101,6 +101,7 @@ func runRootCmd(cmd *cobra.Command, args []string) {
 	defer client.Shutdown()
 
 	schema := client.DescribeSchema()
+	fmt.Printf("++++++++ Connection: %s\n", client.Heartbeat().Status)
 	fmt.Println("--------------")
 	log.Printf("Received schema: %+v\n", schema.Schema.Root.Description)
 	fmt.Println("--------------")

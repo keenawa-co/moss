@@ -12,6 +12,12 @@ func Component() component.Interface {
 	return &DummyComponent{}
 }
 
+func (s *DummyComponent) Heartbeat() *component.HeartbeatOutput {
+	return &component.HeartbeatOutput{
+		Status: "OK",
+	}
+}
+
 func (s *DummyComponent) DescribeSchema() *component.DescribeSchemaOutput {
 	return &component.DescribeSchemaOutput{
 		Schema: &component.Schema{
