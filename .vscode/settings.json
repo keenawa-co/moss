@@ -23,6 +23,7 @@
         "hcllang",
         "hclparse",
         "hclsyntax",
+        "hclutil",
         "idxt",
         "iface",
         "iostream",
@@ -64,6 +65,9 @@
     ],
     "files.associations": {
         "*.ray": "hcl"
+    },
+    "material-icon-theme.folders.associations": {
+        "kernel": "core",
     },
     "cSpell.enableFiletypes": [
         "hcl"

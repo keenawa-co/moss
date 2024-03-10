@@ -3,6 +3,7 @@ package rcschema
 import (
 	"fmt"
 
+	"github.com/4rchr4y/goray/pkg/hclutil"
 	"github.com/hashicorp/hcl/v2"
 )
 
@@ -19,8 +20,8 @@ var (
 )
 
 var configFileSchema = &hcl.BodySchema{
-	Attributes: NewAttributeList()(configFileReservedAttributeList[:]...),
-	Blocks: NewBlockList(
+	Attributes: hclutil.NewAttributeList()(configFileReservedAttributeList[:]...),
+	Blocks: hclutil.NewBlockList(
 		hcl.BlockHeaderSchema{
 			Type:       "_",
 			LabelNames: []string{},
