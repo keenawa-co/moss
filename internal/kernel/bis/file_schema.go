@@ -50,7 +50,6 @@ func DecodeFile(body hcl.Body) (file *File, diagnostics hcl.Diagnostics) {
 
 	for _, b := range content.Blocks {
 		switch b.Type {
-
 		case "component":
 			if len(b.Labels) < 1 {
 				diagnostics = append(diagnostics, &hcl.Diagnostic{

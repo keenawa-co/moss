@@ -20,7 +20,6 @@ import (
 	"github.com/4rchr4y/bpm/storage"
 	"github.com/4rchr4y/godevkit/v3/env"
 	"github.com/4rchr4y/godevkit/v3/syswrap"
-	"github.com/4rchr4y/goray/builtin/rck/rcschema"
 	dummy_component "github.com/4rchr4y/goray/example/dummy-component"
 	noop_driver "github.com/4rchr4y/goray/example/noop-driver"
 	"github.com/4rchr4y/goray/interface/component"
@@ -28,6 +27,7 @@ import (
 
 	"github.com/4rchr4y/goray/internal/domain/grpcwrap"
 	"github.com/4rchr4y/goray/internal/grpcplugin"
+	"github.com/4rchr4y/goray/internal/kernel/bis"
 	"github.com/4rchr4y/goray/internal/proto/protocomponent"
 	"github.com/4rchr4y/goray/internal/proto/protodriver"
 
@@ -72,7 +72,7 @@ func runRootCmd(cmd *cobra.Command, args []string) {
 		Encoder: encoder,
 	}
 
-	content, err := osWrap.ReadFile(".ray/main.ray")
+	content, err := osWrap.ReadFile(".ray/component.ray")
 	if err != nil {
 		log.Fatal(err)
 		return
@@ -85,15 +85,16 @@ func runRootCmd(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	f, diags := rcschema.DecodeFile(file.Body)
+	f, diags := bis.DecodeFile(file.Body)
 	for _, d := range diags {
 		fmt.Println(d.Summary)
 	}
-	if f != nil {
-		for _, v := range f.Ray.RequiredProviders {
-			fmt.Println(v.Source)
-		}
-	}
+
+	fmt.Println(f)
+
+	// for _, c := range f.Components {
+	// 	fmt.Println(c.Content.Attributes)
+	// }
 
 	// client := startDriver(".ray/driver/github.com/4rchr4y/ray-noop-driver@v0.0.1")
 	client := startComponent(".ray/component/github.com/4rchr4y/ray-dummy-component@v0.0.1")

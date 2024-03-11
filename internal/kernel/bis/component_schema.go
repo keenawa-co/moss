@@ -20,7 +20,7 @@ var providerBlockSchema = &hcl.BodySchema{
 	Attributes: hclutil.NewAttributeList(
 		hcl.AttributeSchema{
 			Name:     "version",
-			Required: true,
+			Required: false,
 		},
 	)(componentBlockReservedAttributeList[:]...),
 	Blocks: hclutil.NewBlockList()(componentBlockReservedBlockList[:]...),
@@ -42,7 +42,7 @@ func DecodeComponentBlock(block *hcl.Block) (componentBlock *ComponentBlock, dia
 		diagnostics = append(diagnostics, &hcl.Diagnostic{
 			Severity: hcl.DiagError,
 			Summary:  "Invalid provider name",
-			Detail:   fmt.Sprintf("Provider name is invalid. %s", hcllang.BadIdentDetail),
+			Detail:   fmt.Sprintf("Component name is invalid. %s", hcllang.BadIdentDetail),
 		})
 	}
 
