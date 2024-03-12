@@ -10,6 +10,7 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"time"
 
 	"github.com/4rchr4y/bpm/bundleutil/encode"
 	"github.com/4rchr4y/bpm/bundleutil/inspect"
@@ -19,20 +20,25 @@ import (
 	"github.com/4rchr4y/bpm/pkg/linker"
 	"github.com/4rchr4y/bpm/storage"
 	"github.com/4rchr4y/godevkit/v3/env"
+	"github.com/4rchr4y/godevkit/v3/must"
 	"github.com/4rchr4y/godevkit/v3/syswrap"
 	dummy_component "github.com/4rchr4y/goray/example/dummy-component"
 	noop_driver "github.com/4rchr4y/goray/example/noop-driver"
 	"github.com/4rchr4y/goray/interface/component"
 	"github.com/4rchr4y/goray/interface/driver"
+	clientv3 "go.etcd.io/etcd/client/v3"
+	"go.etcd.io/etcd/server/v3/embed"
 
 	"github.com/4rchr4y/goray/internal/domain/grpcwrap"
 	"github.com/4rchr4y/goray/internal/grpcplugin"
 	"github.com/4rchr4y/goray/internal/kernel/bis"
 	"github.com/4rchr4y/goray/internal/proto/protocomponent"
 	"github.com/4rchr4y/goray/internal/proto/protodriver"
+	"github.com/4rchr4y/goray/internal/schematica"
 
 	"github.com/g10z3r/ason"
 	pluginHCL "github.com/hashicorp/go-plugin"
+	"github.com/hashicorp/hcl/v2/hcldec"
 	"github.com/hashicorp/hcl/v2/hclparse"
 	"github.com/open-policy-agent/opa/ast"
 	"github.com/open-policy-agent/opa/rego"
@@ -54,6 +60,43 @@ type failCase struct {
 }
 
 func runRootCmd(cmd *cobra.Command, args []string) {
+	cfg := embed.NewConfig()
+	cfg.Dir = ".ray/cache"
+
+	e, err := embed.StartEtcd(cfg)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer e.Close()
+
+	select {
+	case <-e.Server.ReadyNotify():
+		log.Println("Server is ready!")
+	case <-time.After(60 * time.Second):
+		e.Server.Stop()
+		log.Fatal("Server took too long to start!")
+	}
+
+	cli, err := clientv3.New(clientv3.Config{
+		Endpoints:   []string{"localhost:2379"},
+		DialTimeout: 5 * time.Second,
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer cli.Close()
+
+	jsData, _ := json.Marshal(map[string]string{
+		"key1": "value1",
+	})
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	_, err = cli.Put(ctx, "your/key", string(jsData))
+	cancel()
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	dir := env.MustGetString("BPM_PATH")
 
 	io := iostream.NewIOStream()
@@ -90,13 +133,6 @@ func runRootCmd(cmd *cobra.Command, args []string) {
 		fmt.Println(d.Summary)
 	}
 
-	fmt.Println(f)
-
-	// for _, c := range f.Components {
-	// 	fmt.Println(c.Content.Attributes)
-	// }
-
-	// client := startDriver(".ray/driver/github.com/4rchr4y/ray-noop-driver@v0.0.1")
 	client := startComponent(".ray/component/github.com/4rchr4y/ray-dummy-component@v0.0.1")
 	defer client.Stop()
 	defer client.Shutdown()
@@ -104,8 +140,14 @@ func runRootCmd(cmd *cobra.Command, args []string) {
 	schema := client.DescribeSchema()
 	fmt.Printf("++++++++ Connection: %s\n", client.Heartbeat().Status)
 	fmt.Println("--------------")
-	log.Printf("Received schema: %+v\n", schema.Schema.Root.Description)
+	log.Printf("Received schema: %+v\n", schema.Schema)
 	fmt.Println("--------------")
+
+	for name, b := range f.Components {
+		s := hcldec.ImpliedSchema(must.Must(schematica.DecodeBlock(schema.Schema.Root)))
+		b.Config.PartialContent(s)
+		fmt.Println(name)
+	}
 
 	b, err := s.LoadFromAbs("./testdata", nil)
 	if err != nil {
@@ -232,6 +274,7 @@ func startComponent(pluginPath string) component.Interface {
 		Cmd:              exec.Command(pluginPath),
 		AllowedProtocols: []pluginHCL.Protocol{pluginHCL.ProtocolGRPC},
 		Managed:          true,
+		SyncStdout:       os.Stdout,
 	})
 
 	rpcClient, err := client.Client()
@@ -267,6 +310,7 @@ func startDriver(pluginPath string) driver.Interface {
 		Cmd:              exec.Command(pluginPath),
 		AllowedProtocols: []pluginHCL.Protocol{pluginHCL.ProtocolGRPC},
 		Managed:          true,
+		SyncStdout:       os.Stdout,
 	})
 
 	rpcClient, err := client.Client()

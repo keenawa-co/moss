@@ -33,7 +33,7 @@ type Block struct {
 
 type Attribute struct {
 	Type        cty.Type
-	NestingType *Object
+	NestedType  *Object
 	Description string
 	Required    bool
 	Optional    bool

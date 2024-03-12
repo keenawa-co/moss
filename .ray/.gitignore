@@ -1,2 +1,3 @@
-driver/*
-component/*
+driver
+component
+cache
