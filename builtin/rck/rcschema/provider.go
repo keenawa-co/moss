@@ -3,7 +3,7 @@ package rcschema
 import (
 	"fmt"
 
-	"github.com/4rchr4y/goray/lib/hcllang"
+	"github.com/4rchr4y/goray/internal/kernel/hcllang"
 	"github.com/4rchr4y/goray/pkg/hclutil"
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/hclsyntax"

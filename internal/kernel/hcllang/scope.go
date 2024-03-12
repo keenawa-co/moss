@@ -6,12 +6,12 @@ import (
 	"github.com/zclconf/go-cty/cty/function"
 )
 
-type ParserScope struct {
+type Scope struct {
 	functions map[string]function.Function
 }
 
-func NewParserScope() *ParserScope {
-	scope := &ParserScope{
+func NewScope() *Scope {
+	scope := &Scope{
 		functions: make(map[string]function.Function, len(builtinFunctionList)*2),
 	}
 
@@ -31,7 +31,7 @@ func NewParserScope() *ParserScope {
 	return scope
 }
 
-func (ps *ParserScope) Functions() map[string]function.Function {
+func (ps *Scope) Functions() map[string]function.Function {
 	if ps.functions != nil {
 		return ps.functions
 	}
