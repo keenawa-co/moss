@@ -5,8 +5,10 @@ option go_package = "github.com/4rchr4y/goray/internal/proto/protocomponent";
 
 import "protoschema/schema1.0.proto";
 
+
 service Component {
     rpc Heartbeat(Heartbeat.Request) returns (Heartbeat.Response);
+    rpc Configure(Configure.Request) returns (Configure.Response);
     rpc DescribeSchema(DescribeSchema.Request) returns (DescribeSchema.Response);
     rpc Stop(Stop.Request) returns (Stop.Response);
 }
@@ -15,6 +17,18 @@ message Heartbeat {
     message Request {}
     message Response {
         string status = 1;
+    }
+}
+
+message Configure{
+    message Request{
+        string name = 1;
+        string version = 2;
+        protoschema.Schema content = 3;
+    }
+
+    message Response{
+        string error = 1;
     }
 }
 
@@ -33,3 +47,4 @@ message Stop {
         string error = 1;
     }
 }
+

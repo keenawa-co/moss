@@ -30,11 +30,11 @@ type ComponentBlock struct {
 	_       [0]int
 	Name    string
 	Version string
-	Content *hcl.BodyContent
+	Config  hcl.Body
 }
 
 func DecodeComponentBlock(block *hcl.Block) (componentBlock *ComponentBlock, diagnostics hcl.Diagnostics) {
-	content, _, partialContentDiag := block.Body.PartialContent(providerBlockSchema)
+	content, body, partialContentDiag := block.Body.PartialContent(providerBlockSchema)
 	diagnostics = append(diagnostics, partialContentDiag...)
 
 	// existence of a label is checked when a block is detected
@@ -47,8 +47,8 @@ func DecodeComponentBlock(block *hcl.Block) (componentBlock *ComponentBlock, dia
 	}
 
 	componentBlock = &ComponentBlock{
-		Name:    block.Labels[0],
-		Content: content,
+		Name:   block.Labels[0],
+		Config: body,
 	}
 
 	if attr, exists := content.Attributes["version"]; exists {

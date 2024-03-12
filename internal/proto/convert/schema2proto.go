@@ -67,11 +67,11 @@ func processSchemaAttribute(name string, a *schematica.Attribute) *protoschema.S
 		Name: name,
 		Type: must.Must(json.Marshal(a.Type)),
 		NestedType: func() *protoschema.Schema_Object {
-			if a.NestingType == nil {
+			if a.NestedType == nil {
 				return nil
 			}
 
-			return SchemaObject(a.NestingType)
+			return SchemaObject(a.NestedType)
 		}(),
 		Description: a.Description,
 		Deprecated:  a.Deprecated,

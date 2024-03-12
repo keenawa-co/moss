@@ -48,6 +48,20 @@ func (p *GRPCComponent) Heartbeat() *component.HeartbeatOutput {
 	}
 }
 
+func (p *GRPCComponent) Configure(input *component.ConfigureInput) (*component.ConfigureOutput, error) {
+	configureReq := &protocomponent.Configure_Request{}
+	configureResp, err := p.client.Configure(p.ctx, configureReq)
+	if err != nil {
+		return nil, err
+	}
+	if configureResp.Error != "" {
+		return nil, errors.New(configureResp.Error)
+	}
+
+	return new(component.ConfigureOutput), nil
+
+}
+
 func (p *GRPCComponent) DescribeSchema() *component.DescribeSchemaOutput {
 	descSchemaResp, err := p.client.DescribeSchema(p.ctx, new(protocomponent.DescribeSchema_Request))
 	if err != nil {

@@ -1,15 +1,24 @@
 package dummy_component
 
 import (
+	"fmt"
+
 	"github.com/4rchr4y/goray/interface/component"
 	"github.com/4rchr4y/goray/internal/schematica"
 	"github.com/zclconf/go-cty/cty"
 )
 
-type DummyComponent struct{}
+type DummyComponent struct {
+	// value string
+}
 
 func Component() component.Interface {
 	return &DummyComponent{}
+}
+
+func (s *DummyComponent) Configure(input *component.ConfigureInput) (*component.ConfigureOutput, error) {
+	fmt.Println(input.Schema.Attributes["value"])
+	return new(component.ConfigureOutput), nil
 }
 
 func (s *DummyComponent) Heartbeat() *component.HeartbeatOutput {

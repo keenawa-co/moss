@@ -59,6 +59,44 @@ func (*Heartbeat) Descriptor() ([]byte, []int) {
 	return file_protocomponent_component1_0_proto_rawDescGZIP(), []int{0}
 }
 
+type Configure struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+}
+
+func (x *Configure) Reset() {
+	*x = Configure{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_protocomponent_component1_0_proto_msgTypes[1]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *Configure) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Configure) ProtoMessage() {}
+
+func (x *Configure) ProtoReflect() protoreflect.Message {
+	mi := &file_protocomponent_component1_0_proto_msgTypes[1]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Configure.ProtoReflect.Descriptor instead.
+func (*Configure) Descriptor() ([]byte, []int) {
+	return file_protocomponent_component1_0_proto_rawDescGZIP(), []int{1}
+}
+
 type DescribeSchema struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -68,7 +106,7 @@ type DescribeSchema struct {
 func (x *DescribeSchema) Reset() {
 	*x = DescribeSchema{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_protocomponent_component1_0_proto_msgTypes[1]
+		mi := &file_protocomponent_component1_0_proto_msgTypes[2]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -81,7 +119,7 @@ func (x *DescribeSchema) String() string {
 func (*DescribeSchema) ProtoMessage() {}
 
 func (x *DescribeSchema) ProtoReflect() protoreflect.Message {
-	mi := &file_protocomponent_component1_0_proto_msgTypes[1]
+	mi := &file_protocomponent_component1_0_proto_msgTypes[2]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -94,7 +132,7 @@ func (x *DescribeSchema) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DescribeSchema.ProtoReflect.Descriptor instead.
 func (*DescribeSchema) Descriptor() ([]byte, []int) {
-	return file_protocomponent_component1_0_proto_rawDescGZIP(), []int{1}
+	return file_protocomponent_component1_0_proto_rawDescGZIP(), []int{2}
 }
 
 type Stop struct {
@@ -106,7 +144,7 @@ type Stop struct {
 func (x *Stop) Reset() {
 	*x = Stop{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_protocomponent_component1_0_proto_msgTypes[2]
+		mi := &file_protocomponent_component1_0_proto_msgTypes[3]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -119,7 +157,7 @@ func (x *Stop) String() string {
 func (*Stop) ProtoMessage() {}
 
 func (x *Stop) ProtoReflect() protoreflect.Message {
-	mi := &file_protocomponent_component1_0_proto_msgTypes[2]
+	mi := &file_protocomponent_component1_0_proto_msgTypes[3]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -132,7 +170,7 @@ func (x *Stop) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Stop.ProtoReflect.Descriptor instead.
 func (*Stop) Descriptor() ([]byte, []int) {
-	return file_protocomponent_component1_0_proto_rawDescGZIP(), []int{2}
+	return file_protocomponent_component1_0_proto_rawDescGZIP(), []int{3}
 }
 
 type Heartbeat_Request struct {
@@ -144,7 +182,7 @@ type Heartbeat_Request struct {
 func (x *Heartbeat_Request) Reset() {
 	*x = Heartbeat_Request{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_protocomponent_component1_0_proto_msgTypes[3]
+		mi := &file_protocomponent_component1_0_proto_msgTypes[4]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -157,7 +195,7 @@ func (x *Heartbeat_Request) String() string {
 func (*Heartbeat_Request) ProtoMessage() {}
 
 func (x *Heartbeat_Request) ProtoReflect() protoreflect.Message {
-	mi := &file_protocomponent_component1_0_proto_msgTypes[3]
+	mi := &file_protocomponent_component1_0_proto_msgTypes[4]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -184,7 +222,7 @@ type Heartbeat_Response struct {
 func (x *Heartbeat_Response) Reset() {
 	*x = Heartbeat_Response{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_protocomponent_component1_0_proto_msgTypes[4]
+		mi := &file_protocomponent_component1_0_proto_msgTypes[5]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -197,7 +235,7 @@ func (x *Heartbeat_Response) String() string {
 func (*Heartbeat_Response) ProtoMessage() {}
 
 func (x *Heartbeat_Response) ProtoReflect() protoreflect.Message {
-	mi := &file_protocomponent_component1_0_proto_msgTypes[4]
+	mi := &file_protocomponent_component1_0_proto_msgTypes[5]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -220,6 +258,116 @@ func (x *Heartbeat_Response) GetStatus() string {
 	return ""
 }
 
+type Configure_Request struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Name    string              `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	Version string              `protobuf:"bytes,2,opt,name=version,proto3" json:"version,omitempty"`
+	Content *protoschema.Schema `protobuf:"bytes,3,opt,name=content,proto3" json:"content,omitempty"`
+}
+
+func (x *Configure_Request) Reset() {
+	*x = Configure_Request{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_protocomponent_component1_0_proto_msgTypes[6]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *Configure_Request) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Configure_Request) ProtoMessage() {}
+
+func (x *Configure_Request) ProtoReflect() protoreflect.Message {
+	mi := &file_protocomponent_component1_0_proto_msgTypes[6]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Configure_Request.ProtoReflect.Descriptor instead.
+func (*Configure_Request) Descriptor() ([]byte, []int) {
+	return file_protocomponent_component1_0_proto_rawDescGZIP(), []int{1, 0}
+}
+
+func (x *Configure_Request) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *Configure_Request) GetVersion() string {
+	if x != nil {
+		return x.Version
+	}
+	return ""
+}
+
+func (x *Configure_Request) GetContent() *protoschema.Schema {
+	if x != nil {
+		return x.Content
+	}
+	return nil
+}
+
+type Configure_Response struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Error string `protobuf:"bytes,1,opt,name=error,proto3" json:"error,omitempty"`
+}
+
+func (x *Configure_Response) Reset() {
+	*x = Configure_Response{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_protocomponent_component1_0_proto_msgTypes[7]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *Configure_Response) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Configure_Response) ProtoMessage() {}
+
+func (x *Configure_Response) ProtoReflect() protoreflect.Message {
+	mi := &file_protocomponent_component1_0_proto_msgTypes[7]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Configure_Response.ProtoReflect.Descriptor instead.
+func (*Configure_Response) Descriptor() ([]byte, []int) {
+	return file_protocomponent_component1_0_proto_rawDescGZIP(), []int{1, 1}
+}
+
+func (x *Configure_Response) GetError() string {
+	if x != nil {
+		return x.Error
+	}
+	return ""
+}
+
 type DescribeSchema_Request struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -229,7 +377,7 @@ type DescribeSchema_Request struct {
 func (x *DescribeSchema_Request) Reset() {
 	*x = DescribeSchema_Request{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_protocomponent_component1_0_proto_msgTypes[5]
+		mi := &file_protocomponent_component1_0_proto_msgTypes[8]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -242,7 +390,7 @@ func (x *DescribeSchema_Request) String() string {
 func (*DescribeSchema_Request) ProtoMessage() {}
 
 func (x *DescribeSchema_Request) ProtoReflect() protoreflect.Message {
-	mi := &file_protocomponent_component1_0_proto_msgTypes[5]
+	mi := &file_protocomponent_component1_0_proto_msgTypes[8]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -255,7 +403,7 @@ func (x *DescribeSchema_Request) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DescribeSchema_Request.ProtoReflect.Descriptor instead.
 func (*DescribeSchema_Request) Descriptor() ([]byte, []int) {
-	return file_protocomponent_component1_0_proto_rawDescGZIP(), []int{1, 0}
+	return file_protocomponent_component1_0_proto_rawDescGZIP(), []int{2, 0}
 }
 
 type DescribeSchema_Response struct {
@@ -269,7 +417,7 @@ type DescribeSchema_Response struct {
 func (x *DescribeSchema_Response) Reset() {
 	*x = DescribeSchema_Response{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_protocomponent_component1_0_proto_msgTypes[6]
+		mi := &file_protocomponent_component1_0_proto_msgTypes[9]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -282,7 +430,7 @@ func (x *DescribeSchema_Response) String() string {
 func (*DescribeSchema_Response) ProtoMessage() {}
 
 func (x *DescribeSchema_Response) ProtoReflect() protoreflect.Message {
-	mi := &file_protocomponent_component1_0_proto_msgTypes[6]
+	mi := &file_protocomponent_component1_0_proto_msgTypes[9]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -295,7 +443,7 @@ func (x *DescribeSchema_Response) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DescribeSchema_Response.ProtoReflect.Descriptor instead.
 func (*DescribeSchema_Response) Descriptor() ([]byte, []int) {
-	return file_protocomponent_component1_0_proto_rawDescGZIP(), []int{1, 1}
+	return file_protocomponent_component1_0_proto_rawDescGZIP(), []int{2, 1}
 }
 
 func (x *DescribeSchema_Response) GetDriver() *protoschema.Schema {
@@ -314,7 +462,7 @@ type Stop_Request struct {
 func (x *Stop_Request) Reset() {
 	*x = Stop_Request{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_protocomponent_component1_0_proto_msgTypes[7]
+		mi := &file_protocomponent_component1_0_proto_msgTypes[10]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -327,7 +475,7 @@ func (x *Stop_Request) String() string {
 func (*Stop_Request) ProtoMessage() {}
 
 func (x *Stop_Request) ProtoReflect() protoreflect.Message {
-	mi := &file_protocomponent_component1_0_proto_msgTypes[7]
+	mi := &file_protocomponent_component1_0_proto_msgTypes[10]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -340,7 +488,7 @@ func (x *Stop_Request) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Stop_Request.ProtoReflect.Descriptor instead.
 func (*Stop_Request) Descriptor() ([]byte, []int) {
-	return file_protocomponent_component1_0_proto_rawDescGZIP(), []int{2, 0}
+	return file_protocomponent_component1_0_proto_rawDescGZIP(), []int{3, 0}
 }
 
 type Stop_Response struct {
@@ -354,7 +502,7 @@ type Stop_Response struct {
 func (x *Stop_Response) Reset() {
 	*x = Stop_Response{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_protocomponent_component1_0_proto_msgTypes[8]
+		mi := &file_protocomponent_component1_0_proto_msgTypes[11]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -367,7 +515,7 @@ func (x *Stop_Response) String() string {
 func (*Stop_Response) ProtoMessage() {}
 
 func (x *Stop_Response) ProtoReflect() protoreflect.Message {
-	mi := &file_protocomponent_component1_0_proto_msgTypes[8]
+	mi := &file_protocomponent_component1_0_proto_msgTypes[11]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -380,7 +528,7 @@ func (x *Stop_Response) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Stop_Response.ProtoReflect.Descriptor instead.
 func (*Stop_Response) Descriptor() ([]byte, []int) {
-	return file_protocomponent_component1_0_proto_rawDescGZIP(), []int{2, 1}
+	return file_protocomponent_component1_0_proto_rawDescGZIP(), []int{3, 1}
 }
 
 func (x *Stop_Response) GetError() string {
@@ -401,37 +549,51 @@ var file_protocomponent_component1_0_proto_rawDesc = []byte{
 	0x22, 0x3a, 0x0a, 0x09, 0x48, 0x65, 0x61, 0x72, 0x74, 0x62, 0x65, 0x61, 0x74, 0x1a, 0x09, 0x0a,
 	0x07, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x22, 0x0a, 0x08, 0x52, 0x65, 0x73, 0x70,
 	0x6f, 0x6e, 0x73, 0x65, 0x12, 0x16, 0x0a, 0x06, 0x73, 0x74, 0x61, 0x74, 0x75, 0x73, 0x18, 0x01,
-	0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x73, 0x74, 0x61, 0x74, 0x75, 0x73, 0x22, 0x54, 0x0a, 0x0e,
-	0x44, 0x65, 0x73, 0x63, 0x72, 0x69, 0x62, 0x65, 0x53, 0x63, 0x68, 0x65, 0x6d, 0x61, 0x1a, 0x09,
-	0x0a, 0x07, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x37, 0x0a, 0x08, 0x52, 0x65, 0x73,
-	0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x2b, 0x0a, 0x06, 0x64, 0x72, 0x69, 0x76, 0x65, 0x72, 0x18,
-	0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x13, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x73, 0x63, 0x68,
-	0x65, 0x6d, 0x61, 0x2e, 0x53, 0x63, 0x68, 0x65, 0x6d, 0x61, 0x52, 0x06, 0x64, 0x72, 0x69, 0x76,
-	0x65, 0x72, 0x22, 0x33, 0x0a, 0x04, 0x53, 0x74, 0x6f, 0x70, 0x1a, 0x09, 0x0a, 0x07, 0x52, 0x65,
-	0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x20, 0x0a, 0x08, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73,
-	0x65, 0x12, 0x14, 0x0a, 0x05, 0x65, 0x72, 0x72, 0x6f, 0x72, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09,
-	0x52, 0x05, 0x65, 0x72, 0x72, 0x6f, 0x72, 0x32, 0x87, 0x02, 0x0a, 0x09, 0x43, 0x6f, 0x6d, 0x70,
-	0x6f, 0x6e, 0x65, 0x6e, 0x74, 0x12, 0x52, 0x0a, 0x09, 0x48, 0x65, 0x61, 0x72, 0x74, 0x62, 0x65,
-	0x61, 0x74, 0x12, 0x21, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x63, 0x6f, 0x6d, 0x70, 0x6f, 0x6e,
-	0x65, 0x6e, 0x74, 0x2e, 0x48, 0x65, 0x61, 0x72, 0x74, 0x62, 0x65, 0x61, 0x74, 0x2e, 0x52, 0x65,
-	0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x22, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x63, 0x6f, 0x6d,
-	0x70, 0x6f, 0x6e, 0x65, 0x6e, 0x74, 0x2e, 0x48, 0x65, 0x61, 0x72, 0x74, 0x62, 0x65, 0x61, 0x74,
-	0x2e, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x61, 0x0a, 0x0e, 0x44, 0x65, 0x73,
-	0x63, 0x72, 0x69, 0x62, 0x65, 0x53, 0x63, 0x68, 0x65, 0x6d, 0x61, 0x12, 0x26, 0x2e, 0x70, 0x72,
-	0x6f, 0x74, 0x6f, 0x63, 0x6f, 0x6d, 0x70, 0x6f, 0x6e, 0x65, 0x6e, 0x74, 0x2e, 0x44, 0x65, 0x73,
-	0x63, 0x72, 0x69, 0x62, 0x65, 0x53, 0x63, 0x68, 0x65, 0x6d, 0x61, 0x2e, 0x52, 0x65, 0x71, 0x75,
-	0x65, 0x73, 0x74, 0x1a, 0x27, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x63, 0x6f, 0x6d, 0x70, 0x6f,
-	0x6e, 0x65, 0x6e, 0x74, 0x2e, 0x44, 0x65, 0x73, 0x63, 0x72, 0x69, 0x62, 0x65, 0x53, 0x63, 0x68,
-	0x65, 0x6d, 0x61, 0x2e, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x43, 0x0a, 0x04,
-	0x53, 0x74, 0x6f, 0x70, 0x12, 0x1c, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x63, 0x6f, 0x6d, 0x70,
-	0x6f, 0x6e, 0x65, 0x6e, 0x74, 0x2e, 0x53, 0x74, 0x6f, 0x70, 0x2e, 0x52, 0x65, 0x71, 0x75, 0x65,
-	0x73, 0x74, 0x1a, 0x1d, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x63, 0x6f, 0x6d, 0x70, 0x6f, 0x6e,
-	0x65, 0x6e, 0x74, 0x2e, 0x53, 0x74, 0x6f, 0x70, 0x2e, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73,
-	0x65, 0x42, 0x38, 0x5a, 0x36, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f,
-	0x34, 0x72, 0x63, 0x68, 0x72, 0x34, 0x79, 0x2f, 0x67, 0x6f, 0x72, 0x61, 0x79, 0x2f, 0x69, 0x6e,
-	0x74, 0x65, 0x72, 0x6e, 0x61, 0x6c, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x70, 0x72, 0x6f,
-	0x74, 0x6f, 0x63, 0x6f, 0x6d, 0x70, 0x6f, 0x6e, 0x65, 0x6e, 0x74, 0x62, 0x06, 0x70, 0x72, 0x6f,
-	0x74, 0x6f, 0x33,
+	0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x73, 0x74, 0x61, 0x74, 0x75, 0x73, 0x22, 0x95, 0x01, 0x0a,
+	0x09, 0x43, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x75, 0x72, 0x65, 0x1a, 0x66, 0x0a, 0x07, 0x52, 0x65,
+	0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x12, 0x0a, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x01, 0x20,
+	0x01, 0x28, 0x09, 0x52, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x12, 0x18, 0x0a, 0x07, 0x76, 0x65, 0x72,
+	0x73, 0x69, 0x6f, 0x6e, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x76, 0x65, 0x72, 0x73,
+	0x69, 0x6f, 0x6e, 0x12, 0x2d, 0x0a, 0x07, 0x63, 0x6f, 0x6e, 0x74, 0x65, 0x6e, 0x74, 0x18, 0x03,
+	0x20, 0x01, 0x28, 0x0b, 0x32, 0x13, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x73, 0x63, 0x68, 0x65,
+	0x6d, 0x61, 0x2e, 0x53, 0x63, 0x68, 0x65, 0x6d, 0x61, 0x52, 0x07, 0x63, 0x6f, 0x6e, 0x74, 0x65,
+	0x6e, 0x74, 0x1a, 0x20, 0x0a, 0x08, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x14,
+	0x0a, 0x05, 0x65, 0x72, 0x72, 0x6f, 0x72, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x65,
+	0x72, 0x72, 0x6f, 0x72, 0x22, 0x54, 0x0a, 0x0e, 0x44, 0x65, 0x73, 0x63, 0x72, 0x69, 0x62, 0x65,
+	0x53, 0x63, 0x68, 0x65, 0x6d, 0x61, 0x1a, 0x09, 0x0a, 0x07, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73,
+	0x74, 0x1a, 0x37, 0x0a, 0x08, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x2b, 0x0a,
+	0x06, 0x64, 0x72, 0x69, 0x76, 0x65, 0x72, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x13, 0x2e,
+	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x73, 0x63, 0x68, 0x65, 0x6d, 0x61, 0x2e, 0x53, 0x63, 0x68, 0x65,
+	0x6d, 0x61, 0x52, 0x06, 0x64, 0x72, 0x69, 0x76, 0x65, 0x72, 0x22, 0x33, 0x0a, 0x04, 0x53, 0x74,
+	0x6f, 0x70, 0x1a, 0x09, 0x0a, 0x07, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x20, 0x0a,
+	0x08, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x14, 0x0a, 0x05, 0x65, 0x72, 0x72,
+	0x6f, 0x72, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x65, 0x72, 0x72, 0x6f, 0x72, 0x32,
+	0xdb, 0x02, 0x0a, 0x09, 0x43, 0x6f, 0x6d, 0x70, 0x6f, 0x6e, 0x65, 0x6e, 0x74, 0x12, 0x52, 0x0a,
+	0x09, 0x48, 0x65, 0x61, 0x72, 0x74, 0x62, 0x65, 0x61, 0x74, 0x12, 0x21, 0x2e, 0x70, 0x72, 0x6f,
+	0x74, 0x6f, 0x63, 0x6f, 0x6d, 0x70, 0x6f, 0x6e, 0x65, 0x6e, 0x74, 0x2e, 0x48, 0x65, 0x61, 0x72,
+	0x74, 0x62, 0x65, 0x61, 0x74, 0x2e, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x22, 0x2e,
+	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x63, 0x6f, 0x6d, 0x70, 0x6f, 0x6e, 0x65, 0x6e, 0x74, 0x2e, 0x48,
+	0x65, 0x61, 0x72, 0x74, 0x62, 0x65, 0x61, 0x74, 0x2e, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73,
+	0x65, 0x12, 0x52, 0x0a, 0x09, 0x43, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x75, 0x72, 0x65, 0x12, 0x21,
+	0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x63, 0x6f, 0x6d, 0x70, 0x6f, 0x6e, 0x65, 0x6e, 0x74, 0x2e,
+	0x43, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x75, 0x72, 0x65, 0x2e, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73,
+	0x74, 0x1a, 0x22, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x63, 0x6f, 0x6d, 0x70, 0x6f, 0x6e, 0x65,
+	0x6e, 0x74, 0x2e, 0x43, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x75, 0x72, 0x65, 0x2e, 0x52, 0x65, 0x73,
+	0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x61, 0x0a, 0x0e, 0x44, 0x65, 0x73, 0x63, 0x72, 0x69, 0x62,
+	0x65, 0x53, 0x63, 0x68, 0x65, 0x6d, 0x61, 0x12, 0x26, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x63,
+	0x6f, 0x6d, 0x70, 0x6f, 0x6e, 0x65, 0x6e, 0x74, 0x2e, 0x44, 0x65, 0x73, 0x63, 0x72, 0x69, 0x62,
+	0x65, 0x53, 0x63, 0x68, 0x65, 0x6d, 0x61, 0x2e, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a,
+	0x27, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x63, 0x6f, 0x6d, 0x70, 0x6f, 0x6e, 0x65, 0x6e, 0x74,
+	0x2e, 0x44, 0x65, 0x73, 0x63, 0x72, 0x69, 0x62, 0x65, 0x53, 0x63, 0x68, 0x65, 0x6d, 0x61, 0x2e,
+	0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x43, 0x0a, 0x04, 0x53, 0x74, 0x6f, 0x70,
+	0x12, 0x1c, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x63, 0x6f, 0x6d, 0x70, 0x6f, 0x6e, 0x65, 0x6e,
+	0x74, 0x2e, 0x53, 0x74, 0x6f, 0x70, 0x2e, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x1d,
+	0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x63, 0x6f, 0x6d, 0x70, 0x6f, 0x6e, 0x65, 0x6e, 0x74, 0x2e,
+	0x53, 0x74, 0x6f, 0x70, 0x2e, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x42, 0x38, 0x5a,
+	0x36, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x34, 0x72, 0x63, 0x68,
+	0x72, 0x34, 0x79, 0x2f, 0x67, 0x6f, 0x72, 0x61, 0x79, 0x2f, 0x69, 0x6e, 0x74, 0x65, 0x72, 0x6e,
+	0x61, 0x6c, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x63, 0x6f,
+	0x6d, 0x70, 0x6f, 0x6e, 0x65, 0x6e, 0x74, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -446,32 +608,38 @@ func file_protocomponent_component1_0_proto_rawDescGZIP() []byte {
 	return file_protocomponent_component1_0_proto_rawDescData
 }
 
-var file_protocomponent_component1_0_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
+var file_protocomponent_component1_0_proto_msgTypes = make([]protoimpl.MessageInfo, 12)
 var file_protocomponent_component1_0_proto_goTypes = []interface{}{
 	(*Heartbeat)(nil),               // 0: protocomponent.Heartbeat
-	(*DescribeSchema)(nil),          // 1: protocomponent.DescribeSchema
-	(*Stop)(nil),                    // 2: protocomponent.Stop
-	(*Heartbeat_Request)(nil),       // 3: protocomponent.Heartbeat.Request
-	(*Heartbeat_Response)(nil),      // 4: protocomponent.Heartbeat.Response
-	(*DescribeSchema_Request)(nil),  // 5: protocomponent.DescribeSchema.Request
-	(*DescribeSchema_Response)(nil), // 6: protocomponent.DescribeSchema.Response
-	(*Stop_Request)(nil),            // 7: protocomponent.Stop.Request
-	(*Stop_Response)(nil),           // 8: protocomponent.Stop.Response
-	(*protoschema.Schema)(nil),      // 9: protoschema.Schema
+	(*Configure)(nil),               // 1: protocomponent.Configure
+	(*DescribeSchema)(nil),          // 2: protocomponent.DescribeSchema
+	(*Stop)(nil),                    // 3: protocomponent.Stop
+	(*Heartbeat_Request)(nil),       // 4: protocomponent.Heartbeat.Request
+	(*Heartbeat_Response)(nil),      // 5: protocomponent.Heartbeat.Response
+	(*Configure_Request)(nil),       // 6: protocomponent.Configure.Request
+	(*Configure_Response)(nil),      // 7: protocomponent.Configure.Response
+	(*DescribeSchema_Request)(nil),  // 8: protocomponent.DescribeSchema.Request
+	(*DescribeSchema_Response)(nil), // 9: protocomponent.DescribeSchema.Response
+	(*Stop_Request)(nil),            // 10: protocomponent.Stop.Request
+	(*Stop_Response)(nil),           // 11: protocomponent.Stop.Response
+	(*protoschema.Schema)(nil),      // 12: protoschema.Schema
 }
 var file_protocomponent_component1_0_proto_depIdxs = []int32{
-	9, // 0: protocomponent.DescribeSchema.Response.driver:type_name -> protoschema.Schema
-	3, // 1: protocomponent.Component.Heartbeat:input_type -> protocomponent.Heartbeat.Request
-	5, // 2: protocomponent.Component.DescribeSchema:input_type -> protocomponent.DescribeSchema.Request
-	7, // 3: protocomponent.Component.Stop:input_type -> protocomponent.Stop.Request
-	4, // 4: protocomponent.Component.Heartbeat:output_type -> protocomponent.Heartbeat.Response
-	6, // 5: protocomponent.Component.DescribeSchema:output_type -> protocomponent.DescribeSchema.Response
-	8, // 6: protocomponent.Component.Stop:output_type -> protocomponent.Stop.Response
-	4, // [4:7] is the sub-list for method output_type
-	1, // [1:4] is the sub-list for method input_type
-	1, // [1:1] is the sub-list for extension type_name
-	1, // [1:1] is the sub-list for extension extendee
-	0, // [0:1] is the sub-list for field type_name
+	12, // 0: protocomponent.Configure.Request.content:type_name -> protoschema.Schema
+	12, // 1: protocomponent.DescribeSchema.Response.driver:type_name -> protoschema.Schema
+	4,  // 2: protocomponent.Component.Heartbeat:input_type -> protocomponent.Heartbeat.Request
+	6,  // 3: protocomponent.Component.Configure:input_type -> protocomponent.Configure.Request
+	8,  // 4: protocomponent.Component.DescribeSchema:input_type -> protocomponent.DescribeSchema.Request
+	10, // 5: protocomponent.Component.Stop:input_type -> protocomponent.Stop.Request
+	5,  // 6: protocomponent.Component.Heartbeat:output_type -> protocomponent.Heartbeat.Response
+	7,  // 7: protocomponent.Component.Configure:output_type -> protocomponent.Configure.Response
+	9,  // 8: protocomponent.Component.DescribeSchema:output_type -> protocomponent.DescribeSchema.Response
+	11, // 9: protocomponent.Component.Stop:output_type -> protocomponent.Stop.Response
+	6,  // [6:10] is the sub-list for method output_type
+	2,  // [2:6] is the sub-list for method input_type
+	2,  // [2:2] is the sub-list for extension type_name
+	2,  // [2:2] is the sub-list for extension extendee
+	0,  // [0:2] is the sub-list for field type_name
 }
 
 func init() { file_protocomponent_component1_0_proto_init() }
@@ -493,7 +661,7 @@ func file_protocomponent_component1_0_proto_init() {
 			}
 		}
 		file_protocomponent_component1_0_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*DescribeSchema); i {
+			switch v := v.(*Configure); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -505,7 +673,7 @@ func file_protocomponent_component1_0_proto_init() {
 			}
 		}
 		file_protocomponent_component1_0_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Stop); i {
+			switch v := v.(*DescribeSchema); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -517,7 +685,7 @@ func file_protocomponent_component1_0_proto_init() {
 			}
 		}
 		file_protocomponent_component1_0_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Heartbeat_Request); i {
+			switch v := v.(*Stop); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -529,7 +697,7 @@ func file_protocomponent_component1_0_proto_init() {
 			}
 		}
 		file_protocomponent_component1_0_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Heartbeat_Response); i {
+			switch v := v.(*Heartbeat_Request); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -541,7 +709,7 @@ func file_protocomponent_component1_0_proto_init() {
 			}
 		}
 		file_protocomponent_component1_0_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*DescribeSchema_Request); i {
+			switch v := v.(*Heartbeat_Response); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -553,7 +721,7 @@ func file_protocomponent_component1_0_proto_init() {
 			}
 		}
 		file_protocomponent_component1_0_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*DescribeSchema_Response); i {
+			switch v := v.(*Configure_Request); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -565,7 +733,7 @@ func file_protocomponent_component1_0_proto_init() {
 			}
 		}
 		file_protocomponent_component1_0_proto_msgTypes[7].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Stop_Request); i {
+			switch v := v.(*Configure_Response); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -577,6 +745,42 @@ func file_protocomponent_component1_0_proto_init() {
 			}
 		}
 		file_protocomponent_component1_0_proto_msgTypes[8].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*DescribeSchema_Request); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_protocomponent_component1_0_proto_msgTypes[9].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*DescribeSchema_Response); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_protocomponent_component1_0_proto_msgTypes[10].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*Stop_Request); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_protocomponent_component1_0_proto_msgTypes[11].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*Stop_Response); i {
 			case 0:
 				return &v.state
@@ -595,7 +799,7 @@ func file_protocomponent_component1_0_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_protocomponent_component1_0_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   9,
+			NumMessages:   12,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

@@ -69,7 +69,7 @@ func processProtoSchemaAttribute(a *protoschema.Schema_Attribute) *schematica.At
 		Description: a.Description,
 		Required:    a.Required,
 		Optional:    a.Optional,
-		NestingType: ProtoSchemaObject(a.NestedType),
+		NestedType:  ProtoSchemaObject(a.NestedType),
 		Deprecated:  a.Deprecated,
 	}
 

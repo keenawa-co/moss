@@ -46,3 +46,5 @@ func (s *driverWrapper) Stop(ctx context.Context, req *protodriver.Stop_Request)
 
 	return resp, nil
 }
+
+var _ protodriver.DriverServer = (*driverWrapper)(nil)
