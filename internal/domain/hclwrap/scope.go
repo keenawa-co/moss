@@ -1,8 +1,9 @@
-package hcllang
+package hclwrap
 
 import (
 	"strings"
 
+	"github.com/4rchr4y/goray/internal/kernel/hcllang"
 	"github.com/zclconf/go-cty/cty/function"
 )
 
@@ -12,19 +13,19 @@ type Scope struct {
 
 func NewScope() *Scope {
 	scope := &Scope{
-		functions: make(map[string]function.Function, len(builtinFunctionList)*2),
+		functions: make(map[string]function.Function, len(hcllang.BuiltinFunctionList)*2),
 	}
 
 	builder := strings.Builder{}
 
-	for ident, fn := range builtinFunctionList {
+	for ident, fn := range hcllang.BuiltinFunctionList {
 		builder.Reset()
 
-		builder.WriteString(ident.namespace)
-		builder.WriteString(IdentSeparator)
-		builder.WriteString(ident.name)
+		builder.WriteString(ident.Namespace())
+		builder.WriteString(hcllang.IdentSeparator)
+		builder.WriteString(ident.Name())
 
-		scope.functions[ident.name] = fn
+		scope.functions[ident.Name()] = fn
 		scope.functions[builder.String()] = fn
 	}
 

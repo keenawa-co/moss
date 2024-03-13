@@ -1,3 +1,4 @@
 component "dummy" {
-    version = "Hello, World!"
+    version = "1.0"
+    value = "Hello, World!"
 }

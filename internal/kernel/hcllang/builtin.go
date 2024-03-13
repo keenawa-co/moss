@@ -39,7 +39,7 @@ func (ident NameIdent) String() (name string) {
 	return name + ident.name
 }
 
-var builtinFunctionList = map[NameIdent]function.Function{
+var BuiltinFunctionList = map[NameIdent]function.Function{
 	newIdent("abs"):             stdlib.AbsoluteFunc,
 	newIdent("ceil"):            stdlib.CeilFunc,
 	newIdent("chomp"):           stdlib.ChompFunc,

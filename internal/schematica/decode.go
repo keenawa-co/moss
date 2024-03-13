@@ -15,7 +15,6 @@ func DecodeBlock(block *Block) (hcldec.Spec, error) {
 		return result, nil
 	}
 
-	// invalid attribute schema:
 	for name, attr := range block.Attributes {
 		a, err := DecodeAttribute(name, attr)
 		if err != nil {
@@ -69,6 +68,7 @@ func DecodeAttribute(name string, attr *Attribute) (hcldec.Spec, error) {
 		return result, nil
 	}
 
+	fmt.Println(345)
 	result.Type = attr.Type
 	result.Required = attr.Required
 	return result, nil

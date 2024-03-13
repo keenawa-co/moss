@@ -1,8 +1,6 @@
 package dummy_component
 
 import (
-	"fmt"
-
 	"github.com/4rchr4y/goray/interface/component"
 	"github.com/4rchr4y/goray/internal/schematica"
 	"github.com/zclconf/go-cty/cty"
@@ -17,7 +15,6 @@ func Component() component.Interface {
 }
 
 func (s *DummyComponent) Configure(input *component.ConfigureInput) (*component.ConfigureOutput, error) {
-	fmt.Println(input.Schema.Attributes["value"])
 	return new(component.ConfigureOutput), nil
 }
 

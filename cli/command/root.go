@@ -38,6 +38,7 @@ import (
 
 	"github.com/g10z3r/ason"
 	pluginHCL "github.com/hashicorp/go-plugin"
+	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/hcldec"
 	"github.com/hashicorp/hcl/v2/hclparse"
 	"github.com/open-policy-agent/opa/ast"
@@ -130,7 +131,7 @@ func runRootCmd(cmd *cobra.Command, args []string) {
 
 	f, diags := bis.DecodeFile(file.Body)
 	for _, d := range diags {
-		fmt.Println(d.Summary)
+		panic(d)
 	}
 
 	client := startComponent(".ray/component/github.com/4rchr4y/ray-dummy-component@v0.0.1")
@@ -143,10 +144,34 @@ func runRootCmd(cmd *cobra.Command, args []string) {
 	log.Printf("Received schema: %+v\n", schema.Schema)
 	fmt.Println("--------------")
 
-	for name, b := range f.Components {
-		s := hcldec.ImpliedSchema(must.Must(schematica.DecodeBlock(schema.Schema.Root)))
-		b.Config.PartialContent(s)
-		fmt.Println(name)
+	// scope := hclwrap.NewScope()
+
+	for _, b := range f.Components {
+		spec := must.Must(schematica.DecodeBlock(schema.Schema.Root))
+		s := hcldec.ImpliedSchema(spec)
+
+		bc, diags := b.Config.Content(s)
+		if diags.HasErrors() {
+			panic(diags)
+		}
+
+		v, _ := bc.Attributes["value"].Expr.Value(&hcl.EvalContext{})
+		fmt.Println("val", v.AsString())
+
+		// val, diags := scope.EvalBlock(body, schema.Schema.Root)
+		// if diags.HasErrors() {
+		// 	panic(diags)
+		// }
+
+		// fmt.Println(val.GoString())
+		// _, err := convert.EncodeValue(val, hcldec.ImpliedType(spec).WithoutOptionalAttributesDeep())
+		// if err != nil {
+		// 	log.Fatal(err)
+		// 	return
+		// }
+
+		// decoded, _ := convert.DecodeValue(encoded, hcldec.ImpliedType(spec))
+
 	}
 
 	b, err := s.LoadFromAbs("./testdata", nil)
