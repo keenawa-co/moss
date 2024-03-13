@@ -22,9 +22,7 @@ message Heartbeat {
 
 message Configure{
     message Request{
-        string name = 1;
-        string version = 2;
-        protoschema.Schema content = 3;
+        bytes payload = 1;
     }
 
     message Response{
