@@ -28,6 +28,18 @@ func (p *componentWrapper) Heartbeat(_ context.Context, req *protocomponent.Hear
 	}, nil
 }
 
+func (p *componentWrapper) Configure(_ context.Context, req *protocomponent.Configure_Request) (*protocomponent.Configure_Response, error) {
+
+	_, err := p.origin.Configure(&component.ConfigureInput{
+		MessagePack: req.Msgpack,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return &protocomponent.Configure_Response{}, nil
+}
+
 func (p *componentWrapper) DescribeSchema(_ context.Context, req *protocomponent.DescribeSchema_Request) (*protocomponent.DescribeSchema_Response, error) {
 	resp := &protocomponent.DescribeSchema_Response{
 		Driver: &protoschema.Schema{

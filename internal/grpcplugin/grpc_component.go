@@ -49,7 +49,9 @@ func (p *GRPCComponent) Heartbeat() *component.HeartbeatOutput {
 }
 
 func (p *GRPCComponent) Configure(input *component.ConfigureInput) (*component.ConfigureOutput, error) {
-	configureReq := &protocomponent.Configure_Request{}
+	configureReq := &protocomponent.Configure_Request{
+		Msgpack: input.MessagePack,
+	}
 	configureResp, err := p.client.Configure(p.ctx, configureReq)
 	if err != nil {
 		return nil, err

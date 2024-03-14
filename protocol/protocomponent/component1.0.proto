@@ -22,7 +22,7 @@ message Heartbeat {
 
 message Configure{
     message Request{
-        bytes payload = 1;
+        bytes msgpack = 1;
     }
 
     message Response{

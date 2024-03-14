@@ -30,7 +30,6 @@ func Component() component.Interface {
 }
 
 func (s *DummyComponent) Configure(input *component.ConfigureInput) (*component.ConfigureOutput, error) {
-	fmt.Println(1111)
 	spec := must.Must(schematica.DecodeBlock(&componentSchema))
 	decoded, err := convert.DecodeValue(input.MessagePack, hcldec.ImpliedType(spec))
 	if err != nil {
