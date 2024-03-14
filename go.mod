@@ -11,6 +11,8 @@ require (
 	github.com/open-policy-agent/opa v0.61.0
 	github.com/spf13/cobra v1.8.0
 	github.com/zclconf/go-cty v1.14.3
+	go.etcd.io/etcd/client/v3 v3.5.12
+	go.etcd.io/etcd/server/v3 v3.5.12
 	google.golang.org/grpc v1.61.0
 	google.golang.org/protobuf v1.31.0
 )
@@ -107,10 +109,8 @@ require (
 	go.etcd.io/etcd/api/v3 v3.5.12 // indirect
 	go.etcd.io/etcd/client/pkg/v3 v3.5.12 // indirect
 	go.etcd.io/etcd/client/v2 v2.305.12 // indirect
-	go.etcd.io/etcd/client/v3 v3.5.12 // indirect
 	go.etcd.io/etcd/pkg/v3 v3.5.12 // indirect
 	go.etcd.io/etcd/raft/v3 v3.5.12 // indirect
-	go.etcd.io/etcd/server/v3 v3.5.12 // indirect
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.46.0 // indirect
 	go.opentelemetry.io/otel v1.21.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace v1.21.0 // indirect

@@ -30,15 +30,16 @@ import (
 	"go.etcd.io/etcd/server/v3/embed"
 
 	"github.com/4rchr4y/goray/internal/domain/grpcwrap"
+	"github.com/4rchr4y/goray/internal/domain/hclwrap"
 	"github.com/4rchr4y/goray/internal/grpcplugin"
 	"github.com/4rchr4y/goray/internal/kernel/bis"
+	"github.com/4rchr4y/goray/internal/proto/convert"
 	"github.com/4rchr4y/goray/internal/proto/protocomponent"
 	"github.com/4rchr4y/goray/internal/proto/protodriver"
 	"github.com/4rchr4y/goray/internal/schematica"
 
 	"github.com/g10z3r/ason"
 	pluginHCL "github.com/hashicorp/go-plugin"
-	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/hcldec"
 	"github.com/hashicorp/hcl/v2/hclparse"
 	"github.com/open-policy-agent/opa/ast"
@@ -144,34 +145,30 @@ func runRootCmd(cmd *cobra.Command, args []string) {
 	log.Printf("Received schema: %+v\n", schema.Schema)
 	fmt.Println("--------------")
 
-	// scope := hclwrap.NewScope()
+	scope := hclwrap.NewScope()
 
 	for _, b := range f.Components {
 		spec := must.Must(schematica.DecodeBlock(schema.Schema.Root))
-		s := hcldec.ImpliedSchema(spec)
-
-		bc, diags := b.Config.Content(s)
+		val, diags := scope.EvalBlock(b.Config, spec)
 		if diags.HasErrors() {
 			panic(diags)
 		}
 
-		v, _ := bc.Attributes["value"].Expr.Value(&hcl.EvalContext{})
-		fmt.Println("val", v.AsString())
+		encoded, err := convert.EncodeValue(val, hcldec.ImpliedType(spec).WithoutOptionalAttributesDeep())
+		if err != nil {
+			log.Fatal(err)
+			return
+		}
 
-		// val, diags := scope.EvalBlock(body, schema.Schema.Root)
-		// if diags.HasErrors() {
-		// 	panic(diags)
-		// }
-
-		// fmt.Println(val.GoString())
-		// _, err := convert.EncodeValue(val, hcldec.ImpliedType(spec).WithoutOptionalAttributesDeep())
-		// if err != nil {
-		// 	log.Fatal(err)
-		// 	return
-		// }
+		if _, err := client.Configure(&component.ConfigureInput{
+			MessagePack: encoded,
+		}); err != nil {
+			log.Fatal(err)
+			return
+		}
 
 		// decoded, _ := convert.DecodeValue(encoded, hcldec.ImpliedType(spec))
-
+		// fmt.Println(decoded.AsValueMap()["value"])
 	}
 
 	b, err := s.LoadFromAbs("./testdata", nil)

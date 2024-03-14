@@ -68,7 +68,6 @@ func DecodeAttribute(name string, attr *Attribute) (hcldec.Spec, error) {
 		return result, nil
 	}
 
-	fmt.Println(345)
 	result.Type = attr.Type
 	result.Required = attr.Required
 	return result, nil

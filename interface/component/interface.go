@@ -1,7 +1,6 @@
 package component
 
 import (
-	"github.com/4rchr4y/goray/internal/schematica"
 	"github.com/hashicorp/hcl/v2"
 )
 
@@ -21,9 +20,7 @@ type (
 
 type (
 	ConfigureInput struct {
-		Name    string
-		Version string
-		Schema  *schematica.Block
+		MessagePack []byte
 	}
 
 	ConfigureOutput struct{}
