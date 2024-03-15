@@ -36,11 +36,11 @@ type GRPCComponent struct {
 }
 
 func (p *GRPCComponent) Heartbeat() *component.HeartbeatOutput {
+	output := new(component.HeartbeatOutput)
+
 	heartbeatResp, err := p.client.Heartbeat(p.ctx, new(protocomponent.Heartbeat_Request))
 	if err != nil {
-		//TODO:
-		fmt.Println(err)
-		return nil
+		return output.WithError(err)
 	}
 
 	return &component.HeartbeatOutput{
@@ -48,19 +48,20 @@ func (p *GRPCComponent) Heartbeat() *component.HeartbeatOutput {
 	}
 }
 
-func (p *GRPCComponent) Configure(input *component.ConfigureInput) (*component.ConfigureOutput, error) {
-	configureReq := &protocomponent.Configure_Request{
+func (p *GRPCComponent) Configure(input *component.ConfigureInput) *component.ConfigureOutput {
+	output := new(component.ConfigureOutput)
+
+	resp, err := p.client.Configure(p.ctx, &protocomponent.Configure_Request{
 		Msgpack: input.MessagePack,
-	}
-	configureResp, err := p.client.Configure(p.ctx, configureReq)
+	})
 	if err != nil {
-		return nil, err
+		return output.WithError(err)
 	}
-	if configureResp.Error != "" {
-		return nil, errors.New(configureResp.Error)
+	if resp.Error != "" {
+		return output.WithError(errors.New(resp.Error))
 	}
 
-	return new(component.ConfigureOutput), nil
+	return output
 
 }
 

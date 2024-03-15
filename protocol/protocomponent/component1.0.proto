@@ -15,8 +15,10 @@ service Component {
 
 message Heartbeat {
     message Request {}
+    
     message Response {
         string status = 1;
+        string error = 2;
     }
 }
 

@@ -10,7 +10,6 @@ import (
 	"log"
 	"os"
 	"os/exec"
-	"time"
 
 	"github.com/4rchr4y/bpm/bundleutil/encode"
 	"github.com/4rchr4y/bpm/bundleutil/inspect"
@@ -26,8 +25,6 @@ import (
 	noop_driver "github.com/4rchr4y/goray/example/noop-driver"
 	"github.com/4rchr4y/goray/interface/component"
 	"github.com/4rchr4y/goray/interface/driver"
-	clientv3 "go.etcd.io/etcd/client/v3"
-	"go.etcd.io/etcd/server/v3/embed"
 
 	"github.com/4rchr4y/goray/internal/domain/grpcwrap"
 	"github.com/4rchr4y/goray/internal/domain/hclwrap"
@@ -62,43 +59,6 @@ type failCase struct {
 }
 
 func runRootCmd(cmd *cobra.Command, args []string) {
-	cfg := embed.NewConfig()
-	cfg.Dir = ".ray/cache"
-
-	e, err := embed.StartEtcd(cfg)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer e.Close()
-
-	select {
-	case <-e.Server.ReadyNotify():
-		log.Println("Server is ready!")
-	case <-time.After(60 * time.Second):
-		e.Server.Stop()
-		log.Fatal("Server took too long to start!")
-	}
-
-	cli, err := clientv3.New(clientv3.Config{
-		Endpoints:   []string{"localhost:2379"},
-		DialTimeout: 5 * time.Second,
-	})
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer cli.Close()
-
-	jsData, _ := json.Marshal(map[string]string{
-		"key1": "value1",
-	})
-
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	_, err = cli.Put(ctx, "your/key", string(jsData))
-	cancel()
-	if err != nil {
-		log.Fatal(err)
-	}
-
 	dir := env.MustGetString("BPM_PATH")
 
 	io := iostream.NewIOStream()
@@ -160,9 +120,9 @@ func runRootCmd(cmd *cobra.Command, args []string) {
 			return
 		}
 
-		if _, err := client.Configure(&component.ConfigureInput{
+		if out := client.Configure(&component.ConfigureInput{
 			MessagePack: encoded,
-		}); err != nil {
+		}); out.Error != nil {
 			log.Fatal(err)
 			return
 		}

@@ -29,18 +29,20 @@ func Component() component.Interface {
 	return &DummyComponent{}
 }
 
-func (s *DummyComponent) Configure(input *component.ConfigureInput) (*component.ConfigureOutput, error) {
+func (s *DummyComponent) Configure(input *component.ConfigureInput) *component.ConfigureOutput {
 	spec := must.Must(schematica.DecodeBlock(&componentSchema))
 	decoded, err := convert.DecodeValue(input.MessagePack, hcldec.ImpliedType(spec))
 	if err != nil {
-		return nil, err
+		return &component.ConfigureOutput{
+			Error: err,
+		}
 	}
 
 	s.value = decoded.GetAttr("value").AsString()
 
 	fmt.Printf("\n----------------- %s -----------------\n", s.value)
 
-	return new(component.ConfigureOutput), nil
+	return new(component.ConfigureOutput)
 }
 
 func (s *DummyComponent) Heartbeat() *component.HeartbeatOutput {

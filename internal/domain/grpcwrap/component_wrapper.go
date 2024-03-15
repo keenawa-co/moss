@@ -23,21 +23,31 @@ func ComponentWrapper(c component.Interface) protocomponent.ComponentServer {
 }
 
 func (p *componentWrapper) Heartbeat(_ context.Context, req *protocomponent.Heartbeat_Request) (*protocomponent.Heartbeat_Response, error) {
+	output := p.origin.Heartbeat()
+
+	resp := new(protocomponent.Heartbeat_Response)
+	if output.Error != nil {
+		resp.Error = output.Error.Error()
+		return resp, nil
+	}
+
 	return &protocomponent.Heartbeat_Response{
 		Status: p.origin.Heartbeat().Status,
 	}, nil
 }
 
 func (p *componentWrapper) Configure(_ context.Context, req *protocomponent.Configure_Request) (*protocomponent.Configure_Response, error) {
-
-	_, err := p.origin.Configure(&component.ConfigureInput{
+	output := p.origin.Configure(&component.ConfigureInput{
 		MessagePack: req.Msgpack,
 	})
-	if err != nil {
-		return nil, err
+
+	resp := new(protocomponent.Configure_Response)
+	if output.Error != nil {
+		resp.Error = output.Error.Error()
+		return resp, nil
 	}
 
-	return &protocomponent.Configure_Response{}, nil
+	return resp, nil
 }
 
 func (p *componentWrapper) DescribeSchema(_ context.Context, req *protocomponent.DescribeSchema_Request) (*protocomponent.DescribeSchema_Response, error) {
