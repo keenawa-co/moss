@@ -11,13 +11,7 @@ import (
 	"os"
 	"os/exec"
 
-	"github.com/4rchr4y/bpm/bundleutil/encode"
-	"github.com/4rchr4y/bpm/bundleutil/inspect"
-	"github.com/4rchr4y/bpm/bundleutil/manifest"
-	"github.com/4rchr4y/bpm/fetch"
 	"github.com/4rchr4y/bpm/iostream"
-	"github.com/4rchr4y/bpm/pkg/linker"
-	"github.com/4rchr4y/bpm/storage"
 	"github.com/4rchr4y/godevkit/v3/env"
 	"github.com/4rchr4y/godevkit/v3/must"
 	"github.com/4rchr4y/godevkit/v3/syswrap"
@@ -26,9 +20,10 @@ import (
 	"github.com/4rchr4y/goray/interface/component"
 	"github.com/4rchr4y/goray/interface/driver"
 
-	"github.com/4rchr4y/goray/internal/domain/grpcwrap"
-	"github.com/4rchr4y/goray/internal/domain/hclwrap"
+	"github.com/4rchr4y/goray/internal/bundlepkg"
 	"github.com/4rchr4y/goray/internal/grpcplugin"
+	"github.com/4rchr4y/goray/internal/grpcwrap"
+	"github.com/4rchr4y/goray/internal/hclutl"
 	"github.com/4rchr4y/goray/internal/kernel/bis"
 	"github.com/4rchr4y/goray/internal/proto/convert"
 	"github.com/4rchr4y/goray/internal/proto/protocomponent"
@@ -59,23 +54,19 @@ type failCase struct {
 }
 
 func runRootCmd(cmd *cobra.Command, args []string) {
-	dir := env.MustGetString("BPM_PATH")
-
-	io := iostream.NewIOStream()
-
 	osWrap := new(syswrap.OSWrap)
-	ioWrap := new(syswrap.IOWrap)
-	encoder := &encode.Encoder{
-		IO: io,
-	}
 
-	s := &storage.Storage{
-		Dir:     dir,
-		IO:      io,
-		OSWrap:  osWrap,
-		IOWrap:  ioWrap,
-		Encoder: encoder,
-	}
+	bpm := bundlepkg.NewBundlePkgManager(bundlepkg.BundlePkgManagerConf{
+		RootDir:  env.MustGetString("BPM_PATH"),
+		OSWrap:   new(syswrap.OSWrap),
+		IOWrap:   new(syswrap.IOWrap),
+		IOStream: iostream.NewIOStream(),
+	})
+	linker := bundlepkg.NewBundlePkgLinker(bundlepkg.LinkerConf{
+		Fetcher:    bpm.Fetcher(),
+		Inspector:  bpm.Inspector(),
+		Manifester: bpm.Manifester(),
+	})
 
 	content, err := osWrap.ReadFile(".ray/component.ray")
 	if err != nil {
@@ -105,7 +96,7 @@ func runRootCmd(cmd *cobra.Command, args []string) {
 	log.Printf("Received schema: %+v\n", schema.Schema)
 	fmt.Println("--------------")
 
-	scope := hclwrap.NewScope()
+	scope := hclutl.NewScope()
 
 	for _, b := range f.Components {
 		spec := must.Must(schematica.DecodeBlock(schema.Schema.Root))
@@ -133,42 +124,13 @@ func runRootCmd(cmd *cobra.Command, args []string) {
 		}
 	}
 
-	b, err := s.LoadFromAbs("./testdata", nil)
+	b, err := bpm.Storage().LoadFromAbs("./testdata", nil)
 	if err != nil {
 		log.Fatal(err)
 		return
 	}
 
-	inspector := &inspect.Inspector{
-		IO: io,
-	}
-
-	fetcher := &fetch.Fetcher{
-		IO:        io,
-		Storage:   s,
-		Inspector: inspector,
-		GitHub: &fetch.GithubFetcher{
-			IO:      io,
-			Client:  nil,
-			Encoder: encoder,
-		},
-	}
-
-	manifester := &manifest.Manifester{
-		IO:      io,
-		OSWrap:  osWrap,
-		Storage: s,
-		Encoder: encoder,
-		Fetcher: fetcher,
-	}
-
-	l := linker.Linker{
-		Fetcher:    fetcher,
-		Manifester: manifester,
-		Inspector:  inspector,
-	}
-
-	modules, err := l.Link(context.Background(), b)
+	modules, err := linker.Link(context.Background(), b)
 	if err != nil {
 		log.Fatal(err)
 		return
