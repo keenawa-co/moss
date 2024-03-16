@@ -9,6 +9,7 @@
         "bundlelock",
         "cmds",
         "dgraph",
+        "diagset",
         "Elts",
         "fobj",
         "fset",
@@ -37,6 +38,7 @@
         "pluginproto",
         "protocomponent",
         "protodriver",
+        "protopkg",
         "protoschema",
         "rayfile",
         "rchr",
@@ -78,6 +80,7 @@
     "protoc": {
         "options": [
             "-I./protocol/protoschema/schema1.0.proto",
+            "-I./protocol/protokpg/diagnostic.proto",
         ]
     }
 }

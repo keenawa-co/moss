@@ -55,14 +55,13 @@ func (p *GRPCComponent) Configure(input *component.ConfigureInput) *component.Co
 		Msgpack: input.MessagePack,
 	})
 	if err != nil {
-		return output.WithError(err)
+		output.Diagnostics = output.Diagnostics.Append(convert.FromGRPCError(err))
+		return output
 	}
-	if resp.Error != "" {
-		return output.WithError(errors.New(resp.Error))
-	}
+
+	output.Diagnostics = output.Diagnostics.Append(convert.FromProtoDiagSet(resp.Diagnostics))
 
 	return output
-
 }
 
 func (p *GRPCComponent) DescribeSchema() *component.DescribeSchemaOutput {

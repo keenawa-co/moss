@@ -4,6 +4,7 @@ package protocomponent;
 option go_package = "github.com/4rchr4y/goray/internal/proto/protocomponent";
 
 import "protoschema/schema1.0.proto";
+import "protopkg/diagnostic.proto";
 
 
 service Component {
@@ -28,7 +29,7 @@ message Configure{
     }
 
     message Response{
-        string error = 1;
+        repeated protopkg.Diagnostic diagnostics = 1;
     }
 }
 

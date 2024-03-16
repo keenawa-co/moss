@@ -1,6 +1,7 @@
 package component
 
 import (
+	"github.com/4rchr4y/goray/diag"
 	"github.com/hashicorp/hcl/v2"
 )
 
@@ -30,14 +31,9 @@ type (
 	}
 
 	ConfigureOutput struct {
-		Error error
+		Diagnostics diag.DiagnosticSet
 	}
 )
-
-func (o *ConfigureOutput) WithError(err error) *ConfigureOutput {
-	o.Error = err
-	return o
-}
 
 type (
 	DescribeSchemaOutput struct {

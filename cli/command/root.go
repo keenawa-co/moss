@@ -122,13 +122,10 @@ func runRootCmd(cmd *cobra.Command, args []string) {
 
 		if out := client.Configure(&component.ConfigureInput{
 			MessagePack: encoded,
-		}); out.Error != nil {
-			log.Fatal(err)
+		}); out.Diagnostics.HasError() {
+			log.Fatal("diagnostics with error")
 			return
 		}
-
-		// decoded, _ := convert.DecodeValue(encoded, hcldec.ImpliedType(spec))
-		// fmt.Println(decoded.AsValueMap()["value"])
 	}
 
 	b, err := s.LoadFromAbs("./testdata", nil)

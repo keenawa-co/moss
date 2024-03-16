@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/4rchr4y/godevkit/v3/must"
+	"github.com/4rchr4y/goray/diag"
 	"github.com/4rchr4y/goray/interface/component"
 	"github.com/4rchr4y/goray/internal/proto/convert"
 	"github.com/4rchr4y/goray/internal/schematica"
@@ -30,12 +31,12 @@ func Component() component.Interface {
 }
 
 func (s *DummyComponent) Configure(input *component.ConfigureInput) *component.ConfigureOutput {
+	output := new(component.ConfigureOutput)
 	spec := must.Must(schematica.DecodeBlock(&componentSchema))
 	decoded, err := convert.DecodeValue(input.MessagePack, hcldec.ImpliedType(spec))
 	if err != nil {
-		return &component.ConfigureOutput{
-			Error: err,
-		}
+		output.Diagnostics = output.Diagnostics.Append(diag.NewNativeError(err))
+		return output
 	}
 
 	s.value = decoded.GetAttr("value").AsString()

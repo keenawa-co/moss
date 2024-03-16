@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package protopkg;
+option go_package = "github.com/4rchr4y/goray/internal/proto/protopkg";
+
+message Diagnostic {
+    enum Severity {
+        INVALID = 0;
+        ERR = 1;
+        WARN = 2;
+    }
+    
+    Severity severity = 1;
+    string summary = 2;
+    string detail = 3;
+}

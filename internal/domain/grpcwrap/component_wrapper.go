@@ -41,13 +41,9 @@ func (p *componentWrapper) Configure(_ context.Context, req *protocomponent.Conf
 		MessagePack: req.Msgpack,
 	})
 
-	resp := new(protocomponent.Configure_Response)
-	if output.Error != nil {
-		resp.Error = output.Error.Error()
-		return resp, nil
-	}
-
-	return resp, nil
+	return &protocomponent.Configure_Response{
+		Diagnostics: convert.ToProtoDiagSet(output.Diagnostics),
+	}, nil
 }
 
 func (p *componentWrapper) DescribeSchema(_ context.Context, req *protocomponent.DescribeSchema_Request) (*protocomponent.DescribeSchema_Response, error) {
