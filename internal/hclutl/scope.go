@@ -1,4 +1,4 @@
-package hclwrap
+package hclutl
 
 import (
 	"strings"
