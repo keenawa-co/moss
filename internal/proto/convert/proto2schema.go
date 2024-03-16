@@ -5,27 +5,27 @@ import (
 
 	"github.com/4rchr4y/goray/interface/component"
 	"github.com/4rchr4y/goray/interface/driver"
-	"github.com/4rchr4y/goray/internal/proto/protoschema"
+	"github.com/4rchr4y/goray/internal/proto/protopkg"
 	"github.com/4rchr4y/goray/internal/schematica"
 )
 
-var protoNestingModeMap = map[protoschema.Schema_NestingMode]schematica.NestingMode{}
+var protoNestingModeMap = map[protopkg.Schema_NestingMode]schematica.NestingMode{}
 
-func MustProtoDriverSchema(s *protoschema.Schema) *driver.Schema {
+func MustProtoDriverSchema(s *protopkg.Schema) *driver.Schema {
 	return &driver.Schema{
 		Version: s.Version,
-		Root:    MustProtoSchemaBlock(s.Root),
+		Root:    MustprotopkgBlock(s.Root),
 	}
 }
 
-func MustProtoComponentSchema(s *protoschema.Schema) *component.Schema {
+func MustProtoComponentSchema(s *protopkg.Schema) *component.Schema {
 	return &component.Schema{
 		Version: s.Version,
-		Root:    MustProtoSchemaBlock(s.Root),
+		Root:    MustprotopkgBlock(s.Root),
 	}
 }
 
-func MustProtoSchemaBlock(block *protoschema.Schema_Block) *schematica.Block {
+func MustprotopkgBlock(block *protopkg.Schema_Block) *schematica.Block {
 	result := &schematica.Block{
 		BlockTypes:  make(map[string]*schematica.NestedBlock, len(block.BlockTypes)),
 		Attributes:  make(map[string]*schematica.Attribute, len(block.Attributes)),
@@ -34,12 +34,12 @@ func MustProtoSchemaBlock(block *protoschema.Schema_Block) *schematica.Block {
 	}
 
 	for _, a := range block.Attributes {
-		result.Attributes[a.Name] = processProtoSchemaAttribute(a)
+		result.Attributes[a.Name] = processprotopkgAttribute(a)
 	}
 
 	for _, b := range block.BlockTypes {
 		result.BlockTypes[b.Name] = &schematica.NestedBlock{
-			Block:   MustProtoSchemaBlock(b.Block),
+			Block:   MustprotopkgBlock(b.Block),
 			Nesting: protoNestingModeMap[b.Nesting],
 		}
 	}
@@ -47,7 +47,7 @@ func MustProtoSchemaBlock(block *protoschema.Schema_Block) *schematica.Block {
 	return result
 }
 
-func ProtoSchemaObject(obj *protoschema.Schema_Object) *schematica.Object {
+func protopkgObject(obj *protopkg.Schema_Object) *schematica.Object {
 	if obj == nil {
 		return nil
 	}
@@ -58,18 +58,18 @@ func ProtoSchemaObject(obj *protoschema.Schema_Object) *schematica.Object {
 	}
 
 	for _, a := range obj.Attributes {
-		result.Attributes[a.Name] = processProtoSchemaAttribute(a)
+		result.Attributes[a.Name] = processprotopkgAttribute(a)
 	}
 
 	return result
 }
 
-func processProtoSchemaAttribute(a *protoschema.Schema_Attribute) *schematica.Attribute {
+func processprotopkgAttribute(a *protopkg.Schema_Attribute) *schematica.Attribute {
 	attr := &schematica.Attribute{
 		Description: a.Description,
 		Required:    a.Required,
 		Optional:    a.Optional,
-		NestedType:  ProtoSchemaObject(a.NestedType),
+		NestedType:  protopkgObject(a.NestedType),
 		Deprecated:  a.Deprecated,
 	}
 

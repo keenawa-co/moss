@@ -76,7 +76,7 @@ func FromGRPCError(err error) diag.Diagnostic {
 
 	pc, _, _, ok := runtime.Caller(1)
 	if !ok {
-		return diag.NewNativeError(err)
+		return diag.NewNativeErrorDiag(err)
 	}
 
 	f := runtime.FuncForPC(pc)
@@ -84,25 +84,26 @@ func FromGRPCError(err error) diag.Diagnostic {
 
 	switch status.Code(err) {
 	case codes.Unavailable:
-		return diag.NewBaseDiagnostic(
+		return diag.NewBaseDiag(
 			diag.Error,
 			"gRPC plugin didn't respond",
 			fmt.Sprintf("The plugin ran into an issue and was unable to process the `%s` invocation", requestName),
 		)
 	case codes.Canceled:
-		return diag.NewBaseDiagnostic(
+		return diag.NewBaseDiag(
 			diag.Error,
 			"gRPC request was cancelled",
 			fmt.Sprintf("The `%s` request was cancelled", requestName),
 		)
 	case codes.Unimplemented:
-		return diag.NewBaseDiagnostic(
+		return diag.NewBaseDiag(
 			diag.Error,
 			"undefined gRPC plugin method",
 			fmt.Sprintf("The `%s` method is undefined for this gRPC plugin", requestName),
 		)
+
 	default:
-		return diag.NewBaseDiagnostic(
+		return diag.NewBaseDiag(
 			diag.Error,
 			"gRPC plugin error",
 			fmt.Sprintf("unexpected error was returned from `%s`: %v", requestName, err),

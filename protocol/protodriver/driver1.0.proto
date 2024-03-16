@@ -4,7 +4,7 @@ package protodriver;
 option go_package = "github.com/4rchr4y/goray/internal/proto/protodriver";
 
 
-import "protoschema/schema1.0.proto";
+import "protopkg/schema.proto";
 
 service Driver {
     rpc DescribeSchema(DescribeSchema.Request) returns (DescribeSchema.Response);
@@ -15,7 +15,7 @@ message DescribeSchema {
     message Request {}
 
     message Response {
-        protoschema.Schema driver = 1;
+        protopkg.Schema driver = 1;
     }
 }
 

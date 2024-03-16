@@ -1,7 +1,7 @@
 syntax = "proto3";
 
-package protoschema;
-option go_package = "github.com/4rchr4y/goray/internal/proto/protoschema";
+package protopkg;
+option go_package = "github.com/4rchr4y/goray/internal/proto/protopkg";
 
 message Schema {
     message Block {

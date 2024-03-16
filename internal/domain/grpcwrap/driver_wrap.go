@@ -6,7 +6,7 @@ import (
 	"github.com/4rchr4y/goray/interface/driver"
 	"github.com/4rchr4y/goray/internal/proto/convert"
 	"github.com/4rchr4y/goray/internal/proto/protodriver"
-	"github.com/4rchr4y/goray/internal/proto/protoschema"
+	"github.com/4rchr4y/goray/internal/proto/protopkg"
 )
 
 // schema -> proto
@@ -26,8 +26,8 @@ func DriverWrapper(p driver.Interface) protodriver.DriverServer {
 
 func (p *driverWrapper) DescribeSchema(_ context.Context, req *protodriver.DescribeSchema_Request) (*protodriver.DescribeSchema_Response, error) {
 	resp := &protodriver.DescribeSchema_Response{
-		Driver: &protoschema.Schema{
-			Root: &protoschema.Schema_Block{},
+		Driver: &protopkg.Schema{
+			Root: &protopkg.Schema_Block{},
 		},
 	}
 

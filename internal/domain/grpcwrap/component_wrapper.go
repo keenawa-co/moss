@@ -6,7 +6,7 @@ import (
 	"github.com/4rchr4y/goray/interface/component"
 	"github.com/4rchr4y/goray/internal/proto/convert"
 	"github.com/4rchr4y/goray/internal/proto/protocomponent"
-	"github.com/4rchr4y/goray/internal/proto/protoschema"
+	"github.com/4rchr4y/goray/internal/proto/protopkg"
 )
 
 type componentWrapper struct {
@@ -48,8 +48,8 @@ func (p *componentWrapper) Configure(_ context.Context, req *protocomponent.Conf
 
 func (p *componentWrapper) DescribeSchema(_ context.Context, req *protocomponent.DescribeSchema_Request) (*protocomponent.DescribeSchema_Response, error) {
 	resp := &protocomponent.DescribeSchema_Response{
-		Driver: &protoschema.Schema{
-			Root: &protoschema.Schema_Block{},
+		Driver: &protopkg.Schema{
+			Root: &protopkg.Schema_Block{},
 		},
 	}
 

@@ -6,30 +6,31 @@ import (
 	"github.com/4rchr4y/godevkit/v3/must"
 	"github.com/4rchr4y/goray/interface/component"
 	"github.com/4rchr4y/goray/interface/driver"
-	"github.com/4rchr4y/goray/internal/proto/protoschema"
+	"github.com/4rchr4y/goray/internal/proto/protopkg"
+
 	"github.com/4rchr4y/goray/internal/schematica"
 )
 
-var nestingModeMap = map[schematica.NestingMode]protoschema.Schema_NestingMode{}
+var nestingModeMap = map[schematica.NestingMode]protopkg.Schema_NestingMode{}
 
-func MustDriverSchema(s *driver.Schema) *protoschema.Schema {
-	return &protoschema.Schema{
+func MustDriverSchema(s *driver.Schema) *protopkg.Schema {
+	return &protopkg.Schema{
 		Version: s.Version,
 		Root:    MustSchemaBlock(s.Root),
 	}
 }
 
-func MustComponentSchema(s *component.Schema) *protoschema.Schema {
-	return &protoschema.Schema{
+func MustComponentSchema(s *component.Schema) *protopkg.Schema {
+	return &protopkg.Schema{
 		Version: s.Version,
 		Root:    MustSchemaBlock(s.Root),
 	}
 }
 
-func MustSchemaBlock(block *schematica.Block) *protoschema.Schema_Block {
-	result := &protoschema.Schema_Block{
-		BlockTypes:  make([]*protoschema.Schema_NestedBlock, 0, len(block.BlockTypes)),
-		Attributes:  make([]*protoschema.Schema_Attribute, 0, len(block.Attributes)),
+func MustSchemaBlock(block *schematica.Block) *protopkg.Schema_Block {
+	result := &protopkg.Schema_Block{
+		BlockTypes:  make([]*protopkg.Schema_NestedBlock, 0, len(block.BlockTypes)),
+		Attributes:  make([]*protopkg.Schema_Attribute, 0, len(block.Attributes)),
 		Description: block.Description,
 		Deprecated:  block.Deprecated,
 	}
@@ -39,7 +40,7 @@ func MustSchemaBlock(block *schematica.Block) *protoschema.Schema_Block {
 	}
 
 	for name, b := range block.BlockTypes {
-		result.BlockTypes = append(result.BlockTypes, &protoschema.Schema_NestedBlock{
+		result.BlockTypes = append(result.BlockTypes, &protopkg.Schema_NestedBlock{
 			Name:    name,
 			Block:   MustSchemaBlock(b.Block),
 			Nesting: nestingModeMap[b.Nesting],
@@ -49,9 +50,9 @@ func MustSchemaBlock(block *schematica.Block) *protoschema.Schema_Block {
 	return result
 }
 
-func SchemaObject(obj *schematica.Object) *protoschema.Schema_Object {
-	result := &protoschema.Schema_Object{
-		Attributes: make([]*protoschema.Schema_Attribute, 0, len(obj.Attributes)),
+func SchemaObject(obj *schematica.Object) *protopkg.Schema_Object {
+	result := &protopkg.Schema_Object{
+		Attributes: make([]*protopkg.Schema_Attribute, 0, len(obj.Attributes)),
 		Nesting:    nestingModeMap[obj.Nesting],
 	}
 
@@ -62,11 +63,11 @@ func SchemaObject(obj *schematica.Object) *protoschema.Schema_Object {
 	return result
 }
 
-func processSchemaAttribute(name string, a *schematica.Attribute) *protoschema.Schema_Attribute {
-	attr := &protoschema.Schema_Attribute{
+func processSchemaAttribute(name string, a *schematica.Attribute) *protopkg.Schema_Attribute {
+	attr := &protopkg.Schema_Attribute{
 		Name: name,
 		Type: must.Must(json.Marshal(a.Type)),
-		NestedType: func() *protoschema.Schema_Object {
+		NestedType: func() *protopkg.Schema_Object {
 			if a.NestedType == nil {
 				return nil
 			}

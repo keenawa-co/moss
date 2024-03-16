@@ -123,7 +123,12 @@ func runRootCmd(cmd *cobra.Command, args []string) {
 		if out := client.Configure(&component.ConfigureInput{
 			MessagePack: encoded,
 		}); out.Diagnostics.HasError() {
-			log.Fatal("diagnostics with error")
+			for _, d := range out.Diagnostics {
+				log.Fatalf("summary: %s\ndetails: %s",
+					d.Description().Summary,
+					d.Description().Detail,
+				)
+			}
 			return
 		}
 	}
@@ -254,6 +259,7 @@ func startComponent(pluginPath string) component.Interface {
 		AllowedProtocols: []pluginHCL.Protocol{pluginHCL.ProtocolGRPC},
 		Managed:          true,
 		SyncStdout:       os.Stdout,
+		Stderr:           os.Stderr,
 	})
 
 	rpcClient, err := client.Client()

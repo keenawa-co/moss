@@ -35,7 +35,7 @@ func (s *DummyComponent) Configure(input *component.ConfigureInput) *component.C
 	spec := must.Must(schematica.DecodeBlock(&componentSchema))
 	decoded, err := convert.DecodeValue(input.MessagePack, hcldec.ImpliedType(spec))
 	if err != nil {
-		output.Diagnostics = output.Diagnostics.Append(diag.NewNativeError(err))
+		output.Diagnostics = output.Diagnostics.Append(diag.NewNativeErrorDiag(err))
 		return output
 	}
 
