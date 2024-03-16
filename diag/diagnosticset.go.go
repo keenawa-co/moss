@@ -29,6 +29,8 @@ func (ds DiagnosticSet) Append(items ...interface{}) DiagnosticSet {
 			for i := range value {
 				ds = append(ds, hclDiagnostic{value[i]})
 			}
+		case error:
+			ds = append(ds, nativeErrorDiagnostic{value})
 		default:
 			panic(fmt.Sprintf("unsupported diagnostic(s) type: %T", value))
 		}

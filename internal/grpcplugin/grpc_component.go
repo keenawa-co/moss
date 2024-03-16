@@ -3,7 +3,6 @@ package grpcplugin
 import (
 	"context"
 	"errors"
-	"fmt"
 
 	"github.com/4rchr4y/goray/interface/component"
 	"github.com/4rchr4y/goray/internal/proto/convert"
@@ -38,13 +37,15 @@ type GRPCComponent struct {
 func (p *GRPCComponent) Heartbeat() *component.HeartbeatOutput {
 	output := new(component.HeartbeatOutput)
 
-	heartbeatResp, err := p.client.Heartbeat(p.ctx, new(protocomponent.Heartbeat_Request))
+	resp, err := p.client.Heartbeat(p.ctx, new(protocomponent.Heartbeat_Request))
 	if err != nil {
-		return output.WithError(err)
+		output.Diagnostics = output.Diagnostics.Append(convert.FromGRPCError(err))
+		return output
 	}
 
 	return &component.HeartbeatOutput{
-		Status: heartbeatResp.Status,
+		Status:      convert.FromComponentProtoStatus[resp.Status],
+		Diagnostics: output.Diagnostics.Append(convert.FromProtoDiagSet(resp.Diagnostics)),
 	}
 }
 
@@ -60,26 +61,26 @@ func (p *GRPCComponent) Configure(input *component.ConfigureInput) *component.Co
 	}
 
 	output.Diagnostics = output.Diagnostics.Append(convert.FromProtoDiagSet(resp.Diagnostics))
-
 	return output
 }
 
 func (p *GRPCComponent) DescribeSchema() *component.DescribeSchemaOutput {
-	descSchemaResp, err := p.client.DescribeSchema(p.ctx, new(protocomponent.DescribeSchema_Request))
+	output := new(component.DescribeSchemaOutput)
+
+	resp, err := p.client.DescribeSchema(p.ctx, new(protocomponent.DescribeSchema_Request))
 	if err != nil {
-		//TODO: response.Diagnostics.Append() <- error
-		fmt.Println(err)
-		return nil
+		output.Diagnostics = output.Diagnostics.Append(convert.FromGRPCError(err))
+		return output
 	}
 
-	if descSchemaResp.Driver == nil {
-		fmt.Println("missing provider schema")
-		// output.Diagnostics = output.Diagnostics.Append(errors.New("missing provider schema"))
-		return nil
+	if resp.Driver == nil {
+		output.Diagnostics = output.Diagnostics.Append(errors.New("missing provider schema"))
+		return output
 	}
 
 	return &component.DescribeSchemaOutput{
-		Schema: convert.MustProtoComponentSchema(descSchemaResp.Driver),
+		Schema:      convert.MustFromProtoComponentSchema(resp.Driver),
+		Diagnostics: output.Diagnostics.Append(convert.FromGRPCError(err)),
 	}
 }
 

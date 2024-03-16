@@ -15,11 +15,16 @@ service Component {
 }
 
 message Heartbeat {
+    enum Status {
+        UNKNOWN = 0;
+        OK = 1;
+    }
+
     message Request {}
     
     message Response {
-        string status = 1;
-        string error = 2;
+        Status status = 1;
+        repeated protopkg.Diagnostic diagnostics = 2;
     }
 }
 
@@ -38,6 +43,7 @@ message DescribeSchema {
 
     message Response {
         protopkg.Schema driver = 1;
+        repeated protopkg.Diagnostic diagnostics = 2;
     }
 }
 

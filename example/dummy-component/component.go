@@ -48,7 +48,7 @@ func (s *DummyComponent) Configure(input *component.ConfigureInput) *component.C
 
 func (s *DummyComponent) Heartbeat() *component.HeartbeatOutput {
 	return &component.HeartbeatOutput{
-		Status: "OK",
+		Status: component.StatusOK,
 	}
 }
 

@@ -54,7 +54,7 @@ func (p *GRPCDriver) DescribeSchema() *driver.DescribeSchemaOutput {
 		return output
 	}
 
-	output.Schema = convert.MustProtoDriverSchema(descSchemaResp.Driver)
+	output.Schema = convert.MustFromProtoDriverSchema(descSchemaResp.Driver)
 
 	return output
 }

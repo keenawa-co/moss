@@ -2,7 +2,6 @@ package component
 
 import (
 	"github.com/4rchr4y/goray/diag"
-	"github.com/hashicorp/hcl/v2"
 )
 
 type Interface interface {
@@ -15,15 +14,10 @@ type Interface interface {
 
 type (
 	HeartbeatOutput struct {
-		Status string
-		Error  error
+		Status      Status
+		Diagnostics diag.DiagnosticSet
 	}
 )
-
-func (o *HeartbeatOutput) WithError(err error) *HeartbeatOutput {
-	o.Error = err
-	return o
-}
 
 type (
 	ConfigureInput struct {
@@ -38,6 +32,6 @@ type (
 type (
 	DescribeSchemaOutput struct {
 		Schema      *Schema
-		Diagnostics hcl.Diagnostics // TODO: use local diagnostics type
+		Diagnostics diag.DiagnosticSet
 	}
 )

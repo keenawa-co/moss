@@ -32,7 +32,7 @@ func (p *driverWrapper) DescribeSchema(_ context.Context, req *protodriver.Descr
 	}
 
 	if p.schema.Schema.Root != nil {
-		resp.Driver = convert.MustDriverSchema(p.schema.Schema)
+		resp.Driver = convert.MustFromDriverSchema(p.schema.Schema)
 	}
 
 	return resp, nil
