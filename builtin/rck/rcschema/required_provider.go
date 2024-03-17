@@ -3,8 +3,8 @@ package rcschema
 import (
 	"fmt"
 
+	"github.com/4rchr4y/goray/internal/hclutl"
 	"github.com/4rchr4y/goray/internal/kernel/hcllang"
-	"github.com/4rchr4y/goray/pkg/hclutil"
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/gohcl"
 	"github.com/hashicorp/hcl/v2/hclsyntax"
@@ -19,7 +19,7 @@ var (
 )
 
 var requiredProviderBlockSchema = &hcl.BodySchema{
-	Attributes: hclutil.NewAttributeList(
+	Attributes: hclutl.NewAttributeList(
 		hcl.AttributeSchema{
 			Name:     "source",
 			Required: true,
@@ -33,7 +33,7 @@ var requiredProviderBlockSchema = &hcl.BodySchema{
 			Required: false,
 		},
 	)(requiredProviderBlockReservedAttributeList[:]...),
-	Blocks: hclutil.NewBlockList(
+	Blocks: hclutl.NewBlockList(
 		hcl.BlockHeaderSchema{
 			Type:       "_",
 			LabelNames: []string{},

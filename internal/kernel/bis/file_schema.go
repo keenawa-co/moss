@@ -3,7 +3,7 @@ package bis
 import (
 	"fmt"
 
-	"github.com/4rchr4y/goray/pkg/hclutil"
+	"github.com/4rchr4y/goray/internal/hclutl"
 	"github.com/hashicorp/hcl/v2"
 )
 
@@ -18,8 +18,8 @@ var (
 )
 
 var fileSchema = &hcl.BodySchema{
-	Attributes: hclutil.NewAttributeList()(fileReservedAttributeList[:]...),
-	Blocks: hclutil.NewBlockList(
+	Attributes: hclutl.NewAttributeList()(fileReservedAttributeList[:]...),
+	Blocks: hclutl.NewBlockList(
 		hcl.BlockHeaderSchema{
 			Type:       "_",
 			LabelNames: []string{},

@@ -1,8 +1,11 @@
 {
     "cSpell.words": [
+        "afero",
         "ason",
         "bpmiface",
         "bundlepkg",
+        "confload",
+        "confsetup",
         "diagset",
         "fset",
         "getenv",
@@ -11,6 +14,7 @@
         "grpcplugin",
         "grpcwrap",
         "hcllang",
+        "hclp",
         "hclparse",
         "hclsyntax",
         "hclutil",
@@ -41,6 +45,7 @@
         "syswrap",
         "testcode",
         "testmain",
+        "tmpl"
     ],
     "files.associations": {
         "*.ray": "hcl"

@@ -21,10 +21,10 @@ import (
 	"github.com/4rchr4y/goray/interface/driver"
 
 	"github.com/4rchr4y/goray/internal/bundlepkg"
+	"github.com/4rchr4y/goray/internal/config/confload"
 	"github.com/4rchr4y/goray/internal/grpcplugin"
 	"github.com/4rchr4y/goray/internal/grpcwrap"
 	"github.com/4rchr4y/goray/internal/hclutl"
-	"github.com/4rchr4y/goray/internal/kernel/bis"
 	"github.com/4rchr4y/goray/internal/proto/convert"
 	"github.com/4rchr4y/goray/internal/proto/protocomponent"
 	"github.com/4rchr4y/goray/internal/proto/protodriver"
@@ -33,10 +33,10 @@ import (
 	"github.com/g10z3r/ason"
 	pluginHCL "github.com/hashicorp/go-plugin"
 	"github.com/hashicorp/hcl/v2/hcldec"
-	"github.com/hashicorp/hcl/v2/hclparse"
 	"github.com/open-policy-agent/opa/ast"
 	"github.com/open-policy-agent/opa/rego"
 	"github.com/open-policy-agent/opa/topdown"
+	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
 )
 
@@ -54,8 +54,6 @@ type failCase struct {
 }
 
 func runRootCmd(cmd *cobra.Command, args []string) {
-	osWrap := new(syswrap.OSWrap)
-
 	bpm := bundlepkg.NewBundlePkgManager(bundlepkg.BundlePkgManagerConf{
 		RootDir:  env.MustGetString("BPM_PATH"),
 		OSWrap:   new(syswrap.OSWrap),
@@ -68,23 +66,32 @@ func runRootCmd(cmd *cobra.Command, args []string) {
 		Manifester: bpm.Manifester(),
 	})
 
-	content, err := osWrap.ReadFile(".ray/component.ray")
-	if err != nil {
-		log.Fatal(err)
-		return
-	}
+	parser := confload.NewParser(afero.OsFs{})
+	loader := confload.NewLoader(parser)
 
-	parser := hclparse.NewParser()
-	file, diags := parser.ParseHCL(content, "filename.hcl")
+	mod, diags := loader.Load(".ray")
 	if diags.HasErrors() {
 		fmt.Fprintf(os.Stderr, "Errors encountered while parsing HCL file: %s", diags.Error())
 		return
 	}
 
-	f, diags := bis.DecodeFile(file.Body)
-	for _, d := range diags {
-		panic(d)
-	}
+	// content, err := osWrap.ReadFile(".ray/component.ray")
+	// if err != nil {
+	// 	log.Fatal(err)
+	// 	return
+	// }
+
+	// parser := hclparse.NewParser()
+	// file, diags := parser.ParseHCL(content, "filename.hcl")
+	// if diags.HasErrors() {
+	// 	fmt.Fprintf(os.Stderr, "Errors encountered while parsing HCL file: %s", diags.Error())
+	// 	return
+	// }
+
+	// f, diags := bis.DecodeFile(file.Body)
+	// for _, d := range diags {
+	// 	panic(d)
+	// }
 
 	client := startComponent(".ray/component/github.com/4rchr4y/ray-dummy-component@v0.0.1")
 	defer client.Stop()
@@ -98,7 +105,7 @@ func runRootCmd(cmd *cobra.Command, args []string) {
 
 	scope := hclutl.NewScope()
 
-	for _, b := range f.Components {
+	for _, b := range mod.Components {
 		spec := must.Must(schematica.DecodeBlock(schema.Schema.Root))
 		val, diags := scope.EvalBlock(b.Config, spec)
 		if diags.HasErrors() {

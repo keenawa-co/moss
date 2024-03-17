@@ -3,8 +3,8 @@ package rcschema
 import (
 	"fmt"
 
+	"github.com/4rchr4y/goray/internal/hclutl"
 	"github.com/4rchr4y/goray/internal/kernel/hcllang"
-	"github.com/4rchr4y/goray/pkg/hclutil"
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/hclsyntax"
 )
@@ -16,8 +16,8 @@ var (
 )
 
 var providerBlockSchema = &hcl.BodySchema{
-	Attributes: hclutil.NewAttributeList()(providerBlockReservedAttributeList[:]...),
-	Blocks:     hclutil.NewBlockList()(providerBlockReservedBlockList[:]...),
+	Attributes: hclutl.NewAttributeList()(providerBlockReservedAttributeList[:]...),
+	Blocks:     hclutl.NewBlockList()(providerBlockReservedBlockList[:]...),
 }
 
 type Provider struct {

@@ -3,8 +3,8 @@ package bis
 import (
 	"fmt"
 
+	"github.com/4rchr4y/goray/internal/hclutl"
 	"github.com/4rchr4y/goray/internal/kernel/hcllang"
-	"github.com/4rchr4y/goray/pkg/hclutil"
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/gohcl"
 	"github.com/hashicorp/hcl/v2/hclsyntax"
@@ -17,13 +17,13 @@ var (
 )
 
 var providerBlockSchema = &hcl.BodySchema{
-	Attributes: hclutil.NewAttributeList(
+	Attributes: hclutl.NewAttributeList(
 		hcl.AttributeSchema{
 			Name:     "version",
 			Required: false,
 		},
 	)(componentBlockReservedAttributeList[:]...),
-	Blocks: hclutil.NewBlockList()(componentBlockReservedBlockList[:]...),
+	Blocks: hclutl.NewBlockList()(componentBlockReservedBlockList[:]...),
 }
 
 type ComponentBlock struct {
