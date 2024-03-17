@@ -1,4 +1,4 @@
-package bis
+package baseschema
 
 import (
 	"fmt"
@@ -37,16 +37,18 @@ type File struct {
 	_          [0]int
 	Name       string
 	Components map[string]*ComponentBlock
+	Body       hcl.Body
 }
 
 func DecodeFile(body hcl.Body) (file *File, diagnostics hcl.Diagnostics) {
-	content, diags := body.Content(fileSchema)
-	diagnostics = append(diagnostics, diags...)
+	content, body, diagnostics := body.PartialContent(fileSchema)
 	if diagnostics.HasErrors() {
 		return nil, diagnostics
 	}
 
-	file = &File{}
+	file = &File{
+		Body: body,
+	}
 
 	for _, b := range content.Blocks {
 		switch b.Type {

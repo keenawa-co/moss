@@ -75,24 +75,6 @@ func runRootCmd(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	// content, err := osWrap.ReadFile(".ray/component.ray")
-	// if err != nil {
-	// 	log.Fatal(err)
-	// 	return
-	// }
-
-	// parser := hclparse.NewParser()
-	// file, diags := parser.ParseHCL(content, "filename.hcl")
-	// if diags.HasErrors() {
-	// 	fmt.Fprintf(os.Stderr, "Errors encountered while parsing HCL file: %s", diags.Error())
-	// 	return
-	// }
-
-	// f, diags := bis.DecodeFile(file.Body)
-	// for _, d := range diags {
-	// 	panic(d)
-	// }
-
 	client := startComponent(".ray/component/github.com/4rchr4y/ray-dummy-component@v0.0.1")
 	defer client.Stop()
 	defer client.Shutdown()

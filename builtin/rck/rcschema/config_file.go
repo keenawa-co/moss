@@ -45,7 +45,7 @@ type File struct {
 }
 
 func DecodeFile(body hcl.Body) (file *File, diagnostics hcl.Diagnostics) {
-	content, diags := body.Content(configFileSchema)
+	content, diags := body.Content(configFileSchema) // FIXME:
 	diagnostics = append(diagnostics, diags...)
 	if diagnostics.HasErrors() {
 		return nil, diagnostics

@@ -1,4 +1,4 @@
-package bis
+package baseschema
 
 import (
 	"fmt"

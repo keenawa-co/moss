@@ -3,7 +3,7 @@ package confload
 import (
 	"fmt"
 
-	"github.com/4rchr4y/goray/internal/kernel/bis"
+	"github.com/4rchr4y/goray/internal/config/baseschema"
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/hclparse"
 	"github.com/spf13/afero"
@@ -21,7 +21,7 @@ func NewParser(fs afero.Fs) *Parser {
 	}
 }
 
-func (p *Parser) ParseHCLFile(path string) (file *bis.File, diagnostics hcl.Diagnostics) {
+func (p *Parser) ParseHCLFile(path string) (file *baseschema.File, diagnostics hcl.Diagnostics) {
 	content, err := p.fs.ReadFile(path)
 	if err != nil {
 		return nil, diagnostics.Append(&hcl.Diagnostic{
@@ -36,7 +36,7 @@ func (p *Parser) ParseHCLFile(path string) (file *bis.File, diagnostics hcl.Diag
 		return nil, diagnostics
 	}
 
-	file, diags := bis.DecodeFile(parsedHCLFile.Body)
+	file, diags := baseschema.DecodeFile(parsedHCLFile.Body)
 	diagnostics = append(diagnostics, diags...)
 	if diagnostics.HasErrors() {
 		return nil, diagnostics

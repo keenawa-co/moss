@@ -6,7 +6,8 @@ import (
 	"strings"
 
 	"github.com/4rchr4y/goray/internal/config"
-	"github.com/4rchr4y/goray/internal/kernel/bis"
+	"github.com/4rchr4y/goray/internal/config/baseschema"
+
 	"github.com/hashicorp/hcl/v2"
 )
 
@@ -34,7 +35,7 @@ func (l *Loader) Load(dir string) (mod *config.Module, diagnostics hcl.Diagnosti
 
 	mod = &config.Module{
 		Source:     dir,
-		Components: make(map[string]*bis.ComponentBlock),
+		Components: make(map[string]*baseschema.ComponentBlock),
 	}
 
 	filePaths := make([]string, 0, len(infos))
@@ -51,7 +52,7 @@ func (l *Loader) Load(dir string) (mod *config.Module, diagnostics hcl.Diagnosti
 		}
 	}
 
-	files := make([]*bis.File, len(filePaths))
+	files := make([]*baseschema.File, len(filePaths))
 	for i := range filePaths {
 		f, diags := l.parser.ParseHCLFile(filePaths[i])
 		diagnostics = append(diagnostics, diags...)
