@@ -1,12 +1,7 @@
 package confload
 
 import (
-	"fmt"
-	"path/filepath"
-	"strings"
-
 	"github.com/4rchr4y/goray/internal/config"
-	"github.com/4rchr4y/goray/internal/config/baseschema"
 
 	"github.com/hashicorp/hcl/v2"
 )
@@ -22,52 +17,16 @@ func NewLoader(p *Parser) *Loader {
 	}
 }
 
-func (l *Loader) Load(dir string) (mod *config.Module, diagnostics hcl.Diagnostics) {
-	infos, err := l.parser.fs.ReadDir(dir)
-	if err != nil {
-		diagnostics = append(diagnostics, &hcl.Diagnostic{
-			Severity: hcl.DiagError,
-			Summary:  "Failed to read template directory",
-			Detail:   fmt.Sprintf("Template directory %s does not exist or is unreadable.", dir),
-		})
+func (l *Loader) LoadConf(dir string) (conf *config.Config, diagnostics hcl.Diagnostics) {
+	rootMod, diagnostics := l.parser.ParseConfDir(dir)
+	if diagnostics.HasErrors() {
 		return nil, diagnostics
 	}
 
-	mod = &config.Module{
-		Source:     dir,
-		Components: make(map[string]*baseschema.ComponentBlock),
-	}
-
-	filePaths := make([]string, 0, len(infos))
-	for i := range infos {
-		if infos[i].IsDir() {
-			continue
-		}
-
-		name := infos[i].Name()
-
-		if strings.HasSuffix(name, ".ray") {
-			filePaths = append(filePaths, filepath.Join(dir, name))
-			continue
-		}
-	}
-
-	files := make([]*baseschema.File, len(filePaths))
-	for i := range filePaths {
-		f, diags := l.parser.ParseHCLFile(filePaths[i])
-		diagnostics = append(diagnostics, diags...)
-		if diags.HasErrors() {
-			return nil, diagnostics
-		}
-
-		files[i] = f
-	}
-
-	for _, file := range files {
-		for name, component := range file.Components {
-			mod.Components[name] = component
-		}
-	}
-
-	return mod, diagnostics
+	return &config.Config{
+		Parent:   nil,
+		Children: nil,
+		Module:   rootMod,
+		Version:  rootMod.Version,
+	}, diagnostics
 }

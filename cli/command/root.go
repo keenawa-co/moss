@@ -69,9 +69,10 @@ func runRootCmd(cmd *cobra.Command, args []string) {
 	parser := confload.NewParser(afero.OsFs{})
 	loader := confload.NewLoader(parser)
 
-	mod, diags := loader.Load(".ray")
+	conf, diags := loader.LoadConf(".ray")
+	fmt.Println(diags)
 	if diags.HasErrors() {
-		fmt.Fprintf(os.Stderr, "Errors encountered while parsing HCL file: %s", diags.Error())
+		fmt.Fprintf(os.Stderr, "errors encountered while parsing HCL file: %s", diags.Error())
 		return
 	}
 
@@ -87,7 +88,7 @@ func runRootCmd(cmd *cobra.Command, args []string) {
 
 	scope := hclutl.NewScope()
 
-	for _, b := range mod.Components {
+	for _, b := range conf.Module.Components {
 		spec := must.Must(schematica.DecodeBlock(schema.Schema.Root))
 		val, diags := scope.EvalBlock(b.Config, spec)
 		if diags.HasErrors() {
