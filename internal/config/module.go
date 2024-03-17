@@ -10,7 +10,7 @@ import (
 
 type Module struct {
 	Source     string
-	Components map[string]*baseschema.ComponentBlock
+	Components map[string]*baseschema.Component
 
 	// The specified version will represent the version
 	// of the entire module, and if the module is root, it
@@ -21,7 +21,7 @@ type Module struct {
 func NewModule(source string, files map[string]*baseschema.File) (mod *Module, diagnostics hcl.Diagnostics) {
 	mod = &Module{
 		Source:     source,
-		Components: make(map[string]*baseschema.ComponentBlock),
+		Components: make(map[string]*baseschema.Component),
 	}
 
 	for fileName, f := range files {

@@ -46,7 +46,8 @@
         "syswrap",
         "testcode",
         "testmain",
-        "tmpl"
+        "tmpl",
+        "typeexpr"
     ],
     "files.associations": {
         "*.ray": "hcl"

@@ -17,7 +17,7 @@ var (
 	}
 	fileReservedBlockList = [...]string{
 		"package",
-		"mod",
+		"module",
 		"import",
 	}
 )
@@ -46,6 +46,12 @@ var fileSchema = &hcl.BodySchema{
 				"name",
 			},
 		},
+		hcl.BlockHeaderSchema{
+			Type: "variable",
+			LabelNames: []string{
+				"name",
+			},
+		},
 	)(fileReservedBlockList[:]...),
 }
 
@@ -57,7 +63,8 @@ type Version struct {
 type File struct {
 	_          [0]int
 	Name       string
-	Components map[string]*ComponentBlock
+	Components map[string]*Component
+	Variables  map[string]*Variable
 	Body       hcl.Body
 	Version    *Version
 }
@@ -69,7 +76,9 @@ func DecodeFile(body hcl.Body) (file *File, diagnostics hcl.Diagnostics) {
 	}
 
 	file = &File{
-		Body: body,
+		Body:       body,
+		Components: make(map[string]*Component),
+		Variables:  make(map[string]*Variable),
 	}
 
 	if attr, exists := content.Attributes["version"]; exists {
@@ -101,47 +110,74 @@ func DecodeFile(body hcl.Body) (file *File, diagnostics hcl.Diagnostics) {
 	for _, b := range content.Blocks {
 		switch b.Type {
 		case "component":
-			if len(b.Labels) < 1 {
-				diagnostics = append(diagnostics, &hcl.Diagnostic{
-					Severity: hcl.DiagError,
-					Summary:  "Component name not found",
-					Detail:   fmt.Sprintf("The component name must be specified as the first block label, on line: %d", b.DefRange.Start.Line),
-				})
+			c, diags := decodeComponentBlock(file, b)
+			diagnostics = append(diagnostics, diags...)
+			if diagnostics.HasErrors() {
 				return nil, diagnostics
 			}
 
-			if _, exists := file.Components[b.Labels[0]]; exists {
-				diagnostics = append(diagnostics, &hcl.Diagnostic{
-					Severity: hcl.DiagError,
-					Summary:  "Duplicated component definition",
-					// TODO: Detail:   fmt.Sprintf("Provider name is invalid. %s", badIdentDetail),
-				})
+			file.Components[c.Name] = c
+			continue
 
+		case "variable":
+			v, diags := decodeVariableBlock(file, b)
+			diagnostics = append(diagnostics, diags...)
+			if diagnostics.HasErrors() {
 				return nil, diagnostics
 			}
 
-			diagnostics = append(diagnostics, decodeComponentBlock(file, b)...)
+			file.Variables[v.Name] = v
+			continue
 		}
 	}
 
 	return file, diagnostics
 }
 
-func decodeComponentBlock(file *File, block *hcl.Block) (diagnostics hcl.Diagnostics) {
-	b, diags := DecodeComponentBlock(block)
-	diagnostics = append(diagnostics, diags...)
-	if diagnostics.HasErrors() {
-		return diagnostics
+func decodeVariableBlock(file *File, block *hcl.Block) (v *Variable, diagnostics hcl.Diagnostics) {
+	if len(block.Labels) < 1 {
+		diagnostics = append(diagnostics, &hcl.Diagnostic{
+			Severity: hcl.DiagError,
+			Summary:  "Variable name not found",
+			Detail:   fmt.Sprintf("Variable name must be specified as the first block label, on line: %d", block.DefRange.Start.Line),
+			Subject:  &block.DefRange,
+		})
+		return nil, diagnostics
 	}
 
-	if file.Components == nil {
-		file.Components = map[string]*ComponentBlock{
-			block.Labels[0]: b,
-		}
-
-		return diagnostics
+	if _, exists := file.Variables[block.Labels[0]]; exists {
+		diagnostics = append(diagnostics, &hcl.Diagnostic{
+			Severity: hcl.DiagError,
+			Summary:  "Duplicated variable",
+			Detail:   fmt.Sprintf("A duplicate version declaration was detected in file %s on line %d. This declaration will be ignored when building the configuration", file.Name, block.DefRange.Start.Line),
+			Subject:  &block.DefRange,
+		})
+		return nil, diagnostics
 	}
 
-	file.Components[block.Labels[0]] = b
-	return diagnostics
+	return DecodeVariableBlock(block)
+}
+
+func decodeComponentBlock(file *File, block *hcl.Block) (c *Component, diagnostics hcl.Diagnostics) {
+	if len(block.Labels) < 1 {
+		diagnostics = diagnostics.Append(&hcl.Diagnostic{
+			Severity: hcl.DiagError,
+			Summary:  "Component name not found",
+			Detail:   fmt.Sprintf("Component name must be specified as the first block label, on line: %d", block.DefRange.Start.Line),
+			Subject:  &block.DefRange,
+		})
+		return nil, diagnostics
+	}
+
+	if _, exists := file.Components[block.Labels[0]]; exists {
+		diagnostics = diagnostics.Append(&hcl.Diagnostic{
+			Severity: hcl.DiagError,
+			Summary:  "Duplicated component",
+			Detail:   fmt.Sprintf("A duplicate version declaration was detected in file %s on line %d. This declaration will be ignored when building the configuration", file.Name, block.DefRange.Start.Line),
+			Subject:  &block.DefRange,
+		})
+		return nil, diagnostics
+	}
+
+	return DecodeComponentBlock(block)
 }

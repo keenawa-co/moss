@@ -1,0 +1,5 @@
+variable "example" {
+    type = string
+    description = "Example of using variables"
+    default     = "Hello, World!"
+}

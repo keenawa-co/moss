@@ -26,33 +26,36 @@ var providerBlockSchema = &hcl.BodySchema{
 	Blocks: hclutl.NewBlockList()(componentBlockReservedBlockList[:]...),
 }
 
-type ComponentBlock struct {
+type Component struct {
 	_       [0]int
 	Name    string
 	Version string
 	Config  hcl.Body
 }
 
-func DecodeComponentBlock(block *hcl.Block) (componentBlock *ComponentBlock, diagnostics hcl.Diagnostics) {
-	content, body, partialContentDiag := block.Body.PartialContent(providerBlockSchema)
-	diagnostics = append(diagnostics, partialContentDiag...)
+func DecodeComponentBlock(block *hcl.Block) (component *Component, diagnostics hcl.Diagnostics) {
+	content, body, diagnostics := block.Body.PartialContent(providerBlockSchema)
+	if diagnostics.HasErrors() {
+		return nil, diagnostics
+	}
 
-	// existence of a label is checked when a block is detected
+	// existence of a label is checked when this block was detected
 	if !hclsyntax.ValidIdentifier(block.Labels[0]) {
 		diagnostics = append(diagnostics, &hcl.Diagnostic{
 			Severity: hcl.DiagError,
-			Summary:  "Invalid provider name",
+			Summary:  "Invalid component name",
 			Detail:   fmt.Sprintf("Component name is invalid. %s", hcllang.BadIdentDetail),
+			Subject:  &block.LabelRanges[0],
 		})
 	}
 
-	componentBlock = &ComponentBlock{
+	component = &Component{
 		Name:   block.Labels[0],
 		Config: body,
 	}
 
 	if attr, exists := content.Attributes["version"]; exists {
-		diags := gohcl.DecodeExpression(attr.Expr, nil, &componentBlock.Version)
+		diags := gohcl.DecodeExpression(attr.Expr, nil, &component.Version)
 		diagnostics = append(diagnostics, diags...)
 		if diagnostics.HasErrors() {
 			return nil, diagnostics
@@ -61,5 +64,5 @@ func DecodeComponentBlock(block *hcl.Block) (componentBlock *ComponentBlock, dia
 		// TODO: source validation
 	}
 
-	return componentBlock, diagnostics
+	return component, diagnostics
 }
