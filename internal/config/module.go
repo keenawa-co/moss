@@ -14,14 +14,9 @@ type Module struct {
 	Components map[string]*baseschema.Component
 	Variables  map[string]*baseschema.Variable
 	Includes   *baseschema.IncludeList
-
-	// The specified version will represent the version
-	// of the entire module, and if the module is root, it
-	// will denote the version of the entire configuration.
-	Version *version.Version // TODO: Remove it
 }
 
-func NewModule(source string, files map[string]*baseschema.File) (mod *Module, diagnostics hcl.Diagnostics) {
+func NewModule(source string, files map[string]*baseschema.File) (mod *Module, v *version.Version, diagnostics hcl.Diagnostics) {
 	mod = &Module{
 		Source:     source,
 		Components: make(map[string]*baseschema.Component),
@@ -36,7 +31,7 @@ func NewModule(source string, files map[string]*baseschema.File) (mod *Module, d
 		mod.Variables = maps.Merge(mod.Variables, f.Variables)
 		mod.Includes.Modules = maps.Merge(mod.Includes.Modules, f.Includes.Modules)
 
-		if f.Version != nil && mod.Version != nil {
+		if f.Version != nil && v != nil {
 			diagnostics = diagnostics.Append(&hcl.Diagnostic{
 				Severity: hcl.DiagWarning,
 				Summary:  "Duplication of versions",
@@ -46,9 +41,9 @@ func NewModule(source string, files map[string]*baseschema.File) (mod *Module, d
 		}
 
 		if f.Version != nil {
-			mod.Version = f.Version.Value
+			v = f.Version.Value
 		}
 	}
 
-	return mod, diagnostics
+	return mod, v, diagnostics
 }

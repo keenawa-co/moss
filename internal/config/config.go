@@ -7,6 +7,7 @@ import (
 
 type Config struct {
 	Root *Config
+
 	// Reference to the module that is directly invoking this specific module
 	Parent *Config
 
@@ -16,7 +17,9 @@ type Config struct {
 	// A set of configuration settings specific to this module
 	Module *Module
 
-	// Specified configuration version
+	// The specified version will represent the version
+	// of the entire module, and if the module is root, it
+	// will denote the version of the entire configuration.
 	Version *version.Version
 }
 
@@ -26,19 +29,13 @@ type IncludeModuleInput struct {
 	Parent *Config
 }
 
-type Includer interface {
-	IncludeModule(source string) (*Module, hcl.Diagnostics)
+type Includer struct {
+	IncludeModule func(source string) (*Module, *version.Version, hcl.Diagnostics)
 }
-
-// type ModuleIncluderFn func(input IncludeModuleInput) (*Module, hcl.Diagnostics)
-
-// func (include ModuleIncluderFn) IncludeModule(input IncludeModuleInput) (*Module, hcl.Diagnostics) {
-// 	return include(input)
-// }
 
 func BuildConfig(root *Module, includer Includer) (conf *Config, diagnostics hcl.Diagnostics) {
 	conf = &Config{
-		// Root:   conf,
+		Root:   conf,
 		Module: root,
 	}
 
@@ -70,7 +67,7 @@ func buildChildren(parent *Config, includer Includer) (children map[string]*Conf
 }
 
 func buildChild(root *Config, includer Includer, input *IncludeModuleInput) (child *Config, diagnostics hcl.Diagnostics) {
-	mod, diags := includer.IncludeModule(input.Source)
+	mod, v, diags := includer.IncludeModule(input.Source)
 	diagnostics = append(diagnostics, diags...)
 	if mod == nil {
 		return nil, diagnostics
@@ -80,7 +77,7 @@ func buildChild(root *Config, includer Includer, input *IncludeModuleInput) (chi
 		Root:    root,
 		Parent:  input.Parent,
 		Module:  mod,
-		Version: mod.Version,
+		Version: v,
 	}
 
 	child.Children, diags = buildChildren(child, includer)

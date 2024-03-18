@@ -8,6 +8,7 @@ import (
 	"github.com/4rchr4y/goray/constant"
 	"github.com/4rchr4y/goray/internal/config"
 	"github.com/4rchr4y/goray/internal/config/baseschema"
+	version "github.com/hashicorp/go-version"
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/hclparse"
 	"github.com/spf13/afero"
@@ -25,7 +26,7 @@ func NewParser(fs afero.Fs) *Parser {
 	}
 }
 
-func (p *Parser) ParseModDir(dir string) (mod *config.Module, diagnostics hcl.Diagnostics) {
+func (p *Parser) ParseModDir(dir string) (mod *config.Module, v *version.Version, diagnostics hcl.Diagnostics) {
 	infos, err := p.fs.ReadDir(dir)
 	if err != nil {
 		diagnostics = append(diagnostics, &hcl.Diagnostic{
@@ -33,7 +34,7 @@ func (p *Parser) ParseModDir(dir string) (mod *config.Module, diagnostics hcl.Di
 			Summary:  "Failed to read module directory",
 			Detail:   fmt.Sprintf("Module directory %s does not exist or is unreadable.", dir),
 		})
-		return nil, diagnostics
+		return nil, nil, diagnostics
 	}
 
 	filePaths := make([]string, 0, len(infos))
@@ -55,7 +56,7 @@ func (p *Parser) ParseModDir(dir string) (mod *config.Module, diagnostics hcl.Di
 		f, diags := p.parseHCLFile(filePaths[i])
 		diagnostics = append(diagnostics, diags...)
 		if diags.HasErrors() {
-			return nil, diagnostics
+			return nil, nil, diagnostics
 		}
 
 		files[filePaths[i]] = f
