@@ -88,7 +88,7 @@ func runRootCmd(cmd *cobra.Command, args []string) {
 
 	scope := hclutl.NewScope()
 
-	for _, b := range conf.Module.Components {
+	for _, b := range conf.Children["example_module"].Module.Components {
 		spec := must.Must(schematica.DecodeBlock(schema.Schema.Root))
 		val, diags := scope.EvalBlock(b.Config, spec)
 		if diags.HasErrors() {

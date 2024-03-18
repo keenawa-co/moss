@@ -15,4 +15,3 @@ ray {
 provider "golang" {
     go_version = getenv("GOVERSION")
 }
-

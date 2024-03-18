@@ -20,6 +20,8 @@
         "hclsyntax",
         "hclutil",
         "hclutl",
+        "hray",
+        "Includer",
         "ioiface",
         "iostream",
         "iostreamiface",

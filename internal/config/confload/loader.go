@@ -6,7 +6,6 @@ import (
 	"github.com/hashicorp/hcl/v2"
 )
 
-// TODO: add list of supported file extensions
 type Loader struct {
 	parser *Parser
 }
@@ -18,15 +17,12 @@ func NewLoader(p *Parser) *Loader {
 }
 
 func (l *Loader) LoadConf(dir string) (conf *config.Config, diagnostics hcl.Diagnostics) {
-	rootMod, diagnostics := l.parser.ParseConfDir(dir)
+	rootMod, diagnostics := l.parser.ParseModDir(dir)
 	if diagnostics.HasErrors() {
 		return nil, diagnostics
 	}
 
-	return &config.Config{
-		Parent:   nil,
-		Children: nil,
-		Module:   rootMod,
-		Version:  rootMod.Version,
-	}, diagnostics
+	return config.BuildConfig(rootMod, &includer{
+		parser: l.parser,
+	})
 }

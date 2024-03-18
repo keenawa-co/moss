@@ -5,6 +5,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/4rchr4y/goray/constant"
 	"github.com/4rchr4y/goray/internal/config"
 	"github.com/4rchr4y/goray/internal/config/baseschema"
 	"github.com/hashicorp/hcl/v2"
@@ -24,13 +25,13 @@ func NewParser(fs afero.Fs) *Parser {
 	}
 }
 
-func (p *Parser) ParseConfDir(dir string) (mod *config.Module, diagnostics hcl.Diagnostics) {
+func (p *Parser) ParseModDir(dir string) (mod *config.Module, diagnostics hcl.Diagnostics) {
 	infos, err := p.fs.ReadDir(dir)
 	if err != nil {
 		diagnostics = append(diagnostics, &hcl.Diagnostic{
 			Severity: hcl.DiagError,
-			Summary:  "Failed to read template directory",
-			Detail:   fmt.Sprintf("Template directory %s does not exist or is unreadable.", dir),
+			Summary:  "Failed to read module directory",
+			Detail:   fmt.Sprintf("Module directory %s does not exist or is unreadable.", dir),
 		})
 		return nil, diagnostics
 	}
@@ -43,7 +44,7 @@ func (p *Parser) ParseConfDir(dir string) (mod *config.Module, diagnostics hcl.D
 
 		name := infos[i].Name()
 
-		if strings.HasSuffix(name, ".ray") {
+		if strings.HasSuffix(name, constant.ConfigFileExt) {
 			filePaths = append(filePaths, filepath.Join(dir, name))
 			continue
 		}
@@ -51,7 +52,7 @@ func (p *Parser) ParseConfDir(dir string) (mod *config.Module, diagnostics hcl.D
 
 	files := make(map[string]*baseschema.File, len(filePaths))
 	for i := range filePaths {
-		f, diags := p.ParseHCLFile(filePaths[i])
+		f, diags := p.parseHCLFile(filePaths[i])
 		diagnostics = append(diagnostics, diags...)
 		if diags.HasErrors() {
 			return nil, diagnostics
@@ -63,7 +64,7 @@ func (p *Parser) ParseConfDir(dir string) (mod *config.Module, diagnostics hcl.D
 	return config.NewModule(dir, files)
 }
 
-func (p *Parser) ParseHCLFile(path string) (file *baseschema.File, diagnostics hcl.Diagnostics) {
+func (p *Parser) parseHCLFile(path string) (file *baseschema.File, diagnostics hcl.Diagnostics) {
 	content, err := p.fs.ReadFile(path)
 	if err != nil {
 		return nil, diagnostics.Append(&hcl.Diagnostic{
