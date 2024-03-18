@@ -4,11 +4,9 @@ import (
 	"fmt"
 
 	"github.com/4rchr4y/goray/internal/hclutl"
-	"github.com/4rchr4y/goray/internal/kernel/hcllang"
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/ext/typeexpr"
 	"github.com/hashicorp/hcl/v2/gohcl"
-	"github.com/hashicorp/hcl/v2/hclsyntax"
 	"github.com/zclconf/go-cty/cty"
 	"github.com/zclconf/go-cty/cty/convert"
 )
@@ -16,29 +14,29 @@ import (
 // Reserved for future expansion
 var (
 	variableBlockReservedAttributeList = [...]string{
-		SENSITIVE,
+		"sensitive",
 	}
 	variableBlockReservedBlockList = [...]string{
-		VALIDATION,
+		"validation",
 	}
 )
 
 var variableBlockSchema = &hcl.BodySchema{
 	Attributes: hclutl.NewAttributeList(
 		hcl.AttributeSchema{
-			Name:     TYPE,
+			Name:     "type",
 			Required: false,
 		},
 		hcl.AttributeSchema{
-			Name:     DESCRIPTION,
+			Name:     "description",
 			Required: false,
 		},
 		hcl.AttributeSchema{
-			Name:     DEFAULT,
+			Name:     "default",
 			Required: false,
 		},
 		hcl.AttributeSchema{
-			Name:     NULLABLE,
+			Name:     "nullable",
 			Required: false,
 		},
 	)(variableBlockReservedAttributeList[:]...),
@@ -62,31 +60,19 @@ func DecodeVariableBlock(block *hcl.Block) (variable *Variable, diagnostics hcl.
 		return nil, diagnostics
 	}
 
-	// existence of a label is checked when this block was detected
-	if !hclsyntax.ValidIdentifier(block.Labels[0]) {
-		diagnostics = diagnostics.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
-			Summary:  "Invalid variable name",
-			Detail:   fmt.Sprintf("Variable name is invalid. %s", hcllang.BadIdentDetail),
-			Subject:  &block.LabelRanges[0],
-		})
+	// if IsReserved(block.Labels[0]) {
+	// 	diagnostics = diagnostics.Append(&hcl.Diagnostic{
+	// 		Severity: hcl.DiagError,
+	// 		Summary:  "Forbidden variable name used",
+	// 		Detail:   fmt.Sprintf("Variable name %q is a reserved keyword.", block.Labels[0]),
+	// 		Subject:  &block.LabelRanges[0],
+	// 	})
 
-		return nil, diagnostics
-	}
-
-	if IsReserved(block.Labels[0]) {
-		diagnostics = diagnostics.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
-			Summary:  "Forbidden variable name used",
-			Detail:   fmt.Sprintf("Variable name %q is a reserved keyword.", block.Labels[0]),
-			Subject:  &block.LabelRanges[0],
-		})
-
-		return nil, diagnostics
-	}
+	// 	return nil, diagnostics
+	// }
 
 	variable = &Variable{
-		Name:      block.Labels[0],
+		Name:      block.Labels[0], // label presence was verified upon block detection
 		DeclRange: block.DefRange,
 	}
 

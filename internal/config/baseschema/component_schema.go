@@ -1,13 +1,9 @@
 package baseschema
 
 import (
-	"fmt"
-
 	"github.com/4rchr4y/goray/internal/hclutl"
-	"github.com/4rchr4y/goray/internal/kernel/hcllang"
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/gohcl"
-	"github.com/hashicorp/hcl/v2/hclsyntax"
 )
 
 // Reserved for future expansion
@@ -39,18 +35,8 @@ func DecodeComponentBlock(block *hcl.Block) (component *Component, diagnostics h
 		return nil, diagnostics
 	}
 
-	// existence of a label is checked when this block was detected
-	if !hclsyntax.ValidIdentifier(block.Labels[0]) {
-		diagnostics = append(diagnostics, &hcl.Diagnostic{
-			Severity: hcl.DiagError,
-			Summary:  "Invalid component name",
-			Detail:   fmt.Sprintf("Component name is invalid. %s", hcllang.BadIdentDetail),
-			Subject:  &block.LabelRanges[0],
-		})
-	}
-
 	component = &Component{
-		Name:   block.Labels[0],
+		Name:   block.Labels[0], // label presence was verified upon block detection
 		Config: body,
 	}
 
