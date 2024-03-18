@@ -4,7 +4,7 @@ go 1.21.3
 
 require (
 	github.com/4rchr4y/bpm v0.0.6
-	github.com/4rchr4y/godevkit/v3 v3.2.0
+	github.com/4rchr4y/godevkit/v3 v3.3.0
 	github.com/g10z3r/ason v0.0.1
 	github.com/hashicorp/go-plugin v1.6.0
 	github.com/hashicorp/hcl/v2 v2.19.1
