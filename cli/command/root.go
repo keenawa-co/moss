@@ -86,6 +86,8 @@ func runRootCmd(cmd *cobra.Command, args []string) {
 	log.Printf("Received schema: %+v\n", schema.Schema)
 	fmt.Println("--------------")
 
+	fmt.Println(conf.Children["example_module"].Module.Input)
+
 	scope := hclutl.NewScope()
 
 	for _, b := range conf.Children["example_module"].Module.Components {

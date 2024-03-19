@@ -60,12 +60,16 @@ var fileSchema = &hcl.BodySchema{
 				"name",
 			},
 		},
+		hcl.BlockHeaderSchema{
+			Type:       "input",
+			LabelNames: []string{},
+		},
 	)(fileReservedBlockList[:]...),
 }
 
 type Version struct {
-	DefRange hcl.Range
-	Value    *version.Version
+	DeclRange hcl.Range
+	Value     *version.Version
 }
 
 type IncludeList struct {
@@ -75,6 +79,7 @@ type IncludeList struct {
 type File struct {
 	_          [0]int
 	Name       string
+	Input      *Input // input block
 	Components map[string]*Component
 	Variables  map[string]*Variable
 	Includes   *IncludeList
@@ -111,7 +116,7 @@ func DecodeFile(body hcl.Body) (file *File, diagnostics hcl.Diagnostics) {
 		}
 
 		file.Version = &Version{
-			DefRange: attr.Range,
+			DeclRange: attr.Range,
 		}
 
 		file.Version.Value, err = version.NewVersion(v)
@@ -155,12 +160,33 @@ func DecodeFile(body hcl.Body) (file *File, diagnostics hcl.Diagnostics) {
 
 			file.Includes.Modules[decoded.Name] = decoded
 			continue
+
+		case "input":
+			if file.Input != nil {
+				diagnostics = diagnostics.Append(&hcl.Diagnostic{
+					Severity: hcl.DiagError,
+					Summary:  "Duplicated input block",
+					Detail:   fmt.Sprintf("A duplicate input block declaration was detected in file %s on line %d. This declaration will be ignored when building the configuration", file.Name, b.DefRange.Start.Line),
+					Subject:  &b.DefRange,
+				})
+				continue
+			}
+
+			decoded, diags := DecodeInputBlock(b)
+			diagnostics = append(diagnostics, diags...)
+			if diagnostics.HasErrors() {
+				return nil, diagnostics
+			}
+
+			file.Input = decoded
+			continue
 		}
 	}
 
 	return file, diagnostics
 }
 
+// TODO: replace with validation func
 func decodeIncludeModuleBlock(file *File, block *hcl.Block) (b *IncludeModule, diagnostics hcl.Diagnostics) {
 	if len(block.Labels) < 1 {
 		diagnostics = append(diagnostics, &hcl.Diagnostic{
@@ -195,6 +221,7 @@ func decodeIncludeModuleBlock(file *File, block *hcl.Block) (b *IncludeModule, d
 	return DecodeIncludeModuleBlock(block)
 }
 
+// TODO: replace with validation func
 func decodeVariableBlock(file *File, block *hcl.Block) (v *Variable, diagnostics hcl.Diagnostics) {
 	if len(block.Labels) < 1 {
 		diagnostics = append(diagnostics, &hcl.Diagnostic{
@@ -230,6 +257,7 @@ func decodeVariableBlock(file *File, block *hcl.Block) (v *Variable, diagnostics
 	return DecodeVariableBlock(block)
 }
 
+// TODO: replace with validation func
 func decodeComponentBlock(file *File, block *hcl.Block) (c *Component, diagnostics hcl.Diagnostics) {
 	if len(block.Labels) < 1 {
 		diagnostics = diagnostics.Append(&hcl.Diagnostic{

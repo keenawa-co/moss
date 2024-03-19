@@ -45,7 +45,14 @@ func (p *Parser) ParseModDir(dir string) (mod *config.Module, v *version.Version
 
 		name := infos[i].Name()
 
+		// TODO: create a list of valid file extensions and make checking more elegant
+
 		if strings.HasSuffix(name, constant.ConfigFileExt) {
+			filePaths = append(filePaths, filepath.Join(dir, name))
+			continue
+		}
+
+		if strings.HasSuffix(name, constant.HeaderConfigFilePrefix) {
 			filePaths = append(filePaths, filepath.Join(dir, name))
 			continue
 		}

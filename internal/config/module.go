@@ -11,6 +11,7 @@ import (
 
 type Module struct {
 	Source     string
+	Input      *baseschema.Input
 	Components map[string]*baseschema.Component
 	Variables  map[string]*baseschema.Variable
 	Includes   *baseschema.IncludeList
@@ -31,18 +32,30 @@ func NewModule(source string, files map[string]*baseschema.File) (mod *Module, v
 		mod.Variables = maps.Merge(mod.Variables, f.Variables)
 		mod.Includes.Modules = maps.Merge(mod.Includes.Modules, f.Includes.Modules)
 
-		if f.Version != nil && v != nil {
+		switch {
+		case f.Version != nil && v != nil:
 			diagnostics = diagnostics.Append(&hcl.Diagnostic{
 				Severity: hcl.DiagWarning,
-				Summary:  "Duplication of versions",
-				Detail:   fmt.Sprintf("A duplicate version declaration was detected in file %s on line %d. This declaration will be ignored when building the configuration", fileName, f.Version.DefRange.Start.Line),
+				Summary:  "Duplication of version declaration",
+				Detail:   fmt.Sprintf("A duplicate version declaration was detected in file %s on line %d. This declaration will be ignored when building the configuration", fileName, f.Version.DeclRange.Start.Line),
 			})
 			continue
-		}
-
-		if f.Version != nil {
+		case f.Version != nil:
 			v = f.Version.Value
 		}
+
+		switch {
+		case f.Input != nil && mod.Input != nil:
+			diagnostics = diagnostics.Append(&hcl.Diagnostic{
+				Severity: hcl.DiagWarning,
+				Summary:  "Duplicated input block declaration",
+				Detail:   fmt.Sprintf("A duplicate input block declaration was detected in file %s on line %d. This declaration will be ignored when building the configuration", fileName, f.Input.DeclRange.Start.Line),
+			})
+			continue
+		case f.Input != nil:
+			mod.Input = f.Input
+		}
+
 	}
 
 	return mod, v, diagnostics

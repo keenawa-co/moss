@@ -1,4 +1,6 @@
+version = "1.0"
+
 component "dummy" {
     version = "1.0"
-    value = "Hello, World!"
+    value = input.example
 }
