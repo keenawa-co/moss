@@ -1,5 +1,5 @@
 module_header {
-    variable "example" {
+    let "example" {
         type = string
         description = "Example of using variables"
         default     = "Hello, World!"

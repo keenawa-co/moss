@@ -15,15 +15,15 @@ import (
 
 // Reserved for future expansion
 var (
-	variableBlockReservedAttributeList = [...]string{
+	letBlockReservedAttributeList = [...]string{
 		"sensitive",
 	}
-	variableBlockReservedBlockList = [...]string{
+	letBlockReservedBlockList = [...]string{
 		"validation",
 	}
 )
 
-var variableBlockSchema = hcl.BodySchema{
+var letBlockSchema = hcl.BodySchema{
 	Attributes: hclutl.NewAttributeList(
 		hcl.AttributeSchema{
 			Name:     "type",
@@ -41,18 +41,18 @@ var variableBlockSchema = hcl.BodySchema{
 			Name:     "nullable",
 			Required: false,
 		},
-	)(variableBlockReservedAttributeList[:]...),
-	Blocks: hclutl.NewBlockList()(variableBlockReservedBlockList[:]...),
+	)(letBlockReservedAttributeList[:]...),
+	Blocks: hclutl.NewBlockList()(letBlockReservedBlockList[:]...),
 }
 
-var variableBlockDef = hcl.BlockHeaderSchema{
-	Type: "variable",
+var letBlockDef = hcl.BlockHeaderSchema{
+	Type: "let",
 	LabelNames: []string{
 		"name",
 	},
 }
 
-type Variable struct {
+type Let struct {
 	Name           string
 	ConstraintType cty.Type
 	Type           cty.Type
@@ -63,7 +63,7 @@ type Variable struct {
 	DeclRange      hcl.Range
 }
 
-func ValidateVariableBlock(block *hcl.Block) (diagnostics hcl.Diagnostics) {
+func ValidateLetBlock(block *hcl.Block) (diagnostics hcl.Diagnostics) {
 	if len(block.Labels) < 1 {
 		diagnostics = append(diagnostics, &hcl.Diagnostic{
 			Severity: hcl.DiagError,
@@ -88,13 +88,13 @@ func ValidateVariableBlock(block *hcl.Block) (diagnostics hcl.Diagnostics) {
 	return diagnostics
 }
 
-func DecodeVariableBlock(block *hcl.Block) (decodedBlock *Variable, diagnostics hcl.Diagnostics) {
-	content, diagnostics := block.Body.Content(&variableBlockSchema)
+func DecodeLetBlock(block *hcl.Block) (decodedBlock *Let, diagnostics hcl.Diagnostics) {
+	content, diagnostics := block.Body.Content(&letBlockSchema)
 	if diagnostics.HasErrors() {
 		return nil, diagnostics
 	}
 
-	decodedBlock = &Variable{
+	decodedBlock = &Let{
 		Name:      block.Labels[0], // label presence was verified upon block detection
 		DeclRange: block.DefRange,
 	}

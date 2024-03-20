@@ -8,10 +8,12 @@ import (
 type Config struct {
 	Root *Config
 
-	// Reference to the module that is directly invoking this specific module
+	// Reference to the module that is directly invoking
+	// this specific module
 	Parent *Config
 
-	// Array of modules invoked within the configuration scope of this module
+	// Array of modules invoked within the configuration
+	// scope of this module
 	Children map[string]*Config
 
 	// A set of configuration settings specific to this module

@@ -1,4 +1,4 @@
-version = "1.0"
+
 
 include_module "example_module" {
     source = ".ray/example_module"

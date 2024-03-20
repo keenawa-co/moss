@@ -16,12 +16,7 @@ var (
 var moduleHeaderBlockSchema = hcl.BodySchema{
 	Attributes: hclutl.NewAttributeList()(moduleHeaderReservedAttributeList[:]...),
 	Blocks: hclutl.NewBlockList(
-		hcl.BlockHeaderSchema{
-			Type: "variable",
-			LabelNames: []string{
-				"name",
-			},
-		},
+		letBlockDef,
 	)(moduleHeaderReservedBlockList[:]...),
 }
 
@@ -32,7 +27,7 @@ var moduleHeaderBlockDef = hcl.BlockHeaderSchema{
 
 type ModuleHeader struct {
 	_         [0]int
-	Variables map[string]*Variable
+	Variables map[string]*Let
 	DeclRange hcl.Range
 }
 
@@ -43,13 +38,13 @@ func DecodeModuleHeaderBlock(block *hcl.Block) (decodedBlock *ModuleHeader, diag
 	}
 
 	decodedBlock = &ModuleHeader{
-		Variables: make(map[string]*Variable),
+		Variables: make(map[string]*Let),
 	}
 
 	for _, b := range content.Blocks {
 		switch b.Type {
-		case "variable":
-			diagnostics = append(diagnostics, ValidateVariableBlock(b)...)
+		case letBlockDef.Type:
+			diagnostics = append(diagnostics, ValidateLetBlock(b)...)
 			if diagnostics.HasErrors() {
 				return nil, diagnostics
 			}
@@ -63,7 +58,7 @@ func DecodeModuleHeaderBlock(block *hcl.Block) (decodedBlock *ModuleHeader, diag
 				})
 			}
 
-			decoded, diags := DecodeVariableBlock(b)
+			decoded, diags := DecodeLetBlock(b)
 			diagnostics = append(diagnostics, diags...)
 			if diagnostics.HasErrors() {
 				return nil, diagnostics

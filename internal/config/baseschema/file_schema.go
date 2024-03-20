@@ -24,12 +24,6 @@ var (
 
 var fileSchema = hcl.BodySchema{
 	Attributes: hclutl.NewAttributeList(
-		// The version is not mandatory for every file, but it must
-		// be specified in at least one of them. The version should
-		// be declared a single time in any file deemed primary by
-		// the user. The specified version will represent the
-		// version of the entire module, and if the module is root,
-		// it will denote the version of the entire configuration.
 		hcl.AttributeSchema{
 			Name:     "version",
 			Required: false,
@@ -41,7 +35,7 @@ var fileSchema = hcl.BodySchema{
 			LabelNames: []string{},
 		},
 		componentBlockDef,
-		variableBlockDef,
+		letBlockDef,
 		includeModuleBlockDef,
 		moduleHeaderBlockDef,
 	)(fileReservedBlockList[:]...),
@@ -61,7 +55,7 @@ type File struct {
 	Name         string
 	ModuleHeader *ModuleHeader
 	Components   map[string]*Component
-	Variables    map[string]*Variable
+	Variables    map[string]*Let
 	Includes     *IncludeList
 	Body         hcl.Body
 	Version      *Version
@@ -76,7 +70,7 @@ func DecodeFile(body hcl.Body) (decodedBlock *File, diagnostics hcl.Diagnostics)
 	decodedBlock = &File{
 		Body:       body,
 		Components: make(map[string]*Component),
-		Variables:  make(map[string]*Variable),
+		Variables:  make(map[string]*Let),
 		Includes: &IncludeList{
 			Modules: make(map[string]*IncludeModule),
 		},
@@ -110,7 +104,7 @@ func DecodeFile(body hcl.Body) (decodedBlock *File, diagnostics hcl.Diagnostics)
 
 	for _, b := range content.Blocks {
 		switch b.Type {
-		case "component":
+		case componentBlockDef.Type:
 			diagnostics = append(diagnostics, ValidateComponentBlock(b)...)
 			if diagnostics.HasErrors() {
 				return nil, diagnostics
@@ -135,8 +129,8 @@ func DecodeFile(body hcl.Body) (decodedBlock *File, diagnostics hcl.Diagnostics)
 			decodedBlock.Components[decoded.Name] = decoded
 			continue
 
-		case "variable":
-			diagnostics = append(diagnostics, ValidateVariableBlock(b)...)
+		case letBlockDef.Type:
+			diagnostics = append(diagnostics, ValidateLetBlock(b)...)
 			if diagnostics.HasErrors() {
 				return nil, diagnostics
 			}
@@ -150,7 +144,7 @@ func DecodeFile(body hcl.Body) (decodedBlock *File, diagnostics hcl.Diagnostics)
 				})
 			}
 
-			decoded, diags := DecodeVariableBlock(b)
+			decoded, diags := DecodeLetBlock(b)
 			diagnostics = append(diagnostics, diags...)
 			if diagnostics.HasErrors() {
 				return nil, diagnostics
@@ -159,7 +153,7 @@ func DecodeFile(body hcl.Body) (decodedBlock *File, diagnostics hcl.Diagnostics)
 			decodedBlock.Variables[decoded.Name] = decoded
 			continue
 
-		case "include_module":
+		case includeModuleBlockDef.Type:
 			diagnostics = append(diagnostics, ValidateIncludeModuleBlock(b)...)
 			if diagnostics.HasErrors() {
 				return nil, diagnostics
@@ -184,7 +178,7 @@ func DecodeFile(body hcl.Body) (decodedBlock *File, diagnostics hcl.Diagnostics)
 			decodedBlock.Includes.Modules[decoded.Name] = decoded
 			continue
 
-		case "module_header":
+		case moduleHeaderBlockDef.Type:
 			if decodedBlock.ModuleHeader != nil {
 				diagnostics = diagnostics.Append(&hcl.Diagnostic{
 					Severity: hcl.DiagError,

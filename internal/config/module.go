@@ -13,7 +13,7 @@ type Module struct {
 	Source     string
 	Header     *baseschema.ModuleHeader
 	Components map[string]*baseschema.Component
-	Variables  map[string]*baseschema.Variable
+	Variables  map[string]*baseschema.Let
 	Includes   *baseschema.IncludeList
 }
 
@@ -21,7 +21,7 @@ func NewModule(source string, files map[string]*baseschema.File) (mod *Module, v
 	mod = &Module{
 		Source:     source,
 		Components: make(map[string]*baseschema.Component),
-		Variables:  make(map[string]*baseschema.Variable),
+		Variables:  make(map[string]*baseschema.Let),
 		Includes: &baseschema.IncludeList{
 			Modules: make(map[string]*baseschema.IncludeModule),
 		},
