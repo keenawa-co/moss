@@ -1,4 +1,4 @@
-input {
+module_header {
     variable "example" {
         type = string
         description = "Example of using variables"

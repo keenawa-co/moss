@@ -11,7 +11,7 @@ import (
 
 type Module struct {
 	Source     string
-	Input      *baseschema.Input
+	Header     *baseschema.ModuleHeader
 	Components map[string]*baseschema.Component
 	Variables  map[string]*baseschema.Variable
 	Includes   *baseschema.IncludeList
@@ -45,15 +45,15 @@ func NewModule(source string, files map[string]*baseschema.File) (mod *Module, v
 		}
 
 		switch {
-		case f.Input != nil && mod.Input != nil:
+		case f.ModuleHeader != nil && mod.Header != nil:
 			diagnostics = diagnostics.Append(&hcl.Diagnostic{
 				Severity: hcl.DiagWarning,
 				Summary:  "Duplicated input block declaration",
-				Detail:   fmt.Sprintf("A duplicate input block declaration was detected in file %s on line %d. This declaration will be ignored when building the configuration", fileName, f.Input.DeclRange.Start.Line),
+				Detail:   fmt.Sprintf("A duplicate input block declaration was detected in file %s on line %d. This declaration will be ignored when building the configuration", fileName, f.ModuleHeader.DeclRange.Start.Line),
 			})
 			continue
-		case f.Input != nil:
-			mod.Input = f.Input
+		case f.ModuleHeader != nil:
+			mod.Header = f.ModuleHeader
 		}
 
 	}

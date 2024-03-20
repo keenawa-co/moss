@@ -4,9 +4,11 @@ import (
 	"fmt"
 
 	"github.com/4rchr4y/goray/internal/hclutl"
+	"github.com/4rchr4y/goray/internal/kernel/hcllang"
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/ext/typeexpr"
 	"github.com/hashicorp/hcl/v2/gohcl"
+	"github.com/hashicorp/hcl/v2/hclsyntax"
 	"github.com/zclconf/go-cty/cty"
 	"github.com/zclconf/go-cty/cty/convert"
 )
@@ -21,7 +23,7 @@ var (
 	}
 )
 
-var variableBlockSchema = &hcl.BodySchema{
+var variableBlockSchema = hcl.BodySchema{
 	Attributes: hclutl.NewAttributeList(
 		hcl.AttributeSchema{
 			Name:     "type",
@@ -43,6 +45,13 @@ var variableBlockSchema = &hcl.BodySchema{
 	Blocks: hclutl.NewBlockList()(variableBlockReservedBlockList[:]...),
 }
 
+var variableBlockDef = hcl.BlockHeaderSchema{
+	Type: "variable",
+	LabelNames: []string{
+		"name",
+	},
+}
+
 type Variable struct {
 	Name           string
 	ConstraintType cty.Type
@@ -54,24 +63,38 @@ type Variable struct {
 	DeclRange      hcl.Range
 }
 
-func DecodeVariableBlock(block *hcl.Block) (variable *Variable, diagnostics hcl.Diagnostics) {
-	content, diagnostics := block.Body.Content(variableBlockSchema)
+func ValidateVariableBlock(block *hcl.Block) (diagnostics hcl.Diagnostics) {
+	if len(block.Labels) < 1 {
+		diagnostics = append(diagnostics, &hcl.Diagnostic{
+			Severity: hcl.DiagError,
+			Summary:  "Variable name not found",
+			Detail:   fmt.Sprintf("Variable name must be specified as the first block label, on line: %d", block.DefRange.Start.Line),
+			Subject:  &block.DefRange,
+		})
+		return diagnostics
+	}
+
+	if !hclsyntax.ValidIdentifier(block.Labels[0]) {
+		diagnostics = diagnostics.Append(&hcl.Diagnostic{
+			Severity: hcl.DiagError,
+			Summary:  "Invalid variable name",
+			Detail:   fmt.Sprintf("Variable name is invalid. %s", hcllang.BadIdentDetail),
+			Subject:  &block.LabelRanges[0],
+		})
+
+		return diagnostics
+	}
+
+	return diagnostics
+}
+
+func DecodeVariableBlock(block *hcl.Block) (decodedBlock *Variable, diagnostics hcl.Diagnostics) {
+	content, diagnostics := block.Body.Content(&variableBlockSchema)
 	if diagnostics.HasErrors() {
 		return nil, diagnostics
 	}
 
-	// if IsReserved(block.Labels[0]) {
-	// 	diagnostics = diagnostics.Append(&hcl.Diagnostic{
-	// 		Severity: hcl.DiagError,
-	// 		Summary:  "Forbidden variable name used",
-	// 		Detail:   fmt.Sprintf("Variable name %q is a reserved keyword.", block.Labels[0]),
-	// 		Subject:  &block.LabelRanges[0],
-	// 	})
-
-	// 	return nil, diagnostics
-	// }
-
-	variable = &Variable{
+	decodedBlock = &Variable{
 		Name:      block.Labels[0], // label presence was verified upon block detection
 		DeclRange: block.DefRange,
 	}
@@ -80,28 +103,28 @@ func DecodeVariableBlock(block *hcl.Block) (variable *Variable, diagnostics hcl.
 		ty, defaults, diags := decodeVariableType(attr.Expr)
 		diagnostics = append(diagnostics, diags...)
 
-		variable.ConstraintType = ty
-		variable.TypeDefaults = defaults
-		variable.Type = ty.WithoutOptionalAttributesDeep()
+		decodedBlock.ConstraintType = ty
+		decodedBlock.TypeDefaults = defaults
+		decodedBlock.Type = ty.WithoutOptionalAttributesDeep()
 	}
 
 	if attr, exists := content.Attributes["description"]; exists {
-		diags := gohcl.DecodeExpression(attr.Expr, nil, &variable.Description)
+		diags := gohcl.DecodeExpression(attr.Expr, nil, &decodedBlock.Description)
 		diagnostics = append(diagnostics, diags...)
 	}
 
 	if attr, exists := content.Attributes["nullable"]; exists {
-		diags := gohcl.DecodeExpression(attr.Expr, nil, &variable.Nullable)
+		diags := gohcl.DecodeExpression(attr.Expr, nil, &decodedBlock.Nullable)
 		diagnostics = append(diagnostics, diags...)
 	} else {
-		variable.Nullable = true
+		decodedBlock.Nullable = true
 	}
 
 	if attr, exists := content.Attributes["default"]; exists {
 		val, diags := attr.Expr.Value(nil)
 		diagnostics = append(diagnostics, diags...)
 
-		if variable.ConstraintType != cty.NilType {
+		if decodedBlock.ConstraintType != cty.NilType {
 			var err error
 
 			// Should the type constraint include defaults, those
@@ -111,10 +134,10 @@ func DecodeVariableBlock(block *hcl.Block) (variable *Variable, diagnostics hcl.
 			// from this default application process, permitting
 			// variables that can be null to possess a null default
 			// value as a special case.
-			if variable.TypeDefaults != nil && !val.IsNull() {
-				val = variable.TypeDefaults.Apply(val)
+			if decodedBlock.TypeDefaults != nil && !val.IsNull() {
+				val = decodedBlock.TypeDefaults.Apply(val)
 			}
-			val, err = convert.Convert(val, variable.ConstraintType)
+			val, err = convert.Convert(val, decodedBlock.ConstraintType)
 			if err != nil {
 				diagnostics = diagnostics.Append(&hcl.Diagnostic{
 					Severity: hcl.DiagError,
@@ -127,7 +150,7 @@ func DecodeVariableBlock(block *hcl.Block) (variable *Variable, diagnostics hcl.
 			}
 		}
 
-		if !variable.Nullable && val.IsNull() {
+		if !decodedBlock.Nullable && val.IsNull() {
 			diagnostics = diagnostics.Append(&hcl.Diagnostic{
 				Severity: hcl.DiagError,
 				Summary:  "Invalid default value for variable",
@@ -136,10 +159,10 @@ func DecodeVariableBlock(block *hcl.Block) (variable *Variable, diagnostics hcl.
 			})
 		}
 
-		variable.Default = val
+		decodedBlock.Default = val
 	}
 
-	return variable, diagnostics
+	return decodedBlock, diagnostics
 
 }
 

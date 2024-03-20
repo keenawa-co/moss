@@ -4,10 +4,8 @@ import (
 	"fmt"
 
 	"github.com/4rchr4y/goray/internal/hclutl"
-	"github.com/4rchr4y/goray/internal/kernel/hcllang"
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/gohcl"
-	"github.com/hashicorp/hcl/v2/hclsyntax"
 
 	version "github.com/hashicorp/go-version"
 )
@@ -24,7 +22,7 @@ var (
 	}
 )
 
-var fileSchema = &hcl.BodySchema{
+var fileSchema = hcl.BodySchema{
 	Attributes: hclutl.NewAttributeList(
 		// The version is not mandatory for every file, but it must
 		// be specified in at least one of them. The version should
@@ -42,28 +40,10 @@ var fileSchema = &hcl.BodySchema{
 			Type:       "_",
 			LabelNames: []string{},
 		},
-		hcl.BlockHeaderSchema{
-			Type: "component",
-			LabelNames: []string{
-				"name",
-			},
-		},
-		hcl.BlockHeaderSchema{
-			Type: "variable",
-			LabelNames: []string{
-				"name",
-			},
-		},
-		hcl.BlockHeaderSchema{
-			Type: "include_module",
-			LabelNames: []string{
-				"name",
-			},
-		},
-		hcl.BlockHeaderSchema{
-			Type:       "input",
-			LabelNames: []string{},
-		},
+		componentBlockDef,
+		variableBlockDef,
+		includeModuleBlockDef,
+		moduleHeaderBlockDef,
 	)(fileReservedBlockList[:]...),
 }
 
@@ -77,24 +57,23 @@ type IncludeList struct {
 }
 
 type File struct {
-	_          [0]int
-	Name       string
-	Input      *Input // input block
-	Components map[string]*Component
-	Variables  map[string]*Variable
-	Includes   *IncludeList
-	Body       hcl.Body
-	Version    *Version
-	// TODO: FileType
+	_            [0]int
+	Name         string
+	ModuleHeader *ModuleHeader
+	Components   map[string]*Component
+	Variables    map[string]*Variable
+	Includes     *IncludeList
+	Body         hcl.Body
+	Version      *Version
 }
 
-func DecodeFile(body hcl.Body) (file *File, diagnostics hcl.Diagnostics) {
-	content, body, diagnostics := body.PartialContent(fileSchema)
+func DecodeFile(body hcl.Body) (decodedBlock *File, diagnostics hcl.Diagnostics) {
+	content, body, diagnostics := body.PartialContent(&fileSchema)
 	if diagnostics.HasErrors() {
 		return nil, diagnostics
 	}
 
-	file = &File{
+	decodedBlock = &File{
 		Body:       body,
 		Components: make(map[string]*Component),
 		Variables:  make(map[string]*Variable),
@@ -115,11 +94,11 @@ func DecodeFile(body hcl.Body) (file *File, diagnostics hcl.Diagnostics) {
 			return nil, diagnostics
 		}
 
-		file.Version = &Version{
+		decodedBlock.Version = &Version{
 			DeclRange: attr.Range,
 		}
 
-		file.Version.Value, err = version.NewVersion(v)
+		decodedBlock.Version.Value, err = version.NewVersion(v)
 		if err != nil {
 			diagnostics = diagnostics.Append(&hcl.Diagnostic{
 				Severity: hcl.DiagError,
@@ -132,162 +111,100 @@ func DecodeFile(body hcl.Body) (file *File, diagnostics hcl.Diagnostics) {
 	for _, b := range content.Blocks {
 		switch b.Type {
 		case "component":
-			decoded, diags := decodeComponentBlock(file, b)
+			diagnostics = append(diagnostics, ValidateComponentBlock(b)...)
+			if diagnostics.HasErrors() {
+				return nil, diagnostics
+			}
+
+			if _, exists := decodedBlock.Components[b.Labels[0]]; exists {
+				diagnostics = diagnostics.Append(&hcl.Diagnostic{
+					Severity: hcl.DiagError,
+					Summary:  "Duplicated component",
+					Detail:   fmt.Sprintf("A duplicate version declaration was detected in file %s on line %d. This declaration will be ignored when building the configuration", decodedBlock.Name, b.DefRange.Start.Line),
+					Subject:  &b.DefRange,
+				})
+				return nil, diagnostics
+			}
+
+			decoded, diags := DecodeComponentBlock(b)
 			diagnostics = append(diagnostics, diags...)
 			if diagnostics.HasErrors() {
 				return nil, diagnostics
 			}
 
-			file.Components[decoded.Name] = decoded
+			decodedBlock.Components[decoded.Name] = decoded
 			continue
 
 		case "variable":
-			decoded, diags := decodeVariableBlock(file, b)
+			diagnostics = append(diagnostics, ValidateVariableBlock(b)...)
+			if diagnostics.HasErrors() {
+				return nil, diagnostics
+			}
+
+			if _, exists := decodedBlock.Variables[b.Labels[0]]; exists {
+				diagnostics = append(diagnostics, &hcl.Diagnostic{
+					Severity: hcl.DiagError,
+					Summary:  "Duplicated variable",
+					Detail:   fmt.Sprintf("A duplicate variable declaration was detected in file %s on line %d. This declaration will be ignored when building the configuration", decodedBlock.Name, b.DefRange.Start.Line),
+					Subject:  &b.DefRange,
+				})
+			}
+
+			decoded, diags := DecodeVariableBlock(b)
 			diagnostics = append(diagnostics, diags...)
 			if diagnostics.HasErrors() {
 				return nil, diagnostics
 			}
 
-			file.Variables[decoded.Name] = decoded
+			decodedBlock.Variables[decoded.Name] = decoded
 			continue
 
 		case "include_module":
-			decoded, diags := decodeIncludeModuleBlock(file, b)
+			diagnostics = append(diagnostics, ValidateIncludeModuleBlock(b)...)
+			if diagnostics.HasErrors() {
+				return nil, diagnostics
+			}
+
+			if _, exists := decodedBlock.Variables[b.Labels[0]]; exists {
+				diagnostics = append(diagnostics, &hcl.Diagnostic{
+					Severity: hcl.DiagError,
+					Summary:  "Duplicated module include",
+					Detail:   fmt.Sprintf("Module %s in file %s on line %d was already included. This declaration will be ignored when building the configuration", b.Labels[0], decodedBlock.Name, b.DefRange.Start.Line),
+					Subject:  &b.DefRange,
+				})
+				return nil, diagnostics
+			}
+
+			decoded, diags := DecodeIncludeModuleBlock(b)
 			diagnostics = append(diagnostics, diags...)
 			if diagnostics.HasErrors() {
 				return nil, diagnostics
 			}
 
-			file.Includes.Modules[decoded.Name] = decoded
+			decodedBlock.Includes.Modules[decoded.Name] = decoded
 			continue
 
-		case "input":
-			if file.Input != nil {
+		case "module_header":
+			if decodedBlock.ModuleHeader != nil {
 				diagnostics = diagnostics.Append(&hcl.Diagnostic{
 					Severity: hcl.DiagError,
-					Summary:  "Duplicated input block",
-					Detail:   fmt.Sprintf("A duplicate input block declaration was detected in file %s on line %d. This declaration will be ignored when building the configuration", file.Name, b.DefRange.Start.Line),
+					Summary:  "Duplicated module_header block",
+					Detail:   fmt.Sprintf("A duplicate module_header block declaration was detected in file %s on line %d. This declaration will be ignored when building the configuration", decodedBlock.Name, b.DefRange.Start.Line),
 					Subject:  &b.DefRange,
 				})
 				continue
 			}
 
-			decoded, diags := DecodeInputBlock(b)
+			decoded, diags := DecodeModuleHeaderBlock(b)
 			diagnostics = append(diagnostics, diags...)
 			if diagnostics.HasErrors() {
 				return nil, diagnostics
 			}
 
-			file.Input = decoded
+			decodedBlock.ModuleHeader = decoded
 			continue
 		}
 	}
 
-	return file, diagnostics
-}
-
-// TODO: replace with validation func
-func decodeIncludeModuleBlock(file *File, block *hcl.Block) (b *IncludeModule, diagnostics hcl.Diagnostics) {
-	if len(block.Labels) < 1 {
-		diagnostics = append(diagnostics, &hcl.Diagnostic{
-			Severity: hcl.DiagError,
-			Summary:  "Module name not found",
-			Detail:   fmt.Sprintf("Module name must be specified as the first block label, on line: %d", block.DefRange.Start.Line),
-			Subject:  &block.DefRange,
-		})
-		return nil, diagnostics
-	}
-
-	if _, exists := file.Variables[block.Labels[0]]; exists {
-		diagnostics = append(diagnostics, &hcl.Diagnostic{
-			Severity: hcl.DiagError,
-			Summary:  "Duplicated module include",
-			Detail:   fmt.Sprintf("Module %s in file %s on line %d was already included. This declaration will be ignored when building the configuration", block.Labels[0], file.Name, block.DefRange.Start.Line),
-			Subject:  &block.DefRange,
-		})
-		return nil, diagnostics
-	}
-
-	if !hclsyntax.ValidIdentifier(block.Labels[0]) {
-		diagnostics = diagnostics.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
-			Summary:  "Invalid module name",
-			Detail:   fmt.Sprintf("Module name is invalid. %s", hcllang.BadIdentDetail),
-			Subject:  &block.LabelRanges[0],
-		})
-		return nil, diagnostics
-	}
-
-	return DecodeIncludeModuleBlock(block)
-}
-
-// TODO: replace with validation func
-func decodeVariableBlock(file *File, block *hcl.Block) (v *Variable, diagnostics hcl.Diagnostics) {
-	if len(block.Labels) < 1 {
-		diagnostics = append(diagnostics, &hcl.Diagnostic{
-			Severity: hcl.DiagError,
-			Summary:  "Variable name not found",
-			Detail:   fmt.Sprintf("Variable name must be specified as the first block label, on line: %d", block.DefRange.Start.Line),
-			Subject:  &block.DefRange,
-		})
-		return nil, diagnostics
-	}
-
-	if _, exists := file.Variables[block.Labels[0]]; exists {
-		diagnostics = append(diagnostics, &hcl.Diagnostic{
-			Severity: hcl.DiagError,
-			Summary:  "Duplicated variable",
-			Detail:   fmt.Sprintf("A duplicate version declaration was detected in file %s on line %d. This declaration will be ignored when building the configuration", file.Name, block.DefRange.Start.Line),
-			Subject:  &block.DefRange,
-		})
-		return nil, diagnostics
-	}
-
-	if !hclsyntax.ValidIdentifier(block.Labels[0]) {
-		diagnostics = diagnostics.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
-			Summary:  "Invalid variable name",
-			Detail:   fmt.Sprintf("Variable name is invalid. %s", hcllang.BadIdentDetail),
-			Subject:  &block.LabelRanges[0],
-		})
-
-		return nil, diagnostics
-	}
-
-	return DecodeVariableBlock(block)
-}
-
-// TODO: replace with validation func
-func decodeComponentBlock(file *File, block *hcl.Block) (c *Component, diagnostics hcl.Diagnostics) {
-	if len(block.Labels) < 1 {
-		diagnostics = diagnostics.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
-			Summary:  "Component name not found",
-			Detail:   fmt.Sprintf("Component name must be specified as the first block label, on line: %d", block.DefRange.Start.Line),
-			Subject:  &block.DefRange,
-		})
-		return nil, diagnostics
-	}
-
-	if _, exists := file.Components[block.Labels[0]]; exists {
-		diagnostics = diagnostics.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
-			Summary:  "Duplicated component",
-			Detail:   fmt.Sprintf("A duplicate version declaration was detected in file %s on line %d. This declaration will be ignored when building the configuration", file.Name, block.DefRange.Start.Line),
-			Subject:  &block.DefRange,
-		})
-		return nil, diagnostics
-	}
-
-	if !hclsyntax.ValidIdentifier(block.Labels[0]) {
-		diagnostics = append(diagnostics, &hcl.Diagnostic{
-			Severity: hcl.DiagError,
-			Summary:  "Invalid component name",
-			Detail:   fmt.Sprintf("Component name is invalid. %s", hcllang.BadIdentDetail),
-			Subject:  &block.LabelRanges[0],
-		})
-		return nil, diagnostics
-	}
-
-	return DecodeComponentBlock(block)
+	return decodedBlock, diagnostics
 }
