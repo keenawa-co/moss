@@ -21,6 +21,7 @@ import (
 	"github.com/4rchr4y/goray/interface/driver"
 
 	"github.com/4rchr4y/goray/internal/bundlepkg"
+	"github.com/4rchr4y/goray/internal/config/confeval"
 	"github.com/4rchr4y/goray/internal/config/confload"
 	"github.com/4rchr4y/goray/internal/grpcplugin"
 	"github.com/4rchr4y/goray/internal/grpcwrap"
@@ -86,13 +87,14 @@ func runRootCmd(cmd *cobra.Command, args []string) {
 	log.Printf("Received schema: %+v\n", schema.Schema)
 	fmt.Println("--------------")
 
-	fmt.Println(conf.Children["example_module"].Module.Header)
-
 	scope := hclutl.NewScope()
+
+	evalCtx := confeval.BuildEvalContextGraph(scope, conf)
+	fmt.Println(evalCtx)
 
 	for _, b := range conf.Children["example_module"].Module.Components {
 		spec := must.Must(schematica.DecodeBlock(schema.Schema.Root))
-		val, diags := scope.EvalBlock(b.Config, spec)
+		val, diags := scope.EvalBlock(evalCtx, b.Config, spec)
 		if diags.HasErrors() {
 			panic(diags)
 		}

@@ -3,7 +3,7 @@ package hclutl
 import (
 	"strings"
 
-	"github.com/4rchr4y/goray/internal/kernel/hcllang"
+	"github.com/4rchr4y/goray/internal/hcllang"
 	"github.com/zclconf/go-cty/cty/function"
 )
 

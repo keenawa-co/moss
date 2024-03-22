@@ -3,8 +3,8 @@ package baseschema
 import (
 	"fmt"
 
+	"github.com/4rchr4y/goray/internal/hcllang"
 	"github.com/4rchr4y/goray/internal/hclutl"
-	"github.com/4rchr4y/goray/internal/kernel/hcllang"
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/ext/typeexpr"
 	"github.com/hashicorp/hcl/v2/gohcl"
