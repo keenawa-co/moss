@@ -1,13 +1,10 @@
 let "example" {
     type = string
     description = "Example of using variables"
-    default     = "Hello, World!"
+    default     = "Hello, from root module!"
 }
 
 include_module "example_module" {
     source = ".ray/example_module"
-    props = {
-        testing = let.example
-        module_var_example = "let.example"
-    }
+    module_var_example = let.example
 }
