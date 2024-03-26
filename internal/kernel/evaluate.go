@@ -1,8 +1,6 @@
 package kernel
 
 import (
-	"fmt"
-
 	"github.com/4rchr4y/goray/internal/config"
 	"github.com/4rchr4y/goray/internal/hclutl"
 	"github.com/hashicorp/hcl/v2"
@@ -95,8 +93,6 @@ func (e *Evaluate) expandModuleProps(ctx *hcl.EvalContext, conf *config.Config) 
 	if propsSchema == nil {
 		return nil, diagnostics
 	}
-
-	fmt.Println(conf.Path, propsSchema, len(propsSchema.Attributes))
 
 	propsAttrsValue = make(map[string]cty.Value, propsMeta.AttributesSize)
 	content, diags := conf.Parent.Module.Includes.Modules[conf.Path].Config.Content(propsSchema)
