@@ -1,6 +1,6 @@
 package state
 
-type State struct {
-	Modules map[string]*Module
-	Delta   uint
-}
+// type State struct {
+// 	Modules map[string]*Module
+// 	Delta   uint
+// }

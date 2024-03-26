@@ -21,11 +21,11 @@ import (
 	"github.com/4rchr4y/goray/interface/driver"
 
 	"github.com/4rchr4y/goray/internal/bundlepkg"
-	"github.com/4rchr4y/goray/internal/config/confeval"
 	"github.com/4rchr4y/goray/internal/config/confload"
 	"github.com/4rchr4y/goray/internal/grpcplugin"
 	"github.com/4rchr4y/goray/internal/grpcwrap"
 	"github.com/4rchr4y/goray/internal/hclutl"
+	"github.com/4rchr4y/goray/internal/kernel"
 	"github.com/4rchr4y/goray/internal/proto/convert"
 	"github.com/4rchr4y/goray/internal/proto/protocomponent"
 	"github.com/4rchr4y/goray/internal/proto/protodriver"
@@ -33,6 +33,7 @@ import (
 
 	"github.com/g10z3r/ason"
 	pluginHCL "github.com/hashicorp/go-plugin"
+	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/hcldec"
 	"github.com/open-policy-agent/opa/ast"
 	"github.com/open-policy-agent/opa/rego"
@@ -89,32 +90,45 @@ func runRootCmd(cmd *cobra.Command, args []string) {
 
 	scope := hclutl.NewScope()
 
-	evalCtx := confeval.BuildEvalContextGraph(scope, conf)
-	fmt.Println(evalCtx)
+	evaluator := kernel.NewEvaluate(conf, scope)
+	s, diags := evaluator.ExpandVariables()
+	fmt.Println(diags)
+	if diags.HasErrors() {
+		panic(diags.Error())
+	}
 
-	for _, b := range conf.Children["example_module"].Module.Components {
-		spec := must.Must(schematica.DecodeBlock(schema.Schema.Root))
-		val, diags := scope.EvalBlock(evalCtx, b.Config, spec)
-		if diags.HasErrors() {
-			panic(diags)
-		}
-
-		encoded, err := convert.EncodeValue(val, hcldec.ImpliedType(spec).WithoutOptionalAttributesDeep())
-		if err != nil {
-			log.Fatal(err)
-			return
-		}
-
-		if out := client.Configure(&component.ConfigureInput{
-			MessagePack: encoded,
-		}); out.Diagnostics.HasError() {
-			for _, d := range out.Diagnostics {
-				log.Fatalf("summary: %s\ndetails: %s",
-					d.Description().Summary,
-					d.Description().Detail,
-				)
+	for name, cfg := range conf.Children {
+		for _, b := range cfg.Module.Components {
+			spec := must.Must(schematica.DecodeBlock(schema.Schema.Root))
+			val, diags := scope.EvalBlock(
+				&hcl.EvalContext{
+					Functions: scope.Functions(),
+					Variables: s.Modules[name].Variables(),
+				},
+				b.Config,
+				spec,
+			)
+			if diags.HasErrors() {
+				panic(diags)
 			}
-			return
+
+			encoded, err := convert.EncodeValue(val, hcldec.ImpliedType(spec).WithoutOptionalAttributesDeep())
+			if err != nil {
+				log.Fatal(err)
+				return
+			}
+
+			if out := client.Configure(&component.ConfigureInput{
+				MessagePack: encoded,
+			}); out.Diagnostics.HasError() {
+				for _, d := range out.Diagnostics {
+					log.Fatalf("summary: %s\ndetails: %s",
+						d.Description().Summary,
+						d.Description().Detail,
+					)
+				}
+				return
+			}
 		}
 	}
 

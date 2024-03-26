@@ -10,7 +10,7 @@ import (
 )
 
 type Module struct {
-	Source     string
+	SourceDir  string
 	Header     *baseschema.ModuleHeader
 	Components map[string]*baseschema.Component
 	Variables  map[string]*baseschema.Let
@@ -19,7 +19,7 @@ type Module struct {
 
 func NewModule(source string, files map[string]*baseschema.File) (mod *Module, v *version.Version, diagnostics hcl.Diagnostics) {
 	mod = &Module{
-		Source:     source,
+		SourceDir:  source,
 		Components: make(map[string]*baseschema.Component),
 		Variables:  make(map[string]*baseschema.Let),
 		Includes: &baseschema.IncludeList{
@@ -59,4 +59,28 @@ func NewModule(source string, files map[string]*baseschema.File) (mod *Module, v
 	}
 
 	return mod, v, diagnostics
+}
+
+type PropsMeta struct {
+	AttributesSize uint
+}
+
+func (m *Module) PropsSchema() (*hcl.BodySchema, PropsMeta) {
+	if m.Header == nil {
+		return nil, PropsMeta{}
+	}
+
+	modPropsSchema := new(hcl.BodySchema)
+	modPropsMeta := PropsMeta{}
+
+	for varName, varDecl := range m.Header.Variables {
+
+		modPropsSchema.Attributes = append(modPropsSchema.Attributes, hcl.AttributeSchema{
+			Name:     varName,
+			Required: varDecl.Nullable,
+		})
+		modPropsMeta.AttributesSize++
+	}
+
+	return modPropsSchema, modPropsMeta
 }

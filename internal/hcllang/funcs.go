@@ -19,6 +19,7 @@ var GetEnvFn = function.New(&function.Spec{
 	Impl: func(args []cty.Value, retType cty.Type) (cty.Value, error) {
 		key := args[0].AsString()
 		value, ok := os.LookupEnv(key)
+		fmt.Println("+++++++++++++++++++", value)
 		if !ok {
 			return cty.UnknownVal(cty.String), fmt.Errorf("environment variable %s was not found", key)
 		}

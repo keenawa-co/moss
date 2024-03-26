@@ -66,25 +66,25 @@ func ValidateIncludeModuleBlock(block *hcl.Block) (diagnostics hcl.Diagnostics) 
 	return diagnostics
 }
 
-func DecodeIncludeModuleBlock(block *hcl.Block) (b *IncludeModule, diagnostics hcl.Diagnostics) {
+func DecodeIncludeModuleBlock(block *hcl.Block) (decodedBlock *IncludeModule, diagnostics hcl.Diagnostics) {
 	content, body, diagnostics := block.Body.PartialContent(&includeModuleBlockSchema)
 	if diagnostics.HasErrors() {
 		return nil, diagnostics
 	}
 
-	b = &IncludeModule{
+	decodedBlock = &IncludeModule{
 		Name:      block.Labels[0], // label presence was verified upon block detection
 		Config:    body,
 		DeclRange: block.DefRange,
 	}
 
 	if attr, exists := content.Attributes["source"]; exists {
-		diags := gohcl.DecodeExpression(attr.Expr, nil, &b.Source)
+		diags := gohcl.DecodeExpression(attr.Expr, nil, &decodedBlock.Source)
 		diagnostics = append(diagnostics, diags...)
 		if diagnostics.HasErrors() {
 			return nil, diagnostics
 		}
 	}
 
-	return b, diagnostics
+	return decodedBlock, diagnostics
 }

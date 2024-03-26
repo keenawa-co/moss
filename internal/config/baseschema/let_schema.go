@@ -137,6 +137,7 @@ func DecodeLetBlock(block *hcl.Block) (decodedBlock *Let, diagnostics hcl.Diagno
 			if decodedBlock.TypeDefaults != nil && !val.IsNull() {
 				val = decodedBlock.TypeDefaults.Apply(val)
 			}
+
 			val, err = convert.Convert(val, decodedBlock.ConstraintType)
 			if err != nil {
 				diagnostics = diagnostics.Append(&hcl.Diagnostic{

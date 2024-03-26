@@ -8,6 +8,8 @@ import (
 type Config struct {
 	Root *Config
 
+	Path string
+
 	// Reference to the module that is directly invoking
 	// this specific module
 	Parent *Config
@@ -26,9 +28,10 @@ type Config struct {
 }
 
 type IncludeModuleInput struct {
-	_      [0]int
-	Source string
-	Parent *Config
+	_          [0]int
+	ModuleName string
+	Source     string
+	Parent     *Config
 }
 
 type Includer struct {
@@ -38,6 +41,7 @@ type Includer struct {
 func BuildConfig(root *Module, includer Includer) (conf *Config, diagnostics hcl.Diagnostics) {
 	conf = &Config{
 		Root:   conf,
+		Path:   "root",
 		Module: root,
 	}
 
@@ -54,8 +58,9 @@ func buildChildren(parent *Config, includer Includer) (children map[string]*Conf
 
 	for name, includeModule := range parent.Module.Includes.Modules {
 		child, diags := buildChild(parent.Root, includer, &IncludeModuleInput{
-			Source: includeModule.Source,
-			Parent: parent,
+			ModuleName: name,
+			Source:     includeModule.Source,
+			Parent:     parent,
 		})
 		diagnostics = append(diagnostics, diags...)
 		if child == nil {
@@ -77,6 +82,7 @@ func buildChild(root *Config, includer Includer, input *IncludeModuleInput) (chi
 
 	child = &Config{
 		Root:    root,
+		Path:    input.ModuleName,
 		Parent:  input.Parent,
 		Module:  mod,
 		Version: v,
