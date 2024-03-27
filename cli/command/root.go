@@ -13,28 +13,25 @@ import (
 
 	"github.com/4rchr4y/bpm/iostream"
 	"github.com/4rchr4y/godevkit/v3/env"
-	"github.com/4rchr4y/godevkit/v3/must"
 	"github.com/4rchr4y/godevkit/v3/syswrap"
 	dummy_component "github.com/4rchr4y/goray/example/dummy-component"
 	noop_driver "github.com/4rchr4y/goray/example/noop-driver"
+	"github.com/4rchr4y/goray/exp"
 	"github.com/4rchr4y/goray/interface/component"
 	"github.com/4rchr4y/goray/interface/driver"
 
 	"github.com/4rchr4y/goray/internal/bundlepkg"
 	"github.com/4rchr4y/goray/internal/config/confload"
 	"github.com/4rchr4y/goray/internal/grpcplugin"
+	"github.com/4rchr4y/goray/internal/grpcplugin/detection"
 	"github.com/4rchr4y/goray/internal/grpcwrap"
 	"github.com/4rchr4y/goray/internal/hclutl"
 	"github.com/4rchr4y/goray/internal/kernel"
-	"github.com/4rchr4y/goray/internal/proto/convert"
 	"github.com/4rchr4y/goray/internal/proto/protocomponent"
 	"github.com/4rchr4y/goray/internal/proto/protodriver"
-	"github.com/4rchr4y/goray/internal/schematica"
 
 	"github.com/g10z3r/ason"
 	pluginHCL "github.com/hashicorp/go-plugin"
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/hcl/v2/hcldec"
 	"github.com/open-policy-agent/opa/ast"
 	"github.com/open-policy-agent/opa/rego"
 	"github.com/open-policy-agent/opa/topdown"
@@ -78,59 +75,25 @@ func runRootCmd(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	client := startComponent(".ray/component/github.com/4rchr4y/ray-dummy-component@v0.0.1")
-	defer client.Stop()
-	defer client.Shutdown()
+	app := &exp.RayApp{
+		Drivers: processDriversList(detection.FindDriverPaths(".ray/driver")),
+		Config:  conf,
+	}
 
-	schema := client.DescribeSchema()
-	fmt.Printf("++++++++ Connection: %s\n", client.Heartbeat().Status)
-	fmt.Println("--------------")
-	log.Printf("Received schema: %+v\n", schema.Schema)
-	fmt.Println("--------------")
+	confParams := exp.ConfParams{
+		Scope: hclutl.NewScope(),
+	}
 
 	scope := hclutl.NewScope()
-
 	evaluator := kernel.NewEvaluate(conf, scope)
 	s, diags := evaluator.ExpandVariables()
 	fmt.Println(diags)
 	if diags.HasErrors() {
 		panic(diags.Error())
 	}
+	confParams.Modules = s.Modules
 
-	for name, cfg := range conf.Children {
-		for _, b := range cfg.Module.Components {
-			spec := must.Must(schematica.DecodeBlock(schema.Schema.Root))
-			val, diags := scope.EvalBlock(
-				&hcl.EvalContext{
-					Functions: scope.Functions(),
-					Variables: s.Modules[name].Variables(),
-				},
-				b.Config,
-				spec,
-			)
-			if diags.HasErrors() {
-				panic(diags)
-			}
-
-			encoded, err := convert.EncodeValue(val, hcldec.ImpliedType(spec).WithoutOptionalAttributesDeep())
-			if err != nil {
-				log.Fatal(err)
-				return
-			}
-
-			if out := client.Configure(&component.ConfigureInput{
-				MessagePack: encoded,
-			}); out.Diagnostics.HasError() {
-				for _, d := range out.Diagnostics {
-					log.Fatalf("summary: %s\ndetails: %s",
-						d.Description().Summary,
-						d.Description().Detail,
-					)
-				}
-				return
-			}
-		}
-	}
+	app.Configure(&confParams)
 
 	b, err := bpm.Storage().LoadFromAbs("./testdata", nil)
 	if err != nil {
@@ -185,6 +148,14 @@ func runRootCmd(cmd *cobra.Command, args []string) {
 	}
 
 	fmt.Println(buf.String())
+}
+
+func processDriversList(paths []string) map[string]component.Interface {
+	result := make(map[string]component.Interface, len(paths))
+
+	result["dummy"] = startComponent(".ray/component/github.com/4rchr4y/ray-dummy-component@v0.0.1")
+
+	return result
 }
 
 func tmpGetFileAstAsMap(filePath string) (map[string]interface{}, error) {
