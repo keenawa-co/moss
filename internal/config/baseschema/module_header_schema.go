@@ -3,7 +3,7 @@ package baseschema
 import (
 	"fmt"
 
-	"github.com/4rchr4y/goray/internal/hclutl"
+	"github.com/4rchr4y/goray/internal/hcllang"
 	"github.com/hashicorp/hcl/v2"
 )
 
@@ -14,8 +14,8 @@ var (
 )
 
 var moduleHeaderBlockSchema = hcl.BodySchema{
-	Attributes: hclutl.NewAttributeList()(moduleHeaderReservedAttributeList[:]...),
-	Blocks: hclutl.NewBlockList(
+	Attributes: hcllang.NewAttributeList()(moduleHeaderReservedAttributeList[:]...),
+	Blocks: hcllang.NewBlockList(
 		letBlockDef,
 	)(moduleHeaderReservedBlockList[:]...),
 }

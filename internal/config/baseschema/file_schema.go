@@ -3,7 +3,7 @@ package baseschema
 import (
 	"fmt"
 
-	"github.com/4rchr4y/goray/internal/hclutl"
+	"github.com/4rchr4y/goray/internal/hcllang"
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/gohcl"
 
@@ -23,13 +23,13 @@ var (
 )
 
 var fileSchema = hcl.BodySchema{
-	Attributes: hclutl.NewAttributeList(
+	Attributes: hcllang.NewAttributeList(
 		hcl.AttributeSchema{
 			Name:     "version",
 			Required: false,
 		},
 	)(fileReservedAttributeList[:]...),
-	Blocks: hclutl.NewBlockList(
+	Blocks: hcllang.NewBlockList(
 		hcl.BlockHeaderSchema{
 			Type:       "_",
 			LabelNames: []string{},

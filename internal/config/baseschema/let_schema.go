@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/4rchr4y/goray/internal/hcllang"
-	"github.com/4rchr4y/goray/internal/hclutl"
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/ext/typeexpr"
 	"github.com/hashicorp/hcl/v2/gohcl"
@@ -24,7 +23,7 @@ var (
 )
 
 var letBlockSchema = hcl.BodySchema{
-	Attributes: hclutl.NewAttributeList(
+	Attributes: hcllang.NewAttributeList(
 		hcl.AttributeSchema{
 			Name:     "type",
 			Required: false,
@@ -42,7 +41,7 @@ var letBlockSchema = hcl.BodySchema{
 			Required: false,
 		},
 	)(letBlockReservedAttributeList[:]...),
-	Blocks: hclutl.NewBlockList()(letBlockReservedBlockList[:]...),
+	Blocks: hcllang.NewBlockList()(letBlockReservedBlockList[:]...),
 }
 
 var letBlockDef = hcl.BlockHeaderSchema{

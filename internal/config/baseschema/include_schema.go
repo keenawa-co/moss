@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/4rchr4y/goray/internal/hcllang"
-	"github.com/4rchr4y/goray/internal/hclutl"
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/gohcl"
 	"github.com/hashicorp/hcl/v2/hclsyntax"
@@ -19,13 +18,13 @@ var (
 )
 
 var includeModuleBlockSchema = hcl.BodySchema{
-	Attributes: hclutl.NewAttributeList(
+	Attributes: hcllang.NewAttributeList(
 		hcl.AttributeSchema{
 			Name:     "source",
 			Required: true,
 		},
 	)(includeModuleBlockReservedAttributeList[:]...),
-	Blocks: hclutl.NewBlockList()(includeModuleBlockReservedBlockList[:]...),
+	Blocks: hcllang.NewBlockList()(includeModuleBlockReservedBlockList[:]...),
 }
 
 var includeModuleBlockDef = hcl.BlockHeaderSchema{
