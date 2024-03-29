@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/4rchr4y/goray/internal/hcllang"
-	"github.com/4rchr4y/goray/internal/hclutl"
+
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/gohcl"
 	"github.com/hashicorp/hcl/v2/hclsyntax"
@@ -19,7 +19,7 @@ var (
 )
 
 var requiredProviderBlockSchema = &hcl.BodySchema{
-	Attributes: hclutl.NewAttributeList(
+	Attributes: hcllang.NewAttributeList(
 		hcl.AttributeSchema{
 			Name:     "source",
 			Required: true,
@@ -33,7 +33,7 @@ var requiredProviderBlockSchema = &hcl.BodySchema{
 			Required: false,
 		},
 	)(requiredProviderBlockReservedAttributeList[:]...),
-	Blocks: hclutl.NewBlockList(
+	Blocks: hcllang.NewBlockList(
 		hcl.BlockHeaderSchema{
 			Type:       "_",
 			LabelNames: []string{},

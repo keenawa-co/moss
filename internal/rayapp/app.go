@@ -1,4 +1,4 @@
-package exp
+package rayapp
 
 import (
 	"fmt"
@@ -7,12 +7,11 @@ import (
 	"github.com/4rchr4y/goray/diag"
 	"github.com/4rchr4y/goray/interface/component"
 	"github.com/4rchr4y/goray/internal/config"
-	"github.com/4rchr4y/goray/internal/hclutl"
-	"github.com/4rchr4y/goray/internal/kernel"
+	"github.com/4rchr4y/goray/internal/hcllang"
 	"github.com/4rchr4y/goray/internal/proto/convert"
 	"github.com/4rchr4y/goray/internal/schematica"
-	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/hcldec"
+	"github.com/zclconf/go-cty/cty"
 )
 
 type RayApp struct {
@@ -20,21 +19,38 @@ type RayApp struct {
 	Config  *config.Config
 }
 
-func (app *RayApp) Configure(params *ConfParams) diag.DiagnosticSet {
-	for moduleName, cfg := range app.Config.Children {
+type ConfigureParams struct{}
+
+func (a *RayApp) Configure(params *ConfigureParams) diag.DiagnosticSet {
+	nv := hcllang.NewNamedValueSet()
+	nv.SetLetVariableValue("example", cty.StringVal("test"))
+	nv.SetPropVariableValue("example_module.module_var_example", cty.StringVal("test"))
+
+	evalCtx := AppEvalContext{
+		Evaluator: &Evaluator{
+			Config:      a.Config,
+			NamedValues: nv,
+		},
+	}
+
+	for modName, cfg := range a.Config.Children {
 		for componentName, c := range cfg.Module.Components {
-			describeSchemaOutput := app.Drivers[componentName].DescribeSchema()
+			describeSchemaOutput := a.Drivers[componentName].DescribeSchema()
 			spec := must.Must(schematica.DecodeBlock(describeSchemaOutput.Schema.Root)) // FIXME: must
 
-			val, diags := params.Scope.EvalBlock(
-				&hcl.EvalContext{
-					Functions: params.Scope.Functions(),
-					Variables: params.Modules[moduleName].Variables(),
-				},
+			val, _, diags := evalCtx.EvaluateBlock(
 				c.Config,
-				spec,
+				describeSchemaOutput.Schema.Root,
+				&EvalDataSelector{
+					Evaluator:  evalCtx.Evaluator,
+					ModulePath: modName,
+				},
 			)
-			if diags.HasErrors() {
+
+			if diags.HasError() {
+				for _, v := range diags {
+					fmt.Println(v.Description().Detail)
+				}
 				panic(diags)
 			}
 
@@ -43,7 +59,7 @@ func (app *RayApp) Configure(params *ConfParams) diag.DiagnosticSet {
 				panic(err)
 			}
 
-			if out := app.Drivers[componentName].Configure(&component.ConfigureInput{
+			if out := a.Drivers[componentName].Configure(&component.ConfigureInput{
 				MessagePack: encoded,
 			}); out.Diagnostics.HasError() {
 				for _, d := range out.Diagnostics {
@@ -52,19 +68,9 @@ func (app *RayApp) Configure(params *ConfParams) diag.DiagnosticSet {
 						d.Description().Detail,
 					))
 				}
-
 			}
 		}
 	}
 
 	return nil
-}
-
-type DriverConf struct {
-	Client component.Interface
-}
-
-type ConfParams struct {
-	Scope   *hclutl.Scope
-	Modules map[string]*kernel.Module
 }

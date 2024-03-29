@@ -3,7 +3,7 @@ package rcschema
 import (
 	"fmt"
 
-	"github.com/4rchr4y/goray/internal/hclutl"
+	"github.com/4rchr4y/goray/internal/hcllang"
 	"github.com/hashicorp/hcl/v2"
 )
 
@@ -18,8 +18,8 @@ var (
 )
 
 var rayBlockSchema = &hcl.BodySchema{
-	Attributes: hclutl.NewAttributeList()(rayBlockReservedAttributeList[:]...),
-	Blocks: hclutl.NewBlockList(
+	Attributes: hcllang.NewAttributeList()(rayBlockReservedAttributeList[:]...),
+	Blocks: hcllang.NewBlockList(
 		hcl.BlockHeaderSchema{
 			Type:       "_",
 			LabelNames: []string{},

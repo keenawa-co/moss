@@ -74,7 +74,7 @@ func (m *Module) PropsSchema() (*hcl.BodySchema, PropsMeta) {
 	modPropsMeta := PropsMeta{}
 
 	for varName, varDecl := range m.Header.Variables {
-
+		fmt.Println(varDecl.Nullable)
 		modPropsSchema.Attributes = append(modPropsSchema.Attributes, hcl.AttributeSchema{
 			Name:     varName,
 			Required: varDecl.Nullable,

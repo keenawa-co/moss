@@ -16,7 +16,6 @@ import (
 	"github.com/4rchr4y/godevkit/v3/syswrap"
 	dummy_component "github.com/4rchr4y/goray/example/dummy-component"
 	noop_driver "github.com/4rchr4y/goray/example/noop-driver"
-	"github.com/4rchr4y/goray/exp"
 	"github.com/4rchr4y/goray/interface/component"
 	"github.com/4rchr4y/goray/interface/driver"
 
@@ -25,10 +24,9 @@ import (
 	"github.com/4rchr4y/goray/internal/grpcplugin"
 	"github.com/4rchr4y/goray/internal/grpcplugin/detection"
 	"github.com/4rchr4y/goray/internal/grpcwrap"
-	"github.com/4rchr4y/goray/internal/hclutl"
-	"github.com/4rchr4y/goray/internal/kernel"
 	"github.com/4rchr4y/goray/internal/proto/protocomponent"
 	"github.com/4rchr4y/goray/internal/proto/protodriver"
+	"github.com/4rchr4y/goray/internal/rayapp"
 
 	"github.com/g10z3r/ason"
 	pluginHCL "github.com/hashicorp/go-plugin"
@@ -75,25 +73,12 @@ func runRootCmd(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	app := &exp.RayApp{
+	app := &rayapp.RayApp{
 		Drivers: processDriversList(detection.FindDriverPaths(".ray/driver")),
 		Config:  conf,
 	}
 
-	confParams := exp.ConfParams{
-		Scope: hclutl.NewScope(),
-	}
-
-	scope := hclutl.NewScope()
-	evaluator := kernel.NewEvaluate(conf, scope)
-	s, diags := evaluator.ExpandVariables()
-	fmt.Println(diags)
-	if diags.HasErrors() {
-		panic(diags.Error())
-	}
-	confParams.Modules = s.Modules
-
-	app.Configure(&confParams)
+	app.Configure(&rayapp.ConfigureParams{})
 
 	b, err := bpm.Storage().LoadFromAbs("./testdata", nil)
 	if err != nil {

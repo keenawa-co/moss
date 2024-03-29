@@ -27,6 +27,17 @@ type Config struct {
 	Version *version.Version
 }
 
+// func (c *Config) Descendent(moduleAddr string) *Config {
+// 	current := c
+// 	for _, name := range path {
+// 		current = current.Children[name]
+// 		if current == nil {
+// 			return nil
+// 		}
+// 	}
+// 	return current
+// }
+
 type IncludeModuleInput struct {
 	_          [0]int
 	ModuleName string

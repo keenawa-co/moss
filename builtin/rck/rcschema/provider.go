@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/4rchr4y/goray/internal/hcllang"
-	"github.com/4rchr4y/goray/internal/hclutl"
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/hclsyntax"
 )
@@ -16,8 +15,8 @@ var (
 )
 
 var providerBlockSchema = &hcl.BodySchema{
-	Attributes: hclutl.NewAttributeList()(providerBlockReservedAttributeList[:]...),
-	Blocks:     hclutl.NewBlockList()(providerBlockReservedBlockList[:]...),
+	Attributes: hcllang.NewAttributeList()(providerBlockReservedAttributeList[:]...),
+	Blocks:     hcllang.NewBlockList()(providerBlockReservedBlockList[:]...),
 }
 
 type Provider struct {
