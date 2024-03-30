@@ -1,9 +1,0 @@
-let "example" {
-    type = string
-    description = "Example of using variables"
-    default     = "Hello, from root module 2"
-}
-
-include_module "example_module" {
-    source = ".ray/example_module"
-}

@@ -1,8 +1,0 @@
-module_header {
-    let "module_var_example" {
-        type = string
-        nullable = false
-        description = "Example of using variables"
-        default     = "Hello, from Variable 2!"
-    }
-}

@@ -1,6 +1,0 @@
-version = "1.0"
-
-component "dummy" {
-    version = "1.0"
-    value = props.module_var_example
-}
