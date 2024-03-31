@@ -4,12 +4,11 @@ version = "0.1.0"
 edition = "2021"
 
 [workspace]
-members = ["cli"]
+members = ["cli", "server"]
 
 
 [dependencies]
 cli = { path = "cli" }
 
 anyhow = "1.0.81"
-clap = { version = "4.5.4", features = ["cargo", "string", "derive"] }
 tokio = { version = "1.37.0", features = ["full"] }
