@@ -1,3 +1,11 @@
-fn main() {
-    println!("Hello, world!");
+mod cli;
+
+use std::process::ExitCode;
+
+fn main() -> ExitCode {
+    return tokio::runtime::Builder::new_multi_thread()
+        .enable_all()
+        .build()
+        .unwrap()
+        .block_on(cli::init());
 }
