@@ -1253,6 +1253,7 @@ dependencies = [
  "async-graphql-axum",
  "axum",
  "axum-server",
+ "futures-util",
  "tokio",
 ]
 

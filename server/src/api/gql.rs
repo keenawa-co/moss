@@ -5,5 +5,5 @@ use crate::api::graphql::QueryRoot;
 pub type ApiSchema = Schema<QueryRoot, EmptyMutation, EmptySubscription>;
 
 pub fn graphql_schema() -> ApiSchema {
-    return Schema::build(QueryRoot, EmptyMutation, EmptySubscription).finish();
+    return Schema::build(QueryRoot::default(), EmptyMutation, EmptySubscription).finish();
 }

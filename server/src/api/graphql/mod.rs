@@ -1,10 +1,8 @@
-use async_graphql::Object;
+mod inspector_query;
 
-pub struct QueryRoot;
+use async_graphql::MergedObject;
 
-#[Object]
-impl QueryRoot {
-    async fn version(&self) -> &str {
-        "1.0"
-    }
-}
+use self::inspector_query::InspectorQuery;
+
+#[derive(MergedObject, Default)]
+pub struct QueryRoot(InspectorQuery);
