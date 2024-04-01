@@ -12,5 +12,6 @@ pub struct RunCmdArgs {
 pub async fn init(RunCmdArgs { port }: RunCmdArgs) -> anyhow::Result<()> {
     let s = Server::new(Ipv4Addr::new(127, 0, 0, 1), port);
     s.serve().await.expect("Failed to start the server");
-    Ok(())
+
+    return Ok(());
 }
