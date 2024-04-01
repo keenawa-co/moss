@@ -11,4 +11,4 @@ members = ["cli", "server"]
 cli = { path = "cli" }
 
 anyhow = "1.0.81"
-tokio = { version = "1.37.0", features = ["full"] }
+tokio = { version = "1", features = ["full"] }
