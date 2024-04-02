@@ -1,6 +1,5 @@
 use crate::api::graphql::SchemaRoot;
 use async_graphql::http::GraphiQLSource;
-use async_graphql::{EmptyMutation, EmptySubscription, Schema};
 use async_graphql_axum::{GraphQLRequest, GraphQLResponse};
 use axum::{
     response::{self, IntoResponse},
@@ -23,5 +22,4 @@ where
     return Router::new()
         .route("/graphiql", axum::routing::get(graphiql_handler))
         .route("/graphql", post(graphql_handler));
-    // .layer(Extension(schema));
 }

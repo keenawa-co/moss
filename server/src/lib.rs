@@ -1,35 +1,24 @@
 mod api;
-use axum::Router;
-use std::net::{IpAddr, Ipv4Addr, SocketAddr};
+mod config;
+
+pub use config::{Config, CONF};
+
 use surrealdb::engine::local::Mem;
 use surrealdb::Surreal;
 
-pub struct Server {
-    addr: SocketAddr,
-    router: Router,
-}
+pub async fn init() -> Result<(), Box<dyn std::error::Error>> {
+    let conf = CONF.get().unwrap();
+    let router = api::router();
+    let db = Surreal::new::<Mem>(()).await?;
 
-impl Server {
-    pub fn new(host: Ipv4Addr, port: u16) -> Self {
-        Self {
-            addr: SocketAddr::new(IpAddr::V4(host), port),
-            router: api::router(),
-        }
-    }
+    // Select a specific namespace / database
+    db.use_ns("test").use_db("test").await?;
 
-    pub async fn serve(&self) -> Result<(), Box<dyn std::error::Error>> {
-        // Create database connection
-        let db = Surreal::new::<Mem>(()).await?;
+    println!("Listening on {}", conf.bind);
 
-        // Select a specific namespace / database
-        db.use_ns("test").use_db("test").await?;
+    axum_server::bind(conf.bind)
+        .serve(router.clone().into_make_service())
+        .await?;
 
-        println!("Listening on {}", self.addr);
-
-        axum_server::bind(self.addr)
-            .serve(self.router.clone().into_make_service())
-            .await?;
-
-        Ok(())
-    }
+    return Ok(());
 }

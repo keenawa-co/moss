@@ -1,17 +1,16 @@
 use clap::Args;
-use server::Server;
-
-use std::net::Ipv4Addr;
+use std::net::SocketAddr;
 
 #[derive(Args, Debug)]
 pub struct RunCmdArgs {
-    #[arg(help = "UI host port")]
-    port: u16,
+    #[arg(help = "The hostname and port to listen for connections on")]
+    #[arg(default_value = "127.0.0.1:3000")]
+    bind: SocketAddr,
 }
 
-pub async fn init(RunCmdArgs { port }: RunCmdArgs) -> anyhow::Result<()> {
-    let s = Server::new(Ipv4Addr::new(127, 0, 0, 1), port);
-    s.serve().await.expect("Failed to start the server");
+pub async fn init(RunCmdArgs { bind }: RunCmdArgs) -> anyhow::Result<()> {
+    let _ = server::CONF.set(server::Config { bind });
 
+    server::init().await.expect("Failed to start the server");
     return Ok(());
 }
