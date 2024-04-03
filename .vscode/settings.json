@@ -1,4 +1,9 @@
 {
   "rust-analyzer.showUnlinkedFileNotification": false,
-  "cSpell.words": ["graphiql", "surrealdb"]
+  "cSpell.words": [
+    "graphiql",
+    "inmem",
+    "surrealdb",
+    "thiserror"
+  ]
 }

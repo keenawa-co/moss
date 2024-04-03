@@ -894,6 +894,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "clap",
+ "core",
  "server",
 ]
 
@@ -3183,11 +3184,14 @@ dependencies = [
  "anyhow",
  "async-graphql",
  "async-graphql-axum",
+ "async-trait",
  "axum",
  "axum-server",
  "futures-util",
  "serde",
+ "serde_json",
  "surrealdb",
+ "thiserror",
  "tokio",
  "tower",
  "tower-http",
