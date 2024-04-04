@@ -1,18 +1,54 @@
 mod api;
 mod config;
+mod err;
+
+pub mod infra;
 
 pub use config::{Config, CONF};
 
-use surrealdb::engine::local::Mem;
-use surrealdb::Surreal;
+use axum::{Extension, Router};
+use err::Error;
+use infra::surrealdb::inmem::SurrealInMem;
+use tower::ServiceBuilder;
+use tower_http::{
+    compression::{
+        predicate::{NotForContentType, SizeAbove},
+        CompressionLayer, Predicate,
+    },
+    request_id::MakeRequestUuid,
+    ServiceBuilderExt,
+};
 
-pub async fn init() -> Result<(), Box<dyn std::error::Error>> {
+use crate::{
+    api::service::UserService,
+    api::{gql, graphql, status},
+};
+
+pub async fn init(
+    // inmemdb: SurrealInMem,
+    user_settings: Box<mosscore::config::preference_file::BehaverPreferenceFile>,
+) -> Result<(), Error> {
     let conf = CONF.get().unwrap();
-    let router = api::router();
-    let db = Surreal::new::<Mem>(()).await?;
 
-    // Select a specific namespace / database
-    db.use_ns("test").use_db("test").await?;
+    let service = ServiceBuilder::new()
+        .catch_panic()
+        .set_x_request_id(MakeRequestUuid)
+        .propagate_x_request_id();
+
+    let user_service = UserService::init(user_settings);
+
+    let service = service
+        .layer(Extension(user_service.clone()))
+        .layer(Extension(graphql::build_schema(user_service)))
+        .layer(
+            CompressionLayer::new().compress_when(
+                SizeAbove::new(512) // don't compress below 512 bytes
+                    .and(NotForContentType::IMAGES), // don't compress images
+            ),
+        );
+
+    let router = Router::new().merge(status::router()).merge(gql::router());
+    let router = Router::new().nest("/api/v1", router).layer(service);
 
     println!("Listening on {}", conf.bind);
 

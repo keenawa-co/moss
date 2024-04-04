@@ -1,12 +1,12 @@
+mod loader;
 mod run;
 
 use self::run::RunCmdArgs;
 use clap::{Parser, Subcommand};
 use std::process::ExitCode;
-
 #[derive(Parser, Debug)]
-#[command(bin_name = "app")]
-#[command(about = "App command-line interface and server")]
+#[command(name = mosscore::constant::APP_NAME, bin_name = mosscore::constant::APP_NAME)]
+#[command(about = "Moss command-line interface and server")]
 struct CLI {
     #[command(subcommand)]
     command: Commands,

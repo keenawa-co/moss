@@ -3,6 +3,8 @@
   "cSpell.words": [
     "graphiql",
     "inmem",
+    "inmemdb",
+    "mosscore",
     "surrealdb",
     "thiserror"
   ]

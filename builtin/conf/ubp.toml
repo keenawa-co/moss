@@ -1,0 +1,5 @@
+[visual]
+theme = "default"
+
+[notification]
+sound = true
