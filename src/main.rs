@@ -5,5 +5,5 @@ fn main() -> ExitCode {
         .enable_all()
         .build()
         .unwrap()
-        .block_on(cli::init());
+        .block_on(moss_cli::init());
 }

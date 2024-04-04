@@ -1,12 +1,12 @@
 [package]
-name = "server"
+name = "moss-net"
 version = "0.1.0"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-mosscore = { path = "../mosscore" }
+moss-core = { path = "../moss-core" }
 
 anyhow = "1.0"
 async-graphql = "7.0"

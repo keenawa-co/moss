@@ -1,7 +1,7 @@
 use std::sync::Arc;
 
 use async_graphql::{Context, Object, Result, SimpleObject};
-use mosscore::config::preference_file::BehaverPreferenceFile;
+use moss_core::config::preference_file::BehaverPreferenceFile;
 
 use crate::api::service::UserService;
 

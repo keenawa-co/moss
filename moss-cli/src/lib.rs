@@ -5,7 +5,7 @@ use self::run::RunCmdArgs;
 use clap::{Parser, Subcommand};
 use std::process::ExitCode;
 #[derive(Parser, Debug)]
-#[command(name = mosscore::constant::APP_NAME, bin_name = mosscore::constant::APP_NAME)]
+#[command(name = moss_core::constant::APP_NAME, bin_name = moss_core::constant::APP_NAME)]
 #[command(about = "Moss command-line interface and server")]
 struct CLI {
     #[command(subcommand)]

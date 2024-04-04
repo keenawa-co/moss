@@ -1,6 +1,6 @@
 use std::fs;
 
-use mosscore::config::preference_file::BehaverPreferenceFile;
+use moss_core::config::preference_file::BehaverPreferenceFile;
 
 pub fn load_behaver_preference_file(path: String) -> anyhow::Result<Box<BehaverPreferenceFile>> {
     let content = fs::read_to_string(path)?;

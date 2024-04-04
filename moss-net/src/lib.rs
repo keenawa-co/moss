@@ -8,7 +8,6 @@ pub use config::{Config, CONF};
 
 use axum::{Extension, Router};
 use err::Error;
-use infra::surrealdb::inmem::SurrealInMem;
 use tower::ServiceBuilder;
 use tower_http::{
     compression::{
@@ -26,7 +25,7 @@ use crate::{
 
 pub async fn init(
     // inmemdb: SurrealInMem,
-    user_settings: Box<mosscore::config::preference_file::BehaverPreferenceFile>,
+    user_settings: Box<moss_core::config::preference_file::BehaverPreferenceFile>,
 ) -> Result<(), Error> {
     let conf = CONF.get().unwrap();
 

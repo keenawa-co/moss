@@ -1,4 +1,4 @@
-use mosscore::config::preference_file::BehaverPreferenceFile;
+use moss_core::config::preference_file::BehaverPreferenceFile;
 
 #[derive(Clone, Debug)]
 pub struct UserService {

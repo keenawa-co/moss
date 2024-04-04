@@ -1,13 +1,13 @@
 [package]
-name = "cli"
+name = "moss-cli"
 version = "0.1.0"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-server = { path = "../server" }
-mosscore = { path = "../mosscore" }
+moss-net = { path = "../moss-net" }
+moss-core = { path = "../moss-core" }
 
 anyhow = "1.0.81"
 clap = { version = "4.5.4", features = ["cargo", "string", "derive"] }

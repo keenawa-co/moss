@@ -11,12 +11,12 @@ pub struct RunCmdArgs {
 }
 
 pub async fn init(RunCmdArgs { bind, ubp_path }: RunCmdArgs) -> anyhow::Result<()> {
-    let _ = server::CONF.set(server::Config { bind });
+    let _ = moss_net::CONF.set(moss_net::Config { bind });
 
     // let inmemdb = prepare_inmemdb(ubp_path).await?;
     let user_settings = crate::loader::load_behaver_preference_file(ubp_path)?;
 
-    server::init(user_settings)
+    moss_net::init(user_settings)
         .await
         .expect("Failed to start the server");
     return Ok(());

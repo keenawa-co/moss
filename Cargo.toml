@@ -4,11 +4,11 @@ version = "0.1.0"
 edition = "2021"
 
 [workspace]
-members = ["cli", "mosscore", "server"]
+members = ["moss-cli", "moss-core", "moss-net"]
 
 
 [dependencies]
-cli = { path = "cli" }
+moss-cli = { path = "moss-cli" }
 
 anyhow = "1.0.81"
 tokio = { version = "1", features = ["full"] }
