@@ -3,7 +3,8 @@ name = "moss-net"
 version = "0.1.0"
 edition = "2021"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[lib]
+name = "moss_net"
 
 [dependencies]
 moss-core = { path = "../moss-core" }

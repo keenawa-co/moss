@@ -20,7 +20,7 @@ use tower_http::{
 
 use crate::{
     api::service::UserService,
-    api::{gql, graphql, status},
+    api::{gql, rest},
 };
 
 pub async fn init(
@@ -38,7 +38,7 @@ pub async fn init(
 
     let service = service
         .layer(Extension(user_service.clone()))
-        .layer(Extension(graphql::build_schema(user_service)))
+        .layer(Extension(infra::graphql::build_schema(user_service)))
         .layer(
             CompressionLayer::new().compress_when(
                 SizeAbove::new(512) // don't compress below 512 bytes
@@ -46,7 +46,9 @@ pub async fn init(
             ),
         );
 
-    let router = Router::new().merge(status::router()).merge(gql::router());
+    let router = Router::new()
+        .merge(rest::status::router())
+        .merge(gql::router());
     let router = Router::new().nest("/api/v1", router).layer(service);
 
     println!("Listening on {}", conf.bind);

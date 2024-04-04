@@ -1,4 +1,3 @@
-pub(crate) mod gql;
-pub(crate) mod graphql;
-pub(crate) mod service;
-pub(crate) mod status;
+pub mod gql;
+pub mod rest;
+pub mod service;
