@@ -5,4 +5,5 @@ pub static CONF: OnceLock<Config> = OnceLock::new();
 #[derive(Clone, Debug)]
 pub struct Config {
     pub bind: SocketAddr,
+    pub preference: Box<moss_core::config::preference::Preference>,
 }

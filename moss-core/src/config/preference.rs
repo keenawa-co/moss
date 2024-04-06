@@ -5,19 +5,19 @@ use async_graphql::SimpleObject;
 
 #[cfg_attr(feature = "gql", derive(SimpleObject))]
 #[derive(Clone, Serialize, Deserialize, Debug)]
-pub struct BehaverPreferenceConfig {
-    pub visual: VisualBehaverPreference,
-    pub notification: NotificationBehaverPreference,
+pub struct Preference {
+    pub visual: VisualPreference,
+    pub notification: NotificationPreference,
 }
 
 #[cfg_attr(feature = "gql", derive(SimpleObject))]
 #[derive(Clone, Serialize, Deserialize, Debug)]
-pub struct VisualBehaverPreference {
+pub struct VisualPreference {
     pub theme: String,
 }
 
 #[cfg_attr(feature = "gql", derive(SimpleObject))]
 #[derive(Clone, Serialize, Deserialize, Debug)]
-pub struct NotificationBehaverPreference {
+pub struct NotificationPreference {
     pub sound: bool,
 }

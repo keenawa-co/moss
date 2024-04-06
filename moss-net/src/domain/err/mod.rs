@@ -5,6 +5,9 @@ use thiserror::Error;
 
 #[derive(Error, Debug)]
 pub enum Error {
+    #[error("Configuration not initialized")]
+    Configuration,
+
     #[error("The request body contains invalid data")]
     Request,
 

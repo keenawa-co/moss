@@ -1,1 +1,3 @@
-pub mod behaver_preference;
+pub mod preference;
+
+pub use preference::Preference;

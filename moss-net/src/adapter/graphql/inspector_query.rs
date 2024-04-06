@@ -30,7 +30,7 @@ pub struct InspectorQuery;
 
 #[Object]
 impl InspectorQuery {
-    async fn read_dir(&self, ctx: &Context<'_>, path: String) -> Result<Vec<FileInfo>> {
+    async fn read_dir(&self, _ctx: &Context<'_>, path: String) -> Result<Vec<FileInfo>> {
         let mut entries = tokio::fs::read_dir(path).await?;
         let mut files_info = Vec::new();
 
@@ -47,7 +47,7 @@ impl InspectorQuery {
         Ok(files_info)
     }
 
-    async fn read_file(&self, ctx: &Context<'_>, path: String) -> Result<String> {
+    async fn read_file(&self, _ctx: &Context<'_>, path: String) -> Result<String> {
         let content = tokio::fs::read_to_string(path).await?;
         Ok(content)
     }

@@ -1,12 +1,12 @@
-use moss_core::config::behaver_preference::BehaverPreferenceConfig;
+use moss_core::config::preference::Preference;
 
 #[derive(Clone, Debug)]
 pub struct ConfigService {
-    pub preferences: Box<BehaverPreferenceConfig>,
+    pub preferences: Box<Preference>,
 }
 
 impl ConfigService {
-    pub fn new(preferences: Box<BehaverPreferenceConfig>) -> Self {
-        Self { preferences }
+    pub fn new(preferences: Box<Preference>) -> Self {
+        return Self { preferences };
     }
 }

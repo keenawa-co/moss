@@ -5,7 +5,7 @@ use std::sync::Arc;
 
 use async_graphql::{EmptyMutation, EmptySubscription, MergedObject, Schema};
 
-use crate::domain::service::config_service::ConfigService;
+use crate::domain::service::ConfigService;
 
 use self::{config_query::ConfigQuery, inspector_query::InspectorQuery};
 
@@ -14,8 +14,8 @@ pub(crate) struct QueryRoot(InspectorQuery, ConfigQuery);
 
 pub(crate) type SchemaRoot = Schema<QueryRoot, EmptyMutation, EmptySubscription>;
 
-pub(crate) fn build_schema(us: ConfigService) -> SchemaRoot {
+pub(crate) fn build_schema(config_service: Arc<ConfigService>) -> SchemaRoot {
     return Schema::build(QueryRoot::default(), EmptyMutation, EmptySubscription)
-        .data(Arc::new(us))
+        .data(config_service)
         .finish();
 }

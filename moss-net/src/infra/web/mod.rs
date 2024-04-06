@@ -1,9 +1,8 @@
-use std::convert::Infallible;
-
-use axum::{extract::Request, response::IntoResponse, routing::Route};
-
 pub mod gql;
 pub mod status;
+
+use axum::{extract::Request, response::IntoResponse, routing::Route};
+use std::convert::Infallible;
 
 pub fn router<L>(service: L) -> axum::Router
 where
@@ -16,7 +15,6 @@ where
     let router = axum::Router::new()
         .merge(status::router())
         .merge(gql::router());
-    let router = axum::Router::new().nest("/api/v1", router).layer(service);
 
-    router
+    axum::Router::new().nest("/api/v1", router).layer(service)
 }
