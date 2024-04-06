@@ -6,7 +6,7 @@ use axum::{
     Extension, Router,
 };
 
-use crate::infra::graphql::SchemaRoot;
+use crate::adapter::graphql::SchemaRoot;
 
 async fn graphql_handler(schema: Extension<SchemaRoot>, req: GraphQLRequest) -> GraphQLResponse {
     return schema.execute(req.into_inner()).await.into();

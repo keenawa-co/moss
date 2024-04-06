@@ -2090,6 +2090,7 @@ dependencies = [
 name = "moss-core"
 version = "0.1.0"
 dependencies = [
+ "async-graphql",
  "serde",
  "serde_json",
 ]

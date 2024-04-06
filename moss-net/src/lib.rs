@@ -1,3 +1,6 @@
+mod adapter;
+mod domain;
+
 mod api;
 mod config;
 mod err;
@@ -6,8 +9,7 @@ pub mod infra;
 
 pub use config::{Config, CONF};
 
-use axum::{Extension, Router};
-use err::Error;
+use axum::Extension;
 use tower::ServiceBuilder;
 use tower_http::{
     compression::{
@@ -18,15 +20,12 @@ use tower_http::{
     ServiceBuilderExt,
 };
 
-use crate::{
-    api::service::UserService,
-    api::{gql, rest},
-};
+use crate::domain::service::config_service::ConfigService;
 
 pub async fn init(
     // inmemdb: SurrealInMem,
-    user_settings: Box<moss_core::config::preference_file::BehaverPreferenceFile>,
-) -> Result<(), Error> {
+    user_settings: Box<moss_core::config::behaver_preference::BehaverPreferenceConfig>,
+) -> Result<(), err::Error> {
     let conf = CONF.get().unwrap();
 
     let service = ServiceBuilder::new()
@@ -34,11 +33,11 @@ pub async fn init(
         .set_x_request_id(MakeRequestUuid)
         .propagate_x_request_id();
 
-    let user_service = UserService::init(user_settings);
+    let config_service = ConfigService::new(user_settings);
 
     let service = service
-        .layer(Extension(user_service.clone()))
-        .layer(Extension(infra::graphql::build_schema(user_service)))
+        .layer(Extension(config_service.clone()))
+        .layer(Extension(adapter::graphql::build_schema(config_service)))
         .layer(
             CompressionLayer::new().compress_when(
                 SizeAbove::new(512) // don't compress below 512 bytes
@@ -46,10 +45,7 @@ pub async fn init(
             ),
         );
 
-    let router = Router::new()
-        .merge(rest::status::router())
-        .merge(gql::router());
-    let router = Router::new().nest("/api/v1", router).layer(service);
+    let router = infra::web::router(service);
 
     println!("Listening on {}", conf.bind);
 
