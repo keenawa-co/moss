@@ -1,21 +1,31 @@
 mod config_query;
 mod inspector_query;
-
-use std::sync::Arc;
+mod portal_query;
 
 use async_graphql::{EmptyMutation, EmptySubscription, MergedObject, Schema};
 
-use crate::domain::service::ConfigService;
-
-use self::{config_query::ConfigQuery, inspector_query::InspectorQuery};
+use self::{
+    config_query::ConfigQuery,
+    inspector_query::InspectorQuery,
+    portal_query::{PortalMutation, PortalQuery},
+};
+use crate::domain::service::ServiceLocator;
 
 #[derive(MergedObject, Default)]
-pub struct QueryRoot(InspectorQuery, ConfigQuery);
+pub struct QueryRoot(InspectorQuery, ConfigQuery, PortalQuery);
 
-pub type SchemaRoot = Schema<QueryRoot, EmptyMutation, EmptySubscription>;
+#[derive(MergedObject, Default)]
+pub struct MutationRoot(PortalMutation);
 
-pub fn build_schema(config_service: Arc<ConfigService>) -> SchemaRoot {
-    Schema::build(QueryRoot::default(), EmptyMutation, EmptySubscription)
-        .data(config_service)
-        .finish()
+pub type SchemaRoot = Schema<QueryRoot, MutationRoot, EmptySubscription>;
+
+pub fn build_schema(service_locator: &ServiceLocator) -> SchemaRoot {
+    Schema::build(
+        QueryRoot::default(),
+        MutationRoot::default(),
+        EmptySubscription,
+    )
+    .data(service_locator.config_service.clone())
+    .data(service_locator.portal_service.clone())
+    .finish()
 }

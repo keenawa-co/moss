@@ -17,7 +17,10 @@ use tower_http::{
     ServiceBuilderExt,
 };
 
-use crate::domain::service::ConfigService;
+use crate::{
+    domain::service::{ConfigService, PortalService, ServiceLocator},
+    infra::surrealdb::disk::SurrealOnDisk,
+};
 
 pub async fn bind() -> Result<(), domain::Error> {
     let conf = match CONF.get() {
@@ -25,7 +28,11 @@ pub async fn bind() -> Result<(), domain::Error> {
         None => return Err(domain::Error::Configuration),
     };
 
-    let config_service = Arc::new(ConfigService::new(conf.preference.clone()));
+    let surreal_disk = SurrealOnDisk::new(conf.surrealdb_client.clone());
+    let service_locator = ServiceLocator {
+        portal_service: Arc::new(PortalService::new(surreal_disk.portal_repo())),
+        config_service: Arc::new(ConfigService::new(conf.preference.clone())),
+    };
 
     let service = ServiceBuilder::new()
         .catch_panic()
@@ -33,10 +40,8 @@ pub async fn bind() -> Result<(), domain::Error> {
         .propagate_x_request_id();
 
     let service = service
-        .layer(Extension(config_service.clone()))
-        .layer(Extension(adapter::graphql::build_schema(
-            config_service.clone(),
-        )))
+        // .layer(Extension(config_service.clone()))
+        .layer(Extension(adapter::graphql::build_schema(&service_locator)))
         .layer(
             CompressionLayer::new().compress_when(
                 SizeAbove::new(512) // don't compress below 512 bytes
