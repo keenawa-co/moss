@@ -10,12 +10,12 @@ use crate::domain::service::ConfigService;
 use self::{config_query::ConfigQuery, inspector_query::InspectorQuery};
 
 #[derive(MergedObject, Default)]
-pub(crate) struct QueryRoot(InspectorQuery, ConfigQuery);
+pub struct QueryRoot(InspectorQuery, ConfigQuery);
 
-pub(crate) type SchemaRoot = Schema<QueryRoot, EmptyMutation, EmptySubscription>;
+pub type SchemaRoot = Schema<QueryRoot, EmptyMutation, EmptySubscription>;
 
-pub(crate) fn build_schema(config_service: Arc<ConfigService>) -> SchemaRoot {
-    return Schema::build(QueryRoot::default(), EmptyMutation, EmptySubscription)
+pub fn build_schema(config_service: Arc<ConfigService>) -> SchemaRoot {
+    Schema::build(QueryRoot::default(), EmptyMutation, EmptySubscription)
         .data(config_service)
-        .finish();
+        .finish()
 }

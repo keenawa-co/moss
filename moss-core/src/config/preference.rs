@@ -17,7 +17,7 @@ pub struct VisualPreference {
 }
 
 #[cfg_attr(feature = "gql", derive(SimpleObject))]
-#[derive(Clone, Serialize, Deserialize, Debug)]
+#[derive(Clone, Copy, Serialize, Deserialize, Debug)]
 pub struct NotificationPreference {
     pub sound: bool,
 }

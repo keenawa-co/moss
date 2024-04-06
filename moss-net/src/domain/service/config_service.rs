@@ -1,12 +1,14 @@
+use std::sync::Arc;
+
 use moss_core::config::preference::Preference;
 
 #[derive(Clone, Debug)]
 pub struct ConfigService {
-    pub preferences: Box<Preference>,
+    pub preferences: Arc<Preference>,
 }
 
 impl ConfigService {
-    pub fn new(preferences: Box<Preference>) -> Self {
-        return Self { preferences };
+    pub fn new(preferences: Arc<Preference>) -> Self {
+        Self { preferences }
     }
 }

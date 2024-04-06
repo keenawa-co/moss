@@ -1,7 +1,5 @@
-use std::sync::Arc;
-
 use async_graphql::{Context, Object, Result};
-use moss_core::config;
+use std::sync::Arc;
 
 use crate::domain::service::ConfigService;
 
@@ -10,9 +8,12 @@ pub struct ConfigQuery;
 
 #[Object]
 impl ConfigQuery {
-    async fn get_preference(&self, ctx: &Context<'_>) -> Result<config::Preference> {
+    async fn get_preference(
+        &self,
+        ctx: &Context<'_>,
+    ) -> Result<Arc<moss_core::config::Preference>> {
         let config_service = ctx.data::<Arc<ConfigService>>()?;
-        let result: config::Preference = (*config_service.preferences).clone().into();
+        let result = config_service.preferences.clone();
 
         Ok(result)
     }
