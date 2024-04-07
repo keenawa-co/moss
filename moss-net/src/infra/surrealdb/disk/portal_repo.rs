@@ -1,5 +1,3 @@
-use async_trait::async_trait;
-use chrono::Utc;
 use std::sync::Arc;
 use surrealdb::{engine::remote::ws::Client, Surreal};
 

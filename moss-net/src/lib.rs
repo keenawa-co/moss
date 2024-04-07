@@ -4,6 +4,13 @@ mod infra;
 
 pub use config::{Config, CONF};
 
+#[macro_use]
+extern crate async_trait;
+
+#[macro_use]
+extern crate serde;
+extern crate serde_json;
+
 use axum::Extension;
 use std::sync::Arc;
 use tower::ServiceBuilder;

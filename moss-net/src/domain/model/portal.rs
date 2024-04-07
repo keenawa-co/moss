@@ -1,5 +1,4 @@
 use async_graphql::Object;
-use serde::{Deserialize, Serialize};
 use surrealdb::sql::Thing;
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
