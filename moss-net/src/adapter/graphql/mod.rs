@@ -2,7 +2,7 @@ mod config_query;
 mod inspector_query;
 mod portal_query;
 
-use async_graphql::{EmptyMutation, EmptySubscription, MergedObject, Schema};
+use async_graphql::{EmptySubscription, MergedObject, Schema};
 
 use self::{
     config_query::ConfigQuery,
