@@ -39,13 +39,13 @@ impl PortalMutation {
         Ok(result)
     }
 
-    async fn delete_by_id(
+    async fn delete_recent_by_id(
         &self,
         ctx: &Context<'_>,
         id: String,
     ) -> async_graphql::Result<RecentItem> {
         let portal_service = ctx.data::<Arc<PortalService>>()?;
 
-        Ok(portal_service.delete_by_id(id).await?)
+        Ok(portal_service.delete_recent_by_id(id).await?)
     }
 }

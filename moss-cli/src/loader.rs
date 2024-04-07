@@ -1,10 +1,7 @@
-use std::{fs, sync::Arc};
+use serde::de::DeserializeOwned;
+use std::fs;
 
-use moss_core::config::preference::Preference;
-
-pub fn load_preference_file(path: String) -> anyhow::Result<Arc<Preference>> {
+pub fn load_toml_file<T: DeserializeOwned>(path: String) -> anyhow::Result<T> {
     let content = fs::read_to_string(path)?;
-    let preference_file: Preference = toml::from_str(&content)?;
-
-    Ok(Arc::new(preference_file))
+    Ok(toml::from_str(&content)?)
 }

@@ -1,4 +1,5 @@
 use async_trait::async_trait;
+use chrono::Utc;
 use std::sync::Arc;
 use surrealdb::{engine::remote::ws::Client, Surreal};
 
@@ -30,12 +31,20 @@ impl domain::port::PortalRepository for PortalRepositoryImpl {
     async fn create_resent(&self, item: RecentItemInput) -> Result<Vec<RecentItem>, domain::Error> {
         self.client.use_ns("cache").use_db("portal").await?;
 
-        let created: Vec<RecentItem> = self.client.create("recent").content(item).await?;
+        let created: Vec<RecentItem> = self
+            .client
+            .create("recent")
+            .content(RecentItem {
+                id: None,
+                path: item.path,
+                timestamp: Utc::now().timestamp(),
+            })
+            .await?;
 
         Ok(created)
     }
 
-    async fn delete_by_id(&self, id: String) -> Result<Option<RecentItem>, domain::Error> {
+    async fn delete_recent_by_id(&self, id: String) -> Result<Option<RecentItem>, domain::Error> {
         self.client.use_ns("cache").use_db("portal").await?;
 
         let deleted: Option<RecentItem> = self.client.delete(("recent", id)).await?;

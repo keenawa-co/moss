@@ -31,8 +31,8 @@ impl PortalService {
         Ok(result) // FIXME: return one item, not a vector
     }
 
-    pub async fn delete_by_id(&self, path: String) -> Result<RecentItem, domain::Error> {
-        let result = self.cache.delete_by_id(path).await?;
+    pub async fn delete_recent_by_id(&self, path: String) -> Result<RecentItem, domain::Error> {
+        let result = self.cache.delete_recent_by_id(path).await?;
 
         Ok(result.unwrap())
     }
