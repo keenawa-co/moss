@@ -1,5 +1,5 @@
 use clap::Args;
-use moss_net::Config;
+
 use std::{net::SocketAddr, sync::Arc};
 use surrealdb::{engine::remote::ws::Ws, Surreal};
 
