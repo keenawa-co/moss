@@ -5,4 +5,4 @@ namespace = "dev"
 database = "moss"
 
 [surrealdb.tables]
-portal_recent = "portal_recent"
+project_table = "projects"

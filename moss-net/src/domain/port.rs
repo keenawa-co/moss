@@ -1,11 +1,22 @@
 use async_trait::async_trait;
 use std::fmt::Debug;
 
-use super::model::portal::{RecentItem, RecentItemInput};
+use super::model::{
+    portal::RecentProject,
+    project::{NewProjectInput, Project},
+};
 
 #[async_trait]
 pub trait PortalRepository: Debug + Send + Sync {
-    async fn select_resent_list(&self) -> Result<Vec<RecentItem>, super::Error>;
-    async fn create_resent(&self, item: RecentItemInput) -> Result<Vec<RecentItem>, super::Error>;
-    async fn delete_recent_by_id(&self, path: String) -> Result<Option<RecentItem>, super::Error>;
+    async fn select_resent_list(
+        &self,
+        start_time: i64,
+        limit: u8,
+    ) -> Result<Vec<RecentProject>, super::Error>;
+}
+
+#[async_trait]
+pub trait ProjectRepository: Debug + Send + Sync {
+    async fn create_project(&self, input: NewProjectInput) -> Result<Vec<Project>, super::Error>;
+    async fn delete_by_id(&self, id: String) -> Result<Option<Project>, super::Error>;
 }

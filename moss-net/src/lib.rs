@@ -17,7 +17,7 @@ use tower_http::{
 };
 
 use crate::{
-    domain::service::{ConfigService, PortalService, ServiceLocator},
+    domain::service::{ConfigService, PortalService, ProjectService, ServiceLocator},
     infra::surrealdb::disk::SurrealOnDisk,
 };
 
@@ -31,6 +31,7 @@ pub async fn bind() -> Result<(), domain::Error> {
     let service_locator = ServiceLocator {
         portal_service: Arc::new(PortalService::new(surreal_disk.portal_repo())),
         config_service: Arc::new(ConfigService::new(conf.preference.clone())),
+        project_service: Arc::new(ProjectService::new(surreal_disk.project_repo())),
     };
 
     let service = ServiceBuilder::new()

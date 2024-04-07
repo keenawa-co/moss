@@ -1,16 +1,16 @@
-use async_graphql::Object;
+use async_graphql::{InputObject, Object};
 use serde::{Deserialize, Serialize};
 use surrealdb::sql::Thing;
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
-pub struct RecentProject {
+pub struct Project {
     pub id: Option<Thing>,
     pub path: String,
     pub updated: i64,
 }
 
 #[Object]
-impl RecentProject {
+impl Project {
     pub async fn id(&self) -> Option<String> {
         self.id.as_ref().map(|thing| thing.id.to_string())
     }
@@ -19,7 +19,12 @@ impl RecentProject {
         &self.path
     }
 
-    pub async fn timestamp(&self) -> i64 {
+    pub async fn updated(&self) -> i64 {
         self.updated
     }
+}
+
+#[derive(Debug, Clone, Deserialize, Serialize, InputObject)]
+pub struct NewProjectInput {
+    pub path: String,
 }

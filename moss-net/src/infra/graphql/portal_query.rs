@@ -1,51 +1,24 @@
+use async_graphql::{Context, Object};
+use chrono::{Duration, Utc};
 use std::sync::Arc;
 
-use async_graphql::{Context, Object};
-
-use crate::domain::{
-    model::portal::{RecentItem, RecentItemInput},
-    service::PortalService,
-};
+use crate::domain::{model::portal::RecentProject, service::PortalService};
 
 #[derive(Default)]
 pub struct PortalQuery;
 
 #[Object]
 impl PortalQuery {
+    #[graphql(name = "selectPortalResentList")]
     async fn select_resent_list(
         &self,
         ctx: &Context<'_>,
-    ) -> async_graphql::Result<Vec<RecentItem>> {
+        #[graphql(default_with = "(Utc::now() - Duration::days(30)).timestamp()")] start_time: i64,
+        #[graphql(validator(minimum = 1, maximum = 10), default = 10)] limit: u8,
+    ) -> async_graphql::Result<Vec<RecentProject>> {
         let portal_service = ctx.data::<Arc<PortalService>>()?;
-        let result = portal_service.select_resent_list().await?;
+        let result = portal_service.select_resent_list(start_time, limit).await?;
 
         Ok(result)
-    }
-}
-
-#[derive(Default)]
-pub struct PortalMutation;
-
-#[Object]
-impl PortalMutation {
-    async fn create_resent(
-        &self,
-        ctx: &Context<'_>,
-        item: RecentItemInput,
-    ) -> async_graphql::Result<Vec<RecentItem>> {
-        let portal_service = ctx.data::<Arc<PortalService>>()?;
-        let result = portal_service.crate_recent(item).await?;
-
-        Ok(result)
-    }
-
-    async fn delete_recent_by_id(
-        &self,
-        ctx: &Context<'_>,
-        id: String,
-    ) -> async_graphql::Result<RecentItem> {
-        let portal_service = ctx.data::<Arc<PortalService>>()?;
-
-        Ok(portal_service.delete_recent_by_id(id).await?)
     }
 }
