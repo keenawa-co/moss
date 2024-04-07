@@ -1,4 +1,3 @@
-mod adapter;
 pub mod config;
 mod domain;
 mod infra;
@@ -40,8 +39,7 @@ pub async fn bind() -> Result<(), domain::Error> {
         .propagate_x_request_id();
 
     let service = service
-        // .layer(Extension(config_service.clone()))
-        .layer(Extension(adapter::graphql::build_schema(&service_locator)))
+        .layer(Extension(infra::graphql::build_schema(&service_locator)))
         .layer(
             CompressionLayer::new().compress_when(
                 SizeAbove::new(512) // don't compress below 512 bytes
