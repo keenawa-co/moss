@@ -8,16 +8,16 @@ use crate::domain::{
 
 #[derive(Debug, Clone)]
 pub struct PortalService {
-    pub cache: Arc<dyn PortalRepository>,
+    pub repo: Arc<dyn PortalRepository>,
 }
 
 impl PortalService {
-    pub fn new(cache: Arc<dyn PortalRepository>) -> Self {
-        Self { cache }
+    pub fn new(repo: Arc<dyn PortalRepository>) -> Self {
+        Self { repo }
     }
 
     pub async fn select_resent_list(&self) -> Result<Vec<RecentItem>, domain::Error> {
-        let result = self.cache.select_resent_list().await?;
+        let result = self.repo.select_resent_list().await?;
 
         Ok(result)
     }
@@ -26,13 +26,13 @@ impl PortalService {
         &self,
         item: RecentItemInput,
     ) -> Result<Vec<RecentItem>, domain::Error> {
-        let result = self.cache.create_resent(item).await?;
+        let result = self.repo.create_resent(item).await?;
 
-        Ok(result) // FIXME: return one item, not a vector
+        Ok(result)
     }
 
     pub async fn delete_recent_by_id(&self, path: String) -> Result<RecentItem, domain::Error> {
-        let result = self.cache.delete_recent_by_id(path).await?;
+        let result = self.repo.delete_recent_by_id(path).await?;
 
         Ok(result.unwrap())
     }

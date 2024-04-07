@@ -9,6 +9,9 @@ pub struct Config {
 pub struct SurrealdbConfig {
     pub host: String,
     pub port: u16,
+    pub namespace: String,
+    pub database: String,
+    pub tables: moss_net::config::SurrealdbTableSet,
 }
 
 impl SurrealdbConfig {

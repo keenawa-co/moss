@@ -1,6 +1,6 @@
 .PHONY: run_testdata_db
 run_testdata_db:
-	surreal start file:mossdb
+	surreal start --log trace file:mossdb
 
 .PHONY: count
 count:

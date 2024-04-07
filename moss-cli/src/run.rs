@@ -23,12 +23,18 @@ pub async fn init(
         configuration_filepath,
     }: RunCmdArgs,
 ) -> anyhow::Result<()> {
-    let configuration: crate::config::Config = loader::load_toml_file(configuration_filepath)?;
+    let conf: crate::config::Config = loader::load_toml_file(configuration_filepath)?;
+    let surrealdb_client = Surreal::new::<Ws>(conf.surrealdb.bind_addr()).await?;
+    surrealdb_client
+        .use_ns(conf.surrealdb.namespace)
+        .use_db(conf.surrealdb.database)
+        .await?;
 
     let _ = moss_net::CONF.set(moss_net::Config {
         bind,
         preference: loader::load_toml_file(preference_filepath)?,
-        surrealdb_client: Arc::new(Surreal::new::<Ws>(configuration.surrealdb.bind_addr()).await?),
+        surrealdb_client: Arc::new(surrealdb_client),
+        surrealdb_tables: conf.surrealdb.tables,
     });
 
     moss_net::bind().await.expect("Failed to start the server");

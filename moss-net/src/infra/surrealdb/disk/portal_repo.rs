@@ -11,29 +11,30 @@ use crate::domain::{
 #[derive(Debug)]
 pub struct PortalRepositoryImpl {
     client: Arc<Surreal<Client>>,
+    recent_table: String,
 }
 
 impl PortalRepositoryImpl {
-    pub fn new(client: Arc<Surreal<Client>>) -> Self {
-        Self { client }
+    pub fn new(client: Arc<Surreal<Client>>, recent_table: &str) -> Self {
+        Self {
+            client,
+            recent_table: recent_table.into(),
+        }
     }
 }
 
 #[async_trait]
 impl domain::port::PortalRepository for PortalRepositoryImpl {
     async fn select_resent_list(&self) -> Result<Vec<RecentItem>, domain::Error> {
-        self.client.use_ns("cache").use_db("portal").await?;
+        let selected: Vec<RecentItem> = self.client.select(&self.recent_table).await?;
 
-        let selected: Vec<RecentItem> = self.client.select("recent").await?;
         Ok(selected)
     }
 
     async fn create_resent(&self, item: RecentItemInput) -> Result<Vec<RecentItem>, domain::Error> {
-        self.client.use_ns("cache").use_db("portal").await?;
-
         let created: Vec<RecentItem> = self
             .client
-            .create("recent")
+            .create(&self.recent_table)
             .content(RecentItem {
                 id: None,
                 path: item.path,
@@ -45,9 +46,7 @@ impl domain::port::PortalRepository for PortalRepositoryImpl {
     }
 
     async fn delete_recent_by_id(&self, id: String) -> Result<Option<RecentItem>, domain::Error> {
-        self.client.use_ns("cache").use_db("portal").await?;
-
-        let deleted: Option<RecentItem> = self.client.delete(("recent", id)).await?;
+        let deleted: Option<RecentItem> = self.client.delete((&self.recent_table, id)).await?;
 
         Ok(deleted)
     }

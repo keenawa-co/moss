@@ -1,11 +1,14 @@
 {
   "rust-analyzer.showUnlinkedFileNotification": false,
   "cSpell.words": [
+    "chrono",
     "graphiql",
     "inmem",
     "inmemdb",
     "mosscore",
+    "mossdev",
     "surrealdb",
+    "tablename",
     "thiserror"
   ]
 }
