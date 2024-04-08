@@ -1,20 +1,33 @@
 use serde::Deserialize;
 
 #[derive(Deserialize, Debug)]
-pub struct Config {
-    pub surrealdb: SurrealdbConfig,
+pub(crate) struct Config {
+    pub surrealdb: Surrealdb,
 }
 
 #[derive(Deserialize, Debug)]
-pub struct SurrealdbConfig {
+pub(crate) struct Surrealdb {
+    pub endpoint: SurrealdbEndpoint,
+    pub tables: serde_json::Map<String, serde_json::Value>,
+}
+
+#[derive(Deserialize, Debug)]
+pub(crate) struct SurrealdbConfig {
+    #[serde(default)]
+    pub strict: bool,
+    #[serde(default)]
+    pub notifications: bool,
+}
+
+#[derive(Deserialize, Debug)]
+pub(crate) struct SurrealdbEndpoint {
     pub host: String,
     pub port: u16,
     pub namespace: String,
     pub database: String,
-    pub tables: moss_net::config::SurrealdbTableSet,
 }
 
-impl SurrealdbConfig {
+impl SurrealdbEndpoint {
     pub fn bind_addr(&self) -> String {
         format!("{}:{}", self.host, self.port)
     }
