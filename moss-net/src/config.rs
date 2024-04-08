@@ -1,3 +1,4 @@
+use serde_json::Value;
 use std::{
     net::SocketAddr,
     sync::{Arc, OnceLock},
@@ -11,5 +12,5 @@ pub struct Config {
     pub bind: SocketAddr,
     pub preference: Arc<moss_core::config::Preference>,
     pub surrealdb_client: Arc<Surreal<Client>>,
-    pub surrealdb_tables: serde_json::Map<String, serde_json::Value>,
+    pub surrealdb_tables: serde_json::Map<String, Value>,
 }

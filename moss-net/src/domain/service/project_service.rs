@@ -16,16 +16,13 @@ impl ProjectService {
         Self { repo }
     }
 
-    pub async fn create_project(
-        &self,
-        input: NewProjectInput,
-    ) -> Result<Vec<Project>, domain::Error> {
+    pub async fn create_project(&self, input: NewProjectInput) -> domain::Result<Vec<Project>> {
         let result = self.repo.create_project(input).await?;
 
         Ok(result)
     }
 
-    pub async fn delete_by_id(&self, id: String) -> Result<Project, domain::Error> {
+    pub async fn delete_by_id(&self, id: String) -> domain::Result<Project> {
         let result = self.repo.delete_by_id(id).await?;
 
         Ok(result.unwrap())

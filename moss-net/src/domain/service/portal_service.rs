@@ -16,7 +16,7 @@ impl PortalService {
         &self,
         start_time: i64,
         limit: u8,
-    ) -> Result<Vec<RecentProject>, domain::Error> {
+    ) -> domain::Result<Vec<RecentProject>> {
         let result = self.repo.select_resent_list(start_time, limit).await?;
 
         Ok(result)

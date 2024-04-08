@@ -29,15 +29,11 @@ use crate::{
 };
 
 pub async fn bind() -> Result<(), domain::Error> {
-    let conf = match CONF.get() {
-        Some(conf) => conf,
-        None => return Err(domain::Error::Configuration),
-    };
+    let conf = CONF
+        .get()
+        .ok_or_else(|| domain::Error::Configuration("configuration was not defined".to_string()))?;
 
-    let surreal_disk = SurrealOnDisk::new(
-        conf.surrealdb_client.clone(),
-        &serde_json::from_value(conf.surrealdb_tables.clone().into())?,
-    );
+    let surreal_disk = SurrealOnDisk::new(conf.surrealdb_client.clone(), &conf.surrealdb_tables)?;
     let service_locator = ServiceLocator {
         portal_service: Arc::new(PortalService::new(surreal_disk.portal_repo())),
         config_service: Arc::new(ConfigService::new(conf.preference.clone())),

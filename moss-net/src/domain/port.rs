@@ -12,11 +12,11 @@ pub(crate) trait PortalRepository: Debug + Send + Sync {
         &self,
         start_time: i64,
         limit: u8,
-    ) -> Result<Vec<RecentProject>, super::Error>;
+    ) -> super::Result<Vec<RecentProject>>;
 }
 
 #[async_trait]
 pub(crate) trait ProjectRepository: Debug + Send + Sync {
-    async fn create_project(&self, input: NewProjectInput) -> Result<Vec<Project>, super::Error>;
-    async fn delete_by_id(&self, id: String) -> Result<Option<Project>, super::Error>;
+    async fn create_project(&self, input: NewProjectInput) -> super::Result<Vec<Project>>;
+    async fn delete_by_id(&self, id: String) -> super::Result<Option<Project>>;
 }
