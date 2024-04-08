@@ -4,7 +4,7 @@ use std::sync::Arc;
 use crate::domain::service::ConfigService;
 
 #[derive(Default)]
-pub struct ConfigQuery;
+pub(super) struct ConfigQuery;
 
 #[Object]
 impl ConfigQuery {

@@ -1,14 +1,13 @@
-#[derive(Default)]
-pub struct ProjectMutation;
-
-use std::sync::Arc;
-
 use async_graphql::{Context, Object};
+use std::sync::Arc;
 
 use crate::domain::{
     model::project::{NewProjectInput, Project},
     service::ProjectService,
 };
+
+#[derive(Default)]
+pub(super) struct ProjectMutation;
 
 #[Object]
 impl ProjectMutation {

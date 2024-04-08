@@ -1,4 +1,5 @@
 use axum::Error as AxumError;
+use serde_json::Error as SerdeError;
 use std::io::Error as IoError;
 use surrealdb::Error as SurrealError;
 use thiserror::Error;
@@ -13,6 +14,9 @@ pub enum Error {
 
     #[error("There was an error with the network: {0}")]
     Axum(#[from] AxumError),
+
+    #[error("There was a problem with serialization/deserialization: {0}")]
+    Serde(#[from] SerdeError),
 
     #[error("There was a problem with the database: {0}")]
     Db(#[from] SurrealError),

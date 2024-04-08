@@ -5,7 +5,7 @@ use std::sync::Arc;
 use crate::domain::{model::portal::RecentProject, service::PortalService};
 
 #[derive(Default)]
-pub struct PortalQuery;
+pub(super) struct PortalQuery;
 
 #[Object]
 impl PortalQuery {

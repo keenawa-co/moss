@@ -34,7 +34,10 @@ pub async fn bind() -> Result<(), domain::Error> {
         None => return Err(domain::Error::Configuration),
     };
 
-    let surreal_disk = SurrealOnDisk::new(conf.surrealdb_client.clone(), &conf.surrealdb_tables);
+    let surreal_disk = SurrealOnDisk::new(
+        conf.surrealdb_client.clone(),
+        &serde_json::from_value(conf.surrealdb_tables.clone().into())?,
+    );
     let service_locator = ServiceLocator {
         portal_service: Arc::new(PortalService::new(surreal_disk.portal_repo())),
         config_service: Arc::new(ConfigService::new(conf.preference.clone())),

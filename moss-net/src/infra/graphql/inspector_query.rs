@@ -26,7 +26,7 @@ impl FileInfo {
 }
 
 #[derive(Default)]
-pub struct InspectorQuery;
+pub(super) struct InspectorQuery;
 
 #[Object]
 impl InspectorQuery {
