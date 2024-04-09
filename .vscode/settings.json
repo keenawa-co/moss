@@ -5,6 +5,7 @@
     "graphiql",
     "inmem",
     "inmemdb",
+    "mimalloc",
     "mosscore",
     "mossdev",
     "surrealdb",

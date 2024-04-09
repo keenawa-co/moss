@@ -6,6 +6,14 @@ edition = "2021"
 [workspace]
 members = ["moss-cli", "moss-core", "moss-net"]
 
+[profile.release]
+lto = true
+opt-level = 3
+panic = "abort"
+codegen-units = 1
+
+[build]
+rustflags = ["-C", "target-cpu=native"]
 
 [dependencies]
 moss-cli = { path = "moss-cli" }
@@ -13,3 +21,6 @@ moss-cli = { path = "moss-cli" }
 anyhow = "1.0.81"
 tokio = { version = "1", features = ["full"] }
 once_cell = "1.19.0"
+
+[target.'cfg(any(target_os = "linux", target_os = "macos"))'.dependencies]
+mimalloc = { version = "0.1.39", default-features = false }

@@ -1,29 +1,32 @@
 use serde::Deserialize;
 
 #[derive(Deserialize, Debug)]
-pub(crate) struct Config {
-    pub surrealdb: Surrealdb,
+pub struct Config {
+    pub(super) surrealdb: Surrealdb,
 }
 
 #[derive(Deserialize, Debug)]
-pub(crate) struct Surrealdb {
-    pub endpoint: SurrealdbEndpoint,
+pub struct Surrealdb {
+    pub(super) endpoint: SurrealdbEndpoint,
+    #[allow(dead_code)]
+    pub(super) config: Option<SurrealdbConfig>,
 }
 
+#[allow(dead_code)]
 #[derive(Deserialize, Debug)]
-pub(crate) struct SurrealdbConfig {
+pub struct SurrealdbConfig {
     #[serde(default)]
-    pub strict: bool,
+    pub(super) strict: bool,
     #[serde(default)]
-    pub notifications: bool,
+    pub(super) notifications: bool,
 }
 
 #[derive(Deserialize, Debug)]
-pub(crate) struct SurrealdbEndpoint {
-    pub host: String,
-    pub port: u16,
-    pub namespace: String,
-    pub database: String,
+pub struct SurrealdbEndpoint {
+    pub(super) host: String,
+    pub(super) port: u16,
+    pub(super) namespace: String,
+    pub(super) database: String,
 }
 
 impl SurrealdbEndpoint {
