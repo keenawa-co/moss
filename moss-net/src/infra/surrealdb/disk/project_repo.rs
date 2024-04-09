@@ -11,15 +11,11 @@ use crate::domain::{
 #[derive(Debug)]
 pub(crate) struct ProjectRepositoryImpl {
     client: Arc<Surreal<Client>>,
-    table_name: String,
 }
 
 impl ProjectRepositoryImpl {
-    pub(super) fn new(client: Arc<Surreal<Client>>, table: &str) -> Self {
-        Self {
-            client,
-            table_name: table.into(),
-        }
+    pub(super) fn new(client: Arc<Surreal<Client>>) -> Self {
+        Self { client }
     }
 }
 
@@ -28,7 +24,7 @@ impl domain::port::ProjectRepository for ProjectRepositoryImpl {
     async fn create_project(&self, input: NewProjectInput) -> domain::Result<Vec<Project>> {
         let result: Vec<Project> = self
             .client
-            .create(&self.table_name)
+            .create(super::PROJECT_TABLE_NAME)
             .content(Project {
                 id: None,
                 path: input.path,
@@ -40,7 +36,7 @@ impl domain::port::ProjectRepository for ProjectRepositoryImpl {
     }
 
     async fn delete_by_id(&self, id: String) -> domain::Result<Option<Project>> {
-        let result: Option<Project> = self.client.delete((&self.table_name, id)).await?;
+        let result: Option<Project> = self.client.delete((super::PROJECT_TABLE_NAME, id)).await?;
 
         Ok(result)
     }

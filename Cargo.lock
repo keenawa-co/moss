@@ -2068,6 +2068,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "moss-cli",
+ "once_cell",
  "tokio",
 ]
 
@@ -2080,6 +2081,7 @@ dependencies = [
  "clap",
  "moss-core",
  "moss-net",
+ "once_cell",
  "serde",
  "serde_json",
  "surrealdb",
@@ -2109,6 +2111,7 @@ dependencies = [
  "chrono",
  "futures-util",
  "moss-core",
+ "once_cell",
  "serde",
  "serde_json",
  "surrealdb",

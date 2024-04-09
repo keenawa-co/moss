@@ -1,4 +1,5 @@
 use clap::Args;
+use once_cell::sync::Lazy;
 
 use std::{net::SocketAddr, sync::Arc};
 use surrealdb::{engine::remote::ws::Ws, Surreal};
@@ -34,7 +35,6 @@ pub async fn init(
         bind,
         preference: loader::load_toml_file(preference_filepath)?,
         surrealdb_client: Arc::new(surrealdb_client),
-        surrealdb_tables: conf.surrealdb.tables,
     });
 
     moss_net::bind().await.expect("Failed to start the server");

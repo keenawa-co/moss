@@ -8,7 +8,6 @@ pub(crate) struct Config {
 #[derive(Deserialize, Debug)]
 pub(crate) struct Surrealdb {
     pub endpoint: SurrealdbEndpoint,
-    pub tables: serde_json::Map<String, serde_json::Value>,
 }
 
 #[derive(Deserialize, Debug)]

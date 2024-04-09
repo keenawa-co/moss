@@ -6,15 +6,11 @@ use crate::domain::{self, model::portal::RecentProject};
 #[derive(Debug)]
 pub(crate) struct PortalRepositoryImpl {
     client: Arc<Surreal<Client>>,
-    table_name: String,
 }
 
 impl PortalRepositoryImpl {
-    pub(super) fn new(client: Arc<Surreal<Client>>, recent_table: &str) -> Self {
-        Self {
-            client,
-            table_name: recent_table.into(),
-        }
+    pub(super) fn new(client: Arc<Surreal<Client>>) -> Self {
+        Self { client }
     }
 }
 
@@ -35,7 +31,7 @@ impl domain::port::PortalRepository for PortalRepositoryImpl {
                 LIMIT type::int($limit)
                 ",
             )
-            .bind(("table", &self.table_name))
+            .bind(("table", super::PROJECT_TABLE_NAME))
             .bind(("start_time", start_time))
             .bind(("limit", limit))
             .await?

@@ -33,7 +33,7 @@ pub async fn bind() -> Result<(), domain::Error> {
         .get()
         .ok_or_else(|| domain::Error::Configuration("configuration was not defined".to_string()))?;
 
-    let surreal_disk = SurrealOnDisk::new(conf.surrealdb_client.clone(), &conf.surrealdb_tables)?;
+    let surreal_disk = SurrealOnDisk::new(conf.surrealdb_client.clone())?;
     let service_locator = ServiceLocator {
         portal_service: Arc::new(PortalService::new(surreal_disk.portal_repo())),
         config_service: Arc::new(ConfigService::new(conf.preference.clone())),
