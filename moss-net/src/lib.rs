@@ -11,8 +11,12 @@ extern crate async_trait;
 extern crate serde;
 extern crate serde_json;
 
+#[macro_use]
+extern crate tracing;
+
 use axum::Extension;
 use std::sync::Arc;
+use tokio_util::sync::CancellationToken as TokioCancellationToken;
 use tower::ServiceBuilder;
 use tower_http::{
     compression::{
@@ -22,13 +26,29 @@ use tower_http::{
     request_id::MakeRequestUuid,
     ServiceBuilderExt,
 };
+use tracing::Level;
+use tracing_subscriber::{layer::SubscriberExt, FmtSubscriber};
 
 use crate::{
     domain::service::{ConfigService, PortalService, ProjectService, ServiceLocator},
     infra::surrealdb::disk::SurrealOnDisk,
 };
 
-pub async fn bind() -> Result<(), domain::Error> {
+use tracing_subscriber::EnvFilter;
+
+pub async fn bind(cancel_token: TokioCancellationToken) -> Result<(), domain::Error> {
+    // let filter = EnvFilter::default();
+
+    // let registry = tracing_subscriber::registry();
+
+    // registry.with(otlp::new(filter));
+
+    let subscriber = FmtSubscriber::builder()
+        .with_max_level(Level::TRACE)
+        .finish();
+
+    tracing::subscriber::set_global_default(subscriber).expect("setting default subscriber failed");
+
     let conf = CONF
         .get()
         .ok_or_else(|| domain::Error::Configuration("configuration was not defined".to_string()))?;
@@ -54,9 +74,13 @@ pub async fn bind() -> Result<(), domain::Error> {
             ),
         );
 
-    let router = infra::web::router(service);
+    let router = infra::web::router(service); // TODO: consider to use Cow<T>
 
-    println!("Listening on {}", conf.bind);
+    warn!(
+        "{} has been successfully launched on {}",
+        moss_core::constant::APP_NAME,
+        conf.bind
+    );
 
     axum_server::bind(conf.bind)
         .serve(router.clone().into_make_service())
