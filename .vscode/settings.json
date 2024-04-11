@@ -9,8 +9,18 @@
     "mosscore",
     "mossdev",
     "otlp",
+    "sqlx",
     "surrealdb",
     "tablename",
     "thiserror"
-  ]
+  ],
+  "sqltools.connections": [
+    {
+      "previewLimit": 50,
+      "driver": "SQLite",
+      "name": "moss",
+      "database": "${workspaceFolder:goray}/moss.db"
+    }
+  ],
+  "sqltools.useNodeRuntime": true
 }

@@ -2,3 +2,5 @@
 /mossdb
 
 *.txt
+*.db*
+*.session*
