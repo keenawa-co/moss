@@ -2,7 +2,10 @@ use std::sync::Arc;
 
 use crate::domain::{
     self,
-    model::project::{NewProjectInput, Project},
+    model::{
+        project::{NewProjectInput, Project},
+        RecordObject,
+    },
     port::ProjectRepository,
 };
 
@@ -22,9 +25,9 @@ impl ProjectService {
         Ok(result)
     }
 
-    pub async fn delete_by_id(&self, id: i32) -> domain::Result<Project> {
+    pub async fn delete_by_id(&self, id: i32) -> domain::Result<RecordObject<i32>> {
         let result = self.repo.delete_by_id(id).await?;
 
-        Ok(result.unwrap())
+        Ok(result)
     }
 }

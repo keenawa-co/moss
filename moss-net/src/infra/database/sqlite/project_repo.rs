@@ -5,6 +5,7 @@ use std::sync::Arc;
 
 use crate::domain;
 use crate::domain::model::project::{NewProjectInput, Project, RecentProject};
+use crate::domain::model::RecordObject;
 
 #[derive(Clone, Debug, PartialEq, Eq, DeriveEntityModel, Serialize, Deserialize)]
 #[sea_orm(table_name = "project")]
@@ -68,10 +69,16 @@ impl domain::port::ProjectRepository for ProjectRepositoryImpl {
         Ok(model.into())
     }
 
-    async fn delete_by_id(&self, id: i32) -> domain::Result<Option<Project>> {
-        let r = Entity::delete_by_id(id).exec(self.conn.as_ref()).await?;
+    async fn delete_by_id(&self, id: i32) -> domain::Result<RecordObject<i32>> {
+        let result = Entity::delete_by_id(id).exec(self.conn.as_ref()).await?;
 
-        unimplemented!()
+        if result.rows_affected != 0 {
+            Ok(RecordObject { id })
+        } else {
+            Err(domain::Error::SeaORM(DbErr::RecordNotFound(format!(
+                "project with id {id} is not found"
+            ))))
+        }
     }
 
     async fn select_resent_list(

@@ -2,7 +2,10 @@ use async_graphql::{Context, Object};
 use std::sync::Arc;
 
 use crate::domain::{
-    model::project::{NewProjectInput, Project},
+    model::{
+        project::{NewProjectInput, Project},
+        RecordObject,
+    },
     service::ProjectService,
 };
 
@@ -23,7 +26,11 @@ impl ProjectMutation {
     }
 
     #[graphql(name = "deleteProjectById")]
-    async fn delete_by_id(&self, ctx: &Context<'_>, id: i32) -> async_graphql::Result<Project> {
+    async fn delete_by_id(
+        &self,
+        ctx: &Context<'_>,
+        id: i32,
+    ) -> async_graphql::Result<RecordObject<i32>> {
         let project_service = ctx.data::<Arc<ProjectService>>()?;
         let result = project_service.delete_by_id(id).await?;
 
