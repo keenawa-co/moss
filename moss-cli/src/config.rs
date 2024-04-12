@@ -1,6 +1,7 @@
+use serde::Deserialize;
 use std::net::{IpAddr, SocketAddr};
 
-use serde::Deserialize;
+pub(crate) const MIGRATION_DIR: &str = "../../../migration";
 
 #[derive(Deserialize, Debug)]
 pub struct Config {

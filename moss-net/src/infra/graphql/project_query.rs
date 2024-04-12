@@ -15,7 +15,7 @@ impl ProjectMutation {
         &self,
         ctx: &Context<'_>,
         input: NewProjectInput,
-    ) -> async_graphql::Result<Vec<Project>> {
+    ) -> async_graphql::Result<Project> {
         let project_service = ctx.data::<Arc<ProjectService>>()?;
         let result = project_service.create_project(input).await?;
 
@@ -23,7 +23,7 @@ impl ProjectMutation {
     }
 
     #[graphql(name = "deleteProjectById")]
-    async fn delete_by_id(&self, ctx: &Context<'_>, id: String) -> async_graphql::Result<Project> {
+    async fn delete_by_id(&self, ctx: &Context<'_>, id: i32) -> async_graphql::Result<Project> {
         let project_service = ctx.data::<Arc<ProjectService>>()?;
         let result = project_service.delete_by_id(id).await?;
 

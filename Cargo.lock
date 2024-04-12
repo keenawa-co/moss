@@ -2327,7 +2327,6 @@ dependencies = [
  "serde",
  "serde_json",
  "sqlx",
- "surrealdb",
  "thiserror",
  "tokio",
  "tokio-util",

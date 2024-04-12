@@ -27,37 +27,29 @@ use tower_http::{
     ServiceBuilderExt,
 };
 use tracing::Level;
-use tracing_subscriber::{layer::SubscriberExt, FmtSubscriber};
+use tracing_subscriber::FmtSubscriber;
 
 use crate::{
     domain::service::{ConfigService, PortalService, ProjectService, ServiceLocator},
-    infra::surrealdb::disk::SurrealOnDisk,
+    infra::database::SQLiteClient,
 };
 
-use tracing_subscriber::EnvFilter;
+pub async fn bind(_: TokioCancellationToken) -> Result<(), domain::Error> {
+    // let subscriber = FmtSubscriber::builder()
+    //     .with_max_level(Level::TRACE)
+    //     .finish();
 
-pub async fn bind(cancel_token: TokioCancellationToken) -> Result<(), domain::Error> {
-    // let filter = EnvFilter::default();
-
-    // let registry = tracing_subscriber::registry();
-
-    // registry.with(otlp::new(filter));
-
-    let subscriber = FmtSubscriber::builder()
-        .with_max_level(Level::TRACE)
-        .finish();
-
-    tracing::subscriber::set_global_default(subscriber).expect("setting default subscriber failed");
+    // tracing::subscriber::set_global_default(subscriber).expect("setting default subscriber failed");
 
     let conf = CONF
         .get()
         .ok_or_else(|| domain::Error::Configuration("configuration was not defined".to_string()))?;
 
-    let surreal_disk = SurrealOnDisk::new(conf.surrealdb_client.clone())?;
+    let sqlite_db = SQLiteClient::new(conf.conn.clone());
     let service_locator = ServiceLocator {
-        portal_service: Arc::new(PortalService::new(surreal_disk.portal_repo())),
+        portal_service: Arc::new(PortalService::new(sqlite_db.project_repo())),
         config_service: Arc::new(ConfigService::new(conf.preference.clone())),
-        project_service: Arc::new(ProjectService::new(surreal_disk.project_repo())),
+        project_service: Arc::new(ProjectService::new(sqlite_db.project_repo())),
     };
 
     let service = ServiceBuilder::new()

@@ -1,0 +1,6 @@
+CREATE TABLE IF NOT EXISTS project (
+    id INTEGER PRIMARY KEY NOT NULL,
+    source VARCHAR NOT NULL,
+    last_used_at TIMESTAMP NOT NULL,
+    created_at TIMESTAMP NOT NULL
+);

@@ -3,9 +3,9 @@ pub mod port;
 pub mod service;
 
 use axum::Error as AxumError;
+use sea_orm::DbErr as SeaOrmDbError;
 use serde_json::Error as SerdeError;
 use std::io::Error as IoError;
-use surrealdb::Error as SurrealError;
 use thiserror::Error;
 
 #[derive(Error, Debug)]
@@ -23,7 +23,7 @@ pub enum Error {
     Serde(#[from] SerdeError),
 
     #[error("There was a problem with the database: {0}")]
-    Db(#[from] SurrealError),
+    SeaORM(#[from] SeaOrmDbError),
 
     #[error("Couldn't open the specified file: {0}")]
     Io(#[from] IoError),

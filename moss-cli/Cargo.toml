@@ -20,3 +20,15 @@ surrealdb = { version = "1.3", features = ["kv-mem"] }
 url = { version = "2.5.0", features = ["serde"] }
 once_cell = "1.19.0"
 tokio-util = "0.7.10"
+sqlx = { version = "0.7.4", features = ["sqlite", "macros", "runtime-tokio"] }
+sea-orm = { version = "0.12.x", features = [
+    "sqlx-sqlite",
+    "sqlx-postgres",
+    "postgres-array",
+    "runtime-tokio-rustls",
+    "with-uuid",
+] }
+
+[dependencies.sea-orm-migration]
+version = "0.12.0"
+features = []

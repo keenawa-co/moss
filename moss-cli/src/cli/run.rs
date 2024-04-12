@@ -1,9 +1,14 @@
 use clap::Args;
+
+use sea_orm::{ActiveValue, Database, DeriveEntityModel, Set};
+use sea_orm_migration::MigratorTrait;
+use serde::{Deserialize, Serialize};
+use sqlx::{migrate::MigrateDatabase, SqlitePool};
 use std::{net::SocketAddr, path::Path, sync::Arc};
 use surrealdb::{engine::remote::ws::Ws, Surreal};
 use tokio_util::sync::CancellationToken as TokioCancellationToken;
 
-use crate::loader;
+use crate::migration;
 
 #[derive(Args, Debug)]
 pub struct RunCmdArgs {
@@ -34,23 +39,32 @@ pub async fn init(
         net_conf_path,
     }: RunCmdArgs,
 ) -> anyhow::Result<()> {
-    let conf: crate::config::Config = loader::load_toml_file(net_conf_path)?;
+    let conf: crate::config::Config = super::common::load_toml_file(net_conf_path)?;
+    let conn = super::common::db_connection(Path::new("./moss.db")).await?;
 
     //  cancel_token is passed to all async functions requiring graceful termination
     let cancel_token = TokioCancellationToken::new();
-    let surrealdb_client = Surreal::new::<Ws>(conf.surrealdb.endpoint_addr()).await?;
-    surrealdb_client
-        .use_ns(conf.surrealdb.endpoint.namespace)
-        .use_db(conf.surrealdb.endpoint.database)
-        .await?;
-
     let _ = moss_net::CONF.set(moss_net::Config {
         bind: bind.unwrap_or(conf.net.endpoint_addr()),
-        preference: loader::load_toml_file(preference_filepath)?,
-        surrealdb_client: Arc::new(surrealdb_client),
+        preference: super::common::load_toml_file(preference_filepath)?,
+        conn: Arc::new(conn),
     });
 
     moss_net::bind(cancel_token).await?;
 
     Ok(())
 }
+
+use sea_orm::entity::prelude::*;
+
+#[derive(Clone, Debug, PartialEq, Eq, DeriveEntityModel, Serialize, Deserialize)]
+#[sea_orm(table_name = "project")]
+pub struct Model {
+    #[sea_orm(primary_key)]
+    pub id: i32,
+}
+
+#[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
+pub enum Relation {}
+
+impl ActiveModelBehavior for ActiveModel {}

@@ -2,7 +2,7 @@ use async_graphql::{Context, Object};
 use chrono::{Duration, Utc};
 use std::sync::Arc;
 
-use crate::domain::{model::portal::RecentProject, service::PortalService};
+use crate::domain::{model::project::RecentProject, service::PortalService};
 
 #[derive(Default)]
 pub(super) struct PortalQuery;
@@ -14,7 +14,7 @@ impl PortalQuery {
         &self,
         ctx: &Context<'_>,
         #[graphql(default_with = "(Utc::now() - Duration::days(30)).timestamp()")] start_time: i64,
-        #[graphql(validator(minimum = 1, maximum = 10), default = 10)] limit: u8,
+        #[graphql(validator(minimum = 1, maximum = 10), default = 10)] limit: u64,
     ) -> async_graphql::Result<Vec<RecentProject>> {
         let portal_service = ctx.data::<Arc<PortalService>>()?;
         let result = portal_service.select_resent_list(start_time, limit).await?;
