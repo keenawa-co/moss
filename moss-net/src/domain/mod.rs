@@ -23,10 +23,29 @@ pub enum Error {
     Serde(#[from] SerdeError),
 
     #[error("There was a problem with the database: {0}")]
-    SeaORM(#[from] SeaOrmDbError),
+    DbError(DbError),
 
     #[error("Couldn't open the specified file: {0}")]
     Io(#[from] IoError),
+}
+
+impl From<sea_orm::DbErr> for Error {
+    fn from(err: sea_orm::DbErr) -> Self {
+        Error::DbError(DbError::Original(err))
+    }
+}
+
+#[derive(Error, Debug)]
+pub enum DbError {
+    #[error("No record found for the specified ID: {0}")]
+    RecordNotFound(String),
+
+    #[error("There was a problem executing the database operation: {0}")]
+    Original(#[from] SeaOrmDbError),
+}
+
+pub(crate) fn error_record_not_found(id: impl ToString) -> Error {
+    Error::DbError(DbError::RecordNotFound(id.to_string()))
 }
 
 pub type Result<T, E = Error> = core::result::Result<T, E>;

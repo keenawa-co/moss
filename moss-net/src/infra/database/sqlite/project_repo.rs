@@ -3,9 +3,17 @@ use sea_orm::entity::prelude::*;
 use sea_orm::{ActiveValue, DatabaseConnection, QueryOrder, QuerySelect, Set};
 use std::sync::Arc;
 
-use crate::domain;
-use crate::domain::model::project::{NewProjectInput, Project, RecentProject};
-use crate::domain::model::RecordObject;
+use crate::domain::{
+    self,
+    model::{
+        project::{NewProjectInput, Project, RecentProject},
+        RecordObject,
+    },
+};
+
+//
+// Entity model definition for `project` table.
+//
 
 #[derive(Clone, Debug, PartialEq, Eq, DeriveEntityModel, Serialize, Deserialize)]
 #[sea_orm(table_name = "project")]
@@ -43,6 +51,10 @@ pub enum Relation {}
 
 impl ActiveModelBehavior for ActiveModel {}
 
+//
+// Repository implementation for project-related operations.
+//
+
 #[derive(Debug)]
 pub(crate) struct ProjectRepositoryImpl {
     conn: Arc<DatabaseConnection>,
@@ -57,11 +69,12 @@ impl ProjectRepositoryImpl {
 #[async_trait]
 impl domain::port::ProjectRepository for ProjectRepositoryImpl {
     async fn create_project(&self, input: NewProjectInput) -> domain::Result<Project> {
+        let current_timestamp = Utc::now().timestamp();
         let model = (ActiveModel {
             id: ActiveValue::NotSet,
             source: Set(input.path),
-            last_used_at: Set(Utc::now().timestamp()),
-            created_at: Set(Utc::now().timestamp()),
+            last_used_at: Set(current_timestamp),
+            created_at: Set(current_timestamp),
         })
         .insert(self.conn.as_ref())
         .await?;
@@ -72,12 +85,9 @@ impl domain::port::ProjectRepository for ProjectRepositoryImpl {
     async fn delete_by_id(&self, id: i32) -> domain::Result<RecordObject<i32>> {
         let result = Entity::delete_by_id(id).exec(self.conn.as_ref()).await?;
 
-        if result.rows_affected != 0 {
-            Ok(RecordObject { id })
-        } else {
-            Err(domain::Error::SeaORM(DbErr::RecordNotFound(format!(
-                "project with id {id} is not found"
-            ))))
+        match result.rows_affected {
+            0 => Err(domain::error_record_not_found(id)),
+            _ => Ok(RecordObject::new(id)),
         }
     }
 
