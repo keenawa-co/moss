@@ -1,6 +1,6 @@
 use clap::Args;
 use sea_orm_migration::MigratorTrait;
-use std::path::Path;
+use std::path::PathBuf;
 
 use crate::migration;
 
@@ -8,7 +8,7 @@ use crate::migration;
 pub struct MigrateCmdArgs {}
 
 pub async fn init(MigrateCmdArgs {}: MigrateCmdArgs) -> anyhow::Result<()> {
-    let conn = super::common::db_connection(Path::new("./moss.db")).await?;
+    let conn = super::utl::db_connection(&PathBuf::from("./")).await?;
     migration::Migrator::up(&conn, None).await?;
 
     Ok(())

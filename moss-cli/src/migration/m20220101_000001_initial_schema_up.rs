@@ -17,6 +17,13 @@ impl MigrationTrait for Migration {
     }
 
     async fn down(&self, manager: &SchemaManager) -> Result<(), DbErr> {
-        unimplemented!()
+        manager
+            .get_connection()
+            .execute_unprepared(include_str!(concat!(
+                "../../../migration/m20220101_000001_initial_schema.down.sql"
+            )))
+            .await?;
+
+        Ok(())
     }
 }

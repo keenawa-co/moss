@@ -26,8 +26,6 @@ use tower_http::{
     request_id::MakeRequestUuid,
     ServiceBuilderExt,
 };
-use tracing::Level;
-use tracing_subscriber::FmtSubscriber;
 
 use crate::{
     domain::service::{ConfigService, PortalService, ProjectService, ServiceLocator},
@@ -35,12 +33,6 @@ use crate::{
 };
 
 pub async fn bind(_: TokioCancellationToken) -> Result<(), domain::Error> {
-    // let subscriber = FmtSubscriber::builder()
-    //     .with_max_level(Level::TRACE)
-    //     .finish();
-
-    // tracing::subscriber::set_global_default(subscriber).expect("setting default subscriber failed");
-
     let conf = CONF
         .get()
         .ok_or_else(|| domain::error_configuration("configuration was not defined"))?;
@@ -68,7 +60,7 @@ pub async fn bind(_: TokioCancellationToken) -> Result<(), domain::Error> {
 
     let router = infra::web::router(service); // TODO: consider to use Cow<T>
 
-    warn!(
+    info!(
         "{} has been successfully launched on {}",
         moss_core::constant::APP_NAME,
         conf.bind
