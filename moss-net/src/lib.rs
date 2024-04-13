@@ -14,7 +14,6 @@ extern crate serde_json;
 #[macro_use]
 extern crate tracing;
 
-use axum::Extension;
 use std::sync::Arc;
 use tokio_util::sync::CancellationToken as TokioCancellationToken;
 use tower::ServiceBuilder;
@@ -26,6 +25,8 @@ use tower_http::{
     request_id::MakeRequestUuid,
     ServiceBuilderExt,
 };
+
+const MIX_COMPRESS_SIZE: u16 = 512;
 
 use crate::{
     domain::service::{ConfigService, PortalService, ProjectService, ServiceLocator},
@@ -49,16 +50,15 @@ pub async fn bind(_: TokioCancellationToken) -> Result<(), domain::Error> {
         .set_x_request_id(MakeRequestUuid)
         .propagate_x_request_id();
 
-    let service = service
-        .layer(Extension(infra::graphql::build_schema(&service_locator)))
-        .layer(
-            CompressionLayer::new().compress_when(
-                SizeAbove::new(512) // don't compress below 512 bytes
-                    .and(NotForContentType::IMAGES), // don't compress images
-            ),
-        );
+    let schema = infra::graphql::build_schema(&service_locator);
+    let service = service.layer(
+        CompressionLayer::new().compress_when(
+            SizeAbove::new(MIX_COMPRESS_SIZE) // don't compress below 512 bytes
+                .and(NotForContentType::IMAGES), // don't compress images
+        ),
+    );
 
-    let router = infra::web::router(service); // TODO: consider to use Cow<T>
+    let router = infra::web::router(service, schema); // TODO: consider to use Cow<T>
 
     info!(
         "{} has been successfully launched on {}",

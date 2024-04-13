@@ -28,7 +28,7 @@ pub struct RunCmdArgs {
         default_value = "conf/net_pref.toml",
         long = "net_pref_path",
         help = "Path to the server preferences configuration file.",
-        help_heading = "CONFIGURATION PATH"
+        help_heading = "CONFIGURATION"
     )]
     net_pref_path: PathBuf,
 
@@ -41,7 +41,7 @@ pub struct RunCmdArgs {
         default_value = "conf/net_conf.toml",
         long = "net_conf_path",
         help = "Path to the server configuration file.",
-        help_heading = "CONFIGURATION PATH"
+        help_heading = "CONFIGURATION"
     )]
     net_conf_path: PathBuf,
 }

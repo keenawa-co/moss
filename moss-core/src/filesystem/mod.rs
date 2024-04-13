@@ -28,6 +28,19 @@ pub struct FileInfo {
     pub is_dir: bool,
 }
 
+impl FileInfo {
+    pub fn new(path_buf: PathBuf) -> anyhow::Result<Self> {
+        let metadata = path_buf.metadata()?;
+
+        Ok(Self {
+            path: path_buf,
+            size: metadata.len(),
+            mod_time: metadata.modified()?,
+            is_dir: metadata.is_dir(),
+        })
+    }
+}
+
 #[cfg(feature = "gql")]
 #[Object]
 impl FileInfo {
@@ -49,19 +62,6 @@ impl FileInfo {
 
     pub async fn is_dir(&self) -> bool {
         self.is_dir
-    }
-}
-
-impl FileInfo {
-    pub fn new(path_buf: PathBuf) -> anyhow::Result<Self> {
-        let metadata = path_buf.metadata()?;
-
-        Ok(Self {
-            path: path_buf,
-            size: metadata.len(),
-            mod_time: metadata.modified()?,
-            is_dir: metadata.is_dir(),
-        })
     }
 }
 
