@@ -43,7 +43,7 @@ pub async fn bind(_: TokioCancellationToken) -> Result<(), domain::Error> {
 
     let conf = CONF
         .get()
-        .ok_or_else(|| domain::Error::Configuration("configuration was not defined".to_string()))?;
+        .ok_or_else(|| domain::error_configuration("configuration was not defined"))?;
 
     let sqlite_db = SQLiteClient::new(conf.conn.clone());
     let service_locator = ServiceLocator {

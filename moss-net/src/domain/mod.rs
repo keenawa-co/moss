@@ -48,4 +48,8 @@ pub(crate) fn error_record_not_found(id: impl ToString) -> Error {
     Error::DbError(DbError::RecordNotFound(id.to_string()))
 }
 
+pub(crate) fn error_configuration(message: impl ToString) -> Error {
+    Error::Configuration(message.to_string())
+}
+
 pub type Result<T, E = Error> = core::result::Result<T, E>;
