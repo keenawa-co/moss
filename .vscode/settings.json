@@ -9,6 +9,7 @@
     "mosscore",
     "mossdev",
     "otlp",
+    "revisioned",
     "smol",
     "sqlx",
     "surrealdb",
