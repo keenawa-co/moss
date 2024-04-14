@@ -1,3 +1,4 @@
+#[cfg(feature = "gql")]
 use async_graphql::SimpleObject;
 use nanoid::nanoid;
 
@@ -9,20 +10,15 @@ const CHAR_SET: [char; 62] = [
     'V', 'W', 'X', 'Y', 'Z',
 ];
 
-#[derive(Clone, Debug, Eq, PartialEq, Ord, PartialOrd, Serialize, Deserialize, Hash)]
-#[cfg(feature = "gql")]
-#[derive(SimpleObject)]
-#[revisioned(revision = 1)]
-pub struct Thing {
-    pub id: String,
+pub fn nanoid() -> String {
+    nanoid!(ID_SIZE, &CHAR_SET)
 }
 
-impl Thing {
-    pub fn new() -> Self {
-        Self {
-            id: nanoid!(ID_SIZE, &CHAR_SET),
-        }
-    }
+#[derive(Clone, Debug, Eq, PartialEq, Ord, PartialOrd, Serialize, Deserialize)]
+#[cfg(feature = "gql")]
+#[derive(SimpleObject)]
+pub struct Thing {
+    pub id: String,
 }
 
 impl From<String> for Thing {
