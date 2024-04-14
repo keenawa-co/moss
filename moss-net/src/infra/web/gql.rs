@@ -1,5 +1,5 @@
 use async_graphql::http::GraphiQLSource;
-use async_graphql_axum::{GraphQLRequest, GraphQLResponse, GraphQLSubscription, GraphQLWebSocket};
+use async_graphql_axum::{GraphQLRequest, GraphQLResponse, GraphQLSubscription};
 use axum::{
     response::{Html, IntoResponse},
     routing::{get, post},

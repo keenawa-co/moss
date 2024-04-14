@@ -21,7 +21,7 @@
       "previewLimit": 50,
       "driver": "SQLite",
       "name": "moss",
-      "database": "${workspaceFolder:goray}/moss.db"
+      "database": "${workspaceFolder:moss}/moss.db"
     }
   ],
   "sqltools.useNodeRuntime": true

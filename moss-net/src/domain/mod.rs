@@ -10,46 +10,27 @@ use thiserror::Error;
 
 #[derive(Error, Debug)]
 pub enum Error {
-    #[error("Configuration not initialized correct: {0}")]
-    Configuration(String),
-
-    #[error("The request body contains invalid data")]
+    #[error("Invalid request body")]
     Request,
 
-    #[error("There was an error with the network: {0}")]
+    #[error("Network error: {0}")]
     Axum(#[from] AxumError),
 
-    #[error("There was a problem with serialization/deserialization: {0}")]
+    #[error("Serialization/deserialization error: {0}")]
     Serde(#[from] SerdeError),
 
-    #[error("There was a problem with the database: {0}")]
-    DbError(DbError),
+    #[error("Database operation failed: {0}")]
+    Database(
+        #[source]
+        #[from]
+        SeaOrmDbError,
+    ),
 
-    #[error("Couldn't open the specified file: {0}")]
+    #[error("File access error: {0}")]
     Io(#[from] IoError),
-}
 
-impl From<sea_orm::DbErr> for Error {
-    fn from(err: sea_orm::DbErr) -> Self {
-        Error::DbError(DbError::Original(err))
-    }
-}
-
-#[derive(Error, Debug)]
-pub enum DbError {
-    #[error("No record found for the specified ID: {0}")]
-    RecordNotFound(String),
-
-    #[error("There was a problem executing the database operation: {0}")]
-    Original(#[from] SeaOrmDbError),
-}
-
-pub(crate) fn error_record_not_found(id: impl ToString) -> Error {
-    Error::DbError(DbError::RecordNotFound(id.to_string()))
-}
-
-pub(crate) fn error_configuration(message: impl ToString) -> Error {
-    Error::Configuration(message.to_string())
+    #[error("Unknown error: {0}")]
+    Unknown(String),
 }
 
 pub type Result<T, E = Error> = core::result::Result<T, E>;

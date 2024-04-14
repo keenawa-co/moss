@@ -2,7 +2,7 @@ use async_graphql::{InputObject, SimpleObject};
 
 #[derive(Debug, Clone, Deserialize, Serialize, SimpleObject)]
 pub(crate) struct Project {
-    pub id: i32,
+    pub id: String,
     pub source: String,
     pub last_used_at: i64,
     pub created_at: i64,
@@ -10,7 +10,7 @@ pub(crate) struct Project {
 
 #[derive(Debug, Clone, Deserialize, Serialize, SimpleObject)]
 pub(crate) struct RecentProject {
-    pub id: i32,
+    pub id: String,
     pub source: String,
     pub last_used_at: i64,
 }

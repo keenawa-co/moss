@@ -36,7 +36,7 @@ use crate::{
 pub async fn bind(_: TokioCancellationToken) -> Result<(), domain::Error> {
     let conf = CONF
         .get()
-        .ok_or_else(|| domain::error_configuration("configuration was not defined"))?;
+        .ok_or_else(|| domain::Error::Unknown("configuration was not defined".to_string()))?;
 
     let sqlite_db = SQLiteClient::new(conf.conn.clone());
     let service_locator = ServiceLocator {

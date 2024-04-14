@@ -1,14 +1,12 @@
 use chrono::Utc;
+use moss_core::model::thing::Thing;
 use sea_orm::entity::prelude::*;
-use sea_orm::{ActiveValue, DatabaseConnection, QueryOrder, QuerySelect, Set};
+use sea_orm::{DatabaseConnection, QueryOrder, QuerySelect, Set};
 use std::sync::Arc;
 
 use crate::domain::{
     self,
-    model::{
-        project::{NewProjectInput, Project, RecentProject},
-        RecordObject,
-    },
+    model::project::{NewProjectInput, Project, RecentProject},
 };
 
 //
@@ -18,8 +16,8 @@ use crate::domain::{
 #[derive(Clone, Debug, PartialEq, Eq, DeriveEntityModel, Serialize, Deserialize)]
 #[sea_orm(table_name = "project")]
 pub struct Model {
-    #[sea_orm(primary_key)]
-    pub id: i32,
+    #[sea_orm(primary_key, auto_increment = false)]
+    pub id: String,
     pub source: String,
     pub last_used_at: i64,
     pub created_at: i64,
@@ -71,7 +69,7 @@ impl domain::port::ProjectRepository for ProjectRepositoryImpl {
     async fn create_project(&self, input: NewProjectInput) -> domain::Result<Project> {
         let current_timestamp = Utc::now().timestamp();
         let model = (ActiveModel {
-            id: ActiveValue::NotSet,
+            id: Set(moss_core::model::nanoid()),
             source: Set(input.path),
             last_used_at: Set(current_timestamp),
             created_at: Set(current_timestamp),
@@ -82,12 +80,12 @@ impl domain::port::ProjectRepository for ProjectRepositoryImpl {
         Ok(model.into())
     }
 
-    async fn delete_by_id(&self, id: i32) -> domain::Result<RecordObject<i32>> {
-        let result = Entity::delete_by_id(id).exec(self.conn.as_ref()).await?;
+    async fn delete_by_id(&self, id: String) -> domain::Result<Thing> {
+        let result = Entity::delete_by_id(&id).exec(self.conn.as_ref()).await?;
 
         match result.rows_affected {
-            0 => Err(domain::error_record_not_found(id)),
-            _ => Ok(RecordObject::new(id)),
+            0 => Err(sea_orm::DbErr::RecordNotFound(id).into()),
+            _ => Ok(Thing::from(id)),
         }
     }
 

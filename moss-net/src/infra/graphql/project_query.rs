@@ -1,11 +1,9 @@
 use async_graphql::{Context, Object};
+use moss_core::model::thing::Thing;
 use std::sync::Arc;
 
 use crate::domain::{
-    model::{
-        project::{NewProjectInput, Project},
-        RecordObject,
-    },
+    model::project::{NewProjectInput, Project},
     service::ProjectService,
 };
 
@@ -26,11 +24,7 @@ impl ProjectMutation {
     }
 
     #[graphql(name = "deleteProjectById")]
-    async fn delete_by_id(
-        &self,
-        ctx: &Context<'_>,
-        id: i32,
-    ) -> async_graphql::Result<RecordObject<i32>> {
+    async fn delete_by_id(&self, ctx: &Context<'_>, id: String) -> async_graphql::Result<Thing> {
         let project_service = ctx.data::<Arc<ProjectService>>()?;
         let result = project_service.delete_by_id(id).await?;
 

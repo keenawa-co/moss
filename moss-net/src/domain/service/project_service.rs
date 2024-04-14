@@ -1,11 +1,9 @@
+use moss_core::model::thing::Thing;
 use std::sync::Arc;
 
 use crate::domain::{
     self,
-    model::{
-        project::{NewProjectInput, Project},
-        RecordObject,
-    },
+    model::project::{NewProjectInput, Project},
     port::ProjectRepository,
 };
 
@@ -25,7 +23,7 @@ impl ProjectService {
         Ok(result)
     }
 
-    pub async fn delete_by_id(&self, id: i32) -> domain::Result<RecordObject<i32>> {
+    pub async fn delete_by_id(&self, id: String) -> domain::Result<Thing> {
         let result = self.repo.delete_by_id(id).await?;
 
         Ok(result)
