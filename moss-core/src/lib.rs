@@ -2,6 +2,7 @@ pub mod config;
 pub mod constant;
 pub mod filesystem;
 pub mod model;
+pub mod runtime;
 pub mod telemetry;
 
 #[macro_use]

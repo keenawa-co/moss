@@ -4,10 +4,12 @@ version = "0.1.0"
 edition = "2021"
 
 [workspace]
-members = ["moss-cli", "moss-core", "moss-net"]
+members = ["moss-cli", "moss-core", "moss-net", "testdata/hello-wasm"]
 
 [profile.release]
-lto = true
+# This makes the compiled code faster and smaller, but it makes 
+# compiling slower, so it's only enabled in release mode.
+lto = false
 opt-level = 3
 panic = "abort"
 codegen-units = 1

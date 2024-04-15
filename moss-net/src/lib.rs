@@ -14,7 +14,7 @@ extern crate serde_json;
 #[macro_use]
 extern crate tracing;
 
-use std::sync::Arc;
+use std::{path::Path, sync::Arc};
 use tokio_util::sync::CancellationToken as TokioCancellationToken;
 use tower::ServiceBuilder;
 use tower_http::{
@@ -59,6 +59,16 @@ pub async fn bind(_: TokioCancellationToken) -> Result<(), domain::Error> {
     );
 
     let router = infra::web::router(service, schema); // TODO: consider to use Cow<T>
+
+    // let isolate = moss_core::runtime::isolate::Isolate::new();
+    // let path_to_main_module = Path::new("testdata/helloworld.ts").canonicalize().unwrap();
+
+    // // isolate.run(&path_to_main_module).await.unwrap();
+    // moss_core::runtime::isolate::create_worker(&path_to_main_module)
+    //     .await
+    //     .unwrap();
+
+    moss_core::runtime::isolate::wasm().unwrap();
 
     info!(
         "{} has been successfully launched on {}",

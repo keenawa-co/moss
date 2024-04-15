@@ -12,7 +12,6 @@
     "revisioned",
     "smol",
     "sqlx",
-    "surrealdb",
     "tablename",
     "thiserror"
   ],
