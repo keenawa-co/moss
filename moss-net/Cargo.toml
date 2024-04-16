@@ -8,6 +8,8 @@ name = "moss_net"
 
 [dependencies]
 moss-core = { path = "../moss-core", features = ["gql"] }
+was = { path = "../kernel/was" }
+metric = { path = "../lib/metric" }
 
 anyhow = "1.0"
 async-graphql = "7.0"
@@ -43,7 +45,7 @@ toml = "0.8.12"
 chrono = { version = "0.4.37", features = ["serde"] }
 once_cell = "1.19.0"
 tokio-util = "0.7.10"
-tokio-stream = "0.1.15"
+tokio-stream = { version = "0.1.15", features = ["sync"] }
 opentelemetry = "0.22.0"
 tracing = "0.1.40"
 tracing-opentelemetry = "0.23.0"

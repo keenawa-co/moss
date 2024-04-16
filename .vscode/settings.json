@@ -6,6 +6,7 @@
     "inmem",
     "inmemdb",
     "mimalloc",
+    "mlua",
     "mosscore",
     "mossdev",
     "otlp",

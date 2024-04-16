@@ -3,6 +3,7 @@ pub mod constant;
 pub mod filesystem;
 pub mod model;
 pub mod runtime;
+pub mod scripting;
 pub mod telemetry;
 
 #[macro_use]
