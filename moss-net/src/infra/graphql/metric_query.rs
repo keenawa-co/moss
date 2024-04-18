@@ -1,7 +1,6 @@
-use std::sync::Arc;
-
 use async_graphql::{Context, FieldResult, Subscription};
 use futures::{Stream, StreamExt};
+use std::sync::Arc;
 use tokio_stream::wrappers::BroadcastStream;
 
 use crate::domain::service::MetricService;
@@ -14,9 +13,9 @@ impl MetricSubscription {
     async fn metric_result_feed(
         &self,
         ctx: &Context<'_>,
-    ) -> async_graphql::Result<impl Stream<Item = FieldResult<String>>> {
-        let scheduler = ctx.data::<Arc<MetricService>>()?;
-        let receiver = scheduler.tx.subscribe();
+    ) -> async_graphql::Result<impl Stream<Item = FieldResult<f32>>> {
+        let metric_service = ctx.data::<Arc<MetricService>>()?;
+        let receiver = metric_service.subscribe()?;
 
         Ok(BroadcastStream::new(receiver).map(|res| {
             res.map_err(|e| async_graphql::Error::new(e.to_string()))

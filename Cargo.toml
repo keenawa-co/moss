@@ -4,7 +4,14 @@ version = "0.1.0"
 edition = "2021"
 
 [workspace]
-members = [ "kernel/was", "lib/metric","moss-cli", "moss-core", "moss-net", "testdata/hello-wasm"]
+members = [
+    "kernel/sys",
+    "lib/metric",
+    "moss-cli",
+    "moss-core",
+    "moss-net",
+    "testdata/hello-wasm",
+]
 
 [profile.release]
 # This makes the compiled code faster and smaller, but it makes 

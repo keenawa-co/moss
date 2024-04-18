@@ -2055,11 +2055,13 @@ dependencies = [
  "futures-util",
  "metric",
  "moss-core",
+ "notify",
  "once_cell",
  "opentelemetry",
  "sea-orm",
  "serde",
  "serde_json",
+ "sys",
  "thiserror",
  "tokio",
  "tokio-stream",
@@ -2070,7 +2072,6 @@ dependencies = [
  "tracing",
  "tracing-opentelemetry",
  "tracing-subscriber",
- "was",
 ]
 
 [[package]]
@@ -3646,6 +3647,16 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a7065abeca94b6a8a577f9bd45aa0867a2238b74e8eb67cf10d492bc39351394"
 
 [[package]]
+name = "sys"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "futures",
+ "notify",
+ "tokio",
+]
+
+[[package]]
 name = "tap"
 version = "1.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4134,19 +4145,6 @@ checksum = "29790946404f91d9c5d06f9874efddea1dc06c5efe94541a7d6863108e3a5e4b"
 dependencies = [
  "same-file",
  "winapi-util",
-]
-
-[[package]]
-name = "was"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "async-trait",
- "chrono",
- "metric",
- "mlua",
- "notify",
- "tokio",
 ]
 
 [[package]]
