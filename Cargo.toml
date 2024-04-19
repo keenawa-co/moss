@@ -5,11 +5,16 @@ edition = "2021"
 
 [workspace]
 members = [
+    "kernel/fs",
     "kernel/sys",
-    "lib/chan", "lib/signal",
-    "moss-cli",
-    "moss-core",
-    "moss-net",
+    "lib/chan",
+    "lib/common",
+    "lib/conf",
+    "lib/dl",
+    "lib/file",
+    "lib/signal",
+    "mossctl",
+    "net",
     "testdata/hello-wasm",
 ]
 
@@ -29,7 +34,7 @@ opt-level = 3
 rustflags = ["-C", "target-cpu=native"]
 
 [dependencies]
-moss-cli = { path = "moss-cli" }
+mossctl = { path = "mossctl" }
 
 anyhow = "1.0.81"
 tokio = { version = "1", features = ["full"] }
