@@ -16,7 +16,8 @@
     "smol",
     "sqlx",
     "tablename",
-    "thiserror"
+    "thiserror",
+    "unwatch"
   ],
   "sqltools.connections": [
     {

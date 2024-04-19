@@ -9,7 +9,6 @@ name = "moss_net"
 [dependencies]
 moss-core = { path = "../moss-core", features = ["gql"] }
 sys = { path = "../kernel/sys" }
-metric = { path = "../lib/metric" }
 
 anyhow = "1.0"
 async-graphql = "7.0"

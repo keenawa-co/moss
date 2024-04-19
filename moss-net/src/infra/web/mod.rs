@@ -14,12 +14,12 @@ where
     <L::Service as tower::Service<Request>>::Error: Into<Infallible> + 'static,
     <L::Service as tower::Service<Request>>::Future: Send + 'static,
 {
-    let router = axum::Router::new()
+    let router_v1 = axum::Router::new()
         .merge(status::router())
         .merge(gql::router(schema.clone()));
 
     axum::Router::new()
-        .nest("/api/v1", router)
+        .nest("/api/v1", router_v1)
         .layer(service)
         .layer(Extension(schema))
 }

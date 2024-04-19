@@ -17,7 +17,7 @@ impl MetricService {
     pub fn subscribe(&self) -> domain::Result<broadcast::Receiver<f32>> {
         let rx = self.fw.subscribe()?;
         self.fw
-            .register_path(PathBuf::from("./testdata/helloworld.ts"))?;
+            .watch_path(&PathBuf::from("./testdata/helloworld.ts"))?;
 
         Ok(rx)
     }

@@ -6,7 +6,7 @@ edition = "2021"
 [workspace]
 members = [
     "kernel/sys",
-    "lib/metric",
+    "lib/chan", "lib/signal",
     "moss-cli",
     "moss-core",
     "moss-net",

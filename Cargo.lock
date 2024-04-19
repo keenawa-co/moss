@@ -782,6 +782,13 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "fd16c4719339c4530435d38e511904438d07cce7950afa3718a84ac36c10e89e"
 
 [[package]]
+name = "chan"
+version = "0.1.0"
+dependencies = [
+ "tokio",
+]
+
+[[package]]
 name = "chrono"
 version = "0.4.38"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1897,14 +1904,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6c8640c5d730cb13ebd907d8d04b52f55ac9a2eec55b440c8892f40d56c76c1d"
 
 [[package]]
-name = "metric"
-version = "0.1.0"
-dependencies = [
- "async-graphql",
- "serde",
-]
-
-[[package]]
 name = "mimalloc"
 version = "0.1.39"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2053,7 +2052,6 @@ dependencies = [
  "chrono",
  "futures",
  "futures-util",
- "metric",
  "moss-core",
  "notify",
  "once_cell",
@@ -3207,6 +3205,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "signal"
+version = "0.1.0"
+
+[[package]]
 name = "signal-hook-registry"
 version = "1.4.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3651,6 +3653,7 @@ name = "sys"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "chan",
  "futures",
  "notify",
  "tokio",
