@@ -33,12 +33,38 @@ opt-level = 3
 [build]
 rustflags = ["-C", "target-cpu=native"]
 
-[dependencies]
-mossctl = { path = "mossctl" }
+[workspace.dependencies]
+fs = { path = "kernel/fs" }
+sys = { path = "kernel/sys" }
+chan = { path = "lib/chan" }
+conf = { path = "lib/conf" }
+dl = { path = "lib/dl" }
+file = { path = "lib/file" }
+common = { path = "lib/common" }
+signal = { path = "lib/signal" }
 
-anyhow = "1.0.81"
-tokio = { version = "1", features = ["full"] }
-once_cell = "1.19.0"
+mossctl = { path = "mossctl" }
+net = { path = "net" }
+
+anyhow = "1.0"
+async-graphql = "7.0"
+tokio = "1"
+thiserror = "1.0"
+async-trait = "0.1"
+chrono = "0.4"
+futures = "0.3"
+serde = "1.0"
+serde_json = "1.0"
+once_cell = "1.19"
+tokio-util = "0.7"
+tracing = "0.1"
+
+
+[dependencies]
+mossctl.workspace = true
+anyhow.workspace = true
+tokio = { workspace = true, features = ["full"] }
+once_cell.workspace = true
 
 [target.'cfg(any(target_os = "linux", target_os = "macos"))'.dependencies]
 mimalloc = { version = "0.1.39", default-features = false }

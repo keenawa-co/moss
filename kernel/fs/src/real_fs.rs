@@ -24,6 +24,7 @@ impl super::FS for FileSystem {
             Ok(entry) => Ok(entry.path()),
             Err(error) => Err(anyhow!("failed to read dir entry {:?}", error)),
         });
+
         Ok(Box::pin(result))
     }
 

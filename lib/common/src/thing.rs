@@ -1,4 +1,4 @@
-#[cfg(feature = "gql")]
+#[cfg(feature = "graphql")]
 use async_graphql::SimpleObject;
 use nanoid::nanoid;
 
@@ -15,7 +15,7 @@ pub fn nanoid() -> String {
 }
 
 #[derive(Clone, Debug, Eq, PartialEq, Ord, PartialOrd, Serialize, Deserialize)]
-#[cfg_attr(feature = "gql", derive(SimpleObject))]
+#[cfg_attr(feature = "graphql", derive(SimpleObject))]
 pub struct Thing {
     pub id: String,
 }

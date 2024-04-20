@@ -5,7 +5,8 @@ edition = "2021"
 
 
 [dependencies]
-anyhow = "1.0"
-async-trait = "0.1"
+anyhow.workspace = true
+async-trait.workspace = true
+futures.workspace = true
+
 smol = "2.0.0"
-futures = "0.3"

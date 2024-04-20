@@ -3,12 +3,10 @@ name = "sys"
 version = "0.1.0"
 edition = "2021"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-chan = { path = "../../lib/chan" }
-
+chan.workspace = true
+anyhow.workspace = true
+futures.workspace = true
+tokio = { workspace = true, features = ["full", "sync"] }
 notify = "6.1.1"
-tokio = { version = "1.37.0", features = ["full", "sync"] }
-anyhow = "1.0"
-futures = "0.3.30"

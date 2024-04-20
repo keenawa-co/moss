@@ -7,27 +7,36 @@ edition = "2021"
 name = "moss_net"
 
 [dependencies]
-sys = { path = "../kernel/sys" }
-fs = { path = "../kernel/fs" }
-file = { path = "../lib/file", features = ["gql"] }
-conf = { path = "../lib/conf", features = ["gql"] }
-common = { path = "../lib/common", features = ["gql"] }
-dl = { path = "../lib/dl" }
+sys.workspace = true
+fs.workspace = true
+dl.workspace = true
+file = { workspace = true, features = ["graphql"] }
+conf = { workspace = true, features = ["graphql"] }
+common = { workspace = true, features = ["graphql"] }
 
 
-anyhow = "1.0"
-async-graphql = "7.0"
-async-graphql-axum = "7.0"
-axum = "0.7"
-axum-server = "0.6"
-futures-util = "0.3"
-serde = { version = "1.0", features = ["derive"] }
-tokio = { version = "1", features = [
+thiserror.workspace = true
+anyhow.workspace = true
+async-graphql.workspace = true
+async-trait.workspace = true
+once_cell.workspace = true
+tokio-util.workspace = true
+tracing.workspace = true
+futures.workspace = true
+serde_json.workspace = true
+serde = { workspace = true, features = ["derive"] }
+tokio = { workspace = true, features = [
     "full",
     "signal",
     "macros",
     "rt-multi-thread",
 ] }
+chrono = { workspace = true, features = ["serde"] }
+
+async-graphql-axum = "7.0"
+axum = "0.7"
+axum-server = "0.6"
+futures-util = "0.3"
 tower = "0.4"
 tower-http = { version = "0.5.2", features = [
     "trace",
@@ -42,18 +51,10 @@ tower-http = { version = "0.5.2", features = [
     "add-extension",
     "compression-full",
 ] }
-thiserror = "1.0.58"
-serde_json = "1.0.115"
-async-trait = "0.1.x"
 toml = "0.8.12"
-chrono = { version = "0.4.37", features = ["serde"] }
-once_cell = "1.19.0"
-tokio-util = "0.7.10"
 tokio-stream = { version = "0.1.15", features = ["sync"] }
 opentelemetry = "0.22.0"
-tracing = "0.1.40"
 tracing-opentelemetry = "0.23.0"
 tracing-subscriber = { version = "0.3.18", features = ["env-filter"] }
 sea-orm = "0.12.x"
-futures = "0.3.x"
 notify = "6.1.1"

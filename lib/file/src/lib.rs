@@ -1,4 +1,4 @@
-#[cfg(feature = "gql")]
+#[cfg(feature = "graphql")]
 use async_graphql::Object;
 use std::{
     borrow::Cow,
@@ -30,7 +30,7 @@ impl FileInfo {
     }
 }
 
-#[cfg(feature = "gql")]
+#[cfg(feature = "graphql")]
 #[Object]
 impl FileInfo {
     pub async fn path(&self) -> Cow<str> {
