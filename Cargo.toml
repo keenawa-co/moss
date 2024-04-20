@@ -6,6 +6,7 @@ edition = "2021"
 [workspace]
 members = [
     "kernel/fs",
+    "kernel/qme",
     "kernel/sys",
     "lib/chan",
     "lib/common",
@@ -36,6 +37,7 @@ rustflags = ["-C", "target-cpu=native"]
 [workspace.dependencies]
 fs = { path = "kernel/fs" }
 sys = { path = "kernel/sys" }
+qme = { path = "kernel/qme" }
 chan = { path = "lib/chan" }
 conf = { path = "lib/conf" }
 dl = { path = "lib/dl" }
@@ -58,6 +60,7 @@ serde_json = "1.0"
 once_cell = "1.19"
 tokio-util = "0.7"
 tracing = "0.1"
+sea-orm = "0.12"
 
 
 [dependencies]

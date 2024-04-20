@@ -1,8 +1,9 @@
 use async_graphql::{InputObject, SimpleObject};
+use common::id::MNID;
 
 #[derive(Debug, Clone, Deserialize, Serialize, SimpleObject)]
 pub(crate) struct Project {
-    pub id: String,
+    pub id: MNID,
     pub source: String,
     pub last_used_at: i64,
     pub created_at: i64,
@@ -10,7 +11,7 @@ pub(crate) struct Project {
 
 #[derive(Debug, Clone, Deserialize, Serialize, SimpleObject)]
 pub(crate) struct RecentProject {
-    pub id: String,
+    pub id: MNID,
     pub source: String,
     pub last_used_at: i64,
 }

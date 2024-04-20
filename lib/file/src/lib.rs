@@ -1,5 +1,6 @@
 #[cfg(feature = "graphql")]
 use async_graphql::Object;
+
 use std::{
     borrow::Cow,
     path::PathBuf,

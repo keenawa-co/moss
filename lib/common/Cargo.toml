@@ -5,9 +5,10 @@ edition = "2021"
 
 
 [dependencies]
+anyhow.workspace = true
 serde = { workspace = true, features = ["derive"] }
 async-graphql = { workspace = true, optional = true }
-nanoid = "0.4.x"
+nanoid = "0.4"
 
 
 [features]

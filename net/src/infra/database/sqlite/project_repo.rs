@@ -1,5 +1,6 @@
 use chrono::Utc;
-use common::thing::{nanoid, Thing};
+use common::id::MNID;
+use common::thing::Thing;
 use sea_orm::entity::prelude::*;
 use sea_orm::{DatabaseConnection, QueryOrder, QuerySelect, Set};
 use std::sync::Arc;
@@ -26,7 +27,7 @@ pub struct Model {
 impl Into<domain::model::project::Project> for Model {
     fn into(self) -> domain::model::project::Project {
         domain::model::project::Project {
-            id: self.id,
+            id: self.id.into(),
             source: self.source,
             last_used_at: self.last_used_at,
             created_at: self.created_at,
@@ -37,7 +38,7 @@ impl Into<domain::model::project::Project> for Model {
 impl Into<domain::model::project::RecentProject> for Model {
     fn into(self) -> domain::model::project::RecentProject {
         domain::model::project::RecentProject {
-            id: self.id,
+            id: self.id.into(),
             source: self.source,
             last_used_at: self.last_used_at,
         }
@@ -69,7 +70,7 @@ impl domain::port::ProjectRepository for ProjectRepositoryImpl {
     async fn create_project(&self, input: NewProjectInput) -> domain::Result<Project> {
         let current_timestamp = Utc::now().timestamp();
         let model = (ActiveModel {
-            id: Set(nanoid()),
+            id: Set(MNID::new().to_string()),
             source: Set(input.path),
             last_used_at: Set(current_timestamp),
             created_at: Set(current_timestamp),
