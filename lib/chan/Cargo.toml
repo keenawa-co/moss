@@ -1,8 +1,0 @@
-[package]
-name = "chan"
-version = "0.1.0"
-edition = "2021"
-
-
-[dependencies]
-tokio = { workspace = true, features = ["full", "sync"] }
