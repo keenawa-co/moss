@@ -3,7 +3,9 @@ mod domain;
 mod infra;
 
 pub use config::{Config, CONF};
+use disp::Dispatcher;
 use dl::APP_NAME;
+use fs::fw::FileWatcher;
 
 #[macro_use]
 extern crate async_trait;
@@ -15,6 +17,7 @@ extern crate serde_json;
 #[macro_use]
 extern crate tracing;
 
+use pe::engine::Engine as PolicyEngine;
 use std::sync::Arc;
 use tokio_util::sync::CancellationToken as TokioCancellationToken;
 use tower::ServiceBuilder;
@@ -27,8 +30,6 @@ use tower_http::{
     ServiceBuilderExt,
 };
 
-const MIX_COMPRESS_SIZE: u16 = 512;
-
 use crate::{
     domain::service::{
         ConfigService, MetricService, PortalService, ProjectService, ServiceLocator,
@@ -36,19 +37,25 @@ use crate::{
     infra::database::SQLiteClient,
 };
 
+const MIX_COMPRESS_SIZE: u16 = 512;
+
 pub async fn bind(_: TokioCancellationToken) -> Result<(), domain::Error> {
     let conf = CONF
         .get()
         .ok_or_else(|| domain::Error::Unknown("configuration was not defined".to_string()))?;
 
-    let fw = sys::FileWatcher::new();
+    let mut dispatcher = Dispatcher::new();
+    let dispatcher_tx = Arc::new(dispatcher.run()?);
+
+    let fw = FileWatcher::new(dispatcher_tx);
+    let policy_engine = PolicyEngine::new(fw);
 
     let sqlite_db = SQLiteClient::new(conf.conn.clone());
     let service_locator = ServiceLocator {
         portal_service: Arc::new(PortalService::new(sqlite_db.project_repo())),
         config_service: Arc::new(ConfigService::new(conf.preference.clone())),
         project_service: Arc::new(ProjectService::new(sqlite_db.project_repo())),
-        metric_service: Arc::new(MetricService::new(fw)),
+        metric_service: Arc::new(MetricService::new(policy_engine)),
     };
 
     let service = ServiceBuilder::new()

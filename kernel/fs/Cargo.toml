@@ -8,5 +8,7 @@ edition = "2021"
 anyhow.workspace = true
 async-trait.workspace = true
 futures.workspace = true
-
+disp.workspace = true
+tokio = { workspace = true, features = ["full", "sync"] }
 smol = "2.0.0"
+notify = "6.1.1"

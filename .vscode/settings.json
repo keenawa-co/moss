@@ -2,6 +2,7 @@
   "rust-analyzer.showUnlinkedFileNotification": false,
   "cSpell.words": [
     "chrono",
+    "disp",
     "graphiql",
     "inmem",
     "inmemdb",

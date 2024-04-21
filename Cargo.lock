@@ -739,13 +739,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "fd16c4719339c4530435d38e511904438d07cce7950afa3718a84ac36c10e89e"
 
 [[package]]
-name = "chan"
-version = "0.1.0"
-dependencies = [
- "tokio",
-]
-
-[[package]]
 name = "chrono"
 version = "0.4.38"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -999,6 +992,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "disp"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "common",
+ "tokio",
+]
+
+[[package]]
 name = "dl"
 version = "0.1.0"
 
@@ -1185,8 +1187,11 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "async-trait",
+ "disp",
  "futures",
+ "notify",
  "smol",
+ "tokio",
 ]
 
 [[package]]
@@ -1897,6 +1902,7 @@ dependencies = [
  "chrono",
  "common",
  "conf",
+ "disp",
  "dl",
  "file",
  "fs",
@@ -1905,10 +1911,10 @@ dependencies = [
  "notify",
  "once_cell",
  "opentelemetry",
+ "pe",
  "sea-orm",
  "serde",
  "serde_json",
- "sys",
  "thiserror",
  "tokio",
  "tokio-stream",
@@ -2168,6 +2174,20 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "de3145af08024dea9fa9914f381a17b8fc6034dfb00f3a84013f7ff43f29ed4c"
 
 [[package]]
+name = "pe"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "async-graphql",
+ "async-stream",
+ "disp",
+ "fs",
+ "futures",
+ "serde",
+ "smol",
+]
+
+[[package]]
 name = "pem-rfc7468"
 version = "0.7.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2395,10 +2415,6 @@ dependencies = [
  "quote",
  "syn 1.0.109",
 ]
-
-[[package]]
-name = "qme"
-version = "0.1.0"
 
 [[package]]
 name = "quote"
@@ -2932,10 +2948,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "signal"
-version = "0.1.0"
-
-[[package]]
 name = "signal-hook-registry"
 version = "1.4.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3368,17 +3380,6 @@ name = "sync_wrapper"
 version = "1.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a7065abeca94b6a8a577f9bd45aa0867a2238b74e8eb67cf10d492bc39351394"
-
-[[package]]
-name = "sys"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "chan",
- "futures",
- "notify",
- "tokio",
-]
 
 [[package]]
 name = "tap"

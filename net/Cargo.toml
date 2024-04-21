@@ -7,14 +7,13 @@ edition = "2021"
 name = "moss_net"
 
 [dependencies]
-sys.workspace = true
 fs.workspace = true
+disp.workspace = true
 dl.workspace = true
+pe.workspace = true
 file = { workspace = true, features = ["graphql"] }
 conf = { workspace = true, features = ["graphql"] }
 common = { workspace = true, features = ["graphql"] }
-
-
 thiserror.workspace = true
 anyhow.workspace = true
 async-graphql.workspace = true

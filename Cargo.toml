@@ -5,15 +5,13 @@ edition = "2021"
 
 [workspace]
 members = [
+    "kernel/disp",
     "kernel/fs",
-    "kernel/qme",
-    "kernel/sys",
-    "lib/chan",
+    "kernel/pe",
     "lib/common",
     "lib/conf",
     "lib/dl",
     "lib/file",
-    "lib/signal",
     "mossctl",
     "net",
     "testdata/hello-wasm",
@@ -36,14 +34,13 @@ rustflags = ["-C", "target-cpu=native"]
 
 [workspace.dependencies]
 fs = { path = "kernel/fs" }
-sys = { path = "kernel/sys" }
-qme = { path = "kernel/qme" }
+disp = { path = "kernel/disp" }
+pe = { path = "kernel/pe" }
 chan = { path = "lib/chan" }
 conf = { path = "lib/conf" }
 dl = { path = "lib/dl" }
 file = { path = "lib/file" }
 common = { path = "lib/common" }
-signal = { path = "lib/signal" }
 
 mossctl = { path = "mossctl" }
 net = { path = "net" }

@@ -1,3 +1,4 @@
+pub mod fw;
 pub mod real_fs;
 
 use futures::Stream;
