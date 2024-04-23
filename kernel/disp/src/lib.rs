@@ -1,5 +1,10 @@
+pub mod bus;
 pub mod signal;
 
+use anyhow::Context;
+use signal::FileSignal;
+use signal::SignalType;
+use std::collections::HashMap;
 use std::sync::Arc;
 use tokio::sync::mpsc;
 use tokio::sync::Mutex;
@@ -15,33 +20,40 @@ pub type Sender = mpsc::Sender<Signal>;
 
 pub struct Dispatcher {
     rx: Arc<Mutex<Receiver>>,
-    tx: Option<Sender>,
 }
 
 impl Dispatcher {
-    pub fn new() -> Self {
+    pub fn new() -> (Self, Sender) {
         let (tx, rx) = mpsc::channel(100);
 
-        Self {
-            rx: Arc::new(Mutex::new(rx)),
-            tx: Some(tx),
-        }
+        (
+            Self {
+                rx: Arc::new(Mutex::new(rx)),
+                // analyzer_tx,
+            },
+            tx,
+        )
     }
 
-    pub fn run(&mut self) -> anyhow::Result<Sender> {
-        if let Some(tx) = self.tx.take() {
-            let rx_clone = self.rx.clone();
+    pub fn run(&mut self) -> anyhow::Result<()> {
+        let rx_clone = self.rx.clone();
+        // let analyzer_tx_clone = self.analyzer_tx.clone();
 
-            task::spawn(async move {
-                let mut rx_lock = rx_clone.lock().await;
-                while let Some(message) = rx_lock.recv().await {
-                    println!("Received event: {:?}", message);
+        task::spawn(async move {
+            let mut rx_lock = rx_clone.lock().await;
+
+            while let Some(signal) = rx_lock.recv().await {
+                match &signal.typ {
+                    SignalType::File(FileSignal::Modify(data)) => {
+                        // analyzer_tx_clone.send(signal).await?
+                    }
+                    SignalType::File(FileSignal::Watch(_)) => todo!(),
                 }
-            });
+            }
 
-            Ok(tx)
-        } else {
-            Err(anyhow!("dispatcher sender was already taken"))
-        }
+            Ok::<(), anyhow::Error>(())
+        });
+
+        Ok(())
     }
 }

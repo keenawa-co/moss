@@ -1,14 +1,13 @@
-use disp::signal::{FileSignal, Origin, Signal};
+use disp::{
+    bus::{Consumer, Message, Producer},
+    signal::{FileSignal, Signal, SignalType},
+};
 use notify::{RecommendedWatcher, RecursiveMode, Watcher};
 use std::{
     path::PathBuf,
     sync::{Arc, Mutex},
 };
 use tokio::sync::{broadcast, broadcast::error::SendError};
-
-pub type Config = notify::Config;
-pub type Channel = BroadcastChannel<Signal>;
-pub type Receiver = broadcast::Receiver<Signal>;
 
 pub struct BroadcastChannel<T>
 where
@@ -40,16 +39,20 @@ where
     }
 }
 
+pub type Config = notify::Config;
+pub type Channel = BroadcastChannel<notify::Event>;
+pub type Receiver = broadcast::Receiver<notify::Event>;
+
 pub struct FileWatcher {
     channel: Arc<Channel>,
     watcher: Mutex<Option<RecommendedWatcher>>,
     subscriber_count: Mutex<usize>,
     watch_list: Mutex<Vec<PathBuf>>, // FIXME:
-    disp_tx: Arc<disp::Sender>,
+    disp_tx: disp::Sender,
 }
 
 impl FileWatcher {
-    pub fn new(disp_tx: Arc<disp::Sender>) -> Arc<Self> {
+    pub fn new(disp_tx: disp::Sender) -> Arc<Self> {
         Arc::new(Self {
             channel: Arc::new(BroadcastChannel::new(32)),
             watcher: Mutex::new(None),
@@ -119,34 +122,38 @@ impl FileWatcher {
                         Ok(event) => {
                             println!("Event detected: {:?}", event);
 
-                            match event.kind {
-                                // notify::EventKind::Any => todo!(),
-                                // notify::EventKind::Access(_) => todo!(),
-                                // notify::EventKind::Create(_) => todo!(),
-                                notify::EventKind::Modify(kind) => match kind {
-                                    notify::event::ModifyKind::Any => todo!(),
-                                    notify::event::ModifyKind::Data(v) => {
-                                        let s = Signal::new(Origin::FileWatcher(
-                                            FileSignal::Modify(event.paths),
-                                        ));
-
-                                        if let Err(e) = disp_tx_clone.send(s.clone()).await {
-                                            eprintln!("Error sending event to dispatcher: {:?}", e);
-                                        }
-
-                                        if let Err(e) = chan.send(s) {
-                                            eprintln!("Error sending event: {:?}", e);
-                                        }
-                                    }
-                                    _ => (),
-                                    // notify::event::ModifyKind::Metadata(_) => todo!(),
-                                    // notify::event::ModifyKind::Name(_) => todo!(),
-                                    // notify::event::ModifyKind::Other => todo!(),
-                                },
-                                // notify::EventKind::Remove(_) => todo!(),
-                                // notify::EventKind::Other => todo!(),
-                                _ => (),
+                            if let Err(e) = chan.send(event) {
+                                eprintln!("Error sending event: {:?}", e);
                             }
+
+                            // match event.kind {
+                            //     // notify::EventKind::Any => todo!(),
+                            //     // notify::EventKind::Access(_) => todo!(),
+                            //     // notify::EventKind::Create(_) => todo!(),
+                            //     notify::EventKind::Modify(kind) => match kind {
+                            //         notify::event::ModifyKind::Any => todo!(),
+                            //         notify::event::ModifyKind::Data(v) => {
+                            //             let s = Signal::new(SignalType::File(FileSignal::Modify(
+                            //                 event.paths,
+                            //             )));
+
+                            //             if let Err(e) = disp_tx_clone.send(s.clone()).await {
+                            //                 eprintln!("Error sending event to dispatcher: {:?}", e);
+                            //             }
+
+                            //             if let Err(e) = chan.send(s) {
+                            //                 eprintln!("Error sending event: {:?}", e);
+                            //             }
+                            //         }
+                            //         _ => (),
+                            //         // notify::event::ModifyKind::Metadata(_) => todo!(),
+                            //         // notify::event::ModifyKind::Name(_) => todo!(),
+                            //         // notify::event::ModifyKind::Other => todo!(),
+                            //     },
+                            //     // notify::EventKind::Remove(_) => todo!(),
+                            //     // notify::EventKind::Other => todo!(),
+                            //     _ => (),
+                            // }
                         }
                         Err(e) => eprintln!("Watch error: {:?}", e),
                     }
@@ -184,5 +191,12 @@ impl FileWatcher {
         }
 
         Ok(())
+    }
+}
+
+impl Consumer for FileWatcher {
+    fn process(&self, message: Message) {
+        let r = message.body.downcast::<String>().unwrap();
+        println!("message: {}", r)
     }
 }

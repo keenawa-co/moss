@@ -1,6 +1,7 @@
+use analysis::metric_engine::Report;
 use async_graphql::{Context, FieldResult, Subscription};
 use futures::{Stream, StreamExt};
-use pe::policy::Report;
+
 use std::sync::Arc;
 
 use crate::domain::service::MetricService;
@@ -17,7 +18,8 @@ impl MetricSubscription {
     ) -> async_graphql::Result<impl Stream<Item = FieldResult<Report>>> {
         let metric_service = ctx.data::<Arc<MetricService>>()?;
         let stream = metric_service
-            .subscribe()?
+            .subscribe()
+            .await?
             .map(|result| result.map_err(|e| async_graphql::Error::new(e.to_string())));
 
         Ok(stream)

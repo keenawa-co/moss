@@ -8,3 +8,4 @@ edition = "2021"
 anyhow.workspace = true
 common = { workspace = true }
 tokio = { workspace = true, features = ["full", "signal", "macros"] }
+typemap = "0.3.3"

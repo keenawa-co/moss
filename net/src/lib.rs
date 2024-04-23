@@ -2,8 +2,9 @@ pub mod config;
 mod domain;
 mod infra;
 
+use analysis::policy_engine::PolicyEngine;
 pub use config::{Config, CONF};
-use disp::Dispatcher;
+use disp::{bus, signal::SignalType, Dispatcher};
 use dl::APP_NAME;
 use fs::fw::FileWatcher;
 
@@ -17,7 +18,6 @@ extern crate serde_json;
 #[macro_use]
 extern crate tracing;
 
-use pe::engine::Engine as PolicyEngine;
 use std::sync::Arc;
 use tokio_util::sync::CancellationToken as TokioCancellationToken;
 use tower::ServiceBuilder;
@@ -37,25 +37,32 @@ use crate::{
     infra::database::SQLiteClient,
 };
 
-const MIX_COMPRESS_SIZE: u16 = 512;
+const MIX_COMPRESS_SIZE: u16 = 512; // TODO: this value should be used from a net_conf.toml file
 
 pub async fn bind(_: TokioCancellationToken) -> Result<(), domain::Error> {
     let conf = CONF
         .get()
         .ok_or_else(|| domain::Error::Unknown("configuration was not defined".to_string()))?;
 
-    let mut dispatcher = Dispatcher::new();
-    let dispatcher_tx = Arc::new(dispatcher.run()?);
+    let (mut dispatcher, dispatcher_tx) = Dispatcher::new();
 
-    let fw = FileWatcher::new(dispatcher_tx);
-    let policy_engine = PolicyEngine::new(fw);
+    dispatcher.run()?;
+
+    let fw = FileWatcher::new(dispatcher_tx.clone());
+
+    let b = bus::Bus::new();
+    let t = b.create_topic("general").await;
+    t.subscribe::<String>(fw.clone()).await;
+    b.start_topic("general").await;
+
+    let pe = PolicyEngine::new(fw.clone(), t);
 
     let sqlite_db = SQLiteClient::new(conf.conn.clone());
     let service_locator = ServiceLocator {
         portal_service: Arc::new(PortalService::new(sqlite_db.project_repo())),
         config_service: Arc::new(ConfigService::new(conf.preference.clone())),
         project_service: Arc::new(ProjectService::new(sqlite_db.project_repo())),
-        metric_service: Arc::new(MetricService::new(policy_engine)),
+        metric_service: Arc::new(MetricService::new(Arc::new(pe))),
     };
 
     let service = ServiceBuilder::new()

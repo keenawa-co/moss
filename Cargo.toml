@@ -7,7 +7,7 @@ edition = "2021"
 members = [
     "kernel/disp",
     "kernel/fs",
-    "kernel/pe",
+    "lib/analysis",
     "lib/common",
     "lib/conf",
     "lib/dl",
@@ -35,12 +35,12 @@ rustflags = ["-C", "target-cpu=native"]
 [workspace.dependencies]
 fs = { path = "kernel/fs" }
 disp = { path = "kernel/disp" }
-pe = { path = "kernel/pe" }
 chan = { path = "lib/chan" }
 conf = { path = "lib/conf" }
 dl = { path = "lib/dl" }
 file = { path = "lib/file" }
 common = { path = "lib/common" }
+analysis = { path = "lib/analysis" }
 
 mossctl = { path = "mossctl" }
 net = { path = "net" }
