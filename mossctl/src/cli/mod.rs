@@ -3,7 +3,7 @@ mod run;
 mod utl;
 
 use clap::{Parser, Subcommand};
-use dl::APP_NAME;
+use common::APP_NAME;
 use std::process::ExitCode;
 
 use self::{migrate::MigrateCmdArgs, run::RunCmdArgs};

@@ -3,8 +3,8 @@ mod domain;
 mod infra;
 
 use analysis::policy_engine::PolicyEngine;
+use common::APP_NAME;
 pub use config::{Config, CONF};
-use dl::APP_NAME;
 use fs::fw::FileWatcher;
 
 #[macro_use]
@@ -17,7 +17,7 @@ extern crate serde_json;
 #[macro_use]
 extern crate tracing;
 
-use std::{rc::Rc, sync::Arc};
+use std::sync::Arc;
 use tokio_util::sync::CancellationToken as TokioCancellationToken;
 use tower::ServiceBuilder;
 use tower_http::{
@@ -43,11 +43,12 @@ pub async fn bind(_: TokioCancellationToken) -> Result<(), domain::Error> {
         .get()
         .ok_or_else(|| domain::Error::Unknown("configuration was not defined".to_string()))?;
 
-    let fw = FileWatcher::new();
-
     let b = bus::Bus::new();
+
+    let fw = FileWatcher::new(b.clone());
+
     b.create_topic("general").await;
-    b.subscribe_topic::<String>("general", fw.clone()).await;
+    b.subscribe_topic::<String>("general", fw.clone()).await?;
 
     let pe = PolicyEngine::new(fw.clone(), b);
 

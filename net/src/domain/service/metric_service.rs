@@ -1,11 +1,7 @@
-use std::{path::PathBuf, pin::Pin, sync::Arc};
-
 use analysis::{policy_engine::PolicyEngine, policy_engine::Report};
-use fs::fw::FileWatcher;
-use futures::Stream;
-use tokio::sync::broadcast;
+use std::{pin::Pin, sync::Arc};
 
-use crate::domain;
+use futures::Stream;
 
 #[derive(Clone)]
 pub struct MetricService {
@@ -23,7 +19,7 @@ impl MetricService {
         &self,
     ) -> anyhow::Result<Pin<Box<dyn Stream<Item = anyhow::Result<Report>> + Send>>> {
         self.policy_engine
-            .register_watch_list(vec!["./testdata/helloworld.ts"])?;
+            .register_watch_list(vec!["./testdata/helloworld2.ts"])?;
 
         self.policy_engine.subscribe().await
     }

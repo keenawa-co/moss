@@ -9,7 +9,7 @@ impl MigrationTrait for Migration {
         manager
             .get_connection()
             .execute_unprepared(include_str!(concat!(
-                "../../../migration/m20220101_000001_initial_schema.up.sql"
+                "../../../migration/app/m20220101_000001_initial_app_schema.up.sql"
             )))
             .await?;
 
@@ -20,7 +20,7 @@ impl MigrationTrait for Migration {
         manager
             .get_connection()
             .execute_unprepared(include_str!(concat!(
-                "../../../migration/m20220101_000001_initial_schema.down.sql"
+                "../../../migration/app/m20220101_000001_initial_app_schema.down.sql"
             )))
             .await?;
 

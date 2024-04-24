@@ -1,7 +1,7 @@
 use anyhow::Context;
 use async_graphql::SimpleObject;
 use bus::message::simple_message::SimpleMessage;
-use bus::Bus;
+use bus::{Bus, Producer};
 
 use fs::fw::FileWatcher;
 use futures::Stream;
@@ -56,7 +56,7 @@ impl PolicyEngine {
         let mut rx = self.fw.subscribe()?;
 
         self.bus
-            .push("general", SimpleMessage::new::<i32>(Box::new(32)))
+            .publish("general", SimpleMessage::new::<i32>(Box::new(32)))
             .await?;
 
         let stream = async_stream::stream! {

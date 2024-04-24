@@ -1,4 +1,7 @@
-use bus::message::{simple_message::SimpleMessage, MessageBody};
+use bus::{
+    message::{simple_message::SimpleMessage, MessageBody},
+    Bus,
+};
 use notify::{RecommendedWatcher, RecursiveMode, Watcher};
 use std::{
     path::PathBuf,
@@ -45,17 +48,17 @@ pub struct FileWatcher {
     watcher: Mutex<Option<RecommendedWatcher>>,
     subscriber_count: Mutex<usize>,
     watch_list: Mutex<Vec<PathBuf>>, // FIXME:
-                                     // disp_tx: disp::Sender,
+    bus: Arc<Bus>,
 }
 
 impl FileWatcher {
-    pub fn new() -> Arc<Self> {
+    pub fn new(bus: Arc<Bus>) -> Arc<Self> {
         Arc::new(Self {
             channel: Arc::new(BroadcastChannel::new(32)),
             watcher: Mutex::new(None),
             subscriber_count: Mutex::new(0),
             watch_list: Mutex::new(Vec::new()),
-            // disp_tx,
+            bus, // disp_tx,
         })
     }
 
@@ -191,9 +194,20 @@ impl FileWatcher {
     }
 }
 
+#[async_trait]
 impl bus::Consumer for FileWatcher {
     fn process(&self, _topic_name: &str, message: &SimpleMessage) {
         let r = message.body::<String>().unwrap();
         println!("message: {}", r)
     }
 }
+
+#[async_trait]
+impl bus::Producer for FileWatcher {
+    async fn publish(&self, topic_name: &str, message: SimpleMessage) -> anyhow::Result<()> {
+        Ok(self.bus.publish(topic_name, message).await?)
+    }
+}
+
+#[async_trait]
+impl bus::Subscriber for FileWatcher {}

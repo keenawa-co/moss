@@ -7,9 +7,8 @@ edition = "2021"
 name = "moss_cli"
 
 [dependencies]
+common.workspace = true
 net.workspace = true
-dl.workspace = true
-
 tracing.workspace = true
 anyhow.workspace = true
 once_cell.workspace = true

@@ -1,18 +1,15 @@
 use std::sync::atomic::{AtomicBool, Ordering};
-use std::{
-    any::{Any, TypeId},
-    collections::HashMap,
-    sync::Arc,
-};
-use tokio::sync::{mpsc, Mutex, RwLock};
+use std::{any::TypeId, collections::HashMap, sync::Arc};
+use tokio::sync::{mpsc, RwLock};
 
-use crate::{message::simple_message::SimpleMessage, Consumer};
+use crate::message::simple_message::SimpleMessage;
+use crate::Subscriber;
 
 pub struct Topic {
     name: String,
     pub(crate) rx: Arc<RwLock<mpsc::Receiver<SimpleMessage>>>,
     pub(crate) tx: mpsc::Sender<SimpleMessage>,
-    pub(crate) roster: Arc<RwLock<HashMap<TypeId, Arc<dyn Consumer>>>>,
+    pub(crate) roster: Arc<RwLock<HashMap<TypeId, Arc<dyn Subscriber>>>>,
     is_running: AtomicBool,
 }
 

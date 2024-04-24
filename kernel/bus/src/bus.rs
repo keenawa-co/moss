@@ -3,9 +3,9 @@ use std::{
     collections::HashMap,
     sync::Arc,
 };
-use tokio::sync::{Mutex, RwLock};
+use tokio::sync::RwLock;
 
-use crate::{message::simple_message::SimpleMessage, topic::Topic, Consumer};
+use crate::{message::simple_message::SimpleMessage, topic::Topic, Consumer, Producer, Subscriber};
 
 pub struct Bus {
     topics: RwLock<HashMap<String, Arc<Topic>>>,
@@ -25,15 +25,15 @@ impl Bus {
             .or_insert_with(|| Arc::new(Topic::new(topic_name.into())));
     }
 
-    pub async fn subscribe_topic<T: Any + Send + Sync + 'static>(
+    pub async fn subscribe_topic<T: Any + Send + Sync>(
         &self,
         topic_name: &str,
-        consumer: Arc<dyn Consumer>,
+        subscriber: Arc<dyn Subscriber>,
     ) -> anyhow::Result<()> {
         let topics_lock = self.topics.read().await;
         if let Some(topic) = topics_lock.get(topic_name) {
             let mut roster_lock = topic.roster.write().await;
-            roster_lock.insert(TypeId::of::<T>(), consumer);
+            roster_lock.insert(TypeId::of::<T>(), subscriber);
             topic.start().await;
 
             Ok(())
@@ -41,8 +41,11 @@ impl Bus {
             Err(anyhow!("Topic {topic_name} not found"))
         }
     }
+}
 
-    pub async fn push(&self, topic_name: &str, message: SimpleMessage) -> anyhow::Result<()> {
+#[async_trait]
+impl Producer for Bus {
+    async fn publish(&self, topic_name: &str, message: SimpleMessage) -> anyhow::Result<()> {
         let topics_lock = self.topics.read().await;
         if let Some(topic) = topics_lock.get(topic_name) {
             topic.tx.send(message).await?;

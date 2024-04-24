@@ -10,8 +10,8 @@ members = [
     "lib/analysis",
     "lib/common",
     "lib/conf",
-    "lib/dl",
     "lib/file",
+    "lib/initwd",
     "mossctl",
     "net",
     "testdata/hello-wasm",
@@ -35,9 +35,8 @@ rustflags = ["-C", "target-cpu=native"]
 [workspace.dependencies]
 fs = { path = "kernel/fs" }
 bus = { path = "kernel/bus" }
-chan = { path = "lib/chan" }
 conf = { path = "lib/conf" }
-dl = { path = "lib/dl" }
+initwd = { path = "lib/initwd" }
 file = { path = "lib/file" }
 common = { path = "lib/common" }
 analysis = { path = "lib/analysis" }
@@ -58,6 +57,7 @@ once_cell = "1.19"
 tokio-util = "0.7"
 tracing = "0.1"
 sea-orm = "0.12"
+lazy_static = "1.4.0"
 
 
 [dependencies]

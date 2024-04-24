@@ -1,8 +1,7 @@
-use dl::APP_NAME;
+use common::APP_NAME;
 use sea_orm::{Database, DatabaseConnection};
 use sea_orm_migration::MigratorTrait;
 use serde::de::DeserializeOwned;
-// use sqlx::migrate::MigrateDatabase;
 use std::{fs, path::PathBuf};
 
 pub(crate) fn load_toml_file<T: DeserializeOwned>(path: &PathBuf) -> anyhow::Result<T> {
