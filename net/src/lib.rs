@@ -4,7 +4,6 @@ mod infra;
 
 use analysis::policy_engine::PolicyEngine;
 pub use config::{Config, CONF};
-use disp::{bus, signal::SignalType, Dispatcher};
 use dl::APP_NAME;
 use fs::fw::FileWatcher;
 
@@ -18,7 +17,7 @@ extern crate serde_json;
 #[macro_use]
 extern crate tracing;
 
-use std::sync::Arc;
+use std::{rc::Rc, sync::Arc};
 use tokio_util::sync::CancellationToken as TokioCancellationToken;
 use tower::ServiceBuilder;
 use tower_http::{
@@ -44,18 +43,13 @@ pub async fn bind(_: TokioCancellationToken) -> Result<(), domain::Error> {
         .get()
         .ok_or_else(|| domain::Error::Unknown("configuration was not defined".to_string()))?;
 
-    let (mut dispatcher, dispatcher_tx) = Dispatcher::new();
-
-    dispatcher.run()?;
-
-    let fw = FileWatcher::new(dispatcher_tx.clone());
+    let fw = FileWatcher::new();
 
     let b = bus::Bus::new();
-    let t = b.create_topic("general").await;
-    t.subscribe::<String>(fw.clone()).await;
-    b.start_topic("general").await;
+    b.create_topic("general").await;
+    b.subscribe_topic::<String>("general", fw.clone()).await;
 
-    let pe = PolicyEngine::new(fw.clone(), t);
+    let pe = PolicyEngine::new(fw.clone(), b);
 
     let sqlite_db = SQLiteClient::new(conf.conn.clone());
     let service_locator = ServiceLocator {

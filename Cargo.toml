@@ -5,7 +5,7 @@ edition = "2021"
 
 [workspace]
 members = [
-    "kernel/disp",
+    "kernel/bus",
     "kernel/fs",
     "lib/analysis",
     "lib/common",
@@ -34,7 +34,7 @@ rustflags = ["-C", "target-cpu=native"]
 
 [workspace.dependencies]
 fs = { path = "kernel/fs" }
-disp = { path = "kernel/disp" }
+bus = { path = "kernel/bus" }
 chan = { path = "lib/chan" }
 conf = { path = "lib/conf" }
 dl = { path = "lib/dl" }

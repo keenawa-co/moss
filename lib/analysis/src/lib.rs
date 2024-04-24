@@ -1,4 +1,3 @@
-pub mod metric_engine;
 pub mod policy_engine;
 
 #[macro_use]

@@ -94,8 +94,8 @@ dependencies = [
  "anyhow",
  "async-graphql",
  "async-stream",
+ "bus",
  "common",
- "disp",
  "fs",
  "futures",
  "notify",
@@ -697,6 +697,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "79296716171880943b8470b5f8d03aa55eb2e645a4874bdbb28adb49162e012c"
 
 [[package]]
+name = "bus"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "common",
+ "tokio",
+]
+
+[[package]]
 name = "bytecheck"
 version = "0.6.12"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1009,16 +1018,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "disp"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "common",
- "tokio",
- "typemap",
-]
-
-[[package]]
 name = "dl"
 version = "0.1.0"
 
@@ -1205,7 +1204,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "async-trait",
- "disp",
+ "bus",
  "futures",
  "notify",
  "smol",
@@ -1918,10 +1917,10 @@ dependencies = [
  "async-trait",
  "axum",
  "axum-server",
+ "bus",
  "chrono",
  "common",
  "conf",
- "disp",
  "dl",
  "file",
  "fs",
@@ -3739,12 +3738,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "traitobject"
-version = "0.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "efd1f82c56340fdf16f2a953d7bda4f8fdffba13d93b00844c25572110b26079"
-
-[[package]]
 name = "tungstenite"
 version = "0.21.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3761,15 +3754,6 @@ dependencies = [
  "thiserror",
  "url",
  "utf-8",
-]
-
-[[package]]
-name = "typemap"
-version = "0.3.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "653be63c80a3296da5551e1bfd2cca35227e13cdd08c6668903ae2f4f77aa1f6"
-dependencies = [
- "unsafe-any",
 ]
 
 [[package]]
@@ -3816,15 +3800,6 @@ name = "unicode_categories"
 version = "0.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "39ec24b3121d976906ece63c9daad25b85969647682eee313cb5779fdd69e14e"
-
-[[package]]
-name = "unsafe-any"
-version = "0.4.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f30360d7979f5e9c6e6cea48af192ea8fab4afb3cf72597154b8f08935bc9c7f"
-dependencies = [
- "traitobject",
-]
 
 [[package]]
 name = "untrusted"

@@ -1,7 +1,4 @@
-use disp::{
-    bus::{Consumer, Message, Producer},
-    signal::{FileSignal, Signal, SignalType},
-};
+use bus::message::{simple_message::SimpleMessage, MessageBody};
 use notify::{RecommendedWatcher, RecursiveMode, Watcher};
 use std::{
     path::PathBuf,
@@ -48,17 +45,17 @@ pub struct FileWatcher {
     watcher: Mutex<Option<RecommendedWatcher>>,
     subscriber_count: Mutex<usize>,
     watch_list: Mutex<Vec<PathBuf>>, // FIXME:
-    disp_tx: disp::Sender,
+                                     // disp_tx: disp::Sender,
 }
 
 impl FileWatcher {
-    pub fn new(disp_tx: disp::Sender) -> Arc<Self> {
+    pub fn new() -> Arc<Self> {
         Arc::new(Self {
             channel: Arc::new(BroadcastChannel::new(32)),
             watcher: Mutex::new(None),
             subscriber_count: Mutex::new(0),
             watch_list: Mutex::new(Vec::new()),
-            disp_tx,
+            // disp_tx,
         })
     }
 
@@ -114,7 +111,7 @@ impl FileWatcher {
 
     fn create_watcher(&self) -> anyhow::Result<RecommendedWatcher> {
         let chan = self.channel.clone();
-        let disp_tx_clone = self.disp_tx.clone();
+        // let disp_tx_clone = self.disp_tx.clone();
         let watcher = RecommendedWatcher::new(
             move |res: Result<notify::Event, notify::Error>| {
                 futures::executor::block_on(async {
@@ -194,9 +191,9 @@ impl FileWatcher {
     }
 }
 
-impl Consumer for FileWatcher {
-    fn process(&self, message: Message) {
-        let r = message.body.downcast::<String>().unwrap();
+impl bus::Consumer for FileWatcher {
+    fn process(&self, _topic_name: &str, message: &SimpleMessage) {
+        let r = message.body::<String>().unwrap();
         println!("message: {}", r)
     }
 }

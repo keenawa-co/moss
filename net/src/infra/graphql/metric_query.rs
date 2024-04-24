@@ -1,4 +1,4 @@
-use analysis::metric_engine::Report;
+use analysis::policy_engine::Report;
 use async_graphql::{Context, FieldResult, Subscription};
 use futures::{Stream, StreamExt};
 

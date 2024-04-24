@@ -1,8 +1,10 @@
 use anyhow::Context;
-use common::id::MNID;
+use async_graphql::SimpleObject;
+use bus::message::simple_message::SimpleMessage;
+use bus::Bus;
+
 use fs::fw::FileWatcher;
 use futures::Stream;
-use notify::Event;
 use std::collections::HashSet;
 use std::pin::Pin;
 use std::{
@@ -10,19 +12,22 @@ use std::{
     sync::{Arc, Mutex},
 };
 
-use crate::metric_engine::Report;
+#[derive(Clone, Serialize, Deserialize, Debug, SimpleObject)]
+pub struct Report {
+    pub source: String,
+}
 
 pub struct PolicyEngine {
     fw: Arc<FileWatcher>,
-    topic: disp::bus::Topic,
+    bus: Arc<Bus>,
     watch_list: Mutex<HashSet<PathBuf>>,
 }
 
 impl PolicyEngine {
-    pub fn new(fw: Arc<FileWatcher>, topic: disp::bus::Topic) -> Self {
+    pub fn new(fw: Arc<FileWatcher>, bus: Arc<Bus>) -> Self {
         Self {
             fw,
-            topic,
+            bus,
             watch_list: Mutex::new(HashSet::new()),
         }
     }
@@ -50,9 +55,8 @@ impl PolicyEngine {
     ) -> anyhow::Result<Pin<Box<dyn Stream<Item = anyhow::Result<Report>> + Send>>> {
         let mut rx = self.fw.subscribe()?;
 
-        let topic_lock = self.topic.tx.lock().await;
-        topic_lock
-            .send(disp::bus::Message::new::<u128>(Box::new(128)))
+        self.bus
+            .push("general", SimpleMessage::new::<i32>(Box::new(32)))
             .await?;
 
         let stream = async_stream::stream! {
@@ -81,15 +85,6 @@ impl PolicyEngine {
         };
         Ok(Box::pin(stream))
     }
-}
-
-fn notify_filter(event: &notify::Event) -> bool {
-    matches!(
-        event.kind,
-        notify::EventKind::Modify(notify::event::ModifyKind::Data(
-            notify::event::DataChange::Content
-        ))
-    )
 }
 
 fn path_buf_to_string(path_buf: PathBuf) -> Result<String, String> {

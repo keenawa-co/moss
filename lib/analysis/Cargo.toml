@@ -6,9 +6,9 @@ edition = "2021"
 
 [dependencies]
 fs.workspace = true
+bus.workspace = true
 anyhow.workspace = true
 futures.workspace = true
-disp.workspace = true
 common.workspace = true
 async-graphql = { workspace = true }
 serde = { workspace = true, features = ["derive"] }
