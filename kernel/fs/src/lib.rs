@@ -1,5 +1,5 @@
 pub mod fw;
-pub mod real_fs;
+pub mod real;
 
 use futures::{AsyncRead, Stream};
 use std::{

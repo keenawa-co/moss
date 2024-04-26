@@ -1639,8 +1639,10 @@ name = "initwd"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "common",
  "fs",
  "lazy_static",
+ "once_cell",
 ]
 
 [[package]]
@@ -1931,6 +1933,7 @@ dependencies = [
  "fs",
  "futures",
  "futures-util",
+ "initwd",
  "notify",
  "once_cell",
  "opentelemetry",

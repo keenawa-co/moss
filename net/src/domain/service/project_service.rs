@@ -1,5 +1,6 @@
 use common::thing::Thing;
-use std::sync::Arc;
+use fs::real;
+use std::{path::Path, sync::Arc};
 
 use crate::domain::{
     self,
@@ -9,15 +10,17 @@ use crate::domain::{
 
 #[derive(Debug, Clone)]
 pub struct ProjectService {
-    pub repo: Arc<dyn ProjectRepository>,
+    real_fs: Arc<real::FileSystem>,
+    repo: Arc<dyn ProjectRepository>,
 }
 
 impl ProjectService {
-    pub fn new(repo: Arc<dyn ProjectRepository>) -> Self {
-        Self { repo }
+    pub fn new(real_fs: Arc<real::FileSystem>, repo: Arc<dyn ProjectRepository>) -> Self {
+        Self { real_fs, repo }
     }
 
     pub async fn create_project(&self, input: NewProjectInput) -> domain::Result<Project> {
+        initwd::create_from_scratch(&input.path, &self.real_fs).await?;
         let result = self.repo.create_project(input).await?;
 
         Ok(result)

@@ -23,7 +23,7 @@ pub struct RootSubscription(ExplorerSubscription, MetricSubscription);
 
 pub type SchemaRoot = Schema<QueryRoot, MutationRoot, RootSubscription>;
 
-pub fn build_schema(service_locator: &ServiceLocator) -> SchemaRoot {
+pub fn build_schema<'a>(service_locator: &'a ServiceLocator) -> SchemaRoot {
     Schema::build(
         QueryRoot::default(),
         MutationRoot::default(),

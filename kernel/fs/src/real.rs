@@ -10,6 +10,7 @@ use std::{
 
 use crate::CreateOptions;
 
+#[derive(Debug, Clone)]
 pub struct FileSystem;
 
 impl FileSystem {

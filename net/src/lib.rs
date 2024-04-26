@@ -6,7 +6,7 @@ use analysis::policy_engine::PolicyEngine;
 use bus::topic::TopicConfig;
 use common::APP_NAME;
 pub use config::{Config, CONF};
-use fs::{fw::FileWatcher, FS};
+use fs::{fw::FileWatcher, real, FS};
 use tokio_stream::StreamExt;
 
 #[macro_use]
@@ -47,7 +47,7 @@ pub async fn bind(_: TokioCancellationToken) -> Result<(), domain::Error> {
 
     let b = bus::Bus::new();
 
-    // let rfs = fs::real_fs::FileSystem::new();
+    let real_fs = real::FileSystem::new();
     // let watch_stream = rfs
     //     .watch(
     //         Path::new("./testdata/helloworld.ts"),
@@ -71,7 +71,10 @@ pub async fn bind(_: TokioCancellationToken) -> Result<(), domain::Error> {
     let service_locator = ServiceLocator {
         portal_service: Arc::new(PortalService::new(sqlite_db.project_repo())),
         config_service: Arc::new(ConfigService::new(conf.preference.clone())),
-        project_service: Arc::new(ProjectService::new(sqlite_db.project_repo())),
+        project_service: Arc::new(ProjectService::new(
+            Arc::new(real_fs),
+            sqlite_db.project_repo(),
+        )),
         metric_service: Arc::new(MetricService::new(Arc::new(pe))),
     };
 

@@ -12,6 +12,7 @@ pub(super) struct ProjectMutation;
 
 #[Object]
 impl ProjectMutation {
+    #[graphql(name = "createProject")]
     async fn create_project(
         &self,
         ctx: &Context<'_>,
@@ -21,6 +22,11 @@ impl ProjectMutation {
         let result = project_service.create_project(input).await?;
 
         Ok(result)
+    }
+
+    #[graphql(name = "openProject")]
+    async fn open_project(&self, ctx: &Context<'_>) -> async_graphql::Result<Project> {
+        unimplemented!()
     }
 
     #[graphql(name = "deleteProjectById")]

@@ -1,7 +1,7 @@
 use async_graphql::Error as GraphqlError;
 use async_graphql::{Context, FieldResult, Subscription};
 use file::FileInfo;
-use fs::{real_fs::FileSystem, FS};
+use fs::{real::FileSystem, FS};
 use futures::{Stream, StreamExt};
 use std::path::PathBuf;
 
