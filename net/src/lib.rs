@@ -3,9 +3,11 @@ mod domain;
 mod infra;
 
 use analysis::policy_engine::PolicyEngine;
+use bus::topic::TopicConfig;
 use common::APP_NAME;
 pub use config::{Config, CONF};
-use fs::fw::FileWatcher;
+use fs::{fw::FileWatcher, FS};
+use tokio_stream::StreamExt;
 
 #[macro_use]
 extern crate async_trait;
@@ -17,7 +19,7 @@ extern crate serde_json;
 #[macro_use]
 extern crate tracing;
 
-use std::sync::Arc;
+use std::{path::Path, sync::Arc, time::Duration};
 use tokio_util::sync::CancellationToken as TokioCancellationToken;
 use tower::ServiceBuilder;
 use tower_http::{
@@ -45,9 +47,22 @@ pub async fn bind(_: TokioCancellationToken) -> Result<(), domain::Error> {
 
     let b = bus::Bus::new();
 
+    // let rfs = fs::real_fs::FileSystem::new();
+    // let watch_stream = rfs
+    //     .watch(
+    //         Path::new("./testdata/helloworld.ts"),
+    //         Duration::from_secs(1),
+    //     )
+    //     .await;
+
+    // let mut stream = Box::pin(watch_stream);
+    // while let Some(paths) = stream.next().await {
+    //     dbg!(paths);
+    // }
+
     let fw = FileWatcher::new(b.clone());
 
-    b.create_topic("general").await;
+    b.create_topic("general", TopicConfig::default()).await;
     b.subscribe_topic::<String>("general", fw.clone()).await?;
 
     let pe = PolicyEngine::new(fw.clone(), b);

@@ -5,31 +5,42 @@ use tokio::sync::{mpsc, RwLock};
 use crate::message::simple_message::SimpleMessage;
 use crate::Subscriber;
 
+pub struct TopicConfig {
+    pub buffer: usize,
+}
+
+impl Default for TopicConfig {
+    fn default() -> Self {
+        Self { buffer: 100 }
+    }
+}
+
 pub struct Topic {
     name: String,
     pub(crate) rx: Arc<RwLock<mpsc::Receiver<SimpleMessage>>>,
     pub(crate) tx: mpsc::Sender<SimpleMessage>,
-    pub(crate) roster: Arc<RwLock<HashMap<TypeId, Arc<dyn Subscriber>>>>,
-    is_running: AtomicBool,
+    pub(crate) roster:
+        Arc<RwLock<HashMap<TypeId, Arc<dyn Fn(&str, &SimpleMessage) + Send + Sync>>>>,
+    status: AtomicBool,
 }
 
 impl Topic {
-    pub fn new(name: String) -> Self {
-        let (tx, rx) = mpsc::channel(100);
+    pub fn new(name: String, config: TopicConfig) -> Self {
+        let (tx, rx) = mpsc::channel(config.buffer);
         Topic {
             name,
             tx,
             rx: Arc::new(RwLock::new(rx)),
             roster: Arc::new(RwLock::new(HashMap::new())),
-            is_running: AtomicBool::new(false),
+            status: AtomicBool::new(false),
         }
     }
 
     pub async fn start(&self) {
-        if !self.is_running.fetch_or(true, Ordering::SeqCst) {
+        if !self.status.fetch_or(true, Ordering::SeqCst) {
             let rx_clone = self.rx.clone();
             let roster_clone = self.roster.clone();
-            let topic_name_clone = self.name.clone(); // Сохраняем имя топика для использования в потребителях
+            let topic_name_clone = self.name.clone();
 
             tokio::spawn(async move {
                 let mut receiver = rx_clone.write().await;
@@ -37,7 +48,7 @@ impl Topic {
                     let roster = roster_clone.read().await;
 
                     if let Some(consumer) = roster.get(&message.type_id) {
-                        consumer.process(&topic_name_clone, &message);
+                        consumer(&topic_name_clone, &message);
                     } else {
                         println!("No consumer found for this type of message");
                     }

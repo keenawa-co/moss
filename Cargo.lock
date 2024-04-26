@@ -1638,6 +1638,8 @@ dependencies = [
 name = "initwd"
 version = "0.1.0"
 dependencies = [
+ "anyhow",
+ "fs",
  "lazy_static",
 ]
 

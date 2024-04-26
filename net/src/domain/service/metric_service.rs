@@ -19,7 +19,7 @@ impl MetricService {
         &self,
     ) -> anyhow::Result<Pin<Box<dyn Stream<Item = anyhow::Result<Report>> + Send>>> {
         self.policy_engine
-            .register_watch_list(vec!["./testdata/helloworld2.ts"])?;
+            .register_watch_list(vec!["./testdata/helloworld.ts"])?;
 
         self.policy_engine.subscribe().await
     }

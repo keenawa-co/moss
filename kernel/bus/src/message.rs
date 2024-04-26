@@ -5,7 +5,7 @@ pub trait MessageBody: Any + Send + Sync {
     fn body<T: Any + Send + Sync + 'static>(&self) -> anyhow::Result<&T>;
 }
 
-pub trait Message: MessageBody {
+pub trait Message {
     fn id(&self) -> &MNID;
 }
 

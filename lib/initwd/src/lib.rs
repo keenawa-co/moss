@@ -1,5 +1,8 @@
 use std::collections::HashMap;
 use std::path::PathBuf;
+use std::rc::Rc;
+
+use fs::FS;
 
 #[macro_use]
 extern crate lazy_static;
@@ -10,7 +13,7 @@ lazy_static! {
 }
 
 lazy_static! {
-    static ref MY_MAP: HashMap<PathBuf, String> = {
+    static ref INIT_LIST: HashMap<PathBuf, String> = {
         let mut m = HashMap::new();
         m.insert(
             PathBuf::from(".gitignore"),
@@ -19,4 +22,8 @@ lazy_static! {
         m.insert(PathBuf::from("README.md"), README_FILE_CONTENT.to_string());
         m
     };
+}
+
+fn create_from_scratch(fs: Rc<dyn FS>) -> anyhow::Result<()> {
+    todo!()
 }

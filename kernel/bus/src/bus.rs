@@ -5,7 +5,11 @@ use std::{
 };
 use tokio::sync::RwLock;
 
-use crate::{message::simple_message::SimpleMessage, topic::Topic, Consumer, Producer, Subscriber};
+use crate::{
+    message::simple_message::SimpleMessage,
+    topic::{Topic, TopicConfig},
+    Producer, Subscriber,
+};
 
 pub struct Bus {
     topics: RwLock<HashMap<String, Arc<Topic>>>,
@@ -18,11 +22,11 @@ impl Bus {
         })
     }
 
-    pub async fn create_topic(&self, topic_name: &str) {
+    pub async fn create_topic(&self, topic_name: &str, conf: TopicConfig) {
         let mut topics_lock = self.topics.write().await;
         topics_lock
             .entry(topic_name.to_string())
-            .or_insert_with(|| Arc::new(Topic::new(topic_name.into())));
+            .or_insert_with(|| Arc::new(Topic::new(topic_name.into(), conf)));
     }
 
     pub async fn subscribe_topic<T: Any + Send + Sync>(
@@ -33,7 +37,15 @@ impl Bus {
         let topics_lock = self.topics.read().await;
         if let Some(topic) = topics_lock.get(topic_name) {
             let mut roster_lock = topic.roster.write().await;
-            roster_lock.insert(TypeId::of::<T>(), subscriber);
+
+            let callback = {
+                let processor = subscriber.clone();
+                Arc::new(move |topic_name: &str, message: &SimpleMessage| {
+                    processor.process(topic_name, message)
+                })
+            };
+
+            roster_lock.insert(TypeId::of::<T>(), callback);
             topic.start().await;
 
             Ok(())

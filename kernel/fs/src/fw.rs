@@ -198,6 +198,7 @@ impl FileWatcher {
 impl bus::Consumer for FileWatcher {
     fn process(&self, _topic_name: &str, message: &SimpleMessage) {
         let r = message.body::<String>().unwrap();
+
         println!("message: {}", r)
     }
 }
