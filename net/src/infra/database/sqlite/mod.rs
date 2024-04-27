@@ -1,15 +1,17 @@
-mod project_repo;
+mod project_repo_impl;
 
 use sea_orm::DatabaseConnection;
 use std::sync::Arc;
 
-use self::project_repo::ProjectRepositoryImpl;
+use crate::domain::port::ProjectSessionStorage;
 
-pub struct SQLiteClient {
+use self::project_repo_impl::ProjectRepositoryImpl;
+
+pub struct RootClient {
     project_repo: Arc<ProjectRepositoryImpl>,
 }
 
-impl SQLiteClient {
+impl RootClient {
     pub(crate) fn new(conn: Arc<DatabaseConnection>) -> Self {
         Self {
             project_repo: Arc::new(ProjectRepositoryImpl::new(conn)),
@@ -20,3 +22,15 @@ impl SQLiteClient {
         self.project_repo.clone()
     }
 }
+
+#[derive(Debug)]
+pub struct ProjectClient {}
+
+impl ProjectClient {
+    pub fn new(conn: DatabaseConnection) -> Self {
+        Self {}
+    }
+}
+
+#[async_trait]
+impl ProjectSessionStorage for ProjectClient {}
