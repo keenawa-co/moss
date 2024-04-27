@@ -16,7 +16,7 @@ impl MetricSubscription {
         ctx: &Context<'_>,
         // _metric_list: Vec<String>,
     ) -> async_graphql::Result<impl Stream<Item = FieldResult<Report>>> {
-        let metric_service = ctx.data::<Arc<MetricService>>()?;
+        let metric_service = ctx.data::<MetricService>()?;
         let stream = metric_service
             .subscribe()
             .await?

@@ -1,13 +1,13 @@
-pub mod config;
 mod domain;
 mod infra;
+
+pub mod config;
 
 use analysis::policy_engine::PolicyEngine;
 use bus::topic::TopicConfig;
 use common::APP_NAME;
 pub use config::{Config, CONF};
 use fs::{fw::FileWatcher, real, FS};
-use tokio_stream::StreamExt;
 
 #[macro_use]
 extern crate async_trait;
@@ -19,7 +19,12 @@ extern crate serde_json;
 #[macro_use]
 extern crate tracing;
 
-use std::{path::Path, sync::Arc, time::Duration};
+use std::{
+    path::Path,
+    rc::Rc,
+    sync::{Arc, RwLock},
+    time::Duration,
+};
 use tokio_util::sync::CancellationToken as TokioCancellationToken;
 use tower::ServiceBuilder;
 use tower_http::{
@@ -33,9 +38,9 @@ use tower_http::{
 
 use crate::{
     domain::service::{
-        ConfigService, MetricService, PortalService, ProjectService, ServiceLocator,
+        ConfigService, ContextService, MetricService, PortalService, ProjectService, ServiceLocator,
     },
-    infra::database::SQLiteClient,
+    infra::database::sqlite::RootClient,
 };
 
 const MIX_COMPRESS_SIZE: u16 = 512; // TODO: this value should be used from a net_conf.toml file
@@ -43,7 +48,7 @@ const MIX_COMPRESS_SIZE: u16 = 512; // TODO: this value should be used from a ne
 pub async fn bind(_: TokioCancellationToken) -> Result<(), domain::Error> {
     let conf = CONF
         .get()
-        .ok_or_else(|| domain::Error::Unknown("configuration was not defined".to_string()))?;
+        .ok_or_else(|| domain::Error::Internal("configuration was not defined".to_string()))?;
 
     let b = bus::Bus::new();
 
@@ -67,15 +72,13 @@ pub async fn bind(_: TokioCancellationToken) -> Result<(), domain::Error> {
 
     let pe = PolicyEngine::new(fw.clone(), b);
 
-    let sqlite_db = SQLiteClient::new(conf.conn.clone());
+    let sqlite_db = RootClient::new(conf.conn.clone());
     let service_locator = ServiceLocator {
-        portal_service: Arc::new(PortalService::new(sqlite_db.project_repo())),
-        config_service: Arc::new(ConfigService::new(conf.preference.clone())),
-        project_service: Arc::new(ProjectService::new(
-            Arc::new(real_fs),
-            sqlite_db.project_repo(),
-        )),
-        metric_service: Arc::new(MetricService::new(Arc::new(pe))),
+        context_service: RwLock::new(ContextService::default()),
+        portal_service: PortalService::new(sqlite_db.project_repo()),
+        config_service: ConfigService::new(conf.preference.clone()),
+        project_service: ProjectService::new(Arc::new(real_fs), sqlite_db.project_repo()),
+        metric_service: MetricService::new(Arc::new(pe)),
     };
 
     let service = ServiceBuilder::new()
@@ -83,7 +86,7 @@ pub async fn bind(_: TokioCancellationToken) -> Result<(), domain::Error> {
         .set_x_request_id(MakeRequestUuid)
         .propagate_x_request_id();
 
-    let schema = infra::graphql::build_schema(&service_locator);
+    let schema = infra::graphql::build_schema(service_locator);
     let service = service.layer(
         CompressionLayer::new().compress_when(
             SizeAbove::new(MIX_COMPRESS_SIZE) // don't compress below 512 bytes

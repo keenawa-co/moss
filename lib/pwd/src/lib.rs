@@ -8,7 +8,4 @@ pub mod init;
 extern crate lazy_static;
 
 #[macro_use]
-extern crate mac;
-
-#[macro_use]
 extern crate tracing;

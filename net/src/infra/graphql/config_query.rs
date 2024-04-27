@@ -10,7 +10,7 @@ pub(super) struct ConfigQuery;
 #[Object]
 impl ConfigQuery {
     async fn get_preference(&self, ctx: &Context<'_>) -> async_graphql::Result<Arc<Preference>> {
-        let config_service = ctx.data::<Arc<ConfigService>>()?;
+        let config_service = ctx.data::<ConfigService>()?;
         let result = config_service.preferences.clone(); // FIXME
 
         Ok(result)

@@ -2430,7 +2430,6 @@ dependencies = [
  "fs",
  "futures",
  "lazy_static",
- "mac",
  "once_cell",
  "sea-orm",
  "sea-orm-migration",

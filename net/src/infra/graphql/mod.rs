@@ -5,6 +5,7 @@ mod portal_query;
 mod project_query;
 
 use async_graphql::{MergedObject, MergedSubscription, Schema};
+use std::rc::Rc;
 
 use self::{
     config_query::ConfigQuery, explorer_query::ExplorerSubscription,
@@ -23,15 +24,16 @@ pub struct RootSubscription(ExplorerSubscription, MetricSubscription);
 
 pub type SchemaRoot = Schema<QueryRoot, MutationRoot, RootSubscription>;
 
-pub fn build_schema<'a>(service_locator: &'a ServiceLocator) -> SchemaRoot {
+pub fn build_schema(service_locator: ServiceLocator) -> SchemaRoot {
     Schema::build(
         QueryRoot::default(),
         MutationRoot::default(),
         RootSubscription::default(),
     )
-    .data(service_locator.config_service.clone())
-    .data(service_locator.portal_service.clone())
-    .data(service_locator.project_service.clone())
-    .data(service_locator.metric_service.clone())
+    .data(service_locator.config_service)
+    .data(service_locator.portal_service)
+    .data(service_locator.project_service)
+    .data(service_locator.metric_service)
+    .data(service_locator.context_service)
     .finish()
 }

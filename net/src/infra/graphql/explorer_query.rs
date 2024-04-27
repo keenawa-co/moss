@@ -18,6 +18,8 @@ impl ExplorerSubscription {
         _ctx: &Context<'_>,
         path: String,
     ) -> async_graphql::Result<impl Stream<Item = FieldResult<Vec<FileInfo>>>> {
+        // FIXME: use service, not directly FS
+
         let path_buf = PathBuf::from(path);
         let stream = FileSystem::new()
             .read_dir(&path_buf)

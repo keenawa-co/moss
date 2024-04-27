@@ -13,3 +13,9 @@ pub(crate) trait ProjectRepository: Debug + Send + Sync {
         limit: u64,
     ) -> super::Result<Vec<RecentProject>>;
 }
+
+#[async_trait]
+pub(crate) trait ProjectSessionStorage: Debug + Send + Sync {}
+
+#[async_trait]
+pub(crate) trait ProjectCacheStorage: Debug + Send + Sync {}

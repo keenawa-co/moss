@@ -37,8 +37,8 @@ lazy_static! {
 }
 
 pub struct ProjectWorkDirOutput {
-    pub project_db_conn: DatabaseConnection,
-    pub cache_db_conn: DatabaseConnection,
+    pub project_db: DatabaseConnection,
+    pub cache_db: DatabaseConnection,
 }
 
 pub async fn create_from_scratch<P: AsRef<Path>>(
@@ -50,8 +50,8 @@ pub async fn create_from_scratch<P: AsRef<Path>>(
     save_on_disk(&project_path.as_ref().to_path_buf(), &PROJECT_ROOT, fs).await?;
 
     Ok(ProjectWorkDirOutput {
-        project_db_conn: db::open_project_conn(&project_path).await?,
-        cache_db_conn: db::open_cache_conn(&project_path).await?,
+        project_db: db::open_project_conn(&project_path).await?,
+        cache_db: db::open_cache_conn(&project_path).await?,
     })
 }
 
