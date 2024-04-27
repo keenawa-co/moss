@@ -1,6 +1,6 @@
 /target
 /testdata
 
-*.txt
-*.db*
-*.session*
+/*.txt
+/*.db*
+/*.session*

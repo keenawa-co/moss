@@ -25,8 +25,16 @@
     {
       "previewLimit": 50,
       "driver": "SQLite",
-      "name": "moss",
-      "database": "${workspaceFolder:moss}/moss.db"
+      "name": "project_db",
+      "group": "moss",
+      "database": "${workspaceFolder:moss}/.moss/project.db"
+    },
+    {
+      "previewLimit": 50,
+      "driver": "SQLite",
+      "name": "root_db",
+      "group": "moss",
+      "database": "${workspaceFolder:moss}/root.db"
     }
   ],
   "sqltools.useNodeRuntime": true

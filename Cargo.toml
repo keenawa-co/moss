@@ -11,7 +11,8 @@ members = [
     "lib/common",
     "lib/conf",
     "lib/file",
-    "lib/initwd",
+    "lib/mac",
+    "lib/pwd",
     "mossctl",
     "net",
     "testdata/hello-wasm",
@@ -36,7 +37,8 @@ rustflags = ["-C", "target-cpu=native"]
 fs = { path = "kernel/fs" }
 bus = { path = "kernel/bus" }
 conf = { path = "lib/conf" }
-initwd = { path = "lib/initwd" }
+pwd = { path = "lib/pwd" }
+mac = { path = "lib/mac" }
 file = { path = "lib/file" }
 common = { path = "lib/common" }
 analysis = { path = "lib/analysis" }

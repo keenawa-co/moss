@@ -16,7 +16,6 @@ tokio-util.workspace = true
 serde_json.workspace = true
 async-trait.workspace = true
 serde = { workspace = true, features = ["derive"] }
-
 clap = { version = "4.5.4", features = ["cargo", "string", "derive"] }
 toml = "0.8.12"
 url = { version = "2.5.0", features = ["serde"] }

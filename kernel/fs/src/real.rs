@@ -147,3 +147,16 @@ impl super::FS for FileSystem {
         })))
     }
 }
+
+pub mod types {
+    pub enum FileSystemEntity {
+        File {
+            name: String,
+            content: Option<String>,
+        },
+        Directory {
+            name: String,
+            children: Option<Vec<FileSystemEntity>>,
+        },
+    }
+}

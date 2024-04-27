@@ -1,6 +1,9 @@
 use common::thing::Thing;
 use fs::real;
-use std::{path::Path, sync::Arc};
+use std::{
+    path::{Path, PathBuf},
+    sync::Arc,
+};
 
 use crate::domain::{
     self,
@@ -20,7 +23,8 @@ impl ProjectService {
     }
 
     pub async fn create_project(&self, input: NewProjectInput) -> domain::Result<Project> {
-        initwd::create_from_scratch(&input.path, &self.real_fs).await?;
+        pwd::init::create_from_scratch(&PathBuf::from(&input.path), &self.real_fs).await?;
+
         let result = self.repo.create_project(input).await?;
 
         Ok(result)

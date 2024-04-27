@@ -15,10 +15,19 @@ extern crate async_trait;
 #[macro_use]
 extern crate anyhow;
 
-#[derive(Copy, Clone, Default)]
+#[derive(Copy, Clone)]
 pub struct CreateOptions {
     pub overwrite: bool,
     pub ignore_if_exists: bool,
+}
+
+impl Default for CreateOptions {
+    fn default() -> Self {
+        Self {
+            overwrite: false,
+            ignore_if_exists: true,
+        }
+    }
 }
 
 #[async_trait]

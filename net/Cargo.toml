@@ -9,7 +9,7 @@ name = "moss_net"
 [dependencies]
 fs.workspace = true
 bus.workspace = true
-initwd.workspace = true
+pwd.workspace = true
 file = { workspace = true, features = ["graphql"] }
 conf = { workspace = true, features = ["graphql"] }
 common = { workspace = true, features = ["graphql"] }

@@ -1635,17 +1635,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "initwd"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "common",
- "fs",
- "lazy_static",
- "once_cell",
-]
-
-[[package]]
 name = "inotify"
 version = "0.9.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1781,6 +1770,10 @@ name = "log"
 version = "0.4.21"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "90ed8c1e510134f979dbc4f070f87d4313098b704861a105fe34231c70a3901c"
+
+[[package]]
+name = "mac"
+version = "0.1.0"
 
 [[package]]
 name = "matchers"
@@ -1933,10 +1926,10 @@ dependencies = [
  "fs",
  "futures",
  "futures-util",
- "initwd",
  "notify",
  "once_cell",
  "opentelemetry",
+ "pwd",
  "sea-orm",
  "serde",
  "serde_json",
@@ -2425,6 +2418,23 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 1.0.109",
+]
+
+[[package]]
+name = "pwd"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "async-trait",
+ "common",
+ "fs",
+ "futures",
+ "lazy_static",
+ "mac",
+ "once_cell",
+ "sea-orm",
+ "sea-orm-migration",
+ "tracing",
 ]
 
 [[package]]

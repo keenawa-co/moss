@@ -1,4 +1,3 @@
-use common::APP_NAME;
 use sea_orm::{Database, DatabaseConnection};
 use sea_orm_migration::MigratorTrait;
 use serde::de::DeserializeOwned;
@@ -10,16 +9,15 @@ pub(crate) fn load_toml_file<T: DeserializeOwned>(path: &PathBuf) -> anyhow::Res
 }
 
 pub(crate) async fn db_connection(path: &PathBuf) -> anyhow::Result<DatabaseConnection> {
-    let database_filename = format!("{}.db", APP_NAME);
-    let database_path = path.join(&database_filename);
+    let database_path = path.join("root.db");
     let database_url = format!("sqlite://{}?mode=rwc", database_path.to_str().unwrap());
 
-    let is_new = !database_path.exists();
+    let is_new_db = !database_path.exists();
     let conn = Database::connect(&database_url).await?;
 
-    if is_new {
+    if is_new_db {
         info!(
-            "Running migrations for the new database at '{}'",
+            "Running migrations for the new root database at '{}'",
             database_path.display()
         );
         crate::migration::Migrator::up(&conn, None).await?;
