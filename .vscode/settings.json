@@ -13,6 +13,7 @@
     "mossdev",
     "oneshot",
     "otlp",
+    "realfs",
     "revisioned",
     "sched",
     "smol",
