@@ -46,7 +46,7 @@ pub struct RunCmdArgs {
     net_conf_path: PathBuf,
 }
 
-pub async fn init(
+pub async fn cmd_run(
     RunCmdArgs {
         bind,
         net_pref_path: preference_filepath,

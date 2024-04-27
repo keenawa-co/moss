@@ -6,10 +6,7 @@ use graphql_parser::{
     Style,
 };
 use moss_net::sdl;
-use std::{
-    path::{Path, PathBuf},
-    pin::Pin,
-};
+use std::{path::PathBuf, pin::Pin};
 
 #[derive(Debug, Subcommand)]
 pub enum DocsCommandList {
@@ -43,7 +40,9 @@ pub struct SchemaCmdArgs {
     filename: String,
 }
 
-pub async fn new(SchemaCmdArgs { path, filename }: SchemaCmdArgs) -> anyhow::Result<()> {
+pub async fn cmd_graphql_schema(
+    SchemaCmdArgs { path, filename }: SchemaCmdArgs,
+) -> anyhow::Result<()> {
     let formatted_sdl = {
         let raw_sdl = sdl();
         let parsed_sdl: Document<String> = parse_schema(&raw_sdl)?;

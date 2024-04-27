@@ -1,64 +1,64 @@
 type FileInfo {
-    path: String!
-    size: Int!
-    modTime: Int!
-    isDir: Boolean!
+  path: String!
+  size: Int!
+  modTime: Int!
+  isDir: Boolean!
 }
 
 scalar Mnid
 
 type MutationRoot {
-    createProject(input: NewProjectInput!): Project!
-    openProject: Project!
-    deleteProjectById(id: String!): Thing!
+  createProject(input: NewProjectInput!): Project!
+  openProject: Project!
+  deleteProjectById(id: String!): Thing!
 }
 
 input NewProjectInput {
-    path: String!
+  path: String!
 }
 
 type NotificationPreference {
-    sound: Boolean!
+  sound: Boolean!
 }
 
 type Preference {
-    visual: VisualPreference!
-    notification: NotificationPreference!
+  visual: VisualPreference!
+  notification: NotificationPreference!
 }
 
 type Project {
-    id: Mnid!
-    source: String!
-    lastUsedAt: Int!
-    createdAt: Int!
+  id: Mnid!
+  source: String!
+  lastUsedAt: Int!
+  createdAt: Int!
 }
 
 type QueryRoot {
-    getPreference: Preference!
-    selectPortalResentList(startTime: Int! = 1711635322, limit: Int! = 10): [RecentProject!]!
+  getPreference: Preference!
+  selectPortalResentList(startTime: Int! = 1711635645, limit: Int! = 10): [RecentProject!]!
 }
 
 type RecentProject {
-    id: Mnid!
-    source: String!
-    lastUsedAt: Int!
+  id: Mnid!
+  source: String!
+  lastUsedAt: Int!
 }
 
 type Report {
-    source: String!
+  source: String!
 }
 
 type RootSubscription {
-    explorerReadDir(path: String!): [FileInfo!]!
-    metricFeed: Report!
+  explorerReadDir(path: String!): [FileInfo!]!
+  metricFeed: Report!
 }
 
 type Thing {
-    id: String!
+  id: String!
 }
 
 type VisualPreference {
-    theme: String!
+  theme: String!
 }
 
 directive @include(if: Boolean!) on FIELD | FRAGMENT_SPREAD | INLINE_FRAGMENT
@@ -66,7 +66,7 @@ directive @include(if: Boolean!) on FIELD | FRAGMENT_SPREAD | INLINE_FRAGMENT
 directive @skip(if: Boolean!) on FIELD | FRAGMENT_SPREAD | INLINE_FRAGMENT
 
 schema {
-    query: QueryRoot
-    mutation: MutationRoot
-    subscription: RootSubscription
+  query: QueryRoot
+  mutation: MutationRoot
+  subscription: RootSubscription
 }
