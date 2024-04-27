@@ -14,31 +14,43 @@ file = { workspace = true, features = ["graphql"] }
 conf = { workspace = true, features = ["graphql"] }
 common = { workspace = true, features = ["graphql"] }
 analysis.workspace = true
-thiserror.workspace = true
-anyhow.workspace = true
-async-graphql.workspace = true
-async-trait.workspace = true
+
+notify.workspace = true
+chrono = { workspace = true, features = ["serde"] }
+
 once_cell.workspace = true
-tokio-util.workspace = true
-tracing.workspace = true
 futures.workspace = true
-serde_json.workspace = true
-sea-orm.workspace = true
-serde = { workspace = true, features = ["derive"] }
+
+async-trait.workspace = true
+
+tokio-util.workspace = true
 tokio = { workspace = true, features = [
     "full",
     "signal",
     "macros",
     "rt-multi-thread",
 ] }
-chrono = { workspace = true, features = ["serde"] }
 
-async-graphql-axum = "7.0"
-axum = "0.7"
-axum-server = "0.6"
-futures-util = "0.3"
-tower = "0.4"
-tower-http = { version = "0.5.2", features = [
+thiserror.workspace = true
+anyhow.workspace = true
+
+async-graphql.workspace = true
+
+tracing.workspace = true
+
+sea-orm.workspace = true
+
+serde_json.workspace = true
+serde = { workspace = true, features = ["derive"] }
+
+
+async-graphql-axum.workspace = true
+axum.workspace = true
+axum-server.workspace = true
+
+futures-util.workspace = true
+tower.workspace = true
+tower-http = { workspace = true, features = [
     "trace",
     "sensitive-headers",
     "auth",
@@ -51,9 +63,8 @@ tower-http = { version = "0.5.2", features = [
     "add-extension",
     "compression-full",
 ] }
-toml = "0.8.12"
-tokio-stream = { version = "0.1.15", features = ["sync"] }
-opentelemetry = "0.22.0"
-tracing-opentelemetry = "0.23.0"
-tracing-subscriber = { version = "0.3.18", features = ["env-filter"] }
-notify = "6.1.1"
+toml.workspace = true
+tokio-stream = { workspace = true, features = ["sync"] }
+opentelemetry.workspace = true
+tracing-opentelemetry.workspace = true
+tracing-subscriber = { workspace = true, features = ["env-filter"] }
