@@ -3,6 +3,7 @@ name = "net"
 version = "0.1.0"
 edition = "2021"
 
+
 [lib]
 name = "moss_net"
 
@@ -14,15 +15,10 @@ file = { workspace = true, features = ["graphql"] }
 conf = { workspace = true, features = ["graphql"] }
 common = { workspace = true, features = ["graphql"] }
 analysis.workspace = true
-
 notify.workspace = true
 chrono = { workspace = true, features = ["serde"] }
-
 once_cell.workspace = true
-futures.workspace = true
-
 async-trait.workspace = true
-
 tokio-util.workspace = true
 tokio = { workspace = true, features = [
     "full",
@@ -30,24 +26,20 @@ tokio = { workspace = true, features = [
     "macros",
     "rt-multi-thread",
 ] }
-
 thiserror.workspace = true
 anyhow.workspace = true
-
 async-graphql.workspace = true
-
 tracing.workspace = true
-
+opentelemetry.workspace = true
+tracing-opentelemetry.workspace = true
+tracing-subscriber = { workspace = true, features = ["env-filter"] }
 sea-orm.workspace = true
-
 serde_json.workspace = true
 serde = { workspace = true, features = ["derive"] }
-
-
+toml.workspace = true
 async-graphql-axum.workspace = true
 axum.workspace = true
 axum-server.workspace = true
-
 futures-util.workspace = true
 tower.workspace = true
 tower-http = { workspace = true, features = [
@@ -63,8 +55,5 @@ tower-http = { workspace = true, features = [
     "add-extension",
     "compression-full",
 ] }
-toml.workspace = true
 tokio-stream = { workspace = true, features = ["sync"] }
-opentelemetry.workspace = true
-tracing-opentelemetry.workspace = true
-tracing-subscriber = { workspace = true, features = ["env-filter"] }
+futures.workspace = true

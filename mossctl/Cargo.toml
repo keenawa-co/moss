@@ -19,17 +19,16 @@ async-trait.workspace = true
 futures.workspace = true
 graphql-parser.workspace = true
 serde = { workspace = true, features = ["derive"] }
-clap = { version = "4.5.4", features = ["cargo", "string", "derive"] }
-toml = "0.8.12"
-url = { version = "2.5.0", features = ["serde"] }
-sea-orm = { version = "0.12.x", features = [
+clap = { workspace = true, features = ["cargo", "string", "derive"] }
+toml.workspace = true
+url = { workspace = true, features = ["serde"] }
+sea-orm = { workspace = true, features = [
     "sqlx-sqlite",
     "runtime-tokio-rustls",
-    "with-uuid",
 ] }
-tracing-subscriber = { version = "0.3.18", features = ["env-filter"] }
+tracing-subscriber = { workspace = true, features = ["env-filter"] }
 
 
 [dependencies.sea-orm-migration]
-version = "0.12.0"
+workspace = true
 features = []

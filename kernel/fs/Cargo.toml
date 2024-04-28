@@ -10,5 +10,5 @@ async-trait.workspace = true
 futures.workspace = true
 bus.workspace = true
 tokio = { workspace = true, features = ["full", "sync"] }
-smol = "2.0.0"
-notify = "6.1.1"
+smol.workspace = true
+notify.workspace = true
