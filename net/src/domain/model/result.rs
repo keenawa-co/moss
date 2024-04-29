@@ -35,7 +35,7 @@ pub enum Error {
     #[error("File access error: {0}")]
     Io(#[from] IoError),
 
-    #[error("Unknown internal error: {0}")]
+    #[error("Internal error: {0}")]
     Internal(String),
 }
 

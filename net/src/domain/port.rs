@@ -1,11 +1,12 @@
 use common::thing::Thing;
 use std::fmt::Debug;
 
-use super::model::project::{NewProjectInput, Project, RecentProject};
+use super::model::project::{CreateProjectInput, Project, RecentProject};
 
 #[async_trait]
 pub(crate) trait ProjectRepository: Debug + Send + Sync {
-    async fn create_project(&self, input: NewProjectInput) -> super::Result<Project>;
+    async fn create_project(&self, input: &CreateProjectInput) -> super::Result<Project>;
+    async fn get_project_by_id(&self, id: String) -> super::Result<Option<Project>>;
     async fn delete_by_id(&self, id: String) -> super::Result<Thing>;
     async fn select_resent_list(
         &self,
@@ -15,7 +16,4 @@ pub(crate) trait ProjectRepository: Debug + Send + Sync {
 }
 
 #[async_trait]
-pub(crate) trait ProjectSessionStorage: Debug + Send + Sync {}
-
-#[async_trait]
-pub(crate) trait ProjectCacheStorage: Debug + Send + Sync {}
+pub(crate) trait WatchListRepository: Debug + Send + Sync {}

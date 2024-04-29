@@ -1,17 +1,23 @@
+mod migrate;
+mod migration;
+
 mod project_repo_impl;
+mod watch_list_repo_impl;
+
+pub(crate) use migration::ProjectMigrator;
 
 use sea_orm::DatabaseConnection;
 use std::sync::Arc;
 
-use crate::domain::port::ProjectSessionStorage;
+use self::{
+    project_repo_impl::ProjectRepositoryImpl, watch_list_repo_impl::WatchListRepositoryImpl,
+};
 
-use self::project_repo_impl::ProjectRepositoryImpl;
-
-pub struct RootClient {
+pub struct RootDatabaseClient {
     project_repo: Arc<ProjectRepositoryImpl>,
 }
 
-impl RootClient {
+impl RootDatabaseClient {
     pub(crate) fn new(conn: Arc<DatabaseConnection>) -> Self {
         Self {
             project_repo: Arc::new(ProjectRepositoryImpl::new(conn)),
@@ -24,13 +30,18 @@ impl RootClient {
 }
 
 #[derive(Debug)]
-pub struct ProjectClient {}
-
-impl ProjectClient {
-    pub fn new(conn: DatabaseConnection) -> Self {
-        Self {}
-    }
+pub struct ProjectDatabaseClient {
+    watch_list_repo: Arc<WatchListRepositoryImpl>,
 }
 
-#[async_trait]
-impl ProjectSessionStorage for ProjectClient {}
+impl ProjectDatabaseClient {
+    pub fn new(conn: Arc<DatabaseConnection>) -> Self {
+        Self {
+            watch_list_repo: Arc::new(WatchListRepositoryImpl::new(conn)),
+        }
+    }
+
+    pub fn watch_list_repo(&self) -> Arc<WatchListRepositoryImpl> {
+        self.watch_list_repo.clone()
+    }
+}

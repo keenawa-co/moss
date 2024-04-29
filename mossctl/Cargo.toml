@@ -8,6 +8,7 @@ name = "moss_cli"
 
 [dependencies]
 fs.workspace = true
+dbutl.workspace = true
 common.workspace = true
 net.workspace = true
 tracing.workspace = true

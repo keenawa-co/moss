@@ -11,6 +11,7 @@ name = "moss_net"
 fs.workspace = true
 bus.workspace = true
 pwd.workspace = true
+dbutl.workspace = true
 file = { workspace = true, features = ["graphql"] }
 conf = { workspace = true, features = ["graphql"] }
 common = { workspace = true, features = ["graphql"] }
@@ -57,3 +58,7 @@ tower-http = { workspace = true, features = [
 ] }
 tokio-stream = { workspace = true, features = ["sync"] }
 futures.workspace = true
+
+[dependencies.sea-orm-migration]
+workspace = true
+features = []

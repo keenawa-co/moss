@@ -21,7 +21,8 @@ extern crate serde_json;
 #[macro_use]
 extern crate tracing;
 
-use std::sync::{Arc, RwLock};
+use std::sync::Arc;
+use tokio::sync::RwLock;
 use tokio_util::sync::CancellationToken as TokioCancellationToken;
 use tower::ServiceBuilder;
 use tower_http::{
@@ -35,9 +36,9 @@ use tower_http::{
 
 use crate::{
     domain::service::{
-        ConfigService, ContextService, MetricService, PortalService, ProjectService, ServiceLocator,
+        ConfigService, MetricService, PortalService, ProjectService, ServiceLocator, SessionService,
     },
-    infra::database::sqlite::RootClient,
+    infra::database::sqlite::RootDatabaseClient,
 };
 
 const MIX_COMPRESS_SIZE: u16 = 512; // TODO: this value should be used from a net_conf.toml file
@@ -49,7 +50,7 @@ pub async fn bind(_: TokioCancellationToken) -> Result<(), domain::Error> {
 
     let b = bus::Bus::new();
 
-    let real_fs = real::FileSystem::new();
+    let realfs = Arc::new(real::FileSystem::new());
     // let watch_stream = rfs
     //     .watch(
     //         Path::new("./testdata/helloworld.ts"),
@@ -69,13 +70,17 @@ pub async fn bind(_: TokioCancellationToken) -> Result<(), domain::Error> {
 
     let pe = PolicyEngine::new(fw.clone(), b);
 
-    let sqlite_db = RootClient::new(conf.conn.clone());
+    let sqlite_db = RootDatabaseClient::new(conf.conn.clone());
     let service_locator = ServiceLocator {
-        context_service: RwLock::new(ContextService::default()),
+        session_service: RwLock::new(SessionService::new(
+            realfs.clone(),
+            sqlite_db.project_repo(),
+        )),
         portal_service: PortalService::new(sqlite_db.project_repo()),
         config_service: ConfigService::new(conf.preference.clone()),
-        project_service: ProjectService::new(Arc::new(real_fs), sqlite_db.project_repo()),
+        project_service: ProjectService::new(realfs.clone(), sqlite_db.project_repo()),
         metric_service: MetricService::new(Arc::new(pe)),
+        session_project_service: RwLock::new(None),
     };
 
     let service = ServiceBuilder::new()

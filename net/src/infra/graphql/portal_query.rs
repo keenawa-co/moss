@@ -1,6 +1,5 @@
 use async_graphql::{Context, Object, Result as GraphqlResult};
 use chrono::{Duration, Utc};
-use std::sync::Arc;
 
 use crate::domain::{model::project::RecentProject, service::PortalService};
 

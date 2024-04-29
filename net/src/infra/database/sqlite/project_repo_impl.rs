@@ -7,11 +7,11 @@ use std::sync::Arc;
 
 use crate::domain::{
     self,
-    model::project::{NewProjectInput, Project, RecentProject},
+    model::project::{CreateProjectInput, Project, RecentProject},
 };
 
 //
-// Entity model definition for `project` table.
+// Entity model definition for `project` table (root database)
 //
 
 #[derive(Clone, Debug, PartialEq, Eq, DeriveEntityModel, Serialize, Deserialize)]
@@ -24,17 +24,6 @@ pub struct Model {
     pub created_at: i64,
 }
 
-impl Into<domain::model::project::Project> for Model {
-    fn into(self) -> domain::model::project::Project {
-        domain::model::project::Project {
-            id: self.id.into(),
-            source: self.source,
-            last_used_at: self.last_used_at,
-            created_at: self.created_at,
-        }
-    }
-}
-
 impl Into<domain::model::project::RecentProject> for Model {
     fn into(self) -> domain::model::project::RecentProject {
         domain::model::project::RecentProject {
@@ -45,13 +34,24 @@ impl Into<domain::model::project::RecentProject> for Model {
     }
 }
 
+impl From<Model> for Project {
+    fn from(value: Model) -> Self {
+        Project {
+            id: value.id.into(),
+            source: value.source,
+            last_used_at: value.last_used_at,
+            created_at: value.created_at,
+        }
+    }
+}
+
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
 pub enum Relation {}
 
 impl ActiveModelBehavior for ActiveModel {}
 
 //
-// Repository implementation for project-related operations.
+// Repository implementation for project-related operations
 //
 
 #[derive(Debug)]
@@ -67,11 +67,11 @@ impl ProjectRepositoryImpl {
 
 #[async_trait]
 impl domain::port::ProjectRepository for ProjectRepositoryImpl {
-    async fn create_project(&self, input: NewProjectInput) -> domain::Result<Project> {
+    async fn create_project(&self, input: &CreateProjectInput) -> domain::Result<Project> {
         let current_timestamp = Utc::now().timestamp();
         let model = (ActiveModel {
             id: Set(MNID::new().to_string()),
-            source: Set(input.path),
+            source: Set(input.path.to_string()),
             last_used_at: Set(current_timestamp),
             created_at: Set(current_timestamp),
         })
@@ -79,6 +79,12 @@ impl domain::port::ProjectRepository for ProjectRepositoryImpl {
         .await?;
 
         Ok(model.into())
+    }
+
+    async fn get_project_by_id(&self, id: String) -> domain::Result<Option<Project>> {
+        let model_option = Entity::find_by_id(id).one(self.conn.as_ref()).await?;
+
+        Ok(model_option.map(Project::from))
     }
 
     async fn delete_by_id(&self, id: String) -> domain::Result<Thing> {

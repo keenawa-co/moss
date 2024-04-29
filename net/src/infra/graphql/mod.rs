@@ -3,12 +3,14 @@ mod explorer_query;
 mod metric_query;
 mod portal_query;
 mod project_query;
+mod session_query;
 
 use async_graphql::{MergedObject, MergedSubscription, Schema};
 
 use self::{
     config_query::ConfigQuery, explorer_query::ExplorerSubscription,
     metric_query::MetricSubscription, portal_query::PortalQuery, project_query::ProjectMutation,
+    session_query::SessionMutation,
 };
 use crate::domain::service::ServiceLocator;
 
@@ -16,7 +18,7 @@ use crate::domain::service::ServiceLocator;
 pub struct QueryRoot(ConfigQuery, PortalQuery);
 
 #[derive(MergedObject, Default)]
-pub struct MutationRoot(ProjectMutation);
+pub struct MutationRoot(ProjectMutation, SessionMutation);
 
 #[derive(MergedSubscription, Default)]
 pub struct RootSubscription(ExplorerSubscription, MetricSubscription);
@@ -33,7 +35,8 @@ pub fn build_schema(service_locator: ServiceLocator) -> SchemaRoot {
     .data(service_locator.portal_service)
     .data(service_locator.project_service)
     .data(service_locator.metric_service)
-    .data(service_locator.context_service)
+    .data(service_locator.session_service)
+    .data(service_locator.session_project_service)
     .finish()
 }
 

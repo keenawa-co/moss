@@ -17,7 +17,7 @@ lazy_static! {
 }
 
 lazy_static! {
-    static ref PROJECT_ROOT: FileSystemEntity = FileSystemEntity::Directory {
+    static ref ROOT: FileSystemEntity = FileSystemEntity::Directory {
         name: format!(".{}", common::APP_NAME),
         children: Some(vec![
             FileSystemEntity::Directory {
@@ -36,23 +36,15 @@ lazy_static! {
     };
 }
 
-pub struct ProjectWorkDirOutput {
-    pub project_db: DatabaseConnection,
-    pub cache_db: DatabaseConnection,
-}
-
 pub async fn create_from_scratch<P: AsRef<Path>>(
     project_path: P,
     fs: &real::FileSystem,
-) -> anyhow::Result<ProjectWorkDirOutput> {
+) -> anyhow::Result<PathBuf> {
     // TODO: check the folder for an already initialized working directory
 
-    save_on_disk(&project_path.as_ref().to_path_buf(), &PROJECT_ROOT, fs).await?;
+    save_on_disk(&project_path.as_ref().to_path_buf(), &ROOT, fs).await?;
 
-    Ok(ProjectWorkDirOutput {
-        project_db: db::open_project_conn(&project_path).await?,
-        cache_db: db::open_cache_conn(&project_path).await?,
-    })
+    Ok(project_path.as_ref().join(ROOT.name()))
 }
 
 async fn save_on_disk(

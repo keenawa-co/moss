@@ -17,6 +17,12 @@ pub struct RecentProject {
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize, InputObject)]
-pub struct NewProjectInput {
+pub struct CreateProjectInput {
     pub path: String,
+}
+
+#[derive(Debug, Clone, Deserialize, Serialize, InputObject)]
+pub struct WatchProjectInput {
+    pub project_id: MNID,
+    pub ignore_list: Option<Vec<String>>,
 }

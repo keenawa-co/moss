@@ -159,4 +159,13 @@ pub mod types {
             children: Option<Vec<FileSystemEntity>>,
         },
     }
+
+    impl FileSystemEntity {
+        pub fn name(&self) -> &String {
+            match self {
+                FileSystemEntity::File { name, .. } => name,
+                FileSystemEntity::Directory { name, .. } => name,
+            }
+        }
+    }
 }

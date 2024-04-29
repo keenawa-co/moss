@@ -4,6 +4,8 @@ use tokio_util::sync::CancellationToken as TokioCancellationToken;
 use tracing::Level;
 use tracing_subscriber::FmtSubscriber;
 
+use crate::migration::RootMigrator;
+
 #[derive(Args, Debug)]
 pub struct RunCmdArgs {
     /// Specifies the server address on which the server should listen for
@@ -59,7 +61,7 @@ pub async fn cmd_run(
     tracing::subscriber::set_global_default(subscriber)?;
 
     let conf: crate::config::Config = super::utl::load_toml_file(&net_conf_path)?;
-    let conn = super::utl::db_connection(&PathBuf::from("./")).await?;
+    let conn = dbutl::sqlite::conn::<RootMigrator>(&PathBuf::from("root.db")).await?;
 
     //  cancel_token is passed to all async functions requiring graceful termination
     let cancel_token = TokioCancellationToken::new();

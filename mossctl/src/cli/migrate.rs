@@ -1,8 +1,7 @@
 use clap::{Args, Subcommand};
-use sea_orm_migration::MigratorTrait;
 use std::path::PathBuf;
 
-use crate::migration;
+use crate::migration::RootMigrator;
 
 #[derive(Debug, Subcommand)]
 pub enum MigrateCommandList {
@@ -13,8 +12,7 @@ pub enum MigrateCommandList {
 pub struct MigrateUpCmdArgs {}
 
 pub async fn cmd_migration_up(MigrateUpCmdArgs {}: MigrateUpCmdArgs) -> anyhow::Result<()> {
-    let conn = super::utl::db_connection(&PathBuf::from("./")).await?;
-    migration::Migrator::up(&conn, None).await?;
+    dbutl::sqlite::conn::<RootMigrator>(&PathBuf::from("root.db")).await?;
 
     Ok(())
 }
