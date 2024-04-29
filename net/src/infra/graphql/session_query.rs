@@ -21,7 +21,7 @@ impl SessionMutation {
 
         let session_service_lock = session_service.write().await;
         let session = session_service_lock
-            .create_session(input.project_id, session_project_service)
+            .create_session(&input, session_project_service)
             .await?;
 
         Ok(session.into())

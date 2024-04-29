@@ -1,7 +1,10 @@
 use common::thing::Thing;
 use std::fmt::Debug;
 
-use super::model::project::{CreateProjectInput, Project, RecentProject};
+use super::model::{
+    project::{CreateProjectInput, Project, RecentProject},
+    session::{CreateSessionInput, Session},
+};
 
 #[async_trait]
 pub(crate) trait ProjectRepository: Debug + Send + Sync {
@@ -13,6 +16,11 @@ pub(crate) trait ProjectRepository: Debug + Send + Sync {
         start_time: i64,
         limit: u64,
     ) -> super::Result<Vec<RecentProject>>;
+}
+
+#[async_trait]
+pub(crate) trait SessionRepository: Debug + Send + Sync {
+    async fn create_session(&self, input: &CreateSessionInput) -> super::Result<Session>;
 }
 
 #[async_trait]

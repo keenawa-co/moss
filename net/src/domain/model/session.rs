@@ -3,6 +3,8 @@ use common::id::MNID;
 
 pub(crate) struct Session {
     pub id: MNID,
+    pub project_id: MNID,
+    pub created_at: i64,
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize, InputObject)]

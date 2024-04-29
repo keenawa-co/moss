@@ -46,7 +46,10 @@ impl From<Model> for Project {
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
-pub enum Relation {}
+pub enum Relation {
+    #[sea_orm(has_many = "super::session_repo_impl::Entity")]
+    Session,
+}
 
 impl ActiveModelBehavior for ActiveModel {}
 
