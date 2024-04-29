@@ -1,5 +1,5 @@
 use chrono::Utc;
-use common::id::MNID;
+use common::id::NanoId;
 use common::thing::Thing;
 use sea_orm::entity::prelude::*;
 use sea_orm::{DatabaseConnection, Set};
@@ -61,7 +61,7 @@ impl domain::port::ProjectRepository for ProjectRepositoryImpl {
     async fn create(&self, input: &CreateProjectInput) -> domain::Result<Project> {
         let current_timestamp = Utc::now().timestamp();
         let model = (ActiveModel {
-            id: Set(MNID::new().to_string()),
+            id: Set(NanoId::new().to_string()),
             source: Set(input.path.to_string()),
             created_at: Set(current_timestamp),
         })
@@ -71,13 +71,13 @@ impl domain::port::ProjectRepository for ProjectRepositoryImpl {
         Ok(model.into())
     }
 
-    async fn get_by_id(&self, id: MNID) -> domain::Result<Option<Project>> {
+    async fn get_by_id(&self, id: NanoId) -> domain::Result<Option<Project>> {
         let model_option = Entity::find_by_id(id).one(self.conn.as_ref()).await?;
 
         Ok(model_option.map(Project::from))
     }
 
-    async fn delete_by_id(&self, id: MNID) -> domain::Result<Thing> {
+    async fn delete_by_id(&self, id: NanoId) -> domain::Result<Thing> {
         let result = Entity::delete_by_id(id.to_string())
             .exec(self.conn.as_ref())
             .await?;
@@ -88,7 +88,7 @@ impl domain::port::ProjectRepository for ProjectRepositoryImpl {
         }
     }
 
-    async fn get_list_by_ids(&self, ids: &Vec<MNID>) -> domain::Result<Vec<Project>> {
+    async fn get_list_by_ids(&self, ids: &Vec<NanoId>) -> domain::Result<Vec<Project>> {
         let result_list = Entity::find()
             .filter(Column::Id.is_in(ids.clone()))
             .all(self.conn.as_ref())

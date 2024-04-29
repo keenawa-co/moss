@@ -1,4 +1,4 @@
-use common::{id::MNID, thing::Thing};
+use common::{id::NanoId, thing::Thing};
 use std::sync::Arc;
 
 use crate::domain::{
@@ -23,13 +23,13 @@ impl ProjectService {
         Ok(project_entity)
     }
 
-    pub async fn delete_project_by_id(&self, id: MNID) -> domain::Result<Thing> {
+    pub async fn delete_project_by_id(&self, id: NanoId) -> domain::Result<Thing> {
         let result = self.project_repo.delete_by_id(id).await?;
 
         Ok(result)
     }
 
-    pub async fn get_project_list_by_ids(&self, ids: &Vec<MNID>) -> domain::Result<Vec<Project>> {
+    pub async fn get_project_list_by_ids(&self, ids: &Vec<NanoId>) -> domain::Result<Vec<Project>> {
         Ok(self.project_repo.get_list_by_ids(ids).await?)
     }
 }

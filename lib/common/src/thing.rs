@@ -2,7 +2,7 @@
 use async_graphql::SimpleObject;
 use nanoid::nanoid;
 
-use crate::id::MNID;
+use crate::id::NanoId;
 
 const ID_SIZE: usize = 20;
 const CHAR_SET: [char; 62] = [
@@ -28,8 +28,8 @@ impl From<String> for Thing {
     }
 }
 
-impl From<MNID> for Thing {
-    fn from(value: MNID) -> Self {
+impl From<NanoId> for Thing {
+    fn from(value: NanoId) -> Self {
         Self {
             id: value.to_string(),
         }

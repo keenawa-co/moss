@@ -6,7 +6,7 @@ use std::ops::Deref;
 #[cfg(feature = "graphql")]
 use async_graphql::{Scalar, ScalarType};
 
-const MNID20: usize = 20;
+const NANO_ID20: usize = 20;
 
 const CHAR_SET: [char; 62] = [
     '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i',
@@ -18,46 +18,46 @@ const CHAR_SET: [char; 62] = [
 // TODO: implement all traits to use MNID as a SEA ORM model type
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct MNID(BoundedString<MNID20>);
+pub struct NanoId(BoundedString<NANO_ID20>);
 
-impl MNID {
+impl NanoId {
     pub fn new() -> Self {
-        let id = BoundedString::new(&nanoid!(MNID20, &CHAR_SET)).unwrap();
-        MNID(id)
+        let id = BoundedString::new(&nanoid!(NANO_ID20, &CHAR_SET)).unwrap();
+        NanoId(id)
     }
 }
 
-impl std::fmt::Display for MNID {
+impl std::fmt::Display for NanoId {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.0.inner)
     }
 }
 
-impl Into<sea_orm::Value> for MNID {
+impl Into<sea_orm::Value> for NanoId {
     fn into(self) -> sea_orm::Value {
         sea_orm::Value::String(Some(Box::new(self.0.to_string())))
     }
 }
 
-impl From<&str> for MNID {
+impl From<&str> for NanoId {
     fn from(value: &str) -> Self {
-        MNID(BoundedString::new(value).unwrap())
+        NanoId(BoundedString::new(value).unwrap())
     }
 }
 
-impl From<String> for MNID {
+impl From<String> for NanoId {
     fn from(value: String) -> Self {
-        MNID(BoundedString::new(value).unwrap())
+        NanoId(BoundedString::new(value).unwrap())
     }
 }
 
-impl AsRef<str> for MNID {
+impl AsRef<str> for NanoId {
     fn as_ref(&self) -> &str {
         self.0.as_ref()
     }
 }
 
-impl Into<String> for MNID {
+impl Into<String> for NanoId {
     fn into(self) -> String {
         self.0.inner
     }
@@ -65,11 +65,11 @@ impl Into<String> for MNID {
 
 #[cfg(feature = "graphql")]
 #[Scalar]
-impl ScalarType for MNID {
+impl ScalarType for NanoId {
     fn parse(value: async_graphql::Value) -> async_graphql::InputValueResult<Self> {
         if let async_graphql::Value::String(value) = &value {
             BoundedString::<20>::new(value)
-                .map(MNID)
+                .map(NanoId)
                 .map_err(|e| async_graphql::InputValueError::custom(e.to_string()))
         } else {
             Err(async_graphql::InputValueError::expected_type(value))

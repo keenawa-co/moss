@@ -1,5 +1,5 @@
 use async_graphql::{Context, Object, Result as GraphqlResult};
-use common::{id::MNID, thing::Thing};
+use common::{id::NanoId, thing::Thing};
 
 use crate::domain::{
     model::project::{CreateProjectInput, Project},
@@ -21,7 +21,7 @@ impl ProjectMutation {
     }
 
     #[graphql(name = "deleteProjectById")]
-    async fn delete_by_id(&self, ctx: &Context<'_>, id: MNID) -> GraphqlResult<Thing> {
+    async fn delete_by_id(&self, ctx: &Context<'_>, id: NanoId) -> GraphqlResult<Thing> {
         let project_service = ctx.data::<ProjectService>()?;
         Ok(project_service.delete_project_by_id(id).await?)
     }
@@ -30,7 +30,7 @@ impl ProjectMutation {
     async fn get_list_by_ids(
         &self,
         ctx: &Context<'_>,
-        ids: Vec<MNID>,
+        ids: Vec<NanoId>,
     ) -> GraphqlResult<Vec<Project>> {
         let project_service = ctx.data::<ProjectService>()?;
         Ok(project_service.get_project_list_by_ids(&ids).await?)

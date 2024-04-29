@@ -1,4 +1,4 @@
-use common::id::MNID;
+use common::id::NanoId;
 use std::any::Any;
 
 pub trait MessageBody: Any + Send + Sync {
@@ -6,21 +6,21 @@ pub trait MessageBody: Any + Send + Sync {
 }
 
 pub trait Message {
-    fn id(&self) -> &MNID;
+    fn id(&self) -> &NanoId;
 }
 
 pub mod simple_message {
-    use super::MNID;
+    use super::NanoId;
     use std::any::{Any, TypeId};
 
     pub struct SimpleMessage {
-        pub(crate) id: MNID,
+        pub(crate) id: NanoId,
         pub(crate) type_id: TypeId,
         pub(crate) body: Box<dyn Any + Send + Sync>,
     }
 
     impl super::Message for SimpleMessage {
-        fn id(&self) -> &MNID {
+        fn id(&self) -> &NanoId {
             &self.id
         }
     }
@@ -36,7 +36,7 @@ pub mod simple_message {
     impl SimpleMessage {
         pub fn new<T: Send + Sync + 'static>(body: Box<dyn Any + Send + Sync>) -> Self {
             Self {
-                id: MNID::new(),
+                id: NanoId::new(),
                 type_id: TypeId::of::<T>(),
                 body,
             }

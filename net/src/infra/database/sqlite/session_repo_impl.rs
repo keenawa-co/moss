@@ -1,5 +1,5 @@
 use chrono::Utc;
-use common::id::MNID;
+use common::id::NanoId;
 use sea_orm::entity::prelude::*;
 use sea_orm::{DatabaseConnection, QueryOrder, QuerySelect, Set};
 use std::sync::Arc;
@@ -67,7 +67,7 @@ impl SessionRepositoryImpl {
 impl domain::port::SessionRepository for SessionRepositoryImpl {
     async fn create(&self, input: &CreateSessionInput) -> domain::Result<Session> {
         let model = (ActiveModel {
-            id: Set(MNID::new().to_string()),
+            id: Set(NanoId::new().to_string()),
             project_id: Set(input.project_id.to_string()),
             created_at: Set(Utc::now().timestamp()),
         })

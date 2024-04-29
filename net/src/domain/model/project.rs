@@ -1,9 +1,9 @@
 use async_graphql::{InputObject, SimpleObject};
-use common::id::MNID;
+use common::id::NanoId;
 
 #[derive(Debug, Clone, Deserialize, Serialize, SimpleObject)]
 pub struct Project {
-    pub id: MNID,
+    pub id: NanoId,
     pub source: String,
     pub created_at: i64,
 }
@@ -15,6 +15,6 @@ pub struct CreateProjectInput {
 
 #[derive(Debug, Clone, Deserialize, Serialize, InputObject)]
 pub struct WatchProjectInput {
-    pub project_id: MNID,
+    pub project_id: NanoId,
     pub ignore_list: Option<Vec<String>>,
 }

@@ -1,4 +1,4 @@
-use common::{id::MNID, thing::Thing};
+use common::{id::NanoId, thing::Thing};
 use std::fmt::Debug;
 
 use super::model::{
@@ -9,9 +9,9 @@ use super::model::{
 #[async_trait]
 pub(crate) trait ProjectRepository: Debug + Send + Sync {
     async fn create(&self, input: &CreateProjectInput) -> super::Result<Project>;
-    async fn get_by_id(&self, id: MNID) -> super::Result<Option<Project>>;
-    async fn get_list_by_ids(&self, ids: &Vec<MNID>) -> super::Result<Vec<Project>>;
-    async fn delete_by_id(&self, id: MNID) -> super::Result<Thing>;
+    async fn get_by_id(&self, id: NanoId) -> super::Result<Option<Project>>;
+    async fn get_list_by_ids(&self, ids: &Vec<NanoId>) -> super::Result<Vec<Project>>;
+    async fn delete_by_id(&self, id: NanoId) -> super::Result<Thing>;
 }
 
 #[async_trait]
