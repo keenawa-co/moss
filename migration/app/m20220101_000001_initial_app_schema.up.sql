@@ -1,7 +1,6 @@
 CREATE TABLE project (
     id VARCHAR(20) PRIMARY KEY NOT NULL,
     source TEXT UNIQUE NOT NULL,
-    last_used_at TIMESTAMP NOT NULL,
     created_at TIMESTAMP NOT NULL
 );
 

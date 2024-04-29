@@ -77,7 +77,7 @@ pub async fn bind(_: TokioCancellationToken) -> Result<(), domain::Error> {
             sqlite_db.session_repo(),
         )),
         config_service: ConfigService::new(conf.preference.clone()),
-        project_service: ProjectService::new(realfs.clone(), sqlite_db.project_repo()),
+        project_service: ProjectService::new(sqlite_db.project_repo()),
         metric_service: MetricService::new(Arc::new(pe)),
         session_project_service: RwLock::new(None),
     };

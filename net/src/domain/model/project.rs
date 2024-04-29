@@ -5,15 +5,7 @@ use common::id::MNID;
 pub struct Project {
     pub id: MNID,
     pub source: String,
-    pub last_used_at: i64,
     pub created_at: i64,
-}
-
-#[derive(Debug, Clone, Deserialize, Serialize, SimpleObject)]
-pub struct RecentProject {
-    pub id: MNID,
-    pub source: String,
-    pub last_used_at: i64,
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize, InputObject)]

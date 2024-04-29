@@ -65,7 +65,7 @@ impl SessionRepositoryImpl {
 
 #[async_trait]
 impl domain::port::SessionRepository for SessionRepositoryImpl {
-    async fn create_session(&self, input: &CreateSessionInput) -> domain::Result<Session> {
+    async fn create(&self, input: &CreateSessionInput) -> domain::Result<Session> {
         let model = (ActiveModel {
             id: Set(MNID::new().to_string()),
             project_id: Set(input.project_id.to_string()),

@@ -42,10 +42,10 @@ impl SessionService {
     ) -> domain::Result<Session> {
         let project_entity = self
             .project_repo
-            .get_project_by_id(input.project_id.to_string())
+            .get_by_id(input.project_id.clone())
             .await?
             .ok_or_else(|| internal!("project with id {} not found", input.project_id))?;
-        let session_entity = self.session_repo.create_session(input).await?;
+        let session_entity = self.session_repo.create(input).await?;
 
         {
             let project_db_client = {

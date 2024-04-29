@@ -852,6 +852,7 @@ dependencies = [
  "anyhow",
  "async-graphql",
  "nanoid",
+ "sea-orm",
  "serde",
 ]
 

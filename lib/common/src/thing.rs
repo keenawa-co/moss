@@ -2,6 +2,8 @@
 use async_graphql::SimpleObject;
 use nanoid::nanoid;
 
+use crate::id::MNID;
+
 const ID_SIZE: usize = 20;
 const CHAR_SET: [char; 62] = [
     '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i',
@@ -23,6 +25,14 @@ pub struct Thing {
 impl From<String> for Thing {
     fn from(value: String) -> Self {
         Self { id: value }
+    }
+}
+
+impl From<MNID> for Thing {
+    fn from(value: MNID) -> Self {
+        Self {
+            id: value.to_string(),
+        }
     }
 }
 

@@ -33,6 +33,12 @@ impl std::fmt::Display for MNID {
     }
 }
 
+impl Into<sea_orm::Value> for MNID {
+    fn into(self) -> sea_orm::Value {
+        sea_orm::Value::String(Some(Box::new(self.0.to_string())))
+    }
+}
+
 impl From<&str> for MNID {
     fn from(value: &str) -> Self {
         MNID(BoundedString::new(value).unwrap())
