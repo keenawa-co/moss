@@ -3,24 +3,13 @@ mod infra;
 
 pub mod config;
 
+pub use config::{Config, CONF};
+pub use infra::graphql::sdl;
+
 use analysis::policy_engine::PolicyEngine;
 use bus::topic::TopicConfig;
 use common::APP_NAME;
 use fs::{fw::FileWatcher, real, FS};
-
-pub use config::{Config, CONF};
-pub use infra::graphql::sdl;
-
-#[macro_use]
-extern crate async_trait;
-
-#[macro_use]
-extern crate serde;
-extern crate serde_json;
-
-#[macro_use]
-extern crate tracing;
-
 use std::sync::Arc;
 use tokio::sync::RwLock;
 use tokio_util::sync::CancellationToken as TokioCancellationToken;
@@ -36,10 +25,20 @@ use tower_http::{
 
 use crate::{
     domain::service::{
-        ConfigService, MetricService, PortalService, ProjectService, ServiceLocator, SessionService,
+        ConfigService, MetricService, ProjectService, ServiceLocator, SessionService,
     },
     infra::database::sqlite::RootDatabaseClient,
 };
+
+#[macro_use]
+extern crate async_trait;
+
+#[macro_use]
+extern crate serde;
+extern crate serde_json;
+
+#[macro_use]
+extern crate tracing;
 
 const MIX_COMPRESS_SIZE: u16 = 512; // TODO: this value should be used from a net_conf.toml file
 
@@ -77,7 +76,6 @@ pub async fn bind(_: TokioCancellationToken) -> Result<(), domain::Error> {
             sqlite_db.project_repo(),
             sqlite_db.session_repo(),
         )),
-        portal_service: PortalService::new(sqlite_db.project_repo()),
         config_service: ConfigService::new(conf.preference.clone()),
         project_service: ProjectService::new(realfs.clone(), sqlite_db.project_repo()),
         metric_service: MetricService::new(Arc::new(pe)),

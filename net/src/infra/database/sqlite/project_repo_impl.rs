@@ -14,7 +14,7 @@ use crate::domain::{
 // Entity model definition for `project` table (root database)
 //
 
-#[derive(Clone, Debug, PartialEq, Eq, DeriveEntityModel, Serialize, Deserialize)]
+#[derive(Clone, Debug, PartialEq, Eq, DeriveEntityModel)]
 #[sea_orm(table_name = "project")]
 pub struct Model {
     #[sea_orm(primary_key, auto_increment = false)]

@@ -1,4 +1,3 @@
-use common::id::MNID;
 use fs::real;
 use std::{path::PathBuf, sync::Arc};
 use tokio::sync::RwLock;
@@ -6,7 +5,7 @@ use tokio::sync::RwLock;
 use crate::{
     domain::{
         self,
-        model::session::{self, CreateSessionInput, Session},
+        model::session::{CreateSessionInput, Session},
         port::{ProjectRepository, SessionRepository},
     },
     infra::database::sqlite::{ProjectDatabaseClient, ProjectMigrator},
@@ -68,5 +67,13 @@ impl SessionService {
         }
 
         Ok(session_entity)
+    }
+
+    pub async fn get_recent_list(
+        &self,
+        start_time: i64,
+        limit: u64,
+    ) -> domain::Result<Vec<Session>> {
+        Ok(self.session_repo.get_recent_list(start_time, limit).await?)
     }
 }

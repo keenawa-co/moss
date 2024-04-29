@@ -21,6 +21,7 @@ pub(crate) trait ProjectRepository: Debug + Send + Sync {
 #[async_trait]
 pub(crate) trait SessionRepository: Debug + Send + Sync {
     async fn create_session(&self, input: &CreateSessionInput) -> super::Result<Session>;
+    async fn get_recent_list(&self, start_time: i64, limit: u64) -> super::Result<Vec<Session>>;
 }
 
 #[async_trait]

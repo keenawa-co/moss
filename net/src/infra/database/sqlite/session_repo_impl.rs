@@ -76,4 +76,15 @@ impl domain::port::SessionRepository for SessionRepositoryImpl {
 
         Ok(model.into())
     }
+
+    async fn get_recent_list(&self, start_time: i64, limit: u64) -> domain::Result<Vec<Session>> {
+        let result = Entity::find()
+            .filter(Column::CreatedAt.gte(start_time))
+            .order_by_desc(Column::CreatedAt)
+            .limit(limit)
+            .all(self.conn.as_ref())
+            .await?;
+
+        Ok(result.into_iter().map(|item| item.into()).collect())
+    }
 }
