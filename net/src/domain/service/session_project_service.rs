@@ -1,13 +1,15 @@
 use std::sync::Arc;
 
-use crate::domain::port::WatchListRepository;
+use crate::domain::port::IgnoreRepository;
 
 pub struct SessionProjectService {
-    watch_list_repo: Arc<dyn WatchListRepository>,
+    ignore_repo: Arc<dyn IgnoreRepository>,
 }
 
 impl SessionProjectService {
-    pub fn new(watch_list_repo: Arc<dyn WatchListRepository>) -> Self {
-        Self { watch_list_repo }
+    pub fn new(ignore_repo: Arc<dyn IgnoreRepository>) -> Self {
+        Self {
+            ignore_repo: ignore_repo,
+        }
     }
 }

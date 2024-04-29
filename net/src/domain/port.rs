@@ -21,4 +21,4 @@ pub(crate) trait SessionRepository: Debug + Send + Sync {
 }
 
 #[async_trait]
-pub(crate) trait WatchListRepository: Debug + Send + Sync {}
+pub(crate) trait IgnoreRepository: Debug + Send + Sync {}

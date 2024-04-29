@@ -1,4 +1,4 @@
-CREATE TABLE watch_list (
+CREATE TABLE ignore (
     id VARCHAR(20) PRIMARY KEY NOT NULL,
     source TEXT UNIQUE NOT NULL
 );

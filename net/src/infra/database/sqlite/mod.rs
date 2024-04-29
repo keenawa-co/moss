@@ -1,9 +1,8 @@
-mod migrate;
 mod migration;
 
+mod ignore_repo_impl;
 mod project_repo_impl;
 mod session_repo_impl;
-mod watch_list_repo_impl;
 
 pub(crate) use migration::ProjectMigrator;
 
@@ -11,8 +10,8 @@ use sea_orm::DatabaseConnection;
 use std::sync::Arc;
 
 use self::{
-    project_repo_impl::ProjectRepositoryImpl, session_repo_impl::SessionRepositoryImpl,
-    watch_list_repo_impl::WatchListRepositoryImpl,
+    ignore_repo_impl::WatchListRepositoryImpl, project_repo_impl::ProjectRepositoryImpl,
+    session_repo_impl::SessionRepositoryImpl,
 };
 
 pub struct RootDatabaseClient {

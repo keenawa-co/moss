@@ -36,4 +36,4 @@ impl WatchListRepositoryImpl {
     }
 }
 
-impl domain::port::WatchListRepository for WatchListRepositoryImpl {}
+impl domain::port::IgnoreRepository for WatchListRepositoryImpl {}
