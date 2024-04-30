@@ -4,6 +4,8 @@ CREATE TABLE project (
     created_at TIMESTAMP NOT NULL
 );
 
+CREATE INDEX idx_source ON project(source);
+
 CREATE TABLE session (
     id VARCHAR(20) PRIMARY KEY NOT NULL,
     project_id VARCHAR(20) NOT NULL,

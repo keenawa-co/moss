@@ -11,6 +11,7 @@ pub struct Project {
 #[derive(Debug, Clone, Deserialize, Serialize, InputObject)]
 pub struct CreateProjectInput {
     pub path: String,
+    pub ignore_list: Option<Vec<String>>,
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize, InputObject)]

@@ -10,5 +10,5 @@ pub(crate) struct Session {
 
 #[derive(Debug, Clone, Deserialize, Serialize, InputObject)]
 pub(crate) struct CreateSessionInput {
-    pub project_id: NanoId,
+    pub project_source: String,
 }

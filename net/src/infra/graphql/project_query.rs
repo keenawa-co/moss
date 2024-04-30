@@ -17,6 +17,7 @@ impl ProjectMutation {
         input: CreateProjectInput,
     ) -> GraphqlResult<Project> {
         let project_service = ctx.data::<ProjectService>()?;
+
         Ok(project_service.create_project(&input).await?)
     }
 

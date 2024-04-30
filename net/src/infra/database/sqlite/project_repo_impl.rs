@@ -77,6 +77,15 @@ impl domain::port::ProjectRepository for ProjectRepositoryImpl {
         Ok(model_option.map(Project::from))
     }
 
+    async fn get_by_source(&self, source: String) -> domain::Result<Option<Project>> {
+        let model_option = Entity::find()
+            .filter(Column::Source.eq(source))
+            .one(self.conn.as_ref())
+            .await?;
+
+        Ok(model_option.map(Project::from))
+    }
+
     async fn delete_by_id(&self, id: NanoId) -> domain::Result<Thing> {
         let result = Entity::delete_by_id(id.to_string())
             .exec(self.conn.as_ref())

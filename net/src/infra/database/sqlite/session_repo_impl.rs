@@ -65,10 +65,10 @@ impl SessionRepositoryImpl {
 
 #[async_trait]
 impl domain::port::SessionRepository for SessionRepositoryImpl {
-    async fn create(&self, input: &CreateSessionInput) -> domain::Result<Session> {
+    async fn create(&self, project_id: NanoId) -> domain::Result<Session> {
         let model = (ActiveModel {
             id: Set(NanoId::new().to_string()),
-            project_id: Set(input.project_id.to_string()),
+            project_id: Set(project_id.to_string()),
             created_at: Set(Utc::now().timestamp()),
         })
         .insert(self.conn.as_ref())
