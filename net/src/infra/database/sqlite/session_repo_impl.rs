@@ -5,7 +5,8 @@ use sea_orm::{DatabaseConnection, QueryOrder, QuerySelect, Set};
 use std::sync::Arc;
 
 use crate::domain;
-use crate::domain::model::session::Session;
+use crate::domain::model::project::ProjectMeta;
+use crate::domain::model::session::{Session, SessionInfo};
 
 //
 // Entity model definition for `session` table (root database)
@@ -20,9 +21,23 @@ pub struct Model {
     pub created_at: i64,
 }
 
-impl From<Model> for Session {
-    fn from(value: Model) -> Self {
+impl From<(Model, super::project_meta_repo_impl::Model)> for Session {
+    fn from(data: (Model, super::project_meta_repo_impl::Model)) -> Self {
         Session {
+            id: data.0.id.into(),
+            project_meta: ProjectMeta {
+                id: data.1.id.into(),
+                source: data.1.source,
+                created_at: data.1.created_at,
+            },
+            created_at: data.0.created_at,
+        }
+    }
+}
+
+impl From<Model> for SessionInfo {
+    fn from(value: Model) -> Self {
+        SessionInfo {
             id: value.id.into(),
             project_meta_id: value.project_meta_id.into(),
             created_at: value.created_at,
@@ -65,7 +80,7 @@ impl SessionRepositoryImpl {
 
 #[async_trait]
 impl domain::port::SessionRepository for SessionRepositoryImpl {
-    async fn create(&self, project_id: NanoId) -> domain::Result<Session> {
+    async fn create(&self, project_id: NanoId) -> domain::Result<SessionInfo> {
         let model = (ActiveModel {
             id: Set(NanoId::new().to_string()),
             project_meta_id: Set(project_id.to_string()),
@@ -82,9 +97,13 @@ impl domain::port::SessionRepository for SessionRepositoryImpl {
             .filter(Column::CreatedAt.gte(start_time))
             .order_by_desc(Column::CreatedAt)
             .limit(limit)
+            .find_also_related(super::project_meta_repo_impl::Entity)
             .all(self.conn.as_ref())
             .await?;
 
-        Ok(result.into_iter().map(|item| item.into()).collect())
+        Ok(result
+            .into_iter()
+            .map(|(session, project_meta)| (session, project_meta.unwrap()).into())
+            .collect())
     }
 }

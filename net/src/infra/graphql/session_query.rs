@@ -3,7 +3,7 @@ use chrono::{Duration, Utc};
 use tokio::sync::RwLock;
 
 use crate::domain::{
-    model::session::{CreateSessionInput, Session},
+    model::session::{CreateSessionInput, Session, SessionInfo},
     service::{ProjectService, SessionService},
 };
 
@@ -16,7 +16,7 @@ impl SessionMutation {
         &self,
         ctx: &Context<'_>,
         input: CreateSessionInput,
-    ) -> GraphqlResult<Session> {
+    ) -> GraphqlResult<SessionInfo> {
         let session_service = ctx.data::<RwLock<SessionService>>()?;
         let session_project_service = ctx.data::<RwLock<Option<ProjectService>>>()?;
 

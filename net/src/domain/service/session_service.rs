@@ -5,7 +5,7 @@ use tokio::sync::RwLock;
 use crate::{
     domain::{
         self,
-        model::session::{CreateSessionInput, Session},
+        model::session::{CreateSessionInput, Session, SessionInfo},
         port::{ProjectMetaRepository, SessionRepository},
     },
     infra::database::sqlite::{ProjectDatabaseClient, ProjectMigrator},
@@ -39,7 +39,7 @@ impl SessionService {
         &self,
         input: &CreateSessionInput,
         session_project_service: &RwLock<Option<ProjectService>>,
-    ) -> domain::Result<Session> {
+    ) -> domain::Result<SessionInfo> {
         let project_entity = self
             .project_repo
             .get_by_source(input.project_source.clone())
