@@ -5,7 +5,7 @@ use sea_orm::{DatabaseConnection, QueryOrder, QuerySelect, Set};
 use std::sync::Arc;
 
 use crate::domain;
-use crate::domain::model::session::{CreateSessionInput, Session};
+use crate::domain::model::session::Session;
 
 //
 // Entity model definition for `session` table (root database)
@@ -16,7 +16,7 @@ use crate::domain::model::session::{CreateSessionInput, Session};
 pub struct Model {
     #[sea_orm(primary_key, auto_increment = false)]
     pub id: String,
-    pub project_id: String,
+    pub project_meta_id: String,
     pub created_at: i64,
 }
 
@@ -24,7 +24,7 @@ impl From<Model> for Session {
     fn from(value: Model) -> Self {
         Session {
             id: value.id.into(),
-            project_id: value.project_id.into(),
+            project_meta_id: value.project_meta_id.into(),
             created_at: value.created_at,
         }
     }
@@ -33,16 +33,16 @@ impl From<Model> for Session {
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
 pub enum Relation {
     #[sea_orm(
-        belongs_to = "super::project_repo_impl::Entity",
-        from = "Column::ProjectId",
-        to = "super::project_repo_impl::Column::Id"
+        belongs_to = "super::project_meta_repo_impl::Entity",
+        from = "Column::ProjectMetaId",
+        to = "super::project_meta_repo_impl::Column::Id"
     )]
-    Project,
+    ProjectMeta,
 }
 
-impl Related<super::project_repo_impl::Entity> for Entity {
+impl Related<super::project_meta_repo_impl::Entity> for Entity {
     fn to() -> RelationDef {
-        Relation::Project.def()
+        Relation::ProjectMeta.def()
     }
 }
 
@@ -68,7 +68,7 @@ impl domain::port::SessionRepository for SessionRepositoryImpl {
     async fn create(&self, project_id: NanoId) -> domain::Result<Session> {
         let model = (ActiveModel {
             id: Set(NanoId::new().to_string()),
-            project_id: Set(project_id.to_string()),
+            project_meta_id: Set(project_id.to_string()),
             created_at: Set(Utc::now().timestamp()),
         })
         .insert(self.conn.as_ref())

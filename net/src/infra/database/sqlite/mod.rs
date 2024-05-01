@@ -1,7 +1,7 @@
 mod migration;
 
 mod ignore_repo_impl;
-mod project_repo_impl;
+mod project_meta_repo_impl;
 mod session_repo_impl;
 
 pub(crate) use migration::ProjectMigrator;
@@ -10,24 +10,24 @@ use sea_orm::DatabaseConnection;
 use std::sync::Arc;
 
 use self::{
-    ignore_repo_impl::WatchListRepositoryImpl, project_repo_impl::ProjectRepositoryImpl,
+    ignore_repo_impl::WatchListRepositoryImpl, project_meta_repo_impl::ProjectMetaRepositoryImpl,
     session_repo_impl::SessionRepositoryImpl,
 };
 
 pub struct RootDatabaseClient {
-    project_repo: Arc<ProjectRepositoryImpl>,
+    project_repo: Arc<ProjectMetaRepositoryImpl>,
     session_repo: Arc<SessionRepositoryImpl>,
 }
 
 impl RootDatabaseClient {
     pub(crate) fn new(conn: Arc<DatabaseConnection>) -> Self {
         Self {
-            project_repo: Arc::new(ProjectRepositoryImpl::new(conn.clone())),
+            project_repo: Arc::new(ProjectMetaRepositoryImpl::new(conn.clone())),
             session_repo: Arc::new(SessionRepositoryImpl::new(conn.clone())),
         }
     }
 
-    pub(crate) fn project_repo(&self) -> Arc<ProjectRepositoryImpl> {
+    pub(crate) fn project_repo(&self) -> Arc<ProjectMetaRepositoryImpl> {
         self.project_repo.clone()
     }
 

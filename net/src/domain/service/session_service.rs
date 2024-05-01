@@ -6,24 +6,24 @@ use crate::{
     domain::{
         self,
         model::session::{CreateSessionInput, Session},
-        port::{ProjectRepository, SessionRepository},
+        port::{ProjectMetaRepository, SessionRepository},
     },
     infra::database::sqlite::{ProjectDatabaseClient, ProjectMigrator},
     internal,
 };
 
-use super::SessionProjectService;
+use super::ProjectService;
 
 pub struct SessionService {
     realfs: Arc<real::FileSystem>,
-    project_repo: Arc<dyn ProjectRepository>,
+    project_repo: Arc<dyn ProjectMetaRepository>,
     session_repo: Arc<dyn SessionRepository>,
 }
 
 impl SessionService {
     pub fn new(
         realfs: Arc<real::FileSystem>,
-        project_repo: Arc<dyn ProjectRepository>,
+        project_repo: Arc<dyn ProjectMetaRepository>,
         session_repo: Arc<dyn SessionRepository>,
     ) -> Self {
         Self {
@@ -38,7 +38,7 @@ impl SessionService {
     pub async fn create_session(
         &self,
         input: &CreateSessionInput,
-        session_project_service: &RwLock<Option<SessionProjectService>>,
+        session_project_service: &RwLock<Option<ProjectService>>,
     ) -> domain::Result<Session> {
         let project_entity = self
             .project_repo
@@ -46,6 +46,14 @@ impl SessionService {
             .await?
             .ok_or_else(|| internal!("project with source {} not found", input.project_source))?;
         let session_entity = self.session_repo.create(project_entity.id).await?;
+
+        let project_path = PathBuf::from(&input.project_source);
+        if !project_path.exists() {
+            return Err(internal!(
+                "project with source {} is exists in the database but not found on your filesystem",
+                input.project_source
+            ));
+        }
 
         {
             let project_db_client = {
@@ -61,9 +69,8 @@ impl SessionService {
             };
 
             let mut session_project_service_lock = session_project_service.write().await;
-            *session_project_service_lock = Some(SessionProjectService::new(
-                project_db_client.watch_list_repo(),
-            ));
+            *session_project_service_lock =
+                Some(ProjectService::new(project_db_client.watch_list_repo()));
         }
 
         Ok(session_entity)

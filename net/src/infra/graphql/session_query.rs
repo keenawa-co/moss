@@ -4,7 +4,7 @@ use tokio::sync::RwLock;
 
 use crate::domain::{
     model::session::{CreateSessionInput, Session},
-    service::{SessionProjectService, SessionService},
+    service::{ProjectService, SessionService},
 };
 
 #[derive(Default)]
@@ -18,7 +18,7 @@ impl SessionMutation {
         input: CreateSessionInput,
     ) -> GraphqlResult<Session> {
         let session_service = ctx.data::<RwLock<SessionService>>()?;
-        let session_project_service = ctx.data::<RwLock<Option<SessionProjectService>>>()?;
+        let session_project_service = ctx.data::<RwLock<Option<ProjectService>>>()?;
 
         let session_service_lock = session_service.write().await;
         let session = session_service_lock

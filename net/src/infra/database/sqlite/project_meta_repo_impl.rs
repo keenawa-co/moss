@@ -7,15 +7,15 @@ use std::sync::Arc;
 
 use crate::domain::{
     self,
-    model::project::{CreateProjectInput, Project},
+    model::project::{CreateProjectInput, ProjectMeta},
 };
 
 //
-// Entity model definition for `project` table (root database)
+// Entity model definition for `project_meta` table (root database)
 //
 
 #[derive(Clone, Debug, PartialEq, Eq, DeriveEntityModel)]
-#[sea_orm(table_name = "project")]
+#[sea_orm(table_name = "project_meta")]
 pub struct Model {
     #[sea_orm(primary_key, auto_increment = false)]
     pub id: String,
@@ -23,9 +23,9 @@ pub struct Model {
     pub created_at: i64,
 }
 
-impl From<Model> for Project {
+impl From<Model> for ProjectMeta {
     fn from(value: Model) -> Self {
-        Project {
+        ProjectMeta {
             id: value.id.into(),
             source: value.source,
             created_at: value.created_at,
@@ -46,19 +46,19 @@ impl ActiveModelBehavior for ActiveModel {}
 //
 
 #[derive(Debug)]
-pub(crate) struct ProjectRepositoryImpl {
+pub(crate) struct ProjectMetaRepositoryImpl {
     conn: Arc<DatabaseConnection>,
 }
 
-impl ProjectRepositoryImpl {
+impl ProjectMetaRepositoryImpl {
     pub(super) fn new(conn: Arc<DatabaseConnection>) -> Self {
         Self { conn }
     }
 }
 
 #[async_trait]
-impl domain::port::ProjectRepository for ProjectRepositoryImpl {
-    async fn create(&self, input: &CreateProjectInput) -> domain::Result<Project> {
+impl domain::port::ProjectMetaRepository for ProjectMetaRepositoryImpl {
+    async fn create(&self, input: &CreateProjectInput) -> domain::Result<ProjectMeta> {
         let current_timestamp = Utc::now().timestamp();
         let model = (ActiveModel {
             id: Set(NanoId::new().to_string()),
@@ -71,19 +71,19 @@ impl domain::port::ProjectRepository for ProjectRepositoryImpl {
         Ok(model.into())
     }
 
-    async fn get_by_id(&self, id: NanoId) -> domain::Result<Option<Project>> {
+    async fn get_by_id(&self, id: NanoId) -> domain::Result<Option<ProjectMeta>> {
         let model_option = Entity::find_by_id(id).one(self.conn.as_ref()).await?;
 
-        Ok(model_option.map(Project::from))
+        Ok(model_option.map(ProjectMeta::from))
     }
 
-    async fn get_by_source(&self, source: String) -> domain::Result<Option<Project>> {
+    async fn get_by_source(&self, source: String) -> domain::Result<Option<ProjectMeta>> {
         let model_option = Entity::find()
             .filter(Column::Source.eq(source))
             .one(self.conn.as_ref())
             .await?;
 
-        Ok(model_option.map(Project::from))
+        Ok(model_option.map(ProjectMeta::from))
     }
 
     async fn delete_by_id(&self, id: NanoId) -> domain::Result<Thing> {
@@ -97,7 +97,7 @@ impl domain::port::ProjectRepository for ProjectRepositoryImpl {
         }
     }
 
-    async fn get_list_by_ids(&self, ids: &Vec<NanoId>) -> domain::Result<Vec<Project>> {
+    async fn get_list_by_ids(&self, ids: &Vec<NanoId>) -> domain::Result<Vec<ProjectMeta>> {
         let result_list = Entity::find()
             .filter(Column::Id.is_in(ids.clone()))
             .all(self.conn.as_ref())

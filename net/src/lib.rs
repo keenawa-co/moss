@@ -25,7 +25,7 @@ use tower_http::{
 
 use crate::{
     domain::service::{
-        ConfigService, MetricService, ProjectService, ServiceLocator, SessionService,
+        ConfigService, MetricService, ProjectMetaService, ServiceLocator, SessionService,
     },
     infra::database::sqlite::RootDatabaseClient,
 };
@@ -77,9 +77,9 @@ pub async fn bind(_: TokioCancellationToken) -> Result<(), domain::Error> {
             sqlite_db.session_repo(),
         )),
         config_service: ConfigService::new(conf.preference.clone()),
-        project_service: ProjectService::new(sqlite_db.project_repo()),
+        project_meta_service: ProjectMetaService::new(sqlite_db.project_repo()),
         metric_service: MetricService::new(Arc::new(pe)),
-        session_project_service: RwLock::new(None),
+        project_service: RwLock::new(None),
     };
 
     let service = ServiceBuilder::new()
