@@ -45,7 +45,7 @@ const MIX_COMPRESS_SIZE: u16 = 512; // TODO: this value should be used from a ne
 pub async fn bind(_: TokioCancellationToken) -> Result<(), domain::Error> {
     let conf = CONF
         .get()
-        .ok_or_else(|| domain::Error::Internal("configuration was not defined".to_string()))?;
+        .ok_or_else(|| internal!("configuration was not defined"))?;
 
     let b = bus::Bus::new();
 
@@ -73,11 +73,11 @@ pub async fn bind(_: TokioCancellationToken) -> Result<(), domain::Error> {
     let service_locator = ServiceLocator {
         session_service: RwLock::new(SessionService::new(
             realfs.clone(),
-            sqlite_db.project_repo(),
             sqlite_db.session_repo(),
+            sqlite_db.project_meta_repo(),
         )),
         config_service: ConfigService::new(conf.preference.clone()),
-        project_meta_service: ProjectMetaService::new(sqlite_db.project_repo()),
+        project_meta_service: ProjectMetaService::new(sqlite_db.project_meta_repo()),
         metric_service: MetricService::new(Arc::new(pe)),
         project_service: RwLock::new(None),
     };

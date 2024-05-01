@@ -1,9 +1,11 @@
 {
   "rust-analyzer.showUnlinkedFileNotification": false,
   "cSpell.words": [
+    "canonicalize",
     "chrono",
     "dbutl",
     "disp",
+    "gqlutl",
     "graphiql",
     "inmem",
     "inmemdb",

@@ -1,5 +1,6 @@
 use async_graphql::{InputObject, SimpleObject};
 use common::id::NanoId;
+use gqlutl::path::Path as PathGraphQL;
 
 #[derive(Debug, Clone, Deserialize, Serialize, SimpleObject)]
 pub struct ProjectMeta {
@@ -10,6 +11,6 @@ pub struct ProjectMeta {
 
 #[derive(Debug, Clone, Deserialize, Serialize, InputObject)]
 pub struct CreateProjectInput {
-    pub path: String,
+    pub path: PathGraphQL,
     pub ignore_list: Option<Vec<String>>,
 }

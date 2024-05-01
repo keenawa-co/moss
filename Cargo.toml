@@ -12,6 +12,7 @@ members = [
     "lib/conf",
     "lib/dbutl",
     "lib/file",
+    "lib/gqlutl",
     "lib/mac",
     "lib/pwd",
     "mossctl",
@@ -44,6 +45,7 @@ file = { path = "lib/file" }
 common = { path = "lib/common" }
 analysis = { path = "lib/analysis" }
 dbutl = { path = "lib/dbutl" }
+gqlutl = { path = "lib/gqlutl" }
 
 mossctl = { path = "mossctl" }
 net = { path = "net" }

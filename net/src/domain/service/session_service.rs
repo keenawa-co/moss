@@ -9,26 +9,26 @@ use crate::{
         port::{ProjectMetaRepository, SessionRepository},
     },
     infra::database::sqlite::{ProjectDatabaseClient, ProjectMigrator},
-    internal,
+    not_found,
 };
 
 use super::ProjectService;
 
 pub struct SessionService {
     realfs: Arc<real::FileSystem>,
-    project_repo: Arc<dyn ProjectMetaRepository>,
     session_repo: Arc<dyn SessionRepository>,
+    project_meta_repo: Arc<dyn ProjectMetaRepository>,
 }
 
 impl SessionService {
     pub fn new(
         realfs: Arc<real::FileSystem>,
-        project_repo: Arc<dyn ProjectMetaRepository>,
         session_repo: Arc<dyn SessionRepository>,
+        project_meta_repo: Arc<dyn ProjectMetaRepository>,
     ) -> Self {
         Self {
             realfs,
-            project_repo,
+            project_meta_repo,
             session_repo,
         }
     }
@@ -38,19 +38,24 @@ impl SessionService {
     pub async fn create_session(
         &self,
         input: &CreateSessionInput,
-        session_project_service: &RwLock<Option<ProjectService>>,
+        project_service: &RwLock<Option<ProjectService>>,
     ) -> domain::Result<SessionInfo> {
-        let project_entity = self
-            .project_repo
-            .get_by_source(input.project_source.clone())
+        let project_meta_entity = self
+            .project_meta_repo
+            .get_by_source(input.project_source.canonicalize()?)
             .await?
-            .ok_or_else(|| internal!("project with source {} not found", input.project_source))?;
-        let session_entity = self.session_repo.create(project_entity.id).await?;
+            .ok_or_else(|| {
+                not_found!(
+                    "project with source {} does not exist",
+                    input.project_source
+                )
+            })?;
+        let session_entity = self.session_repo.create(project_meta_entity.id).await?;
 
         let project_path = PathBuf::from(&input.project_source);
         if !project_path.exists() {
-            return Err(internal!(
-                "project with source {} is exists in the database but not found on your filesystem",
+            return Err(not_found!(
+                "project {} is not found on your filesystem",
                 input.project_source
             ));
         }
@@ -58,7 +63,7 @@ impl SessionService {
         {
             let project_db_client = {
                 let project_path = pwd::init::create_from_scratch(
-                    &PathBuf::from(&format!("{}/.moss", project_entity.source)),
+                    &PathBuf::from(&format!("{}/.moss", project_meta_entity.source)),
                     &self.realfs,
                 )
                 .await?;
@@ -68,9 +73,8 @@ impl SessionService {
                 ProjectDatabaseClient::new(Arc::new(conn))
             };
 
-            let mut session_project_service_lock = session_project_service.write().await;
-            *session_project_service_lock =
-                Some(ProjectService::new(project_db_client.watch_list_repo()));
+            let mut project_service_lock = project_service.write().await;
+            *project_service_lock = Some(ProjectService::new(project_db_client.watch_list_repo()));
         }
 
         Ok(session_entity)

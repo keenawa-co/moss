@@ -27,7 +27,7 @@ impl RootDatabaseClient {
         }
     }
 
-    pub(crate) fn project_repo(&self) -> Arc<ProjectMetaRepositoryImpl> {
+    pub(crate) fn project_meta_repo(&self) -> Arc<ProjectMetaRepositoryImpl> {
         self.project_repo.clone()
     }
 

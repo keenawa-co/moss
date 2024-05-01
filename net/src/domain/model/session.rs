@@ -1,5 +1,6 @@
 use async_graphql::{InputObject, SimpleObject};
 use common::id::NanoId;
+use gqlutl::path::Path as PathGraphQL;
 
 use super::project::ProjectMeta;
 
@@ -19,5 +20,5 @@ pub(crate) struct SessionInfo {
 
 #[derive(Debug, Clone, Deserialize, Serialize, InputObject)]
 pub(crate) struct CreateSessionInput {
-    pub project_source: String,
+    pub project_source: PathGraphQL,
 }

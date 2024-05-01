@@ -3,6 +3,7 @@ use common::id::NanoId;
 use common::thing::Thing;
 use sea_orm::entity::prelude::*;
 use sea_orm::{DatabaseConnection, Set};
+use std::path::PathBuf;
 use std::sync::Arc;
 
 use crate::domain::{
@@ -62,7 +63,7 @@ impl domain::port::ProjectMetaRepository for ProjectMetaRepositoryImpl {
         let current_timestamp = Utc::now().timestamp();
         let model = (ActiveModel {
             id: Set(NanoId::new().to_string()),
-            source: Set(input.path.to_string()),
+            source: Set(input.path.canonicalize()?.to_string_lossy().to_string()),
             created_at: Set(current_timestamp),
         })
         .insert(self.conn.as_ref())
@@ -77,9 +78,9 @@ impl domain::port::ProjectMetaRepository for ProjectMetaRepositoryImpl {
         Ok(model_option.map(ProjectMeta::from))
     }
 
-    async fn get_by_source(&self, source: String) -> domain::Result<Option<ProjectMeta>> {
+    async fn get_by_source(&self, source: PathBuf) -> domain::Result<Option<ProjectMeta>> {
         let model_option = Entity::find()
-            .filter(Column::Source.eq(source))
+            .filter(Column::Source.eq(source.to_str()))
             .one(self.conn.as_ref())
             .await?;
 
