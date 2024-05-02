@@ -10,7 +10,7 @@ use analysis::policy_engine::PolicyEngine;
 use bus::topic::TopicConfig;
 use common::APP_NAME;
 use fs::{fw::FileWatcher, real, FS};
-use std::sync::Arc;
+use std::{path::PathBuf, sync::Arc};
 use tokio::sync::RwLock;
 use tokio_util::sync::CancellationToken as TokioCancellationToken;
 use tower::ServiceBuilder;
@@ -25,7 +25,11 @@ use tower_http::{
 
 use crate::{
     domain::service::{
-        ConfigService, MetricService, ProjectMetaService, ServiceLocator, SessionService,
+        config_service::ConfigService,
+        metric_service::MetricService,
+        project_meta_service::ProjectMetaService,
+        session_service::{SessionService, SessionServiceConfig},
+        ServiceLocator,
     },
     infra::database::sqlite::RootDatabaseClient,
 };
@@ -72,12 +76,18 @@ pub async fn bind(_: TokioCancellationToken) -> Result<(), domain::Error> {
     let sqlite_db = RootDatabaseClient::new(conf.conn.clone());
     let service_locator = ServiceLocator {
         session_service: RwLock::new(SessionService::new(
-            realfs.clone(),
             sqlite_db.session_repo(),
             sqlite_db.project_meta_repo(),
+            SessionServiceConfig {
+                project_dir: PathBuf::from(".moss"), // FIXME: This value must be obtained from the configuration file
+                project_db_file: PathBuf::from("project.db"), // FIXME: This value must be obtained from the configuration file
+            },
         )),
         config_service: ConfigService::new(conf.preference.clone()),
-        project_meta_service: ProjectMetaService::new(sqlite_db.project_meta_repo()),
+        project_meta_service: ProjectMetaService::new(
+            realfs.clone(),
+            sqlite_db.project_meta_repo(),
+        ),
         metric_service: MetricService::new(Arc::new(pe)),
         project_service: RwLock::new(None),
     };

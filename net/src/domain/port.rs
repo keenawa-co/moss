@@ -22,4 +22,6 @@ pub(crate) trait SessionRepository: Debug + Send + Sync {
 }
 
 #[async_trait]
-pub(crate) trait IgnoreRepository: Debug + Send + Sync {}
+pub(crate) trait IgnoreRepository: Debug + Send + Sync {
+    async fn create(&self, input_list: &Vec<PathBuf>) -> super::Result<()>;
+}

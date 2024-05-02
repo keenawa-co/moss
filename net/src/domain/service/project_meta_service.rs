@@ -1,5 +1,6 @@
 use common::{id::NanoId, thing::Thing};
-use std::sync::Arc;
+use fs::real;
+use std::{path::PathBuf, sync::Arc};
 
 use crate::{
     domain::{
@@ -15,16 +16,25 @@ use crate::{
 
 #[derive(Debug, Clone)]
 pub struct ProjectMetaService {
+    realfs: Arc<real::FileSystem>,
     project_repo: Arc<dyn ProjectMetaRepository>,
 }
 
 impl ProjectMetaService {
-    pub fn new(repo: Arc<dyn ProjectMetaRepository>) -> Self {
-        Self { project_repo: repo }
+    pub fn new(
+        realfs: Arc<real::FileSystem>,
+        project_repo: Arc<dyn ProjectMetaRepository>,
+    ) -> Self {
+        Self {
+            realfs,
+            project_repo,
+        }
     }
 
     pub async fn create_project(&self, input: &CreateProjectInput) -> domain::Result<ProjectMeta> {
         let project_entity = self.project_repo.create(&input).await?;
+
+        pwd::init::create_from_scratch(input.path.as_path_buf(), &self.realfs).await?;
 
         Ok(project_entity)
     }

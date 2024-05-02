@@ -1,16 +1,16 @@
-mod config_service;
-mod metric_service;
-mod project_meta_service;
-mod project_service;
-mod session_service;
+pub mod config_service;
+pub mod metric_service;
+pub mod project_meta_service;
+pub mod project_service;
+pub mod session_service;
 
 use tokio::sync::RwLock;
 
-pub use config_service::ConfigService;
-pub use metric_service::MetricService;
-pub use project_meta_service::ProjectMetaService;
-pub use project_service::ProjectService;
-pub use session_service::SessionService;
+use self::{
+    config_service::ConfigService, metric_service::MetricService,
+    project_meta_service::ProjectMetaService, project_service::ProjectService,
+    session_service::SessionService,
+};
 
 pub struct ServiceLocator {
     pub config_service: ConfigService,

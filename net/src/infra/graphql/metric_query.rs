@@ -4,7 +4,7 @@ use futures::{Stream, StreamExt};
 
 use std::sync::Arc;
 
-use crate::domain::service::MetricService;
+use crate::domain::service::metric_service::MetricService;
 
 #[derive(Default)]
 pub(super) struct MetricSubscription;

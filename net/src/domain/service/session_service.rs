@@ -14,22 +14,31 @@ use crate::{
 
 use super::ProjectService;
 
+pub struct SessionServiceConfig {
+    // Path to the directory inside the project selected by the user for work.
+    // It is assumed that a project creation operation has already been
+    // performed for this project.
+    pub project_dir: PathBuf,
+    // Name of the database file created for each project in the local folder.
+    pub project_db_file: PathBuf,
+}
+
 pub struct SessionService {
-    realfs: Arc<real::FileSystem>,
     session_repo: Arc<dyn SessionRepository>,
     project_meta_repo: Arc<dyn ProjectMetaRepository>,
+    conf: SessionServiceConfig,
 }
 
 impl SessionService {
     pub fn new(
-        realfs: Arc<real::FileSystem>,
         session_repo: Arc<dyn SessionRepository>,
         project_meta_repo: Arc<dyn ProjectMetaRepository>,
+        conf: SessionServiceConfig,
     ) -> Self {
         Self {
-            realfs,
             project_meta_repo,
             session_repo,
+            conf,
         }
     }
 }
@@ -62,13 +71,12 @@ impl SessionService {
 
         {
             let project_db_client = {
-                let project_path = pwd::init::create_from_scratch(
-                    &PathBuf::from(&format!("{}/.moss", project_meta_entity.source)),
-                    &self.realfs,
+                let conn = dbutl::sqlite::conn::<ProjectMigrator>(
+                    &project_path
+                        .join(&self.conf.project_dir)
+                        .join(&self.conf.project_db_file),
                 )
                 .await?;
-                let conn = dbutl::sqlite::conn::<ProjectMigrator>(&project_path.join("project.db"))
-                    .await?;
 
                 ProjectDatabaseClient::new(Arc::new(conn))
             };

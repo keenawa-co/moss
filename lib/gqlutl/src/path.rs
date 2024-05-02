@@ -12,6 +12,14 @@ impl Path {
     pub fn canonicalize(&self) -> Result<PathBuf, Error> {
         fs::canonicalize(self)
     }
+
+    pub fn as_path_buf(&self) -> &PathBuf {
+        &self.0
+    }
+
+    pub fn as_path(&self) -> &std::path::Path {
+        &self.0.as_path()
+    }
 }
 
 impl AsRef<PathBuf> for Path {

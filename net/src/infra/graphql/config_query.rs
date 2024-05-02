@@ -2,7 +2,7 @@ use async_graphql::{Context, Object};
 use conf::pref::Preference;
 use std::sync::Arc;
 
-use crate::domain::service::ConfigService;
+use crate::domain::service::config_service::ConfigService;
 
 #[derive(Default)]
 pub(super) struct ConfigQuery;
