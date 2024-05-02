@@ -1971,6 +1971,7 @@ dependencies = [
  "async-trait",
  "axum",
  "axum-server",
+ "bitflags 2.5.0",
  "bus",
  "chrono",
  "common",

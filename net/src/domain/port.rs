@@ -12,7 +12,7 @@ pub(crate) trait ProjectMetaRepository: Debug + Send + Sync {
     async fn get_by_id(&self, id: NanoId) -> super::Result<Option<ProjectMeta>>;
     async fn get_by_source(&self, source: PathBuf) -> super::Result<Option<ProjectMeta>>;
     async fn get_list_by_ids(&self, ids: &Vec<NanoId>) -> super::Result<Vec<ProjectMeta>>;
-    async fn delete_by_id(&self, id: NanoId) -> super::Result<Thing>;
+    async fn delete_by_id(&self, id: NanoId) -> super::Result<Option<Thing>>;
 }
 
 #[async_trait]

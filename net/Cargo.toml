@@ -29,6 +29,7 @@ tokio = { workspace = true, features = [
     "rt-multi-thread",
 ] }
 thiserror.workspace = true
+bitflags.workspace = true
 anyhow.workspace = true
 async-graphql.workspace = true
 tracing.workspace = true

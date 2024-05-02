@@ -1,5 +1,6 @@
-use async_graphql::{Context, Object, Result as GraphqlResult};
+use async_graphql::{Context, ErrorExtensions, Object, Result as GraphqlResult, ResultExt};
 use common::{id::NanoId, thing::Thing};
+use gqlutl::GraphQLExtendError;
 
 use crate::domain::{
     model::project::{CreateProjectInput, ProjectMeta},
@@ -25,7 +26,10 @@ impl ProjectMutation {
     async fn delete_by_id(&self, ctx: &Context<'_>, id: NanoId) -> GraphqlResult<Thing> {
         let project_meta_service = ctx.data::<ProjectMetaService>()?;
 
-        Ok(project_meta_service.delete_project_by_id(id).await?)
+        Ok(project_meta_service
+            .delete_project_by_id(id)
+            .await
+            .extend_error()?)
     }
 
     #[graphql(name = "getProjectListByIds")]
@@ -36,6 +40,9 @@ impl ProjectMutation {
     ) -> GraphqlResult<Vec<ProjectMeta>> {
         let project_meta_service = ctx.data::<ProjectMetaService>()?;
 
-        Ok(project_meta_service.get_project_list_by_ids(&ids).await?)
+        Ok(project_meta_service
+            .get_project_list_by_ids(&ids)
+            .await
+            .extend_error()?)
     }
 }

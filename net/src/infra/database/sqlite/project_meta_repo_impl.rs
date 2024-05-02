@@ -87,15 +87,17 @@ impl domain::port::ProjectMetaRepository for ProjectMetaRepositoryImpl {
         Ok(model_option.map(ProjectMeta::from))
     }
 
-    async fn delete_by_id(&self, id: NanoId) -> domain::Result<Thing> {
-        let result = Entity::delete_by_id(id.to_string())
+    async fn delete_by_id(&self, id: NanoId) -> domain::Result<Option<Thing>> {
+        let rows_affected = Entity::delete_by_id(id.clone())
             .exec(self.conn.as_ref())
-            .await?;
+            .await?
+            .rows_affected;
 
-        match result.rows_affected {
-            0 => Err(sea_orm::DbErr::RecordNotFound(id.to_string()).into()),
-            _ => Ok(Thing::from(id)),
-        }
+        Ok(if rows_affected > 0 {
+            Some(Thing::from(id.to_string()))
+        } else {
+            None
+        })
     }
 
     async fn get_list_by_ids(&self, ids: &Vec<NanoId>) -> domain::Result<Vec<ProjectMeta>> {

@@ -1,5 +1,6 @@
 use async_graphql::{Context, Object, Result as GraphqlResult};
 use chrono::{Duration, Utc};
+use gqlutl::GraphQLExtendError;
 use tokio::sync::RwLock;
 
 use crate::domain::{
@@ -23,7 +24,8 @@ impl SessionMutation {
         let session_service_lock = session_service.write().await;
         let session = session_service_lock
             .create_session(&input, session_project_service)
-            .await?;
+            .await
+            .extend_error()?;
 
         Ok(session)
     }
@@ -38,7 +40,8 @@ impl SessionMutation {
         let session_service_lock = ctx.data::<RwLock<SessionService>>()?.write().await;
         let result = session_service_lock
             .get_recent_list(start_time, limit)
-            .await?;
+            .await
+            .extend_error()?;
 
         Ok(result)
     }
