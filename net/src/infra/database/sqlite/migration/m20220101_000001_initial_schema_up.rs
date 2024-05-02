@@ -13,11 +13,13 @@ impl MigrationTrait for Migration {
     async fn up(&self, manager: &SchemaManager) -> Result<(), DbErr> {
         let file_path = {
             let migration_file_path = Path::new("m20220101_000001_initial_project_schema.up.sql");
-            let migration_dir = Path::new("migration/app");
+            let migration_dir = Path::new("migration/project");
             let root_dir = PathBuf::from(env::var("CARGO_MANIFEST_DIR").unwrap());
 
             root_dir.join(migration_dir).join(migration_file_path)
         };
+
+        dbg!(&file_path);
 
         let migration_content = tokio::fs::read_to_string(file_path)
             .await
@@ -34,7 +36,7 @@ impl MigrationTrait for Migration {
     async fn down(&self, manager: &SchemaManager) -> Result<(), DbErr> {
         let file_path = {
             let migration_file_path = Path::new("m20220101_000001_initial_project_schema.down.sql");
-            let migration_dir = Path::new("migration/app");
+            let migration_dir = Path::new("migration/project");
             let root_dir = PathBuf::from(env::var("CARGO_MANIFEST_DIR").unwrap());
 
             root_dir.join(migration_dir).join(migration_file_path)
