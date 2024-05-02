@@ -1,5 +1,7 @@
+use common::id::NanoId;
 use sea_orm::entity::prelude::*;
-use sea_orm::DatabaseConnection;
+use sea_orm::{DatabaseConnection, Set};
+use std::path::PathBuf;
 use std::sync::Arc;
 
 use crate::domain;
@@ -36,4 +38,21 @@ impl WatchListRepositoryImpl {
     }
 }
 
-impl domain::port::IgnoreRepository for WatchListRepositoryImpl {}
+#[async_trait]
+impl domain::port::IgnoreRepository for WatchListRepositoryImpl {
+    async fn create(&self, input_list: &Vec<PathBuf>) -> domain::Result<()> {
+        dbutl::transaction::weak_transaction(self.conn.clone(), |tx| async move {
+            Entity::insert_many(input_list.iter().map(|item| ActiveModel {
+                id: Set(NanoId::new().to_string()),
+                source: Set(item.to_string_lossy().to_string()),
+            }))
+            .exec_without_returning(&*tx)
+            .await?;
+
+            Ok(())
+        })
+        .await?;
+
+        Ok(())
+    }
+}
