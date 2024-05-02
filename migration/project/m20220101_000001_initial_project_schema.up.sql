@@ -1,4 +1,4 @@
-CREATE TABLE ignore (
+CREATE TABLE ignore_list (
     id VARCHAR(20) PRIMARY KEY NOT NULL,
     source TEXT UNIQUE NOT NULL
 );
