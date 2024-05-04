@@ -4,14 +4,17 @@ mod metric_query;
 mod project_query;
 mod session_query;
 
-use async_graphql::{MergedObject, MergedSubscription, Schema};
+use async_graphql::{ErrorExtensions, MergedObject, MergedSubscription, Schema};
 
 use self::{
     config_query::ConfigQuery, explorer_query::ExplorerSubscription,
     metric_query::MetricSubscription, project_query::ProjectMutation,
     session_query::SessionMutation,
 };
-use crate::domain::service::ServiceLocator;
+use crate::domain::{
+    model::error::{Error, ResourceError, SystemError},
+    service::ServiceLocator,
+};
 
 #[derive(MergedObject, Default)]
 pub struct QueryRoot(ConfigQuery);
@@ -46,4 +49,34 @@ pub fn sdl() -> String {
     )
     .finish()
     .sdl()
+}
+
+impl ErrorExtensions for Error {
+    fn extend(&self) -> async_graphql::Error {
+        let (summary, detail) = self.decompose();
+
+        async_graphql::Error::new(summary.to_string()).extend_with(|_, e| match self {
+            Error::Resource(err) => match err {
+                ResourceError::Invalid(_) => {
+                    e.set("status_code", http::StatusCode::BAD_REQUEST.as_str());
+                }
+                ResourceError::NotFound(_) => {
+                    e.set("status_code", http::StatusCode::NOT_FOUND.as_str());
+                }
+                _ => (),
+            },
+
+            Error::System(err) => match err {
+                SystemError::Unexpected(_) => {
+                    e.set(
+                        "status_code",
+                        http::StatusCode::INTERNAL_SERVER_ERROR.as_str(),
+                    );
+                }
+                _ => (),
+            },
+
+            Error::Config(_) => unreachable!(),
+        })
+    }
 }

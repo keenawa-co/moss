@@ -60,6 +60,7 @@ tower-http = { workspace = true, features = [
 ] }
 tokio-stream = { workspace = true, features = ["sync"] }
 futures.workspace = true
+http.workspace = true
 
 [dependencies.sea-orm-migration]
 workspace = true

@@ -1,17 +1,17 @@
 use common::id::NanoId;
-use fs::real;
 use std::{path::PathBuf, sync::Arc};
 use tokio::sync::RwLock;
 
 use crate::{
-    bad_request,
     domain::{
-        self,
-        model::session::{CreateSessionInput, Session, SessionInfo},
+        model::{
+            result::Result,
+            session::{CreateSessionInput, Session, SessionInfo},
+        },
         port::{ProjectMetaRepository, SessionRepository},
     },
     infra::database::sqlite::{ProjectDatabaseClient, ProjectMigrator},
-    not_found,
+    resource_invalid, resource_not_found,
 };
 
 use super::ProjectService;
@@ -50,13 +50,13 @@ impl SessionService {
         &self,
         input: &CreateSessionInput,
         project_service: &RwLock<Option<ProjectService>>,
-    ) -> domain::Result<SessionInfo> {
+    ) -> Result<SessionInfo> {
         let project_meta_entity = self
             .project_meta_repo
             .get_by_source(input.project_source.canonicalize()?)
             .await?
             .ok_or_else(|| {
-                not_found!(
+                resource_not_found!(
                     "project with source {} does not exist",
                     input.project_source
                 )
@@ -65,7 +65,7 @@ impl SessionService {
 
         let project_path = PathBuf::from(&input.project_source);
         if !project_path.exists() {
-            return Err(not_found!(
+            return Err(resource_not_found!(
                 "project {} is not found on your filesystem",
                 input.project_source
             ));
@@ -90,20 +90,20 @@ impl SessionService {
         Ok(session_entity)
     }
 
-    pub async fn restore_session(&self, session_id: NanoId) -> domain::Result<Session> {
+    pub async fn restore_session(&self, session_id: NanoId) -> Result<Session> {
         let session = self
             .session_repo
             .get_by_id(session_id.clone())
             .await?
-            .ok_or_else(|| not_found!("session {} does not exist", session_id))?;
+            .ok_or_else(|| resource_not_found!("session {} does not exist", session_id))?;
 
         let project_meta = session
             .project_meta
             .as_ref()
-            .ok_or_else(|| bad_request!("session project does not exist"))?;
+            .ok_or_else(|| resource_invalid!("session project does not exist"))?;
 
         if !PathBuf::from(&project_meta.source).exists() {
-            return Err(bad_request!(
+            return Err(resource_invalid!(
                 "project {} is not found on your filesystem",
                 project_meta.source
             ));
@@ -112,11 +112,7 @@ impl SessionService {
         Ok(session)
     }
 
-    pub async fn get_recent_list(
-        &self,
-        start_time: i64,
-        limit: u64,
-    ) -> domain::Result<Vec<Session>> {
+    pub async fn get_recent_list(&self, start_time: i64, limit: u64) -> Result<Vec<Session>> {
         Ok(self.session_repo.get_recent_list(start_time, limit).await?)
     }
 }

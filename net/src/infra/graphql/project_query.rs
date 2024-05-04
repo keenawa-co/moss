@@ -5,12 +5,11 @@ use std::path::PathBuf;
 use tokio::sync::RwLock;
 
 use crate::{
-    bad_request,
     domain::{
         model::project::{CreateProjectInput, ProjectMeta},
         service::{project_meta_service::ProjectMetaService, project_service::ProjectService},
     },
-    internal,
+    resource_invalid,
 };
 
 #[derive(Default)]
@@ -38,20 +37,6 @@ impl ProjectMutation {
             .extend_error()?)
     }
 
-    #[graphql(name = "getProjectListByIds")]
-    async fn get_list_by_ids(
-        &self,
-        ctx: &Context<'_>,
-        ids: Vec<NanoId>,
-    ) -> GraphqlResult<Vec<ProjectMeta>> {
-        let project_meta_service = ctx.data::<ProjectMetaService>()?;
-
-        Ok(project_meta_service
-            .get_project_list_by_ids(&ids)
-            .await
-            .extend_error()?)
-    }
-
     #[graphql(name = "createProjectIgnoreList")]
     async fn create_ignore_list(
         &self,
@@ -61,7 +46,7 @@ impl ProjectMutation {
         let project_service_lock = ctx.data::<RwLock<Option<ProjectService>>>()?.write().await;
         let project_service = project_service_lock
             .as_ref()
-            .ok_or_else(|| bad_request!("ddgfg"))
+            .ok_or_else(|| resource_invalid!("ddgfg"))
             .extend_error()
             .extend_error_with_status_code(428)?; // TODO:
 

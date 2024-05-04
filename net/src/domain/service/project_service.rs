@@ -1,6 +1,6 @@
 use std::{path::PathBuf, sync::Arc};
 
-use crate::domain::{self, port::IgnoreListRepository};
+use crate::domain::{model::result::Result, port::IgnoreListRepository};
 
 pub struct ProjectService {
     ignore_repo: Arc<dyn IgnoreListRepository>,
@@ -13,7 +13,7 @@ impl ProjectService {
         }
     }
 
-    pub async fn create_ignore_list(&self, input_list: &Vec<PathBuf>) -> domain::Result<()> {
+    pub async fn create_ignore_list(&self, input_list: &Vec<PathBuf>) -> Result<()> {
         self.ignore_repo.create(input_list).await?;
         Ok(())
     }

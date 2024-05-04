@@ -1,17 +1,14 @@
 use common::{id::NanoId, thing::Thing};
 use fs::real;
-use std::{path::PathBuf, sync::Arc};
+use std::sync::Arc;
 
 use crate::{
     domain::{
-        self,
-        model::{
-            project::{CreateProjectInput, ProjectMeta},
-            result::ErrorCode,
-        },
+        model::project::{CreateProjectInput, ProjectMeta},
+        model::result::Result,
         port::ProjectMetaRepository,
     },
-    internal, not_found,
+    resource_not_found,
 };
 
 #[derive(Debug, Clone)]
@@ -31,7 +28,7 @@ impl ProjectMetaService {
         }
     }
 
-    pub async fn create_project(&self, input: &CreateProjectInput) -> domain::Result<ProjectMeta> {
+    pub async fn create_project(&self, input: &CreateProjectInput) -> Result<ProjectMeta> {
         let project_entity = self.project_repo.create(&input).await?;
 
         pwd::init::create_from_scratch(input.path.as_path_buf(), &self.realfs).await?;
@@ -39,21 +36,14 @@ impl ProjectMetaService {
         Ok(project_entity)
     }
 
-    pub async fn delete_project_by_id(&self, id: NanoId) -> domain::Result<Thing> {
+    pub async fn delete_project_by_id(&self, id: NanoId) -> Result<Thing> {
         let result = self
             .project_repo
             .delete_by_id(id.clone())
             .await?
-            .ok_or_else(|| not_found!("project with id {} does not exist", id))?;
+            .ok_or_else(|| resource_not_found!("project with id {} does not exist", id))?;
         // code = ErrorCode::EXPECTED_BUT_NOT_FOUND
 
         Ok(result)
-    }
-
-    pub async fn get_project_list_by_ids(
-        &self,
-        ids: &Vec<NanoId>,
-    ) -> domain::Result<Vec<ProjectMeta>> {
-        Ok(self.project_repo.get_list_by_ids(ids).await?)
     }
 }

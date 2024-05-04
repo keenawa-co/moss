@@ -5,7 +5,7 @@ use sea_orm::{DatabaseConnection, Set};
 use std::path::PathBuf;
 use std::sync::Arc;
 
-use crate::domain;
+use crate::domain::{self, model::result::Result};
 
 //
 // Entity model definition for `ignore_list` table (project database)
@@ -41,7 +41,7 @@ impl IgnoreListRepositoryImpl {
 
 #[async_trait]
 impl domain::port::IgnoreListRepository for IgnoreListRepositoryImpl {
-    async fn create(&self, input_list: &Vec<PathBuf>) -> domain::Result<()> {
+    async fn create(&self, input_list: &Vec<PathBuf>) -> Result<()> {
         dbutl::transaction::weak_transaction(self.conn.as_ref(), |tx| async move {
             let models: Vec<ActiveModel> = input_list
                 .iter()

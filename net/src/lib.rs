@@ -4,6 +4,7 @@ mod infra;
 pub mod config;
 
 pub use config::{Config, CONF};
+use domain::model::error::Error;
 pub use infra::graphql::sdl;
 
 use analysis::policy_engine::PolicyEngine;
@@ -24,6 +25,7 @@ use tower_http::{
 };
 
 use crate::{
+    domain::model::error::OptionExtension,
     domain::service::{
         config_service::ConfigService,
         metric_service::MetricService,
@@ -46,10 +48,10 @@ extern crate tracing;
 
 const MIX_COMPRESS_SIZE: u16 = 512; // TODO: this value should be used from a net_conf.toml file
 
-pub async fn bind(_: TokioCancellationToken) -> Result<(), domain::Error> {
+pub async fn bind(_: TokioCancellationToken) -> Result<(), Error> {
     let conf = CONF
         .get()
-        .ok_or_else(|| internal!("configuration was not defined"))?;
+        .or_else_config_invalid("configuration was not defined")?;
 
     let b = bus::Bus::new();
 

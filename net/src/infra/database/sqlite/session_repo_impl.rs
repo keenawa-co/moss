@@ -4,9 +4,12 @@ use sea_orm::entity::prelude::*;
 use sea_orm::{DatabaseConnection, QueryOrder, QuerySelect, Set};
 use std::sync::Arc;
 
-use crate::domain::model::project::ProjectMeta;
-use crate::domain::model::session::{Session, SessionInfo};
-use crate::{bad_request, domain};
+use crate::domain::{
+    self,
+    model::project::ProjectMeta,
+    model::result::Result,
+    model::session::{Session, SessionInfo},
+};
 
 //
 // Entity model definition for `session` table (root database)
@@ -83,7 +86,7 @@ impl SessionRepositoryImpl {
 
 #[async_trait]
 impl domain::port::SessionRepository for SessionRepositoryImpl {
-    async fn create(&self, project_id: NanoId) -> domain::Result<SessionInfo> {
+    async fn create(&self, project_id: NanoId) -> Result<SessionInfo> {
         let model = (ActiveModel {
             id: Set(NanoId::new().to_string()),
             project_meta_id: Set(project_id.to_string()),
@@ -95,7 +98,7 @@ impl domain::port::SessionRepository for SessionRepositoryImpl {
         Ok(model.into())
     }
 
-    async fn get_recent_list(&self, start_time: i64, limit: u64) -> domain::Result<Vec<Session>> {
+    async fn get_recent_list(&self, start_time: i64, limit: u64) -> Result<Vec<Session>> {
         let result = Entity::find()
             .filter(Column::CreatedAt.gte(start_time))
             .order_by_desc(Column::CreatedAt)
@@ -110,7 +113,7 @@ impl domain::port::SessionRepository for SessionRepositoryImpl {
             .collect())
     }
 
-    async fn get_by_id(&self, session_id: NanoId) -> domain::Result<Option<Session>> {
+    async fn get_by_id(&self, session_id: NanoId) -> Result<Option<Session>> {
         let result = Entity::find_by_id(session_id)
             .find_also_related(super::project_meta_repo_impl::Entity)
             .one(self.conn.as_ref())
