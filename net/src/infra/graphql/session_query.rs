@@ -1,5 +1,6 @@
 use async_graphql::{Context, Object, Result as GraphqlResult};
 use chrono::{Duration, Utc};
+use common::id::NanoId;
 use gqlutl::GraphQLExtendError;
 use tokio::sync::RwLock;
 
@@ -28,6 +29,20 @@ impl SessionMutation {
             .extend_error()?;
 
         Ok(session)
+    }
+
+    async fn restore_session(
+        &self,
+        ctx: &Context<'_>,
+        session_id: NanoId,
+    ) -> GraphqlResult<Session> {
+        let session_service_lock = ctx.data::<RwLock<SessionService>>()?.write().await;
+        let result = session_service_lock
+            .restore_session(session_id)
+            .await
+            .extend_error()?;
+
+        Ok(result)
     }
 
     #[graphql(name = "getRecentSessionList")]

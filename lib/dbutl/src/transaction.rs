@@ -11,13 +11,13 @@ impl Deref for TransactionHandle {
     }
 }
 
-pub async fn weak_transaction<F, Fut, T>(conn: Arc<DatabaseConnection>, f: F) -> anyhow::Result<T>
+pub async fn weak_transaction<F, Fut, T>(conn: &DatabaseConnection, f: F) -> anyhow::Result<T>
 where
     F: Send + Fn(TransactionHandle) -> Fut,
     Fut: Send + Future<Output = anyhow::Result<T>>,
 {
     let tx = conn
-        .begin_with_config(Some(IsolationLevel::ReadCommitted), None)
+        .begin_with_config(Some(IsolationLevel::Serializable), None)
         .await?;
 
     let mut tx = Arc::new(Some(tx));

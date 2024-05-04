@@ -7,7 +7,7 @@ use super::project::ProjectMeta;
 #[derive(Debug, Clone, Deserialize, Serialize, SimpleObject)]
 pub(crate) struct Session {
     pub id: NanoId,
-    pub project_meta: ProjectMeta,
+    pub project_meta: Option<ProjectMeta>,
     pub created_at: i64,
 }
 

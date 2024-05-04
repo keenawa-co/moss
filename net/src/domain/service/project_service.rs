@@ -1,13 +1,13 @@
 use std::{path::PathBuf, sync::Arc};
 
-use crate::domain::{self, port::IgnoreRepository};
+use crate::domain::{self, port::IgnoreListRepository};
 
 pub struct ProjectService {
-    ignore_repo: Arc<dyn IgnoreRepository>,
+    ignore_repo: Arc<dyn IgnoreListRepository>,
 }
 
 impl ProjectService {
-    pub fn new(ignore_repo: Arc<dyn IgnoreRepository>) -> Self {
+    pub fn new(ignore_repo: Arc<dyn IgnoreListRepository>) -> Self {
         Self {
             ignore_repo: ignore_repo,
         }

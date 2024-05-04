@@ -18,10 +18,11 @@ pub(crate) trait ProjectMetaRepository: Debug + Send + Sync {
 #[async_trait]
 pub(crate) trait SessionRepository: Debug + Send + Sync {
     async fn create(&self, project_id: NanoId) -> super::Result<SessionInfo>;
+    async fn get_by_id(&self, session_id: NanoId) -> super::Result<Option<Session>>;
     async fn get_recent_list(&self, start_time: i64, limit: u64) -> super::Result<Vec<Session>>;
 }
 
 #[async_trait]
-pub(crate) trait IgnoreRepository: Debug + Send + Sync {
+pub(crate) trait IgnoreListRepository: Debug + Send + Sync {
     async fn create(&self, input_list: &Vec<PathBuf>) -> super::Result<()>;
 }

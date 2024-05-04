@@ -44,7 +44,8 @@ impl ProjectMetaService {
             .project_repo
             .delete_by_id(id.clone())
             .await?
-            .ok_or_else(|| not_found!("project with id {} does not exist", id; ErrorCode::EXPECTED_BUT_NOT_FOUND))?;
+            .ok_or_else(|| not_found!("project with id {} does not exist", id))?;
+        // code = ErrorCode::EXPECTED_BUT_NOT_FOUND
 
         Ok(result)
     }

@@ -1,8 +1,10 @@
+use common::id::NanoId;
 use fs::real;
 use std::{path::PathBuf, sync::Arc};
 use tokio::sync::RwLock;
 
 use crate::{
+    bad_request,
     domain::{
         self,
         model::session::{CreateSessionInput, Session, SessionInfo},
@@ -86,6 +88,28 @@ impl SessionService {
         }
 
         Ok(session_entity)
+    }
+
+    pub async fn restore_session(&self, session_id: NanoId) -> domain::Result<Session> {
+        let session = self
+            .session_repo
+            .get_by_id(session_id.clone())
+            .await?
+            .ok_or_else(|| not_found!("session {} does not exist", session_id))?;
+
+        let project_meta = session
+            .project_meta
+            .as_ref()
+            .ok_or_else(|| bad_request!("session project does not exist"))?;
+
+        if !PathBuf::from(&project_meta.source).exists() {
+            return Err(bad_request!(
+                "project {} is not found on your filesystem",
+                project_meta.source
+            ));
+        }
+
+        Ok(session)
     }
 
     pub async fn get_recent_list(

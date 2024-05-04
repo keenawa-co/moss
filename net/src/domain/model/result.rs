@@ -8,46 +8,28 @@ pub type Result<T, E = Error> = core::result::Result<T, E>;
 
 #[macro_export]
 macro_rules! internal {
-    ($err:expr) => {{
+    ($msg:expr) => {{
         $crate::domain::Error::Internal(
             $crate::domain::model::result::InternalError::Unknown(
-                format!("{}:{}: {}", file!(), line!(), $err),
+                format!("{}:{}: {}", file!(), line!(), $msg),
                 None
-            ),
-        )
-    }};
-
-    ($msg:expr, code = $code:expr $(,)?) => {{
-        $crate::domain::Error::Internal(
-            $crate::domain::model::result::InternalError::Unknown(
-                format!("{}:{}: {}", file!(), line!(), $err),
-                Some($code)
-            ),
+            )
         )
     }};
 
     ($fmt:expr, $($arg:expr),*) => {{
         $crate::domain::Error::Internal(
             $crate::domain::model::result::InternalError::Unknown(
-                format!("{}:{}: {}", file!(), line!(), format!($fmt, $($arg),*)),
+                format!("{}:{}: {}", file!(), line!(), format!($fmt, $($arg),+)),
                 None
-            ),
-        )
-    }};
-
-    ($fmt:expr, $($arg:expr),+, code = $code:expr $(,)?) => {{
-        $crate::domain::Error::Internal(
-            $crate::domain::model::result::InternalError::Unknown(
-                format!("{}:{}: {}", file!(), line!(), format!($fmt, $($arg),*)),
-                Some($code)
-            ),
+            )
         )
     }};
 }
 
 #[macro_export]
-macro_rules! bad {
-    ($msg:expr $(,)?) => {{
+macro_rules! bad_request {
+    ($msg:expr) => {{
         $crate::domain::Error::Client(
             $crate::domain::model::result::ClientError::BadRequest(
                 format!("{}:{}: {}", file!(), line!(), $msg),
@@ -56,29 +38,11 @@ macro_rules! bad {
         )
     }};
 
-    ($msg:expr, code = $code:expr $(,)?) => {{
+    ($fmt:expr, $($arg:expr),*) => {{
         $crate::domain::Error::Client(
             $crate::domain::model::result::ClientError::BadRequest(
-                format!("{}:{}: {}", file!(), line!(), $msg),
-                Some($code)
-            )
-        )
-    }};
-
-    ($fmt:expr, $($arg:expr),+ $(,)?) => {{
-        $crate::domain::Error::Client(
-            $crate::domain::model::result::ClientError::BadRequest(
-                format!("{}:{}: {}", file!(), line!(), format!($fmt, $($arg),*)),
+                format!("{}:{}: {}", file!(), line!(), format!($fmt, $($arg),+)),
                 None
-            )
-        )
-    }};
-
-    ($fmt:expr, $($arg:expr),+, code = $code:expr $(,)?) => {{
-        $crate::domain::Error::Client(
-            $crate::domain::model::result::ClientError::BadRequest(
-                format!("{}:{}: {}", file!(), line!(), format!($fmt, $($arg),*)),
-                Some($code)
             )
         )
     }};
@@ -95,31 +59,12 @@ macro_rules! not_found {
         )
     }};
 
-    ($msg:expr, code = $code:expr $(,)?) => {{
-        $crate::domain::Error::Client(
-            $crate::domain::model::result::ClientError::NotFound(
-                format!("{}:{}: {}", file!(), line!(), $msg),
-                Some($code)
-            )
-        )
-    }};
-
-    ($fmt:expr, $($arg:expr),+ $(,)?) => {{
+    ($fmt:expr, $($arg:expr),*) => {{
         $crate::domain::Error::Client(
             $crate::domain::model::result::ClientError::NotFound(
                 format!("{}:{}: {}", file!(), line!(), format!($fmt, $($arg),+)),
                 None
             )
-        )
-    }};
-
-
-    ($fmt:expr, $($arg:expr),* ; $code:expr) => {{
-        $crate::domain::Error::Client(
-            $crate::domain::model::result::ClientError::NotFound(
-                format!("{}:{}: {}", file!(), line!(), format!($fmt, $($arg),*)),
-                Some($code),
-            ),
         )
     }};
 }
@@ -162,7 +107,7 @@ pub enum Error {
     #[error(transparent)]
     Client(ClientError),
 
-    #[error("An unexpected internal error occurred. {0}")]
+    #[error(transparent)]
     Internal(InternalError),
 }
 
@@ -184,13 +129,13 @@ pub enum ClientError {
 
     #[error("Cannot find the requested resource. {0}")]
     NotFound(String, Option<ErrorCode>),
+
+    #[error("The origin server requires the request to be conditional. {0}")]
+    PreconditionRequired(String, Option<ErrorCode>),
 }
 
 #[derive(Error, Debug)]
 pub enum InternalError {
-    #[error("Unknown server error. {0}")]
-    Unknown(String, Option<ErrorCode>),
-
     #[error(transparent)]
     Database(#[from] sea_orm::DbErr),
 
@@ -205,6 +150,9 @@ pub enum InternalError {
 
     #[error(transparent)]
     Anyhow(#[from] anyhow::Error),
+
+    #[error("An unexpected internal error occurred. {0}")]
+    Unknown(String, Option<ErrorCode>),
 }
 
 impl ErrorExtensions for Error {

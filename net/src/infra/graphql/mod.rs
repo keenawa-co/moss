@@ -32,9 +32,9 @@ pub fn build_schema(service_locator: ServiceLocator) -> SchemaRoot {
     )
     .data(service_locator.config_service)
     .data(service_locator.project_meta_service)
+    .data(service_locator.project_service)
     .data(service_locator.metric_service)
     .data(service_locator.session_service)
-    .data(service_locator.project_service)
     .finish()
 }
 

@@ -4,9 +4,9 @@ use sea_orm::entity::prelude::*;
 use sea_orm::{DatabaseConnection, QueryOrder, QuerySelect, Set};
 use std::sync::Arc;
 
-use crate::domain;
 use crate::domain::model::project::ProjectMeta;
 use crate::domain::model::session::{Session, SessionInfo};
+use crate::{bad_request, domain};
 
 //
 // Entity model definition for `session` table (root database)
@@ -21,14 +21,17 @@ pub struct Model {
     pub created_at: i64,
 }
 
-impl From<(Model, super::project_meta_repo_impl::Model)> for Session {
-    fn from(data: (Model, super::project_meta_repo_impl::Model)) -> Self {
+impl From<(Model, Option<super::project_meta_repo_impl::Model>)> for Session {
+    fn from(data: (Model, Option<super::project_meta_repo_impl::Model>)) -> Self {
         Session {
             id: data.0.id.into(),
-            project_meta: ProjectMeta {
-                id: data.1.id.into(),
-                source: data.1.source,
-                created_at: data.1.created_at,
+            project_meta: match data.1 {
+                Some(project_meta) => Some(ProjectMeta {
+                    id: project_meta.id.into(),
+                    source: project_meta.source,
+                    created_at: project_meta.created_at,
+                }),
+                None => None,
             },
             created_at: data.0.created_at,
         }
@@ -103,7 +106,19 @@ impl domain::port::SessionRepository for SessionRepositoryImpl {
 
         Ok(result
             .into_iter()
-            .map(|(session, project_meta)| (session, project_meta.unwrap()).into())
+            .map(|(session, project_meta)| (session, project_meta).into())
             .collect())
+    }
+
+    async fn get_by_id(&self, session_id: NanoId) -> domain::Result<Option<Session>> {
+        let result = Entity::find_by_id(session_id)
+            .find_also_related(super::project_meta_repo_impl::Entity)
+            .one(self.conn.as_ref())
+            .await?;
+
+        match result {
+            Some((session, project_meta)) => Ok(Some(Session::from((session, project_meta)))),
+            None => Ok(None),
+        }
     }
 }

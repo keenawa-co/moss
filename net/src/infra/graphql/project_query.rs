@@ -1,12 +1,16 @@
-use async_graphql::{Context, Error as GraphQLError, Object, Result as GraphqlResult};
+use async_graphql::{Context, Object, Result as GraphqlResult};
 use common::{id::NanoId, thing::Thing};
 use gqlutl::{path::Path as PathGraphQL, GraphQLExtendError};
 use std::path::PathBuf;
 use tokio::sync::RwLock;
 
-use crate::domain::{
-    model::project::{CreateProjectInput, ProjectMeta},
-    service::{project_meta_service::ProjectMetaService, project_service::ProjectService},
+use crate::{
+    bad_request,
+    domain::{
+        model::project::{CreateProjectInput, ProjectMeta},
+        service::{project_meta_service::ProjectMetaService, project_service::ProjectService},
+    },
+    internal,
 };
 
 #[derive(Default)]
@@ -48,38 +52,26 @@ impl ProjectMutation {
             .extend_error()?)
     }
 
-    // #[graphql(name = "createProjectIgnoreList")]
-    // async fn create_ignore_list(
-    //     &self,
-    //     ctx: &Context<'_>,
-    //     input_list: Vec<PathGraphQL>,
-    // ) -> GraphqlResult<Thing> {
-    //     let project_service = ctx.data::<RwLock<Option<ProjectService>>>()?;
-    //     let project_service_lock = {
-    //         let service_lock = project_service.write().await;
-    //         service_lock
-    //             .as_ref()
-    //             .ok_or_else(|| GraphQLError::from("ProjectService is not initialized"))
-    //     }?;
+    #[graphql(name = "createProjectIgnoreList")]
+    async fn create_ignore_list(
+        &self,
+        ctx: &Context<'_>,
+        input_list: Vec<PathGraphQL>,
+    ) -> GraphqlResult<Thing> {
+        let project_service_lock = ctx.data::<RwLock<Option<ProjectService>>>()?.write().await;
+        let project_service = project_service_lock
+            .as_ref()
+            .ok_or_else(|| bad_request!("ddgfg"))
+            .extend_error()
+            .extend_error_with_status_code(428)?; // TODO:
 
-    //     // let project_service = ctx.data::<RwLock<Option<ProjectService>>>()?;
-    //     // let project_service_lock = project_service.write().await;
+        project_service
+            .create_ignore_list(&input_list.iter().map(Into::into).collect::<Vec<PathBuf>>())
+            .await
+            .extend_error()?;
 
-    //     // let service = project_service_lock
-    //     //     .as_ref()
-    //     //     .ok_or_else(|| GraphQLError::from("ProjectService is not initialized"))?;
-
-    //     project_service_lock
-    //         .create_ignore_list(
-    //             &input_list
-    //                 .iter()
-    //                 .map(|item| item.into())
-    //                 .collect::<Vec<PathBuf>>(),
-    //         )
-    //         .await?;
-
-    //     Ok(Thing {
-    //         id: "test".to_string(),
-    //     })
-    // }
+        Ok(Thing {
+            id: "test".to_string(),
+        })
+    }
 }
