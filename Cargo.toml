@@ -17,7 +17,6 @@ members = [
     "lib/pwd",
     "mossctl",
     "net",
-    "testdata/hello-wasm",
 ]
 
 [profile.release]
@@ -93,6 +92,7 @@ async-graphql-axum = "7.0"
 axum-server = "0.6"
 tower = "0.4"
 tower-http = "0.5.2"
+http = "1.1.0"
 
 [dependencies]
 mossctl.workspace = true
