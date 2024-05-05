@@ -46,7 +46,7 @@ impl SessionMutation {
         Ok(session)
     }
 
-    #[graphql(name = "getRecentSessionList")]
+    #[graphql(name = "getRecentSessions")]
     async fn get_recent(
         &self,
         ctx: &Context<'_>,

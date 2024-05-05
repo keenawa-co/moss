@@ -13,7 +13,7 @@ impl ProjectService {
         }
     }
 
-    pub async fn create_ignore_list(&self, input_list: &Vec<PathBuf>) -> Result<()> {
+    pub async fn append_to_ignore_list(&self, input_list: &Vec<PathBuf>) -> Result<()> {
         self.ignore_repo.create(input_list).await?;
         Ok(())
     }

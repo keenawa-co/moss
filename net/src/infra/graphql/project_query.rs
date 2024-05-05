@@ -41,8 +41,8 @@ impl ProjectMutation {
             .extend_error()?)
     }
 
-    #[graphql(name = "createProjectIgnoreList")]
-    async fn create_ignore_list(
+    #[graphql(name = "appendToProjectIgnored")]
+    async fn append_to_ignore_list(
         &self,
         ctx: &Context<'_>,
         input_list: Vec<PathGraphQL>,
@@ -56,7 +56,7 @@ impl ProjectMutation {
             .extend_error()?;
 
         project_service
-            .create_ignore_list(&input_list.iter().map(Into::into).collect::<Vec<PathBuf>>())
+            .append_to_ignore_list(&input_list.iter().map(Into::into).collect::<Vec<PathBuf>>())
             .await
             .extend_error()?;
 
