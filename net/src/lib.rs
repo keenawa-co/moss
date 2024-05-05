@@ -12,7 +12,7 @@ use bus::topic::TopicConfig;
 use common::APP_NAME;
 use fs::{fw::FileWatcher, real, FS};
 use std::{path::PathBuf, sync::Arc};
-use tokio::sync::RwLock;
+use tokio::sync::{mpsc, RwLock};
 use tokio_util::sync::CancellationToken as TokioCancellationToken;
 use tower::ServiceBuilder;
 use tower_http::{
@@ -30,9 +30,10 @@ use crate::{
         service::{
             config_service::ConfigService,
             metric_service::MetricService,
+            notification_service::NotificationService,
             project_meta_service::ProjectMetaService,
             session_service::{SessionService, SessionServiceConfig},
-            ServiceLocator,
+            ServiceHub,
         },
     },
     infra::database::sqlite::RootDatabaseClient,
@@ -53,7 +54,7 @@ const MIX_COMPRESS_SIZE: u16 = 512; // TODO: this value should be used from a ne
 pub async fn bind(_: TokioCancellationToken) -> Result<(), Error> {
     let conf = CONF
         .get()
-        .ok_or_config_invalid("configuration was not defined", None)?;
+        .ok_or_config_invalid("Configuration was not defined", None)?;
 
     let b = bus::Bus::new();
 
@@ -77,23 +78,21 @@ pub async fn bind(_: TokioCancellationToken) -> Result<(), Error> {
 
     let pe = PolicyEngine::new(fw.clone(), b);
 
-    let sqlite_db = RootDatabaseClient::new(conf.conn.clone());
-    let service_locator = ServiceLocator {
+    let root_db = RootDatabaseClient::new(conf.conn.clone());
+    let service_hub = ServiceHub {
         session_service: RwLock::new(SessionService::new(
-            sqlite_db.session_repo(),
-            sqlite_db.project_meta_repo(),
+            root_db.session_repo(),
+            root_db.project_meta_repo(),
             SessionServiceConfig {
                 project_dir: PathBuf::from(".moss"), // FIXME: This value must be obtained from the configuration file
                 project_db_file: PathBuf::from("project.db"), // FIXME: This value must be obtained from the configuration file
             },
         )),
         config_service: ConfigService::new(conf.preference.clone()),
-        project_meta_service: ProjectMetaService::new(
-            realfs.clone(),
-            sqlite_db.project_meta_repo(),
-        ),
+        project_meta_service: ProjectMetaService::new(realfs.clone(), root_db.project_meta_repo()),
         metric_service: MetricService::new(Arc::new(pe)),
         project_service: RwLock::new(None),
+        notification_service: NotificationService::new(),
     };
 
     let service = ServiceBuilder::new()
@@ -101,7 +100,7 @@ pub async fn bind(_: TokioCancellationToken) -> Result<(), Error> {
         .set_x_request_id(MakeRequestUuid)
         .propagate_x_request_id();
 
-    let schema = infra::graphql::build_schema(service_locator);
+    let schema = infra::graphql::build_schema(service_hub);
     let service = service.layer(
         CompressionLayer::new().compress_when(
             SizeAbove::new(MIX_COMPRESS_SIZE) // don't compress below 512 bytes

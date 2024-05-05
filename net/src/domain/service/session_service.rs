@@ -6,6 +6,7 @@ use crate::{
     domain::{
         model::{
             error::Error,
+            project::ProjectMeta,
             result::Result,
             session::{CreateSessionInput, Session, SessionInfo},
             OptionExtension,
@@ -30,6 +31,8 @@ pub struct SessionService {
     session_repo: Arc<dyn SessionRepository>,
     project_meta_repo: Arc<dyn ProjectMetaRepository>,
     conf: SessionServiceConfig,
+    session_id: Option<NanoId>,
+    project_id: Option<NanoId>,
 }
 
 impl SessionService {
@@ -42,17 +45,27 @@ impl SessionService {
             project_meta_repo,
             session_repo,
             conf,
+            session_id: None,
+            project_id: None,
         }
     }
 }
 
 impl SessionService {
+    pub fn session_id(&self) -> &Option<NanoId> {
+        &self.session_id
+    }
+
+    pub fn project_id(&self) -> &Option<NanoId> {
+        &self.project_id
+    }
+
     pub async fn create_session(
-        &self,
+        &mut self,
         input: &CreateSessionInput,
         project_service: &RwLock<Option<ProjectService>>,
     ) -> Result<SessionInfo> {
-        let project_meta_entity = self
+        let project_meta = self
             .project_meta_repo
             .get_by_source(input.project_source.canonicalize()?)
             .await?
@@ -63,7 +76,7 @@ impl SessionService {
                 ),
                 None,
             )?;
-        let session_entity = self.session_repo.create(project_meta_entity.id).await?;
+        let session_entity = self.session_repo.create(project_meta.clone().id).await?; // FIXME: remove .clone()
 
         let project_path = PathBuf::from(&input.project_source);
         if !project_path.exists() {
@@ -76,13 +89,14 @@ impl SessionService {
             ));
         }
 
-        self.prepare_data(project_service, &project_path).await?;
+        self.prepare_data(project_service, &project_meta, session_entity.id.clone())
+            .await?;
 
         Ok(session_entity)
     }
 
     pub async fn restore_session(
-        &self,
+        &mut self,
         session_id: NanoId,
         project_service: &RwLock<Option<ProjectService>>,
     ) -> Result<Session> {
@@ -108,7 +122,8 @@ impl SessionService {
             ));
         }
 
-        self.prepare_data(project_service, &project_path).await?;
+        self.prepare_data(project_service, project_meta, session.id.clone())
+            .await?;
 
         Ok(session)
     }
@@ -120,11 +135,16 @@ impl SessionService {
 
 impl SessionService {
     async fn prepare_data(
-        &self,
+        &mut self,
         project_service: &RwLock<Option<ProjectService>>,
-        project_path: &PathBuf,
+        project_meta: &ProjectMeta,
+        session_id: NanoId,
     ) -> Result<()> {
+        self.project_id = Some(project_meta.id.clone());
+        self.session_id = Some(session_id);
+
         let project_db_client = {
+            let project_path = PathBuf::from(&project_meta.source); // FIXME: avoid duplication (the same operation is performed in the parent function when checking the existence of a directory)
             let conn = dbutl::sqlite::conn::<ProjectMigrator>(
                 &project_path
                     .join(&self.conf.project_dir)

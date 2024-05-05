@@ -22,7 +22,7 @@ impl SessionMutation {
         let session_service = ctx.data::<RwLock<SessionService>>()?;
         let project_service = ctx.data::<RwLock<Option<ProjectService>>>()?;
 
-        let session_service_lock = session_service.write().await;
+        let mut session_service_lock = session_service.write().await;
         let session = session_service_lock
             .create_session(&input, project_service)
             .await
@@ -37,7 +37,7 @@ impl SessionMutation {
         session_id: NanoId,
     ) -> GraphqlResult<Session> {
         let project_service = ctx.data::<RwLock<Option<ProjectService>>>()?;
-        let session_service_lock = ctx.data::<RwLock<SessionService>>()?.write().await;
+        let mut session_service_lock = ctx.data::<RwLock<SessionService>>()?.write().await;
         let session = session_service_lock
             .restore_session(session_id, project_service)
             .await

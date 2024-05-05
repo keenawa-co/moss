@@ -7,6 +7,7 @@ pub mod session;
 use crate::domain::model::{error::*, result::Result};
 
 pub trait OptionExtension<T> {
+    fn ok_or_system_unexpected(self, detail: &str, error_code: Option<String>) -> Result<T>;
     fn ok_or_config_invalid(self, detail: &str, error_code: Option<String>) -> Result<T>;
     fn ok_or_resource_invalid(self, detail: &str, error_code: Option<String>) -> Result<T>;
     fn ok_or_resource_not_found(self, detail: &str, error_code: Option<String>) -> Result<T>;
@@ -24,6 +25,9 @@ pub trait OptionExtension<T> {
 }
 
 impl<T> OptionExtension<T> for Option<T> {
+    fn ok_or_system_unexpected(self, detail: &str, error_code: Option<String>) -> Result<T> {
+        self.ok_or_else(|| Error::system_unexpected(detail, error_code))
+    }
     fn ok_or_config_invalid(self, detail: &str, error_code: Option<String>) -> Result<T> {
         self.ok_or_else(|| Error::config_invalid(detail, error_code))
     }

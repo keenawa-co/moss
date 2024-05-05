@@ -89,6 +89,15 @@ pub enum SystemError {
 }
 
 impl Error {
+    pub fn system_unexpected(detail: &str, error_code: Option<String>) -> Self {
+        let err = SystemError::Unexpected {
+            detail: detail.to_string(),
+            error_code,
+        };
+
+        Error::System(err)
+    }
+
     pub fn config_invalid(detail: &str, error_code: Option<String>) -> Self {
         let err = ConfigError::Invalid {
             detail: detail.to_string(),

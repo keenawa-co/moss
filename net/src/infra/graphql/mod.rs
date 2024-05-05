@@ -1,6 +1,7 @@
 mod config_query;
 mod explorer_query;
 mod metric_query;
+mod notification_query;
 mod project_query;
 mod session_query;
 
@@ -10,12 +11,12 @@ use async_graphql::{
 
 use self::{
     config_query::ConfigQuery, explorer_query::ExplorerSubscription,
-    metric_query::MetricSubscription, project_query::ProjectMutation,
-    session_query::SessionMutation,
+    metric_query::MetricSubscription, notification_query::NotificationSubscription,
+    project_query::ProjectMutation, session_query::SessionMutation,
 };
 use crate::domain::{
     model::error::{Error, PreconditionError, ResourceError, SystemError},
-    service::ServiceLocator,
+    service::ServiceHub,
 };
 
 #[derive(MergedObject, Default)]
@@ -25,21 +26,26 @@ pub struct QueryRoot(ConfigQuery);
 pub struct MutationRoot(ProjectMutation, SessionMutation);
 
 #[derive(MergedSubscription, Default)]
-pub struct RootSubscription(ExplorerSubscription, MetricSubscription);
+pub struct RootSubscription(
+    ExplorerSubscription,
+    MetricSubscription,
+    NotificationSubscription,
+);
 
 pub type SchemaRoot = Schema<QueryRoot, MutationRoot, RootSubscription>;
 
-pub fn build_schema(service_locator: ServiceLocator) -> SchemaRoot {
+pub fn build_schema(service_hub: ServiceHub) -> SchemaRoot {
     Schema::build(
         QueryRoot::default(),
         MutationRoot::default(),
         RootSubscription::default(),
     )
-    .data(service_locator.config_service)
-    .data(service_locator.project_meta_service)
-    .data(service_locator.project_service)
-    .data(service_locator.metric_service)
-    .data(service_locator.session_service)
+    .data(service_hub.config_service)
+    .data(service_hub.project_meta_service)
+    .data(service_hub.project_service)
+    .data(service_hub.metric_service)
+    .data(service_hub.session_service)
+    .data(service_hub.notification_service)
     .finish()
 }
 
