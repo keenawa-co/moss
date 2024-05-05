@@ -76,26 +76,16 @@ impl SessionService {
             ));
         }
 
-        {
-            let project_db_client = {
-                let conn = dbutl::sqlite::conn::<ProjectMigrator>(
-                    &project_path
-                        .join(&self.conf.project_dir)
-                        .join(&self.conf.project_db_file),
-                )
-                .await?;
-
-                ProjectDatabaseClient::new(Arc::new(conn))
-            };
-
-            let mut project_service_lock = project_service.write().await;
-            *project_service_lock = Some(ProjectService::new(project_db_client.watch_list_repo()));
-        }
+        self.prepare_data(project_service, &project_path).await?;
 
         Ok(session_entity)
     }
 
-    pub async fn restore_session(&self, session_id: NanoId) -> Result<Session> {
+    pub async fn restore_session(
+        &self,
+        session_id: NanoId,
+        project_service: &RwLock<Option<ProjectService>>,
+    ) -> Result<Session> {
         let session = self
             .session_repo
             .get_by_id(session_id.clone())
@@ -106,8 +96,9 @@ impl SessionService {
             .project_meta
             .as_ref()
             .ok_or_resource_invalid("session project does not exist", None)?;
+        let project_path = PathBuf::from(&project_meta.source);
 
-        if !PathBuf::from(&project_meta.source).exists() {
+        if !project_path.exists() {
             return Err(Error::resource_invalid(
                 &format!(
                     "project {} is not found on your filesystem",
@@ -117,10 +108,36 @@ impl SessionService {
             ));
         }
 
+        self.prepare_data(project_service, &project_path).await?;
+
         Ok(session)
     }
 
     pub async fn get_recent_list(&self, start_time: i64, limit: u64) -> Result<Vec<Session>> {
         Ok(self.session_repo.get_recent_list(start_time, limit).await?)
+    }
+}
+
+impl SessionService {
+    async fn prepare_data(
+        &self,
+        project_service: &RwLock<Option<ProjectService>>,
+        project_path: &PathBuf,
+    ) -> Result<()> {
+        let project_db_client = {
+            let conn = dbutl::sqlite::conn::<ProjectMigrator>(
+                &project_path
+                    .join(&self.conf.project_dir)
+                    .join(&self.conf.project_db_file),
+            )
+            .await?;
+
+            ProjectDatabaseClient::new(Arc::new(conn))
+        };
+
+        let mut project_service_lock = project_service.write().await;
+        *project_service_lock = Some(ProjectService::new(project_db_client.watch_list_repo()));
+
+        Ok(())
     }
 }

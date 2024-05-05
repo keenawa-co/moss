@@ -36,13 +36,14 @@ impl SessionMutation {
         ctx: &Context<'_>,
         session_id: NanoId,
     ) -> GraphqlResult<Session> {
+        let project_service = ctx.data::<RwLock<Option<ProjectService>>>()?;
         let session_service_lock = ctx.data::<RwLock<SessionService>>()?.write().await;
-        let result = session_service_lock
-            .restore_session(session_id)
+        let session = session_service_lock
+            .restore_session(session_id, project_service)
             .await
             .extend_error()?;
 
-        Ok(result)
+        Ok(session)
     }
 
     #[graphql(name = "getRecentSessionList")]
