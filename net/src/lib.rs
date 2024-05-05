@@ -25,13 +25,15 @@ use tower_http::{
 };
 
 use crate::{
-    domain::model::error::OptionExtension,
-    domain::service::{
-        config_service::ConfigService,
-        metric_service::MetricService,
-        project_meta_service::ProjectMetaService,
-        session_service::{SessionService, SessionServiceConfig},
-        ServiceLocator,
+    domain::{
+        model::OptionExtension,
+        service::{
+            config_service::ConfigService,
+            metric_service::MetricService,
+            project_meta_service::ProjectMetaService,
+            session_service::{SessionService, SessionServiceConfig},
+            ServiceLocator,
+        },
     },
     infra::database::sqlite::RootDatabaseClient,
 };
@@ -51,7 +53,7 @@ const MIX_COMPRESS_SIZE: u16 = 512; // TODO: this value should be used from a ne
 pub async fn bind(_: TokioCancellationToken) -> Result<(), Error> {
     let conf = CONF
         .get()
-        .or_else_config_invalid("configuration was not defined")?;
+        .ok_or_config_invalid("configuration was not defined", None)?;
 
     let b = bus::Bus::new();
 

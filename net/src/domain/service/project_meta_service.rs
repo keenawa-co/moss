@@ -2,13 +2,13 @@ use common::{id::NanoId, thing::Thing};
 use fs::real;
 use std::sync::Arc;
 
-use crate::{
-    domain::{
-        model::project::{CreateProjectInput, ProjectMeta},
-        model::result::Result,
-        port::ProjectMetaRepository,
+use crate::domain::{
+    model::{
+        project::{CreateProjectInput, ProjectMeta},
+        result::Result,
+        OptionExtension,
     },
-    resource_not_found,
+    port::ProjectMetaRepository,
 };
 
 #[derive(Debug, Clone)]
@@ -41,7 +41,7 @@ impl ProjectMetaService {
             .project_repo
             .delete_by_id(id.clone())
             .await?
-            .ok_or_else(|| resource_not_found!("project with id {} does not exist", id))?;
+            .ok_or_resource_not_found(&format!("project with id {} does not exist", id), None)?;
         // code = ErrorCode::EXPECTED_BUT_NOT_FOUND
 
         Ok(result)

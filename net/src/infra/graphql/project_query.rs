@@ -4,12 +4,12 @@ use gqlutl::{path::Path as PathGraphQL, GraphQLExtendError};
 use std::path::PathBuf;
 use tokio::sync::RwLock;
 
-use crate::{
-    domain::{
-        model::project::{CreateProjectInput, ProjectMeta},
-        service::{project_meta_service::ProjectMetaService, project_service::ProjectService},
+use crate::domain::{
+    model::{
+        project::{CreateProjectInput, ProjectMeta},
+        OptionExtension,
     },
-    resource_invalid,
+    service::{project_meta_service::ProjectMetaService, project_service::ProjectService},
 };
 
 #[derive(Default)]
@@ -46,9 +46,8 @@ impl ProjectMutation {
         let project_service_lock = ctx.data::<RwLock<Option<ProjectService>>>()?.write().await;
         let project_service = project_service_lock
             .as_ref()
-            .ok_or_else(|| resource_invalid!("ddgfg"))
-            .extend_error()
-            .extend_error_with_status_code(428)?; // TODO:
+            .ok_or_resource_precondition_required("Session must be initialized first", None)
+            .extend_error()?;
 
         project_service
             .create_ignore_list(&input_list.iter().map(Into::into).collect::<Vec<PathBuf>>())

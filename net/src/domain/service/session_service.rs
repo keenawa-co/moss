@@ -5,13 +5,14 @@ use tokio::sync::RwLock;
 use crate::{
     domain::{
         model::{
+            error::Error,
             result::Result,
             session::{CreateSessionInput, Session, SessionInfo},
+            OptionExtension,
         },
         port::{ProjectMetaRepository, SessionRepository},
     },
     infra::database::sqlite::{ProjectDatabaseClient, ProjectMigrator},
-    resource_invalid, resource_not_found,
 };
 
 use super::ProjectService;
@@ -55,19 +56,23 @@ impl SessionService {
             .project_meta_repo
             .get_by_source(input.project_source.canonicalize()?)
             .await?
-            .ok_or_else(|| {
-                resource_not_found!(
+            .ok_or_resource_not_found(
+                &format!(
                     "project with source {} does not exist",
                     input.project_source
-                )
-            })?;
+                ),
+                None,
+            )?;
         let session_entity = self.session_repo.create(project_meta_entity.id).await?;
 
         let project_path = PathBuf::from(&input.project_source);
         if !project_path.exists() {
-            return Err(resource_not_found!(
-                "project {} is not found on your filesystem",
-                input.project_source
+            return Err(Error::resource_not_found(
+                &format!(
+                    "project {} is not found on your filesystem",
+                    input.project_source
+                ),
+                None,
             ));
         }
 
@@ -95,17 +100,20 @@ impl SessionService {
             .session_repo
             .get_by_id(session_id.clone())
             .await?
-            .ok_or_else(|| resource_not_found!("session {} does not exist", session_id))?;
+            .ok_or_resource_not_found(&format!("session {} does not exist", session_id), None)?;
 
         let project_meta = session
             .project_meta
             .as_ref()
-            .ok_or_else(|| resource_invalid!("session project does not exist"))?;
+            .ok_or_resource_invalid("session project does not exist", None)?;
 
         if !PathBuf::from(&project_meta.source).exists() {
-            return Err(resource_invalid!(
-                "project {} is not found on your filesystem",
-                project_meta.source
+            return Err(Error::resource_invalid(
+                &format!(
+                    "project {} is not found on your filesystem",
+                    project_meta.source
+                ),
+                None,
             ));
         }
 

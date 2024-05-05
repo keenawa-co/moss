@@ -1,48 +1,4 @@
-use std::fmt;
-
-use async_graphql::{ErrorExtensionValues, ErrorExtensions};
 use thiserror::Error;
-
-use crate::domain::model::result::Result;
-
-#[macro_export]
-macro_rules! resource_not_found {
-    ($msg:expr) => {{
-        $crate::domain::model::error::Error::Resource(
-            $crate::domain::model::error::ResourceError::NotFound(
-                format!("{}:{}: {}", file!(), line!(), $msg),
-                None
-            )
-        )
-    }};
-
-    ($fmt:expr, $($arg:expr),*) => {{
-        $crate::domain::model::error::Error::Resource(
-            $crate::domain::model::error::ResourceError::NotFound(
-                format!("{}:{}: {}", file!(), line!(), format!($fmt, $($arg),+)),
-            )
-        )
-    }};
-}
-
-#[macro_export]
-macro_rules! resource_invalid {
-    ($msg:expr) => {{
-        $crate::domain::model::error::Error::Resource(
-            $crate::domain::model::error::ResourceError::Invalid(
-                format!("{}:{}: {}", file!(), line!(), $msg)
-            )
-        )
-    }};
-
-    ($fmt:expr, $($arg:expr),*) => {{
-        $crate::domain::model::error::Error::Resource(
-            $crate::domain::model::error::ResourceError::Invalid(
-                format!("{}:{}: {}", file!(), line!(), format!($fmt, $($arg),+)),
-            )
-        )
-    }};
-}
 
 macro_rules! transparent_error {
     ($outer_variant:ident, $inner_variant:path, $err_type:ty) => {
@@ -52,10 +8,6 @@ macro_rules! transparent_error {
             }
         }
     };
-}
-
-pub trait OptionExtension<T> {
-    fn or_else_config_invalid(self, detail: &str) -> Result<T>;
 }
 
 #[derive(Error, Debug)]
@@ -72,17 +24,44 @@ pub enum Error {
 
 #[derive(Error, Debug)]
 pub enum ConfigError {
-    #[error("Configuration is invalid. {0}")]
-    Invalid(String),
+    #[error("Configuration is invalid. {detail:?}")]
+    Invalid {
+        detail: String,
+        error_code: Option<String>,
+    },
 }
 
 #[derive(Error, Debug)]
 pub enum ResourceError {
-    #[error("Cannot find the requested resource. {0}")]
-    NotFound(String),
+    #[error("Cannot or will not process the request. {detail}")]
+    Invalid {
+        detail: String,
+        error_code: Option<String>,
+    },
 
-    #[error("Cannot or will not process the request. {0}")]
-    Invalid(String),
+    #[error("Cannot find the requested resource. {detail}")]
+    NotFound {
+        detail: String,
+        error_code: Option<String>,
+    },
+
+    #[error(transparent)]
+    Precondition(PreconditionError),
+}
+
+#[derive(Error, Debug)]
+pub enum PreconditionError {
+    #[error("Prerequisites are not met. {detail}")]
+    Required {
+        detail: String,
+        error_code: Option<String>,
+    },
+
+    #[error("Prerequisites are met, but not correctly. {detail}")]
+    Invalid {
+        detail: String,
+        error_code: Option<String>,
+    },
 }
 
 #[derive(Error, Debug)]
@@ -102,11 +81,58 @@ pub enum SystemError {
     #[error(transparent)]
     Serde(#[from] serde_json::Error),
 
-    #[error("The origin server requires the request to be conditional. {0}")]
-    Precondition(String),
+    #[error("An unexpected internal error occurred. {detail}")]
+    Unexpected {
+        detail: String,
+        error_code: Option<String>,
+    },
+}
 
-    #[error("An unexpected internal error occurred. {0}")]
-    Unexpected(String),
+impl Error {
+    pub fn config_invalid(detail: &str, error_code: Option<String>) -> Self {
+        let err = ConfigError::Invalid {
+            detail: detail.to_string(),
+            error_code,
+        };
+
+        Error::Config(err)
+    }
+
+    pub fn resource_not_found(detail: &str, error_code: Option<String>) -> Self {
+        let err = ResourceError::NotFound {
+            detail: detail.to_string(),
+            error_code,
+        };
+
+        Error::Resource(err)
+    }
+
+    pub fn resource_invalid(detail: &str, error_code: Option<String>) -> Self {
+        let err = ResourceError::Invalid {
+            detail: detail.to_string(),
+            error_code,
+        };
+
+        Error::Resource(err)
+    }
+
+    pub fn resource_precondition_invalid(detail: &str, error_code: Option<String>) -> Self {
+        let err = PreconditionError::Invalid {
+            detail: detail.to_string(),
+            error_code,
+        };
+
+        Error::Resource(ResourceError::Precondition(err))
+    }
+
+    pub fn resource_precondition_required(detail: &str, error_code: Option<String>) -> Self {
+        let err = PreconditionError::Required {
+            detail: detail.to_string(),
+            error_code,
+        };
+
+        Error::Resource(ResourceError::Precondition(err))
+    }
 }
 
 impl Error {
@@ -125,10 +151,3 @@ transparent_error!(System, SystemError::Database, sea_orm::DbErr);
 transparent_error!(System, SystemError::Anyhow, anyhow::Error);
 transparent_error!(System, SystemError::Notify, notify::Error);
 transparent_error!(System, SystemError::IO, std::io::Error);
-
-impl<T> OptionExtension<T> for Option<T> {
-    fn or_else_config_invalid(self, detail: &str) -> Result<T> {
-        let err = ConfigError::Invalid(detail.to_string());
-        self.ok_or_else(|| Error::Config(err))
-    }
-}
