@@ -6,17 +6,6 @@ pub mod session;
 
 use crate::domain::model::{error::*, result::Result};
 
-#[macro_export]
-macro_rules! err_args {
-    ($option:expr, $detail:expr, $error_code:expr) => {
-        ($option, $detail, Some($error_code), file!(), line!())
-    };
-
-    ($option:expr, $detail:expr) => {
-        ($option, $detail, None, file!(), line!())
-    };
-}
-
 pub trait OptionExtension<T> {
     fn ok_or_config_invalid(self, detail: &str, error_code: Option<String>) -> Result<T>;
     fn ok_or_resource_invalid(self, detail: &str, error_code: Option<String>) -> Result<T>;

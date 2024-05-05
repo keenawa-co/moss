@@ -7,7 +7,6 @@ mod session_query;
 use async_graphql::{
     ErrorExtensionValues, ErrorExtensions, MergedObject, MergedSubscription, Schema,
 };
-use serde_json::json;
 
 use self::{
     config_query::ConfigQuery, explorer_query::ExplorerSubscription,
