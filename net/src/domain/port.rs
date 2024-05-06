@@ -25,5 +25,6 @@ pub(crate) trait SessionRepository: Debug + Send + Sync {
 
 #[async_trait]
 pub(crate) trait IgnoreListRepository: Debug + Send + Sync {
-    async fn create(&self, input_list: &Vec<PathBuf>) -> Result<Vec<IgnoredSource>>;
+    async fn create_from_list(&self, input_list: &Vec<PathBuf>) -> Result<Vec<IgnoredSource>>;
+    async fn delete_by_id(&self, id: &NanoId) -> Result<Option<Thing>>;
 }

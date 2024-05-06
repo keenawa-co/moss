@@ -1,6 +1,6 @@
 use common::id::NanoId;
+use common::thing::Thing;
 use sea_orm::entity::prelude::*;
-use sea_orm::sea_query::OnConflict;
 use sea_orm::{DatabaseConnection, Set};
 use std::path::PathBuf;
 use std::sync::Arc;
@@ -42,7 +42,7 @@ impl IgnoreListRepositoryImpl {
 
 #[async_trait]
 impl domain::port::IgnoreListRepository for IgnoreListRepositoryImpl {
-    async fn create(&self, input_list: &Vec<PathBuf>) -> Result<Vec<IgnoredSource>> {
+    async fn create_from_list(&self, input_list: &Vec<PathBuf>) -> Result<Vec<IgnoredSource>> {
         let result = dbutl::transaction::weak_transaction(self.conn.as_ref(), |tx| async move {
             let mut result = Vec::new();
             let models: Vec<ActiveModel> = input_list
@@ -72,5 +72,17 @@ impl domain::port::IgnoreListRepository for IgnoreListRepositoryImpl {
         .await?;
 
         Ok(result)
+    }
+
+    async fn delete_by_id(&self, id: &NanoId) -> Result<Option<Thing>> {
+        let result = Entity::delete_by_id(id.clone())
+            .exec(self.conn.as_ref())
+            .await?;
+
+        Ok(if result.rows_affected > 0 {
+            Some(Thing::from(id.to_string()))
+        } else {
+            None
+        })
     }
 }

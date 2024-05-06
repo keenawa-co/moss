@@ -92,7 +92,7 @@ impl domain::port::ProjectMetaRepository for ProjectMetaRepositoryImpl {
         let rows_affected = Entity::delete_by_id(id.clone())
             .exec(self.conn.as_ref())
             .await?
-            .rows_affected;
+            .rows_affected; // FIXME: remove this call
 
         Ok(if rows_affected > 0 {
             Some(Thing::from(id.to_string()))
