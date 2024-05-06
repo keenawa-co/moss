@@ -8,6 +8,7 @@
     "disp",
     "gqlutl",
     "graphiql",
+    "hashbrown",
     "inmem",
     "inmemdb",
     "mimalloc",

@@ -5,6 +5,7 @@ use sea_orm::{DatabaseConnection, Set};
 use std::path::PathBuf;
 use std::sync::Arc;
 
+use crate::domain::model::project::IgnoredSource;
 use crate::domain::{self, model::result::Result};
 
 //
@@ -41,29 +42,35 @@ impl IgnoreListRepositoryImpl {
 
 #[async_trait]
 impl domain::port::IgnoreListRepository for IgnoreListRepositoryImpl {
-    async fn create(&self, input_list: &Vec<PathBuf>) -> Result<()> {
-        dbutl::transaction::weak_transaction(self.conn.as_ref(), |tx| async move {
+    async fn create(&self, input_list: &Vec<PathBuf>) -> Result<Vec<IgnoredSource>> {
+        let result = dbutl::transaction::weak_transaction(self.conn.as_ref(), |tx| async move {
+            let mut result = Vec::new();
             let models: Vec<ActiveModel> = input_list
                 .iter()
-                .map(|item| ActiveModel {
-                    id: Set(NanoId::new().to_string()),
-                    source: Set(item.to_string_lossy().to_string()),
+                .map(|item| {
+                    let item_id = NanoId::new();
+                    let item_source = item.to_string_lossy().to_string();
+
+                    result.push(IgnoredSource {
+                        id: item_id.clone(),
+                        source: item_source.clone(),
+                    });
+
+                    ActiveModel {
+                        id: Set(item_id.to_string()),
+                        source: Set(item_source),
+                    }
                 })
                 .collect();
 
             Entity::insert_many(models)
-                .on_conflict(
-                    OnConflict::columns([Column::Source])
-                        .do_nothing()
-                        .to_owned(),
-                )
                 .exec_without_returning(&*tx)
                 .await?;
 
-            Ok(())
+            Ok(result)
         })
         .await?;
 
-        Ok(())
+        Ok(result)
     }
 }

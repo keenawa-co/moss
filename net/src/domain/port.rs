@@ -2,7 +2,7 @@ use common::{id::NanoId, thing::Thing};
 use std::{fmt::Debug, path::PathBuf};
 
 use super::model::{
-    project::{CreateProjectInput, ProjectMeta},
+    project::{CreateProjectInput, IgnoredSource, ProjectMeta},
     result::Result,
     session::{Session, SessionInfo},
 };
@@ -25,5 +25,5 @@ pub(crate) trait SessionRepository: Debug + Send + Sync {
 
 #[async_trait]
 pub(crate) trait IgnoreListRepository: Debug + Send + Sync {
-    async fn create(&self, input_list: &Vec<PathBuf>) -> Result<()>;
+    async fn create(&self, input_list: &Vec<PathBuf>) -> Result<Vec<IgnoredSource>>;
 }
