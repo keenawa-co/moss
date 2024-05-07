@@ -1,11 +1,12 @@
 use async_graphql::{Context, Object, Result as GraphqlResult};
 use common::{id::NanoId, thing::Thing};
-use gqlutl::{path::Path as PathGraphQL, GraphQLExtendError};
+use graphql_utl::{path::Path as PathGraphQL, GraphQLExtendError};
 use std::path::PathBuf;
 use tokio::sync::RwLock;
 
 use crate::domain::{
     model::{
+        error::Error,
         notification::Notification,
         project::{CreateProjectInput, IgnoredSource, ProjectMeta},
         OptionExtension,
@@ -42,11 +43,16 @@ impl ProjectMutation {
     }
 
     #[graphql(name = "appendToProjectIgnored")]
+    // #[graphql_mac::check_header("session-id")]
     async fn append_to_ignore_list(
         &self,
         ctx: &Context<'_>,
         input_list: Vec<PathGraphQL>,
     ) -> GraphqlResult<Vec<IgnoredSource>> {
+        if !ctx.http_header_contains("Content-Type") {
+            return Err(Error::resource_invalid("session-id not found", None)).extend_error()?;
+        }
+
         let notification_service = ctx.data::<NotificationService>()?;
         let session_service_lock = ctx.data::<RwLock<SessionService>>()?.write().await;
         let project_service_lock = ctx.data::<RwLock<Option<ProjectService>>>()?.write().await;

@@ -12,7 +12,8 @@ fs.workspace = true
 bus.workspace = true
 pwd.workspace = true
 dbutl.workspace = true
-gqlutl.workspace = true
+graphql_utl.workspace = true
+graphql_mac.workspace = true
 file = { workspace = true, features = ["graphql"] }
 conf = { workspace = true, features = ["graphql"] }
 common = { workspace = true, features = ["graphql"] }

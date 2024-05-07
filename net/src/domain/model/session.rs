@@ -1,6 +1,6 @@
 use async_graphql::{InputObject, SimpleObject};
 use common::id::NanoId;
-use gqlutl::path::Path as PathGraphQL;
+use graphql_utl::path::Path as PathGraphQL;
 
 use super::project::ProjectMeta;
 

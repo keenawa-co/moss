@@ -12,7 +12,8 @@ members = [
     "lib/conf",
     "lib/dbutl",
     "lib/file",
-    "lib/gqlutl",
+    "lib/graphql_mac",
+    "lib/graphql_utl",
     "lib/mac",
     "lib/pwd",
     "mossctl",
@@ -44,7 +45,8 @@ file = { path = "lib/file" }
 common = { path = "lib/common" }
 analysis = { path = "lib/analysis" }
 dbutl = { path = "lib/dbutl" }
-gqlutl = { path = "lib/gqlutl" }
+graphql_utl = { path = "lib/graphql_utl" }
+graphql_mac = { path = "lib/graphql_mac" }
 
 mossctl = { path = "mossctl" }
 net = { path = "net" }

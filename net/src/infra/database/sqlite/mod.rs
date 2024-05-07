@@ -34,6 +34,10 @@ impl RootDatabaseClient {
     pub(crate) fn session_repo(&self) -> Arc<SessionRepositoryImpl> {
         self.session_repo.clone()
     }
+
+    // pub(crate) fn session_repo(&self) -> &impl SessionRepository {
+    //     &self.session_repo
+    // }
 }
 
 #[derive(Debug)]

@@ -1407,14 +1407,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d2fabcfbdc87f4758337ca535fb41a6d701b65693ce38287d856d1674551ec9b"
 
 [[package]]
-name = "gqlutl"
-version = "0.1.0"
-dependencies = [
- "async-graphql",
- "serde",
-]
-
-[[package]]
 name = "graphql-parser"
 version = "0.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1422,6 +1414,23 @@ checksum = "d2ebc8013b4426d5b81a4364c419a95ed0b404af2b82e2457de52d9348f0e474"
 dependencies = [
  "combine",
  "thiserror",
+]
+
+[[package]]
+name = "graphql_mac"
+version = "0.1.0"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 2.0.59",
+]
+
+[[package]]
+name = "graphql_utl"
+version = "0.1.0"
+dependencies = [
+ "async-graphql",
+ "serde",
 ]
 
 [[package]]
@@ -1991,7 +2000,8 @@ dependencies = [
  "fs",
  "futures",
  "futures-util",
- "gqlutl",
+ "graphql_mac",
+ "graphql_utl",
  "hashbrown 0.7.2",
  "http",
  "notify",

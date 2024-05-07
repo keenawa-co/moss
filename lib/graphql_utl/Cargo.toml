@@ -1,5 +1,5 @@
 [package]
-name = "gqlutl"
+name = "graphql_utl"
 version = "0.1.0"
 edition = "2021"
 
