@@ -12,12 +12,12 @@ members = [
     "lib/conf",
     "lib/dbutl",
     "lib/file",
-    "lib/gqlutl",
+    "lib/graphql_mac",
+    "lib/graphql_utl",
     "lib/mac",
     "lib/pwd",
     "mossctl",
     "net",
-    "testdata/hello-wasm",
 ]
 
 [profile.release]
@@ -45,7 +45,8 @@ file = { path = "lib/file" }
 common = { path = "lib/common" }
 analysis = { path = "lib/analysis" }
 dbutl = { path = "lib/dbutl" }
-gqlutl = { path = "lib/gqlutl" }
+graphql_utl = { path = "lib/graphql_utl" }
+graphql_mac = { path = "lib/graphql_mac" }
 
 mossctl = { path = "mossctl" }
 net = { path = "net" }
@@ -59,11 +60,12 @@ chrono = "0.4"
 notify = "6.1.1"
 url = "2.5.0"
 nanoid = "0.4"
+hashbrown = "=0.7.2"
 
 tokio = "1"
 tokio-util = "0.7"
 tokio-stream = "0.1.15"
-
+async-stream = "0.3.5"
 smol = "2.0.0"
 
 futures = "0.3"
@@ -93,6 +95,7 @@ async-graphql-axum = "7.0"
 axum-server = "0.6"
 tower = "0.4"
 tower-http = "0.5.2"
+http = "1.1.0"
 
 [dependencies]
 mossctl.workspace = true

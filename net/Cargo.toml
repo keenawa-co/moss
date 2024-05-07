@@ -12,7 +12,8 @@ fs.workspace = true
 bus.workspace = true
 pwd.workspace = true
 dbutl.workspace = true
-gqlutl.workspace = true
+graphql_utl.workspace = true
+graphql_mac.workspace = true
 file = { workspace = true, features = ["graphql"] }
 conf = { workspace = true, features = ["graphql"] }
 common = { workspace = true, features = ["graphql"] }
@@ -60,6 +61,9 @@ tower-http = { workspace = true, features = [
 ] }
 tokio-stream = { workspace = true, features = ["sync"] }
 futures.workspace = true
+http.workspace = true
+async-stream.workspace = true
+hashbrown.workspace = true
 
 [dependencies.sea-orm-migration]
 workspace = true

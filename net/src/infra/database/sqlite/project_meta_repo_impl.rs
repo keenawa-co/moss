@@ -9,6 +9,7 @@ use std::sync::Arc;
 use crate::domain::{
     self,
     model::project::{CreateProjectInput, ProjectMeta},
+    model::result::Result,
 };
 
 //
@@ -59,7 +60,7 @@ impl ProjectMetaRepositoryImpl {
 
 #[async_trait]
 impl domain::port::ProjectMetaRepository for ProjectMetaRepositoryImpl {
-    async fn create(&self, input: &CreateProjectInput) -> domain::Result<ProjectMeta> {
+    async fn create(&self, input: &CreateProjectInput) -> Result<ProjectMeta> {
         let current_timestamp = Utc::now().timestamp();
         let model = (ActiveModel {
             id: Set(NanoId::new().to_string()),
@@ -72,13 +73,15 @@ impl domain::port::ProjectMetaRepository for ProjectMetaRepositoryImpl {
         Ok(model.into())
     }
 
-    async fn get_by_id(&self, id: NanoId) -> domain::Result<Option<ProjectMeta>> {
-        let model_option = Entity::find_by_id(id).one(self.conn.as_ref()).await?;
+    async fn get_by_id(&self, id: &NanoId) -> Result<Option<ProjectMeta>> {
+        let model_option = Entity::find_by_id(id.clone())
+            .one(self.conn.as_ref())
+            .await?;
 
         Ok(model_option.map(ProjectMeta::from))
     }
 
-    async fn get_by_source(&self, source: PathBuf) -> domain::Result<Option<ProjectMeta>> {
+    async fn get_by_source(&self, source: &PathBuf) -> Result<Option<ProjectMeta>> {
         let model_option = Entity::find()
             .filter(Column::Source.eq(source.to_str()))
             .one(self.conn.as_ref())
@@ -87,11 +90,11 @@ impl domain::port::ProjectMetaRepository for ProjectMetaRepositoryImpl {
         Ok(model_option.map(ProjectMeta::from))
     }
 
-    async fn delete_by_id(&self, id: NanoId) -> domain::Result<Option<Thing>> {
+    async fn delete_by_id(&self, id: &NanoId) -> Result<Option<Thing>> {
         let rows_affected = Entity::delete_by_id(id.clone())
             .exec(self.conn.as_ref())
             .await?
-            .rows_affected;
+            .rows_affected; // FIXME: remove this call
 
         Ok(if rows_affected > 0 {
             Some(Thing::from(id.to_string()))
@@ -100,7 +103,7 @@ impl domain::port::ProjectMetaRepository for ProjectMetaRepositoryImpl {
         })
     }
 
-    async fn get_list_by_ids(&self, ids: &Vec<NanoId>) -> domain::Result<Vec<ProjectMeta>> {
+    async fn get_list_by_ids(&self, ids: &Vec<NanoId>) -> Result<Vec<ProjectMeta>> {
         let result_list = Entity::find()
             .filter(Column::Id.is_in(ids.clone()))
             .all(self.conn.as_ref())

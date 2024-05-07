@@ -2,8 +2,6 @@ use analysis::policy_engine::Report;
 use async_graphql::{Context, FieldResult, Subscription};
 use futures::{Stream, StreamExt};
 
-use std::sync::Arc;
-
 use crate::domain::service::metric_service::MetricService;
 
 #[derive(Default)]

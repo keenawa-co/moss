@@ -4,9 +4,12 @@ use sea_orm::entity::prelude::*;
 use sea_orm::{DatabaseConnection, QueryOrder, QuerySelect, Set};
 use std::sync::Arc;
 
-use crate::domain;
-use crate::domain::model::project::ProjectMeta;
-use crate::domain::model::session::{Session, SessionInfo};
+use crate::domain::{
+    self,
+    model::project::ProjectMeta,
+    model::result::Result,
+    model::session::{Session, SessionInfo},
+};
 
 //
 // Entity model definition for `session` table (root database)
@@ -21,14 +24,17 @@ pub struct Model {
     pub created_at: i64,
 }
 
-impl From<(Model, super::project_meta_repo_impl::Model)> for Session {
-    fn from(data: (Model, super::project_meta_repo_impl::Model)) -> Self {
+impl From<(Model, Option<super::project_meta_repo_impl::Model>)> for Session {
+    fn from(data: (Model, Option<super::project_meta_repo_impl::Model>)) -> Self {
         Session {
             id: data.0.id.into(),
-            project_meta: ProjectMeta {
-                id: data.1.id.into(),
-                source: data.1.source,
-                created_at: data.1.created_at,
+            project_meta: match data.1 {
+                Some(project_meta) => Some(ProjectMeta {
+                    id: project_meta.id.into(),
+                    source: project_meta.source,
+                    created_at: project_meta.created_at,
+                }),
+                None => None,
             },
             created_at: data.0.created_at,
         }
@@ -80,7 +86,7 @@ impl SessionRepositoryImpl {
 
 #[async_trait]
 impl domain::port::SessionRepository for SessionRepositoryImpl {
-    async fn create(&self, project_id: NanoId) -> domain::Result<SessionInfo> {
+    async fn create(&self, project_id: &NanoId) -> Result<SessionInfo> {
         let model = (ActiveModel {
             id: Set(NanoId::new().to_string()),
             project_meta_id: Set(project_id.to_string()),
@@ -92,7 +98,7 @@ impl domain::port::SessionRepository for SessionRepositoryImpl {
         Ok(model.into())
     }
 
-    async fn get_recent_list(&self, start_time: i64, limit: u64) -> domain::Result<Vec<Session>> {
+    async fn fetch_list_by_start_time(&self, start_time: i64, limit: u64) -> Result<Vec<Session>> {
         let result = Entity::find()
             .filter(Column::CreatedAt.gte(start_time))
             .order_by_desc(Column::CreatedAt)
@@ -103,7 +109,19 @@ impl domain::port::SessionRepository for SessionRepositoryImpl {
 
         Ok(result
             .into_iter()
-            .map(|(session, project_meta)| (session, project_meta.unwrap()).into())
+            .map(|(session, project_meta)| (session, project_meta).into())
             .collect())
+    }
+
+    async fn get_by_id(&self, session_id: &NanoId) -> Result<Option<Session>> {
+        let result = Entity::find_by_id(session_id.clone())
+            .find_also_related(super::project_meta_repo_impl::Entity)
+            .one(self.conn.as_ref())
+            .await?;
+
+        match result {
+            Some((session, project_meta)) => Ok(Some(Session::from((session, project_meta)))),
+            None => Ok(None),
+        }
     }
 }

@@ -5,6 +5,7 @@ use axum::{
     routing::{get, post},
     Extension, Router,
 };
+use http::HeaderMap;
 
 use crate::infra::graphql::SchemaRoot;
 
@@ -12,8 +13,12 @@ async fn graphiql_handler() -> impl IntoResponse {
     Html(GraphiQLSource::build().endpoint("/").finish())
 }
 
-async fn graphql_handler(schema: Extension<SchemaRoot>, req: GraphQLRequest) -> GraphQLResponse {
-    return schema.execute(req.into_inner()).await.into();
+async fn graphql_handler(
+    schema: Extension<SchemaRoot>,
+    headers: HeaderMap,
+    req: GraphQLRequest,
+) -> GraphQLResponse {
+    return schema.execute(req.into_inner().data(headers)).await.into();
 }
 
 pub fn router<S>(schema: SchemaRoot) -> Router<S>

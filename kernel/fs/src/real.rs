@@ -1,5 +1,5 @@
 use futures::{AsyncRead, Stream};
-use notify::{event, Watcher};
+use notify::Watcher;
 use smol::stream::StreamExt;
 use std::{
     io,
