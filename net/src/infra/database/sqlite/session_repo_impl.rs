@@ -86,7 +86,7 @@ impl SessionRepositoryImpl {
 
 #[async_trait]
 impl domain::port::SessionRepository for SessionRepositoryImpl {
-    async fn create(&self, project_id: NanoId) -> Result<SessionInfo> {
+    async fn create(&self, project_id: &NanoId) -> Result<SessionInfo> {
         let model = (ActiveModel {
             id: Set(NanoId::new().to_string()),
             project_meta_id: Set(project_id.to_string()),
@@ -98,7 +98,7 @@ impl domain::port::SessionRepository for SessionRepositoryImpl {
         Ok(model.into())
     }
 
-    async fn get_recent_list(&self, start_time: i64, limit: u64) -> Result<Vec<Session>> {
+    async fn fetch_list_by_start_time(&self, start_time: i64, limit: u64) -> Result<Vec<Session>> {
         let result = Entity::find()
             .filter(Column::CreatedAt.gte(start_time))
             .order_by_desc(Column::CreatedAt)
@@ -113,8 +113,8 @@ impl domain::port::SessionRepository for SessionRepositoryImpl {
             .collect())
     }
 
-    async fn get_by_id(&self, session_id: NanoId) -> Result<Option<Session>> {
-        let result = Entity::find_by_id(session_id)
+    async fn get_by_id(&self, session_id: &NanoId) -> Result<Option<Session>> {
+        let result = Entity::find_by_id(session_id.clone())
             .find_also_related(super::project_meta_repo_impl::Entity)
             .one(self.conn.as_ref())
             .await?;

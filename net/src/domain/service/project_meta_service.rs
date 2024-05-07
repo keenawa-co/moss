@@ -36,10 +36,10 @@ impl ProjectMetaService {
         Ok(project_entity)
     }
 
-    pub async fn delete_project_by_id(&self, id: NanoId) -> Result<Thing> {
+    pub async fn delete_project_by_id(&self, id: &NanoId) -> Result<Thing> {
         let result = self
             .project_repo
-            .delete_by_id(id.clone())
+            .delete_by_id(id)
             .await?
             .ok_or_resource_not_found(&format!("project with id {} does not exist", id), None)?;
         // code = ErrorCode::EXPECTED_BUT_NOT_FOUND

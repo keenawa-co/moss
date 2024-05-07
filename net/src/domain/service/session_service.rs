@@ -71,7 +71,7 @@ impl SessionService {
     ) -> Result<SessionInfo> {
         let project_meta = self
             .project_meta_repo
-            .get_by_source(input.project_source.canonicalize()?)
+            .get_by_source(&input.project_source.canonicalize()?)
             .await?
             .ok_or_resource_not_found(
                 &format!(
@@ -80,7 +80,7 @@ impl SessionService {
                 ),
                 None,
             )?;
-        let session_entity = self.session_repo.create(project_meta.clone().id).await?; // FIXME: remove .clone()
+        let session_entity = self.session_repo.create(&project_meta.id).await?;
 
         let project_path = PathBuf::from(&input.project_source);
         if !project_path.exists() {
@@ -106,7 +106,7 @@ impl SessionService {
     ) -> Result<Session> {
         let session = self
             .session_repo
-            .get_by_id(session_id.clone())
+            .get_by_id(&session_id)
             .await?
             .ok_or_resource_not_found(&format!("session {} does not exist", session_id), None)?;
 
@@ -133,7 +133,10 @@ impl SessionService {
     }
 
     pub async fn get_recent_list(&self, start_time: i64, limit: u64) -> Result<Vec<Session>> {
-        Ok(self.session_repo.get_recent_list(start_time, limit).await?)
+        Ok(self
+            .session_repo
+            .fetch_list_by_start_time(start_time, limit)
+            .await?)
     }
 }
 

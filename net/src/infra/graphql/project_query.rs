@@ -36,7 +36,7 @@ impl ProjectMutation {
         let project_meta_service = ctx.data::<ProjectMetaService>()?;
 
         Ok(project_meta_service
-            .delete_project_by_id(id)
+            .delete_project_by_id(&id)
             .await
             .extend_error()?)
     }

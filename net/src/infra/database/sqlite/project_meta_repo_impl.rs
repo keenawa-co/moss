@@ -73,13 +73,15 @@ impl domain::port::ProjectMetaRepository for ProjectMetaRepositoryImpl {
         Ok(model.into())
     }
 
-    async fn get_by_id(&self, id: NanoId) -> Result<Option<ProjectMeta>> {
-        let model_option = Entity::find_by_id(id).one(self.conn.as_ref()).await?;
+    async fn get_by_id(&self, id: &NanoId) -> Result<Option<ProjectMeta>> {
+        let model_option = Entity::find_by_id(id.clone())
+            .one(self.conn.as_ref())
+            .await?;
 
         Ok(model_option.map(ProjectMeta::from))
     }
 
-    async fn get_by_source(&self, source: PathBuf) -> Result<Option<ProjectMeta>> {
+    async fn get_by_source(&self, source: &PathBuf) -> Result<Option<ProjectMeta>> {
         let model_option = Entity::find()
             .filter(Column::Source.eq(source.to_str()))
             .one(self.conn.as_ref())
@@ -88,7 +90,7 @@ impl domain::port::ProjectMetaRepository for ProjectMetaRepositoryImpl {
         Ok(model_option.map(ProjectMeta::from))
     }
 
-    async fn delete_by_id(&self, id: NanoId) -> Result<Option<Thing>> {
+    async fn delete_by_id(&self, id: &NanoId) -> Result<Option<Thing>> {
         let rows_affected = Entity::delete_by_id(id.clone())
             .exec(self.conn.as_ref())
             .await?
