@@ -1843,6 +1843,10 @@ name = "mac"
 version = "0.1.0"
 
 [[package]]
+name = "manifest"
+version = "0.1.0"
+
+[[package]]
 name = "matchers"
 version = "0.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2512,6 +2516,7 @@ dependencies = [
  "once_cell",
  "sea-orm",
  "sea-orm-migration",
+ "serde_json",
  "tracing",
 ]
 

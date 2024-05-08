@@ -3,18 +3,11 @@ use fs::{
     CreateOptions, FS,
 };
 use futures::io::Cursor;
-use sea_orm::DatabaseConnection;
+use serde_json::{json, Value};
 use std::{
     path::{Path, PathBuf},
     pin::Pin,
 };
-
-use super::db;
-
-lazy_static! {
-    static ref README_FILE_CONTENT: &'static str = "";
-    static ref GITIGNORE_FILE_CONTENT: &'static str = "cache";
-}
 
 lazy_static! {
     static ref ROOT: FileSystemEntity = FileSystemEntity::Directory {
@@ -26,7 +19,18 @@ lazy_static! {
             },
             FileSystemEntity::File {
                 name: ".gitignore".to_string(),
-                content: Some(GITIGNORE_FILE_CONTENT.to_string())
+                content: Some("cache".to_string())
+            },
+            FileSystemEntity::File {
+                name: "moss.json".to_string(),
+                content: Some(
+                    json!({
+                        "version": 1.0,
+                        "serial": 1,
+                        "toolchain": "v1.0.0",
+                    })
+                    .to_string()
+                )
             },
             FileSystemEntity::File {
                 name: "README.md".to_string(),

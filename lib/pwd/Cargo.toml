@@ -18,6 +18,7 @@ sea-orm = { workspace = true, features = [
     "sqlx-sqlite",
     "runtime-tokio-rustls",
 ] }
+serde_json.workspace = true
 
 [dependencies.sea-orm-migration]
 workspace = true

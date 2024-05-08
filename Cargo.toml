@@ -14,7 +14,7 @@ members = [
     "lib/file",
     "lib/graphql_mac",
     "lib/graphql_utl",
-    "lib/mac",
+    "lib/mac", "lib/manifest",
     "lib/pwd",
     "mossctl",
     "net",

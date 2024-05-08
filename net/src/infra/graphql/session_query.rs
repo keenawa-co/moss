@@ -51,17 +51,13 @@ impl SessionMutation {
     }
 
     #[graphql(name = "getRecentSessions")]
+    #[graphql_mac::require_header("session-id")]
     async fn get_recent(
         &self,
         ctx: &Context<'_>,
         #[graphql(default_with = "(Utc::now() - Duration::days(30)).timestamp()")] start_time: i64,
         #[graphql(validator(minimum = 1, maximum = 10), default = 10)] limit: u64,
     ) -> GraphqlResult<Vec<Session>> {
-        let header_map = ctx.data::<HeaderMap>()?;
-        if header_map.get("session-id").is_none() {
-            return Err(Error::resource_invalid("session-id not found", None)).extend_error()?;
-        }
-
         let session_service_lock = ctx.data::<RwLock<SessionService>>()?.write().await;
         let result = session_service_lock
             .get_recent_list(start_time, limit)
