@@ -84,8 +84,8 @@ pub async fn bind(_: TokioCancellationToken) -> Result<(), Error> {
             root_db.session_repo(),
             root_db.project_meta_repo(),
             SessionServiceConfig {
-                project_dir: PathBuf::from(".moss"), // FIXME: This value must be obtained from the configuration file
-                project_db_file: PathBuf::from("project.db"), // FIXME: This value must be obtained from the configuration file
+                project_dir: PathBuf::from(".moss/cache"), // FIXME: This value must be obtained from the configuration file
+                project_db_file: PathBuf::from("cache.db"), // FIXME: This value must be obtained from the configuration file
             },
         )),
         config_service: ConfigService::new(conf.preference.clone()),

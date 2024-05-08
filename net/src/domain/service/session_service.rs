@@ -52,14 +52,6 @@ impl SessionService {
 }
 
 impl SessionService {
-    // pub fn session_id(&self) -> &Option<NanoId> {
-    //     let r = self.context.get("project_id");
-    // }
-
-    // pub fn project_id(&self) -> &Option<NanoId> {
-    //     &self.project_id
-    // }
-
     pub fn get_from_context(&self, key: &str) -> Option<&Value> {
         self.context.get(key)
     }
