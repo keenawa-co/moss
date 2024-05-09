@@ -36,7 +36,7 @@ use crate::{
             ServiceHub,
         },
     },
-    infra::database::sqlite::RootDatabaseClient,
+    infra::adapter::sqlite::RootSQLiteAdapter,
 };
 
 #[macro_use]
@@ -78,7 +78,7 @@ pub async fn bind(_: TokioCancellationToken) -> Result<(), Error> {
 
     let pe = PolicyEngine::new(fw.clone(), b);
 
-    let root_db = RootDatabaseClient::new(Arc::clone(&conf.conn));
+    let root_db = RootSQLiteAdapter::new(Arc::clone(&conf.conn));
     let service_hub = ServiceHub {
         session_service: RwLock::new(SessionService::new(
             root_db.session_repo(),

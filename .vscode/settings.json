@@ -2,6 +2,7 @@
   "rust-analyzer.showUnlinkedFileNotification": false,
   "cSpell.words": [
     "bitflags",
+    "cachedb",
     "canonicalize",
     "chrono",
     "dbutl",
@@ -11,6 +12,7 @@
     "hashbrown",
     "inmem",
     "inmemdb",
+    "manifestfile",
     "mimalloc",
     "mlua",
     "MNID",
@@ -20,6 +22,7 @@
     "otlp",
     "realfs",
     "revisioned",
+    "rootdb",
     "sched",
     "smol",
     "sqlx",

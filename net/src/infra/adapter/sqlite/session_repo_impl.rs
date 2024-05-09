@@ -4,6 +4,7 @@ use sea_orm::entity::prelude::*;
 use sea_orm::{DatabaseConnection, QueryOrder, QuerySelect, Set};
 use std::sync::Arc;
 
+use crate::domain::port;
 use crate::domain::{
     self,
     model::project::ProjectMeta,
@@ -85,7 +86,7 @@ impl SessionRepositoryImpl {
 }
 
 #[async_trait]
-impl domain::port::SessionRepository for SessionRepositoryImpl {
+impl port::rootdb::SessionRepository for SessionRepositoryImpl {
     async fn create(&self, project_id: &NanoId) -> Result<SessionInfo> {
         let model = (ActiveModel {
             id: Set(NanoId::new().to_string()),

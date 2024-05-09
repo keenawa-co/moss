@@ -6,6 +6,7 @@ use std::path::PathBuf;
 use std::sync::Arc;
 
 use crate::domain::model::project::IgnoredSource;
+use crate::domain::port;
 use crate::domain::{self, model::result::Result};
 
 //
@@ -41,7 +42,7 @@ impl IgnoreListRepositoryImpl {
 }
 
 #[async_trait]
-impl domain::port::IgnoreListRepository for IgnoreListRepositoryImpl {
+impl port::cachedb::IgnoreListRepository for IgnoreListRepositoryImpl {
     async fn create_from_list(&self, input_list: &Vec<PathBuf>) -> Result<Vec<IgnoredSource>> {
         let result = dbutl::transaction::weak_transaction(self.conn.as_ref(), |tx| async move {
             let mut result = Vec::new();

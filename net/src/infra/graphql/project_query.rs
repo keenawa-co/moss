@@ -49,10 +49,6 @@ impl ProjectMutation {
         ctx: &Context<'_>,
         input_list: Vec<PathGraphQL>,
     ) -> GraphqlResult<Vec<IgnoredSource>> {
-        if !ctx.http_header_contains("Content-Type") {
-            return Err(Error::resource_invalid("session-id not found", None)).extend_error()?;
-        }
-
         let notification_service = ctx.data::<NotificationService>()?;
         let session_service_lock = ctx.data::<RwLock<SessionService>>()?.write().await;
         let project_service_lock = ctx.data::<RwLock<Option<ProjectService>>>()?.write().await;

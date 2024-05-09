@@ -13,9 +13,9 @@ use crate::{
             session::{CreateSessionInput, Session, SessionInfo},
             OptionExtension,
         },
-        port::{ProjectMetaRepository, SessionRepository},
+        port::{rootdb::ProjectMetaRepository, rootdb::SessionRepository},
     },
-    infra::database::sqlite::{CacheMigrator, ProjectDatabaseClient},
+    infra::adapter::sqlite::{CacheMigrator, CacheSQLiteAdapter},
 };
 
 use super::ProjectService;
@@ -157,7 +157,7 @@ impl SessionService {
             )
             .await?;
 
-            ProjectDatabaseClient::new(Arc::new(conn))
+            CacheSQLiteAdapter::new(Arc::new(conn))
         };
 
         let mut project_service_lock = project_service.write().await;

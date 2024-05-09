@@ -6,6 +6,7 @@ use sea_orm::{DatabaseConnection, Set};
 use std::path::PathBuf;
 use std::sync::Arc;
 
+use crate::domain::port;
 use crate::domain::{
     self,
     model::project::{CreateProjectInput, ProjectMeta},
@@ -59,7 +60,7 @@ impl ProjectMetaRepositoryImpl {
 }
 
 #[async_trait]
-impl domain::port::ProjectMetaRepository for ProjectMetaRepositoryImpl {
+impl port::rootdb::ProjectMetaRepository for ProjectMetaRepositoryImpl {
     async fn create(&self, input: &CreateProjectInput) -> Result<ProjectMeta> {
         let current_timestamp = Utc::now().timestamp();
         let model = (ActiveModel {

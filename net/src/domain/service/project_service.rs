@@ -4,7 +4,7 @@ use common::{id::NanoId, thing::Thing};
 
 use crate::domain::{
     model::{project::IgnoredSource, result::Result, OptionExtension},
-    port::IgnoreListRepository,
+    port::cachedb::IgnoreListRepository,
 };
 
 pub struct ProjectService {

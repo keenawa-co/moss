@@ -8,7 +8,7 @@ use crate::domain::{
         result::Result,
         OptionExtension,
     },
-    port::ProjectMetaRepository,
+    port::rootdb::ProjectMetaRepository,
 };
 
 #[derive(Debug, Clone)]

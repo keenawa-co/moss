@@ -9,19 +9,21 @@ pub(crate) use migration::CacheMigrator;
 use sea_orm::DatabaseConnection;
 use std::sync::Arc;
 
-use crate::domain::port::{IgnoreListRepository, ProjectMetaRepository, SessionRepository};
+use crate::domain::port::{
+    cachedb::IgnoreListRepository, rootdb::ProjectMetaRepository, rootdb::SessionRepository,
+};
 
 use self::{
     ignore_list_repo_impl::IgnoreListRepositoryImpl,
     project_meta_repo_impl::ProjectMetaRepositoryImpl, session_repo_impl::SessionRepositoryImpl,
 };
 
-pub struct RootDatabaseClient {
+pub struct RootSQLiteAdapter {
     project_meta_repo: Arc<dyn ProjectMetaRepository>,
     session_repo: Arc<dyn SessionRepository>,
 }
 
-impl RootDatabaseClient {
+impl RootSQLiteAdapter {
     pub(crate) fn new(conn: Arc<DatabaseConnection>) -> Self {
         Self {
             project_meta_repo: Arc::new(ProjectMetaRepositoryImpl::new(conn.clone())),
@@ -39,11 +41,11 @@ impl RootDatabaseClient {
 }
 
 #[derive(Debug)]
-pub struct ProjectDatabaseClient {
+pub struct CacheSQLiteAdapter {
     watch_list_repo: Arc<dyn IgnoreListRepository>,
 }
 
-impl ProjectDatabaseClient {
+impl CacheSQLiteAdapter {
     pub fn new(conn: Arc<DatabaseConnection>) -> Self {
         Self {
             watch_list_repo: Arc::new(IgnoreListRepositoryImpl::new(conn.clone())),
