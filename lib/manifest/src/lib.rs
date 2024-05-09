@@ -1,5 +1,5 @@
-pub struct ManifestFile {
-    pub version: f32,
-    pub serial: usize,
-    pub toolchain: String,
-}
+pub mod model;
+pub mod port;
+
+#[macro_use]
+extern crate async_trait;
