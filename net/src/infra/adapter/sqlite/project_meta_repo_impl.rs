@@ -8,7 +8,6 @@ use std::sync::Arc;
 
 use crate::domain::port;
 use crate::domain::{
-    self,
     model::project::{CreateProjectInput, ProjectMeta},
     model::result::Result,
 };

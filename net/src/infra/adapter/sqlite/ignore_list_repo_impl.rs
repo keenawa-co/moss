@@ -6,8 +6,8 @@ use std::path::PathBuf;
 use std::sync::Arc;
 
 use crate::domain::model::project::IgnoredSource;
+use crate::domain::model::result::Result;
 use crate::domain::port;
-use crate::domain::{self, model::result::Result};
 
 //
 // Entity model definition for `ignore_list` table (project database)

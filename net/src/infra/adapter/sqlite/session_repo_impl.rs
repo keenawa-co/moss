@@ -7,7 +7,7 @@ use std::sync::Arc;
 use crate::domain::model::session::SessionEntity;
 use crate::domain::port;
 use crate::domain::{
-    self, model::project::ProjectMeta, model::result::Result, model::session::SessionInfoEntity,
+    model::project::ProjectMeta, model::result::Result, model::session::SessionInfoEntity,
 };
 
 //

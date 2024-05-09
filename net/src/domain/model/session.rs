@@ -1,7 +1,6 @@
-use async_graphql::{InputObject, Scalar, ScalarType, SimpleObject};
+use async_graphql::{Scalar, ScalarType, SimpleObject};
 use chrono::Utc;
 use common::id::{nanoid_serde, NanoId};
-use graphql_utl::path::Path as PathGraphQL;
 use jsonwebtoken::{EncodingKey, Header};
 
 use crate::{config::MAGIC_TOKEN_KEY, domain};
@@ -21,15 +20,6 @@ pub(crate) struct SessionEntity {
     pub project_meta: Option<ProjectMeta>,
     pub created_at: i64,
 }
-
-// GraphQL DTO
-
-#[derive(Debug, Clone, Deserialize, Serialize, InputObject)]
-pub(crate) struct CreateSessionInput {
-    pub project_source: PathGraphQL,
-}
-
-// Session Token
 
 #[derive(Debug, Serialize, Deserialize)]
 pub(crate) struct SessionTokenClaims {

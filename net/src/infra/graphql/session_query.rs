@@ -1,6 +1,7 @@
 use async_graphql::{Context, Object, Result as GraphqlResult};
 use chrono::{Duration, Utc};
 use common::id::NanoId;
+use graphql_utl::path::Path as PathGraphQL;
 use graphql_utl::GraphQLExtendError;
 use http::HeaderMap;
 use tokio::sync::RwLock;
@@ -8,7 +9,7 @@ use tokio::sync::RwLock;
 use crate::domain::{
     model::{
         error::Error,
-        session::{CreateSessionInput, Session, SessionEntity, SessionToken},
+        session::{Session, SessionEntity, SessionToken},
     },
     service::{project_service::ProjectService, session_service::SessionService},
 };
@@ -21,14 +22,14 @@ impl SessionMutation {
     async fn create_session(
         &self,
         ctx: &Context<'_>,
-        input: CreateSessionInput,
+        project_source: PathGraphQL,
     ) -> GraphqlResult<Session> {
         let session_service = ctx.data::<RwLock<SessionService>>()?;
         let project_service = ctx.data::<RwLock<Option<ProjectService>>>()?;
 
         let mut session_service_lock = session_service.write().await;
         let session_entity = session_service_lock
-            .create_session(&input, project_service)
+            .create_session(&project_source.into(), project_service)
             .await
             .extend_error()?;
 

@@ -4,19 +4,11 @@ use serde_json::Value;
 use std::{path::PathBuf, sync::Arc};
 use tokio::sync::RwLock;
 
-use crate::{
-    domain::{
-        model::{
-            error::Error,
-            project::ProjectMeta,
-            result::Result,
-            session::{CreateSessionInput, SessionEntity, SessionToken},
-            OptionExtension,
-        },
-        port::rootdb::{ProjectMetaRepository, SessionRepository},
-    },
-    infra::adapter::sqlite::{CacheMigrator, CacheSQLiteAdapter},
+use crate::domain::model::{
+    error::Error, project::ProjectMeta, result::Result, session::SessionEntity, OptionExtension,
 };
+use crate::domain::port::rootdb::{ProjectMetaRepository, SessionRepository};
+use crate::infra::adapter::sqlite::{CacheMigrator, CacheSQLiteAdapter};
 
 use super::ProjectService;
 
@@ -58,28 +50,27 @@ impl SessionService {
 
     pub async fn create_session(
         &mut self,
-        input: &CreateSessionInput,
+        project_source: &PathBuf,
         project_service: &RwLock<Option<ProjectService>>,
     ) -> Result<SessionEntity> {
         let project_meta = self
             .project_meta_repo
-            .get_by_source(&input.project_source.canonicalize()?)
+            .get_by_source(&project_source.canonicalize()?)
             .await?
             .ok_or_resource_not_found(
                 &format!(
                     "project with source {} does not exist",
-                    input.project_source
+                    &project_source.to_string_lossy().to_string()
                 ),
                 None,
             )?;
         let session_info_entity = self.session_repo.create(&project_meta.id).await?;
 
-        let project_path = PathBuf::from(&input.project_source);
-        if !project_path.exists() {
+        if !project_source.exists() {
             return Err(Error::resource_not_found(
                 &format!(
                     "project {} is not found on your filesystem",
-                    input.project_source
+                    &project_source.to_string_lossy().to_string()
                 ),
                 None,
             ));
