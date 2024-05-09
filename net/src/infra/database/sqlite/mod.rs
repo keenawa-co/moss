@@ -4,10 +4,12 @@ mod ignore_list_repo_impl;
 mod project_meta_repo_impl;
 mod session_repo_impl;
 
-pub(crate) use migration::ProjectMigrator;
+pub(crate) use migration::CacheMigrator;
 
 use sea_orm::DatabaseConnection;
 use std::sync::Arc;
+
+use crate::domain::port::{IgnoreListRepository, ProjectMetaRepository, SessionRepository};
 
 use self::{
     ignore_list_repo_impl::IgnoreListRepositoryImpl,
@@ -15,44 +17,40 @@ use self::{
 };
 
 pub struct RootDatabaseClient {
-    project_repo: Arc<ProjectMetaRepositoryImpl>,
-    session_repo: Arc<SessionRepositoryImpl>,
+    project_meta_repo: Arc<dyn ProjectMetaRepository>,
+    session_repo: Arc<dyn SessionRepository>,
 }
 
 impl RootDatabaseClient {
     pub(crate) fn new(conn: Arc<DatabaseConnection>) -> Self {
         Self {
-            project_repo: Arc::new(ProjectMetaRepositoryImpl::new(conn.clone())),
+            project_meta_repo: Arc::new(ProjectMetaRepositoryImpl::new(conn.clone())),
             session_repo: Arc::new(SessionRepositoryImpl::new(conn.clone())),
         }
     }
 
-    pub(crate) fn project_meta_repo(&self) -> Arc<ProjectMetaRepositoryImpl> {
-        self.project_repo.clone()
+    pub(crate) fn project_meta_repo(&self) -> Arc<dyn ProjectMetaRepository> {
+        Arc::clone(&self.project_meta_repo)
     }
 
-    pub(crate) fn session_repo(&self) -> Arc<SessionRepositoryImpl> {
-        self.session_repo.clone()
+    pub(crate) fn session_repo(&self) -> Arc<dyn SessionRepository> {
+        Arc::clone(&self.session_repo)
     }
-
-    // pub(crate) fn session_repo(&self) -> &impl SessionRepository {
-    //     &self.session_repo
-    // }
 }
 
 #[derive(Debug)]
 pub struct ProjectDatabaseClient {
-    watch_list_repo: Arc<IgnoreListRepositoryImpl>,
+    watch_list_repo: Arc<dyn IgnoreListRepository>,
 }
 
 impl ProjectDatabaseClient {
     pub fn new(conn: Arc<DatabaseConnection>) -> Self {
         Self {
-            watch_list_repo: Arc::new(IgnoreListRepositoryImpl::new(conn)),
+            watch_list_repo: Arc::new(IgnoreListRepositoryImpl::new(conn.clone())),
         }
     }
 
-    pub fn watch_list_repo(&self) -> Arc<IgnoreListRepositoryImpl> {
-        self.watch_list_repo.clone()
+    pub fn watch_list_repo(&self) -> Arc<dyn IgnoreListRepository> {
+        Arc::clone(&self.watch_list_repo)
     }
 }

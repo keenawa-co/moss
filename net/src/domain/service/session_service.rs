@@ -15,7 +15,7 @@ use crate::{
         },
         port::{ProjectMetaRepository, SessionRepository},
     },
-    infra::database::sqlite::{ProjectDatabaseClient, ProjectMigrator},
+    infra::database::sqlite::{CacheMigrator, ProjectDatabaseClient},
 };
 
 use super::ProjectService;
@@ -150,7 +150,7 @@ impl SessionService {
 
         let project_db_client = {
             let project_path = PathBuf::from(&project_meta.source); // FIXME: avoid duplication (the same operation is performed in the parent function when checking the existence of a directory)
-            let conn = dbutl::sqlite::conn::<ProjectMigrator>(
+            let conn = dbutl::sqlite::conn::<CacheMigrator>(
                 &project_path
                     .join(&self.conf.project_dir)
                     .join(&self.conf.project_db_file),
