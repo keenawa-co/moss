@@ -65,11 +65,13 @@ pub async fn cmd_run(
 
     //  cancel_token is passed to all async functions requiring graceful termination
     let cancel_token = TokioCancellationToken::new();
+
     let _ = moss_net::CONF.set(moss_net::Config {
         bind: bind.unwrap_or(conf.net.endpoint_addr()),
         preference: super::utl::load_toml_file(&preference_filepath)?,
         conn: Arc::new(conn),
     });
+    let _ = moss_net::config::MAGIC_TOKEN_KEY.set("MAGIC_TEST_TOKEN".to_string());
 
     moss_net::bind(cancel_token).await?;
 

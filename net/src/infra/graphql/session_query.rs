@@ -8,7 +8,7 @@ use tokio::sync::RwLock;
 use crate::domain::{
     model::{
         error::Error,
-        session::{CreateSessionInput, Session, SessionInfo},
+        session::{CreateSessionInput, Session, SessionEntity, SessionToken},
     },
     service::{project_service::ProjectService, session_service::SessionService},
 };
@@ -22,17 +22,24 @@ impl SessionMutation {
         &self,
         ctx: &Context<'_>,
         input: CreateSessionInput,
-    ) -> GraphqlResult<SessionInfo> {
+    ) -> GraphqlResult<Session> {
         let session_service = ctx.data::<RwLock<SessionService>>()?;
         let project_service = ctx.data::<RwLock<Option<ProjectService>>>()?;
 
         let mut session_service_lock = session_service.write().await;
-        let session = session_service_lock
+        let session_entity = session_service_lock
             .create_session(&input, project_service)
             .await
             .extend_error()?;
 
-        Ok(session)
+        let session_token = SessionToken::try_from(session_entity.clone())?;
+
+        Ok(Session {
+            id: session_entity.id,
+            token: session_token,
+            project_meta: session_entity.project_meta,
+            created_at: session_entity.created_at,
+        })
     }
 
     async fn restore_session(
@@ -42,12 +49,19 @@ impl SessionMutation {
     ) -> GraphqlResult<Session> {
         let project_service = ctx.data::<RwLock<Option<ProjectService>>>()?;
         let mut session_service_lock = ctx.data::<RwLock<SessionService>>()?.write().await;
-        let session = session_service_lock
+        let session_entity = session_service_lock
             .restore_session(session_id, project_service)
             .await
             .extend_error()?;
 
-        Ok(session)
+        let session_token = SessionToken::try_from(session_entity.clone())?;
+
+        Ok(Session {
+            id: session_entity.id,
+            token: session_token,
+            project_meta: session_entity.project_meta,
+            created_at: session_entity.created_at,
+        })
     }
 
     #[graphql(name = "getRecentSessions")]
@@ -57,7 +71,7 @@ impl SessionMutation {
         ctx: &Context<'_>,
         #[graphql(default_with = "(Utc::now() - Duration::days(30)).timestamp()")] start_time: i64,
         #[graphql(validator(minimum = 1, maximum = 10), default = 10)] limit: u64,
-    ) -> GraphqlResult<Vec<Session>> {
+    ) -> GraphqlResult<Vec<SessionEntity>> {
         let session_service_lock = ctx.data::<RwLock<SessionService>>()?.write().await;
         let result = session_service_lock
             .get_recent_list(start_time, limit)

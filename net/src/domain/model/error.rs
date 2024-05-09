@@ -81,6 +81,9 @@ pub enum SystemError {
     #[error(transparent)]
     Serde(#[from] serde_json::Error),
 
+    #[error(transparent)]
+    JWT(#[from] jsonwebtoken::errors::Error),
+
     #[error("An unexpected internal error occurred. {detail}")]
     Unexpected {
         detail: String,
@@ -160,3 +163,4 @@ transparent_error!(System, SystemError::Database, sea_orm::DbErr);
 transparent_error!(System, SystemError::Anyhow, anyhow::Error);
 transparent_error!(System, SystemError::Notify, notify::Error);
 transparent_error!(System, SystemError::IO, std::io::Error);
+transparent_error!(System, SystemError::JWT, jsonwebtoken::errors::Error);

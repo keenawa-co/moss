@@ -6,7 +6,6 @@ use tokio::sync::RwLock;
 
 use crate::domain::{
     model::{
-        error::Error,
         notification::Notification,
         project::{CreateProjectInput, IgnoredSource, ProjectMeta},
         OptionExtension,

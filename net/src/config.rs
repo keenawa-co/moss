@@ -6,6 +6,7 @@ use std::{
 };
 
 pub static CONF: OnceLock<Config> = OnceLock::new();
+pub static MAGIC_TOKEN_KEY: OnceLock<String> = OnceLock::new();
 
 #[derive(Clone, Debug)]
 pub struct Config {

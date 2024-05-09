@@ -14,7 +14,8 @@ members = [
     "lib/file",
     "lib/graphql_mac",
     "lib/graphql_utl",
-    "lib/mac", "lib/manifest",
+    "lib/mac",
+    "lib/manifest",
     "lib/pwd",
     "mossctl",
     "net",
@@ -96,6 +97,7 @@ axum-server = "0.6"
 tower = "0.4"
 tower-http = "0.5.2"
 http = "1.1.0"
+jsonwebtoken = "9.3.0"
 
 [dependencies]
 mossctl.workspace = true

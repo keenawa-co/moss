@@ -10,10 +10,10 @@ use crate::{
             error::Error,
             project::ProjectMeta,
             result::Result,
-            session::{CreateSessionInput, Session, SessionInfo},
+            session::{CreateSessionInput, SessionEntity, SessionToken},
             OptionExtension,
         },
-        port::{rootdb::ProjectMetaRepository, rootdb::SessionRepository},
+        port::rootdb::{ProjectMetaRepository, SessionRepository},
     },
     infra::adapter::sqlite::{CacheMigrator, CacheSQLiteAdapter},
 };
@@ -60,7 +60,7 @@ impl SessionService {
         &mut self,
         input: &CreateSessionInput,
         project_service: &RwLock<Option<ProjectService>>,
-    ) -> Result<SessionInfo> {
+    ) -> Result<SessionEntity> {
         let project_meta = self
             .project_meta_repo
             .get_by_source(&input.project_source.canonicalize()?)
@@ -72,7 +72,7 @@ impl SessionService {
                 ),
                 None,
             )?;
-        let session_entity = self.session_repo.create(&project_meta.id).await?;
+        let session_info_entity = self.session_repo.create(&project_meta.id).await?;
 
         let project_path = PathBuf::from(&input.project_source);
         if !project_path.exists() {
@@ -85,24 +85,32 @@ impl SessionService {
             ));
         }
 
-        self.prepare_data(project_service, &project_meta, session_entity.id.clone())
-            .await?;
+        self.prepare_data(
+            project_service,
+            &project_meta,
+            session_info_entity.id.clone(),
+        )
+        .await?;
 
-        Ok(session_entity)
+        Ok(SessionEntity {
+            id: session_info_entity.id,
+            project_meta: Some(project_meta),
+            created_at: session_info_entity.created_at,
+        })
     }
 
     pub async fn restore_session(
         &mut self,
         session_id: NanoId,
         project_service: &RwLock<Option<ProjectService>>,
-    ) -> Result<Session> {
-        let session = self
+    ) -> Result<SessionEntity> {
+        let session_entity = self
             .session_repo
             .get_by_id(&session_id)
             .await?
             .ok_or_resource_not_found(&format!("session {} does not exist", session_id), None)?;
 
-        let project_meta = session
+        let project_meta = session_entity
             .project_meta
             .as_ref()
             .ok_or_resource_invalid("session project does not exist", None)?;
@@ -118,13 +126,13 @@ impl SessionService {
             ));
         }
 
-        self.prepare_data(project_service, project_meta, session.id.clone())
+        self.prepare_data(project_service, project_meta, session_entity.id.clone())
             .await?;
 
-        Ok(session)
+        Ok(session_entity)
     }
 
-    pub async fn get_recent_list(&self, start_time: i64, limit: u64) -> Result<Vec<Session>> {
+    pub async fn get_recent_list(&self, start_time: i64, limit: u64) -> Result<Vec<SessionEntity>> {
         Ok(self
             .session_repo
             .fetch_list_by_start_time(start_time, limit)

@@ -5,7 +5,7 @@ pub(crate) mod rootdb {
     use crate::domain::model::{
         project::{CreateProjectInput, ProjectMeta},
         result::Result,
-        session::{Session, SessionInfo},
+        session::{SessionEntity, SessionInfoEntity},
     };
 
     #[async_trait]
@@ -19,13 +19,13 @@ pub(crate) mod rootdb {
 
     #[async_trait]
     pub trait SessionRepository: Debug + Send + Sync {
-        async fn create(&self, project_id: &NanoId) -> Result<SessionInfo>;
-        async fn get_by_id(&self, session_id: &NanoId) -> Result<Option<Session>>;
+        async fn create(&self, project_id: &NanoId) -> Result<SessionInfoEntity>;
+        async fn get_by_id(&self, session_id: &NanoId) -> Result<Option<SessionEntity>>;
         async fn fetch_list_by_start_time(
             &self,
             start_time: i64,
             limit: u64,
-        ) -> Result<Vec<Session>>;
+        ) -> Result<Vec<SessionEntity>>;
     }
 }
 

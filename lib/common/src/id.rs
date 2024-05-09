@@ -1,5 +1,6 @@
-use anyhow::{anyhow, Ok};
+use anyhow::anyhow;
 use nanoid::nanoid;
+use serde::Serializer;
 use std::marker::PhantomData;
 use std::ops::Deref;
 
@@ -80,11 +81,58 @@ impl ScalarType for NanoId {
     }
 }
 
+pub mod nanoid_serde {
+    use std::fmt;
+
+    use serde::{
+        de::{self, Visitor},
+        Deserializer,
+    };
+
+    use super::*;
+
+    pub fn serialize<S>(value: &NanoId, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        serializer.serialize_str(&value.0.inner)
+    }
+
+    pub fn deserialize<'de, D>(deserializer: D) -> Result<NanoId, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        struct StringVisitor;
+
+        impl<'de> Visitor<'de> for StringVisitor {
+            type Value = NanoId;
+
+            fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
+                formatter.write_str("a string")
+            }
+
+            fn visit_str<E>(self, v: &str) -> Result<Self::Value, E>
+            where
+                E: de::Error,
+            {
+                Ok(NanoId(BoundedString {
+                    inner: v.to_string(),
+                    _marker: PhantomData,
+                }))
+            }
+        }
+
+        deserializer.deserialize_string(StringVisitor)
+    }
+}
+
 // Bounded String implementation
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct BoundedString<const N: usize> {
     inner: String,
+
+    #[serde(skip)]
     _marker: PhantomData<[u8; N]>,
 }
 

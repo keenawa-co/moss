@@ -12,6 +12,7 @@
     "hashbrown",
     "inmem",
     "inmemdb",
+    "jsonwebtoken",
     "manifestfile",
     "mimalloc",
     "mlua",
