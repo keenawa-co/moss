@@ -1,16 +1,18 @@
 use async_graphql::{Context, FieldResult, Subscription};
+use graphql_utl::GraphQLExtendError;
+use http::HeaderMap;
 use std::pin::Pin;
 use tokio_stream::{Stream, StreamExt};
 
-use crate::domain::{
-    model::notification::Notification, service::notification_service::NotificationService,
-};
+use crate::domain::service::notification_service::NotificationService;
+use crate::domain::{model::error::Error, model::notification::Notification};
 
 #[derive(Default)]
 pub(super) struct NotificationSubscription;
 
 #[Subscription]
 impl NotificationSubscription {
+    #[graphql_mac::require_header("session-token")]
     async fn notification_feed(
         &self,
         ctx: &Context<'_>,

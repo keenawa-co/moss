@@ -25,6 +25,7 @@
     "revisioned",
     "rootdb",
     "sched",
+    "sess",
     "smol",
     "sqlx",
     "tablename",

@@ -5,8 +5,6 @@ mod notification_query;
 mod project_query;
 mod session_query;
 
-use std::collections::BTreeMap;
-
 use async_graphql::{
     ErrorExtensionValues, ErrorExtensions, MergedObject, MergedSubscription, Schema,
 };

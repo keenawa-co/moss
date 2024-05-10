@@ -3,14 +3,10 @@ use chrono::{Duration, Utc};
 use common::id::NanoId;
 use graphql_utl::path::Path as PathGraphQL;
 use graphql_utl::GraphQLExtendError;
-use http::HeaderMap;
 use tokio::sync::RwLock;
 
 use crate::domain::{
-    model::{
-        error::Error,
-        session::{Session, SessionEntity, SessionToken},
-    },
+    model::session::{Session, SessionEntity, SessionToken},
     service::{project_service::ProjectService, session_service::SessionService},
 };
 

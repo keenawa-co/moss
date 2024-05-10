@@ -1,6 +1,4 @@
 use common::id::NanoId;
-use hashbrown::HashMap;
-use serde_json::Value;
 use std::{path::PathBuf, sync::Arc};
 use tokio::sync::RwLock;
 
@@ -25,7 +23,6 @@ pub struct SessionService {
     session_repo: Arc<dyn SessionRepository>,
     project_meta_repo: Arc<dyn ProjectMetaRepository>,
     conf: SessionServiceConfig,
-    context: HashMap<String, Value>,
 }
 
 impl SessionService {
@@ -38,16 +35,11 @@ impl SessionService {
             project_meta_repo,
             session_repo,
             conf,
-            context: HashMap::new(),
         }
     }
 }
 
 impl SessionService {
-    pub fn get_from_context(&self, key: &str) -> Option<&Value> {
-        self.context.get(key)
-    }
-
     pub async fn create_session(
         &mut self,
         project_source: &PathBuf,
@@ -76,12 +68,7 @@ impl SessionService {
             ));
         }
 
-        self.prepare_data(
-            project_service,
-            &project_meta,
-            session_info_entity.id.clone(),
-        )
-        .await?;
+        self.prepare_data(project_service, &project_meta).await?;
 
         Ok(SessionEntity {
             id: session_info_entity.id,
@@ -117,8 +104,7 @@ impl SessionService {
             ));
         }
 
-        self.prepare_data(project_service, project_meta, session_entity.id.clone())
-            .await?;
+        self.prepare_data(project_service, project_meta).await?;
 
         Ok(session_entity)
     }
@@ -136,17 +122,7 @@ impl SessionService {
         &mut self,
         project_service: &RwLock<Option<ProjectService>>,
         project_meta: &ProjectMeta,
-        session_id: NanoId,
     ) -> Result<()> {
-        self.context.insert(
-            String::from("session_id"),
-            Value::String(session_id.to_string()),
-        );
-        self.context.insert(
-            String::from("project_id"),
-            Value::String(project_meta.id.clone().to_string()),
-        );
-
         let project_db_client = {
             let project_path = PathBuf::from(&project_meta.source); // FIXME: avoid duplication (the same operation is performed in the parent function when checking the existence of a directory)
             let conn = dbutl::sqlite::conn::<CacheMigrator>(
