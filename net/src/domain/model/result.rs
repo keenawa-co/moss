@@ -6,6 +6,7 @@ pub trait ResultExtension<T, E: std::fmt::Display> {
     fn ok_or_system_unexpected(self, detail: &str, error_code: Option<String>) -> Result<T, Error>;
     fn ok_or_resource_not_found(self, detail: &str, error_code: Option<String>)
         -> Result<T, Error>;
+    fn ok_or_resource_invalid(self, detail: &str, error_code: Option<String>) -> Result<T, Error>;
 }
 
 impl<T, E: std::fmt::Display> ResultExtension<T, E> for Result<T, E> {
@@ -19,5 +20,9 @@ impl<T, E: std::fmt::Display> ResultExtension<T, E> for Result<T, E> {
         error_code: Option<String>,
     ) -> Result<T, Error> {
         self.map_err(|e| Error::resource_not_found(&format!("{detail}: {e}"), error_code))
+    }
+
+    fn ok_or_resource_invalid(self, detail: &str, error_code: Option<String>) -> Result<T, Error> {
+        self.map_err(|e| Error::resource_invalid(&format!("{detail}: {e}"), error_code))
     }
 }

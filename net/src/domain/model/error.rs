@@ -1,3 +1,6 @@
+use std::f64::consts::E;
+
+use async_graphql::ErrorExtensions;
 use thiserror::Error;
 
 macro_rules! transparent_error {

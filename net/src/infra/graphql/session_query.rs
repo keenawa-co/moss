@@ -66,7 +66,6 @@ impl SessionMutation {
     }
 
     #[graphql(name = "getRecentSessions")]
-    #[graphql_mac::require_header("session-id")]
     async fn get_recent(
         &self,
         ctx: &Context<'_>,

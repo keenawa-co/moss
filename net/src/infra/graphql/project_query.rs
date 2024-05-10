@@ -1,11 +1,13 @@
 use async_graphql::{Context, Object, Result as GraphqlResult};
 use common::{id::NanoId, thing::Thing};
 use graphql_utl::{path::Path as PathGraphQL, GraphQLExtendError};
+use http::HeaderMap;
 use std::path::PathBuf;
 use tokio::sync::RwLock;
 
 use crate::domain::{
     model::{
+        error::Error,
         notification::Notification,
         project::{CreateProjectInput, IgnoredSource, ProjectMeta},
         OptionExtension,
@@ -42,7 +44,7 @@ impl ProjectMutation {
     }
 
     #[graphql(name = "appendToProjectIgnored")]
-    // #[graphql_mac::check_header("session-id")]
+    #[graphql_mac::require_header("session-token")]
     async fn append_to_ignore_list(
         &self,
         ctx: &Context<'_>,

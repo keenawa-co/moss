@@ -1,11 +1,14 @@
+use std::collections::HashSet;
+
 use async_graphql::{Scalar, ScalarType, SimpleObject};
 use chrono::Utc;
 use common::id::{nanoid_serde, NanoId};
-use jsonwebtoken::{EncodingKey, Header};
+use http::HeaderValue;
+use jsonwebtoken::{Algorithm, DecodingKey, EncodingKey, Header, TokenData, Validation};
 
-use crate::{config::MAGIC_TOKEN_KEY, domain};
+use crate::{config::MAGIC_TOKEN_KEY, domain, domain::model::result::Result};
 
-use super::{project::ProjectMeta, OptionExtension};
+use super::{project::ProjectMeta, result::ResultExtension, OptionExtension};
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub(crate) struct SessionInfoEntity {
@@ -33,6 +36,53 @@ pub(crate) struct SessionTokenClaims {
 
     #[serde(rename = "t")]
     pub timestamp: i64,
+}
+
+impl SessionTokenClaims {
+    pub fn decode(token_str: &str) -> Result<Self> {
+        let magic_key = MAGIC_TOKEN_KEY
+            .get()
+            .ok_or_config_invalid("Session token MAGIC_KEY was not defined", None)?;
+
+        let token_data: TokenData<SessionTokenClaims> = jsonwebtoken::decode(
+            token_str,
+            &DecodingKey::from_secret(magic_key.as_ref()),
+            &Self::validation(),
+        )?;
+
+        Ok(token_data.claims)
+    }
+
+    pub fn validation() -> jsonwebtoken::Validation {
+        let mut v = Validation::new(Algorithm::HS256);
+
+        v.required_spec_claims =
+            HashSet::from([String::from("sid"), String::from("pid"), String::from("t")]);
+        v.leeway = 60;
+        v.reject_tokens_expiring_in_less_than = 0;
+        v.validate_exp = false;
+        v.validate_nbf = false;
+        v.validate_aud = true;
+        v.aud = None;
+        v.iss = None;
+
+        return v;
+    }
+}
+
+impl TryFrom<&HeaderValue> for SessionTokenClaims {
+    type Error = domain::model::error::Error;
+
+    fn try_from(value: &HeaderValue) -> std::prelude::v1::Result<Self, Self::Error> {
+        let token_str = value
+            .to_str()
+            .ok_or_resource_invalid("Session token in incorrect format", None)?;
+
+        let claims = SessionTokenClaims::decode(token_str)
+            .ok_or_resource_invalid("Failed to decode session token", None)?;
+
+        Ok(claims)
+    }
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]

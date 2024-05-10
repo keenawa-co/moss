@@ -7,7 +7,7 @@ use axum::{
 };
 use http::HeaderMap;
 
-use crate::infra::graphql::SchemaRoot;
+use crate::{domain::model::session::SessionTokenClaims, infra::graphql::SchemaRoot};
 
 async fn graphiql_handler() -> impl IntoResponse {
     Html(GraphiQLSource::build().endpoint("/").finish())
@@ -18,7 +18,18 @@ async fn graphql_handler(
     headers: HeaderMap,
     req: GraphQLRequest,
 ) -> GraphQLResponse {
-    return schema.execute(req.into_inner().data(headers)).await.into();
+    let mut req = req.into_inner();
+
+    if let Some(value) = headers.get("session-token") {
+        match SessionTokenClaims::try_from(value) {
+            Ok(claims) => req = req.data(claims),
+            Err(e) => {
+                return GraphQLResponse::from(async_graphql::Response::from_errors(vec![e.into()]));
+            }
+        };
+    }
+
+    return schema.execute(req.data(headers)).await.into();
 }
 
 pub fn router<S>(schema: SchemaRoot) -> Router<S>

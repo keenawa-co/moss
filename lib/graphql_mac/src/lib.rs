@@ -1,9 +1,6 @@
 use proc_macro::TokenStream;
 use quote::quote;
-use syn::{
-    parse::Parse, parse_macro_input, parse_quote, punctuated::Punctuated, token::Comma, ItemFn,
-    LitStr, Token,
-};
+use syn::{parse::Parse, parse_macro_input, punctuated::Punctuated, ItemFn, LitStr, Token};
 
 struct HeaderMap(Vec<String>);
 
