@@ -28,16 +28,3 @@ pub(crate) mod rootdb {
         ) -> Result<Vec<SessionEntity>>;
     }
 }
-
-pub(crate) mod cachedb {
-    use common::{id::NanoId, thing::Thing};
-    use std::{fmt::Debug, path::PathBuf};
-
-    use crate::domain::model::{project::IgnoredSource, result::Result};
-
-    #[async_trait]
-    pub(crate) trait IgnoreListRepository: Debug + Send + Sync {
-        async fn create_from_list(&self, input_list: &Vec<PathBuf>) -> Result<Vec<IgnoredSource>>;
-        async fn delete_by_id(&self, id: &NanoId) -> Result<Option<Thing>>;
-    }
-}

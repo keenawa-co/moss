@@ -15,7 +15,7 @@ members = [
     "lib/graphql_mac",
     "lib/graphql_utl",
     "lib/mac",
-    "lib/manifest",
+    "lib/project",
     "lib/pwd",
     "mossctl",
     "net",
@@ -48,6 +48,7 @@ analysis = { path = "lib/analysis" }
 dbutl = { path = "lib/dbutl" }
 graphql_utl = { path = "lib/graphql_utl" }
 graphql_mac = { path = "lib/graphql_mac" }
+project = { path = "lib/project" }
 
 mossctl = { path = "mossctl" }
 net = { path = "net" }

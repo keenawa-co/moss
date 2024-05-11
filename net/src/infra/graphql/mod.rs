@@ -16,7 +16,7 @@ use self::{
 };
 use crate::domain::{
     model::error::{Error, PreconditionError, ResourceError, SystemError},
-    service::ServiceHub,
+    service::ServiceRoot,
 };
 
 #[derive(MergedObject)]
@@ -26,43 +26,45 @@ pub struct QueryRoot(ConfigQuery);
 pub struct MutationRoot(ProjectMutation, SessionMutation);
 
 #[derive(MergedSubscription)]
-pub struct RootSubscription(
+pub struct SubscriptionRoot(
     ExplorerSubscription,
     MetricSubscription,
     NotificationSubscription,
 );
 
-pub type SchemaRoot = Schema<QueryRoot, MutationRoot, RootSubscription>;
+pub type SchemaRoot = Schema<QueryRoot, MutationRoot, SubscriptionRoot>;
 
-pub fn build_schema(service_hub: ServiceHub) -> SchemaRoot {
+pub fn build_schema(service_root: ServiceRoot) -> SchemaRoot {
     Schema::build(
         QueryRoot(ConfigQuery {
-            config_service: service_hub.0,
+            config_service: service_root.0,
         }),
         MutationRoot(
             ProjectMutation {
-                project_meta_service: service_hub.1.clone(),
-                project_service: service_hub.5.clone(),
-                notification_service: service_hub.4.clone(),
+                project_meta_service: service_root.1.clone(),
+                project_service: service_root.5.clone(),
+                notification_service: service_root.4.clone(),
             },
             SessionMutation {
-                session_service: service_hub.3.clone(),
-                project_service: service_hub.5.clone(),
+                session_service: service_root.3.clone(),
+                project_service: service_root.5.clone(),
             },
         ),
-        RootSubscription(
+        SubscriptionRoot(
             ExplorerSubscription::default(),
             MetricSubscription {
-                metric_service: service_hub.2,
+                metric_service: service_root.2,
+                project_service: service_root.5.clone(),
             },
             NotificationSubscription {
-                notification_service: service_hub.4.clone(),
+                notification_service: service_root.4.clone(),
             },
         ),
     )
     .finish()
 }
 
+//TODO: move to pkg module
 // pub fn sdl() -> String {
 //     Schema::build(
 //         QueryRoot::default(),

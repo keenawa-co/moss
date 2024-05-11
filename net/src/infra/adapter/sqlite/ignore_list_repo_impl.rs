@@ -1,13 +1,14 @@
 use common::id::NanoId;
 use common::thing::Thing;
+use project::cache::IgnoreListRepository;
+use project::ignored::IgnoredSource;
 use sea_orm::entity::prelude::*;
 use sea_orm::{DatabaseConnection, Set};
 use std::path::PathBuf;
 use std::sync::Arc;
 
-use crate::domain::model::project::IgnoredSource;
+// use crate::domain::model::project::IgnoredSource;
 use crate::domain::model::result::Result;
-use crate::domain::port;
 
 //
 // Entity model definition for `ignore_list` table (project database)
@@ -42,8 +43,11 @@ impl IgnoreListRepositoryImpl {
 }
 
 #[async_trait]
-impl port::cachedb::IgnoreListRepository for IgnoreListRepositoryImpl {
-    async fn create_from_list(&self, input_list: &Vec<PathBuf>) -> Result<Vec<IgnoredSource>> {
+impl IgnoreListRepository for IgnoreListRepositoryImpl {
+    async fn create_from_list(
+        &self,
+        input_list: &Vec<PathBuf>,
+    ) -> anyhow::Result<Vec<IgnoredSource>> {
         let result = dbutl::transaction::weak_transaction(self.conn.as_ref(), |tx| async move {
             let mut result = Vec::new();
             let models: Vec<ActiveModel> = input_list
@@ -75,7 +79,7 @@ impl port::cachedb::IgnoreListRepository for IgnoreListRepositoryImpl {
         Ok(result)
     }
 
-    async fn delete_by_id(&self, id: &NanoId) -> Result<Option<Thing>> {
+    async fn delete_by_id(&self, id: &NanoId) -> anyhow::Result<Option<Thing>> {
         let result = Entity::delete_by_id(id.clone())
             .exec(self.conn.as_ref())
             .await?;

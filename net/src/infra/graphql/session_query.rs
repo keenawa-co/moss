@@ -14,7 +14,7 @@ use crate::domain::{
 
 pub(super) struct SessionMutation {
     pub session_service: Arc<SessionService>,
-    pub project_service: Arc<RwLock<Option<ProjectService>>>,
+    pub project_service: Arc<RwLock<ProjectService>>,
 }
 
 #[Object]
@@ -33,7 +33,7 @@ impl SessionMutation {
 
         let mut project_service_lock = self.project_service.write().await;
         let project_path = PathBuf::from(&session_entity.project_meta.as_ref().unwrap().source);
-        *project_service_lock = Some(ProjectService::new(&project_path).await?);
+        project_service_lock.start_project(&project_path).await?;
 
         Ok(Session {
             id: session_entity.id,
@@ -57,7 +57,7 @@ impl SessionMutation {
 
         let mut project_service_lock = self.project_service.write().await;
         let project_path = PathBuf::from(&session_entity.project_meta.as_ref().unwrap().source);
-        *project_service_lock = Some(ProjectService::new(&project_path).await?);
+        project_service_lock.start_project(&project_path).await?;
 
         Ok(Session {
             id: session_entity.id,

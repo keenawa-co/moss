@@ -7,7 +7,7 @@ pub mod session_service;
 
 use analysis::policy_engine::PolicyEngine;
 use fs::{fw::FileWatcher, real};
-use std::{path::PathBuf, sync::Arc};
+use std::sync::Arc;
 use tokio::sync::RwLock;
 
 use crate::{config::Config, infra::adapter::sqlite::RootSQLiteAdapter};
@@ -18,16 +18,16 @@ use self::{
     project_service::ProjectService, session_service::SessionService,
 };
 
-pub struct ServiceHub(
+pub struct ServiceRoot(
     pub Arc<ConfigService>,
     pub Arc<ProjectMetaService>,
     pub Arc<MetricService>,
     pub Arc<SessionService>,
     pub Arc<NotificationService>,
-    pub Arc<RwLock<Option<ProjectService>>>,
+    pub Arc<RwLock<ProjectService>>,
 );
 
-impl ServiceHub {
+impl ServiceRoot {
     pub fn new(conf: &Config) -> Self {
         let b = bus::Bus::new();
         let realfs = Arc::new(real::FileSystem::new());
@@ -35,7 +35,7 @@ impl ServiceHub {
         let fw = FileWatcher::new(b.clone());
         let pe = PolicyEngine::new(fw.clone(), b);
 
-        ServiceHub(
+        ServiceRoot(
             ConfigService::new(conf.preference.clone()),
             Arc::new(ProjectMetaService::new(
                 realfs.clone(),
@@ -47,7 +47,7 @@ impl ServiceHub {
                 root_db.project_meta_repo(),
             )),
             Arc::new(NotificationService::new()),
-            Arc::new(RwLock::new(None)),
+            Arc::new(RwLock::new(ProjectService::new(realfs.clone()))),
         )
     }
 }

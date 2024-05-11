@@ -1,0 +1,18 @@
+{
+    "common": {
+        "recommendation": {
+            "ignored_list": [
+                "*.db",
+                "*.session.sql"
+            ]
+        }
+    },
+    "rust": {
+        "recommendation": {
+            "ignored_list": [
+                "target",
+                "Cargo.lock"
+            ]
+        }
+    }
+}

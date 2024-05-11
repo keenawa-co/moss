@@ -18,7 +18,7 @@ use tower_http::{
 
 use crate::{
     config::CONF,
-    domain::{model::OptionExtension, service::ServiceHub},
+    domain::{model::OptionExtension, service::ServiceRoot},
 };
 
 #[macro_use]
@@ -60,7 +60,7 @@ pub async fn bind(_: TokioCancellationToken) -> Result<(), Error> {
 
     // let pe = PolicyEngine::new(fw.clone(), b);
 
-    let service_hub = ServiceHub::new(conf);
+    let service_hub = ServiceRoot::new(conf);
 
     let service = ServiceBuilder::new()
         .catch_panic()

@@ -2,6 +2,7 @@ use async_graphql::{Context, Object, Result as GraphqlResult};
 use common::{id::NanoId, thing::Thing};
 use graphql_utl::{path::Path as PathGraphQL, GraphQLExtendError};
 use http::HeaderMap;
+use project::ignored::IgnoredSource;
 use std::{path::PathBuf, sync::Arc};
 use tokio::sync::RwLock;
 
@@ -9,9 +10,8 @@ use crate::domain::{
     model::{
         error::Error,
         notification::Notification,
-        project::{CreateProjectInput, IgnoredSource, ProjectMeta},
+        project::{CreateProjectInput, ProjectMeta},
         session::SessionTokenClaims,
-        OptionExtension,
     },
     service::{
         notification_service::NotificationService, project_meta_service::ProjectMetaService,
@@ -21,7 +21,7 @@ use crate::domain::{
 
 pub(super) struct ProjectMutation {
     pub project_meta_service: Arc<ProjectMetaService>,
-    pub project_service: Arc<RwLock<Option<ProjectService>>>,
+    pub project_service: Arc<RwLock<ProjectService>>,
     pub notification_service: Arc<NotificationService>,
 }
 
@@ -54,12 +54,8 @@ impl ProjectMutation {
     ) -> GraphqlResult<Vec<IgnoredSource>> {
         let sess_claims = ctx.data::<SessionTokenClaims>()?;
         let project_service_lock = self.project_service.write().await;
-        let project_service = project_service_lock
-            .as_ref()
-            .ok_or_resource_precondition_required("Session must be initialized first", None)
-            .extend_error()?;
 
-        let result_list = project_service
+        let result = project_service_lock
             .append_to_ignore_list(&input_list.iter().map(Into::into).collect::<Vec<PathBuf>>())
             .await
             .extend_error()?;
@@ -75,7 +71,7 @@ impl ProjectMutation {
                 .await?;
         }
 
-        Ok(result_list)
+        Ok(result)
     }
 
     #[graphql(name = "removeFromProjectIgnored")]
@@ -83,12 +79,8 @@ impl ProjectMutation {
     async fn remove_from_ignore_list(&self, ctx: &Context<'_>, id: NanoId) -> GraphqlResult<Thing> {
         let sess_claims = ctx.data::<SessionTokenClaims>()?;
         let project_service_lock = self.project_service.write().await;
-        let project_service = project_service_lock
-            .as_ref()
-            .ok_or_resource_precondition_required("Session must be initialized first", None)
-            .extend_error()?;
 
-        let result = project_service.remove_from_ignore_list(&id).await?;
+        let result = project_service_lock.remove_from_ignore_list(&id).await?;
 
         self.notification_service
             .send(Notification {

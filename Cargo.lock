@@ -1866,13 +1866,6 @@ name = "mac"
 version = "0.1.0"
 
 [[package]]
-name = "manifest"
-version = "0.1.0"
-dependencies = [
- "async-trait",
-]
-
-[[package]]
 name = "matchers"
 version = "0.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2038,6 +2031,7 @@ dependencies = [
  "notify",
  "once_cell",
  "opentelemetry",
+ "project",
  "pwd",
  "sea-orm",
  "sea-orm-migration",
@@ -2518,6 +2512,18 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a56dea16b0a29e94408b9aa5e2940a4eedbd128a1ba20e8f7ae60fd3d465af0e"
 dependencies = [
  "unicode-ident",
+]
+
+[[package]]
+name = "project"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "async-graphql",
+ "async-trait",
+ "common",
+ "hashbrown 0.7.2",
+ "serde",
 ]
 
 [[package]]

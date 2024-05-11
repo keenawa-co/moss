@@ -6,12 +6,11 @@ mod session_repo_impl;
 
 pub(crate) use migration::CacheMigrator;
 
+use project::cache::{CacheAdapter, IgnoreListRepository};
 use sea_orm::DatabaseConnection;
 use std::sync::Arc;
 
-use crate::domain::port::{
-    cachedb::IgnoreListRepository, rootdb::ProjectMetaRepository, rootdb::SessionRepository,
-};
+use crate::domain::port::rootdb::{ProjectMetaRepository, SessionRepository};
 
 use self::{
     ignore_list_repo_impl::IgnoreListRepositoryImpl,
@@ -51,8 +50,11 @@ impl CacheSQLiteAdapter {
             ignored_list_repo: Arc::new(IgnoreListRepositoryImpl::new(conn.clone())),
         }
     }
+}
 
-    pub fn ignored_list_repo(&self) -> Arc<dyn IgnoreListRepository> {
+#[async_trait]
+impl CacheAdapter for CacheSQLiteAdapter {
+    async fn ignore_list_repo(&self) -> Arc<dyn IgnoreListRepository> {
         Arc::clone(&self.ignored_list_repo)
     }
 }

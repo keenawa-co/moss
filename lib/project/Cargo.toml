@@ -1,0 +1,21 @@
+[package]
+name = "project"
+version = "0.1.0"
+edition = "2021"
+
+
+[dependencies]
+hashbrown.workspace = true
+anyhow.workspace = true
+
+serde = { workspace = true, features = ["derive"] }
+async-trait.workspace = true
+
+async-graphql = { workspace = true, optional = true }
+
+common = { workspace = true, features = ["graphql"] }
+
+
+[features]
+default = []
+graphql = ["async-graphql"]
