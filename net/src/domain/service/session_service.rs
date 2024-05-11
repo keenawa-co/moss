@@ -41,7 +41,7 @@ impl SessionService {
 
 impl SessionService {
     pub async fn create_session(
-        &mut self,
+        &self,
         project_source: &PathBuf,
         project_service: &RwLock<Option<ProjectService>>,
     ) -> Result<SessionEntity> {
@@ -78,7 +78,7 @@ impl SessionService {
     }
 
     pub async fn restore_session(
-        &mut self,
+        &self,
         session_id: NanoId,
         project_service: &RwLock<Option<ProjectService>>,
     ) -> Result<SessionEntity> {
@@ -119,7 +119,7 @@ impl SessionService {
 
 impl SessionService {
     async fn prepare_data(
-        &mut self,
+        &self,
         project_service: &RwLock<Option<ProjectService>>,
         project_meta: &ProjectMeta,
     ) -> Result<()> {

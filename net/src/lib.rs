@@ -3,16 +3,8 @@ mod infra;
 
 pub mod config;
 
-pub use config::{Config, CONF};
-use domain::model::error::Error;
-pub use infra::graphql::sdl;
-
-use analysis::policy_engine::PolicyEngine;
-use bus::topic::TopicConfig;
 use common::APP_NAME;
-use fs::{fw::FileWatcher, real, FS};
-use std::{path::PathBuf, sync::Arc};
-use tokio::sync::{mpsc, RwLock};
+use domain::model::error::Error;
 use tokio_util::sync::CancellationToken as TokioCancellationToken;
 use tower::ServiceBuilder;
 use tower_http::{
@@ -25,18 +17,8 @@ use tower_http::{
 };
 
 use crate::{
-    domain::{
-        model::OptionExtension,
-        service::{
-            config_service::ConfigService,
-            metric_service::MetricService,
-            notification_service::NotificationService,
-            project_meta_service::ProjectMetaService,
-            session_service::{SessionService, SessionServiceConfig},
-            ServiceHub,
-        },
-    },
-    infra::adapter::sqlite::RootSQLiteAdapter,
+    config::CONF,
+    domain::{model::OptionExtension, service::ServiceHub},
 };
 
 #[macro_use]
@@ -56,9 +38,9 @@ pub async fn bind(_: TokioCancellationToken) -> Result<(), Error> {
         .get()
         .ok_or_config_invalid("Configuration was not defined", None)?;
 
-    let b = bus::Bus::new();
+    // let b = bus::Bus::new();
 
-    let realfs = Arc::new(real::FileSystem::new());
+    // let realfs = Arc::new(real::FileSystem::new());
     // let watch_stream = rfs
     //     .watch(
     //         Path::new("./testdata/helloworld.ts"),
@@ -71,29 +53,14 @@ pub async fn bind(_: TokioCancellationToken) -> Result<(), Error> {
     //     dbg!(paths);
     // }
 
-    let fw = FileWatcher::new(b.clone());
+    // let fw = FileWatcher::new(b.clone());
 
-    b.create_topic("general", TopicConfig::default()).await;
-    b.subscribe_topic::<String>("general", fw.clone()).await?;
+    // b.create_topic("general", TopicConfig::default()).await;
+    // b.subscribe_topic::<String>("general", fw.clone()).await?;
 
-    let pe = PolicyEngine::new(fw.clone(), b);
+    // let pe = PolicyEngine::new(fw.clone(), b);
 
-    let root_db = RootSQLiteAdapter::new(Arc::clone(&conf.conn));
-    let service_hub = ServiceHub {
-        session_service: RwLock::new(SessionService::new(
-            root_db.session_repo(),
-            root_db.project_meta_repo(),
-            SessionServiceConfig {
-                project_dir: PathBuf::from(".moss/cache"), // FIXME: This value must be obtained from the configuration file
-                project_db_file: PathBuf::from("cache.db"), // FIXME: This value must be obtained from the configuration file
-            },
-        )),
-        config_service: ConfigService::new(conf.preference.clone()),
-        project_meta_service: ProjectMetaService::new(realfs.clone(), root_db.project_meta_repo()),
-        metric_service: MetricService::new(Arc::new(pe)),
-        project_service: RwLock::new(None),
-        notification_service: NotificationService::new(),
-    };
+    let service_hub = ServiceHub::new(conf);
 
     let service = ServiceBuilder::new()
         .catch_panic()

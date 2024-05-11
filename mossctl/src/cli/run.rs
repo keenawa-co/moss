@@ -1,4 +1,5 @@
 use clap::Args;
+use moss_net::config::{Config as NetConfig, CONF as NET_CONF};
 use std::{net::SocketAddr, path::PathBuf, sync::Arc};
 use tokio_util::sync::CancellationToken as TokioCancellationToken;
 use tracing::Level;
@@ -66,7 +67,7 @@ pub async fn cmd_run(
     //  cancel_token is passed to all async functions requiring graceful termination
     let cancel_token = TokioCancellationToken::new();
 
-    let _ = moss_net::CONF.set(moss_net::Config {
+    let _ = NET_CONF.set(NetConfig {
         bind: bind.unwrap_or(conf.net.endpoint_addr()),
         preference: super::utl::load_toml_file(&preference_filepath)?,
         conn: Arc::new(conn),

@@ -4,14 +4,14 @@ use std::sync::Arc;
 
 use crate::domain::service::config_service::ConfigService;
 
-#[derive(Default)]
-pub(super) struct ConfigQuery;
+pub(super) struct ConfigQuery {
+    pub config_service: Arc<ConfigService>,
+}
 
 #[Object]
 impl ConfigQuery {
-    async fn get_preference(&self, ctx: &Context<'_>) -> async_graphql::Result<Arc<Preference>> {
-        let config_service = ctx.data::<ConfigService>()?;
-        let result = config_service.preferences.clone(); // FIXME
+    async fn get_preference(&self, _ctx: &Context<'_>) -> async_graphql::Result<Arc<Preference>> {
+        let result = self.config_service.preferences.clone(); // FIXME:
 
         Ok(result)
     }

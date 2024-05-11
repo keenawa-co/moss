@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use async_graphql::{Context, Object, Result as GraphqlResult};
 use chrono::{Duration, Utc};
 use common::id::NanoId;
@@ -10,22 +12,21 @@ use crate::domain::{
     service::{project_service::ProjectService, session_service::SessionService},
 };
 
-#[derive(Default)]
-pub(super) struct SessionMutation;
+pub(super) struct SessionMutation {
+    pub session_service: Arc<SessionService>,
+    pub project_service: Arc<RwLock<Option<ProjectService>>>,
+}
 
 #[Object]
 impl SessionMutation {
     async fn create_session(
         &self,
-        ctx: &Context<'_>,
+        _ctx: &Context<'_>,
         project_source: PathGraphQL,
     ) -> GraphqlResult<Session> {
-        let session_service = ctx.data::<RwLock<SessionService>>()?;
-        let project_service = ctx.data::<RwLock<Option<ProjectService>>>()?;
-
-        let mut session_service_lock = session_service.write().await;
-        let session_entity = session_service_lock
-            .create_session(&project_source.into(), project_service)
+        let session_entity = self
+            .session_service
+            .create_session(&project_source.into(), &self.project_service)
             .await
             .extend_error()?;
 
@@ -41,13 +42,12 @@ impl SessionMutation {
 
     async fn restore_session(
         &self,
-        ctx: &Context<'_>,
+        _ctx: &Context<'_>,
         session_id: NanoId,
     ) -> GraphqlResult<Session> {
-        let project_service = ctx.data::<RwLock<Option<ProjectService>>>()?;
-        let mut session_service_lock = ctx.data::<RwLock<SessionService>>()?.write().await;
-        let session_entity = session_service_lock
-            .restore_session(session_id, project_service)
+        let session_entity = self
+            .session_service
+            .restore_session(session_id, &self.project_service)
             .await
             .extend_error()?;
 
@@ -61,15 +61,16 @@ impl SessionMutation {
         })
     }
 
+    // TODO: move to Query
     #[graphql(name = "getRecentSessions")]
     async fn get_recent(
         &self,
-        ctx: &Context<'_>,
+        _ctx: &Context<'_>,
         #[graphql(default_with = "(Utc::now() - Duration::days(30)).timestamp()")] start_time: i64,
         #[graphql(validator(minimum = 1, maximum = 10), default = 10)] limit: u64,
     ) -> GraphqlResult<Vec<SessionEntity>> {
-        let session_service_lock = ctx.data::<RwLock<SessionService>>()?.write().await;
-        let result = session_service_lock
+        let result = self
+            .session_service
             .get_recent_list(start_time, limit)
             .await
             .extend_error()?;

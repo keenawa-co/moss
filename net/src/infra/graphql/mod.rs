@@ -19,13 +19,13 @@ use crate::domain::{
     service::ServiceHub,
 };
 
-#[derive(MergedObject, Default)]
+#[derive(MergedObject)]
 pub struct QueryRoot(ConfigQuery);
 
-#[derive(MergedObject, Default)]
+#[derive(MergedObject)]
 pub struct MutationRoot(ProjectMutation, SessionMutation);
 
-#[derive(MergedSubscription, Default)]
+#[derive(MergedSubscription)]
 pub struct RootSubscription(
     ExplorerSubscription,
     MetricSubscription,
@@ -36,28 +36,42 @@ pub type SchemaRoot = Schema<QueryRoot, MutationRoot, RootSubscription>;
 
 pub fn build_schema(service_hub: ServiceHub) -> SchemaRoot {
     Schema::build(
-        QueryRoot::default(),
-        MutationRoot::default(),
-        RootSubscription::default(),
+        QueryRoot(ConfigQuery {
+            config_service: service_hub.0,
+        }),
+        MutationRoot(
+            ProjectMutation {
+                project_meta_service: service_hub.1.clone(),
+                project_service: service_hub.5.clone(),
+                notification_service: service_hub.4.clone(),
+            },
+            SessionMutation {
+                session_service: service_hub.3.clone(),
+                project_service: service_hub.5.clone(),
+            },
+        ),
+        RootSubscription(
+            ExplorerSubscription::default(),
+            MetricSubscription {
+                metric_service: service_hub.2,
+            },
+            NotificationSubscription {
+                notification_service: service_hub.4.clone(),
+            },
+        ),
     )
-    .data(service_hub.config_service)
-    .data(service_hub.project_meta_service)
-    .data(service_hub.project_service)
-    .data(service_hub.metric_service)
-    .data(service_hub.session_service)
-    .data(service_hub.notification_service)
     .finish()
 }
 
-pub fn sdl() -> String {
-    Schema::build(
-        QueryRoot::default(),
-        MutationRoot::default(),
-        RootSubscription::default(),
-    )
-    .finish()
-    .sdl()
-}
+// pub fn sdl() -> String {
+//     Schema::build(
+//         QueryRoot::default(),
+//         MutationRoot::default(),
+//         RootSubscription::default(),
+//     )
+//     .finish()
+//     .sdl()
+// }
 
 impl Error {
     fn extend_graphql_error(

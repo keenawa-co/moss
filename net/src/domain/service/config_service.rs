@@ -8,7 +8,7 @@ pub struct ConfigService {
 }
 
 impl ConfigService {
-    pub fn new(preferences: Arc<Preference>) -> Self {
-        Self { preferences }
+    pub fn new(preferences: Arc<Preference>) -> Arc<Self> {
+        Arc::new(Self { preferences })
     }
 }

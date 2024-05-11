@@ -5,7 +5,7 @@ use graphql_parser::{
     schema::{parse_schema, Document},
     Style,
 };
-use moss_net::sdl;
+// use moss_net::sdl;
 use std::{path::PathBuf, pin::Pin};
 
 #[derive(Debug, Subcommand)]
@@ -43,23 +43,23 @@ pub struct SchemaCmdArgs {
 pub async fn cmd_graphql_schema(
     SchemaCmdArgs { path, filename }: SchemaCmdArgs,
 ) -> anyhow::Result<()> {
-    let formatted_sdl = {
-        let raw_sdl = sdl();
-        let parsed_sdl: Document<String> = parse_schema(&raw_sdl)?;
-        parsed_sdl.format(&{
-            let mut s = Style::default();
-            s.multiline_arguments(false);
-            s
-        })
-    };
+    // let formatted_sdl = {
+    //     let raw_sdl = sdl();
+    //     let parsed_sdl: Document<String> = parse_schema(&raw_sdl)?;
+    //     parsed_sdl.format(&{
+    //         let mut s = Style::default();
+    //         s.multiline_arguments(false);
+    //         s
+    //     })
+    // };
 
-    let mut reader = Cursor::new(formatted_sdl.as_bytes());
-    let content_pin = Pin::new(&mut reader);
-    let realfs = fs::real::FileSystem::new();
+    // let mut reader = Cursor::new(formatted_sdl.as_bytes());
+    // let content_pin = Pin::new(&mut reader);
+    // let realfs = fs::real::FileSystem::new();
 
-    realfs
-        .create_file_with(&path.join(format!("{filename}.graphql")), content_pin)
-        .await?;
+    // realfs
+    //     .create_file_with(&path.join(format!("{filename}.graphql")), content_pin)
+    //     .await?;
 
     Ok(())
 }
