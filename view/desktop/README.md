@@ -32,3 +32,8 @@ $ yarn build:mac
 # For Linux
 $ yarn build:linux
 ```
+
+# Convert jsonnet file to json file
+```bash
+$ jsonnet .\test.jsonnet -o test.json
+```
