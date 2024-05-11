@@ -13,12 +13,9 @@ use tokio::sync::RwLock;
 use crate::{config::Config, infra::adapter::sqlite::RootSQLiteAdapter};
 
 use self::{
-    config_service::ConfigService,
-    metric_service::MetricService,
-    notification_service::NotificationService,
-    project_meta_service::ProjectMetaService,
-    project_service::ProjectService,
-    session_service::{SessionService, SessionServiceConfig},
+    config_service::ConfigService, metric_service::MetricService,
+    notification_service::NotificationService, project_meta_service::ProjectMetaService,
+    project_service::ProjectService, session_service::SessionService,
 };
 
 pub struct ServiceHub(
@@ -48,10 +45,6 @@ impl ServiceHub {
             Arc::new(SessionService::new(
                 root_db.session_repo(),
                 root_db.project_meta_repo(),
-                SessionServiceConfig {
-                    project_dir: PathBuf::from(".moss/cache"), // FIXME: This value must be obtained from the configuration file
-                    project_db_file: PathBuf::from("cache.db"), // FIXME: This value must be obtained from the configuration file
-                },
             )),
             Arc::new(NotificationService::new()),
             Arc::new(RwLock::new(None)),

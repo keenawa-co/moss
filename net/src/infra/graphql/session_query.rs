@@ -1,4 +1,4 @@
-use std::sync::Arc;
+use std::{path::PathBuf, sync::Arc};
 
 use async_graphql::{Context, Object, Result as GraphqlResult};
 use chrono::{Duration, Utc};
@@ -26,11 +26,14 @@ impl SessionMutation {
     ) -> GraphqlResult<Session> {
         let session_entity = self
             .session_service
-            .create_session(&project_source.into(), &self.project_service)
+            .create_session(&project_source.into())
             .await
             .extend_error()?;
-
         let session_token = SessionToken::try_from(session_entity.clone())?;
+
+        let mut project_service_lock = self.project_service.write().await;
+        let project_path = PathBuf::from(&session_entity.project_meta.as_ref().unwrap().source);
+        *project_service_lock = Some(ProjectService::new(&project_path).await?);
 
         Ok(Session {
             id: session_entity.id,
@@ -47,11 +50,14 @@ impl SessionMutation {
     ) -> GraphqlResult<Session> {
         let session_entity = self
             .session_service
-            .restore_session(session_id, &self.project_service)
+            .restore_session(session_id)
             .await
             .extend_error()?;
-
         let session_token = SessionToken::try_from(session_entity.clone())?;
+
+        let mut project_service_lock = self.project_service.write().await;
+        let project_path = PathBuf::from(&session_entity.project_meta.as_ref().unwrap().source);
+        *project_service_lock = Some(ProjectService::new(&project_path).await?);
 
         Ok(Session {
             id: session_entity.id,

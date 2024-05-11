@@ -42,17 +42,17 @@ impl RootSQLiteAdapter {
 
 #[derive(Debug)]
 pub struct CacheSQLiteAdapter {
-    watch_list_repo: Arc<dyn IgnoreListRepository>,
+    ignored_list_repo: Arc<dyn IgnoreListRepository>,
 }
 
 impl CacheSQLiteAdapter {
     pub fn new(conn: Arc<DatabaseConnection>) -> Self {
         Self {
-            watch_list_repo: Arc::new(IgnoreListRepositoryImpl::new(conn.clone())),
+            ignored_list_repo: Arc::new(IgnoreListRepositoryImpl::new(conn.clone())),
         }
     }
 
-    pub fn watch_list_repo(&self) -> Arc<dyn IgnoreListRepository> {
-        Arc::clone(&self.watch_list_repo)
+    pub fn ignored_list_repo(&self) -> Arc<dyn IgnoreListRepository> {
+        Arc::clone(&self.ignored_list_repo)
     }
 }

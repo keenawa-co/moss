@@ -2,9 +2,12 @@ use std::{path::PathBuf, sync::Arc};
 
 use common::{id::NanoId, thing::Thing};
 
-use crate::domain::{
-    model::{project::IgnoredSource, result::Result, OptionExtension},
-    port::cachedb::IgnoreListRepository,
+use crate::{
+    domain::{
+        model::{project::IgnoredSource, result::Result, OptionExtension},
+        port::cachedb::IgnoreListRepository,
+    },
+    infra::adapter::sqlite::{CacheMigrator, CacheSQLiteAdapter},
 };
 
 pub struct ProjectService {
@@ -12,10 +15,22 @@ pub struct ProjectService {
 }
 
 impl ProjectService {
-    pub fn new(ignore_repo: Arc<dyn IgnoreListRepository>) -> Self {
-        Self {
-            ignore_repo: ignore_repo,
-        }
+    pub async fn new(project_path: &PathBuf) -> Result<Self> {
+        let cache: CacheSQLiteAdapter = {
+            let conn = dbutl::sqlite::conn::<CacheMigrator>(
+                &project_path
+                    // FIXME: This values must be obtained from the configuration file
+                    .join(PathBuf::from(".moss/cache"))
+                    .join(PathBuf::from("cache.db")),
+            )
+            .await?;
+
+            CacheSQLiteAdapter::new(Arc::new(conn))
+        };
+
+        Ok(Self {
+            ignore_repo: cache.ignored_list_repo(),
+        })
     }
 
     pub async fn append_to_ignore_list(
