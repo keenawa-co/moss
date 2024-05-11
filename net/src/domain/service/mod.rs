@@ -5,8 +5,7 @@ pub mod project_meta_service;
 pub mod project_service;
 pub mod session_service;
 
-use analysis::policy_engine::PolicyEngine;
-use fs::{fw::FileWatcher, real};
+use fs::real;
 use std::sync::Arc;
 use tokio::sync::RwLock;
 
@@ -29,11 +28,8 @@ pub struct ServiceRoot(
 
 impl ServiceRoot {
     pub fn new(conf: &Config) -> Self {
-        let b = bus::Bus::new();
         let realfs = Arc::new(real::FileSystem::new());
         let root_db = RootSQLiteAdapter::new(Arc::clone(&conf.conn));
-        let fw = FileWatcher::new(b.clone());
-        let pe = PolicyEngine::new(fw.clone(), b);
 
         ServiceRoot(
             ConfigService::new(conf.preference.clone()),
@@ -41,7 +37,7 @@ impl ServiceRoot {
                 realfs.clone(),
                 root_db.project_meta_repo(),
             )),
-            Arc::new(MetricService::new(Arc::new(pe))),
+            Arc::new(MetricService::new()),
             Arc::new(SessionService::new(
                 root_db.session_repo(),
                 root_db.project_meta_repo(),

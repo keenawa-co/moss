@@ -3,7 +3,7 @@ use fs::{
     CreateOptions, FS,
 };
 use futures::io::Cursor;
-use serde_json::{json, Value};
+use serde_json::json;
 use std::{
     path::{Path, PathBuf},
     pin::Pin,

@@ -1,5 +1,3 @@
-mod db;
-
 pub mod init;
 
 #[macro_use]

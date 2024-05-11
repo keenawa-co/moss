@@ -1,4 +1,3 @@
-pub mod fw;
 pub mod real;
 
 use futures::{AsyncRead, Stream};

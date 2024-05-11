@@ -78,7 +78,7 @@ impl super::FS for FileSystem {
     async fn watch(
         &self,
         path: &Path,
-        latency: Duration,
+        _latency: Duration, // TODO: use this
     ) -> Pin<Box<dyn Send + Stream<Item = Vec<PathBuf>>>> {
         let (tx, rx) = smol::channel::unbounded();
 

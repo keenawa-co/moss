@@ -1,14 +1,11 @@
-use std::{path::PathBuf, sync::Arc};
-
-use analysis::policy_engine::Report;
 use async_graphql::{Context, FieldResult, Subscription};
 use futures::{Stream, StreamExt};
+use std::{path::PathBuf, sync::Arc};
 use tokio::sync::RwLock;
 
-use crate::domain::service::{metric_service::MetricService, project_service::ProjectService};
+use crate::domain::service::project_service::ProjectService;
 
 pub(super) struct MetricSubscription {
-    pub metric_service: Arc<MetricService>,
     pub project_service: Arc<RwLock<ProjectService>>,
 }
 

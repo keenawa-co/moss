@@ -7,7 +7,6 @@ edition = "2021"
 members = [
     "kernel/bus",
     "kernel/fs",
-    "lib/analysis",
     "lib/common",
     "lib/conf",
     "lib/dbutl",
@@ -44,7 +43,6 @@ pwd = { path = "lib/pwd" }
 mac = { path = "lib/mac" }
 file = { path = "lib/file" }
 common = { path = "lib/common" }
-analysis = { path = "lib/analysis" }
 dbutl = { path = "lib/dbutl" }
 graphql_utl = { path = "lib/graphql_utl" }
 graphql_mac = { path = "lib/graphql_mac" }

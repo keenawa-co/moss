@@ -53,7 +53,6 @@ pub fn build_schema(service_root: ServiceRoot) -> SchemaRoot {
         SubscriptionRoot(
             ExplorerSubscription::default(),
             MetricSubscription {
-                metric_service: service_root.2,
                 project_service: service_root.5.clone(),
             },
             NotificationSubscription {
