@@ -9,7 +9,6 @@ members = [
     "kernel/fs",
     "lib/conf",
     "lib/seaorm_utl",
-    "lib/file",
     "lib/graphql_mac",
     "lib/graphql_utl",
     "lib/mac",
@@ -42,7 +41,6 @@ bus = { path = "kernel/bus" }
 conf = { path = "lib/conf" }
 pwd = { path = "lib/pwd" }
 mac = { path = "lib/mac" }
-file = { path = "lib/file" }
 seaorm_utl = { path = "lib/seaorm_utl" }
 graphql_utl = { path = "lib/graphql_utl" }
 graphql_mac = { path = "lib/graphql_mac" }

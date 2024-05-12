@@ -1,9 +1,9 @@
 use async_graphql::Error as GraphqlError;
 use async_graphql::{Context, FieldResult, Subscription};
-use file::FileInfo;
 use fs::{real::FileSystem, FS};
 use futures::{Stream, StreamExt};
 use std::path::PathBuf;
+use types::file::FileInfo;
 
 const READ_DIR_CHUNK_SIZE: usize = 10;
 

@@ -1,5 +1,5 @@
 use async_graphql::{Context, FieldResult, Subscription};
-use futures::{Stream, StreamExt, TryStreamExt};
+use futures::{Stream, StreamExt};
 use graphql_utl::GraphQLExtendError;
 use std::{path::PathBuf, sync::Arc};
 use tokio::sync::RwLock;

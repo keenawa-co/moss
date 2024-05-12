@@ -7,9 +7,6 @@ use std::{
     time::{SystemTime, UNIX_EPOCH},
 };
 
-#[macro_use]
-extern crate serde;
-
 #[derive(Clone, Serialize, Deserialize, Debug)]
 pub struct FileInfo {
     pub path: PathBuf,
