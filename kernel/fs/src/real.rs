@@ -1,6 +1,9 @@
 use futures::{AsyncRead, Stream};
 use notify::Watcher;
-use smol::stream::StreamExt;
+use smol::{
+    fs::{File, OpenOptions},
+    stream::StreamExt,
+};
 use std::{
     io,
     path::{Path, PathBuf},
@@ -16,6 +19,16 @@ pub struct FileSystem;
 impl FileSystem {
     pub fn new() -> Self {
         Self {}
+    }
+}
+
+impl FileSystem {
+    pub async fn open_with_options(
+        &self,
+        // options: smol::fs::OpenOptions,
+        path: &Path,
+    ) -> io::Result<File> {
+        Ok(OpenOptions::new().write(true).open(path).await?)
     }
 }
 

@@ -1,44 +1,45 @@
+use anyhow::anyhow;
 use fs::{
     real::{self, types::FileSystemEntity},
     CreateOptions, FS,
 };
 use futures::io::Cursor;
-use serde_json::json;
+use once_cell::sync::Lazy;
 use std::{
     path::{Path, PathBuf},
     pin::Pin,
 };
 
-lazy_static! {
-    static ref ROOT: FileSystemEntity = FileSystemEntity::Directory {
+static CONTENT: Lazy<anyhow::Result<FileSystemEntity>> = Lazy::new(|| {
+    let result = FileSystemEntity::Directory {
         name: ".moss".to_string(),
         children: Some(vec![
             FileSystemEntity::Directory {
                 name: "cache".to_string(),
-                children: None
+                children: None,
             },
             FileSystemEntity::File {
                 name: ".gitignore".to_string(),
-                content: Some("cache".to_string())
+                content: Some("cache".to_string()),
             },
             FileSystemEntity::File {
                 name: "moss.json".to_string(),
                 content: Some(
-                    json!({
-                        "version": 1.0,
-                        "serial": 1,
-                        "toolchain": "v1.0.0",
-                    })
-                    .to_string()
-                )
+                    serde_json::to_string_pretty(&manifest::model::file::RootFile::default())
+                        .unwrap_or_else(|e| {
+                            format!("manifest file content cannot be serialized: {}", e)
+                        }),
+                ),
             },
             FileSystemEntity::File {
                 name: "README.md".to_string(),
-                content: None
+                content: None,
             },
         ]),
     };
-}
+
+    Ok(result)
+});
 
 pub async fn create_from_scratch<P: AsRef<Path>>(
     project_path: P,
@@ -46,9 +47,13 @@ pub async fn create_from_scratch<P: AsRef<Path>>(
 ) -> anyhow::Result<PathBuf> {
     // TODO: check the folder for an already initialized working directory
 
-    save_on_disk(&project_path.as_ref().to_path_buf(), &ROOT, fs).await?;
+    let content = CONTENT
+        .as_ref()
+        .map_err(|e| anyhow!("Failed to prepare content: {e}"))?;
 
-    Ok(project_path.as_ref().join(ROOT.name()))
+    save_on_disk(&project_path.as_ref().to_path_buf(), &content, fs).await?;
+
+    Ok(project_path.as_ref().join(content.name()))
 }
 
 async fn save_on_disk(

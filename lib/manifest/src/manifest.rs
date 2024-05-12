@@ -1,9 +1,10 @@
-use hashbrown::HashSet;
+use std::fmt::Debug;
+use std::path::Path;
+use std::{path::PathBuf, sync::Arc};
 use types::{id::NanoId, thing::Thing};
 
-use std::fmt::Debug;
-use std::{path::PathBuf, sync::Arc};
-
+use crate::interface::file::FileAdapter;
+use crate::interface::file_adapter::FileJsonAdapter;
 use crate::interface::{
     cache::CacheAdapter,
     cache_adapter::{migration::CacheMigrator, CacheSQLiteAdapter},
@@ -13,6 +14,7 @@ use crate::model::ignored::IgnoredSource;
 #[derive(Debug)]
 pub struct Manifest {
     cache: Arc<dyn CacheAdapter>,
+    file: Arc<dyn FileAdapter>,
 }
 
 pub struct Config {
@@ -25,6 +27,7 @@ impl Manifest {
 
         Ok(Self {
             cache: Arc::new(CacheSQLiteAdapter::new(Arc::new(conn))),
+            file: Arc::new(FileJsonAdapter::new(&Path::new(".moss/moss.json")).await?),
         })
     }
 }
@@ -34,6 +37,12 @@ impl Manifest {
         &self,
         input_list: &Vec<PathBuf>,
     ) -> anyhow::Result<Vec<IgnoredSource>> {
+        let _ = self
+            .file
+            .ignored_list_storage()
+            .create_from_list(input_list)
+            .await?;
+
         let result = self
             .cache
             .ignored_list_repo()
@@ -49,13 +58,9 @@ impl Manifest {
         Ok(result)
     }
 
-    pub async fn fetch_ignored_list(&self) -> Arc<HashSet<IgnoredSource>> {
-        let mut ignored_paths = HashSet::new();
-        ignored_paths.insert(IgnoredSource {
-            id: NanoId::new(),
-            source: "/Users/g10z3r/Project/4rchr4y/moss/target/".to_string(),
-        });
+    pub async fn fetch_ignored_list(&self) -> anyhow::Result<Vec<IgnoredSource>> {
+        let result = self.cache.ignored_list_repo().fetch_list().await?;
 
-        Arc::new(ignored_paths)
+        Ok(result)
     }
 }

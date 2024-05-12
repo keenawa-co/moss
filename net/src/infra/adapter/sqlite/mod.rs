@@ -1,4 +1,3 @@
-mod ignore_list_repo_impl;
 mod project_meta_repo_impl;
 mod session_repo_impl;
 

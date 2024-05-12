@@ -1,5 +1,6 @@
 use async_graphql::{Context, FieldResult, Subscription};
-use futures::{Stream, StreamExt};
+use futures::{Stream, StreamExt, TryStreamExt};
+use graphql_utl::GraphQLExtendError;
 use std::{path::PathBuf, sync::Arc};
 use tokio::sync::RwLock;
 
@@ -19,6 +20,7 @@ impl MetricSubscription {
         let stream = project_service_lock
             .watch_project()
             .await
+            .extend_error()?
             .map(|list: Vec<PathBuf>| {
                 let strings = list
                     .into_iter()

@@ -30,6 +30,9 @@ extern crate serde_json;
 #[macro_use]
 extern crate tracing;
 
+#[macro_use]
+extern crate mac;
+
 const MIX_COMPRESS_SIZE: u16 = 512; // TODO: this value should be used from a net_conf.toml file
 
 pub async fn bind(_: TokioCancellationToken) -> Result<(), Error> {

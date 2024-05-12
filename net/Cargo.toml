@@ -11,6 +11,7 @@ name = "moss_net"
 fs.workspace = true
 project = { workspace = true, features = ["graphql"] }
 manifest = { workspace = true, features = ["graphql"] }
+mac.workspace = true
 bus.workspace = true
 pwd.workspace = true
 seaorm_utl.workspace = true

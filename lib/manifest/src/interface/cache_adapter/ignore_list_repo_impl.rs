@@ -20,6 +20,15 @@ pub struct Model {
     pub source: String,
 }
 
+impl From<Model> for IgnoredSource {
+    fn from(value: Model) -> Self {
+        IgnoredSource {
+            id: value.id.into(),
+            source: value.source,
+        }
+    }
+}
+
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
 pub enum Relation {}
 
@@ -76,6 +85,12 @@ impl IgnoredListRepository for IgnoreListRepositoryImpl {
             .await?;
 
         Ok(result)
+    }
+
+    async fn fetch_list(&self) -> anyhow::Result<Vec<IgnoredSource>> {
+        let result = Entity::find().all(self.conn.as_ref()).await?;
+
+        Ok(result.into_iter().map(IgnoredSource::from).collect())
     }
 
     async fn delete_by_id(&self, id: &NanoId) -> anyhow::Result<Option<Thing>> {
