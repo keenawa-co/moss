@@ -13,7 +13,7 @@ project = { workspace = true, features = ["graphql"] }
 manifest = { workspace = true, features = ["graphql"] }
 bus.workspace = true
 pwd.workspace = true
-dbutl.workspace = true
+seaorm_utl.workspace = true
 graphql_utl.workspace = true
 graphql_mac.workspace = true
 file = { workspace = true, features = ["graphql"] }

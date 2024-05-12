@@ -6,7 +6,7 @@ edition = "2021"
 
 [dependencies]
 types = { workspace = true, features = ["graphql"] }
-dbutl.workspace = true
+seaorm_utl.workspace = true
 
 async-trait.workspace = true
 anyhow.workspace = true

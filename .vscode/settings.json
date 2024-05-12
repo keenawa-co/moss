@@ -25,6 +25,7 @@
     "revisioned",
     "rootdb",
     "sched",
+    "seaorm",
     "sess",
     "smol",
     "sqlx",

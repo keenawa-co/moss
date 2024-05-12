@@ -979,17 +979,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7e962a19be5cfc3f3bf6dd8f61eb50107f356ad6270fbb3ed41476571db78be5"
 
 [[package]]
-name = "dbutl"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "async-trait",
- "sea-orm",
- "sea-orm-migration",
- "tracing",
-]
-
-[[package]]
 name = "der"
 version = "0.7.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1844,10 +1833,10 @@ dependencies = [
  "anyhow",
  "async-graphql",
  "async-trait",
- "dbutl",
  "hashbrown 0.7.2",
  "sea-orm",
  "sea-orm-migration",
+ "seaorm_utl",
  "serde",
  "tokio",
  "types",
@@ -1944,7 +1933,6 @@ dependencies = [
  "anyhow",
  "async-trait",
  "clap",
- "dbutl",
  "fs",
  "futures",
  "graphql-parser",
@@ -1952,6 +1940,7 @@ dependencies = [
  "once_cell",
  "sea-orm",
  "sea-orm-migration",
+ "seaorm_utl",
  "serde",
  "serde_json",
  "tokio-util",
@@ -2004,7 +1993,6 @@ dependencies = [
  "bus",
  "chrono",
  "conf",
- "dbutl",
  "file",
  "fs",
  "futures",
@@ -2022,6 +2010,7 @@ dependencies = [
  "pwd",
  "sea-orm",
  "sea-orm-migration",
+ "seaorm_utl",
  "serde",
  "serde_json",
  "thiserror",
@@ -2989,6 +2978,17 @@ name = "seahash"
 version = "4.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1c107b6f4780854c8b126e228ea8869f4d7b71260f962fefb57b996b8959ba6b"
+
+[[package]]
+name = "seaorm_utl"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "async-trait",
+ "sea-orm",
+ "sea-orm-migration",
+ "tracing",
+]
 
 [[package]]
 name = "serde"

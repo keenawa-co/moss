@@ -46,33 +46,34 @@ impl IgnoredListRepository for IgnoreListRepositoryImpl {
         &self,
         input_list: &Vec<PathBuf>,
     ) -> anyhow::Result<Vec<IgnoredSource>> {
-        let result = dbutl::transaction::weak_transaction(self.conn.as_ref(), |tx| async move {
-            let mut result = Vec::new();
-            let models: Vec<ActiveModel> = input_list
-                .iter()
-                .map(|item| {
-                    let item_id = NanoId::new();
-                    let item_source = item.to_string_lossy().to_string();
+        let result =
+            seaorm_utl::transaction::weak_transaction(self.conn.as_ref(), |tx| async move {
+                let mut result = Vec::new();
+                let models: Vec<ActiveModel> = input_list
+                    .iter()
+                    .map(|item| {
+                        let item_id = NanoId::new();
+                        let item_source = item.to_string_lossy().to_string();
 
-                    result.push(IgnoredSource {
-                        id: item_id.clone(),
-                        source: item_source.clone(),
-                    });
+                        result.push(IgnoredSource {
+                            id: item_id.clone(),
+                            source: item_source.clone(),
+                        });
 
-                    ActiveModel {
-                        id: Set(item_id.to_string()),
-                        source: Set(item_source),
-                    }
-                })
-                .collect();
+                        ActiveModel {
+                            id: Set(item_id.to_string()),
+                            source: Set(item_source),
+                        }
+                    })
+                    .collect();
 
-            Entity::insert_many(models)
-                .exec_without_returning(&*tx)
-                .await?;
+                Entity::insert_many(models)
+                    .exec_without_returning(&*tx)
+                    .await?;
 
-            Ok(result)
-        })
-        .await?;
+                Ok(result)
+            })
+            .await?;
 
         Ok(result)
     }

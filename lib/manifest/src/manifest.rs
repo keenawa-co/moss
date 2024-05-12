@@ -21,7 +21,7 @@ pub struct Config {
 
 impl Manifest {
     pub async fn new(conf: &Config) -> anyhow::Result<Self> {
-        let conn = dbutl::sqlite::conn::<CacheMigrator>(&conf.database_path).await?;
+        let conn = seaorm_utl::conn::<CacheMigrator>(&conf.database_path).await?;
 
         Ok(Self {
             cache: Arc::new(CacheSQLiteAdapter::new(Arc::new(conn))),

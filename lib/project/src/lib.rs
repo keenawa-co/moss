@@ -1,12 +1,6 @@
 use manifest::Manifest;
 use std::path::PathBuf;
 
-#[macro_use]
-extern crate async_trait;
-
-#[macro_use]
-extern crate serde;
-
 #[derive(Debug)]
 pub struct Project {
     pub root: PathBuf,

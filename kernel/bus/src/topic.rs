@@ -3,7 +3,6 @@ use std::{any::TypeId, collections::HashMap, sync::Arc};
 use tokio::sync::{mpsc, RwLock};
 
 use crate::message::simple_message::SimpleMessage;
-use crate::Subscriber;
 
 pub struct TopicConfig {
     pub buffer: usize,
