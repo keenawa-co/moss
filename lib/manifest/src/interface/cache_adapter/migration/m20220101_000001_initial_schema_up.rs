@@ -12,8 +12,8 @@ pub struct Migration;
 impl MigrationTrait for Migration {
     async fn up(&self, manager: &SchemaManager) -> Result<(), DbErr> {
         let file_path = {
-            let migration_file_path = Path::new("m20220101_000001_initial_project_schema.up.sql");
-            let migration_dir = Path::new("migration/project");
+            let migration_file_path = Path::new("m20220101_000001_initial_cache_schema.up.sql");
+            let migration_dir = Path::new("migration/cache");
             let root_dir = PathBuf::from(env::var("CARGO_MANIFEST_DIR").unwrap());
 
             root_dir.join(migration_dir).join(migration_file_path)
@@ -35,8 +35,8 @@ impl MigrationTrait for Migration {
 
     async fn down(&self, manager: &SchemaManager) -> Result<(), DbErr> {
         let file_path = {
-            let migration_file_path = Path::new("m20220101_000001_initial_project_schema.down.sql");
-            let migration_dir = Path::new("migration/project");
+            let migration_file_path = Path::new("m20220101_000001_initial_cache_schema.down.sql");
+            let migration_dir = Path::new("migration/cache");
             let root_dir = PathBuf::from(env::var("CARGO_MANIFEST_DIR").unwrap());
 
             root_dir.join(migration_dir).join(migration_file_path)
