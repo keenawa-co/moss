@@ -2,9 +2,9 @@ use std::collections::HashSet;
 
 use async_graphql::{Scalar, ScalarType, SimpleObject};
 use chrono::Utc;
-use common::id::{nanoid_serde, NanoId};
 use http::HeaderValue;
 use jsonwebtoken::{Algorithm, DecodingKey, EncodingKey, Header, TokenData, Validation};
+use types::id::{nanoid_serde, NanoId};
 
 use crate::{config::MAGIC_TOKEN_KEY, domain, domain::model::result::Result};
 

@@ -1,5 +1,5 @@
-use common::{id::NanoId, thing::Thing};
 use std::{fmt::Debug, path::PathBuf, sync::Arc};
+use types::{id::NanoId, thing::Thing};
 
 use crate::model::ignored::IgnoredSource;
 

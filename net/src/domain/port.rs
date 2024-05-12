@@ -1,6 +1,6 @@
 pub(crate) mod rootdb {
-    use common::{id::NanoId, thing::Thing};
     use std::{fmt::Debug, path::PathBuf};
+    use types::{id::NanoId, thing::Thing};
 
     use crate::domain::model::{
         project::{CreateProjectInput, ProjectMeta},

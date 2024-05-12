@@ -1,8 +1,8 @@
 use chrono::Utc;
-use common::id::NanoId;
 use sea_orm::entity::prelude::*;
 use sea_orm::{DatabaseConnection, QueryOrder, QuerySelect, Set};
 use std::sync::Arc;
+use types::id::NanoId;
 
 use crate::domain::model::session::SessionEntity;
 use crate::domain::port;

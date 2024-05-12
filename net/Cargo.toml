@@ -18,7 +18,7 @@ graphql_utl.workspace = true
 graphql_mac.workspace = true
 file = { workspace = true, features = ["graphql"] }
 conf = { workspace = true, features = ["graphql"] }
-common = { workspace = true, features = ["graphql"] }
+types = { workspace = true, features = ["graphql"] }
 notify.workspace = true
 chrono = { workspace = true, features = ["serde"] }
 once_cell.workspace = true

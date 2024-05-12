@@ -1,6 +1,5 @@
-use common::id::NanoId;
-use common::thing::Thing;
 use hashbrown::HashSet;
+use types::{id::NanoId, thing::Thing};
 
 use std::fmt::Debug;
 use std::{path::PathBuf, sync::Arc};

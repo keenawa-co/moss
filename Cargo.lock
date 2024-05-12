@@ -703,8 +703,8 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "async-trait",
- "common",
  "tokio",
+ "types",
 ]
 
 [[package]]
@@ -838,17 +838,6 @@ dependencies = [
  "either",
  "memchr",
  "unreachable",
-]
-
-[[package]]
-name = "common"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "async-graphql",
- "nanoid",
- "sea-orm",
- "serde",
 ]
 
 [[package]]
@@ -1855,13 +1844,13 @@ dependencies = [
  "anyhow",
  "async-graphql",
  "async-trait",
- "common",
  "dbutl",
  "hashbrown 0.7.2",
  "sea-orm",
  "sea-orm-migration",
  "serde",
  "tokio",
+ "types",
 ]
 
 [[package]]
@@ -1955,7 +1944,6 @@ dependencies = [
  "anyhow",
  "async-trait",
  "clap",
- "common",
  "dbutl",
  "fs",
  "futures",
@@ -1970,6 +1958,7 @@ dependencies = [
  "toml",
  "tracing",
  "tracing-subscriber",
+ "types",
  "url",
 ]
 
@@ -2014,7 +2003,6 @@ dependencies = [
  "bitflags 2.5.0",
  "bus",
  "chrono",
- "common",
  "conf",
  "dbutl",
  "file",
@@ -2046,6 +2034,7 @@ dependencies = [
  "tracing",
  "tracing-opentelemetry",
  "tracing-subscriber",
+ "types",
 ]
 
 [[package]]
@@ -2520,10 +2509,10 @@ dependencies = [
  "anyhow",
  "async-graphql",
  "async-trait",
- "common",
  "hashbrown 0.7.2",
  "manifest",
  "serde",
+ "types",
 ]
 
 [[package]]
@@ -2552,7 +2541,6 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "async-trait",
- "common",
  "fs",
  "futures",
  "lazy_static",
@@ -2561,6 +2549,7 @@ dependencies = [
  "sea-orm-migration",
  "serde_json",
  "tracing",
+ "types",
 ]
 
 [[package]]
@@ -3917,6 +3906,17 @@ name = "typenum"
 version = "1.17.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "42ff0bf0c66b8238c6f3b578df37d0b7848e55df8577b3f74f92a69acceeb825"
+
+[[package]]
+name = "types"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "async-graphql",
+ "nanoid",
+ "sea-orm",
+ "serde",
+]
 
 [[package]]
 name = "ucd-trie"

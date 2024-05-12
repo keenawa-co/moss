@@ -7,7 +7,6 @@ edition = "2021"
 members = [
     "kernel/bus",
     "kernel/fs",
-    "lib/common",
     "lib/conf",
     "lib/dbutl",
     "lib/file",
@@ -17,6 +16,7 @@ members = [
     "lib/manifest",
     "lib/project",
     "lib/pwd",
+    "lib/types",
     "mossctl",
     "net",
 ]
@@ -43,12 +43,12 @@ conf = { path = "lib/conf" }
 pwd = { path = "lib/pwd" }
 mac = { path = "lib/mac" }
 file = { path = "lib/file" }
-common = { path = "lib/common" }
 dbutl = { path = "lib/dbutl" }
 graphql_utl = { path = "lib/graphql_utl" }
 graphql_mac = { path = "lib/graphql_mac" }
 project = { path = "lib/project" }
 manifest = { path = "lib/manifest" }
+types = { path = "lib/types" }
 
 mossctl = { path = "mossctl" }
 net = { path = "net" }

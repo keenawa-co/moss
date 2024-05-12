@@ -11,7 +11,7 @@ use std::{
 
 lazy_static! {
     static ref ROOT: FileSystemEntity = FileSystemEntity::Directory {
-        name: format!(".{}", common::APP_NAME),
+        name: ".moss".to_string(),
         children: Some(vec![
             FileSystemEntity::Directory {
                 name: "cache".to_string(),

@@ -1,6 +1,6 @@
-use common::{id::NanoId, thing::Thing};
 use fs::real;
 use std::sync::Arc;
+use types::{id::NanoId, thing::Thing};
 
 use crate::domain::{
     model::{

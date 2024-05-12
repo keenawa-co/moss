@@ -1,5 +1,5 @@
-use common::id::NanoId;
 use std::{path::PathBuf, sync::Arc};
+use types::id::NanoId;
 
 use crate::domain::model::{error::Error, result::Result, session::SessionEntity, OptionExtension};
 use crate::domain::port::rootdb::{ProjectMetaRepository, SessionRepository};

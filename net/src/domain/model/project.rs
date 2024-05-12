@@ -1,6 +1,6 @@
 use async_graphql::{InputObject, SimpleObject};
-use common::id::NanoId;
 use graphql_utl::path::Path as PathGraphQL;
+use types::id::NanoId;
 
 #[derive(Debug, Clone, Deserialize, Serialize, SimpleObject)]
 pub struct ProjectMeta {

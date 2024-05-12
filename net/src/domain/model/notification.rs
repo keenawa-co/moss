@@ -1,5 +1,5 @@
 use async_graphql::SimpleObject;
-use common::id::NanoId;
+use types::id::NanoId;
 
 #[derive(Debug, Clone, Deserialize, Serialize, SimpleObject)]
 pub struct Notification {

@@ -1,5 +1,4 @@
-use common::id::NanoId;
-use common::thing::Thing;
+use types::{id::NanoId, thing::Thing};
 
 use sea_orm::entity::prelude::*;
 use sea_orm::{DatabaseConnection, Set};

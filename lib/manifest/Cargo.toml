@@ -5,7 +5,7 @@ edition = "2021"
 
 
 [dependencies]
-common = { workspace = true, features = ["graphql"] }
+types = { workspace = true, features = ["graphql"] }
 dbutl.workspace = true
 
 async-trait.workspace = true

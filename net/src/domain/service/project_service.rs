@@ -1,10 +1,10 @@
-use common::{id::NanoId, thing::Thing};
 use fs::{real, FS};
 use futures::{Stream, StreamExt};
 use hashbrown::HashSet;
 use manifest::model::ignored::IgnoredSource;
 use project::Project;
 use std::{path::PathBuf, pin::Pin, sync::Arc, time::Duration};
+use types::{id::NanoId, thing::Thing};
 
 use crate::domain::model::{result::Result, OptionExtension};
 

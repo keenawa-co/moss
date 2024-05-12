@@ -5,7 +5,7 @@ edition = "2021"
 
 
 [dependencies]
+types.workspace = true
 anyhow.workspace = true
 async-trait.workspace = true
-common = { workspace = true }
 tokio = { workspace = true, features = ["full", "signal", "macros"] }

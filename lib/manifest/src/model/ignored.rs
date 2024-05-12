@@ -1,4 +1,4 @@
-use common::id::NanoId;
+use types::id::NanoId;
 
 #[cfg(feature = "graphql")]
 use async_graphql::SimpleObject;
