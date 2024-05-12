@@ -6,15 +6,16 @@ mod session_repo_impl;
 
 pub(crate) use migration::CacheMigrator;
 
-use project::cache::{CacheAdapter, IgnoreListRepository};
+// use project::cache::{CacheAdapter, IgnoreListRepository};
 use sea_orm::DatabaseConnection;
 use std::sync::Arc;
 
 use crate::domain::port::rootdb::{ProjectMetaRepository, SessionRepository};
 
 use self::{
-    ignore_list_repo_impl::IgnoreListRepositoryImpl,
-    project_meta_repo_impl::ProjectMetaRepositoryImpl, session_repo_impl::SessionRepositoryImpl,
+    // ignore_list_repo_impl::IgnoreListRepositoryImpl,
+    project_meta_repo_impl::ProjectMetaRepositoryImpl,
+    session_repo_impl::SessionRepositoryImpl,
 };
 
 pub struct RootSQLiteAdapter {
@@ -39,22 +40,22 @@ impl RootSQLiteAdapter {
     }
 }
 
-#[derive(Debug)]
-pub struct CacheSQLiteAdapter {
-    ignored_list_repo: Arc<dyn IgnoreListRepository>,
-}
+// #[derive(Debug)]
+// pub struct CacheSQLiteAdapter {
+//     ignored_list_repo: Arc<dyn IgnoreListRepository>,
+// }
 
-impl CacheSQLiteAdapter {
-    pub fn new(conn: Arc<DatabaseConnection>) -> Self {
-        Self {
-            ignored_list_repo: Arc::new(IgnoreListRepositoryImpl::new(conn.clone())),
-        }
-    }
-}
+// impl CacheSQLiteAdapter {
+//     pub fn new(conn: Arc<DatabaseConnection>) -> Self {
+//         Self {
+//             ignored_list_repo: Arc::new(IgnoreListRepositoryImpl::new(conn.clone())),
+//         }
+//     }
+// }
 
-#[async_trait]
-impl CacheAdapter for CacheSQLiteAdapter {
-    async fn ignore_list_repo(&self) -> Arc<dyn IgnoreListRepository> {
-        Arc::clone(&self.ignored_list_repo)
-    }
-}
+// #[async_trait]
+// impl CacheAdapter for CacheSQLiteAdapter {
+//     async fn ignore_list_repo(&self) -> Arc<dyn IgnoreListRepository> {
+//         Arc::clone(&self.ignored_list_repo)
+//     }
+// }

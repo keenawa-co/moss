@@ -10,6 +10,7 @@ name = "moss_net"
 [dependencies]
 fs.workspace = true
 project = { workspace = true, features = ["graphql"] }
+manifest = { workspace = true, features = ["graphql"] }
 bus.workspace = true
 pwd.workspace = true
 dbutl.workspace = true

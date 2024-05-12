@@ -1,15 +1,15 @@
 use common::{id::NanoId, thing::Thing};
 use std::{fmt::Debug, path::PathBuf, sync::Arc};
 
-use crate::ignored::IgnoredSource;
+use crate::model::ignored::IgnoredSource;
 
 #[async_trait]
-pub trait CacheAdapter: Debug + Send + Sync {
-    async fn ignore_list_repo(&self) -> Arc<dyn IgnoreListRepository>;
+pub(crate) trait CacheAdapter: Debug + Send + Sync {
+    fn ignored_list_repo(&self) -> Arc<dyn IgnoredListRepository>;
 }
 
 #[async_trait]
-pub trait IgnoreListRepository: Debug + Send + Sync {
+pub trait IgnoredListRepository: Debug + Send + Sync {
     async fn create_from_list(
         &self,
         input_list: &Vec<PathBuf>,

@@ -1849,6 +1849,22 @@ name = "mac"
 version = "0.1.0"
 
 [[package]]
+name = "manifest"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "async-graphql",
+ "async-trait",
+ "common",
+ "dbutl",
+ "hashbrown 0.7.2",
+ "sea-orm",
+ "sea-orm-migration",
+ "serde",
+ "tokio",
+]
+
+[[package]]
 name = "matchers"
 version = "0.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2010,6 +2026,7 @@ dependencies = [
  "hashbrown 0.7.2",
  "http",
  "jsonwebtoken",
+ "manifest",
  "notify",
  "once_cell",
  "opentelemetry",
@@ -2505,6 +2522,7 @@ dependencies = [
  "async-trait",
  "common",
  "hashbrown 0.7.2",
+ "manifest",
  "serde",
 ]
 

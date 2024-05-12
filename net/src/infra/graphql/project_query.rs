@@ -2,7 +2,7 @@ use async_graphql::{Context, Object, Result as GraphqlResult};
 use common::{id::NanoId, thing::Thing};
 use graphql_utl::{path::Path as PathGraphQL, GraphQLExtendError};
 use http::HeaderMap;
-use project::ignored::IgnoredSource;
+use manifest::model::ignored::IgnoredSource;
 use std::{path::PathBuf, sync::Arc};
 use tokio::sync::RwLock;
 

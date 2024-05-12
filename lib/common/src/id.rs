@@ -17,7 +17,7 @@ const CHAR_SET: [char; 62] = [
 
 // TODO: implement all traits to use MNID as a SEA ORM model type
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, Hash)]
 pub struct NanoId(BoundedString<NANO_ID20>);
 
 impl NanoId {
@@ -128,7 +128,7 @@ pub mod nanoid_serde {
 
 // Bounded String implementation
 
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Hash)]
 pub struct BoundedString<const N: usize> {
     inner: String,
 

@@ -1,21 +1,28 @@
 [package]
-name = "project"
+name = "manifest"
 version = "0.1.0"
 edition = "2021"
 
 
 [dependencies]
 common = { workspace = true, features = ["graphql"] }
-manifest.workspace = true
+dbutl.workspace = true
 
-hashbrown.workspace = true
+async-trait.workspace = true
 anyhow.workspace = true
+hashbrown.workspace = true
 
 serde = { workspace = true, features = ["derive"] }
-async-trait.workspace = true
+
+sea-orm.workspace = true
 
 async-graphql = { workspace = true, optional = true }
 
+tokio = { workspace = true, features = ["full", "signal", "macros"] }
+
+[dependencies.sea-orm-migration]
+workspace = true
+features = []
 
 [features]
 default = []

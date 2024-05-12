@@ -1,9 +1,5 @@
-pub mod cache;
-pub mod ignored;
-
-use cache::CacheAdapter;
-use hashbrown::HashSet;
-use std::{path::PathBuf, sync::Arc};
+use manifest::Manifest;
+use std::path::PathBuf;
 
 #[macro_use]
 extern crate async_trait;
@@ -14,6 +10,19 @@ extern crate serde;
 #[derive(Debug)]
 pub struct Project {
     pub root: PathBuf,
-    pub ignored_list: Arc<HashSet<String>>,
-    pub cache: Arc<dyn CacheAdapter>,
+    pub manifest: Manifest,
+}
+
+impl Project {
+    pub async fn new(path: &PathBuf) -> anyhow::Result<Self> {
+        let manifest = Manifest::new(&manifest::Config {
+            database_path: path.join(".moss/cache").join("cache.db"),
+        })
+        .await?;
+
+        Ok(Self {
+            root: path.clone(),
+            manifest,
+        })
+    }
 }
