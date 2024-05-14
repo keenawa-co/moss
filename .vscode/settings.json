@@ -1,6 +1,7 @@
 {
   "rust-analyzer.showUnlinkedFileNotification": false,
   "cSpell.words": [
+    "asynx",
     "bitflags",
     "cachedb",
     "canonicalize",
@@ -10,6 +11,7 @@
     "gqlutl",
     "graphiql",
     "hashbrown",
+    "Hasher",
     "inmem",
     "inmemdb",
     "jsonwebtoken",

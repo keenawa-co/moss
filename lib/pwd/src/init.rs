@@ -22,15 +22,15 @@ static CONTENT: Lazy<anyhow::Result<FileSystemEntity>> = Lazy::new(|| {
                 name: ".gitignore".to_string(),
                 content: Some("cache".to_string()),
             },
-            FileSystemEntity::File {
-                name: "moss.json".to_string(),
-                content: Some(
-                    serde_json::to_string_pretty(&manifest::model::file::RootFile::default())
-                        .unwrap_or_else(|e| {
-                            format!("manifest file content cannot be serialized: {}", e)
-                        }),
-                ),
-            },
+            // FileSystemEntity::File {
+            //     name: "moss.json".to_string(),
+            //     content: Some(
+            //         serde_json::to_string_pretty(&workspace::settings::Settings::default())
+            //             .unwrap_or_else(|e| {
+            //                 format!("settings.json file content cannot be created: {}", e)
+            //             }),
+            //     ),
+            // },
             FileSystemEntity::File {
                 name: "README.md".to_string(),
                 content: None,

@@ -9,7 +9,7 @@ use crate::interface::cache::IgnoredListRepository;
 use crate::model::ignored::IgnoredSource;
 
 //
-// Entity model definition for `ignore_list` table (project database)
+// Entity model definition for `ignore_list` table
 //
 
 #[derive(Clone, Debug, PartialEq, Eq, DeriveEntityModel, Serialize, Deserialize)]
@@ -39,12 +39,12 @@ impl ActiveModelBehavior for ActiveModel {}
 //
 
 #[derive(Debug)]
-pub(crate) struct IgnoreListRepositoryImpl {
+pub(super) struct IgnoreListRepositoryImpl {
     conn: Arc<DatabaseConnection>,
 }
 
 impl IgnoreListRepositoryImpl {
-    pub(super) fn new(conn: Arc<DatabaseConnection>) -> Self {
+    pub fn new(conn: Arc<DatabaseConnection>) -> Self {
         Self { conn }
     }
 }
@@ -93,13 +93,14 @@ impl IgnoredListRepository for IgnoreListRepositoryImpl {
         Ok(result.into_iter().map(IgnoredSource::from).collect())
     }
 
-    async fn delete_by_id(&self, id: &NanoId) -> anyhow::Result<Option<Thing>> {
+    async fn delete_by_id(&self, id: &NanoId) -> anyhow::Result<Option<Thing<NanoId>>> {
         let result = Entity::delete_by_id(id.clone())
             .exec(self.conn.as_ref())
             .await?;
 
         Ok(if result.rows_affected > 0 {
-            Some(Thing::from(id.to_string()))
+            // Some(Thing::from(id.clone()))
+            None
         } else {
             None
         })

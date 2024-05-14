@@ -6,15 +6,21 @@ edition = "2021"
 
 [dependencies]
 types = { workspace = true, features = ["graphql"] }
-manifest.workspace = true
+workspace.workspace = true
+mac.workspace = true
 
 hashbrown.workspace = true
 anyhow.workspace = true
-
-serde = { workspace = true, features = ["derive"] }
+smol.workspace = true
 async-trait.workspace = true
 
+serde = { workspace = true, features = ["derive"] }
+serde_json.workspace = true
+
+
 async-graphql = { workspace = true, optional = true }
+
+tokio = { workspace = true, features = ["full", "signal", "macros"] }
 
 
 [features]

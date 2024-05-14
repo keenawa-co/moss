@@ -1,7 +1,7 @@
 use async_graphql::{Context, Object, Result as GraphqlResult};
 use graphql_utl::{path::Path as PathGraphQL, GraphQLExtendError};
 use http::HeaderMap;
-use manifest::model::ignored::IgnoredSource;
+// use manifest::model::ignored::IgnoredSource;
 use std::{path::PathBuf, sync::Arc};
 use tokio::sync::RwLock;
 use types::{id::NanoId, thing::Thing};
@@ -37,7 +37,7 @@ impl ProjectMutation {
     }
 
     #[graphql(name = "deleteProjectById")]
-    async fn delete_by_id(&self, _ctx: &Context<'_>, id: NanoId) -> GraphqlResult<Thing> {
+    async fn delete_by_id(&self, _ctx: &Context<'_>, id: NanoId) -> GraphqlResult<Thing<NanoId>> {
         Ok(self
             .project_meta_service
             .delete_project_by_id(&id)
@@ -51,7 +51,7 @@ impl ProjectMutation {
         &self,
         ctx: &Context<'_>,
         input_list: Vec<PathGraphQL>,
-    ) -> GraphqlResult<Vec<IgnoredSource>> {
+    ) -> GraphqlResult<Vec<String>> {
         let sess_claims = ctx.data::<SessionTokenClaims>()?;
         let project_service_lock = self.project_service.write().await;
 
@@ -74,23 +74,27 @@ impl ProjectMutation {
         Ok(result)
     }
 
-    #[graphql(name = "removeFromProjectIgnored")]
-    #[graphql_mac::require_header("session-token")]
-    async fn remove_from_ignore_list(&self, ctx: &Context<'_>, id: NanoId) -> GraphqlResult<Thing> {
-        let sess_claims = ctx.data::<SessionTokenClaims>()?;
-        let project_service_lock = self.project_service.write().await;
+    // #[graphql(name = "removeFromProjectIgnored")]
+    // #[graphql_mac::require_header("session-token")]
+    // async fn remove_from_ignore_list(
+    //     &self,
+    //     ctx: &Context<'_>,
+    //     id: NanoId,
+    // ) -> GraphqlResult<Thing<NanoId>> {
+    //     let sess_claims = ctx.data::<SessionTokenClaims>()?;
+    //     let project_service_lock = self.project_service.write().await;
 
-        let result = project_service_lock.remove_from_ignore_list(&id).await?;
+    //     let result = project_service_lock.remove_from_ignore_list(&id).await?;
 
-        self.notification_service
-            .send(Notification {
-                id: NanoId::new(),
-                project_id: sess_claims.project_id.clone(),
-                session_id: sess_claims.session_id.clone(),
-                summary: format!("Path {id} has been successfully added to the ignore list"),
-            })
-            .await?;
+    //     self.notification_service
+    //         .send(Notification {
+    //             id: NanoId::new(),
+    //             project_id: sess_claims.project_id.clone(),
+    //             session_id: sess_claims.session_id.clone(),
+    //             summary: format!("Path {id} has been successfully added to the ignore list"),
+    //         })
+    //         .await?;
 
-        Ok(result)
-    }
+    //     Ok(result)
+    // }
 }

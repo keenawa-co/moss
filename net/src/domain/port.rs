@@ -14,7 +14,7 @@ pub(crate) mod rootdb {
         async fn get_by_id(&self, id: &NanoId) -> Result<Option<ProjectMeta>>;
         async fn get_by_source(&self, source: &PathBuf) -> Result<Option<ProjectMeta>>;
         async fn get_list_by_ids(&self, ids: &Vec<NanoId>) -> Result<Vec<ProjectMeta>>;
-        async fn delete_by_id(&self, id: &NanoId) -> Result<Option<Thing>>;
+        async fn delete_by_id(&self, id: &NanoId) -> Result<Option<Thing<NanoId>>>;
     }
 
     #[async_trait]

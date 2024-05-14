@@ -8,7 +8,7 @@ description = "Project Work Directory"
 [dependencies]
 fs.workspace = true
 types.workspace = true
-manifest.workspace = true
+workspace.workspace = true
 mac.workspace = true
 
 anyhow.workspace = true

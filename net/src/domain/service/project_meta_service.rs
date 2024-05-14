@@ -36,7 +36,7 @@ impl ProjectMetaService {
         Ok(project_entity)
     }
 
-    pub async fn delete_project_by_id(&self, id: &NanoId) -> Result<Thing> {
+    pub async fn delete_project_by_id(&self, id: &NanoId) -> Result<Thing<NanoId>> {
         let result = self
             .project_repo
             .delete_by_id(id)

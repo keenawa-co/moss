@@ -1,4 +1,5 @@
 mod ignore_list_repo_impl;
+
 pub mod migration;
 
 use sea_orm::DatabaseConnection;

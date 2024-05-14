@@ -12,7 +12,7 @@ members = [
     "lib/graphql_mac",
     "lib/graphql_utl",
     "lib/mac",
-    "lib/manifest",
+    "lib/workspace",
     "lib/project",
     "lib/pwd",
     "lib/types",
@@ -45,7 +45,7 @@ seaorm_utl = { path = "lib/seaorm_utl" }
 graphql_utl = { path = "lib/graphql_utl" }
 graphql_mac = { path = "lib/graphql_mac" }
 project = { path = "lib/project" }
-manifest = { path = "lib/manifest" }
+workspace = { path = "lib/workspace" }
 types = { path = "lib/types" }
 
 mossctl = { path = "mossctl" }
@@ -61,6 +61,7 @@ notify = "6.1.1"
 url = "2.5.0"
 nanoid = "0.4"
 hashbrown = "=0.7.2"
+sha2 = "0.10.8"
 
 tokio = "1"
 tokio-util = "0.7"
@@ -73,6 +74,7 @@ futures-util = "0.3"
 
 serde = "1.0"
 serde_json = "1.0"
+jsonpath_lib = "0.3.0"
 toml = "0.8.12"
 
 async-trait = "0.1"

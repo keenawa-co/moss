@@ -5,9 +5,13 @@ edition = "2021"
 
 [dependencies]
 anyhow.workspace = true
-serde = { workspace = true, features = ["derive"] }
-async-graphql = { workspace = true, optional = true }
+async-trait.workspace = true
+
 nanoid.workspace = true
+serde = { workspace = true, features = ["derive"] }
+
+async-graphql = { workspace = true, optional = true }
+
 sea-orm.workspace = true
 
 

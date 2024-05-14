@@ -1,22 +1,10 @@
-use manifest::Manifest;
-use std::path::PathBuf;
+pub mod project;
+pub mod settings;
 
-#[derive(Debug)]
-pub struct Project {
-    pub root: PathBuf,
-    pub manifest: Manifest,
-}
+#[macro_use]
+extern crate serde;
 
-impl Project {
-    pub async fn new(path: &PathBuf) -> anyhow::Result<Self> {
-        let manifest = Manifest::new(&manifest::Config {
-            database_path: path.join(".moss/cache").join("cache.db"),
-        })
-        .await?;
+#[macro_use]
+extern crate async_trait;
 
-        Ok(Self {
-            root: path.clone(),
-            manifest,
-        })
-    }
-}
+pub use project::Project;

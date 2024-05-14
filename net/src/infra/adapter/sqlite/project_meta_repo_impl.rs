@@ -90,14 +90,14 @@ impl port::rootdb::ProjectMetaRepository for ProjectMetaRepositoryImpl {
         Ok(model_option.map(ProjectMeta::from))
     }
 
-    async fn delete_by_id(&self, id: &NanoId) -> Result<Option<Thing>> {
+    async fn delete_by_id(&self, id: &NanoId) -> Result<Option<Thing<NanoId>>> {
         let rows_affected = Entity::delete_by_id(id.clone())
             .exec(self.conn.as_ref())
             .await?
             .rows_affected; // FIXME: remove this call
 
         Ok(if rows_affected > 0 {
-            Some(Thing::from(id.to_string()))
+            Some(Thing { id: id.clone() }) // FIXME: use new() fn
         } else {
             None
         })

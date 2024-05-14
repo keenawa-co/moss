@@ -5,16 +5,16 @@ use smol::{
 use std::{path::PathBuf, sync::Arc};
 use tokio::sync::Mutex;
 
-use crate::{interface::file::IgnoredListStorage, model::file::RootFile};
+use crate::{interface::file::IgnoredListStorage, model::file::ManifestFile};
 
 #[derive(Debug)]
 pub(super) struct IgnoredListStorageImpl {
-    state: Arc<Mutex<RootFile>>,
-    file: Mutex<File>,
+    state: Arc<Mutex<ManifestFile>>,
+    file: Arc<Mutex<File>>,
 }
 
 impl IgnoredListStorageImpl {
-    pub fn new(state: Arc<Mutex<RootFile>>, file: Mutex<File>) -> Self {
+    pub fn new(state: Arc<Mutex<ManifestFile>>, file: Arc<Mutex<File>>) -> Self {
         Self { state, file }
     }
 }

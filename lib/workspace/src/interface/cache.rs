@@ -15,7 +15,7 @@ pub trait IgnoredListRepository: Debug + Send + Sync {
         input_list: &Vec<PathBuf>,
     ) -> anyhow::Result<Vec<IgnoredSource>>;
 
-    async fn delete_by_id(&self, id: &NanoId) -> anyhow::Result<Option<Thing>>;
+    async fn delete_by_id(&self, id: &NanoId) -> anyhow::Result<Option<Thing<NanoId>>>;
 
     async fn fetch_list(&self) -> anyhow::Result<Vec<IgnoredSource>>;
 }
