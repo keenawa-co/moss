@@ -56,7 +56,9 @@ impl ProjectMutation {
         let project_service_lock = self.project_service.write().await;
 
         let result = project_service_lock
-            .append_to_ignore_list(&input_list.iter().map(Into::into).collect::<Vec<PathBuf>>())
+            .append_to_monitoring_exclude_list(
+                &input_list.iter().map(Into::into).collect::<Vec<PathBuf>>(),
+            )
             .await
             .extend_error()?;
 

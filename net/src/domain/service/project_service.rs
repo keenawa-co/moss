@@ -50,11 +50,14 @@ impl ProjectService {
         Ok(Box::pin(stream))
     }
 
-    pub async fn append_to_ignore_list(&self, input_list: &Vec<PathBuf>) -> Result<Vec<String>> {
+    pub async fn append_to_monitoring_exclude_list(
+        &self,
+        input_list: &Vec<PathBuf>,
+    ) -> Result<Vec<String>> {
         Ok(self
             .project_ref()?
             .settings
-            .exclude_from_monitoring(input_list)
+            .append_to_monitoring_exclude_list(input_list)
             .await?)
     }
 
