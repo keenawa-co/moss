@@ -4,7 +4,7 @@ use hashbrown::HashSet;
 use project::Project;
 use std::{path::PathBuf, pin::Pin, sync::Arc, time::Duration};
 use types::{asynx::AsyncTryFrom, id::NanoId, thing::Thing};
-use workspace::settings::Settings as WorkspaceSettings;
+use workspace::settings::FileAdapter as WorkspaceSettings;
 
 use crate::domain::model::{result::Result, OptionExtension};
 
@@ -24,7 +24,7 @@ impl ProjectService {
     pub async fn start_project(&mut self, project_path: &PathBuf) -> Result<()> {
         let ws = WorkspaceSettings::new(&project_path.join(".moss/settings.json")).await?;
         let ws2 = Arc::new(ws);
-        let project_settings = project::settings::Settings::try_from_async(ws2).await?;
+        let project_settings = project::settings::ProjectSettings::try_from_async(ws2).await?;
         self.project = Some(Project::new(project_path, project_settings));
 
         Ok(())
@@ -61,17 +61,16 @@ impl ProjectService {
             .await?)
     }
 
-    // pub async fn remove_from_ignore_list(&self, id: &NanoId) -> Result<Thing<NanoId>> {
-    //     Ok(self
-    //         .project_ref()?
-    //         .manifest
-    //         .remove_from_ignore_list(id)
-    //         .await?
-    //         .ok_or_resource_not_found(
-    //             &format!("ignored path with id {} does not exist", quote!(id)),
-    //             None,
-    //         )?)
-    // }
+    pub async fn remove_from_monitoring_exclude_list(
+        &self,
+        path: impl AsRef<std::path::Path>,
+    ) -> Result<Vec<String>> {
+        Ok(self
+            .project_ref()?
+            .settings
+            .remove_from_monitoring_exclude_list(path)
+            .await?)
+    }
 }
 
 impl ProjectService {

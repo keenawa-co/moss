@@ -1,4 +1,4 @@
-use anyhow::{Context, Result};
+use anyhow::Context;
 use jsonpath_lib as jsonpath;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
@@ -9,14 +9,37 @@ use tokio::{
     sync::Mutex,
 };
 
-#[derive(Debug)]
-pub struct Settings {
-    cache: Arc<Mutex<Value>>,
-    file: Arc<Mutex<tokio::fs::File>>,
+#[async_trait::async_trait]
+pub trait Settings {
+    async fn get_fragment<T>(&self, key: &str) -> anyhow::Result<T>
+    where
+        T: for<'de> Deserialize<'de> + Send + Sync;
+
+    async fn create_fragment<T>(&self, fragment: T) -> anyhow::Result<()>
+    where
+        T: Serialize + Send + Sync;
+
+    async fn overwrite_fragment<T>(&self, key: &str, value: T) -> anyhow::Result<()>
+    where
+        T: Serialize + Send + Sync;
+
+    async fn append_to_array<T>(&self, key: &str, append_list: &[T]) -> anyhow::Result<()>
+    where
+        T: Serialize + Send + Sync;
+
+    async fn remove_from_array_fragment<T>(&self, key: &str, item: &T) -> anyhow::Result<()>
+    where
+        T: Serialize + Send + Sync;
 }
 
-impl Settings {
-    pub async fn new(file_path: &PathBuf) -> Result<Self> {
+#[derive(Debug)]
+pub struct FileAdapter {
+    file: Arc<Mutex<tokio::fs::File>>,
+    cache: Arc<Mutex<Value>>,
+}
+
+impl FileAdapter {
+    pub async fn new(file_path: &PathBuf) -> anyhow::Result<Self> {
         let mut file = OpenOptions::new()
             .write(true)
             .read(true)
@@ -40,72 +63,54 @@ impl Settings {
             file: Arc::new(Mutex::new(file)),
         })
     }
-}
 
-impl Settings {
-    pub async fn get_by_key<T: for<'de> Deserialize<'de>>(&self, key: &str) -> Result<T> {
+    pub async fn write_by_path<T: Serialize + Send + Sync>(
+        &self,
+        path: &str,
+        value: T,
+    ) -> anyhow::Result<Value> {
+        let serialized_value = serde_json::to_value(value).context("Failed to serialize value")?;
+        let segments: Vec<&str> = path.trim_matches('/').split('/').collect();
+
+        let mut cache_lock = self.cache.lock().await;
+        let mut current = &mut *cache_lock;
+
+        for part in &segments[..segments.len() - 1] {
+            current = current
+                .as_object_mut()
+                .with_context(|| format!("Expected JSON object at '{}'", part))?
+                .entry(part.to_string())
+                .or_insert_with(|| json!({}));
+        }
+
+        let last_part = segments.last().expect("Path should not be empty");
+        current
+            .as_object_mut()
+            .with_context(|| format!("Expected JSON object at '{}'", last_part))?
+            .insert(last_part.to_string(), serialized_value);
+
+        let new_content = cache_lock.clone();
+
+        self.overwrite_file(serde_json::to_string_pretty(&new_content)?)
+            .await
+            .context("Failed to write to file")?;
+
+        Ok(new_content)
+    }
+
+    pub async fn get_by_path<T: for<'de> Deserialize<'de>>(&self, path: &str) -> anyhow::Result<T> {
         let cache_lock = self.cache.lock().await;
-        let fragment = jsonpath::select(&cache_lock, key)?
-            .get(0)
+        let fragment = cache_lock
+            .pointer(path)
             .cloned()
             .ok_or_else(|| anyhow::anyhow!("Key not found"))?;
 
         let module_settings = serde_json::from_value(fragment.clone())?;
         Ok(module_settings)
     }
-
-    pub async fn overwrite_by_key<T: Serialize>(&self, key: &str, value: T) -> Result<()> {
-        let serialized_value = serde_json::to_value(value)?;
-
-        // Lock content and modify it
-        let new_content = {
-            let mut cache_lock = self.cache.lock().await;
-            let result = jsonpath::replace_with(cache_lock.clone(), key, &mut |_| {
-                Some(serialized_value.clone())
-            })?;
-            *cache_lock = result.clone();
-            result
-        };
-
-        Ok(self
-            .overwrite_file(serde_json::to_string_pretty(&new_content)?)
-            .await?)
-    }
-
-    pub async fn append_to_array<T: Serialize>(
-        &self,
-        key: &str,
-        append_list: &[T],
-    ) -> anyhow::Result<()> {
-        let serialized_value = serde_json::to_value(append_list)?;
-
-        // Lock content and modify it
-        let new_content = {
-            let mut cache_lock = self.cache.lock().await;
-            let result = jsonpath::replace_with(cache_lock.clone(), key, &mut |v| {
-                if let Value::Array(mut array) = v {
-                    serialized_value
-                        .as_array()
-                        .unwrap()
-                        .into_iter()
-                        .for_each(|item| array.push(item.clone()));
-
-                    Some(Value::Array(array.to_vec()))
-                } else {
-                    None
-                }
-            })?;
-            *cache_lock = result.clone();
-            result
-        };
-
-        Ok(self
-            .overwrite_file(serde_json::to_string_pretty(&new_content)?)
-            .await?)
-    }
 }
 
-impl Settings {
+impl FileAdapter {
     async fn overwrite_file(&self, content: String) -> anyhow::Result<()> {
         let mut file_lock = self.file.lock().await;
 
