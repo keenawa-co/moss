@@ -81,23 +81,30 @@ impl ProjectMutation {
     async fn remove_from_ignore_list(
         &self,
         ctx: &Context<'_>,
-        path: PathGraphQL,
+        input_list: Vec<PathGraphQL>,
     ) -> GraphqlResult<Vec<String>> {
         let sess_claims = ctx.data::<SessionTokenClaims>()?;
         let project_service_lock = self.project_service.write().await;
 
         let result = project_service_lock
-            .remove_from_monitoring_exclude_list(&path)
+            .remove_from_monitoring_exclude_list(
+                &input_list
+                    .into_iter()
+                    .map(|path| path.into())
+                    .collect::<Vec<PathBuf>>(),
+            )
             .await?;
 
-        self.notification_service
-            .send(Notification {
-                id: NanoId::new(),
-                project_id: sess_claims.project_id.clone(),
-                session_id: sess_claims.session_id.clone(),
-                summary: format!("Path {path} has been successfully added to the ignore list"),
-            })
-            .await?;
+        for item in &result {
+            self.notification_service
+                .send(Notification {
+                    id: NanoId::new(),
+                    project_id: sess_claims.project_id.clone(),
+                    session_id: sess_claims.session_id.clone(),
+                    summary: format!("Path {item} has been successfully added to the ignore list"),
+                })
+                .await?;
+        }
 
         Ok(result)
     }

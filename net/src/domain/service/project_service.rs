@@ -3,8 +3,8 @@ use futures::{Stream, StreamExt};
 use hashbrown::HashSet;
 use project::Project;
 use std::{path::PathBuf, pin::Pin, sync::Arc, time::Duration};
-use types::{asynx::AsyncTryFrom, id::NanoId, thing::Thing};
-use workspace::settings::FileAdapter as WorkspaceSettings;
+use types::asynx::AsyncTryFrom;
+use workspace::settings::SettingsFile as WorkspaceSettings;
 
 use crate::domain::model::{result::Result, OptionExtension};
 
@@ -52,7 +52,7 @@ impl ProjectService {
 
     pub async fn append_to_monitoring_exclude_list(
         &self,
-        input_list: &Vec<PathBuf>,
+        input_list: &[PathBuf],
     ) -> Result<Vec<String>> {
         Ok(self
             .project_ref()?
@@ -63,12 +63,12 @@ impl ProjectService {
 
     pub async fn remove_from_monitoring_exclude_list(
         &self,
-        path: impl AsRef<std::path::Path>,
+        input_list: &[PathBuf],
     ) -> Result<Vec<String>> {
         Ok(self
             .project_ref()?
             .settings
-            .remove_from_monitoring_exclude_list(path)
+            .remove_from_monitoring_exclude_list(input_list)
             .await?)
     }
 }

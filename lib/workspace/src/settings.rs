@@ -1,5 +1,4 @@
 use anyhow::Context;
-use jsonpath_lib as jsonpath;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::{path::PathBuf, sync::Arc};
@@ -9,36 +8,15 @@ use tokio::{
     sync::Mutex,
 };
 
-#[async_trait::async_trait]
-pub trait Settings {
-    async fn get_fragment<T>(&self, key: &str) -> anyhow::Result<T>
-    where
-        T: for<'de> Deserialize<'de> + Send + Sync;
-
-    async fn create_fragment<T>(&self, fragment: T) -> anyhow::Result<()>
-    where
-        T: Serialize + Send + Sync;
-
-    async fn overwrite_fragment<T>(&self, key: &str, value: T) -> anyhow::Result<()>
-    where
-        T: Serialize + Send + Sync;
-
-    async fn append_to_array<T>(&self, key: &str, append_list: &[T]) -> anyhow::Result<()>
-    where
-        T: Serialize + Send + Sync;
-
-    async fn remove_from_array_fragment<T>(&self, key: &str, item: &T) -> anyhow::Result<()>
-    where
-        T: Serialize + Send + Sync;
-}
+pub const ROOT_PATH: &'static str = "/";
 
 #[derive(Debug)]
-pub struct FileAdapter {
+pub struct SettingsFile {
     file: Arc<Mutex<tokio::fs::File>>,
     cache: Arc<Mutex<Value>>,
 }
 
-impl FileAdapter {
+impl SettingsFile {
     pub async fn new(file_path: &PathBuf) -> anyhow::Result<Self> {
         let mut file = OpenOptions::new()
             .write(true)
@@ -63,7 +41,9 @@ impl FileAdapter {
             file: Arc::new(Mutex::new(file)),
         })
     }
+}
 
+impl SettingsFile {
     pub async fn write_by_path<T: Serialize + Send + Sync>(
         &self,
         path: &str,
@@ -78,7 +58,7 @@ impl FileAdapter {
         for part in &segments[..segments.len() - 1] {
             current = current
                 .as_object_mut()
-                .with_context(|| format!("Expected JSON object at '{}'", part))?
+                .with_context(|| format!("Expected JSON object at {}", quote!(part)))?
                 .entry(part.to_string())
                 .or_insert_with(|| json!({}));
         }
@@ -86,7 +66,7 @@ impl FileAdapter {
         let last_part = segments.last().expect("Path should not be empty");
         current
             .as_object_mut()
-            .with_context(|| format!("Expected JSON object at '{}'", last_part))?
+            .with_context(|| format!("Expected JSON object at {}", quote!(last_part)))?
             .insert(last_part.to_string(), serialized_value);
 
         let new_content = cache_lock.clone();
@@ -98,19 +78,26 @@ impl FileAdapter {
         Ok(new_content)
     }
 
-    pub async fn get_by_path<T: for<'de> Deserialize<'de>>(&self, path: &str) -> anyhow::Result<T> {
+    pub async fn get_by_path<T: for<'de> Deserialize<'de>>(
+        &self,
+        path: &str,
+    ) -> anyhow::Result<Option<T>> {
         let cache_lock = self.cache.lock().await;
-        let fragment = cache_lock
-            .pointer(path)
-            .cloned()
-            .ok_or_else(|| anyhow::anyhow!("Key not found"))?;
+        let fragment = if path == ROOT_PATH {
+            cache_lock.clone()
+        } else {
+            match cache_lock.pointer(path).cloned() {
+                Some(value) => value,
+                None => return Ok(None),
+            }
+        };
 
-        let module_settings = serde_json::from_value(fragment.clone())?;
-        Ok(module_settings)
+        match serde_json::from_value(fragment) {
+            Ok(module_settings) => Ok(Some(module_settings)),
+            Err(e) => Err(anyhow::anyhow!(e)),
+        }
     }
-}
 
-impl FileAdapter {
     async fn overwrite_file(&self, content: String) -> anyhow::Result<()> {
         let mut file_lock = self.file.lock().await;
 

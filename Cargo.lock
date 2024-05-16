@@ -4337,6 +4337,7 @@ dependencies = [
  "fs",
  "hashbrown 0.7.2",
  "jsonpath_lib",
+ "mac",
  "sea-orm",
  "sea-orm-migration",
  "seaorm_utl",
@@ -4344,6 +4345,7 @@ dependencies = [
  "serde_json",
  "sha2",
  "smol",
+ "thiserror",
  "tokio",
  "types",
 ]
