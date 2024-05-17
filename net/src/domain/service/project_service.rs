@@ -13,7 +13,7 @@ pub struct ProjectService {
 }
 
 impl ProjectService {
-    pub fn new(realfs: Arc<real::FileSystem>) -> Self {
+    pub fn init(realfs: Arc<real::FileSystem>) -> Self {
         Self {
             realfs,
             project: None,
@@ -31,21 +31,21 @@ impl ProjectService {
     }
 
     pub async fn watch_project(&self) -> Result<Pin<Box<dyn Send + Stream<Item = Vec<PathBuf>>>>> {
-        let ignored_list: Box<HashSet<String>> = Box::new(
-            self.project_ref()?
-                .settings
-                .fetch_exclude_list()
-                .await
-                .into_iter()
-                .flatten()
-                .collect(),
-        );
+        let project = self.project_ref()?;
+        let exclude_watch_rx = project.settings.watch_monitoring_exclude_list();
 
         let stream = self
             .realfs
-            .watch(&self.project.as_ref().unwrap().dir, Duration::from_secs(1))
+            .watch(&project.dir, Duration::from_secs(1))
             .await
-            .filter_map(move |event_paths| path_filtration(event_paths, Box::clone(&ignored_list)));
+            .filter_map(move |event_paths| {
+                let mut exclude_rx = exclude_watch_rx.clone();
+                async move {
+                    let exclude = exclude_rx.borrow_and_update().clone();
+
+                    path_filtration(event_paths, exclude).await
+                }
+            });
 
         Ok(Box::pin(stream))
     }
@@ -84,8 +84,9 @@ impl ProjectService {
 
 async fn path_filtration(
     event_paths: Vec<PathBuf>,
-    ignore_list: Box<HashSet<String>>,
+    ignore_list: HashSet<PathBuf>,
 ) -> Option<Vec<PathBuf>> {
+    dbg!(&ignore_list);
     let filtered_paths = event_paths
         .into_iter()
         .filter(|path| {

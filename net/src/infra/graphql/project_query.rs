@@ -45,9 +45,9 @@ impl ProjectMutation {
             .extend_error()?)
     }
 
-    #[graphql(name = "appendToProjectIgnored")]
+    #[graphql(name = "appendToProjectExclude")]
     #[graphql_mac::require_header("session-token")]
-    async fn append_to_ignore_list(
+    async fn append_to_exclude_list(
         &self,
         ctx: &Context<'_>,
         input_list: Vec<PathGraphQL>,
@@ -76,9 +76,9 @@ impl ProjectMutation {
         Ok(result)
     }
 
-    #[graphql(name = "removeFromProjectIgnored")]
+    #[graphql(name = "removeFromProjectExclude")]
     #[graphql_mac::require_header("session-token")]
-    async fn remove_from_ignore_list(
+    async fn remove_from_exclude_list(
         &self,
         ctx: &Context<'_>,
         input_list: Vec<PathGraphQL>,

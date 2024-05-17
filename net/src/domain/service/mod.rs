@@ -46,7 +46,7 @@ impl ServiceRoot {
                 root_db.project_meta_repo(),
             )),
             Arc::new(NotificationService::new()),
-            Arc::new(RwLock::new(ProjectService::new(realfs.clone()))),
+            Arc::new(RwLock::new(ProjectService::init(realfs.clone()))),
             Arc::new(RwLock::new(WorkspaceService::init())),
         )
     }

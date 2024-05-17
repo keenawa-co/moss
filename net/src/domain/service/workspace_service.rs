@@ -1,7 +1,4 @@
-use std::{
-    path::{Path, PathBuf},
-    sync::Arc,
-};
+use std::{path::PathBuf, sync::Arc};
 use types::file::json_file::JsonFile;
 
 use crate::domain::model::result::Result;
@@ -23,7 +20,6 @@ impl WorkspaceService {
 
     pub async fn create<'a, 'b>(&'a mut self, conf: &'b CreateConfig<'b>) -> Result<()> {
         let settings_file = JsonFile::new(&conf.project_path.join(".moss/settings.json")).await?; // TODO: use WorkspaceConfig
-
         self.settings_file = Some(Arc::new(settings_file));
 
         Ok(())
