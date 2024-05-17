@@ -48,6 +48,7 @@ pub fn build_schema(service_root: ServiceRoot) -> SchemaRoot {
             SessionMutation {
                 session_service: service_root.3.clone(),
                 project_service: service_root.5.clone(),
+                workspace_service: service_root.6.clone(),
             },
         ),
         SubscriptionRoot(

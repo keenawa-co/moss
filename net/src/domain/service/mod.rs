@@ -4,6 +4,7 @@ pub mod notification_service;
 pub mod project_meta_service;
 pub mod project_service;
 pub mod session_service;
+pub mod workspace_service;
 
 use fs::real;
 use std::sync::Arc;
@@ -15,6 +16,7 @@ use self::{
     config_service::ConfigService, metric_service::MetricService,
     notification_service::NotificationService, project_meta_service::ProjectMetaService,
     project_service::ProjectService, session_service::SessionService,
+    workspace_service::WorkspaceService,
 };
 
 pub struct ServiceRoot(
@@ -24,6 +26,7 @@ pub struct ServiceRoot(
     pub Arc<SessionService>,
     pub Arc<NotificationService>,
     pub Arc<RwLock<ProjectService>>,
+    pub Arc<RwLock<WorkspaceService>>,
 );
 
 impl ServiceRoot {
@@ -44,6 +47,7 @@ impl ServiceRoot {
             )),
             Arc::new(NotificationService::new()),
             Arc::new(RwLock::new(ProjectService::new(realfs.clone()))),
+            Arc::new(RwLock::new(WorkspaceService::init())),
         )
     }
 }

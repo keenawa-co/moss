@@ -1,3 +1,6 @@
+#[macro_use]
+extern crate async_trait;
+
 #[async_trait]
 pub trait AsyncTryFrom<T>: Sized {
     /// The type returned in the event of a conversion error.

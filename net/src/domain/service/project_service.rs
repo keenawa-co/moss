@@ -3,8 +3,7 @@ use futures::{Stream, StreamExt};
 use hashbrown::HashSet;
 use project::Project;
 use std::{path::PathBuf, pin::Pin, sync::Arc, time::Duration};
-use types::asynx::AsyncTryFrom;
-use workspace::settings::SettingsFile as WorkspaceSettings;
+use types::file::json_file::JsonFile;
 
 use crate::domain::model::{result::Result, OptionExtension};
 
@@ -21,11 +20,12 @@ impl ProjectService {
         }
     }
 
-    pub async fn start_project(&mut self, project_path: &PathBuf) -> Result<()> {
-        let ws = WorkspaceSettings::new(&project_path.join(".moss/settings.json")).await?;
-        let ws2 = Arc::new(ws);
-        let project_settings = project::settings::ProjectSettings::try_from_async(ws2).await?;
-        self.project = Some(Project::new(project_path, project_settings));
+    pub async fn start_project(
+        &mut self,
+        project_path: &PathBuf,
+        settings_file: Arc<JsonFile>,
+    ) -> Result<()> {
+        self.project = Some(Project::new(project_path, settings_file).await?);
 
         Ok(())
     }
@@ -43,7 +43,7 @@ impl ProjectService {
 
         let stream = self
             .realfs
-            .watch(&self.project.as_ref().unwrap().root, Duration::from_secs(1))
+            .watch(&self.project.as_ref().unwrap().dir, Duration::from_secs(1))
             .await
             .filter_map(move |event_paths| path_filtration(event_paths, Box::clone(&ignored_list)));
 

@@ -1,17 +1,17 @@
-use anyhow::{Error, Result};
+use anyhow::Result;
+use async_utl::AsyncTryFrom;
 use std::{path::PathBuf, sync::Arc};
 use tokio::sync::RwLock;
-use types::asynx::AsyncTryFrom;
-use workspace::settings::SettingsFile;
+use types::file::json_file::JsonFile;
 
 #[derive(Debug)]
-pub struct ProjectSettings {
-    settings_file: Arc<SettingsFile>,
-    module_settings: Arc<RwLock<Module>>,
+pub struct Settings {
+    file: Arc<JsonFile>,
+    inner: Arc<RwLock<Inner>>,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
-pub struct Module {
+pub struct Inner {
     #[serde(flatten)]
     pub monitoring: Monitoring,
 }
@@ -23,12 +23,12 @@ pub struct Monitoring {
     pub exclude: Option<Vec<String>>,
 }
 
-impl ProjectSettings {
+impl Settings {
     pub async fn append_to_monitoring_exclude_list(
         &self,
         exclude_list: &[PathBuf],
     ) -> Result<Vec<String>> {
-        let mut module_lock = self.module_settings.write().await;
+        let mut module_lock = self.inner.write().await;
         let mut new_exclude_list = module_lock
             .monitoring
             .exclude
@@ -48,7 +48,7 @@ impl ProjectSettings {
 
         new_exclude_list.extend(new_items);
 
-        self.settings_file
+        self.file
             .write_by_path("/project.monitoring.exclude", &new_exclude_list)
             .await?;
 
@@ -58,7 +58,7 @@ impl ProjectSettings {
     }
 
     pub async fn fetch_exclude_list(&self) -> Option<Vec<String>> {
-        let module_lock = self.module_settings.read().await;
+        let module_lock = self.inner.read().await;
 
         module_lock.monitoring.exclude.clone()
     }
@@ -67,7 +67,7 @@ impl ProjectSettings {
         &self,
         input_list: &[PathBuf],
     ) -> Result<Vec<String>> {
-        let mut module_lock = self.module_settings.write().await;
+        let mut module_lock = self.inner.write().await;
         let exclude_list = module_lock.monitoring.exclude.get_or_insert_with(Vec::new);
         if exclude_list.is_empty() {
             return Ok(vec![]);
@@ -80,7 +80,7 @@ impl ProjectSettings {
 
         exclude_list.retain(|item| !should_be_removed.contains(item));
 
-        self.settings_file
+        self.file
             .write_by_path("/project.monitoring.exclude", &exclude_list)
             .await?;
 
@@ -89,20 +89,18 @@ impl ProjectSettings {
 }
 
 #[async_trait]
-impl AsyncTryFrom<Arc<workspace::settings::SettingsFile>> for ProjectSettings {
+impl AsyncTryFrom<Arc<JsonFile>> for Settings {
     type Error = anyhow::Error;
 
-    async fn try_from_async(
-        value: Arc<workspace::settings::SettingsFile>,
-    ) -> Result<Self, Self::Error> {
+    async fn try_from_async(value: Arc<JsonFile>) -> Result<Self, Self::Error> {
         let module_settings = value
             .get_by_path("/")
             .await?
             .ok_or_else(|| anyhow!("Module settings not found"))?;
 
         Ok(Self {
-            settings_file: value.clone(),
-            module_settings: Arc::new(RwLock::new(module_settings)),
+            file: value.clone(),
+            inner: Arc::new(RwLock::new(module_settings)),
         })
     }
 }

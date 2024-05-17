@@ -1,18 +1,22 @@
-use std::path::PathBuf;
+use anyhow::Result;
+use async_utl::AsyncTryFrom;
+use std::{path::PathBuf, sync::Arc};
+use types::file::json_file::JsonFile;
 
-use crate::settings::ProjectSettings;
+use crate::settings::Settings;
 
 #[derive(Debug)]
 pub struct Project {
-    pub root: PathBuf,
-    pub settings: ProjectSettings,
+    pub dir: PathBuf,
+    pub settings: Settings,
 }
 
 impl Project {
-    pub fn new(root_path: &PathBuf, settings: ProjectSettings) -> Self {
-        Self {
-            root: root_path.clone(),
+    pub async fn new(dir: &PathBuf, settings_file: Arc<JsonFile>) -> Result<Self> {
+        let settings = Settings::try_from_async(settings_file).await?;
+        Ok(Self {
+            dir: dir.to_owned(),
             settings,
-        }
+        })
     }
 }

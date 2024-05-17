@@ -8,6 +8,7 @@ edition = "2021"
 types = { workspace = true, features = ["graphql"] }
 workspace.workspace = true
 mac.workspace = true
+async_utl.workspace = true
 
 hashbrown.workspace = true
 anyhow.workspace = true
