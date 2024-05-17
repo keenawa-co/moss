@@ -4,7 +4,7 @@ use async_graphql::{Scalar, ScalarType, SimpleObject};
 use chrono::Utc;
 use http::HeaderValue;
 use jsonwebtoken::{Algorithm, DecodingKey, EncodingKey, Header, TokenData, Validation};
-use types::id::{nanoid_serde, NanoId};
+use types::id::NanoId;
 
 use crate::{config::MAGIC_TOKEN_KEY, domain, domain::model::result::Result};
 
@@ -26,11 +26,9 @@ pub(crate) struct SessionEntity {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub(crate) struct SessionTokenClaims {
-    #[serde(with = "nanoid_serde")]
     #[serde(rename = "sid")]
     pub session_id: NanoId,
 
-    #[serde(with = "nanoid_serde")]
     #[serde(rename = "pid")]
     pub project_id: NanoId,
 

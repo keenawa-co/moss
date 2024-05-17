@@ -1,6 +1,5 @@
 use anyhow::anyhow;
 use nanoid::nanoid;
-use serde::Serializer;
 use std::marker::PhantomData;
 use std::ops::Deref;
 
@@ -18,7 +17,7 @@ const CHAR_SET: [char; 62] = [
 // TODO: implement all traits to use MNID as a SEA ORM model type
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, PartialOrd, Hash)]
-pub struct NanoId(BoundedString<NANO_ID20>);
+pub struct NanoId(#[serde(with = "bounded_string_serializer")] BoundedString<NANO_ID20>);
 
 impl NanoId {
     pub fn new() -> Self {
@@ -81,51 +80,6 @@ impl ScalarType for NanoId {
     }
 }
 
-pub mod nanoid_serde {
-    use std::fmt;
-
-    use serde::{
-        de::{self, Visitor},
-        Deserializer,
-    };
-
-    use super::*;
-
-    pub fn serialize<S>(value: &NanoId, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
-        serializer.serialize_str(&value.0.inner)
-    }
-
-    pub fn deserialize<'de, D>(deserializer: D) -> Result<NanoId, D::Error>
-    where
-        D: Deserializer<'de>,
-    {
-        struct StringVisitor;
-
-        impl<'de> Visitor<'de> for StringVisitor {
-            type Value = NanoId;
-
-            fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
-                formatter.write_str("a string")
-            }
-
-            fn visit_str<E>(self, v: &str) -> Result<Self::Value, E>
-            where
-                E: de::Error,
-            {
-                Ok(NanoId(BoundedString {
-                    inner: v.to_string(),
-                    _marker: PhantomData,
-                }))
-            }
-        }
-
-        deserializer.deserialize_string(StringVisitor)
-    }
-}
-
 // Bounded String implementation
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, PartialOrd, Hash)]
@@ -154,5 +108,30 @@ impl<const N: usize> Deref for BoundedString<N> {
     type Target = String;
     fn deref(&self) -> &Self::Target {
         &self.inner
+    }
+}
+
+mod bounded_string_serializer {
+    use super::BoundedString;
+    use serde::{Deserialize, Deserializer, Serializer};
+
+    pub fn serialize<S, const N: usize>(
+        value: &BoundedString<N>,
+        serializer: S,
+    ) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        serializer.serialize_str(&value.inner)
+    }
+
+    pub fn deserialize<'de, D, const N: usize>(
+        deserializer: D,
+    ) -> Result<BoundedString<N>, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        let s = String::deserialize(deserializer)?;
+        BoundedString::new(s).map_err(serde::de::Error::custom)
     }
 }

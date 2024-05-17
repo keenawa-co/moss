@@ -65,8 +65,6 @@ pub mod json_file {
 
     use crate::file::Metadata;
 
-    pub const ROOT_PATH: &'static str = "/";
-
     #[derive(Debug)]
 
     pub struct JsonFile {
@@ -104,6 +102,8 @@ pub mod json_file {
     }
 
     impl JsonFile {
+        pub const ROOT_PATH: &'static str = "/";
+
         pub async fn write_by_path<T: Serialize + Send + Sync>(
             &self,
             path: &str,
@@ -144,7 +144,7 @@ pub mod json_file {
             path: &str,
         ) -> anyhow::Result<Option<T>> {
             let cache_lock = self.cache.lock().await;
-            let fragment_value = if path == ROOT_PATH {
+            let fragment_value = if path == Self::ROOT_PATH {
                 cache_lock.clone()
             } else {
                 match cache_lock.pointer(path).cloned() {

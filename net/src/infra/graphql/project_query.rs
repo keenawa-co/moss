@@ -9,7 +9,7 @@ use types::{id::NanoId, thing::Thing};
 use crate::domain::{
     model::{
         error::Error,
-        notification::Notification,
+        notification::{Notification, NotificationPayload},
         project::{CreateProjectInput, ProjectMeta},
         session::SessionTokenClaims,
     },
@@ -64,12 +64,9 @@ impl ProjectMutation {
 
         for item in input_list.iter() {
             self.notification_service
-                .send(Notification {
-                    id: NanoId::new(),
-                    project_id: sess_claims.project_id.clone(),
-                    session_id: sess_claims.session_id.clone(),
-                    summary: format!("Path {item} has been successfully added to the ignore list"),
-                })
+                .send(Notification::create_client(format!(
+                    "Path {item} has been successfully added to the ignore list"
+                )))
                 .await?;
         }
 
@@ -97,12 +94,9 @@ impl ProjectMutation {
 
         for item in &result {
             self.notification_service
-                .send(Notification {
-                    id: NanoId::new(),
-                    project_id: sess_claims.project_id.clone(),
-                    session_id: sess_claims.session_id.clone(),
-                    summary: format!("Path {item} has been successfully added to the ignore list"),
-                })
+                .send(Notification::create_client(format!(
+                    "Path {item} has been successfully added to the ignore list"
+                )))
                 .await?;
         }
 
