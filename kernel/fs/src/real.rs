@@ -1,3 +1,4 @@
+use anyhow::Result;
 use futures::{AsyncRead, Stream};
 use notify::Watcher;
 use smol::{
@@ -11,7 +12,7 @@ use std::{
     time::Duration,
 };
 
-use crate::CreateOptions;
+use crate::{file::Metadata, CreateOptions};
 
 #[derive(Debug, Clone)]
 pub struct FileSystem;
@@ -86,6 +87,32 @@ impl super::FS for FileSystem {
         smol::fs::metadata(path)
             .await
             .map_or(false, |metadata| metadata.is_dir())
+    }
+
+    async fn metadata(&self, path: &Path) -> Result<Option<Metadata>> {
+        let symlink_metadata = match smol::fs::symlink_metadata(path).await {
+            Ok(metadata) => metadata,
+            Err(err) => {
+                return match (err.kind(), err.raw_os_error()) {
+                    (io::ErrorKind::NotFound, _) => Ok(None),
+                    (io::ErrorKind::Other, Some(libc::ENOTDIR)) => Ok(None),
+                    _ => Err(anyhow::Error::new(err)),
+                }
+            }
+        };
+
+        let is_symlink = symlink_metadata.file_type().is_symlink();
+        let metadata = if is_symlink {
+            smol::fs::metadata(path).await?
+        } else {
+            symlink_metadata
+        };
+
+        Ok(Some(Metadata {
+            modified: metadata.modified().unwrap(), // TODO: avoid unwrap()
+            is_symlink,
+            is_dir: metadata.file_type().is_dir(),
+        }))
     }
 
     async fn watch(

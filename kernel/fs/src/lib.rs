@@ -1,5 +1,8 @@
+pub mod file;
 pub mod real;
 
+use anyhow::Result;
+use file::Metadata;
 use futures::{AsyncRead, Stream};
 use std::{
     io,
@@ -51,6 +54,8 @@ pub trait FS: Send + Sync {
     async fn is_file(&self, path: &Path) -> bool;
 
     async fn is_dir(&self, path: &Path) -> bool;
+
+    async fn metadata(&self, path: &Path) -> Result<Option<Metadata>>;
 
     async fn watch(
         &self,
