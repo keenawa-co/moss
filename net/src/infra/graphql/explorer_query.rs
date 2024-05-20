@@ -3,7 +3,7 @@ use async_graphql::{Context, FieldResult, Subscription};
 use fs::{real::FileSystem, FS};
 use futures::{Stream, StreamExt};
 use std::path::PathBuf;
-use types::file::Metadata;
+use types::file::EntryInfo;
 
 const READ_DIR_CHUNK_SIZE: usize = 10;
 
@@ -17,7 +17,7 @@ impl ExplorerSubscription {
         &self,
         _ctx: &Context<'_>,
         path: String,
-    ) -> async_graphql::Result<impl Stream<Item = FieldResult<Vec<Metadata>>>> {
+    ) -> async_graphql::Result<impl Stream<Item = FieldResult<Vec<EntryInfo>>>> {
         // FIXME: use service, not directly FS
 
         let path_buf = PathBuf::from(path);
@@ -33,7 +33,7 @@ impl ExplorerSubscription {
                 .and_then(|paths| {
                     paths
                         .into_iter()
-                        .map(|path_buf| Metadata::new(&path_buf))
+                        .map(|path_buf| EntryInfo::new(&path_buf))
                         .collect()
                 })
                 .map_err(|e| GraphqlError::new(e.to_string()));

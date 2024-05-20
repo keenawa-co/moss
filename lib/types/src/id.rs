@@ -6,7 +6,7 @@ use std::ops::Deref;
 #[cfg(feature = "graphql")]
 use async_graphql::{Scalar, ScalarType};
 
-const NANO_ID20: usize = 20;
+const NANOID_20: usize = 20;
 const CHAR_SET: [char; 62] = [
     '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i',
     'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B',
@@ -14,14 +14,14 @@ const CHAR_SET: [char; 62] = [
     'V', 'W', 'X', 'Y', 'Z',
 ];
 
-// TODO: implement all traits to use MNID as a SEA ORM model type
+// TODO: implement all traits to use NanoId as a SEA ORM model type
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, PartialOrd, Hash)]
-pub struct NanoId(#[serde(with = "bounded_string_serializer")] BoundedString<NANO_ID20>);
+pub struct NanoId(#[serde(with = "bounded_string_serializer")] BoundedString<NANOID_20>);
 
 impl NanoId {
     pub fn new() -> Self {
-        let id = BoundedString::new(&nanoid!(NANO_ID20, &CHAR_SET)).unwrap();
+        let id = BoundedString::new(&nanoid!(NANOID_20, &CHAR_SET)).unwrap();
         NanoId(id)
     }
 }

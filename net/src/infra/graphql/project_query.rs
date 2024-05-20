@@ -1,7 +1,8 @@
-use async_graphql::{Context, Object, Result as GraphqlResult};
+use async_graphql::{Context, FieldResult, Object, Result as GraphqlResult, Subscription};
 use graphql_utl::{path::Path as PathGraphQL, GraphQLExtendError};
 use http::HeaderMap;
 // use manifest::model::ignored::IgnoredSource;
+use futures::{Stream, StreamExt};
 use std::{path::PathBuf, sync::Arc};
 use tokio::sync::RwLock;
 use types::{id::NanoId, thing::Thing};
@@ -101,5 +102,29 @@ impl ProjectMutation {
         }
 
         Ok(result)
+    }
+}
+
+pub(super) struct ProjectSubscription {
+    pub project_service: Arc<RwLock<ProjectService>>,
+}
+
+#[Subscription]
+impl ProjectSubscription {
+    async fn explorer_event_feed(
+        &self,
+        _ctx: &Context<'_>,
+    ) -> async_graphql::Result<impl Stream<Item = FieldResult<serde_json::Value>>> {
+        let project_service_lock = self.project_service.read().await;
+        let stream = project_service_lock.explorer_event_feed().await?;
+
+        Ok(stream.map(|event| {
+            // let json_event = serde_json::to_value(event)
+            //     .map_err(|e| async_graphql::Error::new(e.to_string()))?;
+            Ok(serde_json::json!({
+                "event": event.kind,
+                "path":  event.entry.path.to_path_buf().to_string_lossy().to_string()
+            }))
+        }))
     }
 }

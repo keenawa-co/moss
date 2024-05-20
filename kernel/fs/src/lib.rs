@@ -5,6 +5,7 @@ use anyhow::Result;
 use file::Metadata;
 use futures::{AsyncRead, Stream};
 use std::{
+    fmt::Debug,
     io,
     path::{Path, PathBuf},
     pin::Pin,
@@ -33,7 +34,7 @@ impl Default for CreateOptions {
 }
 
 #[async_trait]
-pub trait FS: Send + Sync {
+pub trait FS: Debug + Send + Sync {
     async fn create_dir(&self, path: &Path) -> anyhow::Result<()>;
 
     async fn create_file(&self, path: &Path, options: CreateOptions) -> anyhow::Result<()>;

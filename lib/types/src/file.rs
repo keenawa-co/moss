@@ -8,21 +8,21 @@ use std::{
 };
 
 #[derive(Clone, Serialize, Deserialize, Debug)]
-pub struct Metadata {
+pub struct EntryInfo {
     pub path: PathBuf,
     pub size: u64,
-    pub mod_time: SystemTime,
+    pub modified: SystemTime,
     pub is_dir: bool,
 }
 
-impl Metadata {
+impl EntryInfo {
     pub fn new(path: &Path) -> anyhow::Result<Self> {
         let metadata = path.metadata()?;
 
         Ok(Self {
             path: path.to_owned(),
             size: metadata.len(),
-            mod_time: metadata.modified()?,
+            modified: metadata.modified()?,
             is_dir: metadata.is_dir(),
         })
     }
@@ -30,7 +30,7 @@ impl Metadata {
 
 #[cfg(feature = "graphql")]
 #[Object]
-impl Metadata {
+impl EntryInfo {
     pub async fn path(&self) -> Cow<str> {
         self.path.to_string_lossy()
     }
@@ -41,7 +41,7 @@ impl Metadata {
 
     pub async fn mod_time(&self) -> async_graphql::Result<i64> {
         Ok(self
-            .mod_time
+            .modified
             .duration_since(UNIX_EPOCH)
             .expect("File modification time is before UNIX EPOCH")
             .as_secs() as i64)
@@ -63,14 +63,14 @@ pub mod json_file {
         sync::Mutex,
     };
 
-    use crate::file::Metadata;
+    use crate::file::EntryInfo;
 
     #[derive(Debug)]
 
     pub struct JsonFile {
         pub(self) file: Arc<Mutex<tokio::fs::File>>,
         pub(self) cache: Arc<Mutex<Value>>,
-        pub metadata: Metadata,
+        pub metadata: EntryInfo,
     }
 
     impl JsonFile {
@@ -96,7 +96,7 @@ pub mod json_file {
             Ok(Self {
                 cache: Arc::new(Mutex::new(serde_json::from_str(&content)?)),
                 file: Arc::new(Mutex::new(file)),
-                metadata: Metadata::new(file_path)?,
+                metadata: EntryInfo::new(file_path)?,
             })
         }
     }

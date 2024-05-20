@@ -126,7 +126,7 @@ impl super::FS for FileSystem {
             let tx = tx.clone();
 
             move |event: Result<notify::Event, _>| {
-                println!("File event detected: {:?}", event);
+                // println!("File event detected: {:?}", event);
                 if let Some(event) = event.ok() {
                     tx.try_send(event.paths).ok();
                 }
@@ -150,7 +150,7 @@ impl super::FS for FileSystem {
                         .into_iter()
                         .any(|path| path.starts_with(&watched_path))
                     {
-                        println!("Parent event detected: {:?}", event);
+                        // println!("Parent event detected: {:?}", event);
                         if let Err(e) = tx.try_send(event.paths) {
                             eprintln!("Error sending event: {:?}", e);
                         }

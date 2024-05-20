@@ -10,9 +10,12 @@ use async_graphql::{
 };
 
 use self::{
-    config_query::ConfigQuery, explorer_query::ExplorerSubscription,
-    metric_query::MetricSubscription, notification_query::NotificationSubscription,
-    project_query::ProjectMutation, session_query::SessionMutation,
+    config_query::ConfigQuery,
+    explorer_query::ExplorerSubscription,
+    metric_query::MetricSubscription,
+    notification_query::NotificationSubscription,
+    project_query::{ProjectMutation, ProjectSubscription},
+    session_query::SessionMutation,
 };
 use crate::domain::{
     model::error::{Error, PreconditionError, ResourceError, SystemError},
@@ -27,6 +30,7 @@ pub struct MutationRoot(ProjectMutation, SessionMutation);
 
 #[derive(MergedSubscription)]
 pub struct SubscriptionRoot(
+    ProjectSubscription,
     ExplorerSubscription,
     MetricSubscription,
     NotificationSubscription,
@@ -52,6 +56,9 @@ pub fn build_schema(service_root: ServiceRoot) -> SchemaRoot {
             },
         ),
         SubscriptionRoot(
+            ProjectSubscription {
+                project_service: service_root.5.clone(),
+            },
             ExplorerSubscription::default(),
             MetricSubscription {
                 project_service: service_root.5.clone(),

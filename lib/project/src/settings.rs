@@ -6,13 +6,36 @@ use tokio::sync::{watch, RwLock};
 use types::file::json_file::JsonFile;
 
 #[derive(Debug, Deserialize)]
-pub(crate) struct SettingsFileRepresentation {
-    #[serde(skip_serializing_if = "Option::is_none")]
+pub(crate) struct SettingsFileRepr {
     #[serde(rename = "project.monitoring.exclude")]
-    exclude_list: Option<Vec<String>>,
+    #[serde(default = "SettingsFileRepr::default_exclude_list")]
+    exclude_list: Vec<String>,
+
+    // #[serde(rename = "project.worktree.preference.displayExcludedEntries")]
+    // display_excluded_entries: bool,
+
+    // #[serde(rename = "project.worktree.preference.displayGitIgnoredEntries")]
+    // display_gitignore_entries: bool,
+
+    // #[serde(rename = "project.monitoring.watchGitIgnoredEntries")]
+    // watch_gitignore_entries: bool,
+    #[serde(rename = "project.monitoring.autoWatchNewFiles")]
+    #[serde(default = "SettingsFileRepr::default_auto_watch_new")]
+    auto_watch_new: bool,
+}
+
+impl SettingsFileRepr {
+    fn default_exclude_list() -> Vec<String> {
+        vec![]
+    }
+
+    fn default_auto_watch_new() -> bool {
+        true
+    }
 }
 
 #[derive(Debug)]
+// TODO: use glob::Pattern
 struct MonitoringExcludeList {
     cache: RwLock<Vec<String>>,
     watch_tx: watch::Sender<HashSet<PathBuf>>,
@@ -118,13 +141,12 @@ impl AsyncTryFrom<Arc<JsonFile>> for Settings {
 
     async fn try_from_async(file: Arc<JsonFile>) -> Result<Self, Self::Error> {
         let settings_file = file
-            .get_by_path::<SettingsFileRepresentation>("/")
+            .get_by_path::<SettingsFileRepr>("/")
             .await?
             .ok_or_else(|| anyhow!("Module settings not found"))?;
 
         let initial_exclude_list: HashSet<PathBuf> = settings_file
             .exclude_list
-            .unwrap_or_else(Vec::new)
             .into_iter()
             .map(PathBuf::from)
             .collect();

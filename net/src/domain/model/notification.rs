@@ -1,4 +1,3 @@
-use async_graphql::{Enum, MergedObject, Object, OutputType, SimpleObject, Union};
 use chrono::Utc;
 use types::id::NanoId;
 
@@ -24,9 +23,18 @@ pub struct SystemNotification {
     pub message: String,
 }
 
+#[derive(Debug, Clone, Copy, Eq, PartialEq, PartialOrd, Ord)]
+pub enum Severity {
+    Hint,
+    Info,
+    Warning,
+    Error,
+}
+
 #[derive(Serialize, Deserialize)]
 pub struct ClientNotification {
     pub message: String,
+    // pub severity: Severity,
 }
 
 impl Notification {

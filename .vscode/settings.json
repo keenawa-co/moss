@@ -8,6 +8,8 @@
     "chrono",
     "dbutl",
     "disp",
+    "ENOTDIR",
+    "filetree",
     "gqlutl",
     "graphiql",
     "hashbrown",
@@ -15,6 +17,8 @@
     "inmem",
     "inmemdb",
     "jsonwebtoken",
+    "keymap",
+    "libc",
     "manifestfile",
     "mimalloc",
     "mlua",
@@ -34,7 +38,8 @@
     "sqlx",
     "tablename",
     "thiserror",
-    "unwatch"
+    "unwatch",
+    "worktree"
   ],
   "sqltools.connections": [
     {
