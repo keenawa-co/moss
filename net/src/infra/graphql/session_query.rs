@@ -106,8 +106,14 @@ impl SessionMutation {
             created_at: session_entity.created_at,
         })
     }
+}
 
-    // TODO: move to Query
+pub(crate) struct SessionQuery {
+    pub session_service: Arc<SessionService>,
+}
+
+#[Object]
+impl SessionQuery {
     #[graphql(name = "getRecentSessions")]
     async fn get_recent(
         &self,

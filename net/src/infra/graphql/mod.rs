@@ -1,5 +1,4 @@
 mod config_query;
-mod explorer_query;
 mod metric_query;
 mod notification_query;
 mod project_query;
@@ -11,11 +10,10 @@ use async_graphql::{
 
 use self::{
     config_query::ConfigQuery,
-    explorer_query::ExplorerSubscription,
     metric_query::MetricSubscription,
     notification_query::NotificationSubscription,
     project_query::{ProjectMutation, ProjectSubscription},
-    session_query::SessionMutation,
+    session_query::{SessionMutation, SessionQuery},
 };
 use crate::domain::{
     model::error::{Error, PreconditionError, ResourceError, SystemError},
@@ -23,7 +21,7 @@ use crate::domain::{
 };
 
 #[derive(MergedObject)]
-pub struct QueryRoot(ConfigQuery);
+pub struct QueryRoot(SessionQuery, ConfigQuery);
 
 #[derive(MergedObject)]
 pub struct MutationRoot(ProjectMutation, SessionMutation);
@@ -31,7 +29,6 @@ pub struct MutationRoot(ProjectMutation, SessionMutation);
 #[derive(MergedSubscription)]
 pub struct SubscriptionRoot(
     ProjectSubscription,
-    ExplorerSubscription,
     MetricSubscription,
     NotificationSubscription,
 );
@@ -40,9 +37,14 @@ pub type SchemaRoot = Schema<QueryRoot, MutationRoot, SubscriptionRoot>;
 
 pub fn build_schema(service_root: ServiceRoot) -> SchemaRoot {
     Schema::build(
-        QueryRoot(ConfigQuery {
-            config_service: service_root.0,
-        }),
+        QueryRoot(
+            SessionQuery {
+                session_service: service_root.3.clone(),
+            },
+            ConfigQuery {
+                config_service: service_root.0,
+            },
+        ),
         MutationRoot(
             ProjectMutation {
                 project_meta_service: service_root.1.clone(),
@@ -59,7 +61,6 @@ pub fn build_schema(service_root: ServiceRoot) -> SchemaRoot {
             ProjectSubscription {
                 project_service: service_root.5.clone(),
             },
-            ExplorerSubscription::default(),
             MetricSubscription {
                 project_service: service_root.5.clone(),
             },

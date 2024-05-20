@@ -271,14 +271,14 @@ impl LocalWorktreeScanner {
                 .snapshot
                 .tree_by_path
                 .insert(entry.path.to_path_buf(), entry.clone());
-
-            self.sync_tx
-                .send(WorkTreeEvent {
-                    kind: WorkTreeEventKind::Discovery,
-                    entry,
-                })
-                .unwrap();
         }
+
+        self.sync_tx
+            .send(WorkTreeEvent {
+                kind: WorkTreeEventKind::Discovery,
+                entry: parent_entry,
+            })
+            .unwrap();
 
         info!("populated a directory {parent_path:?}");
     }

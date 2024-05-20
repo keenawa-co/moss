@@ -1,8 +1,7 @@
 use async_graphql::{Context, FieldResult, Object, Result as GraphqlResult, Subscription};
+use futures::{Stream, StreamExt};
 use graphql_utl::{path::Path as PathGraphQL, GraphQLExtendError};
 use http::HeaderMap;
-// use manifest::model::ignored::IgnoredSource;
-use futures::{Stream, StreamExt};
 use std::{path::PathBuf, sync::Arc};
 use tokio::sync::RwLock;
 use types::{id::NanoId, thing::Thing};
@@ -10,7 +9,7 @@ use types::{id::NanoId, thing::Thing};
 use crate::domain::{
     model::{
         error::Error,
-        notification::{Notification, NotificationPayload},
+        notification::Notification,
         project::{CreateProjectInput, ProjectMeta},
         session::SessionTokenClaims,
     },
@@ -119,8 +118,6 @@ impl ProjectSubscription {
         let stream = project_service_lock.explorer_event_feed().await?;
 
         Ok(stream.map(|event| {
-            // let json_event = serde_json::to_value(event)
-            //     .map_err(|e| async_graphql::Error::new(e.to_string()))?;
             Ok(serde_json::json!({
                 "event": event.kind,
                 "path":  event.entry.path.to_path_buf().to_string_lossy().to_string()
