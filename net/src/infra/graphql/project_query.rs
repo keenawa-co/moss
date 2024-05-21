@@ -112,8 +112,11 @@ pub(super) struct ProjectSubscription {
 impl ProjectSubscription {
     async fn explorer_event_feed(
         &self,
-        _ctx: &Context<'_>,
+        ctx: &Context<'_>,
     ) -> async_graphql::Result<impl Stream<Item = FieldResult<serde_json::Value>>> {
+        // dbg!(ctx.http_header_contains("session-token"));
+        // let sess_claims = ctx.data::<HeaderMap>()?;
+
         let project_service_lock = self.project_service.read().await;
         let stream = project_service_lock.explorer_event_feed().await?;
 

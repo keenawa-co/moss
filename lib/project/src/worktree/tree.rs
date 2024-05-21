@@ -12,7 +12,7 @@ pub struct Snapshot {
     pub root_name: String,
     pub abs_path: Arc<Path>,
     pub tree_by_path: FileTree<PathBuf>,
-    pub file_scan_exclusions: HashSet<PathBuf>,
+    pub file_scan_exclusions: Arc<HashSet<PathBuf>>,
 }
 
 impl Snapshot {

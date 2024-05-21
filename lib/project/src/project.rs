@@ -8,7 +8,13 @@ use std::{
 };
 use types::file::json_file::JsonFile;
 
-use crate::{settings::Settings, worktree::local::WorkTreeEvent, worktree::Worktree};
+use crate::{
+    settings::Settings,
+    worktree::{
+        local::{LocalWorktreeSettings, WorkTreeEvent},
+        Worktree,
+    },
+};
 
 #[derive(Debug)]
 pub struct Project {
@@ -19,12 +25,20 @@ pub struct Project {
 impl Project {
     pub async fn new(
         fs: Arc<dyn FS>,
-        dir: Arc<Path>,
+        dir_abs_path: Arc<Path>,
         settings_file: Arc<JsonFile>,
     ) -> Result<Self> {
+        let initial_settings = Settings::try_from_async(settings_file).await?;
+        let worktree_settings = LocalWorktreeSettings {
+            abs_path: dir_abs_path.clone(),
+            monitoring_exclude_list: Arc::new(initial_settings.fetch_exclude_list()),
+            watch_gitignore_entries: initial_settings.watch_gitignore_entries,
+            auto_watch_new_entries: initial_settings.auto_watch_new_entries,
+        };
+
         Ok(Self {
-            worktree: Worktree::local(fs, dir).await,
-            settings: Settings::try_from_async(settings_file).await?,
+            worktree: Worktree::local(fs, &worktree_settings).await,
+            settings: initial_settings,
         })
     }
 

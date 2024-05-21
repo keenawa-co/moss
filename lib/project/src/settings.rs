@@ -6,27 +6,43 @@ use tokio::sync::{watch, RwLock};
 use types::file::json_file::JsonFile;
 
 #[derive(Debug, Deserialize)]
-pub(crate) struct SettingsFileRepr {
+pub(crate) struct SettingsFile {
     #[serde(rename = "project.monitoring.exclude")]
-    #[serde(default = "SettingsFileRepr::default_exclude_list")]
-    exclude_list: Vec<String>,
+    #[serde(default = "SettingsFile::default_exclude_list")]
+    monitoring_exclude_list: Vec<String>,
 
-    // #[serde(rename = "project.worktree.preference.displayExcludedEntries")]
-    // display_excluded_entries: bool,
+    #[serde(rename = "project.worktree.preference.displayExcludedEntries")]
+    #[serde(default = "SettingsFile::default_display_excluded_entries")]
+    display_excluded_entries: bool,
 
-    // #[serde(rename = "project.worktree.preference.displayGitIgnoredEntries")]
-    // display_gitignore_entries: bool,
+    #[serde(rename = "project.worktree.preference.displayGitIgnoredEntries")]
+    #[serde(default = "SettingsFile::default_display_gitignore_entries")]
+    display_gitignore_entries: bool,
 
-    // #[serde(rename = "project.monitoring.watchGitIgnoredEntries")]
-    // watch_gitignore_entries: bool,
-    #[serde(rename = "project.monitoring.autoWatchNewFiles")]
-    #[serde(default = "SettingsFileRepr::default_auto_watch_new")]
-    auto_watch_new: bool,
+    #[serde(rename = "project.monitoring.watchGitIgnoredEntries")]
+    #[serde(default = "SettingsFile::default_watch_gitignore_entries")]
+    watch_gitignore_entries: bool,
+
+    #[serde(rename = "project.monitoring.autoWatchNewEntries")]
+    #[serde(default = "SettingsFile::default_auto_watch_new")]
+    auto_watch_new_entries: bool,
 }
 
-impl SettingsFileRepr {
+impl SettingsFile {
     fn default_exclude_list() -> Vec<String> {
         vec![]
+    }
+
+    fn default_display_excluded_entries() -> bool {
+        false
+    }
+
+    fn default_display_gitignore_entries() -> bool {
+        true
+    }
+
+    fn default_watch_gitignore_entries() -> bool {
+        true
     }
 
     fn default_auto_watch_new() -> bool {
@@ -42,15 +58,25 @@ struct MonitoringExcludeList {
     watch_rx: watch::Receiver<HashSet<PathBuf>>,
 }
 
+impl Into<HashSet<PathBuf>> for MonitoringExcludeList {
+    fn into(self) -> HashSet<PathBuf> {
+        self.watch_rx.borrow().clone().into()
+    }
+}
+
 #[derive(Debug)]
 pub struct Settings {
-    file: Arc<JsonFile>,
-    monitoring_exclude: MonitoringExcludeList,
+    pub(crate) file: Arc<JsonFile>,
+    pub(crate) monitoring_exclude_list: MonitoringExcludeList,
+    pub(crate) display_excluded_entries: bool,
+    pub(crate) display_gitignore_entries: bool,
+    pub(crate) watch_gitignore_entries: bool,
+    pub(crate) auto_watch_new_entries: bool,
 }
 
 impl Settings {
     pub fn watch_monitoring_exclude_list(&self) -> watch::Receiver<HashSet<PathBuf>> {
-        self.monitoring_exclude.watch_rx.clone()
+        self.monitoring_exclude_list.watch_rx.clone()
     }
 
     pub async fn append_to_monitoring_exclude_list(
@@ -58,17 +84,17 @@ impl Settings {
         input_list: &[PathBuf],
     ) -> Result<Vec<String>> {
         let input_set: HashSet<PathBuf> = input_list.iter().cloned().collect();
-        let mut current_exclude_list = self.fetch_exclude_list().await;
+        let mut current_exclude_list = self.fetch_exclude_list();
         let additional_exclusion_list: HashSet<PathBuf> = input_set
             .difference(&current_exclude_list)
             .cloned()
             .collect();
         if additional_exclusion_list.is_empty() {
-            return Ok(self.monitoring_exclude.cache.read().await.clone());
+            return Ok(self.monitoring_exclude_list.cache.read().await.clone());
         }
 
         {
-            let mut exclude_cache_list = self.monitoring_exclude.cache.write().await;
+            let mut exclude_cache_list = self.monitoring_exclude_list.cache.write().await;
 
             current_exclude_list.extend(additional_exclusion_list.iter().cloned());
             exclude_cache_list.extend(
@@ -83,15 +109,19 @@ impl Settings {
                 .await?;
         }
 
-        self.monitoring_exclude
+        self.monitoring_exclude_list
             .watch_tx
             .send(current_exclude_list.clone())?;
 
-        Ok(self.monitoring_exclude.cache.read().await.clone())
+        Ok(self.monitoring_exclude_list.cache.read().await.clone())
     }
 
-    pub async fn fetch_exclude_list(&self) -> HashSet<PathBuf> {
-        self.monitoring_exclude.watch_rx.borrow().clone().into()
+    pub fn fetch_exclude_list(&self) -> HashSet<PathBuf> {
+        self.monitoring_exclude_list
+            .watch_rx
+            .borrow()
+            .clone()
+            .into()
     }
 
     pub async fn remove_from_monitoring_exclude_list(
@@ -100,10 +130,10 @@ impl Settings {
     ) -> Result<Vec<String>> {
         let should_be_removed = input_list.iter().cloned().collect::<HashSet<PathBuf>>();
         if should_be_removed.is_empty() {
-            return Ok(self.monitoring_exclude.cache.read().await.to_vec());
+            return Ok(self.monitoring_exclude_list.cache.read().await.to_vec());
         }
 
-        let mut current_exclude_list = self.fetch_exclude_list().await;
+        let mut current_exclude_list = self.fetch_exclude_list();
         if current_exclude_list.is_empty() {
             return Ok(vec![]);
         }
@@ -114,7 +144,7 @@ impl Settings {
             .collect::<HashSet<String>>();
 
         {
-            let mut exclude_cache_list = self.monitoring_exclude.cache.write().await;
+            let mut exclude_cache_list = self.monitoring_exclude_list.cache.write().await;
 
             current_exclude_list.retain(|item| !should_be_removed.contains(item));
             exclude_cache_list.retain(|item| !should_be_removed_as_string.contains(item));
@@ -124,7 +154,7 @@ impl Settings {
                 .await?;
         }
 
-        self.monitoring_exclude
+        self.monitoring_exclude_list
             .watch_tx
             .send(current_exclude_list.clone())?;
 
@@ -141,17 +171,17 @@ impl AsyncTryFrom<Arc<JsonFile>> for Settings {
 
     async fn try_from_async(file: Arc<JsonFile>) -> Result<Self, Self::Error> {
         let settings_file = file
-            .get_by_path::<SettingsFileRepr>("/")
+            .get_by_path::<SettingsFile>("/")
             .await?
             .ok_or_else(|| anyhow!("Module settings not found"))?;
 
         let initial_exclude_list: HashSet<PathBuf> = settings_file
-            .exclude_list
+            .monitoring_exclude_list
             .into_iter()
             .map(PathBuf::from)
             .collect();
 
-        let monitoring_exclude = {
+        let monitoring_exclude_list = {
             let (tx, rx) = watch::channel(HashSet::new());
 
             MonitoringExcludeList {
@@ -168,11 +198,15 @@ impl AsyncTryFrom<Arc<JsonFile>> for Settings {
 
         let settings = Self {
             file,
-            monitoring_exclude,
+            monitoring_exclude_list,
+            display_excluded_entries: settings_file.display_excluded_entries,
+            display_gitignore_entries: settings_file.display_gitignore_entries,
+            watch_gitignore_entries: settings_file.watch_gitignore_entries,
+            auto_watch_new_entries: settings_file.auto_watch_new_entries,
         };
 
         settings
-            .monitoring_exclude
+            .monitoring_exclude_list
             .watch_tx
             .send(initial_exclude_list)?;
 

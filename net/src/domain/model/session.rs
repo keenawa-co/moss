@@ -24,7 +24,7 @@ pub(crate) struct SessionEntity {
     pub created_at: i64,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub(crate) struct SessionTokenClaims {
     #[serde(rename = "sid")]
     pub session_id: NanoId,

@@ -1,5 +1,5 @@
 use anyhow::Result;
-use fs::FS;
+use fs::{file, FS};
 use futures::task::Poll;
 use futures::{select_biased, FutureExt, Stream};
 use hashbrown::HashSet;
@@ -18,11 +18,18 @@ use tokio::{
 use super::tree::{FileTree, Snapshot, WorktreeEntry};
 use crate::worktree::tree::WorktreeEntryKind;
 
+pub struct LocalWorktreeSettings {
+    pub abs_path: Arc<Path>,
+    pub monitoring_exclude_list: Arc<HashSet<PathBuf>>,
+    pub watch_gitignore_entries: bool,
+    pub auto_watch_new_entries: bool,
+}
+
 #[derive(Debug)]
-pub struct TreeScanJob {
+pub struct WorktreeScanJob {
     abs_path: Arc<Path>,
     path: Arc<Path>,
-    scan_queue: mpsc::UnboundedSender<TreeScanJob>,
+    scan_queue: mpsc::UnboundedSender<WorktreeScanJob>,
 }
 
 #[derive(Debug, Serialize, Clone)]
@@ -51,43 +58,39 @@ pub struct LocalWorktree {
     update_rx: Arc<Mutex<mpsc::UnboundedReceiver<WorkTreeEvent>>>,
 }
 
-fn default_file_scan_exclusions() -> HashSet<PathBuf> {
-    let mut hs = HashSet::new();
-    hs.insert(PathBuf::from("/Users/g10z3r/Project/4rchr4y/moss/view"));
-    hs.insert(PathBuf::from("/Users/g10z3r/Project/4rchr4y/moss/target"));
-    hs.insert(PathBuf::from("/Users/g10z3r/Project/4rchr4y/moss/.git"));
-
-    hs
-}
-
 impl LocalWorktree {
-    pub async fn new(fs: Arc<dyn FS>, abs_path: Arc<Path>) -> Arc<Self> {
-        let root_name = abs_path
+    pub async fn new(fs: Arc<dyn FS>, settings: &LocalWorktreeSettings) -> Arc<Self> {
+        let root_name = settings
+            .abs_path
             .file_name()
             .map_or(String::new(), |f| f.to_string_lossy().to_string());
 
         let root_metadata = fs
-            .metadata(&Path::new("/Users/g10z3r/Project/4rchr4y/moss"))
+            .metadata(&settings.abs_path)
             .await
             .unwrap() // TODO: handle option None
             .unwrap();
 
-        let mut initial_filetree_by_path = FileTree::new();
-        initial_filetree_by_path.insert(
-            PathBuf::from("/Users/g10z3r/Project/4rchr4y/moss"),
-            WorktreeEntry {
-                kind: WorktreeEntryKind::PendingDir,
-                path: Arc::from(Path::new("/Users/g10z3r/Project/4rchr4y/moss")),
-                modified: root_metadata.modified,
-                is_symlink: root_metadata.is_symlink,
-            },
-        );
+        let initial_filetree_by_path = {
+            let mut file_tree = FileTree::new();
+            file_tree.insert(
+                settings.abs_path.to_path_buf(),
+                WorktreeEntry {
+                    kind: WorktreeEntryKind::PendingDir,
+                    path: settings.abs_path.clone(),
+                    modified: root_metadata.modified,
+                    is_symlink: root_metadata.is_symlink,
+                },
+            );
+
+            file_tree
+        };
 
         let initial_snapshot = Snapshot {
             root_name,
-            abs_path: abs_path.clone(),
+            abs_path: Arc::clone(&settings.abs_path),
             tree_by_path: initial_filetree_by_path,
-            file_scan_exclusions: default_file_scan_exclusions(), // FIXME:
+            file_scan_exclusions: Arc::clone(&settings.monitoring_exclude_list), // FIXME:
         };
 
         let (update_tx, update_rx) = mpsc::unbounded_channel();
@@ -96,9 +99,9 @@ impl LocalWorktree {
         {
             let initial_snapshot_clone = initial_snapshot.clone();
             let fs_clone = fs.clone();
-            let abs_path_clone = abs_path.clone();
+            let abs_path_clone = settings.abs_path.clone();
 
-            let fs_event_stream = fs.watch(&abs_path, Duration::from_secs(1)).await;
+            let fs_event_stream = fs.watch(&settings.abs_path, Duration::from_secs(1)).await;
             task::spawn(async {
                 LocalWorktreeScanner::new(fs_clone, sync_tx, initial_snapshot_clone)
                     .run(abs_path_clone, fs_event_stream)
@@ -121,8 +124,6 @@ impl LocalWorktree {
             let worktree_clone = Arc::clone(&worktree);
             task::spawn(async move {
                 while let Some(event) = sync_rx.recv().await {
-                    dbg!(&event.entry.path.to_path_buf());
-
                     let mut state_lock = worktree_clone.state.lock().await;
 
                     state_lock.prev_snapshot = Some(state_lock.last_snapshot.clone());
@@ -232,9 +233,9 @@ impl LocalWorktreeScanner {
         &self,
         abs_path: Arc<Path>,
         entry: &WorktreeEntry,
-        scan_job_tx: &mpsc::UnboundedSender<TreeScanJob>,
+        scan_job_tx: &mpsc::UnboundedSender<WorktreeScanJob>,
     ) -> Result<()> {
-        scan_job_tx.clone().send(TreeScanJob {
+        scan_job_tx.clone().send(WorktreeScanJob {
             abs_path,
             path: entry.path.clone(),
             scan_queue: scan_job_tx.clone(),
@@ -283,7 +284,7 @@ impl LocalWorktreeScanner {
         info!("populated a directory {parent_path:?}");
     }
 
-    async fn index_deep(&self, mut scan_jobs_rx: mpsc::UnboundedReceiver<TreeScanJob>) {
+    async fn index_deep(&self, mut scan_jobs_rx: mpsc::UnboundedReceiver<WorktreeScanJob>) {
         loop {
             select_biased! {
                 job_option = scan_jobs_rx.recv().fuse() => {
@@ -299,7 +300,7 @@ impl LocalWorktreeScanner {
         }
     }
 
-    async fn index_dir(&self, job: &TreeScanJob) -> Result<()> {
+    async fn index_dir(&self, job: &WorktreeScanJob) -> Result<()> {
         {
             let state_lock = self.state.lock().await;
             if state_lock
@@ -313,7 +314,7 @@ impl LocalWorktreeScanner {
             drop(state_lock)
         }
 
-        let mut planned_job_list: Vec<TreeScanJob> = Vec::new();
+        let mut planned_job_list: Vec<WorktreeScanJob> = Vec::new();
         let mut entry_list: Vec<WorktreeEntry> = Vec::new();
 
         let mut dir_stream = self.fs.read_dir(&job.path).await?;
@@ -353,7 +354,7 @@ impl LocalWorktreeScanner {
             let child_entry = WorktreeEntry::new(child_path.clone(), &child_metadata);
 
             if child_entry.is_dir() {
-                planned_job_list.push(TreeScanJob {
+                planned_job_list.push(WorktreeScanJob {
                     abs_path: child_path,
                     path: child_abs_path,
                     scan_queue: job.scan_queue.clone(),

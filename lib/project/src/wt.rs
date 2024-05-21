@@ -14,8 +14,6 @@ use std::{
 use tokio::sync::{mpsc, Mutex, RwLock};
 use tokio::task;
 
-pub struct WorktreeSettings {}
-
 #[derive(Debug)]
 pub enum Worktree {
     Local(LocalWorktree),

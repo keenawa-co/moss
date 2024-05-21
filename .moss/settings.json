@@ -1,5 +1,8 @@
 {
   "project.monitoring.exclude": [
-    "/Users/g10z3r/Project/4rchr4y/moss/target"
+    "/Users/g10z3r/Project/4rchr4y/moss/target",
+    "/Users/g10z3r/Project/4rchr4y/moss/view",
+    "/Users/g10z3r/Project/4rchr4y/moss/.git",
+    "/Users/g10z3r/Project/4rchr4y/moss/.vscode"
   ]
 }

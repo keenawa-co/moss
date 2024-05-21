@@ -1,18 +1,15 @@
 {
-    "common": {
-        "recommendation": {
-            "ignored_list": [
-                "*.db",
-                "*.session.sql"
-            ]
-        }
-    },
-    "rust": {
-        "recommendation": {
-            "ignored_list": [
-                "target",
-                "Cargo.lock"
-            ]
-        }
+    "project.monitoring.exclude": {
+        "[general]": [
+            "*.db",
+            "*.session.sql",
+            ".vscode",
+            ".git",
+            ".github"
+        ],
+        "[rust]": [
+            "target",
+            "Cargo.lock"
+        ]
     }
 }
