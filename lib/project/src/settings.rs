@@ -6,29 +6,29 @@ use tokio::sync::{watch, RwLock};
 use types::file::json_file::JsonFile;
 
 #[derive(Debug, Deserialize)]
-pub(crate) struct SettingsFile {
+pub(crate) struct SettingsSchema {
     #[serde(rename = "project.monitoring.exclude")]
-    #[serde(default = "SettingsFile::default_exclude_list")]
+    #[serde(default = "SettingsSchema::default_exclude_list")]
     monitoring_exclude_list: Vec<String>,
 
     #[serde(rename = "project.worktree.preference.displayExcludedEntries")]
-    #[serde(default = "SettingsFile::default_display_excluded_entries")]
+    #[serde(default = "SettingsSchema::default_display_excluded_entries")]
     display_excluded_entries: bool,
 
     #[serde(rename = "project.worktree.preference.displayGitIgnoredEntries")]
-    #[serde(default = "SettingsFile::default_display_gitignore_entries")]
+    #[serde(default = "SettingsSchema::default_display_gitignore_entries")]
     display_gitignore_entries: bool,
 
     #[serde(rename = "project.monitoring.watchGitIgnoredEntries")]
-    #[serde(default = "SettingsFile::default_watch_gitignore_entries")]
+    #[serde(default = "SettingsSchema::default_watch_gitignore_entries")]
     watch_gitignore_entries: bool,
 
     #[serde(rename = "project.monitoring.autoWatchNewEntries")]
-    #[serde(default = "SettingsFile::default_auto_watch_new")]
+    #[serde(default = "SettingsSchema::default_auto_watch_new")]
     auto_watch_new_entries: bool,
 }
 
-impl SettingsFile {
+impl SettingsSchema {
     fn default_exclude_list() -> Vec<String> {
         vec![]
     }
@@ -44,7 +44,6 @@ impl SettingsFile {
     fn default_watch_gitignore_entries() -> bool {
         true
     }
-
     fn default_auto_watch_new() -> bool {
         true
     }
@@ -171,7 +170,7 @@ impl AsyncTryFrom<Arc<JsonFile>> for Settings {
 
     async fn try_from_async(file: Arc<JsonFile>) -> Result<Self, Self::Error> {
         let settings_file = file
-            .get_by_path::<SettingsFile>("/")
+            .get_by_path::<SettingsSchema>("/")
             .await?
             .ok_or_else(|| anyhow!("Module settings not found"))?;
 
