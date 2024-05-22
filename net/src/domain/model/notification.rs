@@ -2,7 +2,7 @@ use chrono::Utc;
 use types::id::NanoId;
 
 #[derive(Serialize, Deserialize)]
-pub struct NotificationPayload<T> {
+pub struct AbstractNotification<T> {
     pub id: NanoId,
     #[serde(flatten)]
     pub body: T,
@@ -13,9 +13,9 @@ pub struct NotificationPayload<T> {
 #[serde(tag = "kind")]
 pub enum Notification {
     #[serde(rename = "system")]
-    System(NotificationPayload<SystemNotification>),
+    System(AbstractNotification<SystemNotification>),
     #[serde(rename = "client")]
-    Client(NotificationPayload<ClientNotification>),
+    Client(AbstractNotification<ClientNotification>),
 }
 
 #[derive(Serialize, Deserialize)]
@@ -40,7 +40,7 @@ pub struct ClientNotification {
 impl Notification {
     pub fn create_client(message: String) -> Self {
         let body = ClientNotification { message };
-        let payload = NotificationPayload {
+        let payload = AbstractNotification {
             id: NanoId::new(),
             body,
             timestamp: Utc::now().timestamp(),
