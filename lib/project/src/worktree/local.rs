@@ -64,7 +64,7 @@ impl LocalWorktree {
         let root_name = settings
             .abs_path
             .file_name()
-            .map_or(String::new(), |f| f.to_string_lossy().to_string());
+            .map_or_else(String::new, |f| f.to_string_lossy().to_string());
 
         let root_metadata = fs
             .metadata(&settings.abs_path)
@@ -73,9 +73,18 @@ impl LocalWorktree {
 
         let mut initial_snapshot = Snapshot {
             root_name,
-            abs_path: Arc::clone(&settings.abs_path),
+            abs_path: settings.abs_path.clone(),
             tree_by_path: Default::default(),
-            file_scan_exclusions: Arc::clone(&settings.monitoring_exclude_list),
+            file_scan_exclusions: settings.monitoring_exclude_list.clone(),
+        };
+
+        let initial_state = {
+            let state = LocalWorktreeState {
+                prev_snapshot: None,
+                last_snapshot: initial_snapshot.clone(),
+            };
+
+            Arc::new(RwLock::new(state))
         };
 
         if let Some(metadata) = root_metadata {
@@ -92,20 +101,11 @@ impl LocalWorktree {
 
         let (share_tx, share_rx) = mpsc::unbounded_channel();
 
-        let initial_state = {
-            let state = LocalWorktreeState {
-                prev_snapshot: None,
-                last_snapshot: initial_snapshot.clone(),
-            };
-
-            Arc::new(RwLock::new(state))
-        };
-
         Self::run_on_background(
             fs,
             share_tx,
             initial_state.clone(),
-            Arc::clone(&settings.abs_path),
+            settings.abs_path.clone(),
         )
         .await?;
 
@@ -154,14 +154,15 @@ impl LocalWorktree {
     ) -> Result<()> {
         task::spawn(async move {
             while let Some(event) = sync_rx.recv().await {
-                let mut state_lock = state.write().await;
+                {
+                    let mut state_lock = state.write().await;
 
-                state_lock.prev_snapshot = Some(state_lock.last_snapshot.clone());
-                state_lock
-                    .last_snapshot
-                    .tree_by_path
-                    .insert(event.entry.path.to_path_buf(), event.clone().entry);
-                drop(state_lock);
+                    state_lock.prev_snapshot = Some(state_lock.last_snapshot.clone());
+                    state_lock
+                        .last_snapshot
+                        .tree_by_path
+                        .insert(event.entry.path.to_path_buf(), event.clone().entry);
+                }
 
                 if let Err(e) = share_tx.send(event) {
                     error!("Failed to send worktree event: {e}");
@@ -173,7 +174,7 @@ impl LocalWorktree {
     }
 
     pub async fn event_stream(&self) -> impl Stream<Item = WorktreeEvent> {
-        let rx_clone = Arc::clone(&self.share_rx);
+        let rx_clone = self.share_rx.clone();
 
         async_stream::stream! {
             let mut rx = rx_clone.lock().await;
