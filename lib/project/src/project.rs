@@ -2,16 +2,13 @@ use anyhow::Result;
 use async_utl::AsyncTryFrom;
 use fs::FS;
 use futures::Stream;
-use std::{
-    path::{Path, PathBuf},
-    sync::Arc,
-};
+use std::{path::Path, sync::Arc};
 use types::file::json_file::JsonFile;
 
 use crate::{
     settings::Settings,
     worktree::{
-        local::{LocalWorktreeSettings, WorkTreeEvent},
+        local::{LocalWorktreeSettings, WorktreeEvent},
         Worktree,
     },
 };
@@ -37,14 +34,15 @@ impl Project {
         };
 
         Ok(Self {
-            worktree: Worktree::local(fs, &worktree_settings).await,
+            worktree: Worktree::local(fs, &worktree_settings).await?,
             settings: initial_settings,
         })
     }
 
-    pub async fn worktree_event_stream(&self) -> impl Stream<Item = WorkTreeEvent> {
+    pub async fn worktree_event_stream(&self) -> impl Stream<Item = WorktreeEvent> {
         match &self.worktree {
             Worktree::Local(local) => local.event_stream().await,
+            Worktree::Remote => unimplemented!(),
         }
     }
 }

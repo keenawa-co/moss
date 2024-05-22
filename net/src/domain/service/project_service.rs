@@ -1,7 +1,7 @@
 use fs::{real, FS};
 use futures::{Stream, StreamExt};
 use hashbrown::HashSet;
-use project::{worktree::local::WorkTreeEvent, Project};
+use project::{worktree::local::WorktreeEvent, Project};
 use std::{
     path::{Path, PathBuf},
     pin::Pin,
@@ -39,7 +39,7 @@ impl ProjectService {
 
     pub async fn explorer_event_feed(
         &self,
-    ) -> Result<Pin<Box<dyn Send + Stream<Item = WorkTreeEvent>>>> {
+    ) -> Result<Pin<Box<dyn Send + Stream<Item = WorktreeEvent>>>> {
         let stream = self.project_ref()?.worktree_event_stream().await;
 
         Ok(Box::pin(stream))

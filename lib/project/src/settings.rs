@@ -51,7 +51,7 @@ impl SettingsSchema {
 
 #[derive(Debug)]
 // TODO: use glob::Pattern
-struct MonitoringExcludeList {
+pub(crate) struct MonitoringExcludeList {
     cache: RwLock<Vec<String>>,
     watch_tx: watch::Sender<HashSet<PathBuf>>,
     watch_rx: watch::Receiver<HashSet<PathBuf>>,
