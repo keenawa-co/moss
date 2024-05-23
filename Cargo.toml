@@ -7,18 +7,21 @@ edition = "2021"
 members = [
     "kernel/bus",
     "kernel/fs",
-    "lib/conf",
+
+    "lib/async_utl",
     "lib/seaorm_utl",
     "lib/graphql_mac",
     "lib/graphql_utl",
     "lib/mac",
-    "lib/workspace",
-    "lib/project",
-    "lib/pwd",
     "lib/types",
+
+    "platform/conf",
+    "platform/pwd",
+    "platform/workspace",
+    "platform/project",
+
     "mossctl",
     "net",
-    "lib/async_utl",
 ]
 
 [profile.release]
@@ -39,16 +42,16 @@ rustflags = ["-C", "target-cpu=native"]
 [workspace.dependencies]
 fs = { path = "kernel/fs" }
 bus = { path = "kernel/bus" }
-conf = { path = "lib/conf" }
-pwd = { path = "lib/pwd" }
 mac = { path = "lib/mac" }
 async_utl = { path = "lib/async_utl" }
 seaorm_utl = { path = "lib/seaorm_utl" }
 graphql_utl = { path = "lib/graphql_utl" }
 graphql_mac = { path = "lib/graphql_mac" }
-project = { path = "lib/project" }
-workspace = { path = "lib/workspace" }
 types = { path = "lib/types" }
+conf = { path = "platform/conf" }
+pwd = { path = "platform/pwd" }
+project = { path = "platform/project" }
+workspace = { path = "platform/workspace" }
 
 mossctl = { path = "mossctl" }
 net = { path = "net" }
