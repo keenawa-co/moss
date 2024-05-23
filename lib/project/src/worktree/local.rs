@@ -16,8 +16,9 @@ use tokio::{
     task,
 };
 
-use super::tree::{FileTree, Snapshot, WorktreeEntry};
-use crate::worktree::tree::WorktreeEntryKind;
+use crate::worktree::tree::{LocalWorktreeEntry, Snapshot, WorktreeEntryKind};
+
+use super::event::{Event, FileSystemEvent, ScannerEvent};
 
 pub struct LocalWorktreeSettings {
     pub abs_path: Arc<Path>,
@@ -33,20 +34,6 @@ pub struct WorktreeScanJob {
     scan_queue: mpsc::UnboundedSender<WorktreeScanJob>,
 }
 
-#[derive(Debug, Serialize, Clone)]
-pub enum WorkTreeEventKind {
-    Create,
-    Delete,
-    Modify,
-    Discovery,
-}
-
-#[derive(Debug, Clone)]
-pub struct WorktreeEvent {
-    pub kind: WorkTreeEventKind,
-    pub entry: WorktreeEntry,
-}
-
 #[derive(Debug, Clone)]
 pub struct LocalWorktreeState {
     prev_snapshot: Option<Snapshot>,
@@ -56,7 +43,7 @@ pub struct LocalWorktreeState {
 #[derive(Debug)]
 pub struct LocalWorktree {
     state: Arc<RwLock<LocalWorktreeState>>,
-    share_rx: Arc<Mutex<mpsc::UnboundedReceiver<WorktreeEvent>>>,
+    share_rx: Arc<Mutex<mpsc::UnboundedReceiver<Event>>>,
 }
 
 impl LocalWorktree {
@@ -90,7 +77,7 @@ impl LocalWorktree {
         if let Some(metadata) = root_metadata {
             initial_snapshot.tree_by_path.insert(
                 settings.abs_path.to_path_buf(),
-                WorktreeEntry {
+                LocalWorktreeEntry {
                     kind: WorktreeEntryKind::PendingDir,
                     path: settings.abs_path.clone(),
                     modified: metadata.modified,
@@ -117,7 +104,7 @@ impl LocalWorktree {
 
     async fn run_on_background(
         fs: Arc<dyn FS>,
-        share_tx: mpsc::UnboundedSender<WorktreeEvent>,
+        share_tx: mpsc::UnboundedSender<Event>,
         initial_state: Arc<RwLock<LocalWorktreeState>>,
         abs_path: Arc<Path>,
     ) -> Result<()> {
@@ -133,7 +120,7 @@ impl LocalWorktree {
     }
     async fn run_background_scanner(
         fs: Arc<dyn FS>,
-        sync_tx: mpsc::UnboundedSender<WorktreeEvent>,
+        sync_tx: mpsc::UnboundedSender<Event>,
         initial_snapshot: Snapshot,
         abs_path: Arc<Path>,
     ) {
@@ -148,21 +135,36 @@ impl LocalWorktree {
     }
 
     async fn run_background_event_listener(
-        mut sync_rx: mpsc::UnboundedReceiver<WorktreeEvent>,
-        share_tx: mpsc::UnboundedSender<WorktreeEvent>,
+        mut sync_rx: mpsc::UnboundedReceiver<Event>,
+        share_tx: mpsc::UnboundedSender<Event>,
         state: Arc<RwLock<LocalWorktreeState>>,
     ) -> Result<()> {
         task::spawn(async move {
             while let Some(event) = sync_rx.recv().await {
-                {
-                    let mut state_lock = state.write().await;
+                let mut state_lock = state.write().await;
+                state_lock.prev_snapshot = Some(state_lock.last_snapshot.clone());
 
-                    state_lock.prev_snapshot = Some(state_lock.last_snapshot.clone());
-                    state_lock
-                        .last_snapshot
-                        .tree_by_path
-                        .insert(event.entry.path.to_path_buf(), event.clone().entry);
+                match event {
+                    Event::FileSystem(FileSystemEvent::Created(ref e))
+                    | Event::FileSystem(FileSystemEvent::Deleted(ref e))
+                    | Event::FileSystem(FileSystemEvent::Modified(ref e)) => {
+                        state_lock
+                            .last_snapshot
+                            .tree_by_path
+                            .insert(e.path.to_path_buf(), e.clone());
+                    }
+
+                    Event::Scanner(ScannerEvent::Discovered(ref entries)) => {
+                        for e in entries {
+                            state_lock
+                                .last_snapshot
+                                .tree_by_path
+                                .insert(e.path.to_path_buf(), e.clone());
+                        }
+                    }
                 }
+
+                drop(state_lock);
 
                 if let Err(e) = share_tx.send(event) {
                     error!("Failed to send worktree event: {e}");
@@ -173,7 +175,7 @@ impl LocalWorktree {
         Ok(())
     }
 
-    pub async fn event_stream(&self) -> impl Stream<Item = WorktreeEvent> {
+    pub async fn event_stream(&self) -> impl Stream<Item = Event> {
         let rx_clone = self.share_rx.clone();
 
         async_stream::stream! {
@@ -193,14 +195,14 @@ pub struct LocalWorktreeScannerState {
 #[derive(Debug)]
 pub struct LocalWorktreeScanner {
     fs: Arc<dyn FS>,
-    sync_tx: mpsc::UnboundedSender<WorktreeEvent>,
+    sync_tx: mpsc::UnboundedSender<Event>,
     state: Mutex<LocalWorktreeScannerState>,
 }
 
 impl LocalWorktreeScanner {
     fn new(
         fs: Arc<dyn FS>,
-        sync_tx: mpsc::UnboundedSender<WorktreeEvent>,
+        sync_tx: mpsc::UnboundedSender<Event>,
         snapshot: Snapshot,
     ) -> LocalWorktreeScanner {
         Self {
@@ -240,17 +242,17 @@ impl LocalWorktreeScanner {
 
                   if paths.contains(&PathBuf::from("/Users/g10z3r/Project/4rchr4y/moss/.moss/settings.json")) {
 
-                    self.sync_tx
-                        .send(WorktreeEvent {
-                            kind: WorkTreeEventKind::Modify,
-                            entry: WorktreeEntry {
-                                kind: WorktreeEntryKind::ReadyFile,
-                                path: Arc::from(Path::new("/Users/g10z3r/Project/4rchr4y/moss/.moss/settings.json")),
-                                modified:SystemTime::now(),
-                                is_symlink: false,
-                            },
-                        })
-                        .unwrap();
+                    // self.sync_tx
+                    //     .send(FileSystemEvent {
+                    //         operation: FileSystemEventOperation::ModifiedFile,
+                    //         entry: LocalWorktreeEntry {
+                    //             kind: WorktreeEntryKind::ReadyFile,
+                    //             path: Arc::from(Path::new("/Users/g10z3r/Project/4rchr4y/moss/.moss/settings.json")),
+                    //             modified:SystemTime::now(),
+                    //             is_symlink: false,
+                    //         },
+                    //     })
+                    //     .unwrap();
 
                     println!("Event: {:?}", paths);
                   }
@@ -265,7 +267,7 @@ impl LocalWorktreeScanner {
     async fn enqueue_scan_dir(
         &self,
         abs_path: Arc<Path>,
-        entry: &WorktreeEntry,
+        entry: &LocalWorktreeEntry,
         scan_job_tx: &mpsc::UnboundedSender<WorktreeScanJob>,
     ) -> Result<()> {
         scan_job_tx.clone().send(WorktreeScanJob {
@@ -277,11 +279,7 @@ impl LocalWorktreeScanner {
         Ok(())
     }
 
-    async fn populate_dir(
-        &self,
-        parent_path: &Arc<Path>,
-        entry_list: impl IntoIterator<Item = WorktreeEntry>,
-    ) {
+    async fn populate_dir(&self, parent_path: &Arc<Path>, entry_list: Vec<LocalWorktreeEntry>) {
         let mut state_lock = self.state.lock().await;
         let mut parent_entry = if let Some(entry) = state_lock
             .snapshot
@@ -300,19 +298,18 @@ impl LocalWorktreeScanner {
             _ => return,
         }
 
-        for entry in entry_list {
+        for entry in &entry_list {
             state_lock
                 .snapshot
                 .tree_by_path
                 .insert(entry.path.to_path_buf(), entry.clone());
         }
 
-        self.sync_tx
-            .send(WorktreeEvent {
-                kind: WorkTreeEventKind::Discovery,
-                entry: parent_entry,
-            })
-            .unwrap();
+        if let Err(e) = self.sync_tx.send(Event::Scanner(ScannerEvent::Discovered(
+            entry_list.into_iter().collect(),
+        ))) {
+            error!("Failed to send event: {e}");
+        }
 
         info!("populated a directory {parent_path:?}");
     }
@@ -348,7 +345,7 @@ impl LocalWorktreeScanner {
         }
 
         let mut planned_job_list: Vec<WorktreeScanJob> = Vec::new();
-        let mut entry_list: Vec<WorktreeEntry> = Vec::new();
+        let mut entry_list: Vec<LocalWorktreeEntry> = Vec::new();
 
         let mut dir_stream = self.fs.read_dir(&job.path).await?;
         while let Some(child) = dir_stream.next().await {
@@ -384,7 +381,7 @@ impl LocalWorktreeScanner {
                 }
             };
 
-            let child_entry = WorktreeEntry::new(child_path.clone(), &child_metadata);
+            let child_entry = LocalWorktreeEntry::new(child_path.clone(), &child_metadata);
 
             if child_entry.is_dir() {
                 planned_job_list.push(WorktreeScanJob {

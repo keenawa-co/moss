@@ -8,7 +8,8 @@ use types::file::json_file::JsonFile;
 use crate::{
     settings::Settings,
     worktree::{
-        local::{LocalWorktreeSettings, WorktreeEvent},
+        event::{Event, FileSystemEvent},
+        local::LocalWorktreeSettings,
         Worktree,
     },
 };
@@ -39,7 +40,7 @@ impl Project {
         })
     }
 
-    pub async fn worktree_event_stream(&self) -> impl Stream<Item = WorktreeEvent> {
+    pub async fn worktree_event_stream(&self) -> impl Stream<Item = Event> {
         match &self.worktree {
             Worktree::Local(local) => local.event_stream().await,
             Worktree::Remote => unimplemented!(),

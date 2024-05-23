@@ -122,8 +122,8 @@ impl ProjectSubscription {
 
         Ok(stream.map(|event| {
             Ok(serde_json::json!({
-                "event": event.kind,
-                "path":  event.entry.path.to_path_buf().to_string_lossy().to_string()
+                "event": "event.kind",
+                // "path":  event.entry.path.to_path_buf().to_string_lossy().to_string()
             }))
         }))
     }

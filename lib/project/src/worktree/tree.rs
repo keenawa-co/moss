@@ -22,7 +22,7 @@ impl Snapshot {
 }
 
 #[derive(Debug, Clone)]
-pub struct FileTree<T>(Trie<T, WorktreeEntry>)
+pub struct FileTree<T>(Trie<T, LocalWorktreeEntry>)
 where
     T: Borrow<T>,
     T: TrieKey;
@@ -32,11 +32,11 @@ where
     T: Borrow<T>,
     T: TrieKey,
 {
-    pub fn get(&self, key: &T) -> Option<&WorktreeEntry> {
+    pub fn get(&self, key: &T) -> Option<&LocalWorktreeEntry> {
         self.0.get(key)
     }
 
-    pub fn insert(&mut self, key: T, value: WorktreeEntry) -> Option<WorktreeEntry> {
+    pub fn insert(&mut self, key: T, value: LocalWorktreeEntry) -> Option<LocalWorktreeEntry> {
         self.0.insert(key, value)
     }
 }
@@ -74,14 +74,14 @@ impl WorktreeEntryKind {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct WorktreeEntry {
+pub struct LocalWorktreeEntry {
     pub kind: WorktreeEntryKind,
     pub path: Arc<Path>,
     pub modified: SystemTime,
     pub is_symlink: bool,
 }
 
-impl WorktreeEntry {
+impl LocalWorktreeEntry {
     pub fn new(path: Arc<Path>, metadata: &fs::file::Metadata) -> Self {
         Self {
             kind: if metadata.is_dir {
