@@ -1,7 +1,8 @@
+pub mod model;
 pub mod project;
 pub mod settings;
 pub mod worktree;
-pub mod wt;
+// pub mod wt;
 
 #[macro_use]
 extern crate serde;
