@@ -17,7 +17,7 @@ async fn graphiql_handler() -> impl IntoResponse {
 }
 
 async fn graphql_handler(
-    schema: Extension<SchemaRoot>,
+    Extension(schema): Extension<SchemaRoot>,
     headers: HeaderMap,
     req: GraphQLRequest,
 ) -> GraphQLResponse {
@@ -60,7 +60,7 @@ async fn graphql_subscription_handler(
         .into_response()
 }
 
-pub fn router<S>(schema: SchemaRoot) -> Router<S>
+pub fn router<S>() -> Router<S>
 where
     S: Clone + Send + Sync + 'static,
 {

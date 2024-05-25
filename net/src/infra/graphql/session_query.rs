@@ -18,14 +18,14 @@ use crate::domain::{
     },
 };
 
-pub(super) struct SessionMutation {
+pub(super) struct SessionMutation<'a> {
     pub session_service: Arc<SessionService>,
-    pub project_service: Arc<RwLock<ProjectService>>,
-    pub workspace_service: Arc<RwLock<WorkspaceService>>,
+    pub project_service: Arc<ProjectService<'a>>,
+    pub workspace_service: Arc<WorkspaceService>,
 }
 
 #[Object]
-impl SessionMutation {
+impl<'a> SessionMutation<'a> {
     async fn create_session(
         &self,
         _ctx: &Context<'_>,
@@ -39,22 +39,23 @@ impl SessionMutation {
         let session_token = SessionToken::try_from(session_entity.clone())?;
         let project_path = PathBuf::from(&session_entity.project_meta.as_ref().unwrap().source);
 
-        let mut workspace_service_lock = self.workspace_service.write().await;
-        workspace_service_lock
+        self.workspace_service
             .create(&CreateConfig {
                 project_path: &project_path,
             })
             .await?;
 
         {
-            let mut project_service_lock = self.project_service.write().await;
-            let settings_file = workspace_service_lock
+            let settings_file = self
+                .workspace_service
                 .get_settings()
                 .ok_or_resource_precondition_required(
                     "Session must be initialized first, settings.json file is not defined",
                     None,
                 )?;
-            project_service_lock
+
+            // let project_service_lock = self.project_service.write().await;
+            self.project_service
                 .start_project(&project_path, settings_file)
                 .await?;
         }
@@ -80,25 +81,26 @@ impl SessionMutation {
         let session_token = SessionToken::try_from(session_entity.clone())?;
         let project_path = PathBuf::from(&session_entity.project_meta.as_ref().unwrap().source);
 
-        let mut workspace_service_lock = self.workspace_service.write().await;
-        workspace_service_lock
+        self.workspace_service
             .create(&CreateConfig {
                 project_path: &project_path,
             })
             .await?;
 
         {
-            let mut project_service_lock = self.project_service.write().await;
-            let settings_file = workspace_service_lock
+            let settings_file = self
+                .workspace_service
                 .get_settings()
                 .ok_or_resource_precondition_required(
                     "Session must be initialized first, settings.json file is not defined",
                     None,
                 )?;
-            project_service_lock
+
+            self.project_service
                 .start_project(&project_path, settings_file)
                 .await?;
         }
+
         Ok(Session {
             id: session_entity.id,
             token: session_token,

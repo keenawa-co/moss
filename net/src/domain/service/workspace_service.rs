@@ -1,10 +1,11 @@
+use arc_swap::ArcSwapOption;
 use std::{path::PathBuf, sync::Arc};
 use types::file::json_file::JsonFile;
 
 use crate::domain::model::result::Result;
 
 pub struct WorkspaceService {
-    settings_file: Option<Arc<JsonFile>>,
+    settings_file: ArcSwapOption<JsonFile>,
 }
 
 pub struct CreateConfig<'a> {
@@ -14,13 +15,13 @@ pub struct CreateConfig<'a> {
 impl WorkspaceService {
     pub fn init() -> Self {
         Self {
-            settings_file: None,
+            settings_file: ArcSwapOption::from(None),
         }
     }
 
-    pub async fn create<'a, 'b>(&'a mut self, conf: &'b CreateConfig<'b>) -> Result<()> {
+    pub async fn create<'a>(self: &Arc<Self>, conf: &CreateConfig<'a>) -> Result<()> {
         let settings_file = JsonFile::new(&conf.project_path.join(".moss/settings.json")).await?; // TODO: use WorkspaceConfig
-        self.settings_file = Some(Arc::new(settings_file));
+        self.settings_file.store(Some(Arc::new(settings_file)));
 
         Ok(())
     }
@@ -28,6 +29,6 @@ impl WorkspaceService {
 
 impl WorkspaceService {
     pub fn get_settings(&self) -> Option<Arc<JsonFile>> {
-        self.settings_file.clone()
+        self.settings_file.load_full()
     }
 }

@@ -25,14 +25,16 @@ pub struct ServiceRoot(
     pub Arc<MetricService>,
     pub Arc<SessionService>,
     pub Arc<NotificationService>,
-    pub Arc<RwLock<ProjectService>>,
-    pub Arc<RwLock<WorkspaceService>>,
+    pub Arc<ProjectService<'static>>,
+    pub Arc<WorkspaceService>,
 );
 
 impl ServiceRoot {
     pub fn new(conf: &Config) -> Self {
         let realfs = Arc::new(real::FileSystem::new());
         let root_db = RootSQLiteAdapter::new(Arc::clone(&conf.conn));
+
+        // let project_service = Arc::new(ProjectService::init(realfs.clone()));
 
         ServiceRoot(
             ConfigService::new(conf.preference.clone()),
@@ -46,8 +48,8 @@ impl ServiceRoot {
                 root_db.project_meta_repo(),
             )),
             Arc::new(NotificationService::new()),
-            Arc::new(RwLock::new(ProjectService::init(realfs.clone()))),
-            Arc::new(RwLock::new(WorkspaceService::init())),
+            Arc::new(ProjectService::init(realfs.clone())),
+            Arc::new(WorkspaceService::init()),
         )
     }
 }

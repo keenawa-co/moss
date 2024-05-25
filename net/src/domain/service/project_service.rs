@@ -1,3 +1,4 @@
+use arc_swap::ArcSwapOption;
 use fs::{real, FS};
 use futures::{Stream, StreamExt};
 use hashbrown::HashSet;
@@ -12,35 +13,38 @@ use types::file::json_file::JsonFile;
 
 use crate::domain::model::{result::Result, OptionExtension};
 
-pub struct ProjectService {
+pub struct ProjectService<'a> {
     realfs: Arc<real::FileSystem>,
-    project: Option<Project>,
+    project: ArcSwapOption<Project>,
+    test: &'a i128,
 }
 
-impl ProjectService {
+impl<'a> ProjectService<'a> {
     pub fn init(realfs: Arc<real::FileSystem>) -> Self {
         Self {
             realfs,
-            project: None,
+            project: ArcSwapOption::from(None),
+            test: &10,
         }
     }
 
     pub async fn start_project(
-        &mut self,
+        self: &Arc<Self>,
         project_path: &PathBuf,
         settings_file: Arc<JsonFile>,
     ) -> Result<()> {
         let arc_path: Arc<Path> = Arc::from(project_path.clone().into_boxed_path());
 
-        self.project = Some(Project::new(self.realfs.clone(), arc_path, settings_file).await?);
+        let project = Project::new(self.realfs.clone(), arc_path, settings_file).await?;
+        self.project.store(Some(Arc::new(project)));
 
         Ok(())
     }
 
     pub async fn explorer_event_feed(
-        &self,
+        self: &Arc<Self>,
     ) -> Result<Pin<Box<dyn Send + Stream<Item = WorktreeEvent>>>> {
-        let stream = self.project_ref()?.worktree_event_stream().await;
+        let stream = self.get_project()?.worktree_event_stream().await;
 
         Ok(Box::pin(stream))
     }
@@ -69,33 +73,33 @@ impl ProjectService {
     }
 
     pub async fn append_to_monitoring_exclude_list(
-        &self,
+        self: &Arc<Self>,
         input_list: &[PathBuf],
     ) -> Result<Vec<String>> {
         Ok(self
-            .project_ref()?
+            .get_project()?
             .settings
             .append_to_monitoring_exclude_list(input_list)
             .await?)
     }
 
     pub async fn remove_from_monitoring_exclude_list(
-        &self,
+        self: &Arc<Self>,
         input_list: &[PathBuf],
     ) -> Result<Vec<String>> {
         Ok(self
-            .project_ref()?
+            .get_project()?
             .settings
             .remove_from_monitoring_exclude_list(input_list)
             .await?)
     }
 }
 
-impl ProjectService {
-    fn project_ref(&self) -> Result<&Project> {
+impl<'a> ProjectService<'a> {
+    fn get_project<'b>(&'b self) -> Result<Arc<Project>> {
         Ok(self
             .project
-            .as_ref()
+            .load_full()
             .ok_or_resource_precondition_required("Session must be initialized first", None)?)
     }
 }

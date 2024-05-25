@@ -6,12 +6,12 @@ use tokio::sync::RwLock;
 
 use crate::domain::service::project_service::ProjectService;
 
-pub(super) struct MetricSubscription {
-    pub project_service: Arc<RwLock<ProjectService>>,
+pub(super) struct MetricSubscription<'a> {
+    pub project_service: RwLock<Arc<ProjectService<'a>>>,
 }
 
 #[Subscription]
-impl MetricSubscription {
+impl<'a> MetricSubscription<'a> {
     async fn metric_feed(
         &self,
         _ctx: &Context<'_>,
