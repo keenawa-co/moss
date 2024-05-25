@@ -27,6 +27,7 @@ thiserror.workspace = true
 bitflags.workspace = true
 anyhow.workspace = true
 hashbrown.workspace = true
+arc-swap.workspace = true
 
 notify.workspace = true
 toml.workspace = true

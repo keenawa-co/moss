@@ -14,7 +14,7 @@ use crate::{
 #[derive(Debug)]
 pub struct Project {
     pub worktree: Worktree,
-    pub settings: Settings,
+    pub settings: Arc<Settings>,
 }
 
 impl Project {
@@ -33,7 +33,7 @@ impl Project {
 
         Ok(Self {
             worktree: Worktree::local(fs, &worktree_settings).await?,
-            settings: initial_settings,
+            settings: Arc::new(initial_settings),
         })
     }
 

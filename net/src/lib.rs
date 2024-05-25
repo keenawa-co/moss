@@ -3,6 +3,8 @@ mod infra;
 
 pub mod config;
 
+use std::sync::Arc;
+
 use domain::model::error::Error;
 use tokio_util::sync::CancellationToken as TokioCancellationToken;
 use tower::ServiceBuilder;
@@ -62,14 +64,13 @@ pub async fn bind(_: TokioCancellationToken) -> Result<(), Error> {
 
     // let pe = PolicyEngine::new(fw.clone(), b);
 
-    let service_hub = ServiceRoot::new(conf);
-
     let service = ServiceBuilder::new()
         .catch_panic()
         .set_x_request_id(MakeRequestUuid)
         .propagate_x_request_id();
 
-    let schema = infra::graphql::build_schema(service_hub);
+    let service_hub = ServiceRoot::new(conf);
+    let schema = infra::graphql::build_schema(Arc::new(service_hub));
     let service = service.layer(
         CompressionLayer::new().compress_when(
             SizeAbove::new(MIX_COMPRESS_SIZE) // don't compress below 512 bytes
