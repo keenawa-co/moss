@@ -6,12 +6,9 @@ use std::{path::Path, sync::Arc};
 use types::file::json_file::JsonFile;
 
 use crate::{
+    model::event::WorktreeEvent,
     settings::Settings,
-    worktree::{
-        event::{Event, FileSystemEvent},
-        local::LocalWorktreeSettings,
-        Worktree,
-    },
+    worktree::{local::LocalWorktreeSettings, Worktree},
 };
 
 #[derive(Debug)]
@@ -40,7 +37,7 @@ impl Project {
         })
     }
 
-    pub async fn worktree_event_stream(&self) -> impl Stream<Item = Event> {
+    pub async fn worktree_event_stream(&self) -> impl Stream<Item = WorktreeEvent> {
         match &self.worktree {
             Worktree::Local(local) => local.event_stream().await,
             Worktree::Remote => unimplemented!(),

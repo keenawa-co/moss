@@ -2,6 +2,7 @@ use async_graphql::{Context, FieldResult, Object, Result as GraphqlResult, Subsc
 use futures::{Stream, StreamExt};
 use graphql_utl::{path::Path as PathGraphQL, GraphQLExtendError};
 use http::HeaderMap;
+use project::model::event::WorktreeEvent;
 use std::{path::PathBuf, sync::Arc};
 use tokio::sync::RwLock;
 use types::{id::NanoId, thing::Thing};
@@ -113,18 +114,13 @@ impl ProjectSubscription {
     async fn explorer_event_feed(
         &self,
         ctx: &Context<'_>,
-    ) -> async_graphql::Result<impl Stream<Item = FieldResult<serde_json::Value>>> {
+    ) -> async_graphql::Result<impl Stream<Item = FieldResult<WorktreeEvent>>> {
         // dbg!(ctx.http_header_contains("session-token"));
         // let sess_claims = ctx.data::<HeaderMap>()?;
 
         let project_service_lock = self.project_service.read().await;
         let stream = project_service_lock.explorer_event_feed().await?;
 
-        Ok(stream.map(|event| {
-            Ok(serde_json::json!({
-                "event": "event.kind",
-                // "path":  event.entry.path.to_path_buf().to_string_lossy().to_string()
-            }))
-        }))
+        Ok(stream.map(|event| Ok(event)))
     }
 }
