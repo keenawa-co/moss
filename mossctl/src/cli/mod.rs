@@ -4,13 +4,12 @@ mod run;
 mod utl;
 
 use clap::{Parser, Subcommand};
-use common::APP_NAME;
 use std::process::ExitCode;
 
 use self::{docs::DocsCommandList, migrate::MigrateCommandList, run::RunCmdArgs};
 
 #[derive(Parser, Debug)]
-#[command(name = APP_NAME, bin_name = APP_NAME)]
+#[command(name = "moss", bin_name = "moss")]
 #[command(about = "Moss command-line interface and server")]
 struct CLI {
     #[command(subcommand)]

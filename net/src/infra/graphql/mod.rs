@@ -1,5 +1,4 @@
 mod config_query;
-mod explorer_query;
 mod metric_query;
 mod notification_query;
 mod project_query;
@@ -10,59 +9,70 @@ use async_graphql::{
 };
 
 use self::{
-    config_query::ConfigQuery, explorer_query::ExplorerSubscription,
-    metric_query::MetricSubscription, notification_query::NotificationSubscription,
-    project_query::ProjectMutation, session_query::SessionMutation,
+    config_query::ConfigQuery,
+    metric_query::MetricSubscription,
+    notification_query::NotificationSubscription,
+    project_query::{ProjectMutation, ProjectSubscription},
+    session_query::{SessionMutation, SessionQuery},
 };
 use crate::domain::{
     model::error::{Error, PreconditionError, ResourceError, SystemError},
-    service::ServiceHub,
+    service::ServiceRoot,
 };
 
 #[derive(MergedObject)]
-pub struct QueryRoot(ConfigQuery);
+pub struct QueryRoot(SessionQuery, ConfigQuery);
 
 #[derive(MergedObject)]
 pub struct MutationRoot(ProjectMutation, SessionMutation);
 
 #[derive(MergedSubscription)]
-pub struct RootSubscription(
-    ExplorerSubscription,
+pub struct SubscriptionRoot(
+    ProjectSubscription,
     MetricSubscription,
     NotificationSubscription,
 );
 
-pub type SchemaRoot = Schema<QueryRoot, MutationRoot, RootSubscription>;
+pub type SchemaRoot = Schema<QueryRoot, MutationRoot, SubscriptionRoot>;
 
-pub fn build_schema(service_hub: ServiceHub) -> SchemaRoot {
+pub fn build_schema(service_root: ServiceRoot) -> SchemaRoot {
     Schema::build(
-        QueryRoot(ConfigQuery {
-            config_service: service_hub.0,
-        }),
-        MutationRoot(
-            ProjectMutation {
-                project_meta_service: service_hub.1.clone(),
-                project_service: service_hub.5.clone(),
-                notification_service: service_hub.4.clone(),
+        QueryRoot(
+            SessionQuery {
+                session_service: service_root.3.clone(),
             },
-            SessionMutation {
-                session_service: service_hub.3.clone(),
-                project_service: service_hub.5.clone(),
+            ConfigQuery {
+                config_service: service_root.0,
             },
         ),
-        RootSubscription(
-            ExplorerSubscription::default(),
+        MutationRoot(
+            ProjectMutation {
+                project_meta_service: service_root.1.clone(),
+                project_service: service_root.5.clone(),
+                notification_service: service_root.4.clone(),
+            },
+            SessionMutation {
+                session_service: service_root.3.clone(),
+                project_service: service_root.5.clone(),
+                workspace_service: service_root.6.clone(),
+            },
+        ),
+        SubscriptionRoot(
+            ProjectSubscription {
+                project_service: service_root.5.clone(),
+            },
             MetricSubscription {
-                metric_service: service_hub.2,
+                project_service: service_root.5.clone(),
             },
             NotificationSubscription {
-                notification_service: service_hub.4.clone(),
+                notification_service: service_root.4.clone(),
             },
         ),
     )
     .finish()
 }
 
+//TODO: move to pkg module
 // pub fn sdl() -> String {
 //     Schema::build(
 //         QueryRoot::default(),

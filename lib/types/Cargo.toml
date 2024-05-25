@@ -1,0 +1,24 @@
+[package]
+name = "types"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+mac.workspace = true
+
+anyhow.workspace = true
+nanoid.workspace = true
+
+serde = { workspace = true, features = ["derive"] }
+serde_json.workspace = true
+
+tokio = { workspace = true, features = ["full", "signal", "macros"] }
+
+async-graphql = { workspace = true, optional = true }
+
+sea-orm.workspace = true
+
+
+[features]
+default = []
+graphql = ["async-graphql"]

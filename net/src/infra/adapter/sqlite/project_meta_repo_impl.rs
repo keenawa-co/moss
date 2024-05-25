@@ -1,10 +1,10 @@
 use chrono::Utc;
-use common::id::NanoId;
-use common::thing::Thing;
+
 use sea_orm::entity::prelude::*;
 use sea_orm::{DatabaseConnection, Set};
 use std::path::PathBuf;
 use std::sync::Arc;
+use types::{id::NanoId, thing::Thing};
 
 use crate::domain::port;
 use crate::domain::{
@@ -90,14 +90,14 @@ impl port::rootdb::ProjectMetaRepository for ProjectMetaRepositoryImpl {
         Ok(model_option.map(ProjectMeta::from))
     }
 
-    async fn delete_by_id(&self, id: &NanoId) -> Result<Option<Thing>> {
+    async fn delete_by_id(&self, id: &NanoId) -> Result<Option<Thing<NanoId>>> {
         let rows_affected = Entity::delete_by_id(id.clone())
             .exec(self.conn.as_ref())
             .await?
             .rows_affected; // FIXME: remove this call
 
         Ok(if rows_affected > 0 {
-            Some(Thing::from(id.to_string()))
+            Some(Thing { id: id.clone() }) // FIXME: use new() fn
         } else {
             None
         })

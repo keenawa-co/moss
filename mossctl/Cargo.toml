@@ -8,8 +8,8 @@ name = "moss_cli"
 
 [dependencies]
 fs.workspace = true
-dbutl.workspace = true
-common.workspace = true
+seaorm_utl.workspace = true
+types.workspace = true
 net.workspace = true
 tracing.workspace = true
 anyhow.workspace = true

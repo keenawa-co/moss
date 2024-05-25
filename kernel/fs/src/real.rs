@@ -1,6 +1,10 @@
+use anyhow::Result;
 use futures::{AsyncRead, Stream};
 use notify::Watcher;
-use smol::stream::StreamExt;
+use smol::{
+    fs::{File, OpenOptions},
+    stream::StreamExt,
+};
 use std::{
     io,
     path::{Path, PathBuf},
@@ -8,7 +12,7 @@ use std::{
     time::Duration,
 };
 
-use crate::CreateOptions;
+use crate::{file::Metadata, CreateOptions};
 
 #[derive(Debug, Clone)]
 pub struct FileSystem;
@@ -16,6 +20,16 @@ pub struct FileSystem;
 impl FileSystem {
     pub fn new() -> Self {
         Self {}
+    }
+}
+
+impl FileSystem {
+    pub async fn open_with_options(
+        &self,
+        // options: smol::fs::OpenOptions,
+        path: &Path,
+    ) -> io::Result<File> {
+        Ok(OpenOptions::new().write(true).open(path).await?)
     }
 }
 
@@ -75,10 +89,36 @@ impl super::FS for FileSystem {
             .map_or(false, |metadata| metadata.is_dir())
     }
 
+    async fn metadata(&self, path: &Path) -> Result<Option<Metadata>> {
+        let symlink_metadata = match smol::fs::symlink_metadata(path).await {
+            Ok(metadata) => metadata,
+            Err(err) => {
+                return match (err.kind(), err.raw_os_error()) {
+                    (io::ErrorKind::NotFound, _) => Ok(None),
+                    (io::ErrorKind::Other, Some(libc::ENOTDIR)) => Ok(None),
+                    _ => Err(anyhow::Error::new(err)),
+                }
+            }
+        };
+
+        let is_symlink = symlink_metadata.file_type().is_symlink();
+        let metadata = if is_symlink {
+            smol::fs::metadata(path).await?
+        } else {
+            symlink_metadata
+        };
+
+        Ok(Some(Metadata {
+            modified: metadata.modified().unwrap(), // TODO: avoid unwrap()
+            is_symlink,
+            is_dir: metadata.file_type().is_dir(),
+        }))
+    }
+
     async fn watch(
         &self,
         path: &Path,
-        latency: Duration,
+        _latency: Duration, // TODO: use this
     ) -> Pin<Box<dyn Send + Stream<Item = Vec<PathBuf>>>> {
         let (tx, rx) = smol::channel::unbounded();
 
@@ -86,6 +126,7 @@ impl super::FS for FileSystem {
             let tx = tx.clone();
 
             move |event: Result<notify::Event, _>| {
+                // println!("File event detected: {:?}", event);
                 if let Some(event) = event.ok() {
                     tx.try_send(event.paths).ok();
                 }
@@ -95,38 +136,24 @@ impl super::FS for FileSystem {
 
         file_watcher
             .watch(path, notify::RecursiveMode::Recursive)
-            .ok();
+            .unwrap();
 
         let mut parent_watcher = notify::recommended_watcher({
-            let watched_path = path.to_path_buf();
+            let watched_path = path.parent().unwrap().to_path_buf();
             let tx = tx.clone();
 
             move |event: Result<notify::Event, _>| {
                 if let Some(event) = event.ok() {
-                    println!("Event detected: {:?}", event);
                     if event
                         .clone()
                         .paths
                         .into_iter()
-                        .any(|path| *path == watched_path)
+                        .any(|path| path.starts_with(&watched_path))
                     {
+                        // println!("Parent event detected: {:?}", event);
                         if let Err(e) = tx.try_send(event.paths) {
                             eprintln!("Error sending event: {:?}", e);
                         }
-
-                        // match event.kind {
-                        //     EventKind::Create(_) => {
-                        //         file_watcher
-                        //             .watch(watched_path.as_path(), notify::RecursiveMode::Recursive)
-                        //             .log_err();
-                        //         let _ = tx.try_send(vec![watched_path.clone()]).ok();
-                        //     }
-                        //     EventKind::Remove(_) => {
-                        //         file_watcher.unwatch(&watched_path).log_err();
-                        //         let _ = tx.try_send(vec![watched_path.clone()]).ok();
-                        //     }
-                        //     _ => {}
-                        // }
                     }
                 }
             }
@@ -143,6 +170,7 @@ impl super::FS for FileSystem {
 
         Box::pin(rx.chain(futures::stream::once(async move {
             drop(parent_watcher);
+            drop(file_watcher);
             vec![]
         })))
     }

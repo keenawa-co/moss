@@ -12,7 +12,7 @@ pub enum MigrateCommandList {
 pub struct MigrateUpCmdArgs {}
 
 pub async fn cmd_migration_up(MigrateUpCmdArgs {}: MigrateUpCmdArgs) -> anyhow::Result<()> {
-    dbutl::sqlite::conn::<RootMigrator>(&PathBuf::from("root.db")).await?;
+    seaorm_utl::conn::<RootMigrator>(&PathBuf::from("root.db")).await?;
 
     Ok(())
 }

@@ -1,6 +1,6 @@
 pub(crate) mod rootdb {
-    use common::{id::NanoId, thing::Thing};
     use std::{fmt::Debug, path::PathBuf};
+    use types::{id::NanoId, thing::Thing};
 
     use crate::domain::model::{
         project::{CreateProjectInput, ProjectMeta},
@@ -14,7 +14,7 @@ pub(crate) mod rootdb {
         async fn get_by_id(&self, id: &NanoId) -> Result<Option<ProjectMeta>>;
         async fn get_by_source(&self, source: &PathBuf) -> Result<Option<ProjectMeta>>;
         async fn get_list_by_ids(&self, ids: &Vec<NanoId>) -> Result<Vec<ProjectMeta>>;
-        async fn delete_by_id(&self, id: &NanoId) -> Result<Option<Thing>>;
+        async fn delete_by_id(&self, id: &NanoId) -> Result<Option<Thing<NanoId>>>;
     }
 
     #[async_trait]
@@ -26,18 +26,5 @@ pub(crate) mod rootdb {
             start_time: i64,
             limit: u64,
         ) -> Result<Vec<SessionEntity>>;
-    }
-}
-
-pub(crate) mod cachedb {
-    use common::{id::NanoId, thing::Thing};
-    use std::{fmt::Debug, path::PathBuf};
-
-    use crate::domain::model::{project::IgnoredSource, result::Result};
-
-    #[async_trait]
-    pub(crate) trait IgnoreListRepository: Debug + Send + Sync {
-        async fn create_from_list(&self, input_list: &Vec<PathBuf>) -> Result<Vec<IgnoredSource>>;
-        async fn delete_by_id(&self, id: &NanoId) -> Result<Option<Thing>>;
     }
 }

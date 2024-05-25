@@ -1,0 +1,15 @@
+{
+    "project.monitoring.exclude": {
+        "[general]": [
+            "*.db",
+            "*.session.sql",
+            ".vscode",
+            ".git",
+            ".github"
+        ],
+        "[rust]": [
+            "target",
+            "Cargo.lock"
+        ]
+    }
+}

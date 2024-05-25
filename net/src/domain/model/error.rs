@@ -1,15 +1,5 @@
 use thiserror::Error;
 
-macro_rules! transparent_error {
-    ($outer_variant:ident, $inner_variant:path, $err_type:ty) => {
-        impl From<$err_type> for Error {
-            fn from(err: $err_type) -> Self {
-                Error::$outer_variant($inner_variant(err))
-            }
-        }
-    };
-}
-
 #[derive(Error, Debug)]
 pub enum Error {
     #[error(transparent)]
@@ -159,8 +149,8 @@ impl Error {
     }
 }
 
-transparent_error!(System, SystemError::Database, sea_orm::DbErr);
-transparent_error!(System, SystemError::Anyhow, anyhow::Error);
-transparent_error!(System, SystemError::Notify, notify::Error);
-transparent_error!(System, SystemError::IO, std::io::Error);
-transparent_error!(System, SystemError::JWT, jsonwebtoken::errors::Error);
+this_transparent_error!(Error, System, SystemError::Database, sea_orm::DbErr);
+this_transparent_error!(Error, System, SystemError::Anyhow, anyhow::Error);
+this_transparent_error!(Error, System, SystemError::Notify, notify::Error);
+this_transparent_error!(Error, System, SystemError::IO, std::io::Error);
+this_transparent_error!(Error, System, SystemError::JWT, jsonwebtoken::errors::Error);

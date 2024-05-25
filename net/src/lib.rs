@@ -3,7 +3,6 @@ mod infra;
 
 pub mod config;
 
-use common::APP_NAME;
 use domain::model::error::Error;
 use tokio_util::sync::CancellationToken as TokioCancellationToken;
 use tower::ServiceBuilder;
@@ -18,7 +17,7 @@ use tower_http::{
 
 use crate::{
     config::CONF,
-    domain::{model::OptionExtension, service::ServiceHub},
+    domain::{model::OptionExtension, service::ServiceRoot},
 };
 
 #[macro_use]
@@ -30,6 +29,9 @@ extern crate serde_json;
 
 #[macro_use]
 extern crate tracing;
+
+#[macro_use]
+extern crate mac;
 
 const MIX_COMPRESS_SIZE: u16 = 512; // TODO: this value should be used from a net_conf.toml file
 
@@ -60,7 +62,7 @@ pub async fn bind(_: TokioCancellationToken) -> Result<(), Error> {
 
     // let pe = PolicyEngine::new(fw.clone(), b);
 
-    let service_hub = ServiceHub::new(conf);
+    let service_hub = ServiceRoot::new(conf);
 
     let service = ServiceBuilder::new()
         .catch_panic()
@@ -77,10 +79,7 @@ pub async fn bind(_: TokioCancellationToken) -> Result<(), Error> {
 
     let router = infra::web::router(service, schema); // TODO: consider to use Cow<T>
 
-    info!(
-        "{} has been successfully launched on {}",
-        APP_NAME, conf.bind
-    );
+    info!("Moss has been successfully launched on {}", conf.bind);
 
     axum_server::bind(conf.bind)
         .serve(router.clone().into_make_service())

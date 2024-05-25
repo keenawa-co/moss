@@ -1,20 +1,27 @@
-use std::{path::PathBuf, sync::Arc};
-
 use async_graphql::{Context, Object, Result as GraphqlResult};
 use chrono::{Duration, Utc};
-use common::id::NanoId;
 use graphql_utl::path::Path as PathGraphQL;
 use graphql_utl::GraphQLExtendError;
+use std::{path::PathBuf, sync::Arc};
 use tokio::sync::RwLock;
+use types::id::NanoId;
 
 use crate::domain::{
-    model::session::{Session, SessionEntity, SessionToken},
-    service::{project_service::ProjectService, session_service::SessionService},
+    model::{
+        session::{Session, SessionEntity, SessionToken},
+        OptionExtension,
+    },
+    service::{
+        project_service::ProjectService,
+        session_service::SessionService,
+        workspace_service::{CreateConfig, WorkspaceService},
+    },
 };
 
 pub(super) struct SessionMutation {
     pub session_service: Arc<SessionService>,
-    pub project_service: Arc<RwLock<Option<ProjectService>>>,
+    pub project_service: Arc<RwLock<ProjectService>>,
+    pub workspace_service: Arc<RwLock<WorkspaceService>>,
 }
 
 #[Object]
@@ -30,10 +37,27 @@ impl SessionMutation {
             .await
             .extend_error()?;
         let session_token = SessionToken::try_from(session_entity.clone())?;
-
-        let mut project_service_lock = self.project_service.write().await;
         let project_path = PathBuf::from(&session_entity.project_meta.as_ref().unwrap().source);
-        *project_service_lock = Some(ProjectService::new(&project_path).await?);
+
+        let mut workspace_service_lock = self.workspace_service.write().await;
+        workspace_service_lock
+            .create(&CreateConfig {
+                project_path: &project_path,
+            })
+            .await?;
+
+        {
+            let mut project_service_lock = self.project_service.write().await;
+            let settings_file = workspace_service_lock
+                .get_settings()
+                .ok_or_resource_precondition_required(
+                    "Session must be initialized first, settings.json file is not defined",
+                    None,
+                )?;
+            project_service_lock
+                .start_project(&project_path, settings_file)
+                .await?;
+        }
 
         Ok(Session {
             id: session_entity.id,
@@ -54,11 +78,27 @@ impl SessionMutation {
             .await
             .extend_error()?;
         let session_token = SessionToken::try_from(session_entity.clone())?;
-
-        let mut project_service_lock = self.project_service.write().await;
         let project_path = PathBuf::from(&session_entity.project_meta.as_ref().unwrap().source);
-        *project_service_lock = Some(ProjectService::new(&project_path).await?);
 
+        let mut workspace_service_lock = self.workspace_service.write().await;
+        workspace_service_lock
+            .create(&CreateConfig {
+                project_path: &project_path,
+            })
+            .await?;
+
+        {
+            let mut project_service_lock = self.project_service.write().await;
+            let settings_file = workspace_service_lock
+                .get_settings()
+                .ok_or_resource_precondition_required(
+                    "Session must be initialized first, settings.json file is not defined",
+                    None,
+                )?;
+            project_service_lock
+                .start_project(&project_path, settings_file)
+                .await?;
+        }
         Ok(Session {
             id: session_entity.id,
             token: session_token,
@@ -66,8 +106,14 @@ impl SessionMutation {
             created_at: session_entity.created_at,
         })
     }
+}
 
-    // TODO: move to Query
+pub(crate) struct SessionQuery {
+    pub session_service: Arc<SessionService>,
+}
+
+#[Object]
+impl SessionQuery {
     #[graphql(name = "getRecentSessions")]
     async fn get_recent(
         &self,

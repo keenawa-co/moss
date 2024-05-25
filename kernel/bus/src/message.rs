@@ -1,5 +1,5 @@
-use common::id::NanoId;
 use std::any::Any;
+use types::id::NanoId;
 
 pub trait MessageBody: Any + Send + Sync {
     fn body<T: Any + Send + Sync + 'static>(&self) -> anyhow::Result<&T>;

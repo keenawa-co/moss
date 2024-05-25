@@ -1,17 +1,18 @@
-use async_graphql::{Context, Object, Result as GraphqlResult};
-use common::{id::NanoId, thing::Thing};
+use async_graphql::{Context, FieldResult, Object, Result as GraphqlResult, Subscription};
+use futures::{Stream, StreamExt};
 use graphql_utl::{path::Path as PathGraphQL, GraphQLExtendError};
 use http::HeaderMap;
+use project::model::event::WorktreeEvent;
 use std::{path::PathBuf, sync::Arc};
 use tokio::sync::RwLock;
+use types::{id::NanoId, thing::Thing};
 
 use crate::domain::{
     model::{
         error::Error,
         notification::Notification,
-        project::{CreateProjectInput, IgnoredSource, ProjectMeta},
+        project::{CreateProjectInput, ProjectMeta},
         session::SessionTokenClaims,
-        OptionExtension,
     },
     service::{
         notification_service::NotificationService, project_meta_service::ProjectMetaService,
@@ -21,7 +22,7 @@ use crate::domain::{
 
 pub(super) struct ProjectMutation {
     pub project_meta_service: Arc<ProjectMetaService>,
-    pub project_service: Arc<RwLock<Option<ProjectService>>>,
+    pub project_service: Arc<RwLock<ProjectService>>,
     pub notification_service: Arc<NotificationService>,
 }
 
@@ -37,7 +38,7 @@ impl ProjectMutation {
     }
 
     #[graphql(name = "deleteProjectById")]
-    async fn delete_by_id(&self, _ctx: &Context<'_>, id: NanoId) -> GraphqlResult<Thing> {
+    async fn delete_by_id(&self, _ctx: &Context<'_>, id: NanoId) -> GraphqlResult<Thing<NanoId>> {
         Ok(self
             .project_meta_service
             .delete_project_by_id(&id)
@@ -45,60 +46,81 @@ impl ProjectMutation {
             .extend_error()?)
     }
 
-    #[graphql(name = "appendToProjectIgnored")]
+    #[graphql(name = "appendToProjectExclude")]
     #[graphql_mac::require_header("session-token")]
-    async fn append_to_ignore_list(
+    async fn append_to_exclude_list(
         &self,
         ctx: &Context<'_>,
         input_list: Vec<PathGraphQL>,
-    ) -> GraphqlResult<Vec<IgnoredSource>> {
+    ) -> GraphqlResult<Vec<String>> {
         let sess_claims = ctx.data::<SessionTokenClaims>()?;
         let project_service_lock = self.project_service.write().await;
-        let project_service = project_service_lock
-            .as_ref()
-            .ok_or_resource_precondition_required("Session must be initialized first", None)
-            .extend_error()?;
 
-        let result_list = project_service
-            .append_to_ignore_list(&input_list.iter().map(Into::into).collect::<Vec<PathBuf>>())
+        let result = project_service_lock
+            .append_to_monitoring_exclude_list(
+                &input_list.iter().map(Into::into).collect::<Vec<PathBuf>>(),
+            )
             .await
             .extend_error()?;
 
         for item in input_list.iter() {
             self.notification_service
-                .send(Notification {
-                    id: NanoId::new(),
-                    project_id: sess_claims.project_id.clone(),
-                    session_id: sess_claims.session_id.clone(),
-                    summary: format!("Path {item} has been successfully added to the ignore list"),
-                })
+                .send(Notification::create_client(format!(
+                    "Path {item} has been successfully added to the ignore list"
+                )))
                 .await?;
         }
 
-        Ok(result_list)
+        Ok(result)
     }
 
-    #[graphql(name = "removeFromProjectIgnored")]
+    #[graphql(name = "removeFromProjectExclude")]
     #[graphql_mac::require_header("session-token")]
-    async fn remove_from_ignore_list(&self, ctx: &Context<'_>, id: NanoId) -> GraphqlResult<Thing> {
+    async fn remove_from_exclude_list(
+        &self,
+        ctx: &Context<'_>,
+        input_list: Vec<PathGraphQL>,
+    ) -> GraphqlResult<Vec<String>> {
         let sess_claims = ctx.data::<SessionTokenClaims>()?;
         let project_service_lock = self.project_service.write().await;
-        let project_service = project_service_lock
-            .as_ref()
-            .ok_or_resource_precondition_required("Session must be initialized first", None)
-            .extend_error()?;
 
-        let result = project_service.remove_from_ignore_list(&id).await?;
-
-        self.notification_service
-            .send(Notification {
-                id: NanoId::new(),
-                project_id: sess_claims.project_id.clone(),
-                session_id: sess_claims.session_id.clone(),
-                summary: format!("Path {id} has been successfully added to the ignore list"),
-            })
+        let result = project_service_lock
+            .remove_from_monitoring_exclude_list(
+                &input_list
+                    .into_iter()
+                    .map(|path| path.into())
+                    .collect::<Vec<PathBuf>>(),
+            )
             .await?;
 
+        for item in &result {
+            self.notification_service
+                .send(Notification::create_client(format!(
+                    "Path {item} has been successfully added to the ignore list"
+                )))
+                .await?;
+        }
+
         Ok(result)
+    }
+}
+
+pub(super) struct ProjectSubscription {
+    pub project_service: Arc<RwLock<ProjectService>>,
+}
+
+#[Subscription]
+impl ProjectSubscription {
+    async fn explorer_event_feed(
+        &self,
+        ctx: &Context<'_>,
+    ) -> async_graphql::Result<impl Stream<Item = FieldResult<WorktreeEvent>>> {
+        // dbg!(ctx.http_header_contains("session-token"));
+        // let sess_claims = ctx.data::<HeaderMap>()?;
+
+        let project_service_lock = self.project_service.read().await;
+        let stream = project_service_lock.explorer_event_feed().await?;
+
+        Ok(stream.map(|event| Ok(event)))
     }
 }
