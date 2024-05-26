@@ -7,7 +7,7 @@ use tokio::sync::RwLock;
 use crate::domain::service::project_service::ProjectService;
 
 pub(super) struct MetricSubscription<'a> {
-    pub project_service: RwLock<Arc<ProjectService<'a>>>,
+    pub project_service: Arc<ProjectService<'a>>,
 }
 
 #[Subscription]
@@ -16,8 +16,8 @@ impl<'a> MetricSubscription<'a> {
         &self,
         _ctx: &Context<'_>,
     ) -> async_graphql::Result<impl Stream<Item = FieldResult<Vec<String>>>> {
-        let project_service_lock = self.project_service.write().await;
-        let stream = project_service_lock
+        let stream = self
+            .project_service
             .watch_project()
             .await
             .extend_error()?

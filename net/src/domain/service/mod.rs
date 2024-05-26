@@ -8,7 +8,6 @@ pub mod workspace_service;
 
 use fs::real;
 use std::sync::Arc;
-use tokio::sync::RwLock;
 
 use crate::{config::Config, infra::adapter::sqlite::RootSQLiteAdapter};
 
@@ -30,26 +29,18 @@ pub struct ServiceRoot(
 );
 
 impl ServiceRoot {
-    pub fn new(conf: &Config) -> Self {
+    pub fn new(conf: &Config) -> Arc<Self> {
         let realfs = Arc::new(real::FileSystem::new());
         let root_db = RootSQLiteAdapter::new(Arc::clone(&conf.conn));
 
-        // let project_service = Arc::new(ProjectService::init(realfs.clone()));
-
-        ServiceRoot(
+        Arc::new(ServiceRoot(
             ConfigService::new(conf.preference.clone()),
-            Arc::new(ProjectMetaService::new(
-                realfs.clone(),
-                root_db.project_meta_repo(),
-            )),
-            Arc::new(MetricService::new()),
-            Arc::new(SessionService::new(
-                root_db.session_repo(),
-                root_db.project_meta_repo(),
-            )),
-            Arc::new(NotificationService::new()),
-            Arc::new(ProjectService::init(realfs.clone())),
-            Arc::new(WorkspaceService::init()),
-        )
+            ProjectMetaService::new(realfs.clone(), root_db.project_meta_repo()),
+            MetricService::new(),
+            SessionService::new(root_db.session_repo(), root_db.project_meta_repo()),
+            NotificationService::new(),
+            ProjectService::init(realfs.clone()),
+            WorkspaceService::init(),
+        ))
     }
 }

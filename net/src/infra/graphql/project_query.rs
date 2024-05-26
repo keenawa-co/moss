@@ -106,7 +106,7 @@ impl<'a> ProjectMutation<'a> {
 }
 
 pub(super) struct ProjectSubscription<'a> {
-    pub project_service: RwLock<Arc<ProjectService<'a>>>,
+    pub project_service: Arc<ProjectService<'a>>,
 }
 
 #[Subscription]
@@ -115,8 +115,7 @@ impl<'a> ProjectSubscription<'a> {
         &self,
         _ctx: &Context<'_>,
     ) -> async_graphql::Result<impl Stream<Item = FieldResult<WorktreeEvent>>> {
-        let project_service = Arc::clone(&*self.project_service.write().await);
-        let stream = project_service.explorer_event_feed().await?;
+        let stream = self.project_service.explorer_event_feed().await?;
 
         Ok(stream.map(|event| Ok(event)))
     }

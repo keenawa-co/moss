@@ -62,10 +62,10 @@ pub fn build_schema(service_root: Arc<ServiceRoot>) -> SchemaRoot {
         ),
         SubscriptionRoot(
             ProjectSubscription {
-                project_service: RwLock::new(service_root.5.clone()),
+                project_service: service_root.5.clone(),
             },
             MetricSubscription {
-                project_service: RwLock::new(service_root.5.clone()),
+                project_service: service_root.5.clone(),
             },
             NotificationSubscription {
                 notification_service: service_root.4.clone(),

@@ -13,16 +13,16 @@ impl SessionService {
     pub fn new(
         session_repo: Arc<dyn SessionRepository>,
         project_meta_repo: Arc<dyn ProjectMetaRepository>,
-    ) -> Self {
-        Self {
+    ) -> Arc<Self> {
+        Arc::new(Self {
             project_meta_repo,
             session_repo,
-        }
+        })
     }
 }
 
 impl SessionService {
-    pub async fn create_session(&self, project_path: &PathBuf) -> Result<SessionEntity> {
+    pub async fn create_session(self: &Arc<Self>, project_path: &PathBuf) -> Result<SessionEntity> {
         let project_meta = self
             .project_meta_repo
             .get_by_source(&project_path.canonicalize()?)
@@ -53,7 +53,7 @@ impl SessionService {
         })
     }
 
-    pub async fn restore_session(&self, session_id: NanoId) -> Result<SessionEntity> {
+    pub async fn restore_session(self: &Arc<Self>, session_id: NanoId) -> Result<SessionEntity> {
         let session_entity = self
             .session_repo
             .get_by_id(&session_id)
@@ -79,7 +79,11 @@ impl SessionService {
         Ok(session_entity)
     }
 
-    pub async fn get_recent_list(&self, start_time: i64, limit: u64) -> Result<Vec<SessionEntity>> {
+    pub async fn get_recent_list(
+        self: &Arc<Self>,
+        start_time: i64,
+        limit: u64,
+    ) -> Result<Vec<SessionEntity>> {
         Ok(self
             .session_repo
             .fetch_list_by_start_time(start_time, limit)

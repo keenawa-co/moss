@@ -42,35 +42,13 @@ pub async fn bind(_: TokioCancellationToken) -> Result<(), Error> {
         .get()
         .ok_or_config_invalid("Configuration was not defined", None)?;
 
-    // let b = bus::Bus::new();
-
-    // let realfs = Arc::new(real::FileSystem::new());
-    // let watch_stream = rfs
-    //     .watch(
-    //         Path::new("./testdata/helloworld.ts"),
-    //         Duration::from_secs(1),
-    //     )
-    //     .await;
-
-    // let mut stream = Box::pin(watch_stream);
-    // while let Some(paths) = stream.next().await {
-    //     dbg!(paths);
-    // }
-
-    // let fw = FileWatcher::new(b.clone());
-
-    // b.create_topic("general", TopicConfig::default()).await;
-    // b.subscribe_topic::<String>("general", fw.clone()).await?;
-
-    // let pe = PolicyEngine::new(fw.clone(), b);
-
     let service = ServiceBuilder::new()
         .catch_panic()
         .set_x_request_id(MakeRequestUuid)
         .propagate_x_request_id();
 
     let service_hub = ServiceRoot::new(conf);
-    let schema = infra::graphql::build_schema(Arc::new(service_hub));
+    let schema = infra::graphql::build_schema(service_hub);
     let service = service.layer(
         CompressionLayer::new().compress_when(
             SizeAbove::new(MIX_COMPRESS_SIZE) // don't compress below 512 bytes

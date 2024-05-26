@@ -21,14 +21,17 @@ impl ProjectMetaService {
     pub fn new(
         realfs: Arc<real::FileSystem>,
         project_repo: Arc<dyn ProjectMetaRepository>,
-    ) -> Self {
-        Self {
+    ) -> Arc<Self> {
+        Arc::new(Self {
             realfs,
             project_repo,
-        }
+        })
     }
 
-    pub async fn create_project(&self, input: &CreateProjectInput) -> Result<ProjectMeta> {
+    pub async fn create_project(
+        self: &Arc<Self>,
+        input: &CreateProjectInput,
+    ) -> Result<ProjectMeta> {
         let project_entity = self.project_repo.create(&input).await?;
 
         pwd::init::create_from_scratch(input.path.as_path_buf(), &self.realfs).await?;
@@ -36,7 +39,7 @@ impl ProjectMetaService {
         Ok(project_entity)
     }
 
-    pub async fn delete_project_by_id(&self, id: &NanoId) -> Result<Thing<NanoId>> {
+    pub async fn delete_project_by_id(self: &Arc<Self>, id: &NanoId) -> Result<Thing<NanoId>> {
         let result = self
             .project_repo
             .delete_by_id(id)

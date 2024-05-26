@@ -13,10 +13,10 @@ pub struct CreateConfig<'a> {
 }
 
 impl WorkspaceService {
-    pub fn init() -> Self {
-        Self {
+    pub fn init() -> Arc<Self> {
+        Arc::new(Self {
             settings_file: ArcSwapOption::from(None),
-        }
+        })
     }
 
     pub async fn create<'a>(self: &Arc<Self>, conf: &CreateConfig<'a>) -> Result<()> {

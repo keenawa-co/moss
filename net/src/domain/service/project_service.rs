@@ -20,12 +20,12 @@ pub struct ProjectService<'a> {
 }
 
 impl<'a> ProjectService<'a> {
-    pub fn init(realfs: Arc<real::FileSystem>) -> Self {
-        Self {
+    pub fn init(realfs: Arc<real::FileSystem>) -> Arc<Self> {
+        Arc::new(Self {
             realfs,
             project: ArcSwapOption::from(None),
             test: &10,
-        }
+        })
     }
 
     pub async fn start_project(
