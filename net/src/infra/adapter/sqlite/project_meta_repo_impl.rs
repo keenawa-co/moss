@@ -97,7 +97,7 @@ impl port::rootdb::ProjectMetaRepository for ProjectMetaRepositoryImpl {
             .rows_affected; // FIXME: remove this call
 
         Ok(if rows_affected > 0 {
-            Some(Thing { id: id.clone() }) // FIXME: use new() fn
+            Some(Thing::new(id.clone()))
         } else {
             None
         })
