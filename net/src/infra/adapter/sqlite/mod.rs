@@ -4,7 +4,7 @@ mod session_repo_impl;
 use sea_orm::DatabaseConnection;
 use std::sync::Arc;
 
-use crate::domain::port::rootdb::{ProjectMetaRepository, SessionRepository};
+use crate::domain::port::rootdb::{ProjectMetaRepository, RootDbAdapter, SessionRepository};
 
 use self::{
     project_meta_repo_impl::ProjectMetaRepositoryImpl, session_repo_impl::SessionRepositoryImpl,
@@ -16,18 +16,20 @@ pub struct RootSQLiteAdapter {
 }
 
 impl RootSQLiteAdapter {
-    pub(crate) fn new(conn: Arc<DatabaseConnection>) -> Self {
+    pub fn new(conn: &Arc<DatabaseConnection>) -> Self {
         Self {
             project_meta_repo: Arc::new(ProjectMetaRepositoryImpl::new(conn.clone())),
             session_repo: Arc::new(SessionRepositoryImpl::new(conn.clone())),
         }
     }
+}
 
-    pub(crate) fn project_meta_repo(&self) -> Arc<dyn ProjectMetaRepository> {
+impl RootDbAdapter for RootSQLiteAdapter {
+    fn project_meta_repo(&self) -> Arc<dyn ProjectMetaRepository> {
         Arc::clone(&self.project_meta_repo)
     }
 
-    pub(crate) fn session_repo(&self) -> Arc<dyn SessionRepository> {
+    fn session_repo(&self) -> Arc<dyn SessionRepository> {
         Arc::clone(&self.session_repo)
     }
 }

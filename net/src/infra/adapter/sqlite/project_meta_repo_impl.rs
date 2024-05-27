@@ -103,9 +103,9 @@ impl port::rootdb::ProjectMetaRepository for ProjectMetaRepositoryImpl {
         })
     }
 
-    async fn get_list_by_ids(&self, ids: &Vec<NanoId>) -> Result<Vec<ProjectMeta>> {
+    async fn get_list_by_ids(&self, ids: &[NanoId]) -> Result<Vec<ProjectMeta>> {
         let result_list = Entity::find()
-            .filter(Column::Id.is_in(ids.clone()))
+            .filter(Column::Id.is_in(ids))
             .all(self.conn.as_ref())
             .await?;
 

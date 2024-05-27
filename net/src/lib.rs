@@ -20,6 +20,7 @@ use tower_http::{
 use crate::{
     config::CONF,
     domain::{model::OptionExtension, service::ServiceRoot},
+    infra::adapter::sqlite::RootSQLiteAdapter,
 };
 
 #[macro_use]
@@ -47,7 +48,8 @@ pub async fn bind(_: TokioCancellationToken) -> Result<(), Error> {
         .set_x_request_id(MakeRequestUuid)
         .propagate_x_request_id();
 
-    let service_hub = ServiceRoot::new(conf);
+    let rootdb_adapter = RootSQLiteAdapter::new(&conf.conn);
+    let service_hub = ServiceRoot::new(&rootdb_adapter);
     let schema = infra::graphql::build_schema(service_hub);
     let service = service.layer(
         CompressionLayer::new().compress_when(
