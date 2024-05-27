@@ -1,6 +1,20 @@
+use std::fmt::Debug;
+
 use async_graphql::Object;
 
-use crate::worktree::local::event::{FileSystemEvent, ScannerEvent};
+use super::filetree::LocalFiletreeEntry;
+
+#[derive(Debug)]
+pub enum FileSystemEvent {
+    Created(LocalFiletreeEntry),
+    Deleted(LocalFiletreeEntry),
+    Modified(LocalFiletreeEntry),
+}
+
+#[derive(Debug)]
+pub enum ScannerEvent {
+    Discovered(Vec<LocalFiletreeEntry>),
+}
 
 // TODO: implement as Interface
 // https://async-graphql.github.io/async-graphql/en/define_interface.html#interface

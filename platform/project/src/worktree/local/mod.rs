@@ -1,11 +1,9 @@
-pub mod event;
-mod tree;
+pub(crate) mod settings;
 
 use anyhow::{Context, Result};
 use fs::FS;
 use futures::task::Poll;
 use futures::{select_biased, FutureExt, Stream};
-use hashbrown::HashSet;
 use smol::{channel::Receiver as SmolReceiver, channel::Sender as SmolSender, stream::StreamExt};
 use std::time::Duration;
 use std::{
@@ -19,17 +17,10 @@ use tokio::{
     task,
 };
 
-use crate::model::event::WorktreeEvent;
-
-use self::event::{FileSystemEvent, ScannerEvent};
-use self::tree::{LocalWorktreeEntry, Snapshot, WorktreeEntryKind};
-
-pub struct LocalWorktreeSettings {
-    pub abs_path: Arc<Path>,
-    pub monitoring_exclude_list: Arc<HashSet<PathBuf>>,
-    pub watch_gitignore_entries: bool,
-    pub auto_watch_new_entries: bool,
-}
+use self::settings::LocalWorktreeSettings;
+use crate::model::event::{FileSystemEvent, ScannerEvent, WorktreeEvent};
+use crate::model::filetree::{LocalFiletree, LocalFiletreeEntry, LocalFiletreeEntryKind};
+use crate::model::snapshot::Snapshot;
 
 #[derive(Debug)]
 pub struct WorktreeScanJob {
@@ -82,8 +73,8 @@ impl LocalWorktree {
             let snapshot_lock = &mut initial_state.write().await.last_snapshot;
             snapshot_lock.tree_by_path.insert(
                 settings.abs_path.to_path_buf(),
-                LocalWorktreeEntry {
-                    kind: WorktreeEntryKind::PendingDir,
+                LocalFiletreeEntry {
+                    kind: LocalFiletreeEntryKind::PendingDir,
                     path: settings.abs_path.clone(),
                     modified: metadata.modified,
                     is_symlink: metadata.is_symlink,
@@ -267,7 +258,7 @@ impl LocalWorktreeScanner {
     async fn enqueue_scan_dir(
         &self,
         abs_path: Arc<Path>,
-        entry: &LocalWorktreeEntry,
+        entry: &LocalFiletreeEntry,
         scan_job_tx: &mpsc::UnboundedSender<WorktreeScanJob>,
     ) -> Result<()> {
         scan_job_tx.clone().send(WorktreeScanJob {
@@ -279,7 +270,7 @@ impl LocalWorktreeScanner {
         Ok(())
     }
 
-    async fn populate_dir(&self, parent_path: &Arc<Path>, entry_list: Vec<LocalWorktreeEntry>) {
+    async fn populate_dir(&self, parent_path: &Arc<Path>, entry_list: Vec<LocalFiletreeEntry>) {
         let mut state_lock = self.state.lock().await;
         let mut parent_entry = if let Some(entry) = state_lock
             .snapshot
@@ -293,8 +284,10 @@ impl LocalWorktreeScanner {
         };
 
         match parent_entry.kind {
-            WorktreeEntryKind::PendingDir => parent_entry.kind = WorktreeEntryKind::ReadyDir,
-            WorktreeEntryKind::ReadyDir => {}
+            LocalFiletreeEntryKind::PendingDir => {
+                parent_entry.kind = LocalFiletreeEntryKind::ReadyDir
+            }
+            LocalFiletreeEntryKind::ReadyDir => {}
             _ => return,
         }
 
@@ -349,7 +342,7 @@ impl LocalWorktreeScanner {
         }
 
         let mut planned_job_list: Vec<WorktreeScanJob> = Vec::new();
-        let mut entry_list: Vec<LocalWorktreeEntry> = Vec::new();
+        let mut entry_list: Vec<LocalFiletreeEntry> = Vec::new();
 
         let mut dir_stream = self.fs.read_dir(&job.path).await?;
         while let Some(child) = dir_stream.next().await {
@@ -385,7 +378,7 @@ impl LocalWorktreeScanner {
                 }
             };
 
-            let child_entry = LocalWorktreeEntry::new(child_path.clone(), &child_metadata);
+            let child_entry = LocalFiletreeEntry::new(child_path.clone(), &child_metadata);
 
             if child_entry.is_dir() {
                 planned_job_list.push(WorktreeScanJob {

@@ -8,7 +8,7 @@ use types::file::json_file::JsonFile;
 use crate::{
     model::event::WorktreeEvent,
     settings::Settings,
-    worktree::{local::LocalWorktreeSettings, Worktree},
+    worktree::{local::settings::LocalWorktreeSettings, Worktree},
 };
 
 #[derive(Debug)]
