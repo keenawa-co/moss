@@ -1,4 +1,4 @@
-pub(crate) mod event;
+pub mod event;
 mod tree;
 
 use anyhow::{Context, Result};
@@ -6,7 +6,7 @@ use fs::FS;
 use futures::task::Poll;
 use futures::{select_biased, FutureExt, Stream};
 use hashbrown::HashSet;
-use smol::stream::StreamExt;
+use smol::{channel::Receiver as SmolReceiver, channel::Sender as SmolSender, stream::StreamExt};
 use std::time::Duration;
 use std::{
     path::{Path, PathBuf},
@@ -48,8 +48,8 @@ pub struct LocalWorktreeState {
 pub struct LocalWorktree {
     fs: Arc<dyn FS>,
     state: Arc<RwLock<LocalWorktreeState>>,
-    share_tx: mpsc::UnboundedSender<WorktreeEvent>,
-    share_rx: Arc<Mutex<mpsc::UnboundedReceiver<WorktreeEvent>>>,
+    share_tx: SmolSender<WorktreeEvent>,
+    share_rx: SmolReceiver<WorktreeEvent>,
 }
 
 impl LocalWorktree {
@@ -91,18 +91,18 @@ impl LocalWorktree {
             );
         };
 
-        let (share_tx, share_rx) = mpsc::unbounded_channel();
+        let (share_tx, share_rx) = smol::channel::unbounded();
 
         Ok(Self {
             fs,
             state: initial_state,
-            share_rx: Arc::new(Mutex::new(share_rx)),
+            share_rx,
             share_tx,
         })
     }
 
     pub async fn run(&self) -> Result<()> {
-        let (sync_tx, sync_rx) = mpsc::unbounded_channel();
+        let (sync_tx, sync_rx) = smol::channel::unbounded();
 
         let initial_state_lock = self.state.read().await;
         let initial_snapshot = initial_state_lock.last_snapshot.clone();
@@ -119,7 +119,7 @@ impl LocalWorktree {
 
     async fn run_background_scanner(
         fs: Arc<dyn FS>,
-        sync_tx: mpsc::UnboundedSender<WorktreeEvent>,
+        sync_tx: SmolSender<WorktreeEvent>,
         initial_snapshot: Snapshot,
         abs_path: Arc<Path>,
     ) -> Result<()> {
@@ -136,12 +136,12 @@ impl LocalWorktree {
     }
 
     async fn run_background_event_listener(
-        mut sync_rx: mpsc::UnboundedReceiver<WorktreeEvent>,
-        share_tx: mpsc::UnboundedSender<WorktreeEvent>,
+        sync_rx: SmolReceiver<WorktreeEvent>,
+        share_tx: SmolSender<WorktreeEvent>,
         state: Arc<RwLock<LocalWorktreeState>>,
     ) -> Result<()> {
         task::spawn(async move {
-            while let Some(event) = sync_rx.recv().await {
+            while let Ok(event) = sync_rx.recv().await {
                 let mut state_lock = state.write().await;
                 state_lock.prev_snapshot = Some(state_lock.last_snapshot.clone());
 
@@ -167,7 +167,7 @@ impl LocalWorktree {
 
                 drop(state_lock);
 
-                if let Err(e) = share_tx.send(event) {
+                if let Err(e) = share_tx.send(event).await {
                     error!("Failed to send worktree event: {e}");
                 }
             }
@@ -180,8 +180,7 @@ impl LocalWorktree {
         let rx_clone = self.share_rx.clone();
 
         async_stream::stream! {
-            let mut rx = rx_clone.lock().await;
-            while let Some(event) = rx.recv().await {
+            while let Ok(event) = rx_clone.recv().await {
                 yield event;
             }
         }
@@ -196,14 +195,14 @@ pub struct LocalWorktreeScannerState {
 #[derive(Debug)]
 pub struct LocalWorktreeScanner {
     fs: Arc<dyn FS>,
-    sync_tx: mpsc::UnboundedSender<WorktreeEvent>,
+    sync_tx: SmolSender<WorktreeEvent>,
     state: Mutex<LocalWorktreeScannerState>,
 }
 
 impl LocalWorktreeScanner {
     fn new(
         fs: Arc<dyn FS>,
-        sync_tx: mpsc::UnboundedSender<WorktreeEvent>,
+        sync_tx: SmolSender<WorktreeEvent>,
         snapshot: Snapshot,
     ) -> LocalWorktreeScanner {
         Self {
@@ -311,6 +310,7 @@ impl LocalWorktreeScanner {
             .send(WorktreeEvent::Scanner(ScannerEvent::Discovered(
                 entry_list.into_iter().collect(),
             )))
+            .await
         {
             error!("Failed to send event: {e}");
         }
