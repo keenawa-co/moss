@@ -10,6 +10,7 @@ workspace.workspace = true
 mac.workspace = true
 async_utl.workspace = true
 fs.workspace = true
+graphql_utl.workspace = true
 
 hashbrown.workspace = true
 anyhow.workspace = true

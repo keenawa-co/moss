@@ -2519,6 +2519,7 @@ dependencies = [
  "async_utl",
  "fs",
  "futures",
+ "graphql_utl",
  "hashbrown 0.7.2",
  "mac",
  "radix_trie",
