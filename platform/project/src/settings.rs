@@ -28,6 +28,8 @@ pub(crate) struct SettingsSchema {
     auto_watch_new_entries: bool,
 }
 
+// TODO: replace me with a macro
+// something like SettingsSchema...
 impl SettingsSchema {
     fn default_exclude_list() -> Vec<String> {
         vec![]

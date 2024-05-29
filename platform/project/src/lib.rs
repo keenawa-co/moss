@@ -17,4 +17,7 @@ extern crate anyhow;
 #[macro_use]
 extern crate tracing;
 
+#[macro_use]
+extern crate mac;
+
 pub use project::Project;

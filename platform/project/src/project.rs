@@ -2,19 +2,22 @@ use anyhow::Result;
 use async_utl::AsyncTryFrom;
 use fs::FS;
 use futures::Stream;
+use smol::channel::Receiver as SmolReceiver;
 use std::{path::Path, sync::Arc};
 use types::file::json_file::JsonFile;
 
 use crate::{
     model::event::WorktreeEvent,
     settings::Settings,
-    worktree::{local::settings::LocalWorktreeSettings, Worktree},
+    worktree::{local::settings::LocalWorktreeSettings, Worktree, WorktreeCreateInput},
 };
 
 #[derive(Debug)]
 pub struct Project {
     pub worktree: Worktree,
     pub settings: Arc<Settings>,
+
+    event_chan_rx: SmolReceiver<WorktreeEvent>,
 }
 
 impl Project {
@@ -31,16 +34,28 @@ impl Project {
             auto_watch_new_entries: initial_settings.auto_watch_new_entries,
         };
 
+        let (event_chan_tx, event_chan_rx) = smol::channel::unbounded();
+
+        let create_worktree_input = WorktreeCreateInput {
+            settings: worktree_settings,
+            event_chan_tx,
+        };
+
         Ok(Self {
-            worktree: Worktree::local(fs, &worktree_settings).await?,
+            worktree: Worktree::local(fs, create_worktree_input).await?,
             settings: Arc::new(initial_settings),
+            event_chan_rx,
         })
     }
 
     pub async fn worktree_event_stream(&self) -> impl Stream<Item = WorktreeEvent> {
-        match &self.worktree {
-            Worktree::Local(local) => local.event_stream().await,
-            Worktree::Remote => unimplemented!(),
-        }
+        let event_chan_rx = self.event_chan_rx.clone();
+
+        futures::stream::unfold(event_chan_rx, |receiver| async {
+            match receiver.recv().await {
+                Ok(event) => Some((event, receiver)),
+                Err(_) => None,
+            }
+        })
     }
 }
