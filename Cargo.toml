@@ -19,6 +19,7 @@ members = [
     "platform/pwd",
     "platform/workspace",
     "platform/project",
+    "platform/shared",
 
     "mossctl",
     "net",
@@ -52,6 +53,7 @@ conf = { path = "platform/conf" }
 pwd = { path = "platform/pwd" }
 project = { path = "platform/project" }
 workspace = { path = "platform/workspace" }
+platform_shared = { path = "platform/shared" }
 
 mossctl = { path = "mossctl" }
 net = { path = "net" }
