@@ -2,7 +2,8 @@ use arc_swap::ArcSwapOption;
 use fs::{real, FS};
 use futures::{Stream, StreamExt};
 use hashbrown::HashSet;
-use project::{model::event::WorktreeEvent, Project};
+use platform_shared::model::event::AbstractEvent;
+use project::Project;
 use std::{
     path::{Path, PathBuf},
     pin::Pin,
@@ -43,8 +44,8 @@ impl<'a> ProjectService<'a> {
 
     pub async fn explorer_event_feed(
         self: &Arc<Self>,
-    ) -> Result<Pin<Box<dyn Send + Stream<Item = WorktreeEvent>>>> {
-        let stream = self.get_project()?.worktree_event_stream().await;
+    ) -> Result<Pin<Box<dyn Send + Stream<Item = AbstractEvent>>>> {
+        let stream = self.get_project()?.event_stream().await;
 
         Ok(Box::pin(stream))
     }

@@ -1,4 +1,5 @@
-pub mod model;
+mod model;
+
 pub mod project;
 pub mod settings;
 pub mod worktree;

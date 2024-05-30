@@ -20,6 +20,7 @@ graphql_utl.workspace = true
 graphql_mac.workspace = true
 conf = { workspace = true, features = ["graphql"] }
 types = { workspace = true, features = ["graphql"] }
+platform_shared.workspace = true
 
 once_cell.workspace = true
 async-trait.workspace = true

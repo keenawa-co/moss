@@ -2,72 +2,66 @@ use radix_trie::{Trie, TrieKey};
 use std::{borrow::Borrow, path::Path, sync::Arc, time::SystemTime};
 
 #[derive(Debug, Clone)]
-pub struct LocalFiletree<T>(Trie<T, LocalFiletreeEntry>)
+pub struct FileTree<T>(Trie<T, FiletreeEntry>)
 where
     T: Borrow<T>,
     T: TrieKey;
 
-impl<T> LocalFiletree<T>
+impl<T> FileTree<T>
 where
     T: Borrow<T>,
     T: TrieKey,
 {
-    pub fn get(&self, key: &T) -> Option<&LocalFiletreeEntry> {
+    pub fn get(&self, key: &T) -> Option<&FiletreeEntry> {
         self.0.get(key)
     }
 
-    pub fn insert(&mut self, key: T, value: LocalFiletreeEntry) -> Option<LocalFiletreeEntry> {
+    pub fn insert(&mut self, key: T, value: FiletreeEntry) -> Option<FiletreeEntry> {
         self.0.insert(key, value)
     }
 }
 
-impl<T: TrieKey> Default for LocalFiletree<T> {
+impl<T: TrieKey> Default for FileTree<T> {
     fn default() -> Self {
         Self(Trie::new())
     }
 }
 
-impl<T: TrieKey> LocalFiletree<T> {
-    pub fn new() -> Self {
-        return Self(Trie::new());
-    }
-}
-
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub enum LocalFiletreeEntryKind {
+pub enum FileTreeEntryKind {
     PendingDir,
     ReadyDir,
     ReadyFile,
 }
 
-impl LocalFiletreeEntryKind {
+impl FileTreeEntryKind {
     pub fn is_dir(&self) -> bool {
         matches!(
             self,
-            LocalFiletreeEntryKind::ReadyDir | LocalFiletreeEntryKind::PendingDir
+            FileTreeEntryKind::ReadyDir | FileTreeEntryKind::PendingDir
         )
     }
 
     pub fn is_file(&self) -> bool {
-        matches!(self, LocalFiletreeEntryKind::ReadyFile)
+        matches!(self, FileTreeEntryKind::ReadyFile)
     }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct LocalFiletreeEntry {
-    pub kind: LocalFiletreeEntryKind,
+pub struct FiletreeEntry {
+    pub kind: FileTreeEntryKind,
     pub path: Arc<Path>,
     pub modified: SystemTime,
     pub is_symlink: bool,
 }
 
-impl LocalFiletreeEntry {
+impl FiletreeEntry {
     pub fn new(path: Arc<Path>, metadata: &fs::file::Metadata) -> Self {
         Self {
             kind: if metadata.is_dir {
-                LocalFiletreeEntryKind::PendingDir
+                FileTreeEntryKind::PendingDir
             } else {
-                LocalFiletreeEntryKind::ReadyFile
+                FileTreeEntryKind::ReadyFile
             },
             path,
             modified: metadata.modified,

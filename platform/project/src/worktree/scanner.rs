@@ -10,9 +10,9 @@ use std::{
 };
 use tokio::sync::{mpsc, Mutex};
 
-use crate::model::event::{ScannerEvent, WorktreeEvent};
-use crate::model::filetree::{LocalFiletreeEntry, LocalFiletreeEntryKind};
-use crate::model::snapshot::Snapshot;
+use super::event::{ScannerEvent, WorktreeEvent};
+use super::filetree::{FileTreeEntryKind, FiletreeEntry};
+use super::snapshot::Snapshot;
 
 #[derive(Debug)]
 pub struct WorktreeScanJob {
@@ -102,7 +102,7 @@ impl LocalWorktreeScanner {
     async fn enqueue_scan_dir(
         &self,
         abs_path: Arc<Path>,
-        entry: &LocalFiletreeEntry,
+        entry: &FiletreeEntry,
         scan_job_tx: &mpsc::UnboundedSender<WorktreeScanJob>,
     ) -> Result<()> {
         scan_job_tx.clone().send(WorktreeScanJob {
@@ -114,7 +114,7 @@ impl LocalWorktreeScanner {
         Ok(())
     }
 
-    async fn populate_dir(&self, parent_path: &Arc<Path>, entry_list: Vec<LocalFiletreeEntry>) {
+    async fn populate_dir(&self, parent_path: &Arc<Path>, entry_list: Vec<FiletreeEntry>) {
         let mut state_lock = self.state.lock().await;
         let mut parent_entry = if let Some(entry) = state_lock
             .snapshot
@@ -128,10 +128,8 @@ impl LocalWorktreeScanner {
         };
 
         match parent_entry.kind {
-            LocalFiletreeEntryKind::PendingDir => {
-                parent_entry.kind = LocalFiletreeEntryKind::ReadyDir
-            }
-            LocalFiletreeEntryKind::ReadyDir => {}
+            FileTreeEntryKind::PendingDir => parent_entry.kind = FileTreeEntryKind::ReadyDir,
+            FileTreeEntryKind::ReadyDir => {}
             _ => return,
         }
 
@@ -186,7 +184,7 @@ impl LocalWorktreeScanner {
         }
 
         let mut planned_job_list: Vec<WorktreeScanJob> = Vec::new();
-        let mut entry_list: Vec<LocalFiletreeEntry> = Vec::new();
+        let mut entry_list: Vec<FiletreeEntry> = Vec::new();
 
         let mut dir_stream = self.fs.read_dir(&job.path).await?;
         while let Some(child) = dir_stream.next().await {
@@ -222,7 +220,7 @@ impl LocalWorktreeScanner {
                 }
             };
 
-            let child_entry = LocalFiletreeEntry::new(child_path.clone(), &child_metadata);
+            let child_entry = FiletreeEntry::new(child_path.clone(), &child_metadata);
 
             if child_entry.is_dir() {
                 planned_job_list.push(WorktreeScanJob {

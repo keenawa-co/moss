@@ -1,93 +1,44 @@
-use async_graphql::{Interface, Object};
-use graphql_utl::path::Path as GraphQLPath;
-use std::fmt::Debug;
+use serde::{Serialize, Serializer};
+use std::{path::Path, sync::Arc};
 
-use super::filetree::LocalFiletreeEntry;
-
-#[derive(Debug)]
-pub enum FileSystemEvent {
-    Created(LocalFiletreeEntry),
-    Deleted(LocalFiletreeEntry),
-    Modified(LocalFiletreeEntry),
+#[derive(Debug, Serialize)]
+pub struct SharedWorktreeEntry {
+    pub path: Arc<Path>,
+    pub is_dir: bool,
 }
 
-#[Object]
-impl FileSystemEvent {
-    async fn tag(&self) -> String {
-        match self {
-            FileSystemEvent::Created(_) => "created".to_string(),
-            FileSystemEvent::Deleted(_) => "deleted".to_string(),
-            FileSystemEvent::Modified(_) => "modified".to_string(),
-        }
-    }
+#[derive(Debug)]
+pub enum SharedWorktreeEvent {
+    Created(Vec<SharedWorktreeEntry>),
+    Deleted(Vec<SharedWorktreeEntry>),
+    Modified(Vec<SharedWorktreeEntry>),
+}
 
-    async fn path(&self) -> Vec<GraphQLPath> {
+impl Serialize for SharedWorktreeEvent {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
         match self {
-            FileSystemEvent::Created(e)
-            | FileSystemEvent::Deleted(e)
-            | FileSystemEvent::Modified(e) => {
-                vec![GraphQLPath::new(e.path.to_path_buf())]
-            }
+            SharedWorktreeEvent::Created(entries) => entries.serialize(serializer),
+            SharedWorktreeEvent::Deleted(entries) => entries.serialize(serializer),
+            SharedWorktreeEvent::Modified(entries) => entries.serialize(serializer),
         }
     }
 }
 
 #[derive(Debug)]
-pub enum ScannerEvent {
-    Discovered(Vec<LocalFiletreeEntry>),
+pub enum SharedEvent {
+    WorktreeEvent(SharedWorktreeEvent),
 }
 
-#[Object]
-impl ScannerEvent {
-    async fn tag(&self) -> String {
+impl Serialize for SharedEvent {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
         match self {
-            ScannerEvent::Discovered(_) => "discovered".to_string(),
-        }
-    }
-
-    async fn path(&self) -> Vec<GraphQLPath> {
-        match self {
-            ScannerEvent::Discovered(e) => e
-                .iter()
-                .map(|item| GraphQLPath::new(item.path.to_path_buf()))
-                .collect::<Vec<GraphQLPath>>(),
+            SharedEvent::WorktreeEvent(event) => event.serialize(serializer),
         }
     }
 }
-
-#[derive(Interface)]
-#[graphql(
-    field(name = "tag", ty = "String"),
-    field(name = "path", ty = "Vec<GraphQLPath>")
-)]
-pub enum WorktreeEvent {
-    FileSystem(FileSystemEvent),
-    Scanner(ScannerEvent),
-}
-
-// #[Object]
-// impl WorktreeEvent {
-//     pub async fn kind(&self) -> String {
-//         match self {
-//             WorktreeEvent::FileSystem(FileSystemEvent::Created(_)) => "created".to_string(),
-//             WorktreeEvent::FileSystem(FileSystemEvent::Deleted(_)) => "deleted".to_string(),
-//             WorktreeEvent::FileSystem(FileSystemEvent::Modified(_)) => "modified".to_string(),
-//             WorktreeEvent::Scanner(ScannerEvent::Discovered(_)) => "discovered".to_string(),
-//         }
-//     }
-
-//     pub async fn path(&self) -> Vec<String> {
-//         match self {
-//             WorktreeEvent::FileSystem(FileSystemEvent::Created(e))
-//             | WorktreeEvent::FileSystem(FileSystemEvent::Deleted(e))
-//             | WorktreeEvent::FileSystem(FileSystemEvent::Modified(e)) => {
-//                 vec![e.path.to_string_lossy().to_string()]
-//             }
-
-//             WorktreeEvent::Scanner(ScannerEvent::Discovered(e)) => e
-//                 .iter()
-//                 .map(|item| item.path.to_string_lossy().to_string())
-//                 .collect(),
-//         }
-//     }
-// }

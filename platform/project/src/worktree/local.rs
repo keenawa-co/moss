@@ -1,19 +1,18 @@
-mod scanner;
-pub(crate) mod settings;
-
 use anyhow::{Context, Result};
 use fs::FS;
-use smol::{channel::Receiver as SmolReceiver, channel::Sender as SmolSender, stream::StreamExt};
+use smol::{channel::Receiver as SmolReceiver, channel::Sender as SmolSender};
 use std::sync::Arc;
 use std::time::Duration;
 use tokio::sync::RwLock;
 use tokio::task;
 
-use self::scanner::LocalWorktreeScanner;
-use self::settings::LocalWorktreeSettings;
-use crate::model::event::{FileSystemEvent, ScannerEvent, WorktreeEvent};
-use crate::model::filetree::{LocalFiletreeEntry, LocalFiletreeEntryKind};
-use crate::model::snapshot::Snapshot;
+use crate::model::event::{SharedEvent, SharedWorktreeEntry, SharedWorktreeEvent};
+
+use super::event::{FileSystemEvent, ScannerEvent, WorktreeEvent};
+use super::filetree::{FileTreeEntryKind, FiletreeEntry};
+use super::scanner::LocalWorktreeScanner;
+use super::settings::LocalWorktreeSettings;
+use super::snapshot::Snapshot;
 
 #[derive(Debug, Clone)]
 struct LocalWorktreeState {
@@ -56,8 +55,8 @@ impl LocalWorktree {
         if let Some(metadata) = root_metadata {
             initial_snapshot.tree_by_path.insert(
                 settings.abs_path.to_path_buf(),
-                LocalFiletreeEntry {
-                    kind: LocalFiletreeEntryKind::PendingDir,
+                FiletreeEntry {
+                    kind: FileTreeEntryKind::PendingDir,
                     path: settings.abs_path.clone(),
                     modified: metadata.modified,
                     is_symlink: metadata.is_symlink,
@@ -76,7 +75,7 @@ impl LocalWorktree {
         }))
     }
 
-    pub async fn run(self: &Arc<Self>, event_chan_tx: SmolSender<WorktreeEvent>) -> Result<()> {
+    pub async fn run(self: &Arc<Self>, event_chan_tx: SmolSender<SharedEvent>) -> Result<()> {
         let worktree = self.clone();
         let (sync_state_tx, sync_state_rx) = smol::channel::unbounded::<WorktreeEvent>();
 
@@ -114,7 +113,7 @@ impl LocalWorktree {
     async fn run_background_event_handler(
         self: &Arc<Self>,
         sync_state_rx: SmolReceiver<WorktreeEvent>,
-        event_chan_tx: SmolSender<WorktreeEvent>,
+        event_chan_tx: SmolSender<SharedEvent>,
     ) -> Result<()> {
         let worktree = self.clone();
 
@@ -134,16 +133,29 @@ impl LocalWorktree {
                     WorktreeEvent::Scanner(ScannerEvent::Discovered(ref entries)) => {
                         let mut snapshot_lock = worktree.state.snapshot.write().await;
 
+                        let shared_event = SharedWorktreeEvent::Created(
+                            entries
+                                .iter()
+                                .map(|item| SharedWorktreeEntry {
+                                    path: item.path.clone(),
+                                    is_dir: item.is_dir(),
+                                })
+                                .collect::<Vec<SharedWorktreeEntry>>(),
+                        );
+
+                        if let Err(e) = event_chan_tx
+                            .send(SharedEvent::WorktreeEvent(shared_event))
+                            .await
+                        {
+                            error!("Failed to send worktree event: {e}");
+                        }
+
                         for e in entries {
                             snapshot_lock
                                 .tree_by_path
                                 .insert(e.path.to_path_buf(), e.clone());
                         }
                     }
-                }
-
-                if let Err(e) = event_chan_tx.send(event).await {
-                    error!("Failed to send worktree event: {e}");
                 }
             }
         });

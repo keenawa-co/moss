@@ -11,6 +11,7 @@ mac.workspace = true
 async_utl.workspace = true
 fs.workspace = true
 graphql_utl.workspace = true
+platform_shared.workspace = true
 
 hashbrown.workspace = true
 anyhow.workspace = true

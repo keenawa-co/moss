@@ -2,9 +2,8 @@ use async_graphql::{Context, FieldResult, Object, Result as GraphqlResult, Subsc
 use futures::{Stream, StreamExt};
 use graphql_utl::{path::Path as PathGraphQL, GraphQLExtendError};
 use http::HeaderMap;
-use project::model::event::WorktreeEvent;
+use platform_shared::model::event::AbstractEvent;
 use std::{path::PathBuf, sync::Arc};
-use tokio::sync::RwLock;
 use types::{id::NanoId, thing::Thing};
 
 use crate::domain::{
@@ -114,7 +113,7 @@ impl<'a> ProjectSubscription<'a> {
     async fn explorer_event_feed(
         &self,
         _ctx: &Context<'_>,
-    ) -> async_graphql::Result<impl Stream<Item = FieldResult<WorktreeEvent>>> {
+    ) -> async_graphql::Result<impl Stream<Item = FieldResult<AbstractEvent>>> {
         let stream = self.project_service.explorer_event_feed().await?;
 
         Ok(stream.map(|event| Ok(event)))

@@ -4,13 +4,13 @@ use std::{
     sync::Arc,
 };
 
-use super::filetree::LocalFiletree;
+use super::filetree::FileTree;
 
 #[derive(Debug, Clone)]
 pub struct Snapshot {
     pub root_name: String,
     pub abs_path: Arc<Path>,
-    pub tree_by_path: LocalFiletree<PathBuf>,
+    pub tree_by_path: FileTree<PathBuf>,
     pub file_scan_exclusions: Arc<HashSet<PathBuf>>,
 }
 
