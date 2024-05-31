@@ -1,25 +1,22 @@
 use anyhow::Result;
 use async_utl::AsyncTryFrom;
 use fs::FS;
-use futures::Stream;
+use futures::stream::{select_all, Stream, StreamExt};
 use platform_shared::model::event::AbstractEvent;
 use serde_json::json;
-use smol::channel::Receiver as SmolReceiver;
-use std::{path::Path, sync::Arc};
+
+use std::{path::Path, pin::Pin, sync::Arc};
 use types::file::json_file::JsonFile;
 
 use crate::{
-    model::event::SharedEvent,
     settings::Settings,
-    worktree::{settings::LocalWorktreeSettings, Worktree, WorktreeCreateInput},
+    worktree::{settings::LocalWorktreeSettings, Worktree},
 };
 
 #[derive(Debug)]
 pub struct Project {
     pub worktree: Worktree,
     pub settings: Arc<Settings>,
-
-    event_chan_rx: SmolReceiver<SharedEvent>,
 }
 
 impl Project {
@@ -36,29 +33,22 @@ impl Project {
             auto_watch_new_entries: initial_settings.auto_watch_new_entries,
         };
 
-        let (event_chan_tx, event_chan_rx) = smol::channel::unbounded();
-
         Ok(Self {
-            worktree: Worktree::local(fs, &worktree_settings, event_chan_tx).await?,
+            worktree: Worktree::local(fs, &worktree_settings).await?,
             settings: Arc::new(initial_settings),
-            event_chan_rx,
         })
     }
 
     pub async fn event_stream(&self) -> impl Stream<Item = AbstractEvent> {
-        let event_chan_rx = self.event_chan_rx.clone();
+        let worktree_event_stream = self
+            .worktree
+            .event_stream()
+            .await
+            .map(|event| AbstractEvent {
+                route: "/workspace/project/worktree".to_string(),
+                data: json!(event),
+            });
 
-        futures::stream::unfold(event_chan_rx, |receiver| async {
-            match receiver.recv().await {
-                Ok(event) => Some((
-                    AbstractEvent {
-                        route: "test".to_string(),
-                        data: json!(event),
-                    },
-                    receiver,
-                )),
-                Err(_) => None,
-            }
-        })
+        select_all(vec![Box::pin(worktree_event_stream)])
     }
 }

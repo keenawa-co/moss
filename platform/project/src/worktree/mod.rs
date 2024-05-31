@@ -3,38 +3,57 @@ pub mod settings;
 mod event;
 mod filetree;
 mod local;
+mod remote;
 mod scanner;
 mod snapshot;
 
 use anyhow::Result;
 use fs::FS;
-use smol::channel::Sender as SmolSender;
+use futures::stream::Stream;
+use smol::channel::Receiver as SmolReceiver;
 use std::sync::Arc;
 
-use crate::model::event::SharedEvent;
+use crate::model::event::SharedWorktreeEvent;
 
-use self::{local::LocalWorktree, settings::LocalWorktreeSettings};
+use self::{local::LocalWorktree, remote::RemoteWorktree, settings::LocalWorktreeSettings};
 
 #[derive(Debug)]
-pub(crate) enum Worktree {
+pub enum Source {
     Local(Arc<LocalWorktree>),
-    Remote,
+
+    #[allow(dead_code)]
+    Remote(Arc<RemoteWorktree>),
 }
 
-pub(crate) struct WorktreeCreateInput {
-    pub settings: LocalWorktreeSettings,
-    // pub event_chan_tx: SmolSender<WorktreeEvent>,
+#[derive(Debug)]
+pub struct Worktree {
+    source: Source,
+    event_pool: SmolReceiver<SharedWorktreeEvent>,
 }
 
 impl Worktree {
-    pub async fn local(
-        fs: Arc<dyn FS>,
-        settings: &LocalWorktreeSettings,
-        event_chan_tx: SmolSender<SharedEvent>,
-    ) -> Result<Self> {
+    pub async fn local(fs: Arc<dyn FS>, settings: &LocalWorktreeSettings) -> Result<Self> {
         let worktree = LocalWorktree::new(fs, settings).await?;
-        worktree.run(event_chan_tx).await?;
+        let (event_pool_tx, event_pool_rx) = smol::channel::unbounded();
 
-        Ok(Worktree::Local(worktree))
+        worktree.run(event_pool_tx).await?;
+
+        Ok(Self {
+            source: Source::Local(worktree),
+            event_pool: event_pool_rx,
+        })
+    }
+
+    pub async fn event_stream(&self) -> impl Stream<Item = SharedWorktreeEvent> {
+        futures::stream::unfold(self.event_pool.clone(), |receiver| async {
+            match receiver.recv().await {
+                Ok(event) => Some((event, receiver)),
+                Err(e) => {
+                    // TODO: send error event to stream instead of logging
+                    error!("failed to receive event: {e}");
+                    None
+                }
+            }
+        })
     }
 }

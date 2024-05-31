@@ -15,35 +15,34 @@ use super::filetree::{FileTreeEntryKind, FiletreeEntry};
 use super::snapshot::Snapshot;
 
 #[derive(Debug)]
-pub struct WorktreeScanJob {
+struct ScanJob {
     abs_path: Arc<Path>,
     path: Arc<Path>,
-    scan_queue: mpsc::UnboundedSender<WorktreeScanJob>,
+    scan_queue: mpsc::UnboundedSender<ScanJob>,
 }
 
 #[derive(Debug)]
-pub struct LocalWorktreeScannerState {
+struct ServiceState {
     snapshot: Snapshot,
 }
 
-// TODO: rename... Something like filesystem service or..
 #[derive(Debug)]
-pub struct LocalWorktreeScanner {
+pub struct FileSystemScanService {
     fs: Arc<dyn FS>,
     sync_tx: SmolSender<WorktreeEvent>,
-    state: Mutex<LocalWorktreeScannerState>,
+    state: Mutex<ServiceState>,
 }
 
-impl LocalWorktreeScanner {
+impl FileSystemScanService {
     pub fn new(
         fs: Arc<dyn FS>,
         sync_tx: SmolSender<WorktreeEvent>,
         snapshot: Snapshot,
-    ) -> LocalWorktreeScanner {
+    ) -> FileSystemScanService {
         Self {
             fs,
             sync_tx,
-            state: Mutex::new(LocalWorktreeScannerState { snapshot }),
+            state: Mutex::new(ServiceState { snapshot }),
         }
     }
 
@@ -103,9 +102,9 @@ impl LocalWorktreeScanner {
         &self,
         abs_path: Arc<Path>,
         entry: &FiletreeEntry,
-        scan_job_tx: &mpsc::UnboundedSender<WorktreeScanJob>,
+        scan_job_tx: &mpsc::UnboundedSender<ScanJob>,
     ) -> Result<()> {
-        scan_job_tx.clone().send(WorktreeScanJob {
+        scan_job_tx.clone().send(ScanJob {
             abs_path,
             path: entry.path.clone(),
             scan_queue: scan_job_tx.clone(),
@@ -153,7 +152,7 @@ impl LocalWorktreeScanner {
         info!("populated a directory {parent_path:?}");
     }
 
-    async fn index_deep(&self, mut scan_jobs_rx: mpsc::UnboundedReceiver<WorktreeScanJob>) {
+    async fn index_deep(&self, mut scan_jobs_rx: mpsc::UnboundedReceiver<ScanJob>) {
         loop {
             select_biased! {
                 job_option = scan_jobs_rx.recv().fuse() => {
@@ -169,7 +168,7 @@ impl LocalWorktreeScanner {
         }
     }
 
-    async fn index_dir(&self, job: &WorktreeScanJob) -> Result<()> {
+    async fn index_dir(&self, job: &ScanJob) -> Result<()> {
         {
             let state_lock = self.state.lock().await;
             if state_lock
@@ -183,7 +182,7 @@ impl LocalWorktreeScanner {
             drop(state_lock)
         }
 
-        let mut planned_job_list: Vec<WorktreeScanJob> = Vec::new();
+        let mut planned_job_list: Vec<ScanJob> = Vec::new();
         let mut entry_list: Vec<FiletreeEntry> = Vec::new();
 
         let mut dir_stream = self.fs.read_dir(&job.path).await?;
@@ -223,7 +222,7 @@ impl LocalWorktreeScanner {
             let child_entry = FiletreeEntry::new(child_path.clone(), &child_metadata);
 
             if child_entry.is_dir() {
-                planned_job_list.push(WorktreeScanJob {
+                planned_job_list.push(ScanJob {
                     abs_path: child_path,
                     path: child_abs_path,
                     scan_queue: job.scan_queue.clone(),

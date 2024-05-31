@@ -6,11 +6,11 @@ use std::time::Duration;
 use tokio::sync::RwLock;
 use tokio::task;
 
-use crate::model::event::{SharedEvent, SharedWorktreeEntry, SharedWorktreeEvent};
+use crate::model::event::{SharedWorktreeEntry, SharedWorktreeEvent};
 
 use super::event::{FileSystemEvent, ScannerEvent, WorktreeEvent};
 use super::filetree::{FileTreeEntryKind, FiletreeEntry};
-use super::scanner::LocalWorktreeScanner;
+use super::scanner::FileSystemScanService;
 use super::settings::LocalWorktreeSettings;
 use super::snapshot::Snapshot;
 
@@ -75,7 +75,10 @@ impl LocalWorktree {
         }))
     }
 
-    pub async fn run(self: &Arc<Self>, event_chan_tx: SmolSender<SharedEvent>) -> Result<()> {
+    pub async fn run(
+        self: &Arc<Self>,
+        event_chan_tx: SmolSender<SharedWorktreeEvent>,
+    ) -> Result<()> {
         let worktree = self.clone();
         let (sync_state_tx, sync_state_rx) = smol::channel::unbounded::<WorktreeEvent>();
 
@@ -99,7 +102,7 @@ impl LocalWorktree {
             .await;
 
         task::spawn(async move {
-            let scanner = LocalWorktreeScanner::new(fs_clone, sync_state_tx, snapshot.clone());
+            let scanner = FileSystemScanService::new(fs_clone, sync_state_tx, snapshot.clone());
 
             // TODO: send error event to event_chan_tx in case of error
             if let Err(e) = scanner.run(abs_path_clone, fs_event_stream).await {
@@ -113,7 +116,7 @@ impl LocalWorktree {
     async fn run_background_event_handler(
         self: &Arc<Self>,
         sync_state_rx: SmolReceiver<WorktreeEvent>,
-        event_chan_tx: SmolSender<SharedEvent>,
+        event_chan_tx: SmolSender<SharedWorktreeEvent>,
     ) -> Result<()> {
         let worktree = self.clone();
 
@@ -143,10 +146,7 @@ impl LocalWorktree {
                                 .collect::<Vec<SharedWorktreeEntry>>(),
                         );
 
-                        if let Err(e) = event_chan_tx
-                            .send(SharedEvent::WorktreeEvent(shared_event))
-                            .await
-                        {
+                        if let Err(e) = event_chan_tx.send(shared_event).await {
                             error!("Failed to send worktree event: {e}");
                         }
 
