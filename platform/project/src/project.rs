@@ -1,8 +1,9 @@
 use anyhow::Result;
 use async_utl::AsyncTryFrom;
+use chrono::Utc;
 use fs::FS;
 use futures::stream::{select_all, Stream, StreamExt};
-use platform_shared::model::event::AbstractEvent;
+use platform_shared::model::event::{PlatformAction, PlatformEvent};
 use serde_json::json;
 
 use std::{path::Path, pin::Pin, sync::Arc};
@@ -39,16 +40,19 @@ impl Project {
         })
     }
 
-    pub async fn event_stream(&self) -> impl Stream<Item = AbstractEvent> {
+    pub async fn event_stream<'a>(
+        self: &Arc<Self>,
+    ) -> Pin<Box<dyn Send + Stream<Item = PlatformEvent<'a>> + 'a>> {
         let worktree_event_stream = self
             .worktree
             .event_stream()
             .await
-            .map(|event| AbstractEvent {
-                route: "/workspace/project/worktree".to_string(),
+            .map(|event| PlatformEvent {
+                action: PlatformAction::new("project", "worktree", "fileCreated"),
                 data: json!(event),
+                timestamp: Utc::now().timestamp(),
             });
 
-        select_all(vec![Box::pin(worktree_event_stream)])
+        Box::pin(select_all(vec![Box::pin(worktree_event_stream)]))
     }
 }

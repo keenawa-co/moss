@@ -2,7 +2,7 @@ use async_graphql::{Context, FieldResult, Object, Result as GraphqlResult, Subsc
 use futures::{Stream, StreamExt};
 use graphql_utl::{path::Path as PathGraphQL, GraphQLExtendError};
 use http::HeaderMap;
-use platform_shared::model::event::AbstractEvent;
+use platform_shared::model::event::PlatformEvent;
 use std::{path::PathBuf, sync::Arc};
 use types::{id::NanoId, thing::Thing};
 
@@ -113,8 +113,8 @@ impl<'a> ProjectSubscription<'a> {
     async fn explorer_event_feed(
         &self,
         _ctx: &Context<'_>,
-    ) -> async_graphql::Result<impl Stream<Item = FieldResult<AbstractEvent>>> {
-        let stream = self.project_service.explorer_event_feed().await?;
+    ) -> async_graphql::Result<impl Stream<Item = FieldResult<PlatformEvent>>> {
+        let stream = self.project_service.event_live_stream().await?;
 
         Ok(stream.map(|event| Ok(event)))
     }
