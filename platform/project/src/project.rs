@@ -1,9 +1,9 @@
 use anyhow::Result;
+use app::event::{PlatformAction, PlatformEvent};
 use async_utl::AsyncTryFrom;
 use chrono::Utc;
 use fs::FS;
 use futures::stream::{select_all, Stream, StreamExt};
-use platform_shared::model::event::{PlatformAction, PlatformEvent};
 use serde_json::json;
 
 use std::{path::Path, pin::Pin, sync::Arc};
@@ -49,6 +49,7 @@ impl Project {
             .await
             .map(|event| PlatformEvent {
                 action: PlatformAction::new("project", "worktree", "fileCreated"),
+                severity: app::event::Severity::Info,
                 data: json!(event),
                 timestamp: Utc::now().timestamp(),
             });

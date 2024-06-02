@@ -1,6 +1,6 @@
 use std::{borrow::Cow, io};
 
-use async_graphql::{Scalar, ScalarType, SimpleObject};
+use async_graphql::{Enum, Scalar, ScalarType, SimpleObject};
 
 use serde::{Serialize, Serializer};
 
@@ -76,9 +76,22 @@ impl<'a> PlatformAction<'a> {
     }
 }
 
+#[derive(Debug, Enum, Copy, Clone, Eq, PartialEq)]
+pub enum Severity {
+    #[graphql(name = "hint")]
+    Hint,
+    #[graphql(name = "info")]
+    Info,
+    #[graphql(name = "warn")]
+    Warn,
+    #[graphql(name = "error")]
+    Error,
+}
+
 #[derive(Debug, SimpleObject)]
 pub struct PlatformEvent<'a> {
     pub action: PlatformAction<'a>,
     pub data: serde_json::Value,
+    pub severity: Severity,
     pub timestamp: i64,
 }

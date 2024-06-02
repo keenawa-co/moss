@@ -29,21 +29,41 @@ impl<T: TrieKey> Default for FileTree<T> {
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum FileTreeEntryKind {
-    PendingDir,
-    ReadyDir,
-    ReadyFile,
+    Any,
+    File,
+    Dir,
+    Other,
+}
+
+impl From<notify::event::CreateKind> for FileTreeEntryKind {
+    fn from(value: notify::event::CreateKind) -> Self {
+        match value {
+            notify::event::CreateKind::File => Self::File,
+            notify::event::CreateKind::Folder => Self::Dir,
+            notify::event::CreateKind::Other => Self::Other,
+            notify::event::CreateKind::Any => Self::Any,
+        }
+    }
+}
+
+impl From<notify::event::RemoveKind> for FileTreeEntryKind {
+    fn from(value: notify::event::RemoveKind) -> Self {
+        match value {
+            notify::event::RemoveKind::File => Self::File,
+            notify::event::RemoveKind::Folder => Self::Dir,
+            notify::event::RemoveKind::Other => Self::Other,
+            notify::event::RemoveKind::Any => Self::Any,
+        }
+    }
 }
 
 impl FileTreeEntryKind {
     pub fn is_dir(&self) -> bool {
-        matches!(
-            self,
-            FileTreeEntryKind::ReadyDir | FileTreeEntryKind::PendingDir
-        )
+        matches!(self, FileTreeEntryKind::Dir)
     }
 
     pub fn is_file(&self) -> bool {
-        matches!(self, FileTreeEntryKind::ReadyFile)
+        matches!(self, FileTreeEntryKind::File)
     }
 }
 
@@ -51,21 +71,21 @@ impl FileTreeEntryKind {
 pub struct FiletreeEntry {
     pub kind: FileTreeEntryKind,
     pub path: Arc<Path>,
-    pub modified: SystemTime,
-    pub is_symlink: bool,
+    pub modified: Option<SystemTime>,
+    pub is_symlink: Option<bool>,
 }
 
 impl FiletreeEntry {
     pub fn new(path: Arc<Path>, metadata: &fs::file::Metadata) -> Self {
         Self {
             kind: if metadata.is_dir {
-                FileTreeEntryKind::PendingDir
+                FileTreeEntryKind::Dir
             } else {
-                FileTreeEntryKind::ReadyFile
+                FileTreeEntryKind::File
             },
             path,
-            modified: metadata.modified,
-            is_symlink: metadata.is_symlink,
+            modified: Some(metadata.modified),
+            is_symlink: Some(metadata.is_symlink),
         }
     }
 

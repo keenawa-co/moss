@@ -8,7 +8,7 @@ use tokio::task;
 
 use crate::model::event::{SharedWorktreeEntry, SharedWorktreeEvent};
 
-use super::event::{FileSystemEvent, ScannerEvent, WorktreeEvent};
+use super::event::WorktreeEvent;
 use super::filetree::{FileTreeEntryKind, FiletreeEntry};
 use super::scanner::FileSystemScanService;
 use super::settings::LocalWorktreeSettings;
@@ -56,16 +56,16 @@ impl LocalWorktree {
             initial_snapshot.tree_by_path.insert(
                 settings.abs_path.to_path_buf(),
                 FiletreeEntry {
-                    kind: FileTreeEntryKind::PendingDir,
+                    kind: FileTreeEntryKind::Dir,
                     path: settings.abs_path.clone(),
-                    modified: metadata.modified,
-                    is_symlink: metadata.is_symlink,
+                    modified: Some(metadata.modified),
+                    is_symlink: Some(metadata.is_symlink),
                 },
             );
         } else {
             return Err(anyhow!(
                 "could not get {} metadata",
-                quote! {settings.abs_path.to_path_buf().to_string_lossy()}
+                quote!(settings.abs_path.to_path_buf().to_string_lossy())
             ));
         }
 
@@ -123,21 +123,11 @@ impl LocalWorktree {
         task::spawn(async move {
             while let Ok(event) = sync_state_rx.recv().await {
                 match &event {
-                    WorktreeEvent::FileSystem(FileSystemEvent::Created(ref e))
-                    | WorktreeEvent::FileSystem(FileSystemEvent::Deleted(ref e))
-                    | WorktreeEvent::FileSystem(FileSystemEvent::Modified(ref e)) => {
-                        let mut snapshot_lock = worktree.state.snapshot.write().await;
-
-                        snapshot_lock
-                            .tree_by_path
-                            .insert(e.path.to_path_buf(), e.clone());
-                    }
-
-                    WorktreeEvent::Scanner(ScannerEvent::Discovered(ref entries)) => {
+                    WorktreeEvent::Created(ref content) => {
                         let mut snapshot_lock = worktree.state.snapshot.write().await;
 
                         let shared_event = SharedWorktreeEvent::Created(
-                            entries
+                            content
                                 .iter()
                                 .map(|item| SharedWorktreeEntry {
                                     path: item.path.clone(),
@@ -150,11 +140,15 @@ impl LocalWorktree {
                             error!("Failed to send worktree event: {e}");
                         }
 
-                        for e in entries {
+                        for e in content {
                             snapshot_lock
                                 .tree_by_path
                                 .insert(e.path.to_path_buf(), e.clone());
                         }
+                    }
+                    WorktreeEvent::Deleted(ref e) => todo!(),
+                    WorktreeEvent::Modified(ref e) => {
+                        todo!()
                     }
                 }
             }
@@ -162,4 +156,6 @@ impl LocalWorktree {
 
         Ok(())
     }
+
+    // fn handle_event( self: &Arc<Self>, event: WorktreeEvent)
 }

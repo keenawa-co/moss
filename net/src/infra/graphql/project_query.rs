@@ -1,8 +1,8 @@
+use app::event::PlatformEvent;
 use async_graphql::{Context, FieldResult, Object, Result as GraphqlResult, Subscription};
 use futures::{Stream, StreamExt};
 use graphql_utl::{path::Path as PathGraphQL, GraphQLExtendError};
 use http::HeaderMap;
-use platform_shared::model::event::PlatformEvent;
 use std::{path::PathBuf, sync::Arc};
 use types::{id::NanoId, thing::Thing};
 

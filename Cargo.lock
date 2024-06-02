@@ -163,6 +163,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f538837af36e6f6a9be0faa67f9a314f8119e4e4b5867c6ab40ed60360142519"
 
 [[package]]
+name = "app"
+version = "0.1.0"
+dependencies = [
+ "async-graphql",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
 name = "arc-swap"
 version = "1.7.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2000,6 +2009,7 @@ name = "net"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "app",
  "arc-swap",
  "async-graphql",
  "async-graphql-axum",
@@ -2024,7 +2034,6 @@ dependencies = [
  "notify",
  "once_cell",
  "opentelemetry",
- "platform_shared",
  "project",
  "pwd",
  "sea-orm",
@@ -2442,15 +2451,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d231b230927b5e4ad203db57bbcbee2802f6bce620b1e4a9024a07d94e2907ec"
 
 [[package]]
-name = "platform_shared"
-version = "0.1.0"
-dependencies = [
- "async-graphql",
- "serde",
- "serde_json",
-]
-
-[[package]]
 name = "polling"
 version = "3.6.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2534,6 +2534,7 @@ name = "project"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "app",
  "async-graphql",
  "async-stream",
  "async-trait",
@@ -2544,7 +2545,7 @@ dependencies = [
  "graphql_utl",
  "hashbrown 0.7.2",
  "mac",
- "platform_shared",
+ "notify",
  "radix_trie",
  "serde",
  "serde_json",

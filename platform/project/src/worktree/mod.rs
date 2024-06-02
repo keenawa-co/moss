@@ -18,7 +18,7 @@ use crate::model::event::SharedWorktreeEvent;
 use self::{local::LocalWorktree, remote::RemoteWorktree, settings::LocalWorktreeSettings};
 
 #[derive(Debug)]
-pub enum Source {
+pub enum TreeSource {
     Local(Arc<LocalWorktree>),
 
     #[allow(dead_code)]
@@ -27,7 +27,7 @@ pub enum Source {
 
 #[derive(Debug)]
 pub struct Worktree {
-    source: Source,
+    source: TreeSource,
     event_pool: SmolReceiver<SharedWorktreeEvent>,
 }
 
@@ -39,7 +39,7 @@ impl Worktree {
         worktree.run(event_pool_tx).await?;
 
         Ok(Self {
-            source: Source::Local(worktree),
+            source: TreeSource::Local(worktree),
             event_pool: event_pool_rx,
         })
     }

@@ -1,6 +1,6 @@
 use anyhow::Result;
 use fs::FS;
-use futures::task::Poll;
+use futures::{future, task::Poll};
 use futures::{select_biased, FutureExt, Stream};
 use smol::{channel::Sender as SmolSender, stream::StreamExt};
 use std::{
@@ -10,7 +10,7 @@ use std::{
 };
 use tokio::sync::{mpsc, Mutex};
 
-use super::event::{ScannerEvent, WorktreeEvent};
+use super::event::WorktreeEvent;
 use super::filetree::{FileTreeEntryKind, FiletreeEntry};
 use super::snapshot::Snapshot;
 
@@ -49,7 +49,7 @@ impl FileSystemScanService {
     pub async fn run(
         &self,
         root_abs_path: Arc<Path>,
-        mut fs_event_stream: Pin<Box<dyn Send + Stream<Item = Vec<PathBuf>>>>,
+        mut fs_event_stream: Pin<Box<dyn Send + Stream<Item = notify::Event>>>,
     ) -> Result<()> {
         let (scan_job_tx, scan_job_rx) = mpsc::unbounded_channel();
         {
@@ -66,36 +66,59 @@ impl FileSystemScanService {
         drop(scan_job_tx);
         self.index_deep(scan_job_rx).await;
 
+        // NOTE: use select_biased! to prioritize event queue
+
         loop {
-            select_biased! {
-                paths = fs_event_stream.next().fuse() => {
-                    let Some(mut paths) = paths else { break };
-                    while let Poll::Ready(Some(more_paths)) = futures::poll!(fs_event_stream.next()) {
-                        paths.extend(more_paths);
-                    }
-
-                  if paths.contains(&PathBuf::from("/Users/g10z3r/Project/4rchr4y/moss/.moss/settings.json")) {
-
-                    // self.sync_tx
-                    //     .send(FileSystemEvent {
-                    //         operation: FileSystemEventOperation::ModifiedFile,
-                    //         entry: LocalWorktreeEntry {
-                    //             kind: WorktreeEntryKind::ReadyFile,
-                    //             path: Arc::from(Path::new("/Users/g10z3r/Project/4rchr4y/moss/.moss/settings.json")),
-                    //             modified:SystemTime::now(),
-                    //             is_symlink: false,
-                    //         },
-                    //     })
-                    //     .unwrap();
-
-                    println!("Event: {:?}", paths);
-                  }
-
-                }
+            if let Some(notify_event) = fs_event_stream.next().await {
+                self.handle_notify_event(notify_event).await.unwrap(); // TODO: handle error
+            } else {
+                break;
             }
         }
 
         Ok(())
+    }
+
+    async fn handle_notify_event(&self, event: notify::Event) -> Result<()> {
+        let map_to_filetree_entry = |paths: Vec<PathBuf>, kind: FileTreeEntryKind| {
+            paths
+                .into_iter()
+                .map(|item| FiletreeEntry {
+                    kind,
+                    path: Arc::from(item),
+                    modified: None,
+                    is_symlink: None,
+                })
+                .collect::<Vec<FiletreeEntry>>()
+        };
+
+        match event.kind {
+            notify::EventKind::Create(kind) => {
+                self.sync_tx
+                    .try_send(WorktreeEvent::Created(map_to_filetree_entry(
+                        event.paths,
+                        FileTreeEntryKind::from(kind),
+                    )))?;
+
+                Ok(())
+            }
+
+            notify::EventKind::Modify(_) => {
+                println!("Modify event: {:?}", event);
+                Ok(())
+            }
+
+            notify::EventKind::Remove(kind) => {
+                self.sync_tx
+                    .try_send(WorktreeEvent::Created(map_to_filetree_entry(
+                        event.paths,
+                        FileTreeEntryKind::from(kind),
+                    )))?;
+
+                Ok(())
+            }
+            _ => Ok(()),
+        }
     }
 
     async fn enqueue_scan_dir(
@@ -115,7 +138,7 @@ impl FileSystemScanService {
 
     async fn populate_dir(&self, parent_path: &Arc<Path>, entry_list: Vec<FiletreeEntry>) {
         let mut state_lock = self.state.lock().await;
-        let mut parent_entry = if let Some(entry) = state_lock
+        let parent_entry = if let Some(entry) = state_lock
             .snapshot
             .tree_by_path
             .get(&parent_path.to_path_buf())
@@ -126,10 +149,8 @@ impl FileSystemScanService {
             return;
         };
 
-        match parent_entry.kind {
-            FileTreeEntryKind::PendingDir => parent_entry.kind = FileTreeEntryKind::ReadyDir,
-            FileTreeEntryKind::ReadyDir => {}
-            _ => return,
+        if parent_entry.kind != FileTreeEntryKind::Dir {
+            return;
         }
 
         for entry in &entry_list {
@@ -139,13 +160,7 @@ impl FileSystemScanService {
                 .insert(entry.path.to_path_buf(), entry.clone());
         }
 
-        if let Err(e) = self
-            .sync_tx
-            .send(WorktreeEvent::Scanner(ScannerEvent::Discovered(
-                entry_list.into_iter().collect(),
-            )))
-            .await
-        {
+        if let Err(e) = self.sync_tx.send(WorktreeEvent::Created(entry_list)).await {
             error!("Failed to send event: {e}");
         }
 

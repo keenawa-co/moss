@@ -1,18 +1,8 @@
 use super::filetree::FiletreeEntry;
 
+#[derive(Debug)]
 pub enum WorktreeEvent {
-    FileSystem(FileSystemEvent),
-    Scanner(ScannerEvent),
-}
-
-#[derive(Debug)]
-pub enum FileSystemEvent {
-    Created(FiletreeEntry),
-    Deleted(FiletreeEntry),
-    Modified(FiletreeEntry),
-}
-
-#[derive(Debug)]
-pub enum ScannerEvent {
-    Discovered(Vec<FiletreeEntry>),
+    Created(Vec<FiletreeEntry>),
+    Modified(Vec<FiletreeEntry>),
+    Deleted(Vec<FiletreeEntry>),
 }

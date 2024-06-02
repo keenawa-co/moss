@@ -1,8 +1,7 @@
+use app::event::PlatformEvent;
 use arc_swap::ArcSwapOption;
 use fs::{real, FS};
 use futures::{Stream, StreamExt};
-use hashbrown::HashSet;
-use platform_shared::model::event::PlatformEvent;
 use project::Project;
 use std::{
     path::{Path, PathBuf},

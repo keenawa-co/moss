@@ -1,4 +1,4 @@
-pub mod model;
+pub mod event;
 
 #[macro_use]
 extern crate serde;
