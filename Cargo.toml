@@ -73,6 +73,7 @@ ahash = "0.8.11"
 sha2 = "0.10.8"
 arc-swap = "1.7.1"
 radix_trie = "0.2.1"
+parking_lot = "0.12.3"
 
 tokio = "1"
 tokio-util = "0.7"

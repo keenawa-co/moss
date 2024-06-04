@@ -1,3 +1,4 @@
+pub mod context;
 pub mod event;
 
 #[macro_use]

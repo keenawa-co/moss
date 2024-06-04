@@ -1,9 +1,10 @@
-use anyhow::{Context, Result};
+use anyhow::{Context as AnyhowContext, Result};
+use app::context::Context;
 use fs::FS;
+use parking_lot::RwLock;
 use smol::{channel::Receiver as SmolReceiver, channel::Sender as SmolSender};
 use std::sync::Arc;
 use std::time::Duration;
-use tokio::sync::RwLock;
 use tokio::task;
 
 use crate::model::event::{SharedWorktreeEntry, SharedWorktreeEvent};
@@ -77,13 +78,50 @@ impl LocalWorktree {
 
     pub async fn run(
         self: &Arc<Self>,
+        ctx: Arc<Context>,
         event_chan_tx: SmolSender<SharedWorktreeEvent>,
     ) -> Result<()> {
+        let worktree = self.clone();
+
+        let test_hook = |e: &mut WorktreeEvent| -> Result<()> {
+            dbg!(1);
+            let mut snapshot_lock = worktree.state.snapshot.write();
+
+            match e {
+                WorktreeEvent::Created(ref content) => {
+                    let shared_event = SharedWorktreeEvent::Created(
+                        content
+                            .iter()
+                            .map(|item| SharedWorktreeEntry {
+                                path: item.path.clone(),
+                                is_dir: item.is_dir(),
+                            })
+                            .collect::<Vec<SharedWorktreeEntry>>(),
+                    );
+
+                    for e in content {
+                        snapshot_lock
+                            .tree_by_path
+                            .insert(e.path.to_path_buf(), e.clone());
+                    }
+                }
+                WorktreeEvent::Deleted(ref e) => todo!(),
+                WorktreeEvent::Modified(ref e) => {
+                    todo!()
+                }
+            };
+
+            Ok(())
+        };
+
+        ctx.event_pool.register_event::<WorktreeEvent>();
+        ctx.event_pool.register_hook(test_hook);
+
         let worktree = self.clone();
         let (sync_state_tx, sync_state_rx) = smol::channel::unbounded::<WorktreeEvent>();
 
         tokio::try_join!(
-            worktree.run_background_scanner(sync_state_tx),
+            worktree.run_background_scanner(ctx, sync_state_tx),
             worktree.run_background_event_handler(sync_state_rx, event_chan_tx),
         )?;
 
@@ -92,9 +130,10 @@ impl LocalWorktree {
 
     async fn run_background_scanner(
         self: &Arc<Self>,
+        ctx: Arc<Context>,
         sync_state_tx: SmolSender<WorktreeEvent>,
     ) -> Result<()> {
-        let snapshot = self.state.snapshot.read().await.clone();
+        let snapshot = self.state.snapshot.read().clone();
         let fs_clone = self.fs.clone();
         let abs_path_clone = Arc::clone(&snapshot.abs_path);
         let fs_event_stream = fs_clone
@@ -105,7 +144,7 @@ impl LocalWorktree {
             let scanner = FileSystemScanService::new(fs_clone, sync_state_tx, snapshot.clone());
 
             // TODO: send error event to event_chan_tx in case of error
-            if let Err(e) = scanner.run(abs_path_clone, fs_event_stream).await {
+            if let Err(e) = scanner.run(ctx, abs_path_clone, fs_event_stream).await {
                 error!("Error in worktree scanner: {e}");
             }
         });
@@ -120,39 +159,39 @@ impl LocalWorktree {
     ) -> Result<()> {
         let worktree = self.clone();
 
-        task::spawn(async move {
-            while let Ok(event) = sync_state_rx.recv().await {
-                match &event {
-                    WorktreeEvent::Created(ref content) => {
-                        let mut snapshot_lock = worktree.state.snapshot.write().await;
+        // task::spawn(async move {
+        //     while let Ok(event) = sync_state_rx.recv().await {
+        //         match &event {
+        //             WorktreeEvent::Created(ref content) => {
+        //                 let mut snapshot_lock = worktree.state.snapshot.write().await;
 
-                        let shared_event = SharedWorktreeEvent::Created(
-                            content
-                                .iter()
-                                .map(|item| SharedWorktreeEntry {
-                                    path: item.path.clone(),
-                                    is_dir: item.is_dir(),
-                                })
-                                .collect::<Vec<SharedWorktreeEntry>>(),
-                        );
+        //                 let shared_event = SharedWorktreeEvent::Created(
+        //                     content
+        //                         .iter()
+        //                         .map(|item| SharedWorktreeEntry {
+        //                             path: item.path.clone(),
+        //                             is_dir: item.is_dir(),
+        //                         })
+        //                         .collect::<Vec<SharedWorktreeEntry>>(),
+        //                 );
 
-                        if let Err(e) = event_chan_tx.send(shared_event).await {
-                            error!("Failed to send worktree event: {e}");
-                        }
+        //                 if let Err(e) = event_chan_tx.send(shared_event).await {
+        //                     error!("Failed to send worktree event: {e}");
+        //                 }
 
-                        for e in content {
-                            snapshot_lock
-                                .tree_by_path
-                                .insert(e.path.to_path_buf(), e.clone());
-                        }
-                    }
-                    WorktreeEvent::Deleted(ref e) => todo!(),
-                    WorktreeEvent::Modified(ref e) => {
-                        todo!()
-                    }
-                }
-            }
-        });
+        //                 for e in content {
+        //                     snapshot_lock
+        //                         .tree_by_path
+        //                         .insert(e.path.to_path_buf(), e.clone());
+        //                 }
+        //             }
+        //             WorktreeEvent::Deleted(ref e) => todo!(),
+        //             WorktreeEvent::Modified(ref e) => {
+        //                 todo!()
+        //             }
+        //         }
+        //     }
+        // });
 
         Ok(())
     }

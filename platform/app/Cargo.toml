@@ -5,7 +5,14 @@ edition = "2021"
 
 
 [dependencies]
+hashbrown.workspace = true
+ahash.workspace = true
+anyhow.workspace = true
+parking_lot.workspace = true
+
 serde = { workspace = true, features = ["derive"] }
 serde_json.workspace = true
+
+smol.workspace = true
 
 async-graphql.workspace = true
