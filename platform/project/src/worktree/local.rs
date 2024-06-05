@@ -114,8 +114,10 @@ impl LocalWorktree {
             Ok(())
         };
 
-        ctx.event_pool.register_event::<WorktreeEvent>();
-        ctx.event_pool.register_hook(test_hook);
+        ctx.get_event_registry_mut(|registry| {
+            registry.register_event::<WorktreeEvent>();
+            registry.register_hook(test_hook);
+        });
 
         let worktree = self.clone();
         let (sync_state_tx, sync_state_rx) = smol::channel::unbounded::<WorktreeEvent>();

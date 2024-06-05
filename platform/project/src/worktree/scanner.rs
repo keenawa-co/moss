@@ -175,8 +175,9 @@ impl FileSystemScanService {
                 .insert(entry.path.to_path_buf(), entry.clone());
         }
 
-        ctx.event_pool
-            .dispatch_event(WorktreeEvent::Created(entry_list.clone()));
+        ctx.get_event_registry(|registry| {
+            registry.dispatch_event(WorktreeEvent::Created(entry_list.clone()))
+        });
 
         if let Err(e) = self.sync_tx.send(WorktreeEvent::Created(entry_list)).await {
             error!("Failed to send event: {e}");

@@ -170,12 +170,14 @@ dependencies = [
  "anyhow",
  "async-graphql",
  "chrono",
+ "futures",
  "hashbrown 0.7.2",
  "parking_lot",
  "serde",
  "serde_json",
  "smol",
  "tokio",
+ "tracing",
 ]
 
 [[package]]

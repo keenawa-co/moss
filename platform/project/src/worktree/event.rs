@@ -1,8 +1,8 @@
-use app::context::Event;
+use app::context::event::Event;
 
 use super::filetree::FiletreeEntry;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum WorktreeEvent {
     Created(Vec<FiletreeEntry>),
     Modified(Vec<FiletreeEntry>),

@@ -19,3 +19,6 @@ smol.workspace = true
 async-graphql.workspace = true
 
 tokio = { workspace = true, features = ["full"] }
+futures.workspace = true
+
+tracing.workspace = true
