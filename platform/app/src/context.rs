@@ -1,21 +1,77 @@
 use anyhow::Result;
 use hashbrown::{hash_map::Entry as HashMapEntry, HashMap};
-
-use parking_lot::RwLock;
-use serde::Serialize;
+use parking_lot::{Mutex, RwLock};
 use std::{
     any::TypeId,
+    future::Future,
+    pin::Pin,
     ptr::{self, NonNull},
+    sync::Arc,
 };
-
-struct Pool {
-    // rx: smol::channel::Receiver<Event>,
-}
 
 struct Abstract(());
 
 pub unsafe trait Event: Sized {
     const TYPE_NAME: &'static str;
+}
+
+pub struct AsyncHook {
+    data: NonNull<Abstract>,
+    call: unsafe fn(
+        NonNull<Abstract>,
+        NonNull<Abstract>,
+        Option<NonNull<Abstract>>,
+    ) -> Pin<Box<dyn Future<Output = Result<()>> + Send>>,
+}
+
+unsafe impl Sync for AsyncHook {}
+unsafe impl Send for AsyncHook {}
+
+impl AsyncHook {
+    pub fn new<E, F, Fut>(hook: F) -> Self
+    where
+        E: Event + 'static,
+        F: Fn(Arc<Mutex<E>>) -> Fut + 'static + Send + Sync,
+        Fut: Future<Output = Result<()>> + 'static + Send,
+    {
+        unsafe fn call<E, F, Fut>(
+            hook: NonNull<Abstract>,
+            event: NonNull<Abstract>,
+            _result: Option<NonNull<Abstract>>,
+        ) -> Pin<Box<dyn Future<Output = Result<()>> + Send>>
+        where
+            E: Event + 'static,
+            F: Fn(Arc<Mutex<E>>) -> Fut + 'static + Send + Sync,
+            Fut: Future<Output = Result<()>> + 'static + Send,
+        {
+            let hook: NonNull<F> = hook.cast();
+            let event: NonNull<Arc<Mutex<E>>> = event.cast();
+            let hook: &F = hook.as_ref();
+            let event = event.as_ref().clone();
+            Box::pin(hook(event))
+        }
+
+        unsafe {
+            AsyncHook {
+                data: NonNull::new_unchecked(Box::into_raw(Box::new(hook)) as *mut Abstract),
+                call: call::<E, F, Fut>,
+            }
+        }
+    }
+
+    pub async fn call<E>(&self, event: Arc<Mutex<E>>) -> Result<()>
+    where
+        E: Event + 'static,
+    {
+        unsafe {
+            (self.call)(
+                self.data,
+                NonNull::from(&event).cast(),
+                None, // Pass None since we don't need the result
+            )
+            .await
+        }
+    }
 }
 
 pub struct Hook {
@@ -65,19 +121,14 @@ impl Hook {
 }
 
 pub struct EventPool {
-    tx: smol::channel::Sender<String>,
-    rx: smol::channel::Receiver<String>,
     hook_map: RwLock<HashMap<&'static str, Vec<Hook>, ahash::RandomState>>,
 }
 
 impl EventPool {
     fn new() -> Self {
-        let (tx, rx) = smol::channel::unbounded();
         let hook_map = HashMap::with_hasher(ahash::RandomState::with_seed(42));
 
         Self {
-            tx,
-            rx,
             hook_map: RwLock::new(hook_map),
         }
     }
@@ -142,6 +193,14 @@ mod tests {
         const TYPE_NAME: &'static str = "MyEvent";
     }
 
+    struct MyEvent2 {
+        user: String,
+    }
+
+    unsafe impl super::Event for MyEvent2 {
+        const TYPE_NAME: &'static str = "MyEvent2";
+    }
+
     #[test]
     fn hook_test() {
         let hook_fn = |e: &mut MyEvent| -> Result<()> {
@@ -156,9 +215,68 @@ mod tests {
         hook.call(&mut test_event).unwrap();
     }
 
+    #[tokio::test]
+    async fn async_hooks_run_concurrently() {
+        use tokio::time::{sleep, Duration};
+
+        let (tx, rx) = smol::channel::bounded(2);
+        let tx1 = tx.clone();
+        let tx2 = tx.clone();
+
+        let hook_fn1 = move |_: Arc<Mutex<MyEvent2>>| {
+            let tx = tx1.clone();
+            async move {
+                sleep(Duration::from_secs(5)).await;
+                tx.send(()).await.unwrap();
+                println!("hook_fn1 is done at {}", chrono::Utc::now());
+                Ok(())
+            }
+        };
+
+        let hook_fn2 = move |_: Arc<Mutex<MyEvent2>>| {
+            let tx = tx2.clone();
+            async move {
+                sleep(Duration::from_secs(1)).await;
+                tx.send(()).await.unwrap();
+                println!("hook_fn2 is done at {}", chrono::Utc::now());
+                Ok(())
+            }
+        };
+
+        let test_event1 = Arc::new(Mutex::new(MyEvent2 {
+            user: "user1".to_string(),
+        }));
+        let test_event2 = Arc::new(Mutex::new(MyEvent2 {
+            user: "user2".to_string(),
+        }));
+
+        let hook1 = Arc::new(AsyncHook::new(hook_fn1));
+        let hook2 = Arc::new(AsyncHook::new(hook_fn2));
+
+        let hook1_clone = hook1.clone();
+        let hook2_clone = hook2.clone();
+
+        let event1_clone = Arc::clone(&test_event1);
+        let event2_clone = Arc::clone(&test_event2);
+
+        let handle1 = tokio::spawn(async move {
+            hook1_clone.call(event1_clone).await.unwrap();
+        });
+
+        let handle2 = tokio::spawn(async move {
+            hook2_clone.call(event2_clone).await.unwrap();
+        });
+
+        let _ = rx.recv().await;
+        let _ = rx.recv().await;
+
+        handle1.await.unwrap();
+        handle2.await.unwrap();
+    }
+
     #[test]
     fn event_pool_test() {
-        let mut pool = EventPool::new();
+        let pool = EventPool::new();
 
         let hook_fn = |e: &mut MyEvent| -> Result<()> {
             println!("{}", e.user);
