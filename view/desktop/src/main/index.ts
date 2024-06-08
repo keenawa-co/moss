@@ -11,6 +11,13 @@ function createWindow(): void {
     show: false,
     autoHideMenuBar: true,
     ...(process.platform === 'linux' ? { icon } : {}),
+    center: true,
+    title: "Moss Desktop App",
+    frame: false, //remove window frame
+    vibrancy: "under-window", //in order to apply background blur effect
+    visualEffectState: "active",
+    titleBarStyle: "hidden", // remove title bar
+    trafficLightPosition: { x: 15, y: 10 },
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
       sandbox: true,
