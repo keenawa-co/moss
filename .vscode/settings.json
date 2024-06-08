@@ -63,33 +63,39 @@
     {
       "text": "NOTE:",
       "color": "#171717",
-      "backgroundColor": "#f5f5f4",
+      "backgroundColor": "#f5f5f4"
     },
     {
       "text": "TODO:",
       "color": "white",
-      "backgroundColor": "#facc15",
+      "backgroundColor": "#facc15"
     },
     {
       "text": "OPTIMIZE:",
       "color": "white",
-      "backgroundColor": "#d97706",
+      "backgroundColor": "#d97706"
     },
     {
       "text": "BUG:",
       "color": "white",
-      "backgroundColor": "#b91c1c",
+      "backgroundColor": "#b91c1c"
     },
     {
       "text": "FIXME:",
       "color": "white",
-      "backgroundColor": "#f87171",
+      "backgroundColor": "#f87171"
     },
     {
       "text": "HACK:",
       "color": "white",
       "backgroundColor": "#9333ea",
-      "isWholeLine": false,
-    },
+      "isWholeLine": false
+    }
   ],
+  "files.associations": {
+    "*.css": "tailwindcss"
+  },
+  "editor.quickSuggestions": {
+    "strings": "on"
+  },
 }
