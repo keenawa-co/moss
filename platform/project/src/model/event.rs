@@ -1,38 +1,31 @@
-use async_graphql::Object;
+use serde::Serialize;
+use std::{path::Path, sync::Arc};
 
-use crate::worktree::local::event::{FileSystemEvent, ScannerEvent};
-
-// TODO: implement as Interface
-// https://async-graphql.github.io/async-graphql/en/define_interface.html#interface
-#[derive(Debug)]
-pub enum WorktreeEvent {
-    FileSystem(FileSystemEvent),
-    Scanner(ScannerEvent),
+#[derive(Debug, Serialize)]
+pub struct SharedWorktreeEntry {
+    pub path: Arc<Path>,
+    pub is_dir: bool,
 }
 
-#[Object]
-impl WorktreeEvent {
-    pub async fn kind(&self) -> String {
-        match self {
-            WorktreeEvent::FileSystem(FileSystemEvent::Created(_)) => "created".to_string(),
-            WorktreeEvent::FileSystem(FileSystemEvent::Deleted(_)) => "deleted".to_string(),
-            WorktreeEvent::FileSystem(FileSystemEvent::Modified(_)) => "modified".to_string(),
-            WorktreeEvent::Scanner(ScannerEvent::Discovered(_)) => "discovered".to_string(),
-        }
-    }
-
-    pub async fn path(&self) -> Vec<String> {
-        match self {
-            WorktreeEvent::FileSystem(FileSystemEvent::Created(e))
-            | WorktreeEvent::FileSystem(FileSystemEvent::Deleted(e))
-            | WorktreeEvent::FileSystem(FileSystemEvent::Modified(e)) => {
-                vec![e.path.to_string_lossy().to_string()]
-            }
-
-            WorktreeEvent::Scanner(ScannerEvent::Discovered(e)) => e
-                .iter()
-                .map(|item| item.path.to_string_lossy().to_string())
-                .collect(),
-        }
-    }
+#[derive(Debug, Serialize)]
+pub enum SharedWorktreeEvent {
+    #[serde(rename = "created")]
+    Created(Vec<SharedWorktreeEntry>),
+    #[serde(rename = "modified")]
+    Modified(Vec<SharedWorktreeEntry>),
+    #[serde(rename = "deleted")]
+    Deleted(Vec<SharedWorktreeEntry>),
 }
+
+// impl Serialize for SharedWorktreeEvent {
+//     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+//     where
+//         S: Serializer,
+//     {
+//         match self {
+//             SharedWorktreeEvent::Created(entries) => entries.serialize(serializer),
+//             SharedWorktreeEvent::Deleted(entries) => entries.serialize(serializer),
+//             SharedWorktreeEvent::Modified(entries) => entries.serialize(serializer),
+//         }
+//     }
+// }

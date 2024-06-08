@@ -14,15 +14,16 @@ pub struct NotificationService {
 }
 
 impl NotificationService {
-    pub fn new() -> Self {
+    pub fn new() -> Arc<Self> {
         let (tx, rx) = mpsc::channel::<Notification>(100);
-        Self {
+
+        Arc::new(Self {
             tx,
             rx: Arc::new(RwLock::new(rx)),
-        }
+        })
     }
 
-    pub async fn send(&self, v: Notification) -> Result<()> {
+    pub async fn send(self: &Arc<Self>, v: Notification) -> Result<()> {
         Ok(self
             .tx
             .send(v)
@@ -30,7 +31,7 @@ impl NotificationService {
             .ok_or_system_unexpected("Failed to send message", None)?)
     }
 
-    pub async fn subscribe(&self) -> impl Stream<Item = Notification> {
+    pub async fn subscribe(self: &Arc<Self>) -> impl Stream<Item = Notification> {
         let (tx, rx) = mpsc::channel(32);
         let rx_clone = self.rx.clone();
 

@@ -1,10 +1,9 @@
+use app::event::PlatformEvent;
 use async_graphql::{Context, FieldResult, Object, Result as GraphqlResult, Subscription};
 use futures::{Stream, StreamExt};
 use graphql_utl::{path::Path as PathGraphQL, GraphQLExtendError};
 use http::HeaderMap;
-use project::model::event::WorktreeEvent;
 use std::{path::PathBuf, sync::Arc};
-use tokio::sync::RwLock;
 use types::{id::NanoId, thing::Thing};
 
 use crate::domain::{
@@ -20,14 +19,14 @@ use crate::domain::{
     },
 };
 
-pub(super) struct ProjectMutation {
+pub(super) struct ProjectMutation<'a> {
     pub project_meta_service: Arc<ProjectMetaService>,
-    pub project_service: Arc<RwLock<ProjectService>>,
+    pub project_service: Arc<ProjectService<'a>>,
     pub notification_service: Arc<NotificationService>,
 }
 
 #[Object]
-impl ProjectMutation {
+impl<'a> ProjectMutation<'a> {
     #[graphql(name = "createProject")]
     async fn create_project(
         &self,
@@ -54,9 +53,9 @@ impl ProjectMutation {
         input_list: Vec<PathGraphQL>,
     ) -> GraphqlResult<Vec<String>> {
         let sess_claims = ctx.data::<SessionTokenClaims>()?;
-        let project_service_lock = self.project_service.write().await;
 
-        let result = project_service_lock
+        let result = self
+            .project_service
             .append_to_monitoring_exclude_list(
                 &input_list.iter().map(Into::into).collect::<Vec<PathBuf>>(),
             )
@@ -82,9 +81,9 @@ impl ProjectMutation {
         input_list: Vec<PathGraphQL>,
     ) -> GraphqlResult<Vec<String>> {
         let sess_claims = ctx.data::<SessionTokenClaims>()?;
-        let project_service_lock = self.project_service.write().await;
 
-        let result = project_service_lock
+        let result = self
+            .project_service
             .remove_from_monitoring_exclude_list(
                 &input_list
                     .into_iter()
@@ -105,21 +104,17 @@ impl ProjectMutation {
     }
 }
 
-pub(super) struct ProjectSubscription {
-    pub project_service: Arc<RwLock<ProjectService>>,
+pub(super) struct ProjectSubscription<'a> {
+    pub project_service: Arc<ProjectService<'a>>,
 }
 
 #[Subscription]
-impl ProjectSubscription {
+impl<'a> ProjectSubscription<'a> {
     async fn explorer_event_feed(
         &self,
-        ctx: &Context<'_>,
-    ) -> async_graphql::Result<impl Stream<Item = FieldResult<WorktreeEvent>>> {
-        // dbg!(ctx.http_header_contains("session-token"));
-        // let sess_claims = ctx.data::<HeaderMap>()?;
-
-        let project_service_lock = self.project_service.read().await;
-        let stream = project_service_lock.explorer_event_feed().await?;
+        _ctx: &Context<'_>,
+    ) -> async_graphql::Result<impl Stream<Item = FieldResult<PlatformEvent>>> {
+        let stream = self.project_service.event_live_stream().await?;
 
         Ok(stream.map(|event| Ok(event)))
     }

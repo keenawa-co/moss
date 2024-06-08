@@ -12,3 +12,14 @@ where
 {
     pub id: T,
 }
+
+impl<T> Thing<T>
+where
+    T: std::fmt::Display + Clone + PartialEq + PartialOrd + std::fmt::Debug,
+    T: OutputType,
+{
+    #[must_use]
+    pub fn new(id: T) -> Thing<T> {
+        Self { id }
+    }
+}

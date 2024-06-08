@@ -8,9 +8,6 @@ pub mod workspace_service;
 
 use fs::real;
 use std::sync::Arc;
-use tokio::sync::RwLock;
-
-use crate::{config::Config, infra::adapter::sqlite::RootSQLiteAdapter};
 
 use self::{
     config_service::ConfigService, metric_service::MetricService,
@@ -19,35 +16,30 @@ use self::{
     workspace_service::WorkspaceService,
 };
 
-pub struct ServiceRoot(
+use super::port::rootdb::RootDbAdapter;
+
+pub struct ServiceRoot<'a: 'static>(
     pub Arc<ConfigService>,
     pub Arc<ProjectMetaService>,
     pub Arc<MetricService>,
     pub Arc<SessionService>,
     pub Arc<NotificationService>,
-    pub Arc<RwLock<ProjectService>>,
-    pub Arc<RwLock<WorkspaceService>>,
+    pub Arc<ProjectService<'a>>,
+    pub Arc<WorkspaceService>,
 );
 
-impl ServiceRoot {
-    pub fn new(conf: &Config) -> Self {
+impl<'a> ServiceRoot<'a> {
+    pub fn new(rootdb: &impl RootDbAdapter) -> Arc<Self> {
         let realfs = Arc::new(real::FileSystem::new());
-        let root_db = RootSQLiteAdapter::new(Arc::clone(&conf.conn));
 
-        ServiceRoot(
-            ConfigService::new(conf.preference.clone()),
-            Arc::new(ProjectMetaService::new(
-                realfs.clone(),
-                root_db.project_meta_repo(),
-            )),
-            Arc::new(MetricService::new()),
-            Arc::new(SessionService::new(
-                root_db.session_repo(),
-                root_db.project_meta_repo(),
-            )),
-            Arc::new(NotificationService::new()),
-            Arc::new(RwLock::new(ProjectService::init(realfs.clone()))),
-            Arc::new(RwLock::new(WorkspaceService::init())),
-        )
+        Arc::new(ServiceRoot(
+            ConfigService::new(),
+            ProjectMetaService::new(realfs.clone(), rootdb.project_meta_repo()),
+            MetricService::new(),
+            SessionService::new(rootdb.session_repo(), rootdb.project_meta_repo()),
+            NotificationService::new(),
+            ProjectService::init(realfs.clone()),
+            WorkspaceService::init(),
+        ))
     }
 }

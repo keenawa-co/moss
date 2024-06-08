@@ -16,7 +16,7 @@ where
 {
     let router = axum::Router::new()
         .merge(status::router())
-        .merge(gql::router(schema.clone()));
+        .merge(gql::router());
 
     axum::Router::new()
         .nest("/api", router)

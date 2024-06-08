@@ -3,6 +3,8 @@ mod infra;
 
 pub mod config;
 
+use std::sync::Arc;
+
 use domain::model::error::Error;
 use tokio_util::sync::CancellationToken as TokioCancellationToken;
 use tower::ServiceBuilder;
@@ -18,6 +20,7 @@ use tower_http::{
 use crate::{
     config::CONF,
     domain::{model::OptionExtension, service::ServiceRoot},
+    infra::adapter::sqlite::RootSQLiteAdapter,
 };
 
 #[macro_use]
@@ -40,35 +43,13 @@ pub async fn bind(_: TokioCancellationToken) -> Result<(), Error> {
         .get()
         .ok_or_config_invalid("Configuration was not defined", None)?;
 
-    // let b = bus::Bus::new();
-
-    // let realfs = Arc::new(real::FileSystem::new());
-    // let watch_stream = rfs
-    //     .watch(
-    //         Path::new("./testdata/helloworld.ts"),
-    //         Duration::from_secs(1),
-    //     )
-    //     .await;
-
-    // let mut stream = Box::pin(watch_stream);
-    // while let Some(paths) = stream.next().await {
-    //     dbg!(paths);
-    // }
-
-    // let fw = FileWatcher::new(b.clone());
-
-    // b.create_topic("general", TopicConfig::default()).await;
-    // b.subscribe_topic::<String>("general", fw.clone()).await?;
-
-    // let pe = PolicyEngine::new(fw.clone(), b);
-
-    let service_hub = ServiceRoot::new(conf);
-
     let service = ServiceBuilder::new()
         .catch_panic()
         .set_x_request_id(MakeRequestUuid)
         .propagate_x_request_id();
 
+    let rootdb_adapter = RootSQLiteAdapter::new(&conf.conn);
+    let service_hub = ServiceRoot::new(&rootdb_adapter);
     let schema = infra::graphql::build_schema(service_hub);
     let service = service.layer(
         CompressionLayer::new().compress_when(

@@ -4,9 +4,12 @@ mod notification_query;
 mod project_query;
 mod session_query;
 
+use std::sync::Arc;
+
 use async_graphql::{
     ErrorExtensionValues, ErrorExtensions, MergedObject, MergedSubscription, Schema,
 };
+use tokio::sync::RwLock;
 
 use self::{
     config_query::ConfigQuery,
@@ -24,37 +27,37 @@ use crate::domain::{
 pub struct QueryRoot(SessionQuery, ConfigQuery);
 
 #[derive(MergedObject)]
-pub struct MutationRoot(ProjectMutation, SessionMutation);
+pub struct MutationRoot<'a>(ProjectMutation<'a>, SessionMutation<'a>);
 
 #[derive(MergedSubscription)]
-pub struct SubscriptionRoot(
-    ProjectSubscription,
-    MetricSubscription,
+pub struct SubscriptionRoot<'a>(
+    ProjectSubscription<'a>,
+    MetricSubscription<'a>,
     NotificationSubscription,
 );
 
-pub type SchemaRoot = Schema<QueryRoot, MutationRoot, SubscriptionRoot>;
+pub type SchemaRoot = Schema<QueryRoot, MutationRoot<'static>, SubscriptionRoot<'static>>;
 
-pub fn build_schema(service_root: ServiceRoot) -> SchemaRoot {
+pub fn build_schema(service_root: Arc<ServiceRoot>) -> SchemaRoot {
     Schema::build(
         QueryRoot(
             SessionQuery {
-                session_service: service_root.3.clone(),
+                session_service: Arc::clone(&service_root.3),
             },
             ConfigQuery {
-                config_service: service_root.0,
+                config_service: Arc::clone(&service_root.0),
             },
         ),
         MutationRoot(
             ProjectMutation {
-                project_meta_service: service_root.1.clone(),
-                project_service: service_root.5.clone(),
-                notification_service: service_root.4.clone(),
+                project_meta_service: Arc::clone(&service_root.1),
+                project_service: Arc::clone(&service_root.5),
+                notification_service: Arc::clone(&service_root.4),
             },
             SessionMutation {
-                session_service: service_root.3.clone(),
-                project_service: service_root.5.clone(),
-                workspace_service: service_root.6.clone(),
+                session_service: Arc::clone(&service_root.3),
+                project_service: Arc::clone(&service_root.5),
+                workspace_service: Arc::clone(&service_root.6),
             },
         ),
         SubscriptionRoot(

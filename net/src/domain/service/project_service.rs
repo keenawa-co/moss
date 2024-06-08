@@ -1,7 +1,8 @@
+use app::event::PlatformEvent;
+use arc_swap::ArcSwapOption;
 use fs::{real, FS};
 use futures::{Stream, StreamExt};
-use hashbrown::HashSet;
-use project::{model::event::WorktreeEvent, Project};
+use project::Project;
 use std::{
     path::{Path, PathBuf},
     pin::Pin,
@@ -10,37 +11,46 @@ use std::{
 };
 use types::file::json_file::JsonFile;
 
-use crate::domain::model::{result::Result, OptionExtension};
+use crate::domain::{
+    self,
+    model::{result::Result, OptionExtension},
+};
 
-pub struct ProjectService {
-    realfs: Arc<real::FileSystem>,
-    project: Option<Project>,
+pub struct ProjectService<'a> {
+    realfs: Arc<dyn FS>,
+    project: ArcSwapOption<Project>,
+    test: &'a i128,
 }
 
-impl ProjectService {
-    pub fn init(realfs: Arc<real::FileSystem>) -> Self {
-        Self {
+impl<'a> ProjectService<'a> {
+    pub fn init(realfs: Arc<dyn FS>) -> Arc<Self> {
+        Arc::new(Self {
             realfs,
-            project: None,
-        }
+            project: ArcSwapOption::from(None),
+            test: &10,
+        })
     }
 
     pub async fn start_project(
-        &mut self,
+        self: &Arc<Self>,
         project_path: &PathBuf,
         settings_file: Arc<JsonFile>,
     ) -> Result<()> {
         let arc_path: Arc<Path> = Arc::from(project_path.clone().into_boxed_path());
 
-        self.project = Some(Project::new(self.realfs.clone(), arc_path, settings_file).await?);
+        let project = Project::new(self.realfs.clone(), arc_path, settings_file).await?;
+        self.project.store(Some(Arc::new(project)));
 
         Ok(())
     }
 
-    pub async fn explorer_event_feed(
-        &self,
-    ) -> Result<Pin<Box<dyn Send + Stream<Item = WorktreeEvent>>>> {
-        let stream = self.project_ref()?.worktree_event_stream().await;
+    pub async fn event_live_stream(
+        self: &'a Arc<Self>,
+    ) -> Result<
+        Pin<Box<dyn Send + Stream<Item = PlatformEvent<'a>> + 'a>>,
+        domain::model::error::Error,
+    > {
+        let stream = self.get_project()?.event_stream().await;
 
         Ok(Box::pin(stream))
     }
@@ -69,54 +79,33 @@ impl ProjectService {
     }
 
     pub async fn append_to_monitoring_exclude_list(
-        &self,
+        self: &Arc<Self>,
         input_list: &[PathBuf],
     ) -> Result<Vec<String>> {
         Ok(self
-            .project_ref()?
+            .get_project()?
             .settings
             .append_to_monitoring_exclude_list(input_list)
             .await?)
     }
 
     pub async fn remove_from_monitoring_exclude_list(
-        &self,
+        self: &Arc<Self>,
         input_list: &[PathBuf],
     ) -> Result<Vec<String>> {
         Ok(self
-            .project_ref()?
+            .get_project()?
             .settings
             .remove_from_monitoring_exclude_list(input_list)
             .await?)
     }
 }
 
-impl ProjectService {
-    fn project_ref(&self) -> Result<&Project> {
+impl<'a> ProjectService<'a> {
+    fn get_project(&'a self) -> Result<Arc<Project>> {
         Ok(self
             .project
-            .as_ref()
+            .load_full()
             .ok_or_resource_precondition_required("Session must be initialized first", None)?)
-    }
-}
-
-async fn path_filtration(
-    event_paths: Vec<PathBuf>,
-    ignore_list: HashSet<PathBuf>,
-) -> Option<Vec<PathBuf>> {
-    dbg!(&ignore_list);
-    let filtered_paths = event_paths
-        .into_iter()
-        .filter(|path| {
-            !ignore_list
-                .iter()
-                .any(|ignore_path| path.starts_with(ignore_path))
-        })
-        .collect::<Vec<PathBuf>>();
-
-    if filtered_paths.is_empty() {
-        None
-    } else {
-        Some(filtered_paths)
     }
 }

@@ -1,5 +1,5 @@
 pub(crate) mod rootdb {
-    use std::{fmt::Debug, path::PathBuf};
+    use std::{fmt::Debug, path::PathBuf, sync::Arc};
     use types::{id::NanoId, thing::Thing};
 
     use crate::domain::model::{
@@ -8,12 +8,17 @@ pub(crate) mod rootdb {
         session::{SessionEntity, SessionInfoEntity},
     };
 
+    pub trait RootDbAdapter {
+        fn project_meta_repo(&self) -> Arc<dyn ProjectMetaRepository>;
+        fn session_repo(&self) -> Arc<dyn SessionRepository>;
+    }
+
     #[async_trait]
     pub trait ProjectMetaRepository: Debug + Send + Sync {
         async fn create(&self, input: &CreateProjectInput) -> Result<ProjectMeta>;
         async fn get_by_id(&self, id: &NanoId) -> Result<Option<ProjectMeta>>;
         async fn get_by_source(&self, source: &PathBuf) -> Result<Option<ProjectMeta>>;
-        async fn get_list_by_ids(&self, ids: &Vec<NanoId>) -> Result<Vec<ProjectMeta>>;
+        async fn get_list_by_ids(&self, ids: &[NanoId]) -> Result<Vec<ProjectMeta>>;
         async fn delete_by_id(&self, id: &NanoId) -> Result<Option<Thing<NanoId>>>;
     }
 

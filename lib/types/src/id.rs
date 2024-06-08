@@ -38,6 +38,12 @@ impl Into<sea_orm::Value> for NanoId {
     }
 }
 
+impl Into<sea_orm::Value> for &NanoId {
+    fn into(self) -> sea_orm::Value {
+        sea_orm::Value::String(Some(Box::new(self.0.to_string())))
+    }
+}
+
 impl From<&str> for NanoId {
     fn from(value: &str) -> Self {
         NanoId(BoundedString::new(value).unwrap())

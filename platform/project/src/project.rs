@@ -1,20 +1,23 @@
 use anyhow::Result;
+use app::event::{PlatformAction, PlatformEvent};
 use async_utl::AsyncTryFrom;
+use chrono::Utc;
 use fs::FS;
-use futures::Stream;
-use std::{path::Path, sync::Arc};
+use futures::stream::{select_all, Stream, StreamExt};
+use serde_json::json;
+
+use std::{path::Path, pin::Pin, sync::Arc};
 use types::file::json_file::JsonFile;
 
 use crate::{
-    model::event::WorktreeEvent,
     settings::Settings,
-    worktree::{local::LocalWorktreeSettings, Worktree},
+    worktree::{settings::LocalWorktreeSettings, Worktree},
 };
 
 #[derive(Debug)]
 pub struct Project {
     pub worktree: Worktree,
-    pub settings: Settings,
+    pub settings: Arc<Settings>,
 }
 
 impl Project {
@@ -33,14 +36,24 @@ impl Project {
 
         Ok(Self {
             worktree: Worktree::local(fs, &worktree_settings).await?,
-            settings: initial_settings,
+            settings: Arc::new(initial_settings),
         })
     }
 
-    pub async fn worktree_event_stream(&self) -> impl Stream<Item = WorktreeEvent> {
-        match &self.worktree {
-            Worktree::Local(local) => local.event_stream().await,
-            Worktree::Remote => unimplemented!(),
-        }
+    pub async fn event_stream<'a>(
+        self: &Arc<Self>,
+    ) -> Pin<Box<dyn Send + Stream<Item = PlatformEvent<'a>> + 'a>> {
+        let worktree_event_stream = self
+            .worktree
+            .event_stream()
+            .await
+            .map(|event| PlatformEvent {
+                action: PlatformAction::new("project", "worktree", "fileCreated"),
+                severity: app::event::Severity::Info,
+                data: json!(event),
+                timestamp: Utc::now().timestamp(),
+            });
+
+        Box::pin(select_all(vec![Box::pin(worktree_event_stream)]))
     }
 }

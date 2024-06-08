@@ -62,5 +62,5 @@ pub trait FS: Debug + Send + Sync {
         &self,
         path: &Path,
         latency: Duration,
-    ) -> Pin<Box<dyn Send + Stream<Item = Vec<PathBuf>>>>;
+    ) -> Pin<Box<dyn Send + Stream<Item = notify::Event>>>;
 }

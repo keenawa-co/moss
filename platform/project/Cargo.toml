@@ -10,17 +10,25 @@ workspace.workspace = true
 mac.workspace = true
 async_utl.workspace = true
 fs.workspace = true
+graphql_utl.workspace = true
+app.workspace = true
 
 hashbrown.workspace = true
 anyhow.workspace = true
 smol.workspace = true
 async-trait.workspace = true
 radix_trie.workspace = true
+chrono.workspace = true
+parking_lot.workspace = true
+
 
 serde = { workspace = true, features = ["derive"] }
 serde_json.workspace = true
+serde_with.workspace = true
 
 async-graphql = { workspace = true, optional = true }
+
+notify.workspace = true
 
 futures.workspace = true
 tokio = { workspace = true, features = ["full", "signal", "macros"] }

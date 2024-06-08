@@ -1,3 +1,4 @@
+pub mod event;
 pub mod file;
 pub mod id;
 pub mod operation;

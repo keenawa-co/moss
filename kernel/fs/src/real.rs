@@ -119,16 +119,15 @@ impl super::FS for FileSystem {
         &self,
         path: &Path,
         _latency: Duration, // TODO: use this
-    ) -> Pin<Box<dyn Send + Stream<Item = Vec<PathBuf>>>> {
+    ) -> Pin<Box<dyn Send + Stream<Item = notify::Event>>> {
         let (tx, rx) = smol::channel::unbounded();
 
         let mut file_watcher = notify::recommended_watcher({
             let tx = tx.clone();
 
             move |event: Result<notify::Event, _>| {
-                // println!("File event detected: {:?}", event);
                 if let Some(event) = event.ok() {
-                    tx.try_send(event.paths).ok();
+                    tx.try_send(event).ok();
                 }
             }
         })
@@ -151,7 +150,7 @@ impl super::FS for FileSystem {
                         .any(|path| path.starts_with(&watched_path))
                     {
                         // println!("Parent event detected: {:?}", event);
-                        if let Err(e) = tx.try_send(event.paths) {
+                        if let Err(e) = tx.try_send(event) {
                             eprintln!("Error sending event: {:?}", e);
                         }
                     }
@@ -171,7 +170,12 @@ impl super::FS for FileSystem {
         Box::pin(rx.chain(futures::stream::once(async move {
             drop(parent_watcher);
             drop(file_watcher);
-            vec![]
+
+            notify::Event {
+                kind: notify::EventKind::Other,
+                paths: vec![],
+                attrs: Default::default(),
+            }
         })))
     }
 }
