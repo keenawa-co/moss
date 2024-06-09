@@ -1,6 +1,14 @@
-# desktop
+# About
 
-An Electron application with React and TypeScript
+Moss Desktop Application 
+
+# Technologies
+- **Electron** (framework for building desktop applications using JS, HTML, and CSS)
+- **React** (framework for creating interactive UI components) 
+- **TypeScript** (type-safety support)
+- **Tailwind CSS** (CSS styling)
+- **Redux** (React state manager)
+- **i18next** (internationalization)
 
 ## Recommended IDE Setup
 
@@ -13,11 +21,19 @@ An Electron application with React and TypeScript
 ```bash
 $ yarn
 ```
+or
+```bash
+$ npm install
+```
 
 ### Development
 
 ```bash
 $ yarn dev
+```
+or
+```bash
+$ npm run dev
 ```
 
 ### Build

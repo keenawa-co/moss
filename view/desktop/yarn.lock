@@ -672,42 +672,6 @@
     lodash "^4.17.15"
     tmp-promise "^3.0.2"
 
-"@messageformat/core@^3.0.0":
-  version "3.3.0"
-  resolved "https://registry.npmjs.org/@messageformat/core/-/core-3.3.0.tgz"
-  integrity sha512-YcXd3remTDdeMxAlbvW6oV9d/01/DZ8DHUFwSttO3LMzIZj3iO0NRw+u1xlsNNORFI+u0EQzD52ZX3+Udi0T3g==
-  dependencies:
-    "@messageformat/date-skeleton" "^1.0.0"
-    "@messageformat/number-skeleton" "^1.0.0"
-    "@messageformat/parser" "^5.1.0"
-    "@messageformat/runtime" "^3.0.1"
-    make-plural "^7.0.0"
-    safe-identifier "^0.4.1"
-
-"@messageformat/date-skeleton@^1.0.0":
-  version "1.0.1"
-  resolved "https://registry.npmjs.org/@messageformat/date-skeleton/-/date-skeleton-1.0.1.tgz"
-  integrity sha512-jPXy8fg+WMPIgmGjxSlnGJn68h/2InfT0TNSkVx0IGXgp4ynnvYkbZ51dGWmGySEK+pBiYUttbQdu5XEqX5CRg==
-
-"@messageformat/number-skeleton@^1.0.0":
-  version "1.2.0"
-  resolved "https://registry.npmjs.org/@messageformat/number-skeleton/-/number-skeleton-1.2.0.tgz"
-  integrity sha512-xsgwcL7J7WhlHJ3RNbaVgssaIwcEyFkBqxHdcdaiJzwTZAWEOD8BuUFxnxV9k5S0qHN3v/KzUpq0IUpjH1seRg==
-
-"@messageformat/parser@^5.1.0":
-  version "5.1.0"
-  resolved "https://registry.npmjs.org/@messageformat/parser/-/parser-5.1.0.tgz"
-  integrity sha512-jKlkls3Gewgw6qMjKZ9SFfHUpdzEVdovKFtW1qRhJ3WI4FW5R/NnGDqr8SDGz+krWDO3ki94boMmQvGke1HwUQ==
-  dependencies:
-    moo "^0.5.1"
-
-"@messageformat/runtime@^3.0.1":
-  version "3.0.1"
-  resolved "https://registry.npmjs.org/@messageformat/runtime/-/runtime-3.0.1.tgz"
-  integrity sha512-6RU5ol2lDtO8bD9Yxe6CZkl0DArdv0qkuoZC+ZwowU+cdRlVE1157wjCmlA5Rsf1Xc/brACnsZa5PZpEDfTFFg==
-  dependencies:
-    make-plural "^7.0.0"
-
 "@nodelib/fs.scandir@2.1.5":
   version "2.1.5"
   resolved "https://registry.npmjs.org/@nodelib/fs.scandir/-/fs.scandir-2.1.5.tgz"
@@ -1386,7 +1350,7 @@ bluebird@^3.5.5:
   resolved "https://registry.npmjs.org/bluebird/-/bluebird-3.7.2.tgz"
   integrity sha512-XpNj6GDQzdfW+r2Wnn7xiSAd7TM3jzkxGXBGTtWKuSXv1xUV+azxAm8jdWZN06QTQk+2N2XB9jRDkvbmQmcRtg==
 
-boolean@^3.0.1, boolean@^3.1.4:
+boolean@^3.0.1:
   version "3.2.0"
   resolved "https://registry.npmjs.org/boolean/-/boolean-3.2.0.tgz"
   integrity sha512-d0II/GO9uf9lfUHH2BQsjxzRJZBdsjgsBiW4BvhWk/3qoKwQFjIDVN19PfX8F2D/r9PCMTtLWjYVCFrpeYUzsw==
@@ -1735,7 +1699,7 @@ data-view-byte-offset@^1.0.0:
     es-errors "^1.3.0"
     is-data-view "^1.0.1"
 
-debug@4, debug@^4.1.0, debug@^4.1.1, debug@^4.3.1, debug@^4.3.2, debug@^4.3.3, debug@^4.3.4:
+debug@4, debug@^4.1.0, debug@^4.1.1, debug@^4.3.1, debug@^4.3.2, debug@^4.3.4:
   version "4.3.4"
   resolved "https://registry.npmjs.org/debug/-/debug-4.3.4.tgz"
   integrity sha512-PRWFHuSU3eDtQJPvnNY7Jcket1j0t5OuOsFzPPzsekD52Zl8qUfFIPEiswXqIvHWGVHOgX+7G/vCNNhehwxfkQ==
@@ -2327,13 +2291,6 @@ fast-levenshtein@^2.0.6:
   resolved "https://registry.npmjs.org/fast-levenshtein/-/fast-levenshtein-2.0.6.tgz"
   integrity sha512-DCXu6Ifhqcks7TZKY3Hxp3y6qphY5SJZmrWMDrKcERSOXWQdMhU9Ig/PYrzyw/ul9jOIyh0N4M0tbC5hodg8dw==
 
-fast-printf@^1.6.9:
-  version "1.6.9"
-  resolved "https://registry.npmjs.org/fast-printf/-/fast-printf-1.6.9.tgz"
-  integrity sha512-FChq8hbz65WMj4rstcQsFB0O7Cy++nmbNfLYnD9cYv2cRn8EG6k/MGn9kO/tjO66t09DLDugj3yL+V2o6Qftrg==
-  dependencies:
-    boolean "^3.1.4"
-
 fastq@^1.6.0:
   version "1.17.1"
   resolved "https://registry.npmjs.org/fastq/-/fastq-1.17.1.tgz"
@@ -2726,18 +2683,6 @@ https-proxy-agent@^5.0.1:
   dependencies:
     agent-base "6"
     debug "4"
-
-i18n@^0.15.1:
-  version "0.15.1"
-  resolved "https://registry.npmjs.org/i18n/-/i18n-0.15.1.tgz"
-  integrity sha512-yue187t8MqUPMHdKjiZGrX+L+xcUsDClGO0Cz4loaKUOK9WrGw5pgan4bv130utOwX7fHE9w2iUeHFalVQWkXA==
-  dependencies:
-    "@messageformat/core" "^3.0.0"
-    debug "^4.3.3"
-    fast-printf "^1.6.9"
-    make-plural "^7.0.0"
-    math-interval-parser "^2.0.1"
-    mustache "^4.2.0"
 
 iconv-corefoundation@^1.1.7:
   version "1.1.7"
@@ -3211,22 +3156,12 @@ magic-string@^0.30.5:
   dependencies:
     "@jridgewell/sourcemap-codec" "^1.4.15"
 
-make-plural@^7.0.0:
-  version "7.4.0"
-  resolved "https://registry.npmjs.org/make-plural/-/make-plural-7.4.0.tgz"
-  integrity sha512-4/gC9KVNTV6pvYg2gFeQYTW3mWaoJt7WZE5vrp1KnQDgW92JtYZnzmZT81oj/dUTqAIu0ufI2x3dkgu3bB1tYg==
-
 matcher@^3.0.0:
   version "3.0.0"
   resolved "https://registry.npmjs.org/matcher/-/matcher-3.0.0.tgz"
   integrity sha512-OkeDaAZ/bQCxeFAozM55PKcKU0yJMPGifLwV4Qgjitu+5MoAfSQN4lsLJeXZ1b8w0x+/Emda6MZgXS1jvsapng==
   dependencies:
     escape-string-regexp "^4.0.0"
-
-math-interval-parser@^2.0.1:
-  version "2.0.1"
-  resolved "https://registry.npmjs.org/math-interval-parser/-/math-interval-parser-2.0.1.tgz"
-  integrity sha512-VmlAmb0UJwlvMyx8iPhXUDnVW1F9IrGEd9CIOmv+XL8AErCUUuozoDMrgImvnYt2A+53qVX/tPW6YJurMKYsvA==
 
 merge2@^1.3.0, merge2@^1.4.1:
   version "1.4.1"
@@ -3339,20 +3274,10 @@ mkdirp@^1.0.3:
   resolved "https://registry.npmjs.org/mkdirp/-/mkdirp-1.0.4.tgz"
   integrity sha512-vVqVZQyf3WLx2Shd0qJ9xuvqgAyKPLAiqITEtqW0oIUjzo3PePDd6fW9iFz30ef7Ysp/oiWqbhszeGWW2T6Gzw==
 
-moo@^0.5.1:
-  version "0.5.2"
-  resolved "https://registry.npmjs.org/moo/-/moo-0.5.2.tgz"
-  integrity sha512-iSAJLHYKnX41mKcJKjqvnAN9sf0LMDTXDEvFv+ffuRR9a1MIuXLjMNL6EsnDHSkKLTWNqQQ5uo61P4EbU4NU+Q==
-
 ms@2.1.2:
   version "2.1.2"
   resolved "https://registry.npmjs.org/ms/-/ms-2.1.2.tgz"
   integrity sha512-sGkPx+VjMtmA6MX27oA4FBFELFCZZ4S4XqeGOXCv68tT+jb3vk/RyaKWP0PTKyWtmLSM0b+adUTEvbs1PEaH2w==
-
-mustache@^4.2.0:
-  version "4.2.0"
-  resolved "https://registry.yarnpkg.com/mustache/-/mustache-4.2.0.tgz#e5892324d60a12ec9c2a73359edca52972bf6f64"
-  integrity sha512-71ippSywq5Yb7/tVYyGbkBggbU8H3u5Rz56fH60jGFgr8uHwxs+aSKeqmluIVzM0m0kB7xQjKS6qPfd0b2ZoqQ==
 
 mz@^2.7.0:
   version "2.7.0"
@@ -3899,11 +3824,6 @@ safe-array-concat@^1.1.2:
     get-intrinsic "^1.2.4"
     has-symbols "^1.0.3"
     isarray "^2.0.5"
-
-safe-identifier@^0.4.1:
-  version "0.4.2"
-  resolved "https://registry.npmjs.org/safe-identifier/-/safe-identifier-0.4.2.tgz"
-  integrity sha512-6pNbSMW6OhAi9j+N8V+U715yBQsaWJ7eyEUaOrawX+isg5ZxhUlV1NipNtgaKHmFGiABwt+ZF04Ii+3Xjkg+8w==
 
 safe-regex-test@^1.0.3:
   version "1.0.3"
