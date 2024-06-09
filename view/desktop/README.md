@@ -51,7 +51,7 @@ $ yarn build:linux
 
 # Convert jsonnet file to json file
 ```bash
-$ jsonnet .\test.jsonnet -o test.json
+$ yarn run jsonnet
 ```
 
 # Create interface for Type-Safe Translations with i18next
