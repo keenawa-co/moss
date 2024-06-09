@@ -75,6 +75,7 @@ arc-swap = "1.7.1"
 radix_trie = "0.2.1"
 parking_lot = "0.12.3"
 derive_more = "0.99.17"
+async-task = "4.7.1"
 
 tokio = "1"
 tokio-util = "0.7"
