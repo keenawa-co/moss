@@ -53,3 +53,11 @@ $ yarn build:linux
 ```bash
 $ jsonnet .\test.jsonnet -o test.json
 ```
+
+# Create interface for Type-Safe Translations with i18next
+```bash
+$ yarn run interface
+```
+**Input**: view\desktop\src\renderer\public\locales
+
+**Output**: view\desktop\src\renderer\src\@types\resources.d.ts
