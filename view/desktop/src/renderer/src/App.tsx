@@ -1,9 +1,11 @@
 import { About, Content, DraggableTopBar, Home, Menu, RootLayout, Sidebar } from '@/components'
-import { Suspense } from 'react'
+import { Suspense, useEffect, useState, createContext } from 'react'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import './i18n'
+import React from 'react';
 
 function App() {
+  
   return (
     <>
       <DraggableTopBar />
