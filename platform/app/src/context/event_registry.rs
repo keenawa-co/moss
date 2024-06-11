@@ -69,7 +69,7 @@ impl EventRegistry {
         self.async_hooks.get_mut(type_id).unwrap().push(hook);
     }
 
-    pub async fn dispatch_event<E>(&self, mut event: E)
+    pub fn dispatch_event<'a, E>(&'a self, mut event: E)
     where
         E: Event + 'static,
     {
@@ -98,34 +98,34 @@ impl EventRegistry {
                 }
             }
         } else {
-            let event_clone = event.clone();
-            let hooks_clone = hooks.clone();
-            let async_hooks_clone = async_hooks.clone();
+            // let event_clone = event.clone();
+            // let hooks_clone = hooks.clone();
+            // let async_hooks_clone = async_hooks.clone();
 
-            let sync_handle = tokio::spawn(async move {
-                for hook in hooks_clone {
-                    if let Err(e) = hook.call(&mut event) {
-                        println!("{e}"); // TODO: handle error
-                    }
-                }
-            });
+            // let sync_handle = tokio::spawn(async move {
+            //     for hook in hooks_clone {
+            //         if let Err(e) = hook.call(&mut event) {
+            //             println!("{e}"); // TODO: handle error
+            //         }
+            //     }
+            // });
 
-            let async_handle = tokio::spawn(async move {
-                let mut tasks = Vec::with_capacity(async_hooks_clone.len());
-                let guarded_event = Arc::new(Mutex::new(event_clone));
+            // let async_handle = tokio::spawn(async move {
+            //     let mut tasks = Vec::with_capacity(async_hooks_clone.len());
+            //     let guarded_event = Arc::new(Mutex::new(event_clone));
 
-                for async_hook in async_hooks_clone {
-                    let guarded_event_clone = Arc::clone(&guarded_event);
-                    tasks.push(tokio::spawn(async move {
-                        if let Err(e) = async_hook.call(guarded_event_clone).await {
-                            println!("{e}"); // TODO: handle error
-                        }
-                    }));
-                }
-                futures::future::join_all(tasks).await;
-            });
+            //     for async_hook in async_hooks_clone {
+            //         let guarded_event_clone = Arc::clone(&guarded_event);
+            //         tasks.push(tokio::spawn(async move {
+            //             if let Err(e) = async_hook.call(guarded_event_clone).await {
+            //                 println!("{e}"); // TODO: handle error
+            //             }
+            //         }));
+            //     }
+            //     futures::future::join_all(tasks).await;
+            // });
 
-            let _ = tokio::join!(sync_handle, async_handle);
+            // let _ = tokio::join!(sync_handle, async_handle);
         }
     }
 }

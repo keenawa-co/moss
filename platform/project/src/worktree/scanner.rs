@@ -49,7 +49,7 @@ impl FileSystemScanService {
 
     pub async fn run(
         &self,
-        ctx: Arc<Context>,
+        // ctx: &Context,
         root_abs_path: Arc<Path>,
         mut fs_event_stream: Pin<Box<dyn Send + Stream<Item = notify::Event>>>,
     ) -> Result<()> {
@@ -68,7 +68,7 @@ impl FileSystemScanService {
         drop(scan_job_tx);
 
         let tm1 = chrono::Utc::now();
-        self.index_deep(ctx.clone(), scan_job_rx).await;
+        self.index_deep(scan_job_rx).await;
         let tm2 = chrono::Utc::now();
 
         let t = tm2 - tm1;
@@ -78,9 +78,7 @@ impl FileSystemScanService {
 
         loop {
             if let Some(notify_event) = fs_event_stream.next().await {
-                self.handle_notify_event(ctx.clone(), notify_event)
-                    .await
-                    .unwrap(); // TODO: handle error
+                self.handle_notify_event(notify_event).await.unwrap(); // TODO: handle error
             } else {
                 break;
             }
@@ -89,7 +87,7 @@ impl FileSystemScanService {
         Ok(())
     }
 
-    async fn handle_notify_event(&self, ctx: Arc<Context>, event: notify::Event) -> Result<()> {
+    async fn handle_notify_event(&self, event: notify::Event) -> Result<()> {
         let map_to_filetree_entry = |paths: Vec<PathBuf>, kind: FileTreeEntryKind| {
             paths
                 .into_iter()
@@ -148,7 +146,7 @@ impl FileSystemScanService {
 
     async fn populate_dir(
         &self,
-        ctx: Arc<Context>,
+        // ctx: &Context,
         parent_path: &Arc<Path>,
         entry_list: Vec<FiletreeEntry>,
     ) {
@@ -175,9 +173,18 @@ impl FileSystemScanService {
                 .insert(entry.path.to_path_buf(), entry.clone());
         }
 
-        ctx.get_event_registry(|registry| {
-            registry.dispatch_event(WorktreeEvent::Created(entry_list.clone()))
-        });
+        // ctx.get_event_registry(|registry| {
+        //     registry.dispatch_event(WorktreeEvent::Created(entry_list))
+        // });
+
+        // ctx.background_executor.spawn(async {
+        //     println!("Hello, World!");
+        // });
+
+        // ctx.with_event_registry_async(|registry| async move {
+        //     registry.dispatch_event(WorktreeEvent::Created(entry_list));
+        // })
+        // .await;
 
         if let Err(e) = self.sync_tx.send(WorktreeEvent::Created(entry_list)).await {
             error!("Failed to send event: {e}");
@@ -186,16 +193,12 @@ impl FileSystemScanService {
         info!("populated a directory {parent_path:?}");
     }
 
-    async fn index_deep(
-        &self,
-        ctx: Arc<Context>,
-        mut scan_jobs_rx: mpsc::UnboundedReceiver<ScanJob>,
-    ) {
+    async fn index_deep(&self, mut scan_jobs_rx: mpsc::UnboundedReceiver<ScanJob>) {
         loop {
             select_biased! {
                 job_option = scan_jobs_rx.recv().fuse() => {
                     if let Some(job) = job_option {
-                        if let Err(e) = self.index_dir(ctx.clone(), &job).await {
+                        if let Err(e) = self.index_dir(&job).await {
                             error!("failed to scan directory {:?}: {}", job.abs_path, e)
                         }
                     } else {
@@ -206,7 +209,7 @@ impl FileSystemScanService {
         }
     }
 
-    async fn index_dir(&self, ctx: Arc<Context>, job: &ScanJob) -> Result<()> {
+    async fn index_dir(&self, job: &ScanJob) -> Result<()> {
         {
             let state_lock = self.state.lock().await;
             if state_lock
@@ -270,7 +273,7 @@ impl FileSystemScanService {
             entry_list.push(child_entry);
         }
 
-        self.populate_dir(ctx, &job.path, entry_list).await;
+        self.populate_dir(&job.path, entry_list).await;
 
         for j in planned_job_list {
             job.scan_queue.send(j).unwrap()
