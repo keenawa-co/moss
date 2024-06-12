@@ -8,9 +8,9 @@ export const Home = () => {
 
   return (
     <main>
-      <h1 className="dark:text-black">{t('title')}</h1>
-      <span className="dark:text-black">{t('description.part1')} </span>
-      <span className="dark:text-black">{t('description.part1', { ns: 'ns2' })} </span>
+      <h1>{t('title')}</h1>
+      <span>{t('description.part1')} </span>
+      <span>{t('description.part1', { ns: 'ns2' })} </span>
     </main>
   )
 }

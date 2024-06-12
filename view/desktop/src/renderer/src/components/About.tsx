@@ -5,8 +5,8 @@ export const About = () => {
 
   return (
     <main>
-      <h1 className="dark:text-black">{t('about')}</h1>
-      <span className="dark:text-black">{t('user', { name: 'Jevgenijs 🦇' })}</span>
+      <h1>{t('about')}</h1>
+      <span>{t('user', { name: 'Jevgenijs 🦇' })}</span>
     </main>
   )
 }

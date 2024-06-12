@@ -44,15 +44,15 @@ export const Menu = () => {
         </Trans>
       </p>
       <div>
-        <NavLink className={isActive + ' bg-blue-400 dark:text-black'} to="/">
+        <NavLink className={isActive + ' bg-blue-400'} to="/">
           {t('home')}
         </NavLink>
-        <NavLink className={isActive + ' bg-red-400 dark:text-black'} to="/about">
+        <NavLink className={isActive + ' bg-red-400'} to="/about">
           {t('about')}
         </NavLink>
       </div>
 
-      <select className="dark:text-black bg-green-500" defaultValue={i18n.language} onChange={onChangeLang}>
+      <select className="bg-green-500" defaultValue={i18n.language} onChange={onChangeLang}>
         {LANGUAGES.map(({ code, label }) => (
           <option key={code} value={code}>
             {label}

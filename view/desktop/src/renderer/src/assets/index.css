@@ -13,9 +13,9 @@
 
     @apply select-none;
 
-    @apply bg-slate-900;
+    @apply dark:bg-slate-900 bg-white;
 
-    @apply font-mono antialiased text-white;
+    @apply font-mono antialiased dark:text-white text-black;
 
     @apply overflow-hidden;
   }

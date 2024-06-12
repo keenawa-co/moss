@@ -13,7 +13,7 @@ function createWindow(): void {
     ...(process.platform === 'linux' ? { icon } : {}),
     center: true,
     title: "Moss Desktop App",
-    frame: false, //remove window frame
+    frame: true, //remove window frame
     vibrancy: "under-window", //in order to apply background blur effect
     visualEffectState: "active",
     titleBarStyle: "hidden", // remove title bar
