@@ -36,8 +36,8 @@ impl Worktree {
     pub async fn local(fs: Arc<dyn FS>, settings: &LocalWorktreeSettings) -> Result<Self> {
         let worktree = LocalWorktree::new(fs, settings).await?;
         let (event_pool_tx, event_pool_rx) = smol::channel::unbounded();
-        let app_cell = Context::new();
-        let context = app_cell.app.borrow();
+        // let app_cell = Context::new();
+        // let context = app_cell.app.borrow();
 
         worktree.run(event_pool_tx).await?;
 

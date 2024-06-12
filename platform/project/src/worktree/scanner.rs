@@ -71,8 +71,8 @@ impl FileSystemScanService {
         self.index_deep(scan_job_rx).await;
         let tm2 = chrono::Utc::now();
 
-        let t = tm2 - tm1;
-        dbg!(t);
+        // let t = tm2 - tm1;
+        // dbg!(t);
 
         // NOTE: use select_biased! to prioritize event queue
 
@@ -186,9 +186,9 @@ impl FileSystemScanService {
         // })
         // .await;
 
-        if let Err(e) = self.sync_tx.send(WorktreeEvent::Created(entry_list)).await {
-            error!("Failed to send event: {e}");
-        }
+        // if let Err(e) = self.sync_tx.send(WorktreeEvent::Created(entry_list)).await {
+        //     error!("Failed to send event: {e}");
+        // }
 
         info!("populated a directory {parent_path:?}");
     }

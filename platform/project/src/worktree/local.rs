@@ -142,14 +142,14 @@ impl LocalWorktree {
             .watch(&abs_path_clone, Duration::from_secs(1))
             .await;
 
-        // task::spawn(async move {
-        //     let scanner = FileSystemScanService::new(fs_clone, sync_state_tx, snapshot.clone());
+        task::spawn(async move {
+            let scanner = FileSystemScanService::new(fs_clone, sync_state_tx, snapshot.clone());
 
-        //     // TODO: send error event to event_chan_tx in case of error
-        //     if let Err(e) = scanner.run(ctx, abs_path_clone, fs_event_stream).await {
-        //         error!("Error in worktree scanner: {e}");
-        //     }
-        // });
+            // TODO: send error event to event_chan_tx in case of error
+            if let Err(e) = scanner.run(abs_path_clone, fs_event_stream).await {
+                error!("Error in worktree scanner: {e}");
+            }
+        });
 
         Ok(())
     }
