@@ -14,6 +14,7 @@ parking_lot.workspace = true
 chrono.workspace = true
 derive_more.workspace = true
 async-task.workspace = true
+async-executor.workspace = true
 
 serde = { workspace = true, features = ["derive"] }
 serde_json.workspace = true
