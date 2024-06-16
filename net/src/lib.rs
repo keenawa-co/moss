@@ -38,7 +38,8 @@ extern crate mac;
 
 const MIX_COMPRESS_SIZE: u16 = 512; // TODO: this value should be used from a net_conf.toml file
 
-pub async fn bind(_: TokioCancellationToken) -> Result<(), Error> {
+// _: TokioCancellationToken
+pub async fn bind() -> Result<(), Error> {
     let conf = CONF
         .get()
         .ok_or_config_invalid("Configuration was not defined", None)?;

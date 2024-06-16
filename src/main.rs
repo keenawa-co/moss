@@ -1,11 +1,14 @@
-mod mem;
-
+use app::context::{App, AppContext};
 use std::process::ExitCode;
 
-fn main() -> ExitCode {
-    return tokio::runtime::Builder::new_multi_thread()
-        .enable_all()
-        .build()
-        .unwrap()
-        .block_on(moss_cli::init());
+// fn main() -> ExitCode {
+//     let app = App::new();
+
+//     return moss_cli::init(&app);
+// }
+
+fn main() {
+    return App::new().run(|ctx: &mut AppContext| {
+        moss_cli::init(ctx);
+    });
 }

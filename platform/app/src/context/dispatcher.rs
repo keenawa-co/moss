@@ -8,7 +8,7 @@ use tokio::sync::Notify;
 use tokio::task;
 use tracing::debug;
 
-use super::task::TaskLabel;
+use crate::executor::TaskLabel;
 
 // pub trait PlatformDispatcher: Send + Sync {
 //     fn is_main_thread(&self) -> bool;

@@ -1,5 +1,8 @@
+use anyhow::Result;
+use app::context::{AppContext, AsyncAppContext};
 use clap::Args;
 use moss_net::config::{Config as NetConfig, CONF as NET_CONF};
+use sea_orm::DatabaseConnection;
 use std::{net::SocketAddr, path::PathBuf, sync::Arc};
 use tokio_util::sync::CancellationToken as TokioCancellationToken;
 use tracing::Level;
@@ -50,6 +53,7 @@ pub struct RunCmdArgs {
 }
 
 pub async fn cmd_run(
+    ctx: &AppContext,
     RunCmdArgs {
         bind,
         net_pref_path: preference_filepath,
@@ -62,9 +66,12 @@ pub async fn cmd_run(
     tracing::subscriber::set_global_default(subscriber)?;
 
     let conf: crate::config::Config = super::utl::load_toml_file(&net_conf_path)?;
-    let conn = seaorm_utl::conn::<RootMigrator>(&PathBuf::from("root.db")).await?;
 
-    //  cancel_token is passed to all async functions requiring graceful termination
+    let conn = ctx.block_on(|ctx| async {
+        seaorm_utl::conn::<RootMigrator>(&PathBuf::from("root.db")).await
+    })?;
+
+    // cancel_token is passed to all async functions requiring graceful termination
     let cancel_token = TokioCancellationToken::new();
 
     let _ = NET_CONF.set(NetConfig {
@@ -73,8 +80,8 @@ pub async fn cmd_run(
         conn: Arc::new(conn),
     });
     let _ = moss_net::config::MAGIC_TOKEN_KEY.set("MAGIC_TEST_TOKEN".to_string());
-
-    moss_net::bind(cancel_token).await?;
+    println!("2");
+    moss_net::bind().await?;
 
     Ok(())
 }

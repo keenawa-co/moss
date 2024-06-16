@@ -40,6 +40,8 @@
     "sqlx",
     "tablename",
     "thiserror",
+    "unpark",
+    "unparker",
     "unwatch",
     "worktree"
   ],

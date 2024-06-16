@@ -1,5 +1,5 @@
 use anyhow::{Context as AnyhowContext, Result};
-use app::context::{AsyncContext, Context};
+use app::context::{AppContext, AsyncAppContext};
 use fs::FS;
 use parking_lot::RwLock;
 use smol::{channel::Receiver as SmolReceiver, channel::Sender as SmolSender};

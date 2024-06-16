@@ -3,8 +3,10 @@ mod migrate;
 mod run;
 mod utl;
 
+use anyhow::Context;
+use app::context::{AppCell, AppContext, AsyncAppContext};
 use clap::{Parser, Subcommand};
-use std::process::ExitCode;
+use std::{process::ExitCode, sync::Arc};
 
 use self::{docs::DocsCommandList, migrate::MigrateCommandList, run::RunCmdArgs};
 
@@ -40,21 +42,28 @@ enum Commands {
     Docs(DocsCommandList),
 }
 
-pub async fn init() -> ExitCode {
+pub fn init(ctx: &AppContext) -> ExitCode {
+    let Ok(runtime) = tokio::runtime::Builder::new_multi_thread()
+        .enable_all()
+        .build()
+    else {
+        panic!("failed to build async runtime");
+    };
+
     let args = CLI::parse();
 
     let output = match args.command {
-        Commands::Run(args) => run::cmd_run(args).await,
+        Commands::Run(args) => runtime.block_on(run::cmd_run(ctx, args)),
         Commands::Migrate(cmd) => match cmd {
-            MigrateCommandList::Up(args) => migrate::cmd_migration_up(args).await,
+            MigrateCommandList::Up(args) => runtime.block_on(migrate::cmd_migration_up(args)),
         },
         Commands::Docs(cmd) => match cmd {
-            DocsCommandList::Schema(args) => docs::cmd_graphql_schema(args).await,
+            DocsCommandList::Schema(args) => runtime.block_on(docs::cmd_graphql_schema(args)),
         },
     };
 
     if let Err(e) = output {
-        println!("{}", e);
+        error!("{}", e);
         return ExitCode::FAILURE;
     } else {
         return ExitCode::SUCCESS;

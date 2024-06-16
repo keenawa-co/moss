@@ -2,149 +2,137 @@ pub mod dispatcher;
 pub mod event;
 pub mod event_registry;
 pub mod hook;
-pub mod task;
 
-use async_executor::Executor;
+use anyhow::Result;
 use derive_more::{Deref, DerefMut};
-use dispatcher::CrossPlatformDispatcher;
-use event_registry::EventRegistry;
 use futures::Future;
-use parking_lot::RwLock;
-use smol::future::FutureExt;
 use std::{
-    borrow::Borrow,
     cell::{Ref, RefCell, RefMut},
-    pin::Pin,
+    rc::Rc,
     sync::{Arc, Weak},
-    task::Poll,
 };
-use task::{Task, TaskLabel};
+
+use crate::{
+    executor::{BackgroundTaskExecutor, ForegroundTaskExecutor, Task},
+    platform::{current_platform, Platform},
+};
 
 pub struct AppCell {
-    pub app: RwLock<Context>,
+    pub app: RefCell<AppContext>,
 }
 
 #[derive(Deref, DerefMut)]
-pub struct AppRef<'a>(parking_lot::RwLockReadGuard<'a, Context>);
+pub struct AppRef<'a>(Ref<'a, AppContext>);
 
 #[derive(Deref, DerefMut)]
-pub struct AppRefMut<'a>(parking_lot::RwLockWriteGuard<'a, Context>);
+pub struct AppRefMut<'a>(RefMut<'a, AppContext>);
 
 impl AppCell {
     pub fn borrow(&self) -> AppRef {
-        AppRef(self.app.read())
+        AppRef(self.app.borrow())
     }
 
     pub fn borrow_mut(&self) -> AppRefMut {
-        AppRefMut(self.app.write())
+        AppRefMut(self.app.borrow_mut())
     }
 }
 
-pub struct AsyncContext {
-    pub app: RwLock<Weak<AppCell>>,
+#[derive(Clone)]
+pub struct AsyncAppContext {
+    pub(crate) app: Weak<AppCell>,
+    pub(crate) background_task_executor: BackgroundTaskExecutor,
 }
 
-impl AsyncContext {
-    fn upgrade(&self) -> Option<Arc<AppCell>> {
-        self.app.read().upgrade()
+unsafe impl Sync for AsyncAppContext {}
+unsafe impl Send for AsyncAppContext {}
+
+impl AsyncAppContext {
+    pub fn update<R>(&self, f: impl FnOnce(&mut AppContext) -> R) -> Result<R> {
+        let app = self
+            .app
+            .upgrade()
+            .ok_or_else(|| anyhow!("app was released"))?;
+        let mut lock = app.borrow_mut();
+        Ok(f(&mut lock))
+    }
+
+    pub fn background_task_executor(&self) -> &BackgroundTaskExecutor {
+        &self.background_task_executor
+    }
+
+    pub fn spawn2<Fut, R>(&self, f: impl FnOnce(AsyncAppContext) -> Fut) -> Task<R>
+    where
+        Fut: Future<Output = R> + Send + 'static,
+        R: Send + 'static,
+    {
+        self.background_task_executor.spawn(f(self.clone()))
     }
 }
 
-// type AnyFuture<R> = Pin<Box<dyn 'static + Send + Future<Output = R>>>;
-
-// #[derive(Clone)]
-// pub struct BackgroundExecutor {
-//     dispatcher: Arc<CrossPlatformDispatcher>,
-// }
-
-// impl BackgroundExecutor {
-//     pub fn spawn<R>(&self, future: impl Future<Output = R> + Send + 'static) -> Task<R>
-//     where
-//         R: Send + 'static,
-//     {
-//         self.spawn_internal::<R>(Box::pin(future), None)
-//     }
-
-//     pub fn spawn_labeled<R>(
-//         &self,
-//         label: TaskLabel,
-//         future: impl Future<Output = R> + Send + 'static,
-//     ) -> Task<R>
-//     where
-//         R: Send + 'static,
-//     {
-//         self.spawn_internal::<R>(Box::pin(future), Some(label))
-//     }
-
-//     fn spawn_internal<R: Send + 'static>(
-//         &self,
-//         future: AnyFuture<R>,
-//         label: Option<TaskLabel>,
-//     ) -> Task<R> {
-//         let dispatcher = self.dispatcher.clone();
-//         let (runnable, task) =
-//             async_task::spawn(future, move |runnable| dispatcher.dispatch(runnable, label));
-//         runnable.schedule();
-//         Task::Spawned(task)
-//     }
-// }
-
-// struct Executor {
-//     executor: LocalExecutor<'static>,
-// }
-
-// impl Executor {
-//     // fn spawn<F>(&self, future: F) -> Task<F::Output>
-//     // where
-//     //     F: Future + Send + 'static,
-//     //     F::Output: Send + 'static,
-//     // {
-//     //     let (task, handle) = async_task::spawn(future, |t| {
-//     //         self.executor.spawn(future).detach();
-//     //     });
-//     //     task.schedule();
-//     //     task
-//     // }
-// }
-
-// pub struct Executor {}
-
-// impl Executor {
-//     pub fn block_on(&self, future: impl Future<Output = ()> + Send) {
-
-//         // let notify = Arc::new(Notify::new());
-//     }
-// }
-
-pub struct Context {
-    this: Weak<AppCell>,
-
-    event_registry: RwLock<EventRegistry>,
+#[derive(Clone)]
+pub struct AppContext {
+    pub(crate) this: Weak<AppCell>,
+    pub(crate) platform: Rc<dyn Platform>,
+    // pub(crate) event_registry: RwLock<EventRegistry>,
+    pub(crate) background_task_executor: BackgroundTaskExecutor,
+    pub(crate) foreground_task_executor: ForegroundTaskExecutor,
 }
 
-impl Context {
-    pub fn new() -> Arc<AppCell> {
-        let ex = Executor::new();
-
-        let task = ex.spawn(async {
-            println!("Hello world!");
-        });
-
-        smol::block_on(ex.run(task));
-        // smol::spawn(ex.run(task));
-
+impl AppContext {
+    pub fn new(platform: Rc<dyn Platform>) -> Arc<AppCell> {
         Arc::new_cyclic(|this| AppCell {
-            app: RwLock::new(Context {
+            app: RefCell::new(AppContext {
                 this: Weak::clone(this),
-                event_registry: RwLock::new(EventRegistry::new()),
+                platform: platform.clone(),
+                // event_registry: RwLock::new(EventRegistry::new()),
+                background_task_executor: platform.background_task_executor(),
+                foreground_task_executor: platform.foreground_task_executor(),
             }),
         })
     }
 
-    pub fn into_async(&self) -> AsyncContext {
-        AsyncContext {
-            app: RwLock::new(self.this.clone()),
+    pub fn into_async(&self) -> AsyncAppContext {
+        AsyncAppContext {
+            app: self.this.clone(),
+            background_task_executor: self.background_task_executor.clone(),
         }
+    }
+
+    pub fn spawn<Fut, R>(&self, f: impl FnOnce(AsyncAppContext) -> Fut) -> Task<R>
+    where
+        Fut: Future<Output = R> + Send + 'static,
+        R: Send + 'static,
+    {
+        self.background_task_executor.spawn(f(self.into_async()))
+    }
+
+    pub fn block_on<'a, Fut, R>(&'a self, f: impl FnOnce(&'a AppContext) -> Fut) -> R
+    where
+        Fut: Future<Output = R>,
+    {
+        self.background_task_executor.block_on(f(self))
+    }
+}
+
+pub struct App(Arc<AppCell>);
+
+impl App {
+    pub fn new() -> Self {
+        Self(AppContext::new(current_platform()))
+    }
+
+    pub fn run<F>(self, on_finish_launching: F)
+    where
+        F: 'static + FnOnce(&mut AppContext),
+    {
+        let this = self.0.clone();
+        // let platform = self.0.app.borrow().platform.clone();
+        // platform.run(Box::new(move || {
+        //     let ctx: &mut RefMut<AppContext> = &mut *this.borrow_mut();
+        //     on_finish_launching(ctx);
+        // }));
+        let ctx: &mut RefMut<AppContext> = &mut *this.borrow_mut();
+        on_finish_launching(ctx);
     }
 }
 

@@ -15,6 +15,7 @@ chrono.workspace = true
 derive_more.workspace = true
 async-task.workspace = true
 async-executor.workspace = true
+ctor.workspace = true
 
 serde = { workspace = true, features = ["derive"] }
 serde_json.workspace = true
@@ -27,3 +28,14 @@ tokio = { workspace = true, features = ["full"] }
 futures.workspace = true
 
 tracing.workspace = true
+
+parking = "2.2.0"
+objc = "0.2.7"
+cocoa = "0.25.0"
+slotmap = "1.0.7"
+waker-fn = "1.2.0"
+
+
+[target.'cfg(target_os = "macos")'.build-dependencies]
+bindgen = "0.65.1"
+cbindgen = "0.26.0"
