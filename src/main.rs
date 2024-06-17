@@ -1,11 +1,4 @@
-use app::context::{App, AppContext};
-use std::process::ExitCode;
-
-// fn main() -> ExitCode {
-//     let app = App::new();
-
-//     return moss_cli::init(&app);
-// }
+use app::{context::AppContext, App};
 
 fn main() {
     return App::new().run(|ctx: &mut AppContext| {

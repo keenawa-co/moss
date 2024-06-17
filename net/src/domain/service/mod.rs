@@ -6,6 +6,7 @@ pub mod project_service;
 pub mod session_service;
 pub mod workspace_service;
 
+use app::context::AppContext;
 use fs::real;
 use std::sync::Arc;
 

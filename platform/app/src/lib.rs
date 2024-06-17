@@ -1,13 +1,33 @@
 pub mod context;
 pub mod event;
-pub mod model_context;
 
 mod executor;
 mod platform;
 
-#[macro_use]
-extern crate serde;
-extern crate serde_json;
+use context::{AppCell, AppContext};
+use std::{cell::RefMut, rc::Rc};
 
 #[macro_use]
 extern crate anyhow;
+
+pub struct App(Rc<AppCell>);
+
+impl App {
+    pub fn new() -> Self {
+        Self(AppContext::new(platform::current_platform()))
+    }
+
+    pub fn run<F>(self, on_finish_launching: F)
+    where
+        F: 'static + FnOnce(&mut AppContext),
+    {
+        let this = self.0.clone();
+        // let platform = self.0.app.borrow().platform.clone();
+        // platform.run(Box::new(move || {
+        //     let ctx: &mut RefMut<AppContext> = &mut *this.borrow_mut();
+        //     on_finish_launching(ctx);
+        // }));
+        let ctx: &mut RefMut<AppContext> = &mut *this.borrow_mut();
+        on_finish_launching(ctx);
+    }
+}

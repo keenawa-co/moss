@@ -5,20 +5,20 @@ pub mod hook;
 
 use anyhow::Result;
 use derive_more::{Deref, DerefMut};
+use event_registry::EventRegistry;
 use futures::Future;
 use std::{
     cell::{Ref, RefCell, RefMut},
-    rc::Rc,
-    sync::{Arc, Weak},
+    rc::{Rc, Weak},
 };
 
 use crate::{
     executor::{BackgroundTaskExecutor, ForegroundTaskExecutor, Task},
-    platform::{current_platform, Platform},
+    platform::Platform,
 };
 
 pub struct AppCell {
-    pub app: RefCell<AppContext>,
+    app: RefCell<AppContext>,
 }
 
 #[derive(Deref, DerefMut)]
@@ -60,12 +60,12 @@ impl AsyncAppContext {
         &self.background_task_executor
     }
 
-    pub fn spawn2<Fut, R>(&self, f: impl FnOnce(AsyncAppContext) -> Fut) -> Task<R>
+    pub fn spawn<Fut, R>(&self, f: impl FnOnce(&AsyncAppContext) -> Fut) -> Task<R>
     where
         Fut: Future<Output = R> + Send + 'static,
         R: Send + 'static,
     {
-        self.background_task_executor.spawn(f(self.clone()))
+        self.background_task_executor.spawn(f(&self))
     }
 }
 
@@ -73,18 +73,18 @@ impl AsyncAppContext {
 pub struct AppContext {
     pub(crate) this: Weak<AppCell>,
     pub(crate) platform: Rc<dyn Platform>,
-    // pub(crate) event_registry: RwLock<EventRegistry>,
+    pub(crate) event_registry: Rc<EventRegistry>,
     pub(crate) background_task_executor: BackgroundTaskExecutor,
     pub(crate) foreground_task_executor: ForegroundTaskExecutor,
 }
 
 impl AppContext {
-    pub fn new(platform: Rc<dyn Platform>) -> Arc<AppCell> {
-        Arc::new_cyclic(|this| AppCell {
+    pub fn new(platform: Rc<dyn Platform>) -> Rc<AppCell> {
+        Rc::new_cyclic(|this| AppCell {
             app: RefCell::new(AppContext {
-                this: Weak::clone(this),
+                this: this.clone(),
                 platform: platform.clone(),
-                // event_registry: RwLock::new(EventRegistry::new()),
+                event_registry: Rc::new(EventRegistry::new()),
                 background_task_executor: platform.background_task_executor(),
                 foreground_task_executor: platform.foreground_task_executor(),
             }),
@@ -111,28 +111,6 @@ impl AppContext {
         Fut: Future<Output = R>,
     {
         self.background_task_executor.block_on(f(self))
-    }
-}
-
-pub struct App(Arc<AppCell>);
-
-impl App {
-    pub fn new() -> Self {
-        Self(AppContext::new(current_platform()))
-    }
-
-    pub fn run<F>(self, on_finish_launching: F)
-    where
-        F: 'static + FnOnce(&mut AppContext),
-    {
-        let this = self.0.clone();
-        // let platform = self.0.app.borrow().platform.clone();
-        // platform.run(Box::new(move || {
-        //     let ctx: &mut RefMut<AppContext> = &mut *this.borrow_mut();
-        //     on_finish_launching(ctx);
-        // }));
-        let ctx: &mut RefMut<AppContext> = &mut *this.borrow_mut();
-        on_finish_launching(ctx);
     }
 }
 

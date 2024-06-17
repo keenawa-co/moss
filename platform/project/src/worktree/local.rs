@@ -78,7 +78,7 @@ impl LocalWorktree {
 
     pub async fn run(
         self: &Arc<Self>,
-        // ctx: &Context,
+        ctx: &AsyncAppContext,
         event_chan_tx: SmolSender<SharedWorktreeEvent>,
     ) -> Result<()> {
         let worktree = self.clone();
@@ -122,17 +122,41 @@ impl LocalWorktree {
         let worktree = self.clone();
         let (sync_state_tx, sync_state_rx) = smol::channel::unbounded::<WorktreeEvent>();
 
-        tokio::try_join!(
-            worktree.run_background_scanner(sync_state_tx),
-            worktree.run_background_event_handler(sync_state_rx, event_chan_tx),
-        )?;
+        // tokio::try_join!(
+        //     worktree.run_background_scanner(sync_state_tx),
+        //     worktree.run_background_event_handler(sync_state_rx, event_chan_tx),
+        // )?;
+
+        ctx.spawn(|ctx: &AsyncAppContext| {
+            let worktree = self.clone();
+            let ctx_clone = ctx.clone();
+
+            async move {
+                worktree
+                    .run_background_scanner(ctx_clone, sync_state_tx)
+                    .await
+                    .unwrap();
+            }
+        })
+        .detach();
+
+        // ctx.spawn(|c| {
+        //     let worktree = self.clone();
+        //     async move {
+        //         worktree
+        //             .run_background_event_handler(sync_state_rx, event_chan_tx)
+        //             .await
+        //             .unwrap();
+        //     }
+        // })
+        // .detach();
 
         Ok(())
     }
 
     async fn run_background_scanner<'a>(
         self: &Arc<Self>,
-        // ctx: &Context,
+        ctx: AsyncAppContext,
         sync_state_tx: SmolSender<WorktreeEvent>,
     ) -> Result<()> {
         let snapshot = self.state.snapshot.read().clone();
@@ -141,6 +165,8 @@ impl LocalWorktree {
         let fs_event_stream = fs_clone
             .watch(&abs_path_clone, Duration::from_secs(1))
             .await;
+
+        // ctx.spawn(|ctx| )
 
         task::spawn(async move {
             let scanner = FileSystemScanService::new(fs_clone, sync_state_tx, snapshot.clone());

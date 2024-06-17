@@ -5,6 +5,7 @@ pub mod config;
 
 use std::sync::Arc;
 
+use app::context::AppContext;
 use domain::model::error::Error;
 use tokio_util::sync::CancellationToken as TokioCancellationToken;
 use tower::ServiceBuilder;
@@ -38,8 +39,7 @@ extern crate mac;
 
 const MIX_COMPRESS_SIZE: u16 = 512; // TODO: this value should be used from a net_conf.toml file
 
-// _: TokioCancellationToken
-pub async fn bind() -> Result<(), Error> {
+pub async fn bind(ctx: &AppContext, _: TokioCancellationToken) -> Result<(), Error> {
     let conf = CONF
         .get()
         .ok_or_config_invalid("Configuration was not defined", None)?;
@@ -50,16 +50,16 @@ pub async fn bind() -> Result<(), Error> {
         .propagate_x_request_id();
 
     let rootdb_adapter = RootSQLiteAdapter::new(&conf.conn);
-    let service_hub = ServiceRoot::new(&rootdb_adapter);
-    let schema = infra::graphql::build_schema(service_hub);
+    let service_root = ServiceRoot::new(&rootdb_adapter);
+    let schema = infra::graphql::build_schema(service_root);
     let service = service.layer(
         CompressionLayer::new().compress_when(
             SizeAbove::new(MIX_COMPRESS_SIZE) // don't compress below 512 bytes
-                .and(NotForContentType::IMAGES), // don't compress images
+                .and(NotForContentType::IMAGES),
         ),
     );
 
-    let router = infra::web::router(service, schema); // TODO: consider to use Cow<T>
+    let router = infra::web::router(ctx, service, schema);
 
     info!("Moss has been successfully launched on {}", conf.bind);
 
