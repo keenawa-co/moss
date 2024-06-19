@@ -18,6 +18,9 @@ export const Menu = () => {
   }
 
   // Dark Mode
+
+  
+
   const [darkMode, setDarkMode] = useState<boolean | undefined>(undefined)
 
   const switchMode = () => {
@@ -36,18 +39,52 @@ export const Menu = () => {
     }
   }, [darkMode])
 
+
+
+
+
+
+
+  const themes = ['black', 'orange', 'purple', 'green', 'blue']
+  const [theme, setTheme] = useState<string>(themes[0])
+
+  const switchTheme = (newTheme: string) => {
+    setTheme(newTheme)
+  }
+
+  useEffect(() => {
+    if (darkMode) {
+      localStorage.setItem('darkMode', 'true')
+      window.document.documentElement.classList.add('dark')
+    } else if (darkMode === false) {
+      localStorage.setItem('darkMode', 'false')
+      window.document.documentElement.classList.remove('dark')
+    } else {
+      setDarkMode(localStorage.getItem('darkMode') === 'true')
+    }
+  }, [theme])
+
+
+
+  const onChangeLTheme = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const newTheme = e.target.value
+    setTheme(newTheme)
+  }
+
+  console.log("---------------->"+theme)
+
   return (
-    <nav>
+    <nav className={`theme-${theme}`}>
       <p>
-        <Trans i18nKey="title">
+        <Trans i18nKey="title" className="text-primary">
           Welcome to react using <code>react-i18next</code> fully type-safe
         </Trans>
       </p>
-      <div>
-        <NavLink className={isActive + ' bg-blue-400'} to="/">
+      <div >
+        <NavLink className={isActive + ' bg-primary'} to="/">
           {t('home')}
         </NavLink>
-        <NavLink className={isActive + ' bg-red-400'} to="/about">
+        <NavLink className={isActive + ' bg-secondary'} to="/about">
           {t('about')}
         </NavLink>
       </div>
@@ -71,6 +108,14 @@ export const Menu = () => {
           children="Mode"
         />
       </div>
+
+      <select className="bg-green-500" defaultValue={themes[0]}  onChange={onChangeLTheme}>
+        {themes.map((t) => (
+          <option key={t} value={t}>
+            {t}
+          </option>
+        ))}
+      </select>
     </nav>
   )
 }

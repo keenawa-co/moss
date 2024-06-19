@@ -1684,6 +1684,11 @@ csstype@^3.0.2:
   resolved "https://registry.npmjs.org/csstype/-/csstype-3.1.3.tgz"
   integrity sha512-M1uQkMl8rQK/szD0LNhtqxIPLpimGm8sOBwU7lLnCpSbTyY3yeU1Vc7l4KT5zT4s/yOxHH5O7tIuuLOCnLADRw==
 
+custom-electron-titlebar@^4.2.8:
+  version "4.2.8"
+  resolved "https://registry.yarnpkg.com/custom-electron-titlebar/-/custom-electron-titlebar-4.2.8.tgz#8b0d024cf372b10c9758cc512ca55498b69616da"
+  integrity sha512-JEFiOKJdSZtMh90FO90FeEqCc463ZZhuh78JxILvO9Nc0H8I9MfKekgCf6jZH6xccd3/tm1OcYOoUJi3JbXR/w==
+
 data-view-buffer@^1.0.1:
   version "1.0.1"
   resolved "https://registry.npmjs.org/data-view-buffer/-/data-view-buffer-1.0.1.tgz"

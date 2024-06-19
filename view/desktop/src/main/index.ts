@@ -3,6 +3,10 @@ import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 
+import { setupTitlebar, attachTitlebarToWindow } from 'custom-electron-titlebar/main';
+
+setupTitlebar();
+
 function createWindow(): void {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
@@ -13,7 +17,7 @@ function createWindow(): void {
     ...(process.platform === 'linux' ? { icon } : {}),
     center: true,
     title: "Moss Desktop App",
-    frame: true, //remove window frame
+    frame: false, //remove window frame
     vibrancy: "under-window", //in order to apply background blur effect
     visualEffectState: "active",
     titleBarStyle: "hidden", // remove title bar
@@ -42,6 +46,8 @@ function createWindow(): void {
   } else {
     mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
   }
+
+  attachTitlebarToWindow(mainWindow);
 }
 
 // This method will be called when Electron has finished

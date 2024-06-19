@@ -3,9 +3,54 @@
 @tailwind utilities;
 
 @layer base {
-  #root {
-    @apply h-full;
+  :root {
+    --color-primary: hsla(0, 0%, 0%);
+    --color-secondary: hsla(0, 0%, 50%);
+    --color-text-base: hsla(0, 0%, 100%);
+    --color-bg-primary: hsla(0, 0%, 100%);
   }
+
+  * {
+    @apply transition-colors duration-500 ease-in-out;
+  }
+
+  html,
+  body {
+    .theme-black {
+      --color-primary: hsla(0, 0%, 0%);
+      --color-secondary: hsla(0, 0%, 50%);
+      --color-bg-primary: hsla(0, 0%, 75%);
+    }
+
+    .theme-orange {
+      --color-primary: hsla(25, 100%, 50%);
+      --color-secondary: hsla(25, 100%, 65%);
+      --color-bg-primary: hsla(25, 100%, 85%);
+    }
+
+    .theme-purple {
+      --color-primary: hsla(270, 100%, 35%);
+      --color-secondary: hsla(270, 100%, 75%);
+    }
+    .theme-purple {
+      --color-primary: hsla(270, 100%, 35%);
+      --color-secondary: hsla(270, 100%, 75%);
+    }
+
+    .theme-green {
+      --color-primary: hsla(120, 100%, 35%);
+      --color-secondary: hsla(120, 100%, 45%);
+    }
+
+    .theme-blue {
+      --color-primary: hsla(220, 100%, 50%);
+      --color-secondary: hsla(220, 100%, 75%);
+    }
+  }
+
+  /*
+
+  @apply h-full;
 
   html,
   body {
@@ -39,4 +84,5 @@
   ::-webkit-scrollbar-track {
     @apply bg-transparent;
   }
+    */
 }
