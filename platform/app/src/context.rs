@@ -5,11 +5,15 @@ pub mod hook;
 
 use anyhow::Result;
 use derive_more::{Deref, DerefMut};
+use event::Event;
 use event_registry::EventRegistry;
 use futures::Future;
+use parking_lot::RwLock;
 use std::{
+    borrow::Borrow,
     cell::{Ref, RefCell, RefMut},
     rc::{Rc, Weak},
+    sync::Arc,
 };
 
 use crate::{
@@ -29,10 +33,12 @@ pub struct AppRefMut<'a>(RefMut<'a, AppContext>);
 
 impl AppCell {
     pub fn borrow(&self) -> AppRef {
+        println!("borrowed");
         AppRef(self.app.borrow())
     }
 
     pub fn borrow_mut(&self) -> AppRefMut {
+        println!("borrowed mut");
         AppRefMut(self.app.borrow_mut())
     }
 }
@@ -40,6 +46,7 @@ impl AppCell {
 #[derive(Clone)]
 pub struct AsyncAppContext {
     pub(crate) app: Weak<AppCell>,
+    pub(crate) event_registry: EventRegistry,
     pub(crate) background_task_executor: BackgroundTaskExecutor,
 }
 
@@ -67,13 +74,68 @@ impl AsyncAppContext {
     {
         self.background_task_executor.spawn(f(&self))
     }
+
+    // pub fn with_event_registry_mut<T>(&self, f: impl FnOnce(&mut EventRegistry) -> T) -> T {
+    //     let mut event_registry = self.update(|ctx: &mut AppContext| {});
+    //     f(&mut event_registry)
+    // }
+
+    pub fn register_hook<E>(
+        &self,
+        hook_fn: impl Fn(&mut E) -> Result<()> + Send + Sync,
+    ) -> Result<()>
+    where
+        E: Event + 'static,
+    {
+        self.update(|ctx: &mut AppContext| {
+            // ctx.event_registry.register_hook(hook_fn);
+        })
+    }
+
+    pub fn register_event<E>(&self) -> Result<()>
+    where
+        E: Event + 'static,
+    {
+        self.update(|ctx: &mut AppContext| {
+            ctx.event_registry.register_event::<E>();
+        })
+    }
+
+    pub fn notify<E>(&self, event: E) -> Task<()>
+    where
+        E: Event + Send + Sync + 'static,
+    {
+        // let future = {
+        //     let r_clone = self.event_registry.clone();
+        //     let event_clone = event.clone();
+        //     async move {
+        //         let event_registry = r_clone.read();
+        //         // event_registry.dispatch_event(event_clone).await
+
+        //         event_registry.te().await;
+        //     }
+        // };
+
+        let r_clone = self.event_registry.clone();
+
+        // self.background_task_executor.spawn(future).detach();
+        self.spawn(move |_| {
+            // let event_clone = event.clone();
+            // let event_registry = r_clone.read();
+
+            async move {
+                let event_registry = r_clone.clone();
+                event_registry.dispatch_event(event).await;
+            }
+        })
+    }
 }
 
 #[derive(Clone)]
 pub struct AppContext {
     pub(crate) this: Weak<AppCell>,
     pub(crate) platform: Rc<dyn Platform>,
-    pub(crate) event_registry: Rc<EventRegistry>,
+    pub(crate) event_registry: EventRegistry,
     pub(crate) background_task_executor: BackgroundTaskExecutor,
     pub(crate) foreground_task_executor: ForegroundTaskExecutor,
 }
@@ -84,16 +146,31 @@ impl AppContext {
             app: RefCell::new(AppContext {
                 this: this.clone(),
                 platform: platform.clone(),
-                event_registry: Rc::new(EventRegistry::new()),
+                event_registry: EventRegistry::new(),
                 background_task_executor: platform.background_task_executor(),
                 foreground_task_executor: platform.foreground_task_executor(),
             }),
         })
     }
 
+    pub fn register_hook<E>(&mut self, hook_fn: impl Fn(&mut E) -> Result<()> + Send + Sync)
+    where
+        E: Event + 'static,
+    {
+        self.event_registry.register_hook(hook_fn)
+    }
+
+    pub fn register_event<E>(&mut self)
+    where
+        E: Event + 'static,
+    {
+        self.event_registry.register_event::<E>();
+    }
+
     pub fn into_async(&self) -> AsyncAppContext {
         AsyncAppContext {
             app: self.this.clone(),
+            event_registry: self.event_registry.clone(),
             background_task_executor: self.background_task_executor.clone(),
         }
     }
@@ -114,32 +191,6 @@ impl AppContext {
     }
 }
 
-// pub fn with_event_registry_mut<T>(&self, f: impl FnOnce(&mut EventRegistry) -> T) -> T {
-//     f(&mut self.event_registry.write())
-// }
-
 // pub fn with_event_registry<T>(&self, f: impl FnOnce(&EventRegistry) -> T) -> T {
 //     f(&self.event_registry.read())
-// }
-
-// #[cfg(test)]
-// mod tests {
-//     use super::*;
-
-//     #[tokio::test]
-//     async fn test() {
-//         use std::sync::atomic::{AtomicBool, Ordering};
-//         use tokio::time::{sleep, Duration};
-
-//         let task_executed = Arc::new(AtomicBool::new(false));
-//         let task_executed_clone = task_executed.clone();
-
-//         let context = Context::new();
-
-//         let future = async move {
-//             task_executed_clone.store(true, Ordering::SeqCst);
-//         };
-
-//         context.borrow().background_executor.spawn(future);
-//     }
 // }

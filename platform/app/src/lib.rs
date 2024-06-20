@@ -5,7 +5,10 @@ mod executor;
 mod platform;
 
 use context::{AppCell, AppContext};
-use std::{cell::RefMut, rc::Rc};
+use std::{
+    cell::{Ref, RefMut},
+    rc::Rc,
+};
 
 #[macro_use]
 extern crate anyhow;
@@ -19,7 +22,7 @@ impl App {
 
     pub fn run<F>(self, on_finish_launching: F)
     where
-        F: 'static + FnOnce(&mut AppContext),
+        F: 'static + FnOnce(&AppContext),
     {
         let this = self.0.clone();
         // let platform = self.0.app.borrow().platform.clone();
@@ -27,7 +30,9 @@ impl App {
         //     let ctx: &mut RefMut<AppContext> = &mut *this.borrow_mut();
         //     on_finish_launching(ctx);
         // }));
-        let ctx: &mut RefMut<AppContext> = &mut *this.borrow_mut();
+
+        let ctx: &Ref<AppContext> = &*this.borrow();
+        // let c = ctx.to_owned();
         on_finish_launching(ctx);
     }
 }

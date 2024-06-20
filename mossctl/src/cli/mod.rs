@@ -53,7 +53,7 @@ pub fn init(ctx: &AppContext) -> ExitCode {
     let args = CLI::parse();
 
     let output = match args.command {
-        Commands::Run(args) => runtime.block_on(run::cmd_run(ctx, args)),
+        Commands::Run(args) => runtime.block_on(run::cmd_run(&ctx, args)),
         Commands::Migrate(cmd) => match cmd {
             MigrateCommandList::Up(args) => runtime.block_on(migrate::cmd_migration_up(args)),
         },

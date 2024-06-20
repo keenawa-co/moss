@@ -1,6 +1,6 @@
 use anyhow::Result;
 use app::{
-    context::AsyncAppContext,
+    context::{AppContext, AsyncAppContext},
     event::{PlatformAction, PlatformEvent},
 };
 use async_utl::AsyncTryFrom;
