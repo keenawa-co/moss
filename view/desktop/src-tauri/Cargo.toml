@@ -1,11 +1,11 @@
 [package]
-name = "desctop_app"
+name = "desktop_view"
 version = "0.1.0"
-description = "A Tauri App"
+description = "Tauri Desktop App"
 authors = ["you"]
 license = ""
 repository = ""
-default-run = "desctop_app"
+default-run = "desktop_view"
 edition = "2021"
 rust-version = "1.60"
 
