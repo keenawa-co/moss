@@ -12,7 +12,7 @@ use app::context::Context;
 use fs::FS;
 use futures::stream::Stream;
 use smol::channel::Receiver as SmolReceiver;
-use std::sync::Arc;
+use std::{borrow::Borrow, sync::Arc};
 
 use crate::model::event::SharedWorktreeEvent;
 
@@ -36,9 +36,10 @@ impl Worktree {
     pub async fn local(fs: Arc<dyn FS>, settings: &LocalWorktreeSettings) -> Result<Self> {
         let worktree = LocalWorktree::new(fs, settings).await?;
         let (event_pool_tx, event_pool_rx) = smol::channel::unbounded();
-        let ctx = Context::new();
+        // let app_cell = Context::new();
+        // let context = app_cell.app.borrow();
 
-        worktree.run(Arc::new(ctx), event_pool_tx).await?;
+        worktree.run(event_pool_tx).await?;
 
         Ok(Self {
             source: TreeSource::Local(worktree),

@@ -1,5 +1,5 @@
 use anyhow::{Context as AnyhowContext, Result};
-use app::context::Context;
+use app::context::{AsyncContext, Context};
 use fs::FS;
 use parking_lot::RwLock;
 use smol::{channel::Receiver as SmolReceiver, channel::Sender as SmolSender};
@@ -78,7 +78,7 @@ impl LocalWorktree {
 
     pub async fn run(
         self: &Arc<Self>,
-        ctx: Arc<Context>,
+        // ctx: &Context,
         event_chan_tx: SmolSender<SharedWorktreeEvent>,
     ) -> Result<()> {
         let worktree = self.clone();
@@ -114,25 +114,25 @@ impl LocalWorktree {
             Ok(())
         };
 
-        ctx.get_event_registry_mut(|registry| {
-            registry.register_event::<WorktreeEvent>();
-            registry.register_hook(test_hook);
-        });
+        // ctx.with_event_registry_mut(|registry| {
+        //     registry.register_event::<WorktreeEvent>();
+        //     registry.register_hook(test_hook);
+        // });
 
         let worktree = self.clone();
         let (sync_state_tx, sync_state_rx) = smol::channel::unbounded::<WorktreeEvent>();
 
         tokio::try_join!(
-            worktree.run_background_scanner(ctx, sync_state_tx),
+            worktree.run_background_scanner(sync_state_tx),
             worktree.run_background_event_handler(sync_state_rx, event_chan_tx),
         )?;
 
         Ok(())
     }
 
-    async fn run_background_scanner(
+    async fn run_background_scanner<'a>(
         self: &Arc<Self>,
-        ctx: Arc<Context>,
+        // ctx: &Context,
         sync_state_tx: SmolSender<WorktreeEvent>,
     ) -> Result<()> {
         let snapshot = self.state.snapshot.read().clone();
@@ -146,7 +146,7 @@ impl LocalWorktree {
             let scanner = FileSystemScanService::new(fs_clone, sync_state_tx, snapshot.clone());
 
             // TODO: send error event to event_chan_tx in case of error
-            if let Err(e) = scanner.run(ctx, abs_path_clone, fs_event_stream).await {
+            if let Err(e) = scanner.run(abs_path_clone, fs_event_stream).await {
                 error!("Error in worktree scanner: {e}");
             }
         });

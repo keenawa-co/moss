@@ -5,11 +5,15 @@ edition = "2021"
 
 
 [dependencies]
+flume = "0.11.0"
+
 hashbrown.workspace = true
 ahash.workspace = true
 anyhow.workspace = true
 parking_lot.workspace = true
 chrono.workspace = true
+derive_more.workspace = true
+async-task.workspace = true
 
 serde = { workspace = true, features = ["derive"] }
 serde_json.workspace = true
