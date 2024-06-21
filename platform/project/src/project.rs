@@ -1,6 +1,8 @@
 use anyhow::Result;
 use app::{
     context::{AppContext, AsyncAppContext},
+    context_compact::AppContextCompact,
+    context_model::ModelContext,
     event::{PlatformAction, PlatformEvent},
 };
 use async_utl::AsyncTryFrom;
@@ -24,6 +26,14 @@ pub struct Project {
 }
 
 impl Project {
+    pub async fn init() {
+        println!("Project init")
+    }
+
+    pub async fn hello() {
+        println!("Hello from Project")
+    }
+
     pub async fn new(
         ctx: &AsyncAppContext,
         fs: Arc<dyn FS>,

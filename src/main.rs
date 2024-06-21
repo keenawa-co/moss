@@ -1,6 +1,10 @@
-use std::time::Duration;
+use std::{borrow::Borrow, time::Duration};
 
-use app::{context::AppContext, context_compact::AppContextCompact, App, AppCompact};
+use app::{
+    context::AppContext, context_compact::AppContextCompact, context_model::ModelContext, App,
+    AppCompact,
+};
+use project::Project;
 
 fn main() {
     // return App::new().run(|ctx: &AppContext| {
@@ -8,6 +12,8 @@ fn main() {
     // });
 
     AppCompact::new().run(|ctx: &mut AppContextCompact| {
+        ctx.insert_model(|| Project::init());
+
         moss_cli::init(ctx);
     })
 }

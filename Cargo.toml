@@ -118,6 +118,7 @@ http = "1.1.0"
 jsonwebtoken = "9.3.0"
 
 [dependencies]
+project.workspace = true
 mossctl.workspace = true
 anyhow.workspace = true
 app.workspace = true

@@ -7,6 +7,9 @@ use std::marker::PhantomData;
 use std::sync::atomic::AtomicUsize;
 use std::sync::Arc;
 
+use crate::context_compact::AppContextCompact;
+use crate::AppCompact;
+
 slotmap::new_key_type! {
     pub struct EntityId;
 }
@@ -30,29 +33,60 @@ impl EntityId {
     }
 }
 
+#[derive(Deref, DerefMut)]
+pub(crate) struct Slot<T>(Model<T>);
+
 struct EntityRefCounter {
-    counter: SlotMap<EntityId, AtomicUsize>,
+    storage: SlotMap<EntityId, AtomicUsize>,
     dropped: Vec<EntityId>,
 }
 
-pub struct EntryMap {
-    storage: SecondaryMap<EntityId, Box<dyn Any>>,
-    counter: Arc<RwLock<EntityRefCounter>>,
-}
+pub struct EntryMap(SlotMap<EntityId, Box<dyn Any>>);
 
 impl EntryMap {
     pub fn new() -> Self {
-        let counter = EntityRefCounter {
-            counter: SlotMap::with_key(),
-            dropped: Vec::new(),
-        };
-
-        Self {
-            storage: SecondaryMap::new(),
-            counter: Arc::new(RwLock::new(counter)),
-        }
+        Self(SlotMap::with_key())
     }
+
+    // pub(crate) fn insert::<T>(&mut self) ->
 }
+
+// pub struct EntryMap {
+//     storage: SecondaryMap<EntityId, Box<dyn Any>>,
+//     counter: Arc<RwLock<EntityRefCounter>>,
+// }
+
+// impl EntryMap {
+//     pub(crate) fn new() -> Self {
+//         let counter = EntityRefCounter {
+//             storage: SlotMap::with_key(),
+//             dropped: Vec::new(),
+//         };
+
+//         Self {
+//             storage: SecondaryMap::new(),
+//             counter: Arc::new(RwLock::new(counter)),
+//         }
+//     }
+
+//     pub(crate) fn reserve<T: 'static>(&self) -> Slot<T> {
+//         let id = self.counter.write().storage.insert(1.into());
+
+//         Slot(Model::new(id))
+//     }
+
+//     pub(crate) fn insert<T: 'static>(&mut self, slot: Slot<T>, entity: T) -> Model<T> {
+//         let model = slot.0;
+//         self.storage.insert(model.id, Box::new(entity));
+//         model
+//     }
+
+//     pub(crate) fn read<T: 'static>(&self, model: &Model<T>) -> &T {
+//         self.storage[model.id]
+//             .downcast_ref()
+//             .unwrap_or_else(|| panic!("failed to read entity model"))
+//     }
+// }
 
 #[derive(Clone)]
 pub struct AnyModel {
@@ -111,12 +145,32 @@ impl<T> PartialEq for Model<T> {
 unsafe impl<T> Send for Model<T> {}
 unsafe impl<T> Sync for Model<T> {}
 
-pub trait Entity<T> {
+pub trait Entity<T: 'static> {
     fn id(&self) -> EntityId;
 }
 
-impl<T> Entity<T> for Model<T> {
+impl<T: 'static> Entity<T> for Model<T> {
     fn id(&self) -> EntityId {
         self.id
+    }
+}
+
+impl<T: 'static> Model<T> {
+    pub fn new(id: EntityId) -> Self {
+        Self {
+            any: AnyModel {
+                id,
+                typ: TypeId::of::<T>(),
+            },
+            _type: PhantomData,
+        }
+    }
+}
+
+pub struct ModelContext {}
+
+impl ModelContext {
+    pub(crate) fn new() -> Self {
+        Self {}
     }
 }

@@ -2229,6 +2229,7 @@ dependencies = [
  "mimalloc",
  "mossctl",
  "once_cell",
+ "project",
  "tokio",
 ]
 

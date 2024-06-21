@@ -10,7 +10,10 @@ use std::{
 };
 use tokio::runtime::Runtime;
 
-use crate::{context_model::EntryMap, executor::TaskCompact};
+use crate::{
+    context_model::{EntryMap, Model, ModelContext},
+    executor::TaskCompact,
+};
 
 pub struct AppCellCompact {
     app: RefCell<AppContextCompact>,
@@ -36,9 +39,9 @@ impl AppCellCompact {
 
 #[derive(Clone)]
 pub struct AppContextCompact {
-    this: Weak<AppCellCompact>,
-    runtime: Rc<Runtime>,
-    // entry_map: EntryMap,
+    pub(crate) this: Weak<AppCellCompact>,
+    pub(crate) runtime: Rc<Runtime>,
+    pub(crate) entry_map: Rc<RefCell<EntryMap>>,
 }
 
 unsafe impl Sync for AppContextCompact {}
@@ -57,9 +60,20 @@ impl AppContextCompact {
             app: RefCell::new(AppContextCompact {
                 this: this.clone(),
                 runtime: Rc::new(runtime),
+                entry_map: Rc::new(RefCell::new(EntryMap::new())),
             }),
         })
     }
+
+    // pub fn insert_model<T: 'static>(&mut self, build_fn: impl FnOnce() -> T) -> Model<T> {
+    //     let mut entry_map = self.entry_map.borrow_mut();
+    //     let slot = entry_map.reserve::<T>();
+    //     entry_map.insert(slot, build_fn())
+    // }
+
+    // pub fn read_model<T: 'static>(&self) {
+    //     self.entry_map.borrow().read(model)
+    // }
 
     pub fn detach<'a, Fut, R>(
         &'a self,
