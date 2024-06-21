@@ -1,5 +1,8 @@
 use anyhow::Result;
-use app::context::{AppContext, AsyncAppContext};
+use app::{
+    context::{AppContext, AsyncAppContext},
+    context_compact::AppContextCompact,
+};
 use clap::Args;
 use moss_net::config::{Config as NetConfig, CONF as NET_CONF};
 use sea_orm::DatabaseConnection;
@@ -53,7 +56,7 @@ pub struct RunCmdArgs {
 }
 
 pub async fn cmd_run(
-    ctx: &AppContext,
+    ctx: &AppContextCompact,
     RunCmdArgs {
         bind,
         net_pref_path: preference_filepath,

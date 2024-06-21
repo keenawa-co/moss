@@ -1,13 +1,13 @@
 pub mod gql;
 pub mod status;
 
-use app::context::AppContext;
+use app::{context::AppContext, context_compact::AppContextCompact};
 use axum::{extract::Request, response::IntoResponse, routing::Route, Extension};
 use std::convert::Infallible;
 
 use crate::infra::graphql::SchemaRoot;
 
-pub fn router<L>(ctx: &AppContext, service: L, schema: SchemaRoot) -> axum::Router
+pub fn router<L>(ctx: &AppContextCompact, service: L, schema: SchemaRoot) -> axum::Router
 where
     L: tower::Layer<Route> + Clone + Send + 'static,
     L::Service: tower::Service<Request> + Clone + Send + 'static,
@@ -23,5 +23,5 @@ where
         .nest("/api", router)
         .layer(service)
         .layer(Extension(schema))
-        .layer(Extension(ctx.into_async()))
+        .layer(Extension(ctx.clone()))
 }

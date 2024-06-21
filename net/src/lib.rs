@@ -5,7 +5,7 @@ pub mod config;
 
 use std::sync::Arc;
 
-use app::context::AppContext;
+use app::{context::AppContext, context_compact::AppContextCompact};
 use domain::model::error::Error;
 use tokio_util::sync::CancellationToken as TokioCancellationToken;
 use tower::ServiceBuilder;
@@ -39,7 +39,7 @@ extern crate mac;
 
 const MIX_COMPRESS_SIZE: u16 = 512; // TODO: this value should be used from a net_conf.toml file
 
-pub async fn bind(ctx: &AppContext, _: TokioCancellationToken) -> Result<(), Error> {
+pub async fn bind(ctx: &AppContextCompact, _: TokioCancellationToken) -> Result<(), Error> {
     let conf = CONF
         .get()
         .ok_or_config_invalid("Configuration was not defined", None)?;

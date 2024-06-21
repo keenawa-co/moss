@@ -1,4 +1,4 @@
-use app::context::AsyncAppContext;
+use app::{context::AsyncAppContext, context_compact::AppContextCompact};
 use async_graphql::{Context, Object, Result as GraphqlResult};
 use chrono::{Duration, Utc};
 use graphql_utl::path::Path as PathGraphQL;
@@ -32,7 +32,7 @@ impl<'a> SessionMutation<'a> {
         _ctx: &Context<'_>,
         project_source: PathGraphQL,
     ) -> GraphqlResult<Session> {
-        let ctx = _ctx.data::<AsyncAppContext>().unwrap();
+        let ctx = _ctx.data::<AppContextCompact>().unwrap();
         let session_entity = self
             .session_service
             .create_session(&project_source.into())
@@ -75,7 +75,7 @@ impl<'a> SessionMutation<'a> {
         _ctx: &Context<'_>,
         session_id: NanoId,
     ) -> GraphqlResult<Session> {
-        let ctx = _ctx.data::<AsyncAppContext>().unwrap();
+        let ctx = _ctx.data::<AppContextCompact>().unwrap();
 
         let session_entity = self
             .session_service

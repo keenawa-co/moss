@@ -1,10 +1,13 @@
 pub mod context;
+pub mod context_compact;
+pub mod context_model;
 pub mod event;
 
 mod executor;
 mod platform;
 
 use context::{AppCell, AppContext};
+use context_compact::{AppCellCompact, AppContextCompact};
 use std::{
     cell::{Ref, RefMut},
     rc::Rc,
@@ -34,5 +37,23 @@ impl App {
         let ctx: &Ref<AppContext> = &*this.borrow();
         // let c = ctx.to_owned();
         on_finish_launching(ctx);
+    }
+}
+
+pub struct AppCompact(Rc<AppCellCompact>);
+
+impl AppCompact {
+    pub fn new() -> Self {
+        Self(AppContextCompact::new())
+    }
+
+    pub fn run<F>(self, launching: F)
+    where
+        F: 'static + FnOnce(&mut AppContextCompact),
+    {
+        let this = self.0.clone();
+        let ctx: &mut RefMut<AppContextCompact> = &mut *this.borrow_mut();
+
+        launching(ctx);
     }
 }

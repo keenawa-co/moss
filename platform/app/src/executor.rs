@@ -185,3 +185,41 @@ impl ForegroundTaskExecutor {
         inner::<R>(dispatcher, Box::pin(future))
     }
 }
+
+// --------------------
+
+use std::task::Context;
+use tokio::task;
+
+#[derive(Debug)]
+pub enum TaskCompact<T> {
+    Ready(Option<T>),
+    Spawned(task::JoinHandle<T>),
+}
+
+impl<T> TaskCompact<T> {
+    pub fn ready(val: T) -> Self {
+        TaskCompact::Ready(Some(val))
+    }
+
+    pub fn abort(self) {
+        if let TaskCompact::Spawned(task) = self {
+            task.abort();
+        }
+    }
+}
+
+impl<T> Future for TaskCompact<T> {
+    type Output = T;
+
+    fn poll(self: Pin<&mut Self>, ctx: &mut Context) -> Poll<Self::Output> {
+        match unsafe { self.get_unchecked_mut() } {
+            TaskCompact::Ready(val) => Poll::Ready(val.take().unwrap()),
+            TaskCompact::Spawned(task) => match Pin::new(task).poll(ctx) {
+                Poll::Ready(Ok(val)) => Poll::Ready(val),
+                Poll::Pending => Poll::Pending,
+                Poll::Ready(Err(e)) => panic!("Task failed: {:?}", e),
+            },
+        }
+    }
+}

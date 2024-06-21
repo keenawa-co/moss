@@ -4,7 +4,10 @@ mod run;
 mod utl;
 
 use anyhow::Context;
-use app::context::{AppCell, AppContext, AsyncAppContext};
+use app::{
+    context::{AppCell, AppContext, AsyncAppContext},
+    context_compact::AppContextCompact,
+};
 use clap::{Parser, Subcommand};
 use std::{process::ExitCode, sync::Arc};
 
@@ -42,23 +45,21 @@ enum Commands {
     Docs(DocsCommandList),
 }
 
-pub fn init(ctx: &AppContext) -> ExitCode {
-    let Ok(runtime) = tokio::runtime::Builder::new_multi_thread()
-        .enable_all()
-        .build()
-    else {
-        panic!("failed to build async runtime");
-    };
-
+pub fn init(ctx: &mut AppContextCompact) -> ExitCode {
     let args = CLI::parse();
 
     let output = match args.command {
-        Commands::Run(args) => runtime.block_on(run::cmd_run(&ctx, args)),
+        Commands::Run(args) => ctx
+            .block_on(move |ctx: &AppContextCompact| async move { run::cmd_run(&ctx, args).await }),
         Commands::Migrate(cmd) => match cmd {
-            MigrateCommandList::Up(args) => runtime.block_on(migrate::cmd_migration_up(args)),
+            MigrateCommandList::Up(args) => {
+                ctx.block_on(move |_| async move { migrate::cmd_migration_up(args).await })
+            }
         },
         Commands::Docs(cmd) => match cmd {
-            DocsCommandList::Schema(args) => runtime.block_on(docs::cmd_graphql_schema(args)),
+            DocsCommandList::Schema(args) => {
+                ctx.block_on(move |_| async move { docs::cmd_graphql_schema(args).await })
+            }
         },
     };
 
