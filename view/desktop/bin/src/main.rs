@@ -17,7 +17,7 @@ fn greet(name: &str) -> String {
 fn main() -> tauri::Result<()> {
     tauri::Builder::default()
         .setup(move |app: &mut App| {
-            dbg!(app.webview_windows());
+            app.get_webview_window("main").unwrap();
             Ok(())
         })
         .menu(menu::setup_window_menu)
