@@ -1,35 +1,28 @@
 [package]
 name = "desktop"
-version = "0.0.0"
-description = "Moss Compass"
+version = "0.1.0"
+description = "A Tauri App"
+authors = ["you"]
+license = ""
+repository = ""
 edition = "2021"
+rust-version = "1.70"
 
+
+[lib]
+name = "app_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
 
 [build-dependencies]
-tauri-build = { version = "2.0.0-beta", features = [] }
+tauri-build = { version = "2.0.0-beta.17", features = [] }
 
 [dependencies]
-specta.workspace = true
 tracing.workspace = true
 strum = { workspace = true, features = ["derive"] }
+serde_json = "1.0"
+serde = { version = "1.0", features = ["derive"] }
+tauri = { version = "2.0.0-beta.22", features = [] }
 
-tauri = { version = "2.0.0-beta", features = [
-    "macos-private-api",
-    "linux-libxdo",
-] }
-tauri-plugin-shell = "2.0.0-beta"
-serde = { version = "1", features = ["derive"] }
-serde_json = "1"
 
 [target.'cfg(any(target_os = "linux", target_os = "macos"))'.dependencies]
 mimalloc = { version = "0.1.39", default-features = false }
-
-[profile.dev]
-incremental = true # Compile your binary in smaller steps.
-
-[profile.release]
-codegen-units = 1 # Allows LLVM to perform better optimization.
-lto = true        # Enables link-time-optimizations.
-opt-level = "s"   # Prioritizes small binary size. Use `3` if you prefer speed.
-panic = "abort"   # Higher performance by disabling panic handlers.
-strip = true      # Ensures debug symbols are removed.
