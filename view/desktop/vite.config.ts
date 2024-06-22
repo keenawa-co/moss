@@ -1,5 +1,6 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
+import react from "@vitejs/plugin-react";
+import { resolve } from "path";
+import { defineConfig } from "vite";
 
 // export default defineConfig({
 //   // prevent vite from obscuring rust errors
@@ -23,4 +24,13 @@ import react from '@vitejs/plugin-react'
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
-})
+  assetsInclude: "src/renderer/assets/**",
+  resolve: {
+    alias: {
+      "@shared": resolve("shared"),
+      "@/hooks": resolve("src/hooks"),
+      "@/assets": resolve("src/assets"),
+      "@/components": resolve("src/components"),
+    },
+  },
+});
