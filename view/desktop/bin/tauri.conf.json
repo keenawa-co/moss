@@ -1,8 +1,8 @@
 {
   "$schema": "https://github.com/tauri-apps/tauri/raw/tauri-v2.0.0-beta.17/core/tauri-config-schema/schema.json",
-  "productName": "desktop",
-  "version": "0.0.0",
-  "identifier": "com.tauri.dev",
+  "productName": "Moss Compass",
+  "version": "0.1.0",
+  "identifier": "com.moss.dev",
   "build": {
     "beforeDevCommand": "npm run dev",
     "devUrl": "http://localhost:1420",
@@ -14,9 +14,14 @@
     "macOSPrivateApi": true,
     "windows": [
       {
-        "title": "desktop",
+        "title": "Moss Compass",
+        "hiddenTitle": true,
         "width": 800,
-        "height": 600
+        "height": 600,
+        "dragDropEnabled": true,
+        "decorations": true,
+        "transparent": true,
+        "center": true
       }
     ],
     "security": {
