@@ -24,7 +24,7 @@ members = [
     "mossctl",
     "net",
 
-    "view/desktop/src-tauri",
+    "view/desktop/bin",
 ]
 
 [profile.release]
