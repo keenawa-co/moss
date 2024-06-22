@@ -1,20 +1,28 @@
 [package]
 name = "desktop"
-version = "0.0.0"
-description = "Moss Compass"
+version = "0.1.0"
+description = "A Tauri App"
 authors = ["you"]
+license = ""
+repository = ""
 edition = "2021"
+rust-version = "1.70"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[lib]
+name = "app_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
 
 [build-dependencies]
-tauri-build = { version = "2.0.0-beta", features = [] }
+tauri-build = { version = "2.0.0-beta.17", features = [] }
 
 [dependencies]
-tauri = { version = "2.0.0-beta", features = [
-    "macos-private-api",
-    "linux-libxdo",
-] }
-tauri-plugin-shell = "2.0.0-beta"
-serde = { version = "1", features = ["derive"] }
-serde_json = "1"
+tracing.workspace = true
+strum = { workspace = true, features = ["derive"] }
+serde_json = "1.0"
+serde = { version = "1.0", features = ["derive"] }
+tauri = { version = "2.0.0-beta.22", features = [] }
+
+
+[target.'cfg(any(target_os = "linux", target_os = "macos"))'.dependencies]
+mimalloc = { version = "0.1.39", default-features = false }
