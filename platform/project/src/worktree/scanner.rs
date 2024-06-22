@@ -1,5 +1,6 @@
 use anyhow::Result;
 use app::context::{AppContext, AsyncAppContext};
+use app::context_compact::AppContextCompact;
 use fs::FS;
 use futures::{future, task::Poll};
 use futures::{select_biased, FutureExt, Stream};
@@ -49,7 +50,7 @@ impl FileSystemScanService {
 
     pub async fn run(
         &self,
-        ctx: AsyncAppContext,
+        ctx: AppContextCompact,
         root_abs_path: Arc<Path>,
         mut fs_event_stream: Pin<Box<dyn Send + Stream<Item = notify::Event>>>,
     ) -> Result<()> {
@@ -146,7 +147,7 @@ impl FileSystemScanService {
 
     async fn populate_dir(
         &self,
-        ctx: &AsyncAppContext,
+        ctx: &AppContextCompact,
         parent_path: &Arc<Path>,
         entry_list: Vec<FiletreeEntry>,
     ) {
@@ -188,7 +189,7 @@ impl FileSystemScanService {
 
     async fn index_deep(
         &self,
-        ctx: &AsyncAppContext,
+        ctx: &AppContextCompact,
         mut scan_jobs_rx: mpsc::UnboundedReceiver<ScanJob>,
     ) {
         loop {
@@ -206,7 +207,7 @@ impl FileSystemScanService {
         }
     }
 
-    async fn index_dir(&self, ctx: &AsyncAppContext, job: &ScanJob) -> Result<()> {
+    async fn index_dir(&self, ctx: &AppContextCompact, job: &ScanJob) -> Result<()> {
         {
             let state_lock = self.state.lock().await;
             if state_lock

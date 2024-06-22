@@ -12,8 +12,6 @@ fn main() {
     // });
 
     AppCompact::new().run(|ctx: &mut AppContextCompact| {
-        ctx.insert_model(|| Project::init());
-
         moss_cli::init(ctx);
     })
 }

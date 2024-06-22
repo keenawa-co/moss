@@ -35,7 +35,7 @@ impl Project {
     }
 
     pub async fn new(
-        ctx: &AsyncAppContext,
+        ctx: &AppContextCompact,
         fs: Arc<dyn FS>,
         dir_abs_path: Arc<Path>,
         settings_file: Arc<JsonFile>,

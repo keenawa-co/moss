@@ -39,8 +39,8 @@ impl<'a> ProjectService<'a> {
     ) -> Result<()> {
         let arc_path: Arc<Path> = Arc::from(project_path.clone().into_boxed_path());
 
-        // let project = Project::new(ctx, self.realfs.clone(), arc_path, settings_file).await?;
-        // self.project.store(Some(Arc::new(project)));
+        let project = Project::new(ctx, self.realfs.clone(), arc_path, settings_file).await?;
+        self.project.store(Some(Arc::new(project)));
 
         Ok(())
     }

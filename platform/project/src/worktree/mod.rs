@@ -8,7 +8,10 @@ mod scanner;
 mod snapshot;
 
 use anyhow::Result;
-use app::context::{AppContext, AsyncAppContext};
+use app::{
+    context::{AppContext, AsyncAppContext},
+    context_compact::AppContextCompact,
+};
 use fs::FS;
 use futures::stream::Stream;
 use smol::channel::Receiver as SmolReceiver;
@@ -34,7 +37,7 @@ pub struct Worktree {
 
 impl Worktree {
     pub async fn local(
-        ctx: &AsyncAppContext,
+        ctx: &AppContextCompact,
         fs: Arc<dyn FS>,
         settings: &LocalWorktreeSettings,
     ) -> Result<Self> {
