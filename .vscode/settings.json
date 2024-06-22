@@ -39,6 +39,7 @@
     "smol",
     "sqlx",
     "tablename",
+    "tauri",
     "thiserror",
     "unpark",
     "unparker",
