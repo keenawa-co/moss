@@ -5,8 +5,3 @@
 2. Keep the **code clean** and **readable**
 
 3. Keep the **code simple** and **easy to maintain**
-
-:))))))))
-
-
-
