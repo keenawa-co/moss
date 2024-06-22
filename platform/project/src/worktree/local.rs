@@ -1,8 +1,10 @@
 use anyhow::{Context as AnyhowContext, Result};
-use app::context::{AsyncContext, Context};
+use app::context::{AppContext, AsyncAppContext};
+use app::context_compact::AppContextCompact;
 use fs::FS;
 use parking_lot::RwLock;
 use smol::{channel::Receiver as SmolReceiver, channel::Sender as SmolSender};
+use std::borrow::{Borrow, BorrowMut};
 use std::sync::Arc;
 use std::time::Duration;
 use tokio::task;
@@ -78,13 +80,12 @@ impl LocalWorktree {
 
     pub async fn run(
         self: &Arc<Self>,
-        // ctx: &Context,
+        ctx: &AppContextCompact,
         event_chan_tx: SmolSender<SharedWorktreeEvent>,
     ) -> Result<()> {
         let worktree = self.clone();
 
         let test_hook = |e: &mut WorktreeEvent| -> Result<()> {
-            dbg!(1);
             let mut snapshot_lock = worktree.state.snapshot.write();
 
             match e {
@@ -114,25 +115,45 @@ impl LocalWorktree {
             Ok(())
         };
 
-        // ctx.with_event_registry_mut(|registry| {
-        //     registry.register_event::<WorktreeEvent>();
-        //     registry.register_hook(test_hook);
-        // });
+        // let mut r = ctx.clone();
+        // let rr = r.borrow_mut();
 
-        let worktree = self.clone();
+        // rr.event_registry.register_hook(test_hook);
+
+        // ctx.to_owned().register_hook(test_hook)?;
+        // ctx.register_event::<WorktreeEvent>().unwrap();
+
         let (sync_state_tx, sync_state_rx) = smol::channel::unbounded::<WorktreeEvent>();
 
-        tokio::try_join!(
-            worktree.run_background_scanner(sync_state_tx),
-            worktree.run_background_event_handler(sync_state_rx, event_chan_tx),
-        )?;
+        ctx.detach(move |ctx: &AppContextCompact| {
+            let worktree = self.clone();
+            let ctx_clone = ctx.clone();
+
+            async move {
+                worktree
+                    .run_background_scanner(ctx_clone, sync_state_tx)
+                    .await
+                    .unwrap();
+            }
+        });
+
+        ctx.detach(|ctx| {
+            let ctx_clone = ctx.clone();
+
+            async move {
+                worktree
+                    .run_background_event_handler(ctx_clone, sync_state_rx, event_chan_tx)
+                    .await
+                    .unwrap();
+            }
+        });
 
         Ok(())
     }
 
-    async fn run_background_scanner<'a>(
+    async fn run_background_scanner(
         self: &Arc<Self>,
-        // ctx: &Context,
+        ctx: AppContextCompact,
         sync_state_tx: SmolSender<WorktreeEvent>,
     ) -> Result<()> {
         let snapshot = self.state.snapshot.read().clone();
@@ -142,12 +163,17 @@ impl LocalWorktree {
             .watch(&abs_path_clone, Duration::from_secs(1))
             .await;
 
-        task::spawn(async move {
-            let scanner = FileSystemScanService::new(fs_clone, sync_state_tx, snapshot.clone());
-
-            // TODO: send error event to event_chan_tx in case of error
-            if let Err(e) = scanner.run(abs_path_clone, fs_event_stream).await {
-                error!("Error in worktree scanner: {e}");
+        ctx.detach(move |ctx| {
+            let ctx_clone = ctx.clone();
+            async move {
+                let scanner = FileSystemScanService::new(fs_clone, sync_state_tx, snapshot.clone());
+                // TODO: send error event to event_chan_tx in case of error
+                if let Err(e) = scanner
+                    .run(ctx_clone, abs_path_clone, fs_event_stream)
+                    .await
+                {
+                    error!("Error in worktree scanner: {e}");
+                }
             }
         });
 
@@ -156,6 +182,7 @@ impl LocalWorktree {
 
     async fn run_background_event_handler(
         self: &Arc<Self>,
+        ctx: AppContextCompact,
         sync_state_rx: SmolReceiver<WorktreeEvent>,
         event_chan_tx: SmolSender<SharedWorktreeEvent>,
     ) -> Result<()> {

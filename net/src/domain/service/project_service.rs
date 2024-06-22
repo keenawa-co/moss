@@ -1,4 +1,4 @@
-use app::event::PlatformEvent;
+use app::{context::AsyncAppContext, context_compact::AppContextCompact, event::PlatformEvent};
 use arc_swap::ArcSwapOption;
 use fs::{real, FS};
 use futures::{Stream, StreamExt};
@@ -33,12 +33,13 @@ impl<'a> ProjectService<'a> {
 
     pub async fn start_project(
         self: &Arc<Self>,
+        ctx: &AppContextCompact,
         project_path: &PathBuf,
         settings_file: Arc<JsonFile>,
     ) -> Result<()> {
         let arc_path: Arc<Path> = Arc::from(project_path.clone().into_boxed_path());
 
-        let project = Project::new(self.realfs.clone(), arc_path, settings_file).await?;
+        let project = Project::new(ctx, self.realfs.clone(), arc_path, settings_file).await?;
         self.project.store(Some(Arc::new(project)));
 
         Ok(())

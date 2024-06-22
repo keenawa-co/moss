@@ -3,8 +3,13 @@ mod migrate;
 mod run;
 mod utl;
 
+use anyhow::Context;
+use app::{
+    context::{AppCell, AppContext, AsyncAppContext},
+    context_compact::AppContextCompact,
+};
 use clap::{Parser, Subcommand};
-use std::process::ExitCode;
+use std::{process::ExitCode, sync::Arc};
 
 use self::{docs::DocsCommandList, migrate::MigrateCommandList, run::RunCmdArgs};
 
@@ -40,21 +45,26 @@ enum Commands {
     Docs(DocsCommandList),
 }
 
-pub async fn init() -> ExitCode {
+pub fn init(ctx: &mut AppContextCompact) -> ExitCode {
     let args = CLI::parse();
 
     let output = match args.command {
-        Commands::Run(args) => run::cmd_run(args).await,
+        Commands::Run(args) => ctx
+            .block_on(move |ctx: &AppContextCompact| async move { run::cmd_run(&ctx, args).await }),
         Commands::Migrate(cmd) => match cmd {
-            MigrateCommandList::Up(args) => migrate::cmd_migration_up(args).await,
+            MigrateCommandList::Up(args) => {
+                ctx.block_on(move |_| async move { migrate::cmd_migration_up(args).await })
+            }
         },
         Commands::Docs(cmd) => match cmd {
-            DocsCommandList::Schema(args) => docs::cmd_graphql_schema(args).await,
+            DocsCommandList::Schema(args) => {
+                ctx.block_on(move |_| async move { docs::cmd_graphql_schema(args).await })
+            }
         },
     };
 
     if let Err(e) = output {
-        println!("{}", e);
+        error!("{}", e);
         return ExitCode::FAILURE;
     } else {
         return ExitCode::SUCCESS;

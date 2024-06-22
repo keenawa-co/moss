@@ -1,5 +1,10 @@
 use anyhow::Result;
-use app::event::{PlatformAction, PlatformEvent};
+use app::{
+    context::{AppContext, AsyncAppContext},
+    context_compact::AppContextCompact,
+    context_model::ModelContext,
+    event::{PlatformAction, PlatformEvent},
+};
 use async_utl::AsyncTryFrom;
 use chrono::Utc;
 use fs::FS;
@@ -21,7 +26,16 @@ pub struct Project {
 }
 
 impl Project {
+    pub async fn init() {
+        println!("Project init")
+    }
+
+    pub async fn hello() {
+        println!("Hello from Project")
+    }
+
     pub async fn new(
+        ctx: &AppContextCompact,
         fs: Arc<dyn FS>,
         dir_abs_path: Arc<Path>,
         settings_file: Arc<JsonFile>,
@@ -35,7 +49,7 @@ impl Project {
         };
 
         Ok(Self {
-            worktree: Worktree::local(fs, &worktree_settings).await?,
+            worktree: Worktree::local(ctx, fs, &worktree_settings).await?,
             settings: Arc::new(initial_settings),
         })
     }

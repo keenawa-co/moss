@@ -82,6 +82,8 @@ impl<'a> ProjectMutation<'a> {
     ) -> GraphqlResult<Vec<String>> {
         let sess_claims = ctx.data::<SessionTokenClaims>()?;
 
+        //
+
         let result = self
             .project_service
             .remove_from_monitoring_exclude_list(

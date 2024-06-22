@@ -3,6 +3,7 @@
   "cSpell.words": [
     "ahash",
     "asynx",
+    "bindgen",
     "bitflags",
     "cachedb",
     "canonicalize",
@@ -39,6 +40,8 @@
     "sqlx",
     "tablename",
     "thiserror",
+    "unpark",
+    "unparker",
     "unwatch",
     "worktree"
   ],

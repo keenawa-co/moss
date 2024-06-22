@@ -1,11 +1,17 @@
-mod mem;
+use std::{borrow::Borrow, time::Duration};
 
-use std::process::ExitCode;
+use app::{
+    context::AppContext, context_compact::AppContextCompact, context_model::ModelContext, App,
+    AppCompact,
+};
+use project::Project;
 
-fn main() -> ExitCode {
-    return tokio::runtime::Builder::new_multi_thread()
-        .enable_all()
-        .build()
-        .unwrap()
-        .block_on(moss_cli::init());
+fn main() {
+    // return App::new().run(|ctx: &AppContext| {
+    //     moss_cli::init(ctx);
+    // });
+
+    AppCompact::new().run(|ctx: &mut AppContextCompact| {
+        moss_cli::init(ctx);
+    })
 }

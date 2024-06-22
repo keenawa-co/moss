@@ -19,6 +19,9 @@ serde_json.workspace = true
 async-trait.workspace = true
 futures.workspace = true
 graphql-parser.workspace = true
+app.workspace = true
+
+tokio = { workspace = true, features = ["full"] }
 serde = { workspace = true, features = ["derive"] }
 clap = { workspace = true, features = ["cargo", "string", "derive"] }
 toml.workspace = true

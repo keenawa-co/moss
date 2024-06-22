@@ -1,3 +1,4 @@
+use app::{context::AsyncAppContext, context_compact::AppContextCompact};
 use async_graphql::http::GraphiQLSource;
 use async_graphql_axum::{GraphQLRequest, GraphQLResponse, GraphQLSubscription};
 use axum::{
@@ -17,6 +18,7 @@ async fn graphiql_handler() -> impl IntoResponse {
 }
 
 async fn graphql_handler(
+    Extension(ctx): Extension<AppContextCompact>,
     Extension(schema): Extension<SchemaRoot>,
     headers: HeaderMap,
     req: GraphQLRequest,
@@ -32,7 +34,7 @@ async fn graphql_handler(
         };
     }
 
-    return schema.execute(req.data(headers)).await.into();
+    return schema.execute(req.data(ctx).data(headers)).await.into();
 }
 
 async fn graphql_subscription_handler(
