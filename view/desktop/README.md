@@ -1,16 +1,42 @@
 # About
 
-Moss Desktop Application 
+Moss Desktop Application
 
 # Technologies
+
 - **Tauri** (framework for building desktop applications using JS, HTML, and CSS)
 - **Vite** (framework for building fast, efficient, and scalable web apps)
-- **React** (framework for creating interactive UI components) 
+- **React** (framework for creating interactive UI components)
 - **TypeScript** (type-safety support)
 - **Tailwind CSS** (CSS styling)
 - **Redux** (React state manager)
 - **i18next** (internationalization)
 - **Jsonnet**
+
+# Usage
+
+```bash
+  $ yarn tauri dev #start Tauri Desktop App
+  $ npm run dev #start web app
+  $ npm run build
+  $ npm run lint
+  $ npm run preview
+  $ npm run interface #generate i18next translation interface
+  $ npm run jsonnet #convert test jsonnet file to json file
+```
+
+## Available scripts
+
+```json
+ "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "preview": "vite preview",
+    "interface": "i18next-resources-for-ts interface -i ./public/locales/de -o ./src/@types/resources.d.ts",
+    "jsonnet": "jsonnet test.jsonnet -o test.json"
+  },
+```
 
 # React + TypeScript + Vite
 
@@ -34,8 +60,8 @@ export default {
     ecmaVersion: 'latest',
     sourceType: 'module',
     project: ['./tsconfig.json', './tsconfig.node.json'],
-    tsconfigRootDir: __dirname,
-  },
+    tsconfigRootDir: __dirname
+  }
 }
 ```
 
