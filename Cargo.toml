@@ -25,6 +25,7 @@ members = [
     "net",
 
     "view/desktop/bin",
+    "view/desktop/bin/lib/macos",
 ]
 
 [profile.release]

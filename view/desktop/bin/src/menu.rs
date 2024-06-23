@@ -1,6 +1,6 @@
 use strum::{AsRefStr as StrumAsRefStr, Display as StrumDisplay, EnumString as StrumEnumString};
 use tauri::{
-    menu::{Menu, MenuItemKind},
+    menu::{Menu, MenuItemKind, PredefinedMenuItem},
     AppHandle, Wry,
 };
 
@@ -38,18 +38,28 @@ pub fn setup_window_menu(handle: &AppHandle) -> tauri::Result<Menu<Wry>> {
     {
         use tauri::menu::{AboutMetadataBuilder, MenuBuilder, MenuItemBuilder, SubmenuBuilder};
 
-        let app_menu = SubmenuBuilder::new(handle, "Moss Compass")
-            .about(Some(
-                AboutMetadataBuilder::new()
-                    // TODO: .authors(Some(vec![]))
-                    .license(Some(env!("CARGO_PKG_VERSION")))
-                    .version(Some(env!("CARGO_PKG_VERSION")))
-                    // TODO: .website(Some("https://mossland.dev/"))
-                    // TODO: .website_label(Some("mossland.dev.com"))
-                    .build(),
-            ))
+        unsafe {
+            macos_trampoline::set_app_name(&"Moss Compass".into());
+        }
+
+        let app_menu = SubmenuBuilder::new(handle, "Moss")
+            .item(&PredefinedMenuItem::about(
+                handle,
+                Some("About Moss Compass"),
+                Some(
+                    AboutMetadataBuilder::new()
+                        .license(Some(env!("CARGO_PKG_VERSION")))
+                        .version(Some(env!("CARGO_PKG_VERSION")))
+                        // TODO: .website(Some("https://mossland.dev/"))
+                        // TODO: .website_label(Some("mossland.dev.com"))
+                        .build(),
+                ),
+            )?)
             .separator()
-            .hide()
+            .item(&PredefinedMenuItem::hide(
+                handle,
+                Some("Hide Moss Compass"),
+            )?)
             .hide_others()
             .show_all()
             .separator()

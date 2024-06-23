@@ -13,7 +13,7 @@ fn greet(name: &str) -> String {
 
 pub fn run() -> tauri::Result<()> {
     tauri::Builder::default()
-        .setup(move |app: &mut App| Ok(()))
+        .setup(move |_app: &mut App| Ok(()))
         .menu(menu::setup_window_menu)
         .invoke_handler(tauri::generate_handler![greet])
         .build(tauri::generate_context!())?
