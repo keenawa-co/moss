@@ -1,3 +1,17 @@
+# About
+
+Moss Desktop Application 
+
+# Technologies
+- **Tauri** (framework for building desktop applications using JS, HTML, and CSS)
+- **Vite** (framework for building fast, efficient, and scalable web apps)
+- **React** (framework for creating interactive UI components) 
+- **TypeScript** (type-safety support)
+- **Tailwind CSS** (CSS styling)
+- **Redux** (React state manager)
+- **i18next** (internationalization)
+- **Jsonnet**
+
 # React + TypeScript + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
