@@ -1,7 +1,7 @@
 mod mem;
 mod menu;
 
-use tauri::{App, Manager};
+use tauri::App;
 
 #[macro_use]
 extern crate tracing;
