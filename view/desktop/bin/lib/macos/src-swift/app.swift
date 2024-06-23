@@ -4,7 +4,6 @@ import SwiftRs
 
 @_cdecl("set_app_name")
 public func setAppName(name: SRString) {
-//   let appName = "Moss Compass"
   DispatchQueue.main.async {
     if let mainWindow = NSApp.mainWindow {
       mainWindow.title = name.toString()
