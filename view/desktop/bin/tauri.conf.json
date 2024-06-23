@@ -1,4 +1,5 @@
 {
+  "$schema": "../node_modules/@tauri-apps/cli/schema.json",
   "productName": "Moss Compass",
   "version": "0.1.0",
   "identifier": "com.tauri.dev",
@@ -32,6 +33,5 @@
       "icons/icon.icns",
       "icons/icon.ico"
     ]
-  },
-  "$schema": "../node_modules/@tauri-apps/cli/schema.json"
+  }
 }

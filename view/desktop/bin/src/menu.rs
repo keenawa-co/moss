@@ -1,6 +1,6 @@
 use strum::{AsRefStr as StrumAsRefStr, Display as StrumDisplay, EnumString as StrumEnumString};
 use tauri::{
-    menu::{Menu, MenuItemKind},
+    menu::{Menu, MenuItemKind, PredefinedMenuItem},
     AppHandle, Wry,
 };
 
@@ -25,43 +25,53 @@ pub fn set_enabled(menu: &Menu<Wry>, event: &MenuEvent, enabled: bool) -> tauri:
     }
 }
 
-pub fn setup_window_menu(handle: &AppHandle) -> tauri::Result<Menu<Wry>> {
-    handle.on_menu_event(move |_app, _event| {
+pub fn setup_window_menu(manager: &AppHandle) -> tauri::Result<Menu<Wry>> {
+    manager.on_menu_event(move |_app, _event| {
         // TODO: handle known and unknown menu events
     });
 
     #[cfg(not(target_os = "macos"))]
     {
-        Menu::new(handle)
+        Menu::new(manager)
     }
     #[cfg(target_os = "macos")]
     {
         use tauri::menu::{AboutMetadataBuilder, MenuBuilder, MenuItemBuilder, SubmenuBuilder};
 
-        let app_menu = SubmenuBuilder::new(handle, "Moss Compass")
-            .about(Some(
-                AboutMetadataBuilder::new()
-                    // TODO: .authors(Some(vec![]))
-                    .license(Some(env!("CARGO_PKG_VERSION")))
-                    .version(Some(env!("CARGO_PKG_VERSION")))
-                    // TODO: .website(Some("https://mossland.dev/"))
-                    // TODO: .website_label(Some("mossland.dev.com"))
-                    .build(),
-            ))
+        unsafe {
+            macos_trampoline::set_app_name(&"Moss Compass".into());
+        }
+
+        let app_menu = SubmenuBuilder::new(manager, "Moss")
+            .item(&PredefinedMenuItem::about(
+                manager,
+                Some("About Moss Compass"),
+                Some(
+                    AboutMetadataBuilder::new()
+                        .license(Some(env!("CARGO_PKG_VERSION")))
+                        .version(Some(env!("CARGO_PKG_VERSION")))
+                        // TODO: .website(Some("https://mossland.dev/"))
+                        // TODO: .website_label(Some("mossland.dev.com"))
+                        .build(),
+                ),
+            )?)
             .separator()
-            .hide()
+            .item(&PredefinedMenuItem::hide(
+                manager,
+                Some("Hide Moss Compass"),
+            )?)
             .hide_others()
             .show_all()
             .separator()
             .quit()
             .build()?;
 
-        let window_menu = SubmenuBuilder::new(handle, "Window")
+        let window_menu = SubmenuBuilder::new(manager, "Window")
             .minimize()
-            .item(&MenuItemBuilder::with_id(MenuEvent::NewWindow, "New Window").build(handle)?)
+            .item(&MenuItemBuilder::with_id(MenuEvent::NewWindow, "New Window").build(manager)?)
             .build()?;
 
-        let menu = MenuBuilder::new(handle)
+        let menu = MenuBuilder::new(manager)
             .item(&app_menu)
             .item(&window_menu)
             .build()?;
