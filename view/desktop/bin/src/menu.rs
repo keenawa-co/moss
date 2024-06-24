@@ -1,10 +1,11 @@
+use specta::Type;
 use strum::{AsRefStr as StrumAsRefStr, Display as StrumDisplay, EnumString as StrumEnumString};
 use tauri::{
     menu::{Menu, MenuItemKind, PredefinedMenuItem},
     AppHandle, Wry,
 };
 
-#[derive(Debug, StrumEnumString, StrumDisplay, StrumAsRefStr)]
+#[derive(Debug, Type, StrumEnumString, StrumDisplay, StrumAsRefStr)]
 pub enum MenuEvent {
     NewWindow,
 }
