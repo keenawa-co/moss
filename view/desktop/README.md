@@ -13,6 +13,7 @@ Moss Desktop Application
 - **i18next** (internationalization)
 - **Jsonnet**
 - **pNPM** (package manager)
+- **Storybook** (workshop for building, testing, documenting and sharing UI components)
 
 # Usage
 
