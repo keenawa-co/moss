@@ -25,6 +25,7 @@ Moss Desktop Application
   $ pnpm run preview
   $ pnpm run interface #generate i18next translation interface
   $ pnpm run jsonnet #convert test jsonnet file to json file
+  $ pnpm --prefix ../storybook run storybook #start Storybook
 ```
 
 ## Available scripts
