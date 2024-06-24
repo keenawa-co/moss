@@ -1,16 +1,30 @@
 import { useTranslation } from 'react-i18next'
+import { commands } from '../bindings'
+import { useState, useEffect } from 'react'
 
 export const Home = () => {
   const { t } = useTranslation(['ns1', 'ns2'])
-  // TODO: Info
-  // const { t } = useTranslation('ns2') - if both part1 and part2 are used from 'ns2'
-  // const { t } = useTranslation() - or in this way
+  const [name, setName] = useState('')
+
+  useEffect(() => {
+    const fetchName = async () => {
+      try {
+        const response = await commands.greet('g10z3r')
+        setName(response)
+      } catch (error) {
+        console.error('Failed to fetch greeting:', error)
+      }
+    }
+
+    fetchName()
+  }, [])
 
   return (
     <main>
       <h1>{t('title')}</h1>
-      <span>{t('description.part1')} </span>
-      <span>{t('description.part1', { ns: 'ns2' })} </span>
+      {name && <p>{t('user', { name: name })}</p>}
+      <span>{t('description.part1')}</span>
+      <span>{t('description.part1', { ns: 'ns2' })}</span>
     </main>
   )
 }

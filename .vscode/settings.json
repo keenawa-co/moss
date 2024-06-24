@@ -38,6 +38,7 @@
     "seaorm",
     "sess",
     "smol",
+    "specta",
     "sqlx",
     "tablename",
     "tauri",
