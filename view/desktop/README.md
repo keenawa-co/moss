@@ -12,17 +12,18 @@ Moss Desktop Application
 - **Redux** (React state manager)
 - **i18next** (internationalization)
 - **Jsonnet**
+- **pNPM** (package manager)
 
 # Usage
 
 ```bash
   $ yarn tauri dev #start Tauri Desktop App
-  $ npm run dev #start web app
-  $ npm run build
-  $ npm run lint
-  $ npm run preview
-  $ npm run interface #generate i18next translation interface
-  $ npm run jsonnet #convert test jsonnet file to json file
+  $ pnpm run dev #start web app
+  $ pnpm run build
+  $ pnpm run lint
+  $ pnpm run preview
+  $ pnpm run interface #generate i18next translation interface
+  $ pnpm run jsonnet #convert test jsonnet file to json file
 ```
 
 ## Available scripts
