@@ -28,7 +28,6 @@ tauri-specta = { version = "2.0.0-rc.8", features = [
     "typescript",
     "javascript",
 ] }
-tauri-plugin-os = "2.0.0-beta.3"
 specta = "=2.0.0-rc.12"
 
 
