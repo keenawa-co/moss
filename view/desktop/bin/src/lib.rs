@@ -21,6 +21,20 @@ async fn app_ready(app_handle: AppHandle) {
 }
 
 pub fn run() -> tauri::Result<()> {
+    let (tx, mut rx) = tokio::sync::broadcast::channel(16);
+
+    tokio::spawn(async move {
+        let mut interval = tokio::time::interval(tokio::time::Duration::from_secs(1));
+        let mut count = 0;
+        loop {
+            interval.tick().await;
+            count += 1;
+            if tx.send(count).is_err() {
+                break;
+            }
+        }
+    });
+
     let (invoke_handler, register_events) = {
         let builder = ts::builder()
             .events(collect_events![])
@@ -36,8 +50,18 @@ pub fn run() -> tauri::Result<()> {
     tauri::Builder::default()
         .invoke_handler(invoke_handler)
         .setup(move |app: &mut App| {
+            let app_handle = app.handle().clone();
+
             tokio::task::block_in_place(|| {
-                tauri::async_runtime::block_on(async move { register_events(app) })
+                tauri::async_runtime::block_on(async move {
+                    register_events(app);
+
+                    tokio::spawn(async move {
+                        while let Ok(data) = rx.recv().await {
+                            app_handle.emit("data-stream", data).unwrap();
+                        }
+                    });
+                });
             });
 
             Ok(())

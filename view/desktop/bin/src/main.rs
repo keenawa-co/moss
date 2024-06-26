@@ -3,7 +3,8 @@
 
 use tracing::error;
 
-fn main() {
+#[tokio::main]
+async fn main() {
     if let Err(err) = app_lib::run() {
         error!("{err:#?}")
     }
