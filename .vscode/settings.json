@@ -33,6 +33,7 @@
     "realfs",
     "repr",
     "revisioned",
+    "rocksdb",
     "rootdb",
     "sched",
     "seaorm",

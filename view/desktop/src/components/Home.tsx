@@ -11,6 +11,7 @@ export const Home: React.FC = () => {
   useEffect(() => {
     const fetchName = async () => {
       try {
+        await commands.createProject('test')
         const response = await commands.greet('g10z3r')
         setName(response)
       } catch (error) {

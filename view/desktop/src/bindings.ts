@@ -3,6 +3,9 @@
 /** user-defined commands **/
 
 export const commands = {
+  async createProject(name: string): Promise<void> {
+    await TAURI_INVOKE('create_project', { name })
+  },
   async appReady(): Promise<void> {
     await TAURI_INVOKE('app_ready')
   },

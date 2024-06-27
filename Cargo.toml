@@ -106,6 +106,8 @@ opentelemetry = "0.22.0"
 tracing-opentelemetry = "0.23.0"
 tracing-subscriber = "0.3.18"
 
+surrealdb = "1.5.3"
+
 sea-orm = "0.12"
 sea-orm-migration = "0.12.0"
 
