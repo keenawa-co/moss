@@ -1745,6 +1745,9 @@ dependencies = [
 name = "desktop"
 version = "0.1.0"
 dependencies = [
+ "anyhow",
+ "app",
+ "chrono",
  "futures",
  "macos-trampoline",
  "mimalloc",
@@ -1758,6 +1761,7 @@ dependencies = [
  "tauri-specta",
  "tokio",
  "tracing",
+ "types",
 ]
 
 [[package]]
@@ -8000,6 +8004,7 @@ dependencies = [
  "sea-orm",
  "serde",
  "serde_json",
+ "specta",
  "tokio",
 ]
 
