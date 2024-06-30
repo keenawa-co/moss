@@ -9,6 +9,8 @@ use types::id::NanoId;
 pub struct ProjectMeta {
     pub id: NanoId,
     pub source: String,
+    pub repository: Option<String>,
+    pub opened_at: usize,
     pub created_at: usize,
 }
 
@@ -27,13 +29,17 @@ impl ProjectService {
     }
 
     pub async fn create_project(&self, input: &CreateProjectMetaInput) -> Result<Vec<ProjectMeta>> {
+        let time_now = Utc::now().timestamp() as usize;
+
         Ok(self
             .conn
             .create("project_meta")
             .content(ProjectMeta {
                 id: NanoId::new(),
                 source: input.source.clone(),
-                created_at: Utc::now().timestamp() as usize,
+                repository: None,
+                opened_at: time_now,
+                created_at: time_now,
             })
             .await?)
     }
