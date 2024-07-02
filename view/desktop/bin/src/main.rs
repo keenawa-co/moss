@@ -4,11 +4,14 @@
 use app::{context_compact::AppContextCompact, AppCompact};
 use app_lib::{
     menu,
-    service::project_service::{CreateProjectMetaInput, ProjectMeta, ProjectService},
+    service::project_service::{CreateProjectInput, Project, ProjectService},
     AppState,
 };
 use std::sync::Arc;
-use surrealdb::{engine::local::File, Surreal};
+use surrealdb::{
+    engine::{local::File, remote::ws::Ws},
+    Surreal,
+};
 use tauri::{App, AppHandle, Manager, State};
 use tauri_specta::{collect_commands, collect_events, ts};
 use tracing::error;
@@ -30,10 +33,13 @@ async fn app_ready(app_handle: AppHandle) {
 #[specta::specta]
 async fn create_project(
     state: State<'_, AppState>,
-    input: CreateProjectMetaInput,
-) -> Result<Vec<ProjectMeta>, String> {
+    input: CreateProjectInput,
+) -> Result<Option<Project>, String> {
     match state.project_service.create_project(&input).await {
-        Ok(project) => Ok(project),
+        Ok(project) => {
+            dbg!(&project);
+            Ok(project)
+        }
         Err(_) => Err("Project creation failed".into()),
     }
 }
@@ -63,8 +69,12 @@ pub fn run(ctx: &mut AppContextCompact) -> tauri::Result<()> {
     });
 
     let db = ctx.block_on(|ctx| async {
-        let db = Surreal::new::<File>("../rocksdb").await.unwrap();
+        let db = Surreal::new::<Ws>("127.0.0.1:8000").await.unwrap();
+        // let db = Surreal::new::<File>("../rocksdb").await.unwrap();
         db.use_ns("moss").use_db("compass").await.unwrap();
+
+        // let schema = include_str!("../schema.surql");
+        // db.query(schema).await.unwrap();
 
         Arc::new(db)
     });

@@ -19,6 +19,8 @@ specta = { workspace = true, optional = true }
 
 sea-orm.workspace = true
 
+surrealdb.workspace = true
+
 
 [features]
 default = []

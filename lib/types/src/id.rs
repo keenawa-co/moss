@@ -2,6 +2,7 @@ use anyhow::anyhow;
 use nanoid::nanoid;
 use std::marker::PhantomData;
 use std::ops::Deref;
+use surrealdb::sql::Thing;
 
 #[cfg(feature = "graphql")]
 use async_graphql::{Scalar, ScalarType};
@@ -35,13 +36,6 @@ pub trait BoundedStringLength {
     const LENGTH: usize;
 }
 
-impl NanoId {
-    pub fn new() -> Self {
-        let id = BoundedString::new(&nanoid!(NANOID_20, &CHAR_SET)).unwrap();
-        NanoId(id)
-    }
-}
-
 impl std::fmt::Display for NanoId {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.0.inner)
@@ -66,6 +60,14 @@ impl From<&str> for NanoId {
     }
 }
 
+impl TryFrom<Thing> for NanoId {
+    type Error = anyhow::Error;
+
+    fn try_from(value: Thing) -> Result<Self, Self::Error> {
+        Ok(NanoId(BoundedString::new(&value.id.to_string())?))
+    }
+}
+
 impl From<String> for NanoId {
     fn from(value: String) -> Self {
         NanoId(BoundedString::new(value).unwrap())
@@ -81,6 +83,13 @@ impl AsRef<str> for NanoId {
 impl Into<String> for NanoId {
     fn into(self) -> String {
         self.0.inner
+    }
+}
+
+impl NanoId {
+    pub fn new() -> Self {
+        let id = BoundedString::new(&nanoid!(NANOID_20, &CHAR_SET)).unwrap();
+        NanoId(id)
     }
 }
 
