@@ -1,6 +1,0 @@
-[net.endpoint]
-host = "127.0.0.1"
-port = 1355
-
-[net.config]
-body_compress_size = 512
