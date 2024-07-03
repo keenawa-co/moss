@@ -1,25 +1,14 @@
 import { useTranslation } from 'react-i18next'
-import { commands, CreateProjectInput } from '../bindings'
+import { commands, SessionInfoDTO } from '../bindings'
 import React, { useEffect, useState } from 'react'
 import { listen } from '@tauri-apps/api/event'
 
 export const Home: React.FC = () => {
   const { t } = useTranslation(['ns1', 'ns2'])
-  const [name, setName] = useState('')
+  const [sessionInfo, setSessionInfo] = useState<SessionInfoDTO | null>(null)
   const [data, setData] = useState<number | null>(null)
 
   useEffect(() => {
-    const fetchName = async () => {
-      try {
-        const response = await commands.greet('g10z3r')
-        setName(response)
-      } catch (error) {
-        console.error('Failed to fetch greeting:', error)
-      }
-    }
-
-    fetchName()
-
     const unlisten = listen<number>('data-stream', (event) => {
       setData(event.payload)
     })
@@ -29,30 +18,45 @@ export const Home: React.FC = () => {
     }
   }, [])
 
-  const handleCreateProject = async () => {
-    console.log('Project Test')
+  useEffect(() => {
+    if (sessionInfo) {
+      console.log('Session restored:', sessionInfo)
+    }
+  }, [sessionInfo])
+
+  const handleRestoreSession = async () => {
     try {
-      const input: CreateProjectInput = {
-        source: '/Users/g10z3r/bar',
-        repository: null
+      let response = await commands.restoreSession(null)
+      if (response.status === 'ok') {
+        setSessionInfo(response.data)
       }
-      await commands.createProject(input)
-      console.log('Project created successfully')
     } catch (error) {
-      console.error('Failed to create project:', error)
+      console.error('Failed to restore session:', error)
     }
   }
 
   return (
     <main>
       <h1>{t('title')}</h1>
-      {name && <p>{t('user', { name })}</p>}
+
+      {sessionInfo ? (
+        <div>
+          <p>Session: {sessionInfo.session.id}</p>
+          <p>Project: {sessionInfo.project.source}</p>
+        </div>
+      ) : (
+        <p>No session</p>
+      )}
+
+      <button className="bg-red-500" onClick={handleRestoreSession}>
+        Restore Session
+      </button>
+
       <span>{t('description.part1')}</span>
       <span>{t('description.part1', { ns: 'ns2' })}</span>
       {data !== null && <p>Received data: {data}</p>}
-      <button className="bg-red-500" onClick={handleCreateProject}>
-        Create Project
-      </button>
     </main>
   )
 }
+
+export default Home

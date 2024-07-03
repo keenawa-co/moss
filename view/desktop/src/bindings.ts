@@ -3,7 +3,7 @@
 /** user-defined commands **/
 
 export const commands = {
-  async createProject(input: CreateProjectInput): Promise<Result<Project | null, string>> {
+  async createProject(input: CreateProjectInput): Promise<Result<ProjectDTO | null, string>> {
     try {
       return { status: 'ok', data: await TAURI_INVOKE('create_project', { input }) }
     } catch (e) {
@@ -11,11 +11,18 @@ export const commands = {
       else return { status: 'error', error: e as any }
     }
   },
+  async restoreSession(
+    projectSource: string | null
+  ): Promise<Result<SessionInfoDTO | null, string>> {
+    try {
+      return { status: 'ok', data: await TAURI_INVOKE('restore_session', { projectSource }) }
+    } catch (e) {
+      if (e instanceof Error) throw e
+      else return { status: 'error', error: e as any }
+    }
+  },
   async appReady(): Promise<void> {
     await TAURI_INVOKE('app_ready')
-  },
-  async greet(name: string): Promise<string> {
-    return await TAURI_INVOKE('greet', { name })
   }
 }
 
@@ -26,7 +33,14 @@ export const commands = {
 /** user-defined types **/
 
 export type CreateProjectInput = { source: string; repository: string | null }
-export type Project = { id: string; source: string; repository: string | null; created_at: string }
+export type ProjectDTO = {
+  id: string
+  source: string
+  repository: string | null
+  created_at: string
+}
+export type SessionDTO = { id: string }
+export type SessionInfoDTO = { created_at: string; project: ProjectDTO; session: SessionDTO }
 
 /** tauri-specta globals **/
 

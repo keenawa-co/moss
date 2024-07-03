@@ -4,7 +4,10 @@
 use app::{context_compact::AppContextCompact, AppCompact};
 use app_lib::{
     menu,
-    service::project_service::{CreateProjectInput, Project, ProjectService},
+    service::{
+        project_service::{CreateProjectInput, ProjectDTO, ProjectService},
+        session_service::{SessionInfoDTO, SessionService},
+    },
     AppState,
 };
 use std::sync::Arc;
@@ -15,12 +18,6 @@ use surrealdb::{
 use tauri::{App, AppHandle, Manager, State};
 use tauri_specta::{collect_commands, collect_events, ts};
 use tracing::error;
-
-#[tauri::command]
-#[specta::specta]
-fn greet(name: &str) -> String {
-    format!("Hello, {}! You've been greeted from Rust!", name)
-}
 
 #[tauri::command(async)]
 #[specta::specta]
@@ -34,13 +31,32 @@ async fn app_ready(app_handle: AppHandle) {
 async fn create_project(
     state: State<'_, AppState>,
     input: CreateProjectInput,
-) -> Result<Option<Project>, String> {
+) -> Result<Option<ProjectDTO>, String> {
     match state.project_service.create_project(&input).await {
-        Ok(project) => {
-            dbg!(&project);
-            Ok(project)
+        Ok(Some(project)) => return Ok(Some(project.into())),
+        Ok(None) => return Ok(None),
+        Err(e) => {
+            let err = format!("An error occurred while creating the project: {e}");
+            error!(err);
+            return Err(err);
         }
-        Err(_) => Err("Project creation failed".into()),
+    }
+}
+
+#[tauri::command(async)]
+#[specta::specta]
+async fn restore_session(
+    state: State<'_, AppState>,
+    project_source: Option<String>,
+) -> Result<Option<SessionInfoDTO>, String> {
+    match state.session_service.restore_session(project_source).await {
+        Ok(Some(session_info)) => return Ok(Some(session_info.into())),
+        Ok(None) => return Ok(None),
+        Err(e) => {
+            let err = format!("An error occurred while restoring the session: {e}");
+            error!(err);
+            return Err(err);
+        }
     }
 }
 
@@ -82,7 +98,11 @@ pub fn run(ctx: &mut AppContextCompact) -> tauri::Result<()> {
     let (invoke_handler, register_events) = {
         let builder = ts::builder()
             .events(collect_events![])
-            .commands(collect_commands![create_project, app_ready, greet])
+            .commands(collect_commands![
+                create_project,
+                restore_session,
+                app_ready,
+            ])
             .config(specta::ts::ExportConfig::new().formatter(specta::ts::formatter::prettier));
 
         #[cfg(debug_assertions)]
@@ -94,6 +114,7 @@ pub fn run(ctx: &mut AppContextCompact) -> tauri::Result<()> {
     tauri::Builder::default()
         .manage(AppState {
             project_service: ProjectService::new(db.clone()),
+            session_service: SessionService::new(db.clone()),
         })
         .invoke_handler(invoke_handler)
         .setup(move |app: &mut App| {

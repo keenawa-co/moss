@@ -3,14 +3,8 @@ mod mem;
 pub mod menu;
 pub mod service;
 
-use anyhow::Result;
 use service::project_service::ProjectService;
-use surrealdb::Result as SurrealResult;
-use surrealdb::{
-    method::Create,
-    opt::{self, Resource},
-    Connection, Surreal,
-};
+use service::session_service::SessionService;
 
 #[macro_use]
 extern crate serde;
@@ -20,4 +14,5 @@ extern crate tracing;
 
 pub struct AppState {
     pub project_service: ProjectService,
+    pub session_service: SessionService,
 }
