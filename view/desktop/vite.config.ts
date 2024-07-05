@@ -12,11 +12,11 @@ export default defineConfig({
   assetsInclude: 'src/renderer/assets/**',
   resolve: {
     alias: {
-      "@shared": resolve("shared"),
-      "@/hooks": resolve("src/hooks"),
-      "@/assets": resolve("src/assets"),
-      "@/components": resolve("src/components"),
-      "@/icons": resolve(__dirname, "../shared/components/icons"),
-    },
-  },
-});
+      '@shared': resolve('shared'),
+      '@/hooks': resolve('src/hooks'),
+      '@/assets': resolve('src/assets'),
+      '@/components': resolve('src/components'),
+      '@/icons': resolve(__dirname, '../shared/components/icons')
+    }
+  }
+})
