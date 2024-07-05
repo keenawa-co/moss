@@ -1,7 +1,7 @@
-## Roadmap
+# Moss
 
-1. Always follow the principle **Work** -> **Right** -> **Fast**
+- [Contributing](#contributing)
 
-2. Keep the **code clean** and **readable**
+## Contributing
 
-3. Keep the **code simple** and **easy to maintain**
+We would for you to get involved with Moss development! If you wish to help, you can learn more about how you can contribute to this project in the [contribution guide](CONTRIBUTING.md).
