@@ -8,11 +8,7 @@ const meta = {
   parameters: {
     layout: 'centered',
   },
-  tags: ['autodocs'],
-
-  argTypes: {
-    className: { control: 'tailwind' },
-  },
+  tags: ['autodocs']
 
 } satisfies Meta<typeof IconHome>;
 

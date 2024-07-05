@@ -6,7 +6,7 @@ interface Props {
 const IconHome = ({ className }: Props) => {
   return (
     <svg
-      className={className}
+      className="text-red-500"
       width="16"
       height="16"
       viewBox="0 0 16 16"

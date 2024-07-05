@@ -31,6 +31,7 @@ export default defineConfig({
       "@/hooks": resolve("src/hooks"),
       "@/assets": resolve("src/assets"),
       "@/components": resolve("src/components"),
+      "@/icons": resolve(__dirname, "../shared/components/icons"),
     },
   },
 });
