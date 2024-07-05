@@ -1750,6 +1750,7 @@ dependencies = [
  "futures",
  "macos-trampoline",
  "mimalloc",
+ "schemars",
  "serde",
  "serde_json",
  "specta",
@@ -8952,6 +8953,10 @@ dependencies = [
  "cfg-if",
  "windows-sys 0.48.0",
 ]
+
+[[package]]
+name = "workbench"
+version = "0.1.0"
 
 [[package]]
 name = "workspace"

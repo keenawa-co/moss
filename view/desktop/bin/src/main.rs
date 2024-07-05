@@ -8,8 +8,9 @@ use app_lib::{
         project_service::{CreateProjectInput, ProjectDTO, ProjectService},
         session_service::{SessionInfoDTO, SessionService},
     },
-    AppState,
+    AppState, WindowSettingsSchema,
 };
+use serde_json::json;
 use std::sync::Arc;
 use surrealdb::{
     engine::{local::File, remote::ws::Ws},
@@ -94,6 +95,15 @@ pub fn run(ctx: &mut AppContextCompact) -> tauri::Result<()> {
 
         Arc::new(db)
     });
+
+    // let schema = json!(include_str!(
+    //     "../../../../testdata/tsp-output/@typespec/json-schema/Person.json"
+    // ));
+    // let compiled = jsonschema::JSONSchema::compile(&schema).expect("A valid schema");
+
+    let schema = schemars::schema_for!(WindowSettingsSchema);
+
+    println!("{}", serde_json::to_string_pretty(&schema).unwrap());
 
     let (invoke_handler, register_events) = {
         let builder = ts::builder()
