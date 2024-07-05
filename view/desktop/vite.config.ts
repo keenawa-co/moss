@@ -15,7 +15,8 @@ export default defineConfig({
       '@shared': resolve('shared'),
       '@/hooks': resolve('src/hooks'),
       '@/assets': resolve('src/assets'),
-      '@/components': resolve('src/components')
+      '@/components': resolve('src/components'),
+      '@/icons': resolve(__dirname, '../shared/components/icons')
     }
   }
 })

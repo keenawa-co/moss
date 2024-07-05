@@ -2,6 +2,7 @@ import { About, Content, DraggableTopBar, Home, Menu, Properties, RootLayout, Si
 import { Suspense, useState } from 'react'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import './i18n'
+import { HomeIcon } from '@/icons'
 
 function App() {
   return (
@@ -9,6 +10,7 @@ function App() {
       <DraggableTopBar />
       <RootLayout>
         <Sidebar className="p-2 border-2 border-red-500">Sidebar</Sidebar>
+        <HomeIcon />
         <Content className="border-2 border-blue-500">
           <Suspense fallback="loading">
             <BrowserRouter>
