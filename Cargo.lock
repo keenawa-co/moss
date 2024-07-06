@@ -1750,6 +1750,7 @@ dependencies = [
  "futures",
  "macos-trampoline",
  "mimalloc",
+ "parking_lot",
  "schemars",
  "serde",
  "serde_json",
@@ -1761,6 +1762,7 @@ dependencies = [
  "tauri-specta",
  "tokio",
  "tracing",
+ "workbench",
 ]
 
 [[package]]
@@ -2859,6 +2861,7 @@ checksum = "96282e96bfcd3da0d3aa9938bedf1e50df3269b6db08b4876d2da0bb1a0841cf"
 dependencies = [
  "ahash 0.3.8",
  "autocfg",
+ "serde",
 ]
 
 [[package]]
@@ -8957,6 +8960,13 @@ dependencies = [
 [[package]]
 name = "workbench"
 version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "hashbrown 0.7.2",
+ "parking_lot",
+ "serde",
+ "serde_json",
+]
 
 [[package]]
 name = "workspace"

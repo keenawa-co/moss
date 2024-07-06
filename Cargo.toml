@@ -15,6 +15,8 @@ members = [
     "lib/mac",
     "lib/types",
 
+    "platform/workbench",
+
     "platform/conf",
     "platform/pwd",
     "platform/workspace",
@@ -24,7 +26,7 @@ members = [
     "mossctl",
     "net",
 
-    "view/desktop/bin", "platform/workbench",
+    "view/desktop/bin",
 ]
 
 [profile.release]
@@ -44,6 +46,9 @@ rustflags = ["-C", "target-cpu=native"]
 
 [workspace.dependencies]
 fs = { path = "kernel/fs" }
+
+workbench = { path = "platform/workbench" }
+
 bus = { path = "kernel/bus" }
 mac = { path = "lib/mac" }
 async_utl = { path = "lib/async_utl" }
