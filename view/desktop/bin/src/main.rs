@@ -10,6 +10,7 @@ use app_lib::{
     },
     AppState, WindowSettingsSchema,
 };
+use parking_lot::Mutex;
 use serde_json::json;
 use std::sync::Arc;
 use surrealdb::{
@@ -19,6 +20,10 @@ use surrealdb::{
 use tauri::{App, AppHandle, Manager, State};
 use tauri_specta::{collect_commands, collect_events, ts};
 use tracing::error;
+use workbench::configuration::{
+    configuration_registry::ConfigurationRegistry, configuration_service::ConfigurationService,
+    AbstractConfigurationService,
+};
 
 #[tauri::command(async)]
 #[specta::specta]
@@ -96,14 +101,17 @@ pub fn run(ctx: &mut AppContextCompact) -> tauri::Result<()> {
         Arc::new(db)
     });
 
-    // let schema = json!(include_str!(
-    //     "../../../../testdata/tsp-output/@typespec/json-schema/Person.json"
-    // ));
-    // let compiled = jsonschema::JSONSchema::compile(&schema).expect("A valid schema");
+    let settings = json!(include_str!("../../../../.moss/settings.json"));
 
-    let schema = schemars::schema_for!(WindowSettingsSchema);
+    let registry = Arc::new(Mutex::new(ConfigurationRegistry::new()));
+    let config_service = ConfigurationService::new(registry, "../../../.moss/settings.json");
 
-    println!("{}", serde_json::to_string_pretty(&schema).unwrap());
+    // let value = config_service.get_value(Some("window.restoreTab"));
+    // println!("Config Value: {:?}", value);
+
+    // let schema = schemars::schema_for!(WindowSettingsSchema);
+
+    // println!("{}", serde_json::to_string_pretty(&schema).unwrap());
 
     let (invoke_handler, register_events) = {
         let builder = ts::builder()

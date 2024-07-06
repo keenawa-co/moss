@@ -38,6 +38,8 @@ impl<C: Connection> SurrealClient<C> {
     }
 }
 
+pub struct SettingsStore {}
+
 pub struct AppState {
     pub project_service: ProjectService,
     pub session_service: SessionService,
@@ -52,20 +54,38 @@ pub struct SettingsSchema {
 #[serde(rename = "Window")]
 pub struct WindowSettingsSchema {
     #[serde(rename = "window.restoreTab")]
-    #[serde(default = "WindowSettingsSchema::default_restore_tab")]
     pub restore_tab: bool,
     #[serde(rename = "window.restoreFullScreen")]
-    #[serde(default = "WindowSettingsSchema::default_restore_full_screen")]
     /// Test123
     pub restore_full_screen: bool,
 }
 
-impl WindowSettingsSchema {
-    fn default_restore_tab() -> bool {
-        true
-    }
-
-    fn default_restore_full_screen() -> bool {
-        true
+impl SettingsSchema {
+    fn default_window_schema() -> WindowSettingsSchema {
+        return WindowSettingsSchema {
+            restore_tab: true,
+            restore_full_screen: true,
+        };
     }
 }
+
+impl Default for SettingsSchema {
+    fn default() -> Self {
+        Self {
+            window: WindowSettingsSchema {
+                restore_tab: true,
+                restore_full_screen: true,
+            },
+        }
+    }
+}
+
+// impl WindowSettingsSchema {
+//     fn default_restore_tab() -> bool {
+//         true
+//     }
+
+//     fn default_restore_full_screen() -> bool {
+//         true
+//     }
+// }

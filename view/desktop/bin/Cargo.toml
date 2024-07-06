@@ -24,6 +24,8 @@ futures.workspace = true
 anyhow.workspace = true
 specta.workspace = true
 app.workspace = true
+workbench.workspace = true
+parking_lot.workspace = true
 surrealdb = { workspace = true, features = ["kv-rocksdb"] }
 strum = { workspace = true, features = ["derive"] }
 tokio = { workspace = true, features = ["full"] }
