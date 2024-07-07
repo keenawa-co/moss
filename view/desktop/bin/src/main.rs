@@ -101,13 +101,14 @@ pub fn run(ctx: &mut AppContextCompact) -> tauri::Result<()> {
         Arc::new(db)
     });
 
-    let settings = json!(include_str!("../../../../.moss/settings.json"));
-
     let registry = Arc::new(Mutex::new(ConfigurationRegistry::new()));
     let config_service = ConfigurationService::new(registry, "../../../.moss/settings.json");
 
-    // let value = config_service.get_value(Some("window.restoreTab"));
-    // println!("Config Value: {:?}", value);
+    let value = config_service.get_value("editor.fontSize", None);
+    println!("Config Value: {:?}", value);
+
+    let value = config_service.get_value("editor.fontSize", Some("[mossql]"));
+    println!("Config Value: {:?}", value);
 
     // let schema = schemars::schema_for!(WindowSettingsSchema);
 

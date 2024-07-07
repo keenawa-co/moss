@@ -1,43 +1,48 @@
-use std::sync::Arc;
+use std::{default, sync::Arc};
 
 use parking_lot::Mutex;
 use serde_json::Value;
 
 use super::{
     configuration_default::DefaultConfiguration,
-    configuration_model::{ConfigurationModel, ConfigurationModelParser},
+    configuration_model::{ConfigurationEntryModel, ConfigurationModel, ConfigurationModelParser},
     configuration_registry::ConfigurationRegistry,
     AbstractConfigurationService,
 };
 
 pub struct ConfigurationService {
     configuration: ConfigurationModel,
-    default_configuration: DefaultConfiguration,
+    // TODO: user_configuration
+    // default_configuration: DefaultConfiguration,
     registry: Arc<Mutex<ConfigurationRegistry>>,
 }
 
 impl ConfigurationService {
     pub fn new(registry: Arc<Mutex<ConfigurationRegistry>>, config_file_path: &str) -> Self {
         let parser = ConfigurationModelParser::new();
-        parser.parse_file(config_file_path).unwrap();
-        todo!()
-        // Self {
-        //     default_configuration: DefaultConfiguration::new(),
-        //     user_configuration: parser
-        //         .parse_file(config_file_path)
-        //         .unwrap_or_else(|_| ConfigurationModel::new()),
-        //     configuration: ConfigurationModel::new(),
-        //     registry,
-        // }
+        let workspace_configuration = parser.parse_file(config_file_path).unwrap();
+        let default_configuration = DefaultConfiguration::new();
+        let conf = ConfigurationModel::new(
+            DefaultConfiguration::new().0, // TODO: use default_configuration,
+            ConfigurationEntryModel::empty(),
+            workspace_configuration,
+            ConfigurationEntryModel::empty(),
+        );
+
+        Self {
+            // default_configuration,
+            configuration: conf,
+            registry,
+        }
     }
 }
 
-// impl AbstractConfigurationService for ConfigurationService {
-//     fn get_value(&self, section: Option<&str>) -> Option<&Value> {
-//         self.configuration.get_value(section)
-//     }
+impl AbstractConfigurationService for ConfigurationService {
+    fn get_value(&self, key: &str, overrider_identifier: Option<&str>) -> Option<Value> {
+        self.configuration.get_value(key, overrider_identifier)
+    }
 
-//     fn update_value(&self, _key: &str, _value: &str) {
-//         unimplemented!()
-//     }
-// }
+    fn update_value(&self, _key: &str, _value: &str) {
+        unimplemented!()
+    }
+}
