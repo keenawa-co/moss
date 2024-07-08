@@ -2,9 +2,9 @@ import type { StorybookConfig } from "@storybook/react-vite";
 
 import { dirname, join } from "path";
 
-import path from "path"
+import path from "path";
 
-import { mergeConfig } from 'vite';
+import { mergeConfig } from "vite";
 
 /**
  * This function is used to resolve the absolute path of a package.
@@ -18,18 +18,37 @@ const config: StorybookConfig = {
     //"../src/**/*.mdx",
     //"../src/**/*.stories.@(js|jsx|mjs|ts|tsx)",
     "../../../packages/ui/src/**/*.stories.@(js|jsx|mjs|ts|tsx)",
-    /* {
-      directory: "../../../packages/ui/src/icons/**",
-      titlePrefix: "Icons",
-      files: "*.stories.*",
-    }, */
   ],
+  staticDirs: ["../public"],
   addons: [
     getAbsolutePath("@storybook/addon-onboarding"),
     getAbsolutePath("@storybook/addon-links"),
     getAbsolutePath("@storybook/addon-essentials"),
     getAbsolutePath("@chromatic-com/storybook"),
     getAbsolutePath("@storybook/addon-interactions"),
+    {
+      name: '@storybook/addon-styling-webpack',
+      options: {
+        rules: [
+          // Replaces existing CSS rules to support PostCSS
+          {
+            test: /\.css$/,
+            use: [
+              'style-loader',
+              {
+                loader: 'css-loader',
+                options: { importLoaders: 1 }
+              },
+              {
+                // Gets options from `postcss.config.js` in your project root
+                loader: 'postcss-loader',
+                options: { implementation: require.resolve('postcss') }
+              }
+            ],
+          }
+        ]
+      }
+    },
   ],
   framework: {
     name: getAbsolutePath("@storybook/react-vite"),

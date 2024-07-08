@@ -1,5 +1,4 @@
 import { twMerge } from 'tailwind-merge';
-import './styles.css';
 
 interface IconHomeProps {
   className?: string;
