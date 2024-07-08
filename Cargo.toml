@@ -24,7 +24,7 @@ members = [
     "mossctl",
     "net",
 
-    "view/desktop/bin",
+    "apps/desktop/bin",
 ]
 
 [profile.release]
