@@ -7,8 +7,8 @@ edition = "2021"
 parking_lot.workspace = true
 lazy-regex.workspace = true
 anyhow.workspace = true
+arc-swap.workspace = true
 hashbrown = { workspace = true, features = ["serde"] }
-once_cell.workspace = true
 
 serde = { workspace = true, features = ["derive"] }
 serde_json.workspace = true

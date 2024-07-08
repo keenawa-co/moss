@@ -1,119 +1,207 @@
 use anyhow::Result;
 use hashbrown::HashMap;
-use once_cell::sync::Lazy;
 use parking_lot::RwLock;
 use serde_json::Value;
 use std::{fs::File, io::Read, sync::Arc};
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct ConfigurationEntryModel {
-    pub contents: HashMap<String, serde_json::Value>,
-    pub keys: Vec<String>,
-    pub overrides: HashMap<String, HashMap<String, Value>>,
+#[derive(Debug, Clone)]
+pub struct Override {
+    identifier: String,
+    _keys: Vec<String>,
+    contents: HashMap<String, Value>,
 }
 
-impl ConfigurationEntryModel {
-    pub fn empty() -> Self {
+#[derive(Debug, Clone)]
+pub struct ConfigurationLayer {
+    content: HashMap<String, Value>,
+    keys: Vec<String>,
+    overrides: Vec<Override>,
+    overridden_configurations: HashMap<String, ConfigurationLayer>,
+}
+
+impl ConfigurationLayer {
+    pub fn new(
+        contents: HashMap<String, Value>,
+        keys: Vec<String>,
+        overrides: Vec<Override>,
+    ) -> Self {
         Self {
-            contents: HashMap::new(),
-            keys: Vec::new(),
-            overrides: HashMap::new(),
+            content: contents,
+            keys,
+            overrides,
+            overridden_configurations: HashMap::new(),
         }
     }
 
-    pub fn get_value(&self, key: &str) -> Option<&serde_json::Value> {
-        self.contents.get(key)
+    pub fn empty() -> Self {
+        Self {
+            content: HashMap::new(),
+            keys: Vec::new(),
+            overrides: Vec::new(),
+            overridden_configurations: HashMap::new(),
+        }
     }
 
-    fn override_configuration(&self, identifier: &str) -> Self {
-        if let Some(override_contents) = self.overrides.get(identifier) {
-            let mut new_contents = self.contents.clone();
-            let mut new_keys = self.keys.clone();
+    pub fn get_value(&self, key: &str) -> Option<&Value> {
+        self.content.get(key)
+    }
 
-            Self::merge_content(&mut new_contents, override_contents);
+    fn override_configuration(&mut self, identifier: &str) -> Self {
+        if let Some(override_model) = self.overridden_configurations.get(identifier) {
+            return override_model.clone();
+        }
 
-            for key in override_contents.keys() {
-                if !new_keys.contains(key) {
-                    new_keys.push(key.clone());
-                }
-            }
+        let override_model = self.create_overridden_configuration(identifier);
+        self.overridden_configurations
+            .insert(identifier.to_string(), override_model.clone());
 
-            ConfigurationEntryModel {
-                contents: new_contents,
-                keys: new_keys,
-                overrides: self.overrides.clone(),
-            }
+        override_model
+    }
+
+    fn create_overridden_configuration(&self, identifier: &str) -> Self {
+        if let Some(override_content) = self.get_override_identifier_content(identifier) {
+            let mut content = self.content.clone();
+            content.extend(override_content);
+
+            ConfigurationLayer::new(content, self.keys.clone(), self.overrides.clone())
         } else {
             self.clone()
         }
     }
 
-    fn merge(&self, others: Vec<ConfigurationEntryModel>) -> Self {
+    fn get_override_identifier_content(&self, identifier: &str) -> Option<HashMap<String, Value>> {
+        self.overrides
+            .iter()
+            .find(|override_data| override_data.identifier == identifier)
+            .map(|override_data| override_data.contents.clone())
+    }
+
+    fn merge(&self, others: Vec<ConfigurationLayer>) -> Self {
         let mut merged = self.clone();
         for other in others {
-            Self::merge_content(&mut merged.contents, &other.contents);
+            merged.content.extend(other.content.clone());
+
             let new_keys: Vec<String> = other
                 .keys
                 .into_iter()
                 .filter(|key| !merged.keys.contains(key))
                 .collect();
+
             merged.keys.extend(new_keys);
             merged.overrides.extend(other.overrides);
         }
+
         merged
     }
 }
-
-impl ConfigurationEntryModel {
-    fn merge_content(target: &mut HashMap<String, Value>, source: &HashMap<String, Value>) {
-        for (key, value) in source {
-            target.insert(key.clone(), value.clone());
-        }
-    }
-}
-
 // TODO: Use kernel/fs to work with the file system
-pub struct ConfigurationModelParser;
+pub struct Parser;
 
-impl ConfigurationModelParser {
+impl Parser {
     pub fn new() -> Self {
         Self {}
     }
 
-    pub fn parse_file(&self, file_path: &str) -> Result<ConfigurationEntryModel> {
+    pub fn parse_file(&self, file_path: &str) -> Result<ConfigurationLayer> {
         let re_override_property = regex!(r#"^\[.*\]$"#);
 
         let mut file = File::open(file_path)?;
         let mut content = String::new();
         file.read_to_string(&mut content)?;
-
         let json_map: HashMap<String, Value> = serde_json::from_str(&content)?;
 
-        Ok(ConfigurationEntryModel {
-            contents: json_map.clone(),
-            keys: json_map.keys().cloned().collect(),
-            overrides: HashMap::new(), // FIXME: not implemented
-        })
+        let mut overrides: Vec<Override> = Vec::new();
+        let mut root_contents: HashMap<String, Value> = HashMap::new();
+        let mut root_keys: Vec<String> = Vec::new();
+
+        for (k, v) in &json_map {
+            if re_override_property.is_match(k) {
+                Self::collect_overrides(k, v, &mut overrides, None);
+            } else {
+                root_contents.insert(k.clone(), v.clone());
+                root_keys.push(k.clone());
+            }
+        }
+
+        Ok(ConfigurationLayer::new(root_contents, root_keys, overrides))
+    }
+
+    fn collect_overrides(
+        key: &str,
+        value: &Value,
+        overrides: &mut Vec<Override>,
+        parent_identifier: Option<&str>,
+    ) {
+        if let Value::Object(inner_map) = value {
+            let current_identifier = Self::format_identifier(parent_identifier, key);
+
+            let (override_content, override_keys) = Self::extract_override_content_and_keys(
+                inner_map,
+                overrides,
+                Some(&current_identifier),
+            );
+
+            overrides.push(Override {
+                identifier: current_identifier.to_string(),
+                _keys: override_keys,
+                contents: override_content,
+            });
+        }
+    }
+
+    fn extract_override_content_and_keys(
+        inner_map: &serde_json::Map<std::string::String, Value>,
+        overrides: &mut Vec<Override>,
+        current_identifier: Option<&str>,
+    ) -> (HashMap<String, Value>, Vec<String>) {
+        let mut override_content = HashMap::new();
+        let mut override_keys = Vec::new();
+
+        for (inner_key, inner_value) in inner_map {
+            if inner_key.starts_with('[') && inner_key.ends_with(']') {
+                Self::collect_overrides(inner_key, inner_value, overrides, current_identifier);
+            } else {
+                override_content.insert(inner_key.clone(), inner_value.clone());
+                override_keys.push(inner_key.clone());
+            }
+        }
+
+        (override_content, override_keys)
+    }
+
+    fn format_identifier(parent_identifier: Option<&str>, key: &str) -> String {
+        let trimmed_key = key.trim_matches(|c| c == '[' || c == ']');
+
+        parent_identifier.map_or_else(
+            || trimmed_key.to_string(),
+            |parent_id| {
+                let mut result = String::from(parent_id);
+                result.push_str("/");
+                result.push_str(trimmed_key);
+
+                result
+            },
+        )
     }
 }
 
-pub struct ConfigurationModel {
-    pub default_configuration: ConfigurationEntryModel,
-    pub user_configuration: ConfigurationEntryModel,
-    pub workspace_configuration: ConfigurationEntryModel,
-    pub inmem_configuration: ConfigurationEntryModel,
-
-    pub consolidated_configuration: RwLock<Option<ConfigurationEntryModel>>,
+#[derive(Debug)]
+pub struct Configuration {
+    default_configuration: ConfigurationLayer,
+    user_configuration: ConfigurationLayer,
+    workspace_configuration: ConfigurationLayer,
+    inmem_configuration: ConfigurationLayer,
+    consolidated_configuration: RwLock<Option<ConfigurationLayer>>,
 }
 
-impl ConfigurationModel {
+impl Configuration {
     pub fn new(
-        default_conf: ConfigurationEntryModel,
-        user_conf: ConfigurationEntryModel,
-        workspace_conf: ConfigurationEntryModel,
-        inmem_conf: ConfigurationEntryModel,
+        default_conf: ConfigurationLayer,
+        user_conf: ConfigurationLayer,
+        workspace_conf: ConfigurationLayer,
+        inmem_conf: ConfigurationLayer,
     ) -> Self {
-        ConfigurationModel {
+        Configuration {
             default_configuration: default_conf,
             user_configuration: user_conf,
             workspace_configuration: workspace_conf,
@@ -130,14 +218,17 @@ impl ConfigurationModel {
     pub fn get_consolidated_configuration(
         &self,
         overrider_identifier: Option<&str>,
-    ) -> Arc<ConfigurationEntryModel> {
+    ) -> Arc<ConfigurationLayer> {
         {
             let read_guard = self.consolidated_configuration.read();
             if let Some(ref config) = *read_guard {
                 if let Some(identifier) = overrider_identifier {
-                    return Arc::new(config.clone().override_configuration(identifier));
+                    return Arc::new(
+                        config
+                            .clone()
+                            .override_configuration(identifier.trim_start_matches('/')),
+                    );
                 }
-
                 return Arc::new(config.clone());
             }
         }
@@ -161,7 +252,6 @@ impl ConfigurationModel {
                     .override_configuration(identifier),
             );
         }
-
         Arc::new(write_guard.as_ref().unwrap().clone())
     }
 }

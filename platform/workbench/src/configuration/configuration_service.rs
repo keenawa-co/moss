@@ -1,39 +1,45 @@
-use std::{default, sync::Arc};
+use std::sync::Arc;
 
+use anyhow::{Context as AnyhowContext, Result};
 use parking_lot::Mutex;
 use serde_json::Value;
 
 use super::{
     configuration_default::DefaultConfiguration,
-    configuration_model::{ConfigurationEntryModel, ConfigurationModel, ConfigurationModelParser},
+    configuration_model::{Configuration, ConfigurationLayer, Parser},
     configuration_registry::ConfigurationRegistry,
     AbstractConfigurationService,
 };
 
 pub struct ConfigurationService {
-    configuration: ConfigurationModel,
+    configuration: Configuration,
     // TODO: user_configuration
     // default_configuration: DefaultConfiguration,
     registry: Arc<Mutex<ConfigurationRegistry>>,
 }
 
 impl ConfigurationService {
-    pub fn new(registry: Arc<Mutex<ConfigurationRegistry>>, config_file_path: &str) -> Self {
-        let parser = ConfigurationModelParser::new();
-        let workspace_configuration = parser.parse_file(config_file_path).unwrap();
-        let default_configuration = DefaultConfiguration::new();
-        let conf = ConfigurationModel::new(
+    pub fn new(
+        registry: Arc<Mutex<ConfigurationRegistry>>,
+        config_file_path: &str,
+    ) -> Result<Self> {
+        let parser = Parser::new();
+        let workspace_configuration = parser
+            .parse_file(config_file_path)
+            .context(format!("failed to open file: {config_file_path}"))?;
+
+        let conf = Configuration::new(
             DefaultConfiguration::new().0, // TODO: use default_configuration,
-            ConfigurationEntryModel::empty(),
+            ConfigurationLayer::empty(),
             workspace_configuration,
-            ConfigurationEntryModel::empty(),
+            ConfigurationLayer::empty(),
         );
 
-        Self {
+        Ok(Self {
             // default_configuration,
             configuration: conf,
             registry,
-        }
+        })
     }
 }
 

@@ -1,9 +1,9 @@
 use hashbrown::HashMap;
 use serde_json::{json, Number, Value};
 
-use super::configuration_model::ConfigurationEntryModel;
+use super::configuration_model::ConfigurationLayer;
 
-pub struct DefaultConfiguration(pub ConfigurationEntryModel);
+pub struct DefaultConfiguration(pub ConfigurationLayer);
 
 impl DefaultConfiguration {
     pub fn new() -> Self {
@@ -28,14 +28,16 @@ impl DefaultConfiguration {
         .into_iter()
         .collect();
 
-        Self(ConfigurationEntryModel {
-            contents,
-            keys: vec![
-                "project.monitoring.exclude".to_string(),
-                "window.restoreFullScreen".to_string(),
-                "window.restoreTab".to_string(),
-            ],
-            overrides,
-        })
+        // Self(ConfigurationEntryModel {
+        //     contents,
+        //     keys: vec![
+        //         "project.monitoring.exclude".to_string(),
+        //         "window.restoreFullScreen".to_string(),
+        //         "window.restoreTab".to_string(),
+        //     ],
+        //     overrides,
+        // })
+
+        Self(ConfigurationLayer::empty())
     }
 }
