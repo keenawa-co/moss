@@ -1,6 +1,10 @@
-import type { StorybookConfig } from "@storybook/react-webpack5";
+import type { StorybookConfig } from "@storybook/react-vite";
 
 import { dirname, join } from "path";
+
+import path from "path";
+
+import { mergeConfig } from "vite";
 
 /**
  * This function is used to resolve the absolute path of a package.
@@ -11,12 +15,12 @@ function getAbsolutePath(value: string): any {
 }
 const config: StorybookConfig = {
   stories: [
-    "../src/**/*.mdx",
-    "../src/**/*.stories.@(js|jsx|mjs|ts|tsx)",
+    //"../src/**/*.mdx",
+    //"../src/**/*.stories.@(js|jsx|mjs|ts|tsx)",
     "../../../packages/ui/src/**/*.stories.@(js|jsx|mjs|ts|tsx)",
   ],
+  staticDirs: ["../public"],
   addons: [
-    getAbsolutePath("@storybook/addon-webpack5-compiler-swc"),
     getAbsolutePath("@storybook/addon-onboarding"),
     getAbsolutePath("@storybook/addon-links"),
     getAbsolutePath("@storybook/addon-essentials"),
@@ -26,36 +30,32 @@ const config: StorybookConfig = {
       name: '@storybook/addon-styling-webpack',
       options: {
         rules: [
+          // Replaces existing CSS rules to support PostCSS
           {
             test: /\.css$/,
-            sideEffects: true,
             use: [
-              require.resolve('style-loader'),
+              'style-loader',
               {
-                loader: require.resolve('css-loader'),
-                options: {
-                  importLoaders: 1,
-                },
+                loader: 'css-loader',
+                options: { importLoaders: 1 }
               },
               {
-                loader: require.resolve('postcss-loader'),
-                options: {
-                  implementation: require.resolve('postcss'),
-                },
-              },
+                // Gets options from `postcss.config.js` in your project root
+                loader: 'postcss-loader',
+                options: { implementation: require.resolve('postcss') }
+              }
             ],
-          },
-        ],
-      },
+          }
+        ]
+      }
     },
   ],
   framework: {
-    name: getAbsolutePath("@storybook/react-webpack5"),
-    options: {
-      builder: {
-        useSWC: true,
-      },
-    },
+    name: getAbsolutePath("@storybook/react-vite"),
+    options: {},
+  },
+  viteFinal(config) {
+    return mergeConfig(config, { cacheDir: path.resolve(__dirname, ".cache") });
   },
 };
 export default config;
