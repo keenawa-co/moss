@@ -26,4 +26,4 @@ dist-ssr
 *storybook.log
 
 .cache
-%SystemDrive%/ProgramData/Microsoft/Windows/Caches
+%SystemDrive%

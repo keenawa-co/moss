@@ -1,4 +1,9 @@
-# Removed from package.json -> scripts
+## Start storybook
+```sh
+pnpm storybook
+```
+
+## Removed from package.json -> scripts
 "dev": "vite",
 "build": "tsc -b && vite build",
 
