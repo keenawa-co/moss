@@ -1,6 +1,6 @@
 use anyhow::Result;
+use arc_swap::{ArcSwap, ArcSwapOption};
 use hashbrown::HashMap;
-use parking_lot::RwLock;
 use serde_json::Value;
 use std::{fs::File, io::Read, sync::Arc};
 
@@ -16,7 +16,7 @@ pub struct ConfigurationLayer {
     content: HashMap<String, Value>,
     keys: Vec<String>,
     overrides: Vec<Override>,
-    overridden_configurations: HashMap<String, ConfigurationLayer>,
+    overridden_configurations: Arc<ArcSwap<HashMap<String, Arc<ConfigurationLayer>>>>,
 }
 
 impl ConfigurationLayer {
@@ -29,7 +29,7 @@ impl ConfigurationLayer {
             content: contents,
             keys,
             overrides,
-            overridden_configurations: HashMap::new(),
+            overridden_configurations: Arc::new(ArcSwap::new(Arc::new(HashMap::new()))),
         }
     }
 
@@ -38,7 +38,7 @@ impl ConfigurationLayer {
             content: HashMap::new(),
             keys: Vec::new(),
             overrides: Vec::new(),
-            overridden_configurations: HashMap::new(),
+            overridden_configurations: Arc::new(ArcSwap::new(Arc::new(HashMap::new()))),
         }
     }
 
@@ -46,16 +46,22 @@ impl ConfigurationLayer {
         self.content.get(key)
     }
 
-    fn override_configuration(&mut self, identifier: &str) -> Self {
-        if let Some(override_model) = self.overridden_configurations.get(identifier) {
-            return override_model.clone();
+    fn override_configuration(&self, identifier: &str) -> Arc<Self> {
+        let current_overrides = self.overridden_configurations.load_full();
+
+        if let Some(override_model) = current_overrides.get(identifier) {
+            return Arc::clone(override_model);
         }
 
-        let override_model = self.create_overridden_configuration(identifier);
-        self.overridden_configurations
-            .insert(identifier.to_string(), override_model.clone());
+        let new_override = Arc::new(self.create_overridden_configuration(identifier));
 
-        override_model
+        let mut new_overrides = HashMap::clone(&*current_overrides);
+        new_overrides.insert(identifier.to_string(), Arc::clone(&new_override));
+
+        self.overridden_configurations
+            .store(Arc::new(new_overrides));
+
+        new_override
     }
 
     fn create_overridden_configuration(&self, identifier: &str) -> Self {
@@ -108,22 +114,26 @@ impl Parser {
         let mut file = File::open(file_path)?;
         let mut content = String::new();
         file.read_to_string(&mut content)?;
-        let json_map: HashMap<String, Value> = serde_json::from_str(&content)?;
 
-        let mut overrides: Vec<Override> = Vec::new();
+        let root_map: HashMap<String, Value> = serde_json::from_str(&content)?;
+        let mut root_overrides: Vec<Override> = Vec::new();
         let mut root_contents: HashMap<String, Value> = HashMap::new();
         let mut root_keys: Vec<String> = Vec::new();
 
-        for (k, v) in &json_map {
+        for (k, v) in &root_map {
             if re_override_property.is_match(k) {
-                Self::collect_overrides(k, v, &mut overrides, None);
+                Self::collect_overrides(k, v, &mut root_overrides, None);
             } else {
                 root_contents.insert(k.clone(), v.clone());
                 root_keys.push(k.clone());
             }
         }
 
-        Ok(ConfigurationLayer::new(root_contents, root_keys, overrides))
+        let result = ConfigurationLayer::new(root_contents, root_keys, root_overrides);
+
+        dbg!(&result);
+
+        Ok(result)
     }
 
     fn collect_overrides(
@@ -191,7 +201,7 @@ pub struct Configuration {
     user_configuration: ConfigurationLayer,
     workspace_configuration: ConfigurationLayer,
     inmem_configuration: ConfigurationLayer,
-    consolidated_configuration: RwLock<Option<ConfigurationLayer>>,
+    consolidated_configuration: ArcSwapOption<ConfigurationLayer>,
 }
 
 impl Configuration {
@@ -206,7 +216,7 @@ impl Configuration {
             user_configuration: user_conf,
             workspace_configuration: workspace_conf,
             inmem_configuration: inmem_conf,
-            consolidated_configuration: RwLock::new(None),
+            consolidated_configuration: ArcSwapOption::from(None),
         }
     }
 
@@ -219,39 +229,31 @@ impl Configuration {
         &self,
         overrider_identifier: Option<&str>,
     ) -> Arc<ConfigurationLayer> {
-        {
-            let read_guard = self.consolidated_configuration.read();
-            if let Some(ref config) = *read_guard {
-                if let Some(identifier) = overrider_identifier {
-                    return Arc::new(
-                        config
-                            .clone()
-                            .override_configuration(identifier.trim_start_matches('/')),
-                    );
-                }
-                return Arc::new(config.clone());
+        if let Some(config) = self.consolidated_configuration.load_full().as_ref() {
+            if let Some(identifier) = overrider_identifier {
+                return config.override_configuration(identifier.trim_start_matches('/'));
             }
+
+            return Arc::clone(config);
         }
 
-        let mut write_guard = self.consolidated_configuration.write();
-        if write_guard.is_none() {
+        let new_configuration = {
             let merged_configuration = self.default_configuration.merge(vec![
                 self.user_configuration.clone(),
                 self.workspace_configuration.clone(),
                 self.inmem_configuration.clone(),
             ]);
-            *write_guard = Some(merged_configuration);
-        }
+
+            Arc::new(merged_configuration)
+        };
+
+        self.consolidated_configuration
+            .store(Some(Arc::clone(&new_configuration)));
 
         if let Some(identifier) = overrider_identifier {
-            return Arc::new(
-                write_guard
-                    .as_ref()
-                    .unwrap()
-                    .clone()
-                    .override_configuration(identifier),
-            );
+            return new_configuration.override_configuration(identifier);
         }
-        Arc::new(write_guard.as_ref().unwrap().clone())
+
+        new_configuration
     }
 }

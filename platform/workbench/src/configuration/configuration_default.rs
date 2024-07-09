@@ -1,5 +1,5 @@
 use hashbrown::HashMap;
-use serde_json::{json, Number, Value};
+use serde_json::Value;
 
 use super::configuration_model::ConfigurationLayer;
 
