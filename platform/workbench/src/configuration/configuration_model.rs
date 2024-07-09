@@ -82,22 +82,26 @@ impl ConfigurationLayer {
             .map(|override_data| override_data.contents.clone())
     }
 
-    fn merge(&self, others: Vec<ConfigurationLayer>) -> Self {
-        let mut merged = self.clone();
+    pub fn merge(&self, others: &[Arc<ConfigurationLayer>]) -> Self {
+        let mut merged_content = self.content.clone();
+        let mut merged_keys = self.keys.clone();
+        let mut merged_overrides = self.overrides.clone();
+
         for other in others {
-            merged.content.extend(other.content.clone());
+            merged_content.extend(other.content.clone());
 
             let new_keys: Vec<String> = other
                 .keys
-                .into_iter()
-                .filter(|key| !merged.keys.contains(key))
+                .iter()
+                .filter(|key| !merged_keys.contains(key))
+                .cloned()
                 .collect();
 
-            merged.keys.extend(new_keys);
-            merged.overrides.extend(other.overrides);
+            merged_keys.extend(new_keys);
+            merged_overrides.extend(other.overrides.clone());
         }
 
-        merged
+        ConfigurationLayer::new(merged_content, merged_keys, merged_overrides)
     }
 }
 // TODO: Use kernel/fs to work with the file system
@@ -197,10 +201,10 @@ impl Parser {
 
 #[derive(Debug)]
 pub struct Configuration {
-    default_configuration: ConfigurationLayer,
-    user_configuration: ConfigurationLayer,
-    workspace_configuration: ConfigurationLayer,
-    inmem_configuration: ConfigurationLayer,
+    default_configuration: Arc<ConfigurationLayer>,
+    user_configuration: Arc<ConfigurationLayer>,
+    workspace_configuration: Arc<ConfigurationLayer>,
+    inmem_configuration: Arc<ConfigurationLayer>,
     consolidated_configuration: ArcSwapOption<ConfigurationLayer>,
 }
 
@@ -212,10 +216,10 @@ impl Configuration {
         inmem_conf: ConfigurationLayer,
     ) -> Self {
         Configuration {
-            default_configuration: default_conf,
-            user_configuration: user_conf,
-            workspace_configuration: workspace_conf,
-            inmem_configuration: inmem_conf,
+            default_configuration: Arc::new(default_conf),
+            user_configuration: Arc::new(user_conf),
+            workspace_configuration: Arc::new(workspace_conf),
+            inmem_configuration: Arc::new(inmem_conf),
             consolidated_configuration: ArcSwapOption::from(None),
         }
     }
@@ -238,10 +242,10 @@ impl Configuration {
         }
 
         let new_configuration = {
-            let merged_configuration = self.default_configuration.merge(vec![
-                self.user_configuration.clone(),
-                self.workspace_configuration.clone(),
-                self.inmem_configuration.clone(),
+            let merged_configuration = self.default_configuration.merge(&[
+                Arc::clone(&self.user_configuration),
+                Arc::clone(&self.workspace_configuration),
+                Arc::clone(&self.inmem_configuration),
             ]);
 
             Arc::new(merged_configuration)

@@ -107,7 +107,7 @@ pub fn run(ctx: &mut AppContextCompact) -> tauri::Result<()> {
     let value = config_service.get_value("editor.fontSize", Some("mossql"));
     println!("Config Value: {:?}", value);
 
-    let value = config_service.get_value("editor.fontSize", Some("mossql"));
+    let value = config_service.get_value("editor.fontSize", Some("mossql/test"));
     println!("Config Value: {:?}", value);
 
     // let value = config_service.get_value("editor.fontSize", Some("[mossql]/[test]"));
