@@ -8,32 +8,31 @@ repository = ""
 edition = "2021"
 rust-version = "1.70"
 
-
 [lib]
 name = "app_lib"
 crate-type = ["staticlib", "cdylib", "rlib"]
 
-
 [build-dependencies]
 tauri-build = { version = "2.0.0-beta.17", features = [] }
 
-
 [dependencies]
+
 tracing.workspace = true
 futures.workspace = true
 anyhow.workspace = true
-specta.workspace = true
 app.workspace = true
 surrealdb = { workspace = true, features = ["kv-rocksdb"] }
 strum = { workspace = true, features = ["derive"] }
 tokio = { workspace = true, features = ["full"] }
 serde_json = "1.0"
 serde = { version = "1.0", features = ["derive"] }
-tauri = { version = "=2.0.0-beta.22", features = [] }
-tauri-specta = { version = "2.0.0-rc.8", features = [
+
+specta = "=2.0.0-rc.12"
+tauri = { version = "2.0.0-beta.23", features = ["specta"] }
+tauri-specta = { git = "https://github.com/oscartbeaumont/tauri-specta", rev = "a49885967adc01c80e33962e3ecac25fe7497839", features = [
     "typescript",
-    "javascript",
 ] }
+# tauri-specta = { version = "2.0.0-rc.11", features = ["typescript"] }
 
 
 [target.'cfg(any(target_os = "linux", target_os = "macos"))'.dependencies]

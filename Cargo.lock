@@ -7224,14 +7224,14 @@ checksum = "4873307b7c257eddcb50c9bedf158eb669578359fb28428bef438fec8e6ba7c2"
 
 [[package]]
 name = "tauri"
-version = "2.0.0-beta.22"
+version = "2.0.0-beta.23"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5a258ecc5ac7ddade525f512c4962fd01cd0f5265e917b4572579c32c027bb31"
+checksum = "68725c4f17f62f0fb1fa2eecaf391200bf00a9414c84f30783ddca10570690c3"
 dependencies = [
  "anyhow",
  "bytes",
  "cocoa",
- "dirs-next",
+ "dirs",
  "dunce",
  "embed_plist",
  "futures-util",
@@ -7269,7 +7269,7 @@ dependencies = [
  "webkit2gtk",
  "webview2-com 0.30.0",
  "window-vibrancy",
- "windows 0.56.0",
+ "windows 0.57.0",
 ]
 
 [[package]]
@@ -7373,7 +7373,11 @@ dependencies = [
  "tauri-utils",
  "url",
  "webkit2gtk",
+<<<<<<< HEAD
  "webview2-com 0.31.0",
+=======
+ "webview2-com",
+>>>>>>> 9ebda94f34590388451a40c151d563d1af2df6e9
  "windows 0.57.0",
  "wry",
 ]
@@ -7381,8 +7385,7 @@ dependencies = [
 [[package]]
 name = "tauri-specta"
 version = "2.0.0-rc.11"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "85f26e4ded13fbeab2216dcb5a59b5cf8b475740afea932918888402bcc62a02"
+source = "git+https://github.com/oscartbeaumont/tauri-specta?rev=a49885967adc01c80e33962e3ecac25fe7497839#a49885967adc01c80e33962e3ecac25fe7497839"
 dependencies = [
  "heck 0.5.0",
  "indoc",
@@ -7397,8 +7400,7 @@ dependencies = [
 [[package]]
 name = "tauri-specta-macros"
 version = "2.0.0-rc.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e6f9e90bf2012877e2c4029a1bf756277183e9c7c77b850ef965711553998012"
+source = "git+https://github.com/oscartbeaumont/tauri-specta?rev=a49885967adc01c80e33962e3ecac25fe7497839#a49885967adc01c80e33962e3ecac25fe7497839"
 dependencies = [
  "heck 0.5.0",
  "proc-macro2",
@@ -8007,7 +8009,6 @@ dependencies = [
  "sea-orm",
  "serde",
  "serde_json",
- "specta",
  "surrealdb",
  "tokio",
 ]
@@ -8479,16 +8480,24 @@ checksum = "5f20c57d8d7db6d3b86154206ae5d8fba62dd39573114de97c2cb0578251f8e1"
 
 [[package]]
 name = "webview2-com"
-version = "0.30.0"
+version = "0.31.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5c914dd492a52f0377bef56fd1b6e74a79090f9ee631d625d5b505a00e4538b6"
+checksum = "6516cfa64c6b3212686080eeec378e662c2af54bb2a5b2a22749673f5cb2226f"
 dependencies = [
  "webview2-com-macros",
+<<<<<<< HEAD
  "webview2-com-sys 0.30.0",
  "windows 0.56.0",
  "windows-core 0.56.0",
  "windows-implement 0.56.0",
  "windows-interface 0.56.0",
+=======
+ "webview2-com-sys",
+ "windows 0.57.0",
+ "windows-core 0.57.0",
+ "windows-implement",
+ "windows-interface",
+>>>>>>> 9ebda94f34590388451a40c151d563d1af2df6e9
 ]
 
 [[package]]
@@ -8518,13 +8527,13 @@ dependencies = [
 
 [[package]]
 name = "webview2-com-sys"
-version = "0.30.0"
+version = "0.31.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2a46bcf03482ec28eeb764ca788f67998cde4213adfbbfa90462622058530f5e"
+checksum = "c76d5b77320ff155660be1df3e6588bc85c75f1a9feef938cc4dc4dd60d1d7cf"
 dependencies = [
  "thiserror",
- "windows 0.56.0",
- "windows-core 0.56.0",
+ "windows 0.57.0",
+ "windows-core 0.57.0",
 ]
 
 [[package]]
@@ -8615,6 +8624,7 @@ dependencies = [
 
 [[package]]
 name = "windows"
+<<<<<<< HEAD
 version = "0.56.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1de69df01bdf1ead2f4ac895dc77c9351aefff65b2f3db429a343f9cbf05e132"
@@ -8625,6 +8635,8 @@ dependencies = [
 
 [[package]]
 name = "windows"
+=======
+>>>>>>> 9ebda94f34590388451a40c151d563d1af2df6e9
 version = "0.57.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "12342cb4d8e3b046f3d80effd474a7a02447231330ef77d71daa6fbc40681143"
@@ -8640,6 +8652,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "33ab640c8d7e35bf8ba19b884ba838ceb4fba93a4e8c65a9059d08afcfc683d9"
 dependencies = [
  "windows-targets 0.52.6",
+<<<<<<< HEAD
 ]
 
 [[package]]
@@ -8652,6 +8665,8 @@ dependencies = [
  "windows-interface 0.56.0",
  "windows-result",
  "windows-targets 0.52.6",
+=======
+>>>>>>> 9ebda94f34590388451a40c151d563d1af2df6e9
 ]
 
 [[package]]
@@ -8660,10 +8675,11 @@ version = "0.57.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d2ed2439a290666cd67ecce2b0ffaad89c2a56b976b736e6ece670297897832d"
 dependencies = [
- "windows-implement 0.57.0",
- "windows-interface 0.57.0",
+ "windows-implement",
+ "windows-interface",
  "windows-result",
  "windows-targets 0.52.6",
+<<<<<<< HEAD
 ]
 
 [[package]]
@@ -8675,6 +8691,8 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 2.0.70",
+=======
+>>>>>>> 9ebda94f34590388451a40c151d563d1af2df6e9
 ]
 
 [[package]]
@@ -8686,6 +8704,7 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 2.0.70",
+<<<<<<< HEAD
 ]
 
 [[package]]
@@ -8697,6 +8716,8 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 2.0.70",
+=======
+>>>>>>> 9ebda94f34590388451a40c151d563d1af2df6e9
 ]
 
 [[package]]
@@ -9029,7 +9050,11 @@ dependencies = [
  "thiserror",
  "webkit2gtk",
  "webkit2gtk-sys",
+<<<<<<< HEAD
  "webview2-com 0.31.0",
+=======
+ "webview2-com",
+>>>>>>> 9ebda94f34590388451a40c151d563d1af2df6e9
  "windows 0.57.0",
  "windows-core 0.57.0",
  "windows-version",
