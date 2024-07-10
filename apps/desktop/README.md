@@ -19,7 +19,7 @@ Moss Desktop Application
 # Usage
 
 ```bash
-  $ yarn tauri dev #start Tauri Desktop App
+  $ pnpm tauri dev #start Tauri Desktop App
   $ pnpm run dev #start web app
   $ pnpm run build
   $ pnpm run lint
