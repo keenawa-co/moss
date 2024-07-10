@@ -4,8 +4,33 @@ use hashbrown::HashMap;
 use serde_json::Value;
 use std::{fs::File, io::Read, sync::Arc};
 
+/// Enum representing the various configuration targets in Moss Compass.
+/// These targets specify where the configuration settings should be applied.
+#[derive(Debug)]
+pub enum ConfigurationTarget {
+    /// Platform specific configuration.
+    /// These settings apply to the entire application and cannot be overridden in local, workspace, etc.
+    Platform,
+
+    /// User specific configuration.
+    /// These settings apply globally to the user and can be overridden in workspace or others settings.
+    User,
+
+    /// Workspace specific configuration.
+    /// These settings apply to the specific workspace and can override by`ConfigurationTarget::User` settings.
+    Workspace,
+
+    /// Default configuration.
+    /// These settings represent the default values provided by Moss Compass and can be overridden by any other configuration target.
+    Default,
+
+    /// Memory specific configuration.
+    /// These settings are stored in memory and are not persisted. They can be used for temporary configurations.
+    Memory,
+}
+
 #[derive(Debug, Clone)]
-pub struct Override {
+pub struct ConfigurationOverride {
     identifier: String,
     _keys: Vec<String>,
     contents: HashMap<String, Value>,
@@ -15,7 +40,7 @@ pub struct Override {
 pub struct ConfigurationLayer {
     content: HashMap<String, Value>,
     keys: Vec<String>,
-    overrides: Vec<Override>,
+    overrides: Vec<ConfigurationOverride>,
     overridden_configurations: Arc<ArcSwap<HashMap<String, Arc<ConfigurationLayer>>>>,
 }
 
@@ -23,7 +48,7 @@ impl ConfigurationLayer {
     pub fn new(
         contents: HashMap<String, Value>,
         keys: Vec<String>,
-        overrides: Vec<Override>,
+        overrides: Vec<ConfigurationOverride>,
     ) -> Self {
         Self {
             content: contents,
@@ -105,9 +130,9 @@ impl ConfigurationLayer {
     }
 }
 // TODO: Use kernel/fs to work with the file system
-pub struct Parser;
+pub struct ConfigurationParser;
 
-impl Parser {
+impl ConfigurationParser {
     pub fn new() -> Self {
         Self {}
     }
@@ -120,7 +145,7 @@ impl Parser {
         file.read_to_string(&mut content)?;
 
         let root_map: HashMap<String, Value> = serde_json::from_str(&content)?;
-        let mut root_overrides: Vec<Override> = Vec::new();
+        let mut root_overrides: Vec<ConfigurationOverride> = Vec::new();
         let mut root_contents: HashMap<String, Value> = HashMap::new();
         let mut root_keys: Vec<String> = Vec::new();
 
@@ -143,7 +168,7 @@ impl Parser {
     fn collect_overrides(
         key: &str,
         value: &Value,
-        overrides: &mut Vec<Override>,
+        overrides: &mut Vec<ConfigurationOverride>,
         parent_identifier: Option<&str>,
     ) {
         if let Value::Object(inner_map) = value {
@@ -155,7 +180,7 @@ impl Parser {
                 Some(&current_identifier),
             );
 
-            overrides.push(Override {
+            overrides.push(ConfigurationOverride {
                 identifier: current_identifier.to_string(),
                 _keys: override_keys,
                 contents: override_content,
@@ -165,7 +190,7 @@ impl Parser {
 
     fn extract_override_content_and_keys(
         inner_map: &serde_json::Map<std::string::String, Value>,
-        overrides: &mut Vec<Override>,
+        overrides: &mut Vec<ConfigurationOverride>,
         current_identifier: Option<&str>,
     ) -> (HashMap<String, Value>, Vec<String>) {
         let mut override_content = HashMap::new();

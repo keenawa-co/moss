@@ -6,7 +6,7 @@ use serde_json::Value;
 
 use super::{
     configuration_default::DefaultConfiguration,
-    configuration_model::{Configuration, ConfigurationLayer, Parser},
+    configuration_model::{Configuration, ConfigurationLayer, ConfigurationParser},
     configuration_registry::ConfigurationRegistry,
     AbstractConfigurationService,
 };
@@ -23,7 +23,7 @@ impl ConfigurationService {
         registry: Arc<Mutex<ConfigurationRegistry>>,
         config_file_path: &str,
     ) -> Result<Self> {
-        let parser = Parser::new();
+        let parser = ConfigurationParser::new();
         let workspace_configuration = parser
             .parse_file(config_file_path)
             .context(format!("failed to open file: {config_file_path}"))?;

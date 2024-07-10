@@ -47,7 +47,7 @@ rustflags = ["-C", "target-cpu=native"]
 [workspace.dependencies]
 fs = { path = "kernel/fs" }
 
-workbench = { path = "platform/workbench" }
+workbench = { path = "" }
 
 bus = { path = "kernel/bus" }
 mac = { path = "lib/mac" }
@@ -87,7 +87,6 @@ async-executor = "1.4"
 ctor = "0.2.8"
 strum = "0.26"
 specta = "=2.0.0-rc.12"
-lazy-regex = "3.1.0"
 
 tokio = "1"
 tokio-util = "0.7"
