@@ -9,7 +9,7 @@ mod executor;
 // use context::{AppCell, AppContext};
 use context_compact::{AppCellCompact, AppContextCompact};
 use std::{
-    cell::{Ref, RefMut},
+    cell::{RefMut},
     rc::Rc,
 };
 
