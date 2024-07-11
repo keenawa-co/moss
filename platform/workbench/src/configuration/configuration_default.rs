@@ -1,43 +1,45 @@
+use std::sync::Arc;
+
+use arc_swap::ArcSwapOption;
 use hashbrown::HashMap;
+use schemars::schema;
 use serde_json::Value;
 
-use super::configuration_model::ConfigurationLayer;
+use super::{
+    configuration_model::ConfigurationModel, configuration_registry::ConfigurationRegistry,
+};
 
-pub struct DefaultConfiguration(pub ConfigurationLayer);
+pub struct DefaultConfiguration {
+    configuration_model: ArcSwapOption<ConfigurationModel>,
+    configuration_registry: Arc<ConfigurationRegistry>,
+}
 
 impl DefaultConfiguration {
-    pub fn new() -> Self {
-        let contents: HashMap<String, Value> = vec![
-            (
-                "project.monitoring.exclude".to_string(),
-                Value::Array(vec![]),
-            ),
-            ("editor.fontSize".to_string(), Value::from(12)),
-            ("window.restoreFullScreen".to_string(), Value::Bool(true)),
-            ("window.restoreTab".to_string(), Value::Bool(true)),
-        ]
-        .into_iter()
-        .collect();
+    pub fn new(registry: Arc<ConfigurationRegistry>) -> Self {
+        Self {
+            configuration_model: ArcSwapOption::from(None),
+            configuration_registry: registry,
+        }
+    }
 
-        let overrides: HashMap<String, HashMap<String, Value>> = vec![(
-            "[mossql]".to_string(),
-            vec![("editor.fontSize".to_string(), Value::from(10))]
-                .into_iter()
-                .collect(),
-        )]
-        .into_iter()
-        .collect();
+    pub fn initialize(&self) {
+        self.reset_configuration_model();
+    }
 
-        // Self(ConfigurationEntryModel {
-        //     contents,
-        //     keys: vec![
-        //         "project.monitoring.exclude".to_string(),
-        //         "window.restoreFullScreen".to_string(),
-        //         "window.restoreTab".to_string(),
-        //     ],
-        //     overrides,
-        // })
+    pub fn get_configuration_model(&self) -> Option<Arc<ConfigurationModel>> {
+        self.configuration_model.load_full()
+    }
 
-        Self(ConfigurationLayer::empty())
+    fn reset_configuration_model(&self) {
+        let mut new_model = ConfigurationModel::empty();
+        let properties = self.configuration_registry.get_configuration_properties();
+
+        for (key, schema) in properties {
+            if let Some(default_value) = &schema.default {
+                new_model.set_value(key.clone(), default_value.clone());
+            }
+        }
+
+        self.configuration_model.store(Some(Arc::new(new_model)))
     }
 }

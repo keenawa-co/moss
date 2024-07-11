@@ -1742,6 +1742,7 @@ dependencies = [
  "anyhow",
  "app",
  "futures",
+ "hashbrown 0.7.2",
  "macos-trampoline",
  "mimalloc",
  "parking_lot",
@@ -8934,6 +8935,7 @@ dependencies = [
  "hashbrown 0.7.2",
  "lazy-regex",
  "parking_lot",
+ "schemars",
  "serde",
  "serde_json",
 ]

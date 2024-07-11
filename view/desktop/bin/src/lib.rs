@@ -4,7 +4,6 @@ pub mod menu;
 pub mod service;
 
 use anyhow::Result;
-use schemars::JsonSchema;
 use service::project_service::ProjectService;
 use service::session_service::SessionService;
 use surrealdb::{

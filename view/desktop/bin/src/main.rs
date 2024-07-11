@@ -10,14 +10,18 @@ use app_lib::{
     },
     AppState,
 };
-use parking_lot::Mutex;
+use hashbrown::HashMap;
 use std::sync::Arc;
 use surrealdb::{engine::remote::ws::Ws, Surreal};
 use tauri::{App, AppHandle, Manager, State};
 use tauri_specta::{collect_commands, collect_events, ts};
 use tracing::error;
+use workbench::configuration::configuration_registry::ConfigurationScope;
 use workbench::configuration::{
-    configuration_registry::ConfigurationRegistry, configuration_service::ConfigurationService,
+    configuration_registry::{
+        ConfigurationNode, ConfigurationPropertySchema, ConfigurationRegistry,
+    },
+    configuration_service::ConfigurationService,
     AbstractConfigurationService,
 };
 
@@ -97,25 +101,55 @@ pub fn run(ctx: &mut AppContextCompact) -> tauri::Result<()> {
         Arc::new(db)
     });
 
-    let registry = Arc::new(Mutex::new(ConfigurationRegistry::new()));
+    let mut registry = ConfigurationRegistry::new();
+
+    let editor_configuration = ConfigurationNode {
+        id: Some("editor".to_string()),
+        title: Some("Editor".to_string()),
+        order: Some(1),
+        typ: None,
+        properties: {
+            let mut properties = HashMap::new();
+            properties.insert(
+                "editor.fontSize".to_string(),
+                ConfigurationPropertySchema {
+                    scope: ConfigurationScope::Resource,
+                    order: Some(1),
+                    default: Some(serde_json::Value::Number(serde_json::Number::from(14))),
+                    description: Some("Controls the font size in pixels.".to_string()),
+                },
+            );
+            properties.insert(
+                "editor.lineHeight".to_string(),
+                ConfigurationPropertySchema {
+                    scope: ConfigurationScope::Resource,
+                    order: Some(2),
+                    default: Some(serde_json::Value::Number(serde_json::Number::from(20))),
+                    description: Some("Controls the line height.".to_string()),
+                },
+            );
+
+            properties
+        },
+        description: None,
+    };
+
+    registry.register_configuration(editor_configuration);
+
     let config_service =
-        ConfigurationService::new(registry, "../../../.moss/settings.json").unwrap();
+        ConfigurationService::new(Arc::new(registry), "../../../.moss/settings.json").unwrap();
 
     let value = config_service.get_value("editor.fontSize", None);
-    println!("Config Value: {:?}", value);
+    println!("Value `editor.fontSize` form None: {:?}", value);
+
+    let value = config_service.get_value("editor.lineHeight", None);
+    println!("Value `editor.lineHeight` form None: {:?}", value);
 
     let value = config_service.get_value("editor.fontSize", Some("mossql"));
-    println!("Config Value: {:?}", value);
+    println!("Value `editor.fontSize` form `mossql`: {:?}", value);
 
     let value = config_service.get_value("editor.fontSize", Some("mossql/test"));
-    println!("Config Value: {:?}", value);
-
-    // let value = config_service.get_value("editor.fontSize", Some("[mossql]/[test]"));
-    // println!("Config Value: {:?}", value);
-
-    // let schema = schemars::schema_for!(WindowSettingsSchema);
-
-    // println!("{}", serde_json::to_string_pretty(&schema).unwrap());
+    println!("Value `editor.fontSize` form `mossql/test`: {:?}", value);
 
     let (invoke_handler, register_events) = {
         let builder = ts::builder()

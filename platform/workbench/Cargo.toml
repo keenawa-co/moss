@@ -8,6 +8,7 @@ parking_lot.workspace = true
 lazy-regex.workspace = true
 anyhow.workspace = true
 arc-swap.workspace = true
+schemars.workspace = true
 hashbrown = { workspace = true, features = ["serde"] }
 
 serde = { workspace = true, features = ["derive"] }

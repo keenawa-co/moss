@@ -37,14 +37,14 @@ pub struct ConfigurationOverride {
 }
 
 #[derive(Debug, Clone)]
-pub struct ConfigurationLayer {
+pub struct ConfigurationModel {
     content: HashMap<String, Value>,
     keys: Vec<String>,
     overrides: Vec<ConfigurationOverride>,
-    overridden_configurations: Arc<ArcSwap<HashMap<String, Arc<ConfigurationLayer>>>>,
+    overridden_configurations: Arc<ArcSwap<HashMap<String, Arc<ConfigurationModel>>>>,
 }
 
-impl ConfigurationLayer {
+impl ConfigurationModel {
     pub fn new(
         contents: HashMap<String, Value>,
         keys: Vec<String>,
@@ -71,7 +71,12 @@ impl ConfigurationLayer {
         self.content.get(key)
     }
 
-    fn override_configuration(&self, identifier: &str) -> Arc<Self> {
+    pub fn set_value(&mut self, key: String, value: serde_json::Value) {
+        self.content.insert(key.clone(), value);
+        self.keys.push(key);
+    }
+
+    fn r#override(&self, identifier: &str) -> Arc<Self> {
         let current_overrides = self.overridden_configurations.load_full();
 
         if let Some(override_model) = current_overrides.get(identifier) {
@@ -94,7 +99,7 @@ impl ConfigurationLayer {
             let mut content = self.content.clone();
             content.extend(override_content);
 
-            ConfigurationLayer::new(content, self.keys.clone(), self.overrides.clone())
+            ConfigurationModel::new(content, self.keys.clone(), self.overrides.clone())
         } else {
             self.clone()
         }
@@ -107,7 +112,7 @@ impl ConfigurationLayer {
             .map(|override_data| override_data.contents.clone())
     }
 
-    pub fn merge(&self, others: &[Arc<ConfigurationLayer>]) -> Self {
+    pub fn merge(&self, others: &[Arc<ConfigurationModel>]) -> Self {
         let mut merged_content = self.content.clone();
         let mut merged_keys = self.keys.clone();
         let mut merged_overrides = self.overrides.clone();
@@ -126,7 +131,7 @@ impl ConfigurationLayer {
             merged_overrides.extend(other.overrides.clone());
         }
 
-        ConfigurationLayer::new(merged_content, merged_keys, merged_overrides)
+        ConfigurationModel::new(merged_content, merged_keys, merged_overrides)
     }
 }
 // TODO: Use kernel/fs to work with the file system
@@ -137,7 +142,7 @@ impl ConfigurationParser {
         Self {}
     }
 
-    pub fn parse_file(&self, file_path: &str) -> Result<ConfigurationLayer> {
+    pub fn parse_file(&self, file_path: &str) -> Result<ConfigurationModel> {
         let re_override_property = regex!(r#"^\[.*\]$"#);
 
         let mut file = File::open(file_path)?;
@@ -158,9 +163,7 @@ impl ConfigurationParser {
             }
         }
 
-        let result = ConfigurationLayer::new(root_contents, root_keys, root_overrides);
-
-        dbg!(&result);
+        let result = ConfigurationModel::new(root_contents, root_keys, root_overrides);
 
         Ok(result)
     }
@@ -226,22 +229,22 @@ impl ConfigurationParser {
 
 #[derive(Debug)]
 pub struct Configuration {
-    default_configuration: Arc<ConfigurationLayer>,
-    user_configuration: Arc<ConfigurationLayer>,
-    workspace_configuration: Arc<ConfigurationLayer>,
-    inmem_configuration: Arc<ConfigurationLayer>,
-    consolidated_configuration: ArcSwapOption<ConfigurationLayer>,
+    default_configuration: Arc<ConfigurationModel>,
+    user_configuration: Arc<ConfigurationModel>,
+    workspace_configuration: Arc<ConfigurationModel>,
+    inmem_configuration: Arc<ConfigurationModel>,
+    consolidated_configuration: ArcSwapOption<ConfigurationModel>,
 }
 
 impl Configuration {
     pub fn new(
-        default_conf: ConfigurationLayer,
-        user_conf: ConfigurationLayer,
-        workspace_conf: ConfigurationLayer,
-        inmem_conf: ConfigurationLayer,
+        default_conf: Arc<ConfigurationModel>,
+        user_conf: ConfigurationModel,
+        workspace_conf: ConfigurationModel,
+        inmem_conf: ConfigurationModel,
     ) -> Self {
         Configuration {
-            default_configuration: Arc::new(default_conf),
+            default_configuration: default_conf,
             user_configuration: Arc::new(user_conf),
             workspace_configuration: Arc::new(workspace_conf),
             inmem_configuration: Arc::new(inmem_conf),
@@ -257,10 +260,10 @@ impl Configuration {
     pub fn get_consolidated_configuration(
         &self,
         overrider_identifier: Option<&str>,
-    ) -> Arc<ConfigurationLayer> {
+    ) -> Arc<ConfigurationModel> {
         if let Some(config) = self.consolidated_configuration.load_full().as_ref() {
             if let Some(identifier) = overrider_identifier {
-                return config.override_configuration(identifier.trim_start_matches('/'));
+                return config.r#override(identifier.trim_start_matches('/'));
             }
 
             return Arc::clone(config);
@@ -280,7 +283,7 @@ impl Configuration {
             .store(Some(Arc::clone(&new_configuration)));
 
         if let Some(identifier) = overrider_identifier {
-            return new_configuration.override_configuration(identifier);
+            return new_configuration.r#override(identifier);
         }
 
         new_configuration
