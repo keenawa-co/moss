@@ -14,7 +14,7 @@ use super::{
 pub struct ConfigurationService {
     configuration: Configuration,
     // TODO: user_configuration
-    // default_configuration: DefaultConfiguration,
+    // TODO: default_configuration: DefaultConfiguration,
     registry: Arc<ConfigurationRegistry>,
 }
 
@@ -28,18 +28,20 @@ impl ConfigurationService {
         let default_configuration = DefaultConfiguration::new(Arc::clone(&registry));
         default_configuration.initialize();
 
-        let default_configuration_model = default_configuration.get_configuration_model().unwrap();
+        let default_configuration_model = default_configuration
+            .get_configuration_model()
+            .context("failed to get default configuration model".to_string())
+            .context("default was not initialized correctly")?;
 
-        let conf = Configuration::new(
-            default_configuration_model, // TODO: use default_configuration,
+        let configuration = Configuration::new(
+            default_configuration_model,
             ConfigurationModel::empty(),
             workspace_configuration,
             ConfigurationModel::empty(),
         );
 
         Ok(Self {
-            // default_configuration,
-            configuration: conf,
+            configuration,
             registry,
         })
     }

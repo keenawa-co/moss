@@ -16,7 +16,7 @@ use surrealdb::{engine::remote::ws::Ws, Surreal};
 use tauri::{App, AppHandle, Manager, State};
 use tauri_specta::{collect_commands, collect_events, ts};
 use tracing::error;
-use workbench::configuration::configuration_registry::ConfigurationScope;
+use workbench::configuration::configuration_registry::{ConfigurationNodeType, ConfigurationScope};
 use workbench::configuration::{
     configuration_registry::{
         ConfigurationNode, ConfigurationPropertySchema, ConfigurationRegistry,
@@ -107,13 +107,14 @@ pub fn run(ctx: &mut AppContextCompact) -> tauri::Result<()> {
         id: Some("editor".to_string()),
         title: Some("Editor".to_string()),
         order: Some(1),
-        typ: None,
+        r#type: None,
         properties: {
             let mut properties = HashMap::new();
             properties.insert(
                 "editor.fontSize".to_string(),
                 ConfigurationPropertySchema {
                     scope: ConfigurationScope::Resource,
+                    r#type: ConfigurationNodeType::Number,
                     order: Some(1),
                     default: Some(serde_json::Value::Number(serde_json::Number::from(14))),
                     description: Some("Controls the font size in pixels.".to_string()),
@@ -123,6 +124,7 @@ pub fn run(ctx: &mut AppContextCompact) -> tauri::Result<()> {
                 "editor.lineHeight".to_string(),
                 ConfigurationPropertySchema {
                     scope: ConfigurationScope::Resource,
+                    r#type: ConfigurationNodeType::Number,
                     order: Some(2),
                     default: Some(serde_json::Value::Number(serde_json::Number::from(20))),
                     description: Some("Controls the line height.".to_string()),
@@ -132,6 +134,7 @@ pub fn run(ctx: &mut AppContextCompact) -> tauri::Result<()> {
             properties
         },
         description: None,
+        all_of: None,
     };
 
     registry.register_configuration(editor_configuration);
