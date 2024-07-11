@@ -37,8 +37,6 @@ impl<C: Connection> SurrealClient<C> {
     }
 }
 
-pub struct SettingsStore {}
-
 pub struct AppState {
     pub project_service: ProjectService,
     pub session_service: SessionService,

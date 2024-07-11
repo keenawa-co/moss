@@ -116,8 +116,11 @@ pub fn run(ctx: &mut AppContextCompact) -> tauri::Result<()> {
                     scope: ConfigurationScope::Resource,
                     r#type: ConfigurationNodeType::Number,
                     order: Some(1),
-                    default: Some(serde_json::Value::Number(serde_json::Number::from(14))),
+                    default: Some(serde_json::Value::Number(serde_json::Number::from(12))),
                     description: Some("Controls the font size in pixels.".to_string()),
+                    protected_from_contribution: Some(false),
+                    allow_for_only_restricted_source: Some(false),
+                    included: Some(true),
                 },
             );
             properties.insert(
@@ -128,6 +131,9 @@ pub fn run(ctx: &mut AppContextCompact) -> tauri::Result<()> {
                     order: Some(2),
                     default: Some(serde_json::Value::Number(serde_json::Number::from(20))),
                     description: Some("Controls the line height.".to_string()),
+                    protected_from_contribution: Some(false),
+                    allow_for_only_restricted_source: Some(false),
+                    included: Some(true),
                 },
             );
 
