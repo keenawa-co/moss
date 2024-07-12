@@ -34,8 +34,8 @@ impl DefaultConfiguration {
         let mut new_model = ConfigurationModel::empty();
         let properties = self.configuration_registry.get_configuration_properties();
 
-        for (key, schema) in properties {
-            if let Some(default_value) = &schema.default {
+        for (key, property) in properties {
+            if let Some(default_value) = &property.schema.default {
                 new_model.set_value(key.clone(), default_value.clone());
             }
         }
