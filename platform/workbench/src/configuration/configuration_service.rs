@@ -20,7 +20,7 @@ pub struct ConfigurationService {
 
 impl ConfigurationService {
     pub fn new(registry: Arc<ConfigurationRegistry>, config_file_path: &str) -> Result<Self> {
-        let parser = ConfigurationParser::new();
+        let parser = ConfigurationParser::new(Arc::clone(&registry));
         let workspace_configuration = parser
             .parse_file(config_file_path)
             .context(format!("failed to open file: {config_file_path}"))?;

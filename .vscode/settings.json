@@ -21,6 +21,7 @@
     "repr",
     "revisioned",
     "rocksdb",
+    "schemable",
     "seaorm",
     "sess",
     "smol",

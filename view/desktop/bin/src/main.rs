@@ -15,8 +15,11 @@ use std::sync::Arc;
 use surrealdb::{engine::remote::ws::Ws, Surreal};
 use tauri::{App, AppHandle, Manager, State};
 use tauri_specta::{collect_commands, collect_events, ts};
-use tracing::error;
-use workbench::configuration::configuration_registry::{ConfigurationNodeType, ConfigurationScope};
+use tracing::{error, Level};
+// use tracing_subscriber::FmtSubscriber;
+use workbench::configuration::configuration_registry::{
+    ConfigurationNodeType, ConfigurationScope, SourceInfo,
+};
 use workbench::configuration::{
     configuration_registry::{
         ConfigurationNode, ConfigurationPropertySchema, ConfigurationRegistry,
@@ -101,43 +104,56 @@ pub fn run(ctx: &mut AppContextCompact) -> tauri::Result<()> {
         Arc::new(db)
     });
 
+    // TODO: move to log service
+    // let subscriber = FmtSubscriber::builder()
+    //     .with_max_level(Level::TRACE)
+    //     .finish();
+    // tracing::subscriber::set_global_default(subscriber).expect("setting default subscriber failed");
+
     let mut registry = ConfigurationRegistry::new();
 
     let editor_configuration = ConfigurationNode {
         id: Some("editor".to_string()),
         title: Some("Editor".to_string()),
         order: Some(1),
-        r#type: None,
+        r#type: Default::default(),
+        scope: Default::default(),
+        source: Some(SourceInfo {
+            id: "moss.core".to_string(),
+            display_name: Some("Moss Core".to_string()),
+        }),
         properties: {
             let mut properties = HashMap::new();
             properties.insert(
                 "editor.fontSize".to_string(),
                 ConfigurationPropertySchema {
-                    scope: ConfigurationScope::Resource,
+                    scope: Some(ConfigurationScope::Resource),
                     r#type: ConfigurationNodeType::Number,
                     order: Some(1),
                     default: Some(serde_json::Value::Number(serde_json::Number::from(12))),
                     description: Some("Controls the font size in pixels.".to_string()),
                     protected_from_contribution: Some(false),
                     allow_for_only_restricted_source: Some(false),
-                    included: Some(true),
+                    schemable: Some(true),
+                    source: None,
                 },
             );
             properties.insert(
                 "editor.lineHeight".to_string(),
                 ConfigurationPropertySchema {
-                    scope: ConfigurationScope::Resource,
+                    scope: Some(ConfigurationScope::Resource),
                     r#type: ConfigurationNodeType::Number,
                     order: Some(2),
                     default: Some(serde_json::Value::Number(serde_json::Number::from(20))),
                     description: Some("Controls the line height.".to_string()),
                     protected_from_contribution: Some(false),
                     allow_for_only_restricted_source: Some(false),
-                    included: Some(true),
+                    schemable: Some(true),
+                    source: None,
                 },
             );
 
-            properties
+            Some(properties)
         },
         description: None,
         all_of: None,

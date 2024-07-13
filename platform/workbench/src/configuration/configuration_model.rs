@@ -3,6 +3,9 @@ use arc_swap::{ArcSwap, ArcSwapOption};
 use hashbrown::HashMap;
 use serde_json::Value;
 use std::{fs::File, io::Read, sync::Arc};
+use tracing::warn;
+
+use super::configuration_registry::ConfigurationRegistry;
 
 /// Enum representing the various configuration targets in Moss Compass.
 /// These targets specify where the configuration settings should be applied.
@@ -135,11 +138,13 @@ impl ConfigurationModel {
     }
 }
 // TODO: Use kernel/fs to work with the file system
-pub struct ConfigurationParser;
+pub struct ConfigurationParser {
+    registry: Arc<ConfigurationRegistry>,
+}
 
 impl ConfigurationParser {
-    pub fn new() -> Self {
-        Self {}
+    pub fn new(registry: Arc<ConfigurationRegistry>) -> Self {
+        Self { registry }
     }
 
     pub fn parse_file(&self, file_path: &str) -> Result<ConfigurationModel> {
@@ -154,13 +159,26 @@ impl ConfigurationParser {
         let mut root_contents: HashMap<String, Value> = HashMap::new();
         let mut root_keys: Vec<String> = Vec::new();
 
-        for (k, v) in &root_map {
-            if re_override_property.is_match(k) {
-                Self::collect_overrides(k, v, &mut root_overrides, None);
+        let configuration_properties = self.registry.get_configuration_properties();
+
+        for (key, value) in &root_map {
+            if let Some(registered_property) = configuration_properties.get(key) {
+                if registered_property.is_protected() {
+                    warn!("Property `{}` is protected from contribution", key);
+                    continue;
+                }
+
+                if re_override_property.is_match(key) {
+                    Self::collect_overrides(key, value, &mut root_overrides, None);
+                } else {
+                    root_contents.insert(key.clone(), value.clone());
+                    root_keys.push(key.clone());
+                }
             } else {
-                root_contents.insert(k.clone(), v.clone());
-                root_keys.push(k.clone());
-            }
+                println!("ss");
+                warn!("Unknown property `{}` was detected", key);
+                continue;
+            };
         }
 
         let result = ConfigurationModel::new(root_contents, root_keys, root_overrides);

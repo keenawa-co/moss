@@ -2,7 +2,7 @@ use hashbrown::{HashMap, HashSet};
 use lazy_regex::{Lazy, Regex};
 use serde_json::Value;
 
-static OVERRIDE_PROPERTY_REGEX: &'static Lazy<Regex> = regex!(r"^(\[.*\])+$");
+pub static OVERRIDE_PROPERTY_REGEX: &'static Lazy<Regex> = regex!(r"^(\[.*\])+$");
 static OVERRIDE_IDENTIFIER_REGEX: &'static Lazy<Regex> = regex!(r"\[([^\]]+)\]");
 
 /// Enumeration representing the scope of a configuration setting.
@@ -28,11 +28,31 @@ impl Default for ConfigurationScope {
 /// Enumeration representing the type of a configuration setting.
 #[derive(Debug, Clone)]
 pub enum ConfigurationNodeType {
+    Null,
     String,
     Bool,
     Number,
     Array,
     Object,
+}
+
+impl Default for ConfigurationNodeType {
+    fn default() -> Self {
+        Self::Null
+    }
+}
+
+impl ConfigurationNodeType {
+    fn default_value(r#type: &Self) -> serde_json::Value {
+        match r#type {
+            ConfigurationNodeType::Null => Value::Null,
+            ConfigurationNodeType::String => Value::String(String::new()),
+            ConfigurationNodeType::Bool => Value::Bool(false),
+            ConfigurationNodeType::Number => Value::Number(serde_json::Number::from(0)),
+            ConfigurationNodeType::Array => Value::Array(vec![]),
+            ConfigurationNodeType::Object => Value::Object(serde_json::Map::new()),
+        }
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -63,7 +83,7 @@ pub struct ConfigurationPropertySchema {
     pub allow_for_only_restricted_source: Option<bool>,
     /// Indicates if the configuration property is included in the registry.
     /// If false, the property is excluded from the configuration registry.
-    pub included: Option<bool>,
+    pub schemable: Option<bool>,
 
     pub source: Option<SourceInfo>,
 }
@@ -109,6 +129,44 @@ pub struct RegisteredConfigurationPropertySchema {
     pub schema: ConfigurationPropertySchema,
     pub source: Option<SourceInfo>,
     pub default_default_value: Option<Value>,
+    pub default_value_source: Option<SourceInfo>,
+}
+
+impl RegisteredConfigurationPropertySchema {
+    pub fn is_protected(&self) -> bool {
+        self.schema.protected_from_contribution.unwrap_or(false)
+    }
+}
+
+impl RegisteredConfigurationPropertySchema {
+    fn update_property_default_value(
+        &mut self,
+        configuration_default_override: Option<ConfigurationDefaultOverrideValue>,
+    ) {
+        let mut default_value = None;
+        let mut default_source = None;
+
+        if let Some(override_value) = configuration_default_override {
+            if !self.schema.protected_from_contribution.unwrap_or(false)
+                || override_value.source.is_none()
+            {
+                default_value = Some(override_value.value);
+                default_source = override_value.source;
+            }
+        }
+
+        if default_value.is_none() {
+            default_value = self.default_default_value.clone();
+            default_source = None;
+        }
+
+        if default_value.is_none() {
+            default_value = Some(ConfigurationNodeType::default_value(&self.schema.r#type));
+        }
+
+        self.schema.default = default_value;
+        self.default_value_source = default_source;
+    }
 }
 
 /// Struct representing an override value for a default configuration.
@@ -121,7 +179,7 @@ pub struct ConfigurationDefaultOverrideValue {
     /// The source of the override.
     /// This optional field indicates the origin of the override, such as an extension or user-defined configuration.
     /// It helps track where the override came from and provides context for the overridden value.
-    pub source: Option<String>,
+    pub source: Option<SourceInfo>,
 }
 
 /// Struct to store schema information for configuration settings.
@@ -154,24 +212,28 @@ impl ConfigurationSchemaStorage {
         self.all_settings_schema
             .insert(key.to_string(), property.clone());
 
-        // match property.scope.as_ref().unwrap_or_default() {
-        //     ConfigurationScope::Platform => {
-        //         self.platform_settings_schema
-        //             .insert(key.to_string(), property.clone());
-        //     }
-        //     ConfigurationScope::Machine => {
-        //         self.machine_settings_schema
-        //             .insert(key.to_string(), property.clone());
-        //     }
-        //     ConfigurationScope::Window => {
-        //         self.window_settings_schema
-        //             .insert(key.to_string(), property.clone());
-        //     }
-        //     ConfigurationScope::Resource => {
-        //         self.resource_settings_schema
-        //             .insert(key.to_string(), property.clone());
-        //     }
-        // }
+        match property
+            .scope
+            .as_ref()
+            .unwrap_or(&ConfigurationScope::Window)
+        {
+            ConfigurationScope::Platform => {
+                self.platform_settings_schema
+                    .insert(key.to_string(), property.clone());
+            }
+            ConfigurationScope::Machine => {
+                self.machine_settings_schema
+                    .insert(key.to_string(), property.clone());
+            }
+            ConfigurationScope::Window => {
+                self.window_settings_schema
+                    .insert(key.to_string(), property.clone());
+            }
+            ConfigurationScope::Resource => {
+                self.resource_settings_schema
+                    .insert(key.to_string(), property.clone());
+            }
+        }
     }
 }
 
@@ -264,7 +326,11 @@ impl ConfigurationRegistry {
                 schema: property.clone(),
                 default_default_value: property.default.clone(),
                 source: configuration.source.clone(),
+                default_value_source: None,
             };
+            registered_property.update_property_default_value(
+                self.configuration_defaults_overrides.get(&key).cloned(),
+            );
 
             if OVERRIDE_PROPERTY_REGEX.is_match(&key) {
                 registered_property.schema.scope = None;
@@ -276,7 +342,7 @@ impl ConfigurationRegistry {
                 );
             }
 
-            if property.included.unwrap_or(true) {
+            if property.schemable.unwrap_or(true) {
                 self.configuration_properties
                     .insert(key.clone(), registered_property);
             } else {
@@ -295,32 +361,9 @@ impl ConfigurationRegistry {
         properties
     }
 
-    fn validate_property(&self, property: &ConfigurationPropertySchema) -> bool {
+    fn validate_property(&self, _property: &ConfigurationPropertySchema) -> bool {
         unimplemented!()
     }
-
-    // fn update_configuration_properties_with_defaults(&mut self) {
-    //     for configuration_default in &self.registered_configuration_defaults {
-    //         for (key, value) in &configuration_default.overrides {
-    //             let override_value = ConfigurationDefaultOverrideValue {
-    //                 value: value.clone(),
-    //                 source: configuration_default.source.clone(),
-    //             };
-
-    //             self.configuration_defaults_overrides
-    //                 .insert(key.clone(), override_value);
-
-    //             if let Some(property) = self.configuration_properties.get_mut(key) {
-    //                 // Check if the property allows configuration defaults to override
-    //                 if property.protected_from_contribution.unwrap_or(false) {
-    //                     continue;
-    //                 }
-
-    //                 property.default = Some(value.clone())
-    //             }
-    //         }
-    //     }
-    // }
 
     // fn register_json_configuration(&mut self, configuration: &ConfigurationNode) {
     //     let properties = configuration.properties.unwrap_or_default();
@@ -338,62 +381,11 @@ impl ConfigurationRegistry {
     //     }
     // }
 
-    // fn validate_and_register_properties(&mut self, configuration: &ConfigurationNode) {
-    //     let properties = configuration.properties.unwrap_or_default();
-
-    //     for (key, property) in &properties {
-    //         if property.included.unwrap_or(true) {
-    //             self.configuration_properties.insert(
-    //                 key.clone(),
-    //                 RegisteredConfigurationPropertySchema {
-    //                     schema: property.clone(),
-    //                     source: None, // TODO:
-    //                 },
-    //             );
-    //         } else {
-    //             self.excluded_configuration_properties.insert(
-    //                 key.clone(),
-    //                 RegisteredConfigurationPropertySchema {
-    //                     schema: property.clone(),
-    //                     source: None, // TODO:
-    //                 },
-    //             );
-    //         }
-    //     }
-
-    //     if let Some(sub_node) = &configuration.all_of {
-    //         for node in sub_node {
-    //             self.validate_and_register_properties(node);
-    //         }
-    //     }
-    // }
-
     pub fn register_override_identifiers(&mut self, override_identifiers: Vec<String>) {
         for identifier in override_identifiers {
             self.override_identifiers.insert(identifier);
         }
     }
-
-    // pub fn deregister_configuration(&mut self, configuration: &ConfigurationNode) {
-    //     let properties = configuration.properties.as_ref().unwrap_or_default();
-
-    //     for key in properties.keys() {
-    //         self.configuration_properties.remove(key);
-    //         self.configuration_schema_storage
-    //             .remove_from_schema(key, &properties[key]);
-    //         self.excluded_configuration_properties.remove(key);
-    //     }
-
-    //     for sub_node in configuration.all_of.as_ref().unwrap_or(&vec![]) {
-    //         self.deregister_configuration(sub_node);
-    //     }
-    // }
-
-    // pub fn deregister_configurations(&mut self, configurations: Vec<ConfigurationNode>) {
-    //     for configuration in configurations {
-    //         self.deregister_configuration(&configuration);
-    //     }
-    // }
 
     pub fn register_default_configurations(
         &mut self,
