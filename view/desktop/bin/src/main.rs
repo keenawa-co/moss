@@ -152,11 +152,25 @@ pub fn run(ctx: &mut AppContextCompact) -> tauri::Result<()> {
                     source: None,
                 },
             );
+            properties.insert(
+                "[mossql]".to_string(),
+                ConfigurationPropertySchema {
+                    scope: Some(ConfigurationScope::Resource),
+                    r#type: ConfigurationNodeType::Object,
+                    order: Some(2),
+                    default: Some(serde_json::Value::Null),
+                    description: Some("Controls the line height.".to_string()),
+                    protected_from_contribution: Some(false),
+                    allow_for_only_restricted_source: Some(false),
+                    schemable: Some(true),
+                    source: None,
+                },
+            );
 
             Some(properties)
         },
         description: None,
-        all_of: None,
+        parent_of: None,
     };
 
     registry.register_configuration(editor_configuration);

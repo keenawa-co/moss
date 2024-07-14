@@ -26,7 +26,7 @@ impl Default for ConfigurationScope {
 }
 
 /// Enumeration representing the type of a configuration setting.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum ConfigurationNodeType {
     Null,
     String,
@@ -43,6 +43,14 @@ impl Default for ConfigurationNodeType {
 }
 
 impl ConfigurationNodeType {
+    fn is_object(&self) -> bool {
+        if self == &ConfigurationNodeType::Object {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     fn default_value(r#type: &Self) -> serde_json::Value {
         match r#type {
             ConfigurationNodeType::Null => Value::Null,
@@ -106,7 +114,7 @@ pub struct ConfigurationNode {
     /// The properties of the configuration node.
     pub properties: Option<HashMap<String, ConfigurationPropertySchema>>,
     /// Sub-nodes of the configuration node.
-    pub all_of: Option<Vec<ConfigurationNode>>,
+    pub parent_of: Option<Vec<ConfigurationNode>>,
 
     pub source: Option<SourceInfo>,
 }
@@ -128,8 +136,6 @@ pub struct ConfigurationDefaults {
 pub struct RegisteredConfigurationPropertySchema {
     pub schema: ConfigurationPropertySchema,
     pub source: Option<SourceInfo>,
-    pub default_default_value: Option<Value>,
-    pub default_value_source: Option<SourceInfo>,
 }
 
 impl RegisteredConfigurationPropertySchema {
@@ -139,33 +145,13 @@ impl RegisteredConfigurationPropertySchema {
 }
 
 impl RegisteredConfigurationPropertySchema {
-    fn update_property_default_value(
-        &mut self,
-        configuration_default_override: Option<ConfigurationDefaultOverrideValue>,
-    ) {
-        let mut default_value = None;
-        let mut default_source = None;
+    fn new(property: &ConfigurationPropertySchema, source: Option<SourceInfo>) -> Self {
+        let registered_property = Self {
+            schema: property.clone(),
+            source,
+        };
 
-        if let Some(override_value) = configuration_default_override {
-            if !self.schema.protected_from_contribution.unwrap_or(false)
-                || override_value.source.is_none()
-            {
-                default_value = Some(override_value.value);
-                default_source = override_value.source;
-            }
-        }
-
-        if default_value.is_none() {
-            default_value = self.default_default_value.clone();
-            default_source = None;
-        }
-
-        if default_value.is_none() {
-            default_value = Some(ConfigurationNodeType::default_value(&self.schema.r#type));
-        }
-
-        self.schema.default = default_value;
-        self.default_value_source = default_source;
+        registered_property
     }
 }
 
@@ -303,6 +289,10 @@ impl ConfigurationRegistry {
         &self.excluded_configuration_properties
     }
 
+    pub fn get_override_identifiers(&self) -> &HashSet<String> {
+        &self.override_identifiers
+    }
+
     pub fn register_configuration(&mut self, configuration: ConfigurationNode) {
         let _properties = self.do_configuration_registration(configuration, false);
 
@@ -314,32 +304,27 @@ impl ConfigurationRegistry {
         configuration: ConfigurationNode,
         validate: bool,
     ) -> HashMap<String, ConfigurationPropertySchema> {
-        let scope = configuration.scope.unwrap_or_default();
-        let mut properties = configuration.properties.unwrap_or_default();
+        let configuration_scope_or_default = configuration.scope.unwrap_or_default();
+        let mut configuration_properties = configuration.properties.unwrap_or_default();
 
-        for (key, property) in properties.clone() {
+        for (key, property) in configuration_properties.clone() {
             if validate && !self.validate_property(&property) {
                 continue;
             }
 
-            let mut registered_property = RegisteredConfigurationPropertySchema {
-                schema: property.clone(),
-                default_default_value: property.default.clone(),
-                source: configuration.source.clone(),
-                default_value_source: None,
-            };
-            registered_property.update_property_default_value(
-                self.configuration_defaults_overrides.get(&key).cloned(),
-            );
+            let mut registered_property =
+                RegisteredConfigurationPropertySchema::new(&property, configuration.source.clone());
 
             if OVERRIDE_PROPERTY_REGEX.is_match(&key) {
+                // Assigning a specific scope is redundant since this property already implies a particular context.
                 registered_property.schema.scope = None;
+
+                self.handle_override_identifier(&key, &property);
+                continue;
             } else {
-                registered_property.schema.scope = Some(scope.clone());
-                registered_property.schema.allow_for_only_restricted_source = Some(
-                    property.allow_for_only_restricted_source.unwrap_or(false)
-                        || configuration.source.is_some(),
-                );
+                registered_property.schema.scope = Some(configuration_scope_or_default.clone());
+                registered_property.schema.allow_for_only_restricted_source =
+                    Some(property.allow_for_only_restricted_source.unwrap_or(false));
             }
 
             if property.schemable.unwrap_or(true) {
@@ -351,18 +336,29 @@ impl ConfigurationRegistry {
             }
         }
 
-        if let Some(sub_nodes) = configuration.all_of {
+        if let Some(sub_nodes) = configuration.parent_of {
             for node in sub_nodes {
                 let sub_properties = self.do_configuration_registration(node, false);
-                properties.extend(sub_properties);
+                configuration_properties.extend(sub_properties);
             }
         }
 
-        properties
+        configuration_properties
     }
 
     fn validate_property(&self, _property: &ConfigurationPropertySchema) -> bool {
         unimplemented!()
+    }
+
+    fn handle_override_identifier(&mut self, key: &str, property: &ConfigurationPropertySchema) {
+        let trimmed_override_identifier = key.trim_matches(|c| c == '[' || c == ']').to_string();
+        self.override_identifiers
+            .insert(trimmed_override_identifier);
+
+        if property.r#type.is_object() {
+            // TODO:
+            // 1. Validation
+        }
     }
 
     // fn register_json_configuration(&mut self, configuration: &ConfigurationNode) {
@@ -381,12 +377,6 @@ impl ConfigurationRegistry {
     //     }
     // }
 
-    pub fn register_override_identifiers(&mut self, override_identifiers: Vec<String>) {
-        for identifier in override_identifiers {
-            self.override_identifiers.insert(identifier);
-        }
-    }
-
     pub fn register_default_configurations(
         &mut self,
         default_configurations: Vec<ConfigurationDefaults>,
@@ -399,7 +389,7 @@ impl ConfigurationRegistry {
 
     fn do_register_default_configuration(
         &mut self,
-        default_configurations: Vec<ConfigurationDefaults>,
+        _default_configurations: Vec<ConfigurationDefaults>,
     ) -> HashSet<String> {
         unimplemented!()
     }

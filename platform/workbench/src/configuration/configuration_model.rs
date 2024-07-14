@@ -1,11 +1,11 @@
 use anyhow::Result;
 use arc_swap::{ArcSwap, ArcSwapOption};
-use hashbrown::HashMap;
+use hashbrown::{HashMap, HashSet};
 use serde_json::Value;
-use std::{fs::File, io::Read, sync::Arc};
+use std::{fs::File, io::Read, sync::Arc, vec};
 use tracing::warn;
 
-use super::configuration_registry::ConfigurationRegistry;
+use super::configuration_registry::{ConfigurationRegistry, OVERRIDE_PROPERTY_REGEX};
 
 /// Enum representing the various configuration targets in Moss Compass.
 /// These targets specify where the configuration settings should be applied.
@@ -148,8 +148,6 @@ impl ConfigurationParser {
     }
 
     pub fn parse_file(&self, file_path: &str) -> Result<ConfigurationModel> {
-        let re_override_property = regex!(r#"^\[.*\]$"#);
-
         let mut file = File::open(file_path)?;
         let mut content = String::new();
         file.read_to_string(&mut content)?;
@@ -160,25 +158,31 @@ impl ConfigurationParser {
         let mut root_keys: Vec<String> = Vec::new();
 
         let configuration_properties = self.registry.get_configuration_properties();
+        let override_identifiers = self.registry.get_override_identifiers();
+
+        dbg!(&override_identifiers);
 
         for (key, value) in &root_map {
-            if let Some(registered_property) = configuration_properties.get(key) {
-                if registered_property.is_protected() {
-                    warn!("Property `{}` is protected from contribution", key);
-                    continue;
-                }
+            if OVERRIDE_PROPERTY_REGEX.is_match(key) {
+                root_overrides.extend(self.handle_override_2(key, value, None));
+                continue;
+            }
 
-                if re_override_property.is_match(key) {
-                    Self::collect_overrides(key, value, &mut root_overrides, None);
-                } else {
+            match configuration_properties.get(key) {
+                Some(registered_property) => {
+                    if registered_property.is_protected() {
+                        println!("Property `{}` is protected from contribution", key);
+                        continue;
+                    }
+
                     root_contents.insert(key.clone(), value.clone());
                     root_keys.push(key.clone());
                 }
-            } else {
-                println!("ss");
-                warn!("Unknown property `{}` was detected", key);
-                continue;
-            };
+                None => {
+                    println!("Unknown property `{}` was detected", key);
+                    continue;
+                }
+            }
         }
 
         let result = ConfigurationModel::new(root_contents, root_keys, root_overrides);
@@ -186,62 +190,78 @@ impl ConfigurationParser {
         Ok(result)
     }
 
-    fn collect_overrides(
+    fn handle_override_2(
+        &self,
         key: &str,
         value: &Value,
-        overrides: &mut Vec<ConfigurationOverride>,
         parent_identifier: Option<&str>,
-    ) {
-        if let Value::Object(inner_map) = value {
-            let current_identifier = Self::format_identifier(parent_identifier, key);
+    ) -> Vec<ConfigurationOverride> {
+        let content = if let Value::Object(obj) = value {
+            obj
+        } else {
+            // If the override is not an object, then we don't want to handle it in any way.
+            return vec![];
+        };
 
-            let (override_content, override_keys) = Self::extract_override_content_and_keys(
-                inner_map,
-                overrides,
-                Some(&current_identifier),
-            );
-
-            overrides.push(ConfigurationOverride {
-                identifier: current_identifier.to_string(),
-                _keys: override_keys,
-                contents: override_content,
-            });
-        }
-    }
-
-    fn extract_override_content_and_keys(
-        inner_map: &serde_json::Map<std::string::String, Value>,
-        overrides: &mut Vec<ConfigurationOverride>,
-        current_identifier: Option<&str>,
-    ) -> (HashMap<String, Value>, Vec<String>) {
-        let mut override_content = HashMap::new();
-        let mut override_keys = Vec::new();
-
-        for (inner_key, inner_value) in inner_map {
-            if inner_key.starts_with('[') && inner_key.ends_with(']') {
-                Self::collect_overrides(inner_key, inner_value, overrides, current_identifier);
-            } else {
-                override_content.insert(inner_key.clone(), inner_value.clone());
-                override_keys.push(inner_key.clone());
-            }
-        }
-
-        (override_content, override_keys)
-    }
-
-    fn format_identifier(parent_identifier: Option<&str>, key: &str) -> String {
-        let trimmed_key = key.trim_matches(|c| c == '[' || c == ']');
-
-        parent_identifier.map_or_else(
-            || trimmed_key.to_string(),
-            |parent_id| {
+        let override_identifiers = self.registry.get_override_identifiers();
+        // let mut identifier_overrides = Vec::new();
+        let formatted_identifier = {
+            let trimmed_key = key.trim_matches(|c| c == '[' || c == ']');
+            if let Some(parent_id) = parent_identifier {
                 let mut result = String::from(parent_id);
                 result.push_str("/");
                 result.push_str(trimmed_key);
 
                 result
-            },
-        )
+            } else {
+                trimmed_key.to_string()
+            }
+        };
+
+        if override_identifiers.get(&formatted_identifier).is_none() {
+            println!(
+                "Unknown override identifier `{}` was detected",
+                formatted_identifier
+            );
+            return vec![];
+        }
+
+        let (override_overrides, parsed_override_content, override_keys) =
+            self.extract_override_content_and_keys_2(Some(&formatted_identifier), content);
+
+        let mut result = vec![ConfigurationOverride {
+            identifier: formatted_identifier.to_string(),
+            _keys: override_keys,
+            contents: parsed_override_content,
+        }];
+        result.extend(override_overrides);
+
+        result
+    }
+
+    fn extract_override_content_and_keys_2(
+        &self,
+        current_identifier: Option<&str>,
+        content: &serde_json::Map<std::string::String, Value>,
+    ) -> (
+        Vec<ConfigurationOverride>,
+        HashMap<String, Value>,
+        Vec<String>,
+    ) {
+        let mut override_overrides = Vec::new();
+        let mut override_content = HashMap::new();
+        let mut override_keys = Vec::new();
+
+        for (key, value) in content {
+            if OVERRIDE_PROPERTY_REGEX.is_match(key) {
+                override_overrides.extend(self.handle_override_2(key, value, current_identifier));
+            } else {
+                override_content.insert(key.clone(), value.clone());
+                override_keys.push(key.clone());
+            }
+        }
+
+        (override_overrides, override_content, override_keys)
     }
 }
 
