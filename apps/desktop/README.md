@@ -1,20 +1,5 @@
-# About
+# Moss Desktop Application
 
-Moss Desktop Application
-
-# Technologies
-
-- **Tauri** (framework for building desktop applications using JS, HTML, and CSS)
-- **Vite** (framework for building fast, efficient, and scalable web apps)
-- **React** (framework for creating interactive UI components)
-- **TypeScript** (type-safety support)
-- **Tailwind CSS** (CSS styling)
-- **Redux** (React state manager)
-- **i18next** (internationalization)
-- **Jsonnet**
-- **pNPM** (package manager)
-- **Storybook** (workshop for building, testing, documenting and sharing UI components)
-- **Turborepo** (smart monorepo build system / monorepo orchestrator) solves monorepos' scaling problem. Its remote cache stores the result of all your tasks, meaning that your CI never needs to do the same work twice. Visualize dependency graphs. Remote Vercel caching.
 
 # Usage
 
@@ -41,28 +26,6 @@ Moss Desktop Application
     "jsonnet": "jsonnet test.jsonnet -o test.json"
   },
 ```
-
-# Architecture
-A monorepo is a single repository containing multiple distinct projects, with well-defined relationships.
-## Monorepo structure:
-
-### Apps:
-- `desktop`: A [Tauri](https://tauri.app) app.
-- `web`: A [React](https://reactjs.org) webapp.
-- `landing`: A [React](https://reactjs.org) app using [Next.js](https://nextjs.org).
-- `cli`: A [Rust](https://www.rust-lang.org) command line interface. (planned)
-- `storybook`: A [React](https://reactjs.org) storybook for the UI components.
-
-
-
-### Packages:
-- `assets`: Shared assets (images, fonts, etc).
-- `client`: A [TypeScript](https://www.typescriptlang.org/) client library to handle dataflow via RPC between UI and the Rust core.
-- `config`: `eslint` configurations (includes `eslint-config-next`, `eslint-config-prettier` and all `tsconfig.json` configs used throughout the monorepo).
-- `ui`: A [React](https://reactjs.org) Shared component library.
-
-
-
 
 # React + TypeScript + Vite
 

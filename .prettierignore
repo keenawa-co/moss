@@ -1,0 +1,10 @@
+target/
+.turbo/
+.vscode/
+
+apps/desktop/public
+
+*.rs
+
+package*.json
+pnpm-lock.yaml

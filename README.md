@@ -8,6 +8,38 @@ We would for you to get involved with Moss development! If you wish to help, you
 
 
 # Usage
+- Run all apps:
+```sh
+pnpm turbo dev
+```
+- Run desktop app:
+```sh
+cd .\apps\desktop\
+pnpm tauri dev
+```
+- Run desktop web app:
+```sh
+cd .\apps\desktop\
+pnpm vite dev
+```
+
+- Run storybook app:
+```sh
+cd .\apps\storybook\
+pnpm storybook dev
+```
+
+- Run web app:
+```sh
+cd .\apps\web\
+pnpm next dev
+```
+
+- Run docs app:
+```sh
+cd .\apps\docs\
+pnpm next dev
+```
 
 - Generate monorepo project dependency graph:
 ```sh
@@ -25,10 +57,18 @@ digraph {
                 "[root] @repo/ui#build" -> "[root] @repo/eslint-config#build"
                 "[root] @repo/ui#build" -> "[root] @repo/tailwind-config#build"
                 "[root] @repo/ui#build" -> "[root] @repo/typescript-config#build"
+                "[root] desktop#build" -> "[root] @repo/eslint-config#build"
+                "[root] desktop#build" -> "[root] @repo/tailwind-config#build"
+                "[root] desktop#build" -> "[root] @repo/typescript-config#build"
+                "[root] desktop#build" -> "[root] @repo/ui#build"
                 "[root] docs#build" -> "[root] @repo/eslint-config#build"
                 "[root] docs#build" -> "[root] @repo/tailwind-config#build"
                 "[root] docs#build" -> "[root] @repo/typescript-config#build"
                 "[root] docs#build" -> "[root] @repo/ui#build"
+                "[root] storybook#build" -> "[root] @repo/eslint-config#build"
+                "[root] storybook#build" -> "[root] @repo/tailwind-config#build"
+                "[root] storybook#build" -> "[root] @repo/typescript-config#build"
+                "[root] storybook#build" -> "[root] @repo/ui#build"
                 "[root] web#build" -> "[root] @repo/eslint-config#build"
                 "[root] web#build" -> "[root] @repo/tailwind-config#build"
                 "[root] web#build" -> "[root] @repo/typescript-config#build"
@@ -36,17 +76,6 @@ digraph {
         }
 }
 ```
-- Run all apps:
-```sh
-pnpm turbo dev
-```
-
-
-
-
-
-
-
 
 ## Turborepo Tailwind CSS starter
 

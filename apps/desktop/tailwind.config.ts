@@ -1,6 +1,9 @@
-/** @type {import('tailwindcss').Config} */
-module.exports = {
+import type { Config } from "tailwindcss";
+import sharedConfig from "@repo/tailwind-config";
+
+const config: Pick<Config, "content" | "presets" | "darkMode" | "theme" | "plugins"> = {
   content: ['./src/**/*.{js,ts,jsx,tsx}'],
+  presets: [sharedConfig],
   darkMode: 'class',
   theme: {
     extend: {
@@ -13,4 +16,7 @@ module.exports = {
     }
   },
   plugins: [require('@tailwindcss/typography')]
-}
+};
+
+export default config;
+
