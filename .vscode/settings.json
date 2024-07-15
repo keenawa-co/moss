@@ -9,6 +9,7 @@
     "hashbrown",
     "inmem",
     "jsonwebtoken",
+    "Keyable",
     "keymap",
     "libc",
     "mimalloc",

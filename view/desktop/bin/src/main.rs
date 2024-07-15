@@ -10,7 +10,8 @@ use app_lib::{
     },
     AppState,
 };
-use hashbrown::HashMap;
+use hashbrown::{HashMap, HashSet};
+use serde_json::json;
 use std::sync::Arc;
 use surrealdb::{engine::remote::ws::Ws, Surreal};
 use tauri::{App, AppHandle, Manager, State};
@@ -18,7 +19,7 @@ use tauri_specta::{collect_commands, collect_events, ts};
 use tracing::{error, Level};
 // use tracing_subscriber::FmtSubscriber;
 use workbench::configuration::configuration_registry::{
-    ConfigurationNodeType, ConfigurationScope, SourceInfo,
+    ConfigurationNodeType, ConfigurationPropertyKey, ConfigurationScope, PropertyMap, SourceInfo,
 };
 use workbench::configuration::{
     configuration_registry::{
@@ -123,7 +124,7 @@ pub fn run(ctx: &mut AppContextCompact) -> tauri::Result<()> {
             display_name: Some("Moss Core".to_string()),
         }),
         properties: {
-            let mut properties = HashMap::new();
+            let mut properties = PropertyMap::new();
             properties.insert(
                 "editor.fontSize".to_string(),
                 ConfigurationPropertySchema {
@@ -152,25 +153,79 @@ pub fn run(ctx: &mut AppContextCompact) -> tauri::Result<()> {
                     source: None,
                 },
             );
-            properties.insert(
-                "[mossql]".to_string(),
-                ConfigurationPropertySchema {
-                    scope: Some(ConfigurationScope::Resource),
-                    r#type: ConfigurationNodeType::Object,
-                    order: Some(2),
-                    default: Some(serde_json::Value::Null),
-                    description: Some("Controls the line height.".to_string()),
-                    protected_from_contribution: Some(false),
-                    allow_for_only_restricted_source: Some(false),
-                    schemable: Some(true),
-                    source: None,
-                },
-            );
 
             Some(properties)
         },
         description: None,
-        parent_of: None,
+        parent_of: Some(vec![ConfigurationNode {
+            id: Some("mossql".to_string()),
+            title: Some("MossQL".to_string()),
+            order: Some(1),
+            r#type: Default::default(),
+            scope: Default::default(),
+            source: Some(SourceInfo {
+                id: "moss.core".to_string(),
+                display_name: Some("Moss Core".to_string()),
+            }),
+
+            properties: {
+                let mut properties = PropertyMap::new();
+                properties.insert(
+                    ConfigurationPropertyKey {
+                        key: "editor.fontSize".to_string(),
+                        override_for: Some(vec![
+                            "typescript/spec".to_string(),
+                            "javascript".to_string(),
+                        ]),
+                    },
+                    ConfigurationPropertySchema {
+                        scope: Some(ConfigurationScope::Resource),
+                        r#type: ConfigurationNodeType::Number,
+                        order: Some(1),
+                        default: Some(serde_json::Value::Number(serde_json::Number::from(12))),
+                        description: Some("Controls the font size in pixels.".to_string()),
+                        protected_from_contribution: Some(false),
+                        allow_for_only_restricted_source: Some(false),
+                        schemable: Some(true),
+                        source: None,
+                    },
+                );
+                properties.insert(
+                    ConfigurationPropertyKey {
+                        key: "editor.fontSize".to_string(),
+                        override_for: Some(vec!["typescript/spec".to_string()]),
+                    },
+                    ConfigurationPropertySchema {
+                        scope: Some(ConfigurationScope::Resource),
+                        r#type: ConfigurationNodeType::Number,
+                        order: Some(1),
+                        default: Some(serde_json::Value::Number(serde_json::Number::from(12))),
+                        description: Some("Controls the font size in pixels.".to_string()),
+                        protected_from_contribution: Some(false),
+                        allow_for_only_restricted_source: Some(false),
+                        schemable: Some(true),
+                        source: None,
+                    },
+                );
+                properties.insert(
+                    "editor.fontSize",
+                    ConfigurationPropertySchema {
+                        scope: Some(ConfigurationScope::Resource),
+                        r#type: ConfigurationNodeType::Number,
+                        order: Some(2),
+                        default: Some(serde_json::Value::Number(serde_json::Number::from(20))),
+                        description: Some("Controls the font size in pixels.".to_string()),
+                        protected_from_contribution: Some(false),
+                        allow_for_only_restricted_source: Some(false),
+                        schemable: Some(true),
+                        source: None,
+                    },
+                );
+                Some(properties)
+            },
+            description: None,
+            parent_of: None,
+        }]),
     };
 
     registry.register_configuration(editor_configuration);

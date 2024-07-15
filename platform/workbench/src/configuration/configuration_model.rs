@@ -164,7 +164,7 @@ impl ConfigurationParser {
 
         for (key, value) in &root_map {
             if OVERRIDE_PROPERTY_REGEX.is_match(key) {
-                root_overrides.extend(self.handle_override_2(key, value, None));
+                root_overrides.extend(self.handle_override(key, value, None));
                 continue;
             }
 
@@ -190,7 +190,7 @@ impl ConfigurationParser {
         Ok(result)
     }
 
-    fn handle_override_2(
+    fn handle_override(
         &self,
         key: &str,
         value: &Value,
@@ -227,7 +227,7 @@ impl ConfigurationParser {
         }
 
         let (override_overrides, parsed_override_content, override_keys) =
-            self.extract_override_content_and_keys_2(Some(&formatted_identifier), content);
+            self.extract_override_content_and_keys(Some(&formatted_identifier), content);
 
         let mut result = vec![ConfigurationOverride {
             identifier: formatted_identifier.to_string(),
@@ -239,7 +239,7 @@ impl ConfigurationParser {
         result
     }
 
-    fn extract_override_content_and_keys_2(
+    fn extract_override_content_and_keys(
         &self,
         current_identifier: Option<&str>,
         content: &serde_json::Map<std::string::String, Value>,
@@ -254,7 +254,7 @@ impl ConfigurationParser {
 
         for (key, value) in content {
             if OVERRIDE_PROPERTY_REGEX.is_match(key) {
-                override_overrides.extend(self.handle_override_2(key, value, current_identifier));
+                override_overrides.extend(self.handle_override(key, value, current_identifier));
             } else {
                 override_content.insert(key.clone(), value.clone());
                 override_keys.push(key.clone());

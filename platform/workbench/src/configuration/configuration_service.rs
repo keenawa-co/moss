@@ -1,7 +1,6 @@
 use std::{default, sync::Arc};
 
 use anyhow::{Context as AnyhowContext, Result};
-use parking_lot::Mutex;
 use serde_json::Value;
 
 use super::{
