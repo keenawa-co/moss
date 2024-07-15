@@ -2,7 +2,7 @@ target/
 .turbo/
 .vscode/
 
-apps/desktop/public
+view/desktop/public
 
 *.rs
 

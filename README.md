@@ -14,30 +14,30 @@ pnpm turbo dev
 ```
 - Run desktop app:
 ```sh
-cd .\apps\desktop\
+cd .\view\desktop\
 pnpm tauri dev
 ```
 - Run desktop web app:
 ```sh
-cd .\apps\desktop\
+cd .\view\desktop\
 pnpm vite dev
 ```
 
 - Run storybook app:
 ```sh
-cd .\apps\storybook\
+cd .\view\storybook\
 pnpm storybook dev
 ```
 
 - Run web app:
 ```sh
-cd .\apps\web\
+cd .\view\web\
 pnpm next dev
 ```
 
 - Run docs app:
 ```sh
-cd .\apps\docs\
+cd .\view\docs\
 pnpm next dev
 ```
 
