@@ -1,0 +1,16 @@
+[package]
+name = "workbench"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+parking_lot.workspace = true
+lazy-regex.workspace = true
+anyhow.workspace = true
+arc-swap.workspace = true
+schemars.workspace = true
+tracing.workspace = true
+hashbrown = { workspace = true, features = ["serde"] }
+
+serde = { workspace = true, features = ["derive"] }
+serde_json.workspace = true

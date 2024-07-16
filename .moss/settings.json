@@ -1,4 +1,13 @@
 {
+  "window.restoreTab": true,
+  "window.restoreFullScreen": false,
+  "editor.fontSize": 14,
+  "[mossql]": {
+    "editor.fontSize": 16,
+    "[test]": {
+      "editor.fontSize": 18
+    }
+  },
   "project.monitoring.exclude": [
     "/Users/g10z3r/Project/4rchr4y/moss/target",
     "/Users/g10z3r/Project/4rchr4y/moss/view",

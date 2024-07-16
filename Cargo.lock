@@ -736,6 +736,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "base"
+version = "0.1.0"
+dependencies = [
+ "hashbrown 0.7.2",
+]
+
+[[package]]
 name = "base64"
 version = "0.21.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1742,8 +1749,10 @@ dependencies = [
  "anyhow",
  "app",
  "futures",
+ "hashbrown 0.7.2",
  "macos-trampoline",
  "mimalloc",
+ "parking_lot",
  "serde",
  "serde_json",
  "specta",
@@ -1754,6 +1763,7 @@ dependencies = [
  "tauri-specta",
  "tokio",
  "tracing",
+ "workbench",
 ]
 
 [[package]]
@@ -2853,6 +2863,7 @@ checksum = "96282e96bfcd3da0d3aa9938bedf1e50df3269b6db08b4876d2da0bb1a0841cf"
 dependencies = [
  "ahash 0.3.8",
  "autocfg",
+ "serde",
 ]
 
 [[package]]
@@ -3483,6 +3494,29 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "507460a910eb7b32ee961886ff48539633b788a36b65692b95f225b844c82553"
 dependencies = [
  "regex-automata 0.4.7",
+]
+
+[[package]]
+name = "lazy-regex"
+version = "3.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5d12be4595afdf58bd19e4a9f4e24187da2a66700786ff660a418e9059937a4c"
+dependencies = [
+ "lazy-regex-proc_macros",
+ "once_cell",
+ "regex",
+]
+
+[[package]]
+name = "lazy-regex-proc_macros"
+version = "3.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "44bcd58e6c97a7fcbaffcdc95728b393b8d98933bfadad49ed4097845b57ef0b"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "regex",
+ "syn 2.0.70",
 ]
 
 [[package]]
@@ -8897,6 +8931,21 @@ checksum = "a277a57398d4bfa075df44f501a17cfdf8542d224f0d36095a2adc7aee4ef0a5"
 dependencies = [
  "cfg-if",
  "windows-sys 0.48.0",
+]
+
+[[package]]
+name = "workbench"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "arc-swap",
+ "hashbrown 0.7.2",
+ "lazy-regex",
+ "parking_lot",
+ "schemars",
+ "serde",
+ "serde_json",
+ "tracing",
 ]
 
 [[package]]
