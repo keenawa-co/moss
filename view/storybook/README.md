@@ -1,8 +1,6 @@
-# Usage
-
-```bash
-  $ pnpm run storybook #start Tauri Desktop App
-```
+# Removed from package.json -> scripts
+"dev": "vite",
+"build": "tsc -b && vite build",
 
 # React + TypeScript + Vite
 
