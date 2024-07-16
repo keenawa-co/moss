@@ -1,11 +1,7 @@
 use std::sync::Arc;
 
 use hashbrown::{HashMap, HashSet};
-use lazy_regex::{Lazy, Regex};
 use serde_json::Value;
-
-pub static OVERRIDE_PROPERTY_REGEX: &'static Lazy<Regex> = regex!(r"^(\[.*\])+$");
-static OVERRIDE_IDENTIFIER_REGEX: &'static Lazy<Regex> = regex!(r"\[([^\]]+)\]");
 
 /// Enumeration representing the scope of a configuration setting.
 /// This enum defines the different levels at which a configuration setting can be applied.
@@ -45,15 +41,7 @@ impl Default for ConfigurationNodeType {
 }
 
 impl ConfigurationNodeType {
-    fn is_object(&self) -> bool {
-        if self == &ConfigurationNodeType::Object {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    fn default_value(r#type: &Self) -> serde_json::Value {
+    pub fn default_value(r#type: &Self) -> serde_json::Value {
         match r#type {
             ConfigurationNodeType::Null => Value::Null,
             ConfigurationNodeType::String => Value::String(String::new()),
@@ -71,60 +59,90 @@ pub struct SourceInfo {
     pub display_name: Option<String>,
 }
 
+pub enum PropertyKeyType {
+    None,
+    Straight(String),
+    Composite(CompositePropertyKey),
+}
+
 pub trait Keyable {
-    fn to_vec_string(&self) -> Vec<String>;
+    fn get_type(&self) -> PropertyKeyType;
+    fn as_straight_key(&self) -> Option<String>;
+    fn as_composite_key(&self) -> Option<CompositePropertyKey> {
+        None
+    }
 }
 
 impl Keyable for String {
-    fn to_vec_string(&self) -> Vec<String> {
-        vec![self.clone()]
+    fn as_straight_key(&self) -> Option<String> {
+        Some(self.clone())
+    }
+
+    fn get_type(&self) -> PropertyKeyType {
+        PropertyKeyType::Straight(self.clone())
     }
 }
 
 impl Keyable for &str {
-    fn to_vec_string(&self) -> Vec<String> {
-        vec![self.to_string()]
+    fn as_straight_key(&self) -> Option<String> {
+        Some(self.to_string())
+    }
+
+    fn get_type(&self) -> PropertyKeyType {
+        PropertyKeyType::Straight(self.to_string())
     }
 }
 
-pub struct ConfigurationPropertyKey {
+#[derive(Debug, Clone)]
+pub struct CompositePropertyKey {
     pub key: String,
-    pub override_for: Option<Vec<String>>,
+    pub override_for: Vec<String>,
 }
 
-impl Keyable for ConfigurationPropertyKey {
-    fn to_vec_string(&self) -> Vec<String> {
-        self.override_for.as_ref().map_or_else(
-            || vec![self.key.to_string()],
-            |overrides| {
-                overrides
-                    .iter()
-                    .map(|override_identifier| format!("[{}].{}", override_identifier, self.key))
-                    .collect()
-            },
-        )
+impl Keyable for CompositePropertyKey {
+    fn as_composite_key(&self) -> Option<CompositePropertyKey> {
+        Some(self.clone())
+    }
+
+    fn as_straight_key(&self) -> Option<String> {
+        Some(self.key.clone())
+    }
+
+    fn get_type(&self) -> PropertyKeyType {
+        PropertyKeyType::Composite(self.clone())
     }
 }
 
 #[derive(Debug, Clone)]
 pub struct PropertyMap {
-    table: HashMap<String, Arc<ConfigurationPropertySchema>>,
+    table: HashMap<String, ConfigurationPropertySchema>,
+    overrides: HashSet<String>,
 }
 
 impl Default for PropertyMap {
     fn default() -> Self {
         Self {
             table: Default::default(),
+            overrides: Default::default(),
         }
     }
 }
 
 impl IntoIterator for PropertyMap {
-    type Item = (String, Arc<ConfigurationPropertySchema>);
-    type IntoIter = hashbrown::hash_map::IntoIter<String, Arc<ConfigurationPropertySchema>>;
+    type Item = (String, ConfigurationPropertySchema);
+    type IntoIter = hashbrown::hash_map::IntoIter<String, ConfigurationPropertySchema>;
 
     fn into_iter(self) -> Self::IntoIter {
         self.table.into_iter()
+    }
+}
+
+impl<'a> IntoIterator for &'a PropertyMap {
+    type Item = (&'a String, &'a ConfigurationPropertySchema);
+    type IntoIter = hashbrown::hash_map::Iter<'a, String, ConfigurationPropertySchema>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.table.iter()
     }
 }
 
@@ -132,13 +150,34 @@ impl PropertyMap {
     pub fn new() -> Self {
         Self {
             table: HashMap::new(),
+            overrides: HashSet::new(),
         }
     }
 
+    pub fn get_overrides(&self) -> &HashSet<String> {
+        &self.overrides
+    }
+
+    pub fn extend(&mut self, item: PropertyMap) {
+        self.overrides.extend(item.overrides);
+        self.table.extend(item.table);
+    }
+
     pub fn insert(&mut self, key: impl Keyable, value: ConfigurationPropertySchema) {
-        let v = Arc::new(value);
-        for formatted_key in key.to_vec_string() {
-            self.table.insert(formatted_key.clone(), Arc::clone(&v));
+        match key.get_type() {
+            PropertyKeyType::Straight(straight_key) => {
+                self.table.insert(straight_key, value);
+            }
+            PropertyKeyType::Composite(composite_key) => {
+                for override_identifier in composite_key.override_for {
+                    self.table.insert(
+                        format!("[{}].{}", override_identifier, composite_key.key),
+                        value.clone(),
+                    );
+                    self.overrides.insert(override_identifier);
+                }
+            }
+            PropertyKeyType::None => {}
         }
     }
 }
@@ -208,7 +247,7 @@ pub struct ConfigurationDefaults {
 
 #[derive(Debug, Clone)]
 pub struct RegisteredConfigurationPropertySchema {
-    pub schema: ConfigurationPropertySchema,
+    pub schema: Arc<ConfigurationPropertySchema>,
     pub source: Option<SourceInfo>,
 }
 
@@ -219,9 +258,9 @@ impl RegisteredConfigurationPropertySchema {
 }
 
 impl RegisteredConfigurationPropertySchema {
-    fn new(property: &ConfigurationPropertySchema, source: Option<SourceInfo>) -> Self {
+    fn new(property: ConfigurationPropertySchema, source: Option<SourceInfo>) -> Self {
         let registered_property = Self {
-            schema: property.clone(),
+            schema: Arc::new(property),
             source,
         };
 
@@ -377,68 +416,56 @@ impl ConfigurationRegistry {
         &mut self,
         configuration: ConfigurationNode,
         validate: bool,
-    ) -> HashMap<String, ConfigurationPropertySchema> {
-        // let configuration_scope_or_default = configuration.scope.unwrap_or_default();
-        // let mut configuration_properties = configuration.properties.unwrap_or_default();
+    ) -> PropertyMap {
+        let node_scope_or_default = configuration.scope.unwrap_or_default();
+        let mut node_properties = configuration.properties.unwrap_or_default();
 
-        // for (key, property) in configuration_properties.clone() {
-        //     if validate && !self.validate_property(&property) {
-        //         continue;
-        //     }
+        // TODO: validate incoming override identifiers before extend
+        self.override_identifiers
+            .extend(node_properties.overrides.clone());
 
-        //     let mut registered_property =
-        //         RegisteredConfigurationPropertySchema::new(&property, configuration.source.clone());
+        for (key, property) in &node_properties {
+            if validate && !self.validate_property(&property) {
+                continue;
+            }
 
-        //     if let Some(overrides) = &property.override_for {
-        //         if overrides.len() > 0 {}
-        //     }
+            let mut property_schema = property.clone();
 
-        //     if OVERRIDE_PROPERTY_REGEX.is_match(&key) {
-        //         // Assigning a specific scope is redundant since this property already implies a particular context.
-        //         registered_property.schema.scope = None;
+            if node_properties.overrides.get(key).is_some() {
+                // Assigning a specific scope is redundant since this property already implies a particular context.
+                property_schema.scope = None;
+            } else {
+                property_schema.scope = Some(node_scope_or_default.clone());
+                property_schema.allow_for_only_restricted_source =
+                    Some(property.allow_for_only_restricted_source.unwrap_or(false));
+            }
 
-        //         self.handle_override_identifier(&key, &property);
-        //         continue;
-        //     } else {
-        //         registered_property.schema.scope = Some(configuration_scope_or_default.clone());
-        //         registered_property.schema.allow_for_only_restricted_source =
-        //             Some(property.allow_for_only_restricted_source.unwrap_or(false));
-        //     }
+            let registered_property = RegisteredConfigurationPropertySchema::new(
+                property_schema,
+                configuration.source.clone(),
+            );
 
-        //     if property.schemable.unwrap_or(true) {
-        //         self.configuration_properties
-        //             .insert(key.clone(), registered_property);
-        //     } else {
-        //         self.excluded_configuration_properties
-        //             .insert(key.clone(), registered_property);
-        //     }
-        // }
+            if property.schemable.unwrap_or(true) {
+                self.configuration_properties
+                    .insert(key.clone(), registered_property);
+            } else {
+                self.excluded_configuration_properties
+                    .insert(key.clone(), registered_property);
+            }
+        }
 
-        // if let Some(sub_nodes) = configuration.parent_of {
-        //     for node in sub_nodes {
-        //         let sub_properties = self.do_configuration_registration(node, false);
-        //         configuration_properties.extend(sub_properties);
-        //     }
-        // }
+        if let Some(sub_nodes) = configuration.parent_of {
+            for node in sub_nodes {
+                let sub_properties = self.do_configuration_registration(node, false);
+                node_properties.extend(sub_properties);
+            }
+        }
 
-        // configuration_properties
-
-        todo!()
+        node_properties
     }
 
     fn validate_property(&self, _property: &ConfigurationPropertySchema) -> bool {
         unimplemented!()
-    }
-
-    fn handle_override_identifier(&mut self, key: &str, property: &ConfigurationPropertySchema) {
-        let trimmed_override_identifier = key.trim_matches(|c| c == '[' || c == ']').to_string();
-        self.override_identifiers
-            .insert(trimmed_override_identifier);
-
-        if property.r#type.is_object() {
-            // TODO:
-            // 1. Validation
-        }
     }
 
     // fn register_json_configuration(&mut self, configuration: &ConfigurationNode) {

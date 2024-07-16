@@ -19,7 +19,7 @@ use tauri_specta::{collect_commands, collect_events, ts};
 use tracing::{error, Level};
 // use tracing_subscriber::FmtSubscriber;
 use workbench::configuration::configuration_registry::{
-    ConfigurationNodeType, ConfigurationPropertyKey, ConfigurationScope, PropertyMap, SourceInfo,
+    CompositePropertyKey, ConfigurationNodeType, ConfigurationScope, PropertyMap, SourceInfo,
 };
 use workbench::configuration::{
     configuration_registry::{
@@ -171,12 +171,9 @@ pub fn run(ctx: &mut AppContextCompact) -> tauri::Result<()> {
             properties: {
                 let mut properties = PropertyMap::new();
                 properties.insert(
-                    ConfigurationPropertyKey {
+                    CompositePropertyKey {
                         key: "editor.fontSize".to_string(),
-                        override_for: Some(vec![
-                            "typescript/spec".to_string(),
-                            "javascript".to_string(),
-                        ]),
+                        override_for: vec!["mossql".to_string()],
                     },
                     ConfigurationPropertySchema {
                         scope: Some(ConfigurationScope::Resource),
@@ -191,29 +188,15 @@ pub fn run(ctx: &mut AppContextCompact) -> tauri::Result<()> {
                     },
                 );
                 properties.insert(
-                    ConfigurationPropertyKey {
+                    CompositePropertyKey {
                         key: "editor.fontSize".to_string(),
-                        override_for: Some(vec!["typescript/spec".to_string()]),
+                        override_for: vec!["mossql/test".to_string()],
                     },
                     ConfigurationPropertySchema {
                         scope: Some(ConfigurationScope::Resource),
                         r#type: ConfigurationNodeType::Number,
                         order: Some(1),
                         default: Some(serde_json::Value::Number(serde_json::Number::from(12))),
-                        description: Some("Controls the font size in pixels.".to_string()),
-                        protected_from_contribution: Some(false),
-                        allow_for_only_restricted_source: Some(false),
-                        schemable: Some(true),
-                        source: None,
-                    },
-                );
-                properties.insert(
-                    "editor.fontSize",
-                    ConfigurationPropertySchema {
-                        scope: Some(ConfigurationScope::Resource),
-                        r#type: ConfigurationNodeType::Number,
-                        order: Some(2),
-                        default: Some(serde_json::Value::Number(serde_json::Number::from(20))),
                         description: Some("Controls the font size in pixels.".to_string()),
                         protected_from_contribution: Some(false),
                         allow_for_only_restricted_source: Some(false),

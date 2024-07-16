@@ -1,11 +1,12 @@
 use anyhow::Result;
 use arc_swap::{ArcSwap, ArcSwapOption};
 use hashbrown::{HashMap, HashSet};
+use lazy_regex::{Lazy, Regex};
 use serde_json::Value;
 use std::{fs::File, io::Read, sync::Arc, vec};
 use tracing::warn;
 
-use super::configuration_registry::{ConfigurationRegistry, OVERRIDE_PROPERTY_REGEX};
+use super::configuration_registry::ConfigurationRegistry;
 
 /// Enum representing the various configuration targets in Moss Compass.
 /// These targets specify where the configuration settings should be applied.
@@ -137,6 +138,9 @@ impl ConfigurationModel {
         ConfigurationModel::new(merged_content, merged_keys, merged_overrides)
     }
 }
+
+static OVERRIDE_PROPERTY_REGEX: &'static Lazy<Regex> = regex!(r"^(\[.*\])+$");
+
 // TODO: Use kernel/fs to work with the file system
 pub struct ConfigurationParser {
     registry: Arc<ConfigurationRegistry>,
@@ -204,15 +208,11 @@ impl ConfigurationParser {
         };
 
         let override_identifiers = self.registry.get_override_identifiers();
-        // let mut identifier_overrides = Vec::new();
         let formatted_identifier = {
             let trimmed_key = key.trim_matches(|c| c == '[' || c == ']');
-            if let Some(parent_id) = parent_identifier {
-                let mut result = String::from(parent_id);
-                result.push_str("/");
-                result.push_str(trimmed_key);
 
-                result
+            if let Some(parent_id) = parent_identifier {
+                format!("{}/{}", parent_id, trimmed_key)
             } else {
                 trimmed_key.to_string()
             }
