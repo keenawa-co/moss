@@ -1,24 +1,10 @@
-# About
+# Moss Desktop Application
 
-Moss Desktop Application
-
-# Technologies
-
-- **Tauri** (framework for building desktop applications using JS, HTML, and CSS)
-- **Vite** (framework for building fast, efficient, and scalable web apps)
-- **React** (framework for creating interactive UI components)
-- **TypeScript** (type-safety support)
-- **Tailwind CSS** (CSS styling)
-- **Redux** (React state manager)
-- **i18next** (internationalization)
-- **Jsonnet**
-- **pNPM** (package manager)
-- **Storybook** (workshop for building, testing, documenting and sharing UI components)
 
 # Usage
 
 ```bash
-  $ yarn tauri dev #start Tauri Desktop App
+  $ pnpm tauri dev #start Tauri Desktop App
   $ pnpm run dev #start web app
   $ pnpm run build
   $ pnpm run lint
