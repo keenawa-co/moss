@@ -38,7 +38,7 @@ export const Button = ({
   return (
     <button
       type="button"
-      className="text-red-500"
+      className="text-green-500"
       style={{ backgroundColor }}
       {...props}
     >

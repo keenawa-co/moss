@@ -16,7 +16,7 @@ type Story = StoryObj<typeof meta>;
 
 export const Primary: Story = {
   args: {
-    className: 'w-15 h-15 fill-white',
+    className: 'w-10 h-10 fill-green',
   },
 };
 
