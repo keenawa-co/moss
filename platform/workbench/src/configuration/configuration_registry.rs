@@ -1,7 +1,10 @@
 use std::sync::Arc;
 
 use hashbrown::{HashMap, HashSet};
+use lazy_regex::Regex as LazyRegex;
 use serde_json::Value;
+
+type Regex = LazyRegex;
 
 /// Enumeration representing the scope of a configuration setting.
 /// This enum defines the different levels at which a configuration setting can be applied.
@@ -182,14 +185,22 @@ impl PropertyMap {
     }
 }
 
+#[derive(Debug, Clone)]
+pub enum StringPresentationFormatType {
+    Multiline,
+    Singleline,
+}
+
 /// Struct representing a schema for a configuration property.
 /// This struct defines the metadata and constraints for a configuration setting.
 #[derive(Debug, Clone)]
 pub struct ConfigurationPropertySchema {
+    /// Unique identifier for the property.
+    pub id: Option<String>,
     /// The scope of the configuration property, indicating the level at which it applies.
     pub scope: Option<ConfigurationScope>,
     /// The type of the configuration property, specifying the kind of value it holds.
-    pub r#type: ConfigurationNodeType,
+    pub r#type: Option<ConfigurationNodeType>,
     /// The order in which the configuration property appears in the settings UI.
     pub order: Option<usize>,
     /// The default value of the configuration property, if any.
@@ -205,8 +216,82 @@ pub struct ConfigurationPropertySchema {
     /// Indicates if the configuration property is included in the registry.
     /// If false, the property is excluded from the configuration registry.
     pub schemable: Option<bool>,
+    /// Indicates that a property is deprecated.
+    pub deprecated: Option<bool>,
+    /// Tags associated with the property:
+    /// - For filtering
+    /// - Use `experimental` to mark property as experimental.
+    /// - Use `deprecated` to mark property as deprecated.
+    /// - Use `beta` to mark property that are in beta testing.
+    pub tags: Option<String>,
 
-    pub source: Option<SourceInfo>,
+    /// Minimum number of properties in the schema.
+    pub max_properties: Option<usize>,
+    /// Minimum number of properties in the schema.
+    pub min_properties: Option<usize>,
+
+    /// Elements of the array defined by the schema.
+    pub array_items: Option<Value>,
+    /// Minimum number of items in the array.
+    pub array_min_items: Option<usize>,
+    /// Maximum number of items in the array.
+    pub array_max_items: Option<usize>,
+    /// Indicates whether the items in the array must be unique.
+    pub array_unique_items: Option<bool>,
+
+    /// Pattern that the string must match.
+    pub string_pattern: Option<Regex>,
+    /// Minimum length of the string.
+    pub string_min_length: Option<usize>,
+    /// Maximum length of the string.
+    pub string_max_length: Option<usize>,
+    /// Specifies the string settings format, defaults to `Singleline` if unspecified.
+    pub string_presentation_format: Option<StringPresentationFormatType>,
+
+    /// Minimum value for numbers.
+    pub number_min_value: Option<isize>,
+    /// Maximum value for numbers.
+    pub number_max_value: Option<isize>,
+
+    /// Allowed values for a property.
+    pub enum_items: Option<Value>,
+    /// Labels for enum items
+    pub enum_item_labels: Option<Vec<String>>,
+}
+
+impl Default for ConfigurationPropertySchema {
+    fn default() -> Self {
+        let default_default_value =
+            ConfigurationNodeType::default_value(&ConfigurationNodeType::Null);
+
+        Self {
+            id: None,
+            scope: Some(ConfigurationScope::Window),
+            r#type: Some(ConfigurationNodeType::Null),
+            order: None,
+            default: Some(default_default_value),
+            description: None,
+            protected_from_contribution: Some(false),
+            allow_for_only_restricted_source: Some(false),
+            schemable: Some(true),
+            deprecated: Some(false),
+            tags: None,
+            max_properties: None,
+            min_properties: None,
+            array_items: None,
+            array_min_items: None,
+            array_max_items: None,
+            array_unique_items: None,
+            string_pattern: None,
+            string_min_length: Some(0),
+            string_max_length: Some(255),
+            string_presentation_format: Some(StringPresentationFormatType::Singleline),
+            number_min_value: None,
+            number_max_value: None,
+            enum_items: None,
+            enum_item_labels: None,
+        }
+    }
 }
 
 /// Struct representing a configuration node.
