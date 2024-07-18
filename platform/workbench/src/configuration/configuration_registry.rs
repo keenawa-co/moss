@@ -1,7 +1,10 @@
 use std::sync::Arc;
 
 use hashbrown::{HashMap, HashSet};
+use lazy_regex::Regex as LazyRegex;
 use serde_json::Value;
+
+type Regex = LazyRegex;
 
 /// Enumeration representing the scope of a configuration setting.
 /// This enum defines the different levels at which a configuration setting can be applied.
@@ -182,14 +185,22 @@ impl PropertyMap {
     }
 }
 
+#[derive(Debug, Clone)]
+pub enum StringPresentationFormatType {
+    Multiline,
+    Singleline,
+}
+
 /// Struct representing a schema for a configuration property.
 /// This struct defines the metadata and constraints for a configuration setting.
 #[derive(Debug, Clone)]
 pub struct ConfigurationPropertySchema {
+    /// Unique identifier for the property.
+    pub id: Option<String>,
     /// The scope of the configuration property, indicating the level at which it applies.
     pub scope: Option<ConfigurationScope>,
     /// The type of the configuration property, specifying the kind of value it holds.
-    pub r#type: ConfigurationNodeType,
+    pub r#type: Option<ConfigurationNodeType>,
     /// The order in which the configuration property appears in the settings UI.
     pub order: Option<usize>,
     /// The default value of the configuration property, if any.
@@ -205,15 +216,89 @@ pub struct ConfigurationPropertySchema {
     /// Indicates if the configuration property is included in the registry.
     /// If false, the property is excluded from the configuration registry.
     pub schemable: Option<bool>,
+    /// Indicates that a property is deprecated.
+    pub deprecated: Option<bool>,
+    /// Tags associated with the property:
+    /// - For filtering
+    /// - Use `experimental` to mark property as experimental.
+    /// - Use `deprecated` to mark property as deprecated.
+    /// - Use `beta` to mark property that are in beta testing.
+    pub tags: Option<String>,
 
-    pub source: Option<SourceInfo>,
+    /// Minimum number of properties in the schema.
+    pub max_properties: Option<usize>,
+    /// Minimum number of properties in the schema.
+    pub min_properties: Option<usize>,
+
+    /// Elements of the array defined by the schema.
+    pub array_items: Option<Value>,
+    /// Minimum number of items in the array.
+    pub array_min_items: Option<usize>,
+    /// Maximum number of items in the array.
+    pub array_max_items: Option<usize>,
+    /// Indicates whether the items in the array must be unique.
+    pub array_unique_items: Option<bool>,
+
+    /// Pattern that the string must match.
+    pub string_pattern: Option<Regex>,
+    /// Minimum length of the string.
+    pub string_min_length: Option<usize>,
+    /// Maximum length of the string.
+    pub string_max_length: Option<usize>,
+    /// Specifies the string settings format, defaults to `Singleline` if unspecified.
+    pub string_presentation_format: Option<StringPresentationFormatType>,
+
+    /// Minimum value for numbers.
+    pub number_min_value: Option<isize>,
+    /// Maximum value for numbers.
+    pub number_max_value: Option<isize>,
+
+    /// Allowed values for a property.
+    pub enum_items: Option<Value>,
+    /// Labels for enum items
+    pub enum_item_labels: Option<Vec<String>>,
+}
+
+impl Default for ConfigurationPropertySchema {
+    fn default() -> Self {
+        let default_default_value =
+            ConfigurationNodeType::default_value(&ConfigurationNodeType::Null);
+
+        Self {
+            id: None,
+            scope: Some(ConfigurationScope::Window),
+            r#type: Some(ConfigurationNodeType::Null),
+            order: None,
+            default: Some(default_default_value),
+            description: None,
+            protected_from_contribution: Some(false),
+            allow_for_only_restricted_source: Some(false),
+            schemable: Some(true),
+            deprecated: Some(false),
+            tags: None,
+            max_properties: None,
+            min_properties: None,
+            array_items: None,
+            array_min_items: None,
+            array_max_items: None,
+            array_unique_items: None,
+            string_pattern: None,
+            string_min_length: Some(0),
+            string_max_length: Some(255),
+            string_presentation_format: Some(StringPresentationFormatType::Singleline),
+            number_min_value: None,
+            number_max_value: None,
+            enum_items: None,
+            enum_item_labels: None,
+        }
+    }
 }
 
 /// Struct representing a configuration node.
 #[derive(Debug, Clone)]
 pub struct ConfigurationNode {
     /// The ID of the configuration node.
-    pub id: Option<String>,
+    pub id: String,
     /// The scope of the configuration property, indicating the level at which it applies.
     pub scope: Option<ConfigurationScope>,
     /// The order in which the configuration node appears.
@@ -357,9 +442,9 @@ pub struct ConfigurationRegistry {
     configuration_properties: HashMap<String, RegisteredConfigurationPropertySchema>,
 
     /// List of configuration nodes contributed.
-    /// This vector contains all configuration nodes that have been registered to the registry.
+    /// This map contains all configuration nodes that have been registered to the registry.
     /// Configuration nodes can include multiple properties and sub-nodes.
-    configuration_contributors: Vec<ConfigurationNode>,
+    configuration_contributors: HashMap<String, Arc<ConfigurationNode>>,
 
     /// Set of override identifiers.
     /// This set contains identifiers that are used to specify configurations that can override default values.
@@ -382,7 +467,7 @@ impl ConfigurationRegistry {
         Self {
             registered_configuration_defaults: Vec::new(),
             configuration_properties: HashMap::new(),
-            configuration_contributors: Vec::new(),
+            configuration_contributors: HashMap::new(),
             configuration_defaults_overrides: HashMap::new(),
             override_identifiers: HashSet::new(),
             configuration_schema_storage: ConfigurationSchemaStorage::empty(),
@@ -407,18 +492,29 @@ impl ConfigurationRegistry {
     }
 
     pub fn register_configuration(&mut self, configuration: ConfigurationNode) {
-        let _properties = self.do_configuration_registration(configuration, false);
+        self.configuration_contributors
+            .insert(configuration.id.clone(), Arc::new(configuration.clone()));
+        self.register_json_configuration(&configuration);
+
+        let _properties = self.do_configuration_registration(&configuration, false);
 
         // TODO: Emit schema change events
     }
 
     fn do_configuration_registration(
         &mut self,
-        configuration: ConfigurationNode,
+        configuration: &ConfigurationNode,
         validate: bool,
     ) -> PropertyMap {
-        let node_scope_or_default = configuration.scope.unwrap_or_default();
-        let mut node_properties = configuration.properties.unwrap_or_default();
+        let node_scope_or_default = configuration
+            .scope
+            .as_ref()
+            .unwrap_or(&ConfigurationScope::Window);
+
+        let mut node_properties = configuration
+            .properties
+            .clone()
+            .unwrap_or(PropertyMap::new());
 
         // TODO: validate incoming override identifiers before extend
         self.override_identifiers
@@ -454,11 +550,12 @@ impl ConfigurationRegistry {
             }
         }
 
-        if let Some(sub_nodes) = configuration.parent_of {
-            for node in sub_nodes {
+        if let Some(sub_nodes) = configuration.parent_of.as_ref() {
+            sub_nodes.iter().for_each(|node| {
                 let sub_properties = self.do_configuration_registration(node, false);
-                node_properties.extend(sub_properties);
-            }
+                node_properties.extend(sub_properties.clone());
+                self.register_json_configuration(&node);
+            });
         }
 
         node_properties
@@ -468,21 +565,20 @@ impl ConfigurationRegistry {
         unimplemented!()
     }
 
-    // fn register_json_configuration(&mut self, configuration: &ConfigurationNode) {
-    //     let properties = configuration.properties.unwrap_or_default();
+    fn register_json_configuration(&mut self, configuration: &ConfigurationNode) {
+        if let Some(properties) = &configuration.properties {
+            for (key, property) in properties {
+                if property.schemable.unwrap_or(true) {
+                    self.configuration_schema_storage
+                        .update_schema(key, property);
+                }
+            }
+        }
 
-    //     for (key, property) in &properties {
-    //         // Check if the property is included in the configuration registry
-    //         if property.included.unwrap_or(true) {
-    //             self.configuration_schema_storage
-    //                 .update_schema(key, property);
-    //         }
-    //     }
-
-    //     for sub_node in configuration.all_of.as_ref().unwrap_or(&vec![]) {
-    //         self.register_json_configuration(sub_node);
-    //     }
-    // }
+        for sub_node in configuration.parent_of.as_ref().unwrap_or(&vec![]) {
+            self.register_json_configuration(sub_node);
+        }
+    }
 
     pub fn register_default_configurations(
         &mut self,
