@@ -112,7 +112,7 @@ pub fn run(ctx: &mut AppContextCompact) -> tauri::Result<()> {
     let mut registry = ConfigurationRegistry::new();
 
     let editor_configuration = ConfigurationNode {
-        id: Some("editor".to_string()),
+        id: "editor".to_string(),
         title: Some("Editor".to_string()),
         order: Some(1),
         r#type: Default::default(),
@@ -150,7 +150,7 @@ pub fn run(ctx: &mut AppContextCompact) -> tauri::Result<()> {
         },
         description: None,
         parent_of: Some(vec![ConfigurationNode {
-            id: Some("mossql".to_string()),
+            id: "mossql".to_string(),
             title: Some("MossQL".to_string()),
             order: Some(1),
             r#type: Default::default(),

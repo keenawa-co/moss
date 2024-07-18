@@ -298,7 +298,7 @@ impl Default for ConfigurationPropertySchema {
 #[derive(Debug, Clone)]
 pub struct ConfigurationNode {
     /// The ID of the configuration node.
-    pub id: Option<String>,
+    pub id: String,
     /// The scope of the configuration property, indicating the level at which it applies.
     pub scope: Option<ConfigurationScope>,
     /// The order in which the configuration node appears.
@@ -442,9 +442,9 @@ pub struct ConfigurationRegistry {
     configuration_properties: HashMap<String, RegisteredConfigurationPropertySchema>,
 
     /// List of configuration nodes contributed.
-    /// This vector contains all configuration nodes that have been registered to the registry.
+    /// This map contains all configuration nodes that have been registered to the registry.
     /// Configuration nodes can include multiple properties and sub-nodes.
-    configuration_contributors: Vec<ConfigurationNode>,
+    configuration_contributors: HashMap<String, Arc<ConfigurationNode>>,
 
     /// Set of override identifiers.
     /// This set contains identifiers that are used to specify configurations that can override default values.
@@ -467,7 +467,7 @@ impl ConfigurationRegistry {
         Self {
             registered_configuration_defaults: Vec::new(),
             configuration_properties: HashMap::new(),
-            configuration_contributors: Vec::new(),
+            configuration_contributors: HashMap::new(),
             configuration_defaults_overrides: HashMap::new(),
             override_identifiers: HashSet::new(),
             configuration_schema_storage: ConfigurationSchemaStorage::empty(),
@@ -492,18 +492,29 @@ impl ConfigurationRegistry {
     }
 
     pub fn register_configuration(&mut self, configuration: ConfigurationNode) {
-        let _properties = self.do_configuration_registration(configuration, false);
+        self.configuration_contributors
+            .insert(configuration.id.clone(), Arc::new(configuration.clone()));
+        self.register_json_configuration(&configuration);
+
+        let _properties = self.do_configuration_registration(&configuration, false);
 
         // TODO: Emit schema change events
     }
 
     fn do_configuration_registration(
         &mut self,
-        configuration: ConfigurationNode,
+        configuration: &ConfigurationNode,
         validate: bool,
     ) -> PropertyMap {
-        let node_scope_or_default = configuration.scope.unwrap_or_default();
-        let mut node_properties = configuration.properties.unwrap_or_default();
+        let node_scope_or_default = configuration
+            .scope
+            .as_ref()
+            .unwrap_or(&ConfigurationScope::Window);
+
+        let mut node_properties = configuration
+            .properties
+            .clone()
+            .unwrap_or(PropertyMap::new());
 
         // TODO: validate incoming override identifiers before extend
         self.override_identifiers
@@ -539,11 +550,12 @@ impl ConfigurationRegistry {
             }
         }
 
-        if let Some(sub_nodes) = configuration.parent_of {
-            for node in sub_nodes {
+        if let Some(sub_nodes) = configuration.parent_of.as_ref() {
+            sub_nodes.iter().for_each(|node| {
                 let sub_properties = self.do_configuration_registration(node, false);
-                node_properties.extend(sub_properties);
-            }
+                node_properties.extend(sub_properties.clone());
+                self.register_json_configuration(&node);
+            });
         }
 
         node_properties
@@ -553,21 +565,20 @@ impl ConfigurationRegistry {
         unimplemented!()
     }
 
-    // fn register_json_configuration(&mut self, configuration: &ConfigurationNode) {
-    //     let properties = configuration.properties.unwrap_or_default();
+    fn register_json_configuration(&mut self, configuration: &ConfigurationNode) {
+        if let Some(properties) = &configuration.properties {
+            for (key, property) in properties {
+                if property.schemable.unwrap_or(true) {
+                    self.configuration_schema_storage
+                        .update_schema(key, property);
+                }
+            }
+        }
 
-    //     for (key, property) in &properties {
-    //         // Check if the property is included in the configuration registry
-    //         if property.included.unwrap_or(true) {
-    //             self.configuration_schema_storage
-    //                 .update_schema(key, property);
-    //         }
-    //     }
-
-    //     for sub_node in configuration.all_of.as_ref().unwrap_or(&vec![]) {
-    //         self.register_json_configuration(sub_node);
-    //     }
-    // }
+        for sub_node in configuration.parent_of.as_ref().unwrap_or(&vec![]) {
+            self.register_json_configuration(sub_node);
+        }
+    }
 
     pub fn register_default_configurations(
         &mut self,
