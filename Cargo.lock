@@ -1457,6 +1457,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "configuration"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "arc-swap",
+ "hashbrown 0.7.2",
+ "lazy-regex",
+ "parking_lot",
+ "schemars",
+ "serde",
+ "serde_json",
+ "tracing",
+]
+
+[[package]]
 name = "const-oid"
 version = "0.9.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1748,6 +1763,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "app",
+ "configuration",
  "futures",
  "hashbrown 0.7.2",
  "macos-trampoline",
@@ -1763,7 +1779,6 @@ dependencies = [
  "tauri-specta",
  "tokio",
  "tracing",
- "workbench",
 ]
 
 [[package]]

@@ -16,10 +16,10 @@ use tauri::{App, AppHandle, Manager, State};
 use tauri_specta::{collect_commands, collect_events, ts};
 use tracing::error;
 // use tracing_subscriber::FmtSubscriber;
-use workbench::configuration::configuration_registry::{
+use configuration::configuration_registry::{
     CompositePropertyKey, ConfigurationNodeType, ConfigurationScope, PropertyMap, SourceInfo,
 };
-use workbench::configuration::{
+use configuration::{
     configuration_registry::{
         ConfigurationNode, ConfigurationPropertySchema, ConfigurationRegistry,
     },

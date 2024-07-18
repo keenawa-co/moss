@@ -15,6 +15,7 @@ members = [
     "lib/mac",
     "lib/types",
 
+    "platform/configuration",
     "platform/workbench",
 
     "platform/conf",
@@ -48,6 +49,7 @@ rustflags = ["-C", "target-cpu=native"]
 [workspace.dependencies]
 fs = { path = "kernel/fs" }
 
+configuration = { path = "platform/configuration" }
 workbench = { path = "platform/workbench" }
 
 bus = { path = "kernel/bus" }
