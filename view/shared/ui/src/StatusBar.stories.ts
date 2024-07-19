@@ -1,6 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import StatusBar from './StatusBar'
-import '../dist/index.css'
 
 const meta = {
   title: 'StatusBar',
