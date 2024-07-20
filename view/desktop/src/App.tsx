@@ -25,7 +25,10 @@ function App() {
               </Routes>
             </BrowserRouter>
           </Suspense>
-          <StatusBar className="sticky bottom-0 mt-auto" />
+          <StatusBar
+            className="sticky bottom-0 mt-auto"
+            branch="MOSSMVP-37-Backend-Migrate-existing-backend-in-Tauri"
+          />
         </Content>
         <Properties className="p-2 border-2 border-green-500">P</Properties>
       </RootLayout>
