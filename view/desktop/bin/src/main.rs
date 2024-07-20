@@ -10,7 +10,7 @@ use app_lib::{
     },
     AppState,
 };
-use std::sync::Arc;
+use std::{path::PathBuf, sync::Arc};
 use surrealdb::{engine::remote::ws::Ws, Surreal};
 use tauri::{App, AppHandle, Manager, State};
 use tauri_specta::{collect_commands, collect_events, ts};
@@ -205,8 +205,11 @@ pub fn run(ctx: &mut AppContextCompact) -> tauri::Result<()> {
 
     registry.register_configuration(editor_configuration);
 
-    let config_service =
-        ConfigurationService::new(Arc::new(registry), "../../../.moss/settings.json").unwrap();
+    let config_service = ConfigurationService::new(
+        Arc::new(registry),
+        &PathBuf::from("../../../.moss/settings.json"),
+    )
+    .unwrap();
 
     let value = config_service.get_value("editor.fontSize", None);
     println!("Value `editor.fontSize` form None: {:?}", value);

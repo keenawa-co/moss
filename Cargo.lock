@@ -1468,6 +1468,7 @@ dependencies = [
  "schemars",
  "serde",
  "serde_json",
+ "tokio",
  "tracing",
 ]
 
@@ -8954,8 +8955,10 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "arc-swap",
+ "configuration",
  "hashbrown 0.7.2",
  "lazy-regex",
+ "lazy_static",
  "parking_lot",
  "schemars",
  "serde",

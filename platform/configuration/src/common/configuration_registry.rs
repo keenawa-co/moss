@@ -10,8 +10,8 @@ type Regex = LazyRegex;
 /// This enum defines the different levels at which a configuration setting can be applied.
 #[derive(Debug, Clone)]
 pub enum ConfigurationScope {
-    /// Platform-specific configuration that applies globally across the entire platform.
-    Platform,
+    /// Application-specific configuration that applies globally across the entire platform.
+    Application,
     /// Machine-specific configuration that applies to the entire machine.
     Machine,
     /// Window-specific configuration that applies to a single window within the application.
@@ -401,7 +401,7 @@ impl ConfigurationSchemaStorage {
             .as_ref()
             .unwrap_or(&ConfigurationScope::Window)
         {
-            ConfigurationScope::Platform => {
+            ConfigurationScope::Application => {
                 self.platform_settings_schema
                     .insert(key.to_string(), property.clone());
             }
