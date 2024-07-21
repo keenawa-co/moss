@@ -17,10 +17,7 @@ export const Menu = () => {
     i18n.changeLanguage(lang_code)
   }
 
-  // Dark Mode
-
-  
-
+  /* Dark Mode
   const [darkMode, setDarkMode] = useState<boolean | undefined>(undefined)
 
   const switchMode = () => {
@@ -38,11 +35,7 @@ export const Menu = () => {
       setDarkMode(localStorage.getItem('darkMode') === 'true')
     }
   }, [darkMode])
-
-
-
-
-
+  */
 
 
   const themes = ['black', 'orange', 'purple', 'green', 'blue']
@@ -51,20 +44,6 @@ export const Menu = () => {
   const switchTheme = (newTheme: string) => {
     setTheme(newTheme)
   }
-
-  useEffect(() => {
-    if (darkMode) {
-      localStorage.setItem('darkMode', 'true')
-      window.document.documentElement.classList.add('dark')
-    } else if (darkMode === false) {
-      localStorage.setItem('darkMode', 'false')
-      window.document.documentElement.classList.remove('dark')
-    } else {
-      setDarkMode(localStorage.getItem('darkMode') === 'true')
-    }
-  }, [theme])
-
-
 
   const onChangeLTheme = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const newTheme = e.target.value
@@ -89,33 +68,26 @@ export const Menu = () => {
         </NavLink>
       </div>
 
-      <select className="bg-green-500" defaultValue={i18n.language} onChange={onChangeLang}>
-        {LANGUAGES.map(({ code, label }) => (
-          <option key={code} value={code}>
-            {label}
-          </option>
-        ))}
-      </select>
-
-      <div>
-        <Button
-          border="none"
-          color="pink"
-          height="50px"
-          onClick={switchMode}
-          radius="50%"
-          width="50px"
-          children="Mode"
-        />
+      <div >
+        <select className="bg-gray-300" defaultValue={i18n.language} onChange={onChangeLang}>
+          {LANGUAGES.map(({ code, label }) => (
+            <option key={code} value={code}>
+              {label}
+            </option>
+          ))}
+        </select>
       </div>
 
-      <select className="bg-green-500" defaultValue={themes[0]}  onChange={onChangeLTheme}>
-        {themes.map((t) => (
-          <option key={t} value={t}>
-            {t}
-          </option>
-        ))}
-      </select>
+      <div >
+        <select className="bg-gray-300" defaultValue={themes[0]}  onChange={onChangeLTheme}>
+          {themes.map((t) => (
+            <option key={t} value={t}>
+              {t}
+            </option>
+          ))}
+        </select>
+      </div>
+
     </nav>
   )
 }
