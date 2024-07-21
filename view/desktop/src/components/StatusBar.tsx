@@ -5,7 +5,7 @@ const StatusBar = ({ branch, className }: { branch?: string } & ComponentPropsWi
   return (
     <div
       className={twMerge(
-        'flex justify-end [&>*:first-child]:mr-auto w-full items-center px-5 bg-olive-900 text-stone-50 text-xs',
+        'flex justify-end [&>*:first-child]:mr-auto w-full items-center px-5 bg-olive-800 text-stone-50 text-xs',
         className
       )}
     >
