@@ -10,16 +10,16 @@ use app_lib::{
     },
     AppState,
 };
-use std::sync::Arc;
+use std::{path::PathBuf, sync::Arc};
 use surrealdb::{engine::remote::ws::Ws, Surreal};
 use tauri::{App, AppHandle, Manager, State};
 use tauri_specta::{collect_commands, collect_events, ts};
 use tracing::error;
 // use tracing_subscriber::FmtSubscriber;
-use configuration::configuration_registry::{
-    CompositePropertyKey, ConfigurationNodeType, ConfigurationScope, PropertyMap, SourceInfo,
+use configuration::common::configuration_registry::{
+    CompositeKey, ConfigurationNodeType, ConfigurationScope, PropertyMap, SourceInfo,
 };
-use configuration::{
+use configuration::common::{
     configuration_registry::{
         ConfigurationNode, ConfigurationPropertySchema, ConfigurationRegistry,
     },
@@ -162,39 +162,31 @@ pub fn run(ctx: &mut AppContextCompact) -> tauri::Result<()> {
 
             properties: {
                 let mut properties = PropertyMap::new();
+                let font_size = ConfigurationPropertySchema {
+                    scope: Some(ConfigurationScope::Resource),
+                    r#type: Some(ConfigurationNodeType::Number),
+                    order: Some(1),
+                    default: Some(serde_json::Value::Number(serde_json::Number::from(12))),
+                    description: Some("Controls the font size in pixels.".to_string()),
+                    protected_from_contribution: Some(false),
+                    allow_for_only_restricted_source: Some(false),
+                    schemable: Some(true),
+                    ..Default::default()
+                };
+
                 properties.insert(
-                    CompositePropertyKey {
+                    CompositeKey {
                         key: "editor.fontSize".to_string(),
-                        override_for: vec!["mossql".to_string()],
+                        r#override: "mossql".to_string(),
                     },
-                    ConfigurationPropertySchema {
-                        scope: Some(ConfigurationScope::Resource),
-                        r#type: Some(ConfigurationNodeType::Number),
-                        order: Some(1),
-                        default: Some(serde_json::Value::Number(serde_json::Number::from(12))),
-                        description: Some("Controls the font size in pixels.".to_string()),
-                        protected_from_contribution: Some(false),
-                        allow_for_only_restricted_source: Some(false),
-                        schemable: Some(true),
-                        ..Default::default()
-                    },
+                    font_size.clone(),
                 );
                 properties.insert(
-                    CompositePropertyKey {
+                    CompositeKey {
                         key: "editor.fontSize".to_string(),
-                        override_for: vec!["mossql/test".to_string()],
+                        r#override: "mossql/test".to_string(),
                     },
-                    ConfigurationPropertySchema {
-                        scope: Some(ConfigurationScope::Resource),
-                        r#type: Some(ConfigurationNodeType::Number),
-                        order: Some(1),
-                        default: Some(serde_json::Value::Number(serde_json::Number::from(12))),
-                        description: Some("Controls the font size in pixels.".to_string()),
-                        protected_from_contribution: Some(false),
-                        allow_for_only_restricted_source: Some(false),
-                        schemable: Some(true),
-                        ..Default::default()
-                    },
+                    font_size,
                 );
                 Some(properties)
             },
@@ -205,20 +197,32 @@ pub fn run(ctx: &mut AppContextCompact) -> tauri::Result<()> {
 
     registry.register_configuration(editor_configuration);
 
-    let config_service =
-        ConfigurationService::new(Arc::new(registry), "../../../.moss/settings.json").unwrap();
+    ctx.block_on(|_| async {
+        let config_service = ConfigurationService::new(
+            Arc::new(registry),
+            &PathBuf::from("../../../.moss/settings.json"),
+        )
+        .unwrap();
 
-    let value = config_service.get_value("editor.fontSize", None);
-    println!("Value `editor.fontSize` form None: {:?}", value);
+        let value = config_service.get_value("editor.fontSize", None);
+        println!("Value `editor.fontSize` form None: {:?}", value);
 
-    let value = config_service.get_value("editor.lineHeight", None);
-    println!("Value `editor.lineHeight` form None: {:?}", value);
+        let value = config_service.get_value("editor.lineHeight", None);
+        println!("Value `editor.lineHeight` form None: {:?}", value);
 
-    let value = config_service.get_value("editor.fontSize", Some("mossql"));
-    println!("Value `editor.fontSize` form `mossql`: {:?}", value);
+        let value = config_service.get_value("editor.fontSize", Some("mossql"));
+        println!("Value `editor.fontSize` form `mossql`: {:?}", value);
 
-    let value = config_service.get_value("editor.fontSize", Some("mossql/test"));
-    println!("Value `editor.fontSize` form `mossql/test`: {:?}", value);
+        let value = config_service.get_value("editor.fontSize", Some("mossql/test"));
+        println!("Value `editor.fontSize` form `mossql/test`: {:?}", value);
+
+        config_service
+            .update_value(
+                "editor.fontSize",
+                serde_json::Value::Number(serde_json::Number::from(42)),
+            )
+            .unwrap();
+    });
 
     let (invoke_handler, register_events) = {
         let builder = ts::builder()

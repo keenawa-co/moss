@@ -1,12 +1,41 @@
 use anyhow::Result;
 use arc_swap::{ArcSwap, ArcSwapOption};
-use hashbrown::{HashMap, HashSet};
+use hashbrown::HashMap;
 use lazy_regex::{Lazy, Regex};
 use serde_json::Value;
-use std::{fs::File, io::Read, sync::Arc, vec};
-use tracing::warn;
+use std::{fs::File, io::Read, path::PathBuf, sync::Arc, vec};
 
 use super::configuration_registry::ConfigurationRegistry;
+
+// TODO:
+// - Use a kernel/fs to work with the file system
+// - Use a LogService.
+// - Use a PolicyService
+pub struct UserConfiguration {
+    content_parser: Arc<ConfigurationParser>,
+    configuration_resource: PathBuf,
+}
+
+impl UserConfiguration {
+    pub fn new(file_path: &PathBuf, content_parser: Arc<ConfigurationParser>) -> Self {
+        Self {
+            content_parser,
+            configuration_resource: file_path.clone(),
+        }
+    }
+
+    pub fn load_configuration(&self) -> Result<ConfigurationModel> {
+        let mut file = File::open(&self.configuration_resource)?;
+        let mut content = String::new();
+        file.read_to_string(&mut content)?;
+
+        if content.trim().is_empty() {
+            content = String::from("{}")
+        }
+
+        Ok(self.content_parser.parse(&content)?)
+    }
+}
 
 /// Enum representing the various configuration targets in Moss Compass.
 /// These targets specify where the configuration settings should be applied.
@@ -141,30 +170,24 @@ impl ConfigurationModel {
 
 static OVERRIDE_PROPERTY_REGEX: &'static Lazy<Regex> = regex!(r"^(\[.*\])+$");
 
-// TODO: Use kernel/fs to work with the file system
 pub struct ConfigurationParser {
     registry: Arc<ConfigurationRegistry>,
 }
+
+pub struct ConfigurationParserSettings {}
 
 impl ConfigurationParser {
     pub fn new(registry: Arc<ConfigurationRegistry>) -> Self {
         Self { registry }
     }
 
-    pub fn parse_file(&self, file_path: &str) -> Result<ConfigurationModel> {
-        let mut file = File::open(file_path)?;
-        let mut content = String::new();
-        file.read_to_string(&mut content)?;
-
-        let root_map: HashMap<String, Value> = serde_json::from_str(&content)?;
+    pub fn parse(&self, content: &str) -> Result<ConfigurationModel> {
+        let root_map: HashMap<String, Value> = serde_json::from_str(content)?;
         let mut root_overrides: Vec<ConfigurationOverride> = Vec::new();
         let mut root_contents: HashMap<String, Value> = HashMap::new();
         let mut root_keys: Vec<String> = Vec::new();
 
         let configuration_properties = self.registry.get_configuration_properties();
-        let override_identifiers = self.registry.get_override_identifiers();
-
-        dbg!(&override_identifiers);
 
         for (key, value) in &root_map {
             if OVERRIDE_PROPERTY_REGEX.is_match(key) {
