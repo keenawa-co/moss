@@ -1,6 +1,12 @@
 use anyhow::{Context as AnyhowContext, Result};
+use hashbrown::HashMap;
 use serde_json::Value;
-use std::{path::PathBuf, sync::Arc};
+use std::{
+    fs::{File, OpenOptions},
+    io::{Read, Seek, SeekFrom, Write},
+    path::{Path, PathBuf},
+    sync::Arc,
+};
 use tokio::sync::mpsc::UnboundedSender;
 
 use super::{
@@ -16,6 +22,7 @@ pub struct ConfigurationService {
     default_configuration: DefaultConfiguration,
     user_configuration: UserConfiguration,
     configuration: Configuration,
+    configuration_editing: ConfigurationEditingService,
 }
 
 impl ConfigurationService {
@@ -41,10 +48,13 @@ impl ConfigurationService {
             ConfigurationModel::empty(),
         );
 
+        let configuration_editing = ConfigurationEditingService::new(config_file_path.clone());
+
         Ok(Self {
             default_configuration,
             user_configuration,
             configuration,
+            configuration_editing,
         })
     }
 }
@@ -55,7 +65,9 @@ impl AbstractConfigurationService for ConfigurationService {
     }
 
     // TODO: use type Keyable for key
-    fn update_value(&self, key: &str, _value: serde_json::Value) {}
+    fn update_value(&self, key: &str, value: serde_json::Value) -> Result<()> {
+        Ok(self.configuration_editing.write(key.to_string(), value)?)
+    }
 }
 
 #[derive(Debug)]
@@ -68,11 +80,20 @@ pub struct ConfigurationEditingService {
 pub struct ConfigurationWriteJob {
     path: String, // JSON Path
     value: serde_json::Value,
+    resource: PathBuf,
 }
 
 impl ConfigurationEditingService {
     fn new(edited_resource: PathBuf) -> Self {
-        let (tx, rx) = tokio::sync::mpsc::unbounded_channel();
+        let (tx, mut rx) = tokio::sync::mpsc::unbounded_channel::<ConfigurationWriteJob>();
+
+        // TODO: !!! GET RID OF THIS DISGRACE !!!
+        // Replace with using an async job queue once it is implemented.
+        tokio::spawn(async move {
+            while let Some(job) = rx.recv().await {
+                Self::do_write_job(job);
+            }
+        });
 
         Self {
             edited_resource,
@@ -81,14 +102,29 @@ impl ConfigurationEditingService {
     }
 
     fn write(&self, path: String, value: serde_json::Value) -> Result<()> {
-        unimplemented!()
+        Ok(self.write_queue.send(ConfigurationWriteJob {
+            path,
+            value,
+            resource: self.edited_resource.clone(),
+        })?)
     }
 
-    fn enqueue_write_job(&self, job: ConfigurationWriteJob) -> Result<()> {
-        Ok(self.write_queue.send(job)?)
-    }
+    fn do_write_job(job: ConfigurationWriteJob) {
+        // TODO: Implement error handling when the event module is implemented
+        if let Ok(mut file) = OpenOptions::new().read(true).write(true).open(job.resource) {
+            let mut content = String::new();
+            file.read_to_string(&mut content).expect("read file");
 
-    fn do_write_job(&self, job: ConfigurationWriteJob) {
-        unimplemented!()
+            let mut json: Value = serde_json::from_str(&content).expect("read content");
+            if let Some(obj) = json.as_object_mut() {
+                obj.insert(job.path, job.value);
+            }
+
+            file.seek(SeekFrom::Start(0)).expect("seek to start");
+            file.set_len(0).expect("truncate file");
+
+            let json_string = serde_json::to_string_pretty(&json).expect("write content");
+            file.write_all(json_string.as_bytes()).expect("write");
+        };
     }
 }

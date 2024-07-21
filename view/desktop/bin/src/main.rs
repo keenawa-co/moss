@@ -205,23 +205,29 @@ pub fn run(ctx: &mut AppContextCompact) -> tauri::Result<()> {
 
     registry.register_configuration(editor_configuration);
 
-    let config_service = ConfigurationService::new(
-        Arc::new(registry),
-        &PathBuf::from("../../../.moss/settings.json"),
-    )
-    .unwrap();
+    ctx.block_on(|_| async {
+        let config_service = ConfigurationService::new(
+            Arc::new(registry),
+            &PathBuf::from("../../../.moss/settings.json"),
+        )
+        .unwrap();
 
-    let value = config_service.get_value("editor.fontSize", None);
-    println!("Value `editor.fontSize` form None: {:?}", value);
+        let value = config_service.get_value("editor.fontSize", None);
+        println!("Value `editor.fontSize` form None: {:?}", value);
 
-    let value = config_service.get_value("editor.lineHeight", None);
-    println!("Value `editor.lineHeight` form None: {:?}", value);
+        let value = config_service.get_value("editor.lineHeight", None);
+        println!("Value `editor.lineHeight` form None: {:?}", value);
 
-    let value = config_service.get_value("editor.fontSize", Some("mossql"));
-    println!("Value `editor.fontSize` form `mossql`: {:?}", value);
+        let value = config_service.get_value("editor.fontSize", Some("mossql"));
+        println!("Value `editor.fontSize` form `mossql`: {:?}", value);
 
-    let value = config_service.get_value("editor.fontSize", Some("mossql/test"));
-    println!("Value `editor.fontSize` form `mossql/test`: {:?}", value);
+        let value = config_service.get_value("editor.fontSize", Some("mossql/test"));
+        println!("Value `editor.fontSize` form `mossql/test`: {:?}", value);
+
+        config_service
+            .update_value("window.restoreTab", serde_json::Value::Bool(true))
+            .unwrap();
+    });
 
     let (invoke_handler, register_events) = {
         let builder = ts::builder()
