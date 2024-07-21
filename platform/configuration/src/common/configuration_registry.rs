@@ -62,57 +62,41 @@ pub struct SourceInfo {
     pub display_name: Option<String>,
 }
 
-pub enum PropertyKeyType {
-    None,
-    Straight(String),
-    Composite(CompositePropertyKey),
-}
-
-pub trait Keyable {
-    fn get_type(&self) -> PropertyKeyType;
-    fn as_straight_key(&self) -> Option<String>;
-    fn as_composite_key(&self) -> Option<CompositePropertyKey> {
-        None
-    }
-}
-
-impl Keyable for String {
-    fn as_straight_key(&self) -> Option<String> {
-        Some(self.clone())
-    }
-
-    fn get_type(&self) -> PropertyKeyType {
-        PropertyKeyType::Straight(self.clone())
-    }
-}
-
-impl Keyable for &str {
+pub trait Keyable: ToString {
     fn as_straight_key(&self) -> Option<String> {
         Some(self.to_string())
     }
 
-    fn get_type(&self) -> PropertyKeyType {
-        PropertyKeyType::Straight(self.to_string())
+    fn as_composite_key(&self) -> Option<CompositeKey>;
+}
+
+impl Keyable for String {
+    fn as_composite_key(&self) -> Option<CompositeKey> {
+        None
+    }
+}
+
+impl Keyable for &str {
+    fn as_composite_key(&self) -> Option<CompositeKey> {
+        None
     }
 }
 
 #[derive(Debug, Clone)]
-pub struct CompositePropertyKey {
+pub struct CompositeKey {
     pub key: String,
-    pub override_for: Vec<String>,
+    pub r#override: String,
 }
 
-impl Keyable for CompositePropertyKey {
-    fn as_composite_key(&self) -> Option<CompositePropertyKey> {
+impl ToString for CompositeKey {
+    fn to_string(&self) -> String {
+        format!("[{}].{}", self.r#override, self.key)
+    }
+}
+
+impl Keyable for CompositeKey {
+    fn as_composite_key(&self) -> Option<CompositeKey> {
         Some(self.clone())
-    }
-
-    fn as_straight_key(&self) -> Option<String> {
-        Some(self.key.clone())
-    }
-
-    fn get_type(&self) -> PropertyKeyType {
-        PropertyKeyType::Composite(self.clone())
     }
 }
 
@@ -167,20 +151,10 @@ impl PropertyMap {
     }
 
     pub fn insert(&mut self, key: impl Keyable, value: ConfigurationPropertySchema) {
-        match key.get_type() {
-            PropertyKeyType::Straight(straight_key) => {
-                self.table.insert(straight_key, value);
-            }
-            PropertyKeyType::Composite(composite_key) => {
-                for override_identifier in composite_key.override_for {
-                    self.table.insert(
-                        format!("[{}].{}", override_identifier, composite_key.key),
-                        value.clone(),
-                    );
-                    self.overrides.insert(override_identifier);
-                }
-            }
-            PropertyKeyType::None => {}
+        self.table.insert(key.to_string(), value);
+
+        if let Some(composite_key) = key.as_composite_key() {
+            self.overrides.insert(composite_key.r#override);
         }
     }
 }
