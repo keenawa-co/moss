@@ -84,8 +84,8 @@ impl Keyable for &str {
 
 #[derive(Debug, Clone)]
 pub struct CompositeKey {
-    pub key: String,
     pub r#override: String,
+    pub key: String,
 }
 
 impl ToString for CompositeKey {

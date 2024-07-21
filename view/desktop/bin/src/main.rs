@@ -217,7 +217,10 @@ pub fn run(ctx: &mut AppContextCompact) -> tauri::Result<()> {
         println!("Value `editor.fontSize` form `mossql/test`: {:?}", value);
 
         config_service
-            .update_value("window.restoreTab", serde_json::Value::Bool(true))
+            .update_value(
+                "editor.fontSize",
+                serde_json::Value::Number(serde_json::Number::from(42)),
+            )
             .unwrap();
     });
 
