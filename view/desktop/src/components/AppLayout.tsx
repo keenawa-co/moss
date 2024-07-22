@@ -12,10 +12,7 @@ export const RootLayout = ({ children, className, ...props }: ComponentProps<'ma
 export const Sidebar = ({ className, children, ...props }: ComponentProps<'aside'>) => {
   return (
     <aside
-      className={twMerge(
-        'flex w-65 h-full [&>*:first-child]:mr-auto items-center px-5 bg-stone-100 text-stone-50 text-sm',
-        className
-      )}
+      className={twMerge('flex flex-col w-65 h-full bg-stone-100 text-stone-50 text-sm', className)}
       //className={twMerge('w-[200px] mt-8 h-[100vh + 10px] overflow-auto bg-bgPrimary', className)}
       {...props}
     >

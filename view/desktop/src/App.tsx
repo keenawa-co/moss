@@ -2,20 +2,25 @@ import { About, Content, DraggableTopBar, Home, Menu, Properties, RootLayout, Si
 import { Suspense, useState } from 'react'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import './i18n'
-import { HomeIcon, Icon, MenuItem, IconTitle } from '../../shared/ui/src'
+import { HomeIcon, Icon, MenuItem, IconTitle, IssuesIcon } from '../../shared/ui/src'
 import StatusBar from './components/StatusBar'
 
 function App() {
   return (
     <>
-      <DraggableTopBar />
       <RootLayout>
         <Sidebar className="p-0">
-          <MenuItem className="group">
+          <MenuItem className="group bg-red-100">
             <Icon className="h-4.5 w-4.5">
-              <HomeIcon className="text-stone-600" />
+              <HomeIcon className="text-stone-500 hover:text-stone-600" />
             </Icon>
             <IconTitle className="text-stone-900" title="Home" />
+          </MenuItem>
+          <MenuItem className="group bg-blue-100">
+            <Icon className="h-4.5 w-4.5">
+              <IssuesIcon className="text-stone-500 hover:text-stone-600" />
+            </Icon>
+            <IconTitle className="text-stone-900" title="Issues" />
           </MenuItem>
         </Sidebar>
 
