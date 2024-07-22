@@ -1,8 +1,8 @@
 import { About, Content, DraggableTopBar, Home, Menu, Properties, RootLayout, Sidebar } from '@/components'
-import { Suspense, useState } from 'react'
+import { Suspense } from 'react'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import './i18n'
-import { IconHome } from '../../shared/ui/src'
+import { IconHome } from '../../shared/ui/src/IconHome'
 import StatusBar from './components/StatusBar'
 
 function App() {
@@ -12,7 +12,7 @@ function App() {
       <RootLayout>
         <Sidebar className="p-2 border-2 border-red-500">
           Sidebar
-          <IconHome className="text-stone-500 w-18 h-18" />
+          <IconHome className="text-red-500 w-18 h-18" />
         </Sidebar>
 
         <Content className="border-2 border-blue-500  relative flex flex-col">
