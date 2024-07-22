@@ -12,7 +12,7 @@ function App() {
       <RootLayout>
         <Sidebar className="p-2 border-2 border-red-500">
           Sidebar
-          <IconHome className="text-red-500 w-18 h-18" />
+          <IconHome className="text-stone-500 w-18 h-18" />
         </Sidebar>
 
         <Content className="border-2 border-blue-500  relative flex flex-col">
