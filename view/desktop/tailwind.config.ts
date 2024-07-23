@@ -1,8 +1,9 @@
-import type { Config } from "tailwindcss";
-import sharedConfig from "@repo/tailwind-config";
+import type { Config } from 'tailwindcss'
+import sharedConfig from '@repo/tailwind-config'
+import tailwindTypography from '@tailwindcss/typography'
 
-const config: Pick<Config, "content" | "presets" | "darkMode" | "theme" | "plugins"> = {
-  content: ['./src/**/*.{js,ts,jsx,tsx}', "../shared/ui/src/**/*.{js,ts,jsx,tsx,mdx}"],
+const config: Pick<Config, 'content' | 'presets' | 'darkMode' | 'theme' | 'plugins'> = {
+  content: ['./src/**/*.{js,ts,jsx,tsx}', '../shared/ui/src/**/*.{js,ts,jsx,tsx,mdx}'],
   presets: [sharedConfig],
   darkMode: 'class',
   theme: {
@@ -15,8 +16,7 @@ const config: Pick<Config, "content" | "presets" | "darkMode" | "theme" | "plugi
       }
     }
   },
-  plugins: [require('@tailwindcss/typography')]
-};
+  plugins: [tailwindTypography]
+}
 
-export default config;
-
+export default config
