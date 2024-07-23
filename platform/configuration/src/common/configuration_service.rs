@@ -1,5 +1,5 @@
 use anyhow::{Context as AnyhowContext, Result};
-use hashbrown::HashMap;
+use base::queue::{Queue, ThreadBackend};
 use serde_json::{json, Value};
 use std::{
     fs::{File, OpenOptions},
@@ -74,6 +74,7 @@ impl AbstractConfigurationService for ConfigurationService {
 pub struct ConfigurationEditingService {
     edited_resource: PathBuf,
     write_queue: UnboundedSender<ConfigurationWriteJob>,
+    queue: Queue<ThreadBackend>,
 }
 
 #[derive(Debug)]
@@ -98,6 +99,7 @@ impl ConfigurationEditingService {
         Self {
             edited_resource,
             write_queue: tx,
+            queue: Queue::new(ThreadBackend::new()),
         }
     }
 
@@ -109,12 +111,21 @@ impl ConfigurationEditingService {
         // - Check if the value being set is equal to the default value. If this is the case,
         //    then the setting should be removed from the file, as it no longer makes sense.
 
+        // self.queue
+        //     .enqueue(Self::async_do_write_job(ConfigurationWriteJob {
+        //         key: key.to_string(),
+        //         value: Some(value),
+        //         resource: self.edited_resource.clone(),
+        //     }));
+
         Ok(self.write_queue.send(ConfigurationWriteJob {
             key: key.to_string(),
             value: Some(value),
             resource: self.edited_resource.clone(),
         })?)
     }
+
+    async fn async_do_write_job(job: ConfigurationWriteJob) {}
 
     fn do_write_job(job: ConfigurationWriteJob) {
         // TODO:
