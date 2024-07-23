@@ -1,5 +1,6 @@
 use anyhow::{Context as AnyhowContext, Result};
-use hashbrown::HashMap;
+use base::queue::{thread_backend::ThreadBackend, Processor, Queue};
+use lazy_regex::Lazy;
 use serde_json::{json, Value};
 use std::{
     fs::{File, OpenOptions},
@@ -73,50 +74,22 @@ impl AbstractConfigurationService for ConfigurationService {
 #[derive(Debug)]
 pub struct ConfigurationEditingService {
     edited_resource: PathBuf,
-    write_queue: UnboundedSender<ConfigurationWriteJob>,
+    queue: Queue<ThreadBackend, ConfigurationWriteJob>,
 }
 
 #[derive(Debug)]
-pub struct ConfigurationWriteJob {
+struct ConfigurationWriteJob {
     key: String, // JSON Path
     value: Option<serde_json::Value>,
     resource: PathBuf,
 }
 
-impl ConfigurationEditingService {
-    fn new(edited_resource: PathBuf) -> Self {
-        let (tx, mut rx) = tokio::sync::mpsc::unbounded_channel::<ConfigurationWriteJob>();
+#[derive(Debug)]
+struct ConfigurationWriteJobProcessor {}
 
-        // TODO: !!! GET RID OF THIS DISGRACE !!!
-        // Replace with using an async job queue once it is implemented.
-        tokio::spawn(async move {
-            while let Some(job) = rx.recv().await {
-                Self::do_write_job(job);
-            }
-        });
-
-        Self {
-            edited_resource,
-            write_queue: tx,
-        }
-    }
-
-    fn write(&self, key: impl Keyable, value: serde_json::Value) -> Result<()> {
-        // TODO:
-        // - Use pointer instead of key
-        // - Check if the setting being changed is a USER level setting
-        // - Check the key policy (can it be overwritten, etc.)
-        // - Check if the value being set is equal to the default value. If this is the case,
-        //    then the setting should be removed from the file, as it no longer makes sense.
-
-        Ok(self.write_queue.send(ConfigurationWriteJob {
-            key: key.to_string(),
-            value: Some(value),
-            resource: self.edited_resource.clone(),
-        })?)
-    }
-
-    fn do_write_job(job: ConfigurationWriteJob) {
+#[async_trait]
+impl Processor<ConfigurationWriteJob> for ConfigurationWriteJobProcessor {
+    async fn process(&self, job: ConfigurationWriteJob) {
         // TODO:
         // - Implement error handling when the event module is implemented
         // - Implement update logic for overriding and nested objects
@@ -141,5 +114,32 @@ impl ConfigurationEditingService {
             let json_string = serde_json::to_string_pretty(&json).expect("write content");
             file.write_all(json_string.as_bytes()).expect("write");
         };
+    }
+}
+
+impl ConfigurationEditingService {
+    fn new(edited_resource: PathBuf) -> Self {
+        Self {
+            edited_resource,
+            queue: Queue::new(
+                Lazy::new(|| ThreadBackend::new()),
+                ConfigurationWriteJobProcessor {},
+            ),
+        }
+    }
+
+    fn write(&self, key: impl Keyable, value: serde_json::Value) -> Result<()> {
+        // TODO:
+        // - Use pointer instead of key
+        // - Check if the setting being changed is a USER level setting
+        // - Check the key policy (can it be overwritten, etc.)
+        // - Check if the value being set is equal to the default value. If this is the case,
+        //    then the setting should be removed from the file, as it no longer makes sense.
+
+        Ok(self.queue.enqueue(ConfigurationWriteJob {
+            key: key.to_string(),
+            value: Some(value),
+            resource: self.edited_resource.clone(),
+        }))
     }
 }
