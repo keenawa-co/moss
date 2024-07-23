@@ -8,6 +8,7 @@ edition = "2021"
 base.workspace = true
 parking_lot.workspace = true
 lazy-regex.workspace = true
+async-trait.workspace = true
 anyhow.workspace = true
 arc-swap.workspace = true
 schemars.workspace = true
