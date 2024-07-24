@@ -1,9 +1,9 @@
-import { About, Content, DraggableTopBar, Home, Menu, Properties, RootLayout, Sidebar } from '@/components';
-import { Suspense } from 'react';
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import './i18n';
-import { IconHome } from '../../shared/ui/src/IconHome';
-import StatusBar from './components/StatusBar';
+import { About, Content, DraggableTopBar, Home, Menu, Properties, RootLayout, Sidebar } from "@/components";
+import { Suspense } from "react";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import "./i18n";
+import { IconHome } from "../../shared/ui/src/IconHome";
+import StatusBar from "./components/StatusBar";
 
 function App() {
   return (

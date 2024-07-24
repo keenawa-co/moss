@@ -5,22 +5,22 @@
 export const commands = {
   async createProject(input: CreateProjectInput): Promise<Result<ProjectDTO | null, string>> {
     try {
-      return { status: 'ok', data: await TAURI_INVOKE('create_project', { input }) };
+      return { status: "ok", data: await TAURI_INVOKE("create_project", { input }) };
     } catch (e) {
       if (e instanceof Error) throw e;
-      else return { status: 'error', error: e as any };
+      else return { status: "error", error: e as any };
     }
   },
   async restoreSession(projectSource: string | null): Promise<Result<SessionInfoDTO | null, string>> {
     try {
-      return { status: 'ok', data: await TAURI_INVOKE('restore_session', { projectSource }) };
+      return { status: "ok", data: await TAURI_INVOKE("restore_session", { projectSource }) };
     } catch (e) {
       if (e instanceof Error) throw e;
-      else return { status: 'error', error: e as any };
+      else return { status: "error", error: e as any };
     }
   },
   async appReady(): Promise<void> {
-    await TAURI_INVOKE('app_ready');
+    await TAURI_INVOKE("app_ready");
   },
 };
 
@@ -37,9 +37,9 @@ export type SessionInfoDTO = { created_at: string; project: ProjectDTO; session:
 
 /** tauri-specta globals **/
 
-import { invoke as TAURI_INVOKE } from '@tauri-apps/api/core';
-import * as TAURI_API_EVENT from '@tauri-apps/api/event';
-import { type WebviewWindow as __WebviewWindow__ } from '@tauri-apps/api/webviewWindow';
+import { invoke as TAURI_INVOKE } from "@tauri-apps/api/core";
+import * as TAURI_API_EVENT from "@tauri-apps/api/event";
+import { type WebviewWindow as __WebviewWindow__ } from "@tauri-apps/api/webviewWindow";
 
 type __EventObj__<T> = {
   listen: (cb: TAURI_API_EVENT.EventCallback<T>) => ReturnType<typeof TAURI_API_EVENT.listen<T>>;
@@ -49,7 +49,7 @@ type __EventObj__<T> = {
     : (payload: T) => ReturnType<typeof TAURI_API_EVENT.emit>;
 };
 
-export type Result<T, E> = { status: 'ok'; data: T } | { status: 'error'; error: E };
+export type Result<T, E> = { status: "ok"; data: T } | { status: "error"; error: E };
 
 function __makeEvents__<T extends Record<string, any>>(mappings: Record<keyof T, string>) {
   return new Proxy(
@@ -70,11 +70,11 @@ function __makeEvents__<T extends Record<string, any>>(mappings: Record<keyof T,
           }),
           get: (_, command: keyof __EventObj__<any>) => {
             switch (command) {
-              case 'listen':
+              case "listen":
                 return (arg: any) => TAURI_API_EVENT.listen(name, arg);
-              case 'once':
+              case "once":
                 return (arg: any) => TAURI_API_EVENT.once(name, arg);
-              case 'emit':
+              case "emit":
                 return (arg: any) => TAURI_API_EVENT.emit(name, arg);
             }
           },

@@ -1,12 +1,12 @@
 // TODO: Info
 // Trans component can also be used for translation
-import { Button } from '@/components';
-import { useEffect, useState } from 'react';
-import { Trans, useTranslation } from 'react-i18next';
-import { NavLink } from 'react-router-dom';
-import { LANGUAGES } from '../constants/index';
+import { Button } from "@/components";
+import { useEffect, useState } from "react";
+import { Trans, useTranslation } from "react-i18next";
+import { NavLink } from "react-router-dom";
+import { LANGUAGES } from "../constants/index";
 
-const isActive = ({ isActive }: any) => `link ${isActive ? 'active' : ''}`;
+const isActive = ({ isActive }: any) => `link ${isActive ? "active" : ""}`;
 
 export const Menu = () => {
   // Translation
@@ -37,7 +37,7 @@ export const Menu = () => {
   }, [darkMode])
   */
 
-  const themes = ['black', 'orange', 'purple', 'green', 'blue'];
+  const themes = ["black", "orange", "purple", "green", "blue"];
   const [theme, setTheme] = useState<string>(themes[0]);
 
   const switchTheme = (newTheme: string) => {
@@ -49,7 +49,7 @@ export const Menu = () => {
     setTheme(newTheme);
   };
 
-  console.log('---------------->' + theme);
+  console.log("---------------->" + theme);
 
   return (
     <nav className={`theme-${theme}`}>
@@ -59,11 +59,11 @@ export const Menu = () => {
         </Trans>
       </p>
       <div>
-        <NavLink className={isActive + ' bg-primary'} to="/">
-          {t('home')}
+        <NavLink className={isActive + " bg-primary"} to="/">
+          {t("home")}
         </NavLink>
-        <NavLink className={isActive + ' bg-secondary'} to="/about">
-          {t('about')}
+        <NavLink className={isActive + " bg-secondary"} to="/about">
+          {t("about")}
         </NavLink>
       </div>
 

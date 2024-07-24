@@ -1,4 +1,4 @@
-import { type ReactNode } from 'react';
+import { type ReactNode } from "react";
 
 export function Card({ title, children, href }: { title: string; children: ReactNode; href: string }): JSX.Element {
   return (
@@ -9,7 +9,7 @@ export function Card({ title, children, href }: { title: string; children: React
       target="_blank"
     >
       <h2 className="ui-mb-3 ui-text-2xl ui-font-semibold">
-        {title}{' '}
+        {title}{" "}
         <span className="ui-inline-block ui-transition-transform group-hover:ui-translate-x-1 motion-reduce:ui-transform-none">
           -&gt;
         </span>
