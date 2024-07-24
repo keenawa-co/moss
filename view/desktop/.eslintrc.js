@@ -1,3 +1,3 @@
 module.exports = {
-  extends: ["@repo/eslint-config/web.js"],
+  extends: ['@repo/eslint-config/web.js'],
 };

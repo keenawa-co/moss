@@ -1,10 +1,11 @@
 # About
 
-Moss Desktop Application 
+Moss Desktop Application
 
 # Technologies
+
 - **Electron** (framework for building desktop applications using JS, HTML, and CSS)
-- **React** (framework for creating interactive UI components) 
+- **React** (framework for creating interactive UI components)
 - **TypeScript** (type-safety support)
 - **Tailwind CSS** (CSS styling)
 - **Redux** (React state manager)
@@ -21,7 +22,9 @@ Moss Desktop Application
 ```bash
 $ yarn
 ```
+
 or
+
 ```bash
 $ npm install
 ```
@@ -31,7 +34,9 @@ $ npm install
 ```bash
 $ yarn dev
 ```
+
 or
+
 ```bash
 $ npm run dev
 ```
@@ -50,14 +55,17 @@ $ yarn build:linux
 ```
 
 # Convert jsonnet file to json file
+
 ```bash
 $ yarn run jsonnet
 ```
 
 # Create interface for Type-Safe Translations with i18next
+
 ```bash
 $ yarn run interface
 ```
+
 **Input**: view\desktop\src\renderer\public\locales
 
 **Output**: view\desktop\src\renderer\src\@types\resources.d.ts

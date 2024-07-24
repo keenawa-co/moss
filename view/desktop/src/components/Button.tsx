@@ -1,5 +1,4 @@
-
-import React from "react";
+import React from 'react';
 
 interface Props {
   border: string;
@@ -7,31 +6,23 @@ interface Props {
   children?: React.ReactNode;
   height: string;
   onClick: () => void;
-  radius: string
+  radius: string;
   width: string;
 }
 
-export const Button: React.FC<Props> = ({ 
-    border,
-    color,
-    children,
-    height,
-    onClick, 
-    radius,
-    width
-  }) => { 
+export const Button: React.FC<Props> = ({ border, color, children, height, onClick, radius, width }) => {
   return (
-    <button 
+    <button
       onClick={onClick}
       style={{
-         backgroundColor: color,
-         border,
-         borderRadius: radius,
-         height,
-         width
+        backgroundColor: color,
+        border,
+        borderRadius: radius,
+        height,
+        width,
       }}
     >
-    {children}
+      {children}
     </button>
   );
-}
+};

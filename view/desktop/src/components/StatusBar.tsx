@@ -1,5 +1,5 @@
-import type { ComponentPropsWithoutRef } from 'react'
-import { twMerge } from 'tailwind-merge'
+import type { ComponentPropsWithoutRef } from 'react';
+import { twMerge } from 'tailwind-merge';
 
 const StatusBar = ({ branch, className }: { branch?: string } & ComponentPropsWithoutRef<'div'>) => {
   return (
@@ -88,10 +88,10 @@ const StatusBar = ({ branch, className }: { branch?: string } & ComponentPropsWi
         <span>About</span>
       </StatusBarButton>
     </div>
-  )
-}
+  );
+};
 
-export default StatusBar
+export default StatusBar;
 
 function StatusBarButton({ children, className }: ComponentPropsWithoutRef<'button'>) {
   return (
@@ -103,5 +103,5 @@ function StatusBarButton({ children, className }: ComponentPropsWithoutRef<'butt
     >
       {children}
     </button>
-  )
+  );
 }

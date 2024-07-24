@@ -1,7 +1,7 @@
 {
   "about": "Über mich",
   "home": "Heim",
-  "title": "Mehrsprachige App",  
+  "title": "Mehrsprachige App",
   "user": "Mein Name ist: {{name}}",
   "description": {
     "part1": "Willkommen, um mit <1>react-i18next</1> völlig typsicher zu reagieren.",

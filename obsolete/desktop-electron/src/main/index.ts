@@ -3,9 +3,9 @@ import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 
-import { setupTitlebar, attachTitlebarToWindow } from 'custom-electron-titlebar/main';
+import { setupTitlebar, attachTitlebarToWindow } from 'custom-electron-titlebar/main'
 
-setupTitlebar();
+setupTitlebar()
 
 function createWindow(): void {
   // Create the browser window.
@@ -16,11 +16,11 @@ function createWindow(): void {
     autoHideMenuBar: true,
     ...(process.platform === 'linux' ? { icon } : {}),
     center: true,
-    title: "Moss Desktop App",
+    title: 'Moss Desktop App',
     frame: false, //remove window frame
-    vibrancy: "under-window", //in order to apply background blur effect
-    visualEffectState: "active",
-    titleBarStyle: "hidden", // remove title bar
+    vibrancy: 'under-window', //in order to apply background blur effect
+    visualEffectState: 'active',
+    titleBarStyle: 'hidden', // remove title bar
     trafficLightPosition: { x: 15, y: 10 },
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
@@ -47,7 +47,7 @@ function createWindow(): void {
     mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
   }
 
-  attachTitlebarToWindow(mainWindow);
+  attachTitlebarToWindow(mainWindow)
 }
 
 // This method will be called when Electron has finished

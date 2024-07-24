@@ -19,8 +19,6 @@ export const Menu = () => {
 
   // Dark Mode
 
-  
-
   const [darkMode, setDarkMode] = useState<boolean | undefined>(undefined)
 
   const switchMode = () => {
@@ -38,12 +36,6 @@ export const Menu = () => {
       setDarkMode(localStorage.getItem('darkMode') === 'true')
     }
   }, [darkMode])
-
-
-
-
-
-
 
   const themes = ['black', 'orange', 'purple', 'green', 'blue']
   const [theme, setTheme] = useState<string>(themes[0])
@@ -64,14 +56,12 @@ export const Menu = () => {
     }
   }, [theme])
 
-
-
   const onChangeLTheme = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const newTheme = e.target.value
     setTheme(newTheme)
   }
 
-  console.log("---------------->"+theme)
+  console.log('---------------->' + theme)
 
   return (
     <nav className={`theme-${theme}`}>
@@ -80,7 +70,7 @@ export const Menu = () => {
           Welcome to react using <code>react-i18next</code> fully type-safe
         </Trans>
       </p>
-      <div >
+      <div>
         <NavLink className={isActive + ' bg-primary'} to="/">
           {t('home')}
         </NavLink>
@@ -109,7 +99,7 @@ export const Menu = () => {
         />
       </div>
 
-      <select className="bg-green-500" defaultValue={themes[0]}  onChange={onChangeLTheme}>
+      <select className="bg-green-500" defaultValue={themes[0]} onChange={onChangeLTheme}>
         {themes.map((t) => (
           <option key={t} value={t}>
             {t}
