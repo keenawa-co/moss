@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import { fn } from '@storybook/test'
-import HomeIcon from './HomeIcon'
+import { HomeIcon } from './HomeIcon'
 
 const meta: Meta<typeof HomeIcon> = {
-  title: 'Icons/HomeIcon',
+  title: 'Shared/Icons/IconHome',
   component: HomeIcon,
   parameters: {
     layout: 'centered'
