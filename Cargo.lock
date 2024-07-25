@@ -739,7 +739,12 @@ dependencies = [
 name = "base"
 version = "0.1.0"
 dependencies = [
- "hashbrown 0.7.2",
+ "anyhow",
+ "async-task",
+ "async-trait",
+ "flume",
+ "once_cell",
+ "smol",
 ]
 
 [[package]]
@@ -1462,12 +1467,15 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "arc-swap",
+ "async-trait",
+ "base",
  "hashbrown 0.7.2",
  "lazy-regex",
  "parking_lot",
  "schemars",
  "serde",
  "serde_json",
+ "tokio",
  "tracing",
 ]
 
@@ -3914,6 +3922,13 @@ dependencies = [
  "once_cell",
  "project",
  "tokio",
+]
+
+[[package]]
+name = "moss_base"
+version = "0.1.0"
+dependencies = [
+ "hashbrown 0.7.2",
 ]
 
 [[package]]
@@ -8954,8 +8969,10 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "arc-swap",
+ "configuration",
  "hashbrown 0.7.2",
  "lazy-regex",
+ "lazy_static",
  "parking_lot",
  "schemars",
  "serde",

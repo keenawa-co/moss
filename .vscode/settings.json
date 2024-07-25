@@ -2,6 +2,7 @@
   "rust-analyzer.showUnlinkedFileNotification": false,
   "cSpell.words": [
     "ahash",
+    "autodocs",
     "bindgen",
     "canonicalize",
     "chrono",
@@ -32,7 +33,9 @@
     "surrealdb",
     "tablename",
     "tauri",
+    "tgui",
     "thiserror",
+    "Turborepo",
     "unpark",
     "unparker",
     "unwatch",

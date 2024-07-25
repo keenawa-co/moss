@@ -1,5 +1,5 @@
 import { About, Content, DraggableTopBar, Home, Menu, Properties, RootLayout, Sidebar } from '@/components'
-import { Suspense, useState } from 'react'
+import { Suspense } from 'react'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import './i18n'
 import {
