@@ -18,6 +18,13 @@ import {
 } from '../../shared/ui/src'
 import StatusBar from './components/StatusBar'
 
+enum State {
+  Default = 'text-stone-500',
+  Hover = 'text-stone-600',
+  Active = 'text-olive-700',
+  Disabled = 'text-stone-500 bg-opacity-50'
+}
+
 function App() {
   return (
     <>
