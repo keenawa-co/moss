@@ -29,6 +29,9 @@ const config: Omit<Config, 'content'> = {
         '4.5': '1.125rem',
         '57': '14.313rem',
         '65': '16.25rem'
+      },
+      margin: {
+        '13': '3.25rem'
       }
     }
   },
