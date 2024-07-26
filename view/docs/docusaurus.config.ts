@@ -12,7 +12,7 @@ const config: Config = {
   projectName: 'moss',
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
-  deploymentBranch: 'MOSSMVP-101-DevOps-Prepare-the-publication-of-the-documentation-site-on-GitHub-pages',
+  deploymentBranch: 'main',
 
   // Even if you don't use internationalization, you can use this field to set
   // useful metadata like html lang. For example, if your site is Chinese, you
