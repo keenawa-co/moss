@@ -41,23 +41,6 @@
     "unwatch",
     "worktree"
   ],
-  "sqltools.connections": [
-    {
-      "previewLimit": 50,
-      "driver": "SQLite",
-      "name": "root",
-      "group": "moss",
-      "database": "${workspaceFolder:moss}/root.db"
-    },
-    {
-      "previewLimit": 50,
-      "driver": "SQLite",
-      "name": "cache",
-      "database": "${workspaceFolder:moss}/.moss/cache/cache.db",
-      "group": "moss"
-    }
-  ],
-  "sqltools.useNodeRuntime": true,
   "todohighlight.keywords": [
     {
       "text": "NOTE:",
