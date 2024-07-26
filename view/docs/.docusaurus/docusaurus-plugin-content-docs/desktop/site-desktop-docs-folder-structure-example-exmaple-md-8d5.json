@@ -1,0 +1,19 @@
+{
+  "id": "folder-structure-example/exmaple",
+  "title": "exmaple",
+  "description": "something about folders",
+  "source": "@site/../desktop/docs/folder-structure-example/exmaple.md",
+  "sourceDirName": "folder-structure-example",
+  "slug": "/folder-structure-example/exmaple",
+  "permalink": "/desktop/folder-structure-example/exmaple",
+  "draft": false,
+  "unlisted": false,
+  "tags": [],
+  "version": "current",
+  "frontMatter": {},
+  "sidebar": "tutorialSidebar",
+  "previous": {
+    "title": "desktop doc",
+    "permalink": "/desktop/desktop_doc"
+  }
+}
