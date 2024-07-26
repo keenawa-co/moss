@@ -6,12 +6,13 @@ const config: Config = {
   title: 'My Site',
   tagline: 'Dinosaurs are cool',
   favicon: 'img/favicon.ico',
-  url: 'https://your-docusaurus-site.example.com',
-  baseUrl: '/',
-  organizationName: 'moss',
+  url: 'https://4rchr4y.github.io',
+  baseUrl: '/moss/',
+  organizationName: 'Mossland',
   projectName: 'moss',
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
+  deploymentBranch: 'MOSSMVP-101-DevOps-Prepare-the-publication-of-the-documentation-site-on-GitHub-pages',
 
   // Even if you don't use internationalization, you can use this field to set
   // useful metadata like html lang. For example, if your site is Chinese, you
