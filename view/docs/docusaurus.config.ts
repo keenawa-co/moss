@@ -8,7 +8,7 @@ const config: Config = {
   favicon: 'img/favicon.ico',
   url: 'https://4rchr4y.github.io/',
   baseUrl: '/',
-  organizationName: 'Mossland',
+  organizationName: '4rchr4y',
   projectName: 'moss',
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
