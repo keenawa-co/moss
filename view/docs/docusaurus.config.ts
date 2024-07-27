@@ -6,8 +6,8 @@ const config: Config = {
   title: 'My Site',
   tagline: 'Dinosaurs are cool',
   favicon: 'img/favicon.ico',
-  url: 'https://4rchr4y.github.io/',
-  baseUrl: '/moss/',
+  url: 'https://4rchr4y.github.io',
+  baseUrl: '/moss',
   organizationName: '4rchr4y',
   projectName: 'moss',
   onBrokenLinks: 'throw',
@@ -45,7 +45,7 @@ const config: Config = {
       {
         id: 'desktop',
         path: '../desktop/docs',
-        routeBasePath: 'desktop',
+        routeBasePath: 'moss/desktop',
         sidebarPath: './sidebars.ts'
       }
     ],
@@ -54,7 +54,7 @@ const config: Config = {
       {
         id: 'web',
         path: '../web/docs',
-        routeBasePath: 'web',
+        routeBasePath: 'moss/web',
         sidebarPath: './sidebars.ts'
       }
     ],
@@ -63,7 +63,7 @@ const config: Config = {
       {
         id: 'shared',
         path: '../shared/docs',
-        routeBasePath: 'shared',
+        routeBasePath: 'moss/shared',
         sidebarPath: './sidebars.ts'
       }
     ]
