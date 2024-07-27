@@ -45,7 +45,7 @@ const config: Config = {
       {
         id: 'desktop',
         path: '../desktop/docs',
-        routeBasePath: 'moss/desktop',
+        routeBasePath: 'desktop',
         sidebarPath: './sidebars.ts'
       }
     ],
@@ -54,7 +54,7 @@ const config: Config = {
       {
         id: 'web',
         path: '../web/docs',
-        routeBasePath: 'moss/web',
+        routeBasePath: 'web',
         sidebarPath: './sidebars.ts'
       }
     ],
@@ -63,7 +63,7 @@ const config: Config = {
       {
         id: 'shared',
         path: '../shared/docs',
-        routeBasePath: 'moss/shared',
+        routeBasePath: 'shared',
         sidebarPath: './sidebars.ts'
       }
     ]
