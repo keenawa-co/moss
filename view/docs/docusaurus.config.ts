@@ -7,7 +7,7 @@ const config: Config = {
   tagline: 'Dinosaurs are cool',
   favicon: 'img/favicon.ico',
   url: 'https://4rchr4y.github.io/',
-  baseUrl: '/',
+  baseUrl: '/moss/',
   organizationName: '4rchr4y',
   projectName: 'moss',
   onBrokenLinks: 'throw',
