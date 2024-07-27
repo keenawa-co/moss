@@ -47,7 +47,10 @@ impl ConfigurationService {
             .context("failed to get default configuration model".to_string())
             .context("default was not initialized correctly")?;
 
-        let configuration_policy = ConfigurationPolicy::new(Arc::clone(&registry), policy_service);
+        let mut configuration_policy =
+            ConfigurationPolicy::new(Arc::clone(&registry), policy_service);
+        configuration_policy.initialize(&default_configuration);
+
         let policy_configuration_model = configuration_policy.get_model();
 
         let configuration = Configuration::new(

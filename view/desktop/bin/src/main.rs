@@ -10,14 +10,19 @@ use app_lib::{
     },
     AppState,
 };
+use hashbrown::HashMap;
 use std::{path::PathBuf, sync::Arc};
 use surrealdb::{engine::remote::ws::Ws, Surreal};
 use tauri::{App, AppHandle, Manager, State};
 use tauri_specta::{collect_commands, collect_events, ts};
 use tracing::error;
 // use tracing_subscriber::FmtSubscriber;
-use configuration::common::configuration_registry::{
-    CompositeKey, ConfigurationNodeType, ConfigurationScope, PropertyMap, SourceInfo,
+use configuration::common::{
+    configuration_policy::{ConfigurationPolicy, ConfigurationPolicyService},
+    configuration_registry::{
+        CompositeKey, ConfigurationNodeType, ConfigurationScope, PropertyMap, PropertyPolicy,
+        SourceInfo,
+    },
 };
 use configuration::common::{
     configuration_registry::{
@@ -142,6 +147,9 @@ pub fn run(ctx: &mut AppContextCompact) -> tauri::Result<()> {
                     order: Some(2),
                     default: Some(serde_json::Value::Number(serde_json::Number::from(20))),
                     description: Some("Controls the line height.".to_string()),
+                    policy: Some(PropertyPolicy {
+                        name: "editorLineHeightPolicy".to_string(),
+                    }),
                     ..Default::default()
                 },
             );
@@ -197,9 +205,34 @@ pub fn run(ctx: &mut AppContextCompact) -> tauri::Result<()> {
 
     registry.register_configuration(editor_configuration);
 
+    let policy_service = ConfigurationPolicyService {
+        definitions: {
+            use configuration::common::policy::PolicyDefinitionType;
+
+            let mut this = HashMap::new();
+
+            this.insert(
+                "editorLineHeightPolicy".to_string(),
+                PolicyDefinitionType::Number,
+            );
+
+            this
+        },
+        policies: {
+            let mut this = HashMap::new();
+            this.insert(
+                "editorLineHeightPolicy".to_string(),
+                serde_json::Value::Number(serde_json::Number::from(45)),
+            );
+
+            this
+        },
+    };
+
     ctx.block_on(|_| async {
         let config_service = ConfigurationService::new(
             Arc::new(registry),
+            policy_service,
             &PathBuf::from("../../../.moss/settings.json"),
         )
         .unwrap();

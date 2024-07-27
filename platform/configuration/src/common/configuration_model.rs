@@ -342,6 +342,8 @@ impl Configuration {
                 Arc::clone(&self.user_configuration),
                 Arc::clone(&self.workspace_configuration),
                 Arc::clone(&self.inmem_configuration),
+                // Values ​​defined through policies have the highest priority.
+                Arc::clone(&self.policy_configuration),
             ]);
 
             Arc::new(merged_configuration)
