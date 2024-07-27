@@ -8,13 +8,13 @@ use std::{
     path::{Path, PathBuf},
     sync::Arc,
 };
-use tokio::sync::mpsc::UnboundedSender;
 
 use super::{
     configuration_default::DefaultConfiguration,
     configuration_model::{
         Configuration, ConfigurationModel, ConfigurationParser, UserConfiguration,
     },
+    configuration_policy::{ConfigurationPolicy, ConfigurationPolicyService},
     configuration_registry::{ConfigurationRegistry, Keyable},
     AbstractConfigurationService,
 };
@@ -24,10 +24,15 @@ pub struct ConfigurationService {
     user_configuration: UserConfiguration,
     configuration: Configuration,
     configuration_editing: ConfigurationEditingService,
+    configuration_policy: ConfigurationPolicy,
 }
 
 impl ConfigurationService {
-    pub fn new(registry: Arc<ConfigurationRegistry>, config_file_path: &PathBuf) -> Result<Self> {
+    pub fn new(
+        registry: Arc<ConfigurationRegistry>,
+        policy_service: ConfigurationPolicyService,
+        config_file_path: &PathBuf,
+    ) -> Result<Self> {
         let parser = ConfigurationParser::new(Arc::clone(&registry));
         let user_configuration = UserConfiguration::new(config_file_path, Arc::new(parser));
 
@@ -42,8 +47,12 @@ impl ConfigurationService {
             .context("failed to get default configuration model".to_string())
             .context("default was not initialized correctly")?;
 
+        let configuration_policy = ConfigurationPolicy::new(Arc::clone(&registry), policy_service);
+        let policy_configuration_model = configuration_policy.get_model();
+
         let configuration = Configuration::new(
             default_configuration_model,
+            policy_configuration_model,
             user_configuration_model,
             ConfigurationModel::empty(),
             ConfigurationModel::empty(),
@@ -56,6 +65,7 @@ impl ConfigurationService {
             user_configuration,
             configuration,
             configuration_editing,
+            configuration_policy,
         })
     }
 }

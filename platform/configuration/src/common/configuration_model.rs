@@ -100,6 +100,10 @@ impl ConfigurationModel {
         }
     }
 
+    pub fn get_keys(&self) -> &Vec<String> {
+        &self.keys
+    }
+
     pub fn get_value(&self, key: &str) -> Option<&Value> {
         self.content.get(key)
     }
@@ -291,6 +295,7 @@ impl ConfigurationParser {
 #[derive(Debug)]
 pub struct Configuration {
     default_configuration: Arc<ConfigurationModel>,
+    policy_configuration: Arc<ConfigurationModel>,
     user_configuration: Arc<ConfigurationModel>,
     workspace_configuration: Arc<ConfigurationModel>,
     inmem_configuration: Arc<ConfigurationModel>,
@@ -299,16 +304,18 @@ pub struct Configuration {
 
 impl Configuration {
     pub fn new(
-        default_conf: Arc<ConfigurationModel>,
-        user_conf: ConfigurationModel,
-        workspace_conf: ConfigurationModel,
-        inmem_conf: ConfigurationModel,
+        default_model: Arc<ConfigurationModel>,
+        policy_model: Arc<ConfigurationModel>,
+        user_model: ConfigurationModel,
+        workspace_model: ConfigurationModel,
+        inmem_model: ConfigurationModel,
     ) -> Self {
         Configuration {
-            default_configuration: default_conf,
-            user_configuration: Arc::new(user_conf),
-            workspace_configuration: Arc::new(workspace_conf),
-            inmem_configuration: Arc::new(inmem_conf),
+            default_configuration: default_model,
+            policy_configuration: policy_model,
+            user_configuration: Arc::new(user_model),
+            workspace_configuration: Arc::new(workspace_model),
+            inmem_configuration: Arc::new(inmem_model),
             consolidated_configuration: ArcSwapOption::from(None),
         }
     }
