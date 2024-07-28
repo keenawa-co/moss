@@ -2,7 +2,7 @@ name: Deploy static content to Pages
 
 on:
   push:
-    branches: ['main', 'MOSSMVP-101-DevOps-Prepare-the-publication-of-the-documentation-site-on-GitHub-pages']
+    branches: ['main']
 
   workflow_dispatch:
 
@@ -77,51 +77,3 @@ jobs:
         uses: actions/deploy-pages@v4
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  # deploy:
-  #   environment:
-  #     name: github-pages
-  #     url: ${{ steps.deployment.outputs.page_url }}
-
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Checkout
-  #       uses: actions/checkout@v4
-
-  #     - name: Cache pnpm store
-  #       uses: actions/cache@v2
-  #       with:
-  #         path: ~/.pnpm-store
-  #         key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-  #         restore-keys: |
-  #           ${{ runner.os }}-pnpm-store-
-
-  #     - name: Set up Node.js
-  #       uses: actions/setup-node@v3
-  #       with:
-  #         node-version: 18.19.x
-
-  #     - name: Install pnpm
-  #       run: npm install -g pnpm
-
-  #     - name: Install dependencies
-  #       run: pnpm install --frozen-lockfile
-  #       working-directory: ./view/docs
-
-  #     - name: Build
-  #       run: pnpm build
-  #       working-directory: ./view/docs
-
-  #     - name: Setup Pages
-  #       uses: actions/configure-pages@v5
-
-  #     - name: Upload artifact
-  #       uses: actions/upload-pages-artifact@v3
-  #       with:
-  #         path: './view/docs/build'
-
-  #     - name: Deploy to GitHub Pages
-  #       id: deployment
-  #       uses: actions/deploy-pages@v4
-  #       env:
-  #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
