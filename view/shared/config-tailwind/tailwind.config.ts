@@ -21,6 +21,17 @@ const config: Omit<Config, 'content'> = {
           900: '#3A3203',
           950: '#1A1A00'
         }
+      },
+      height: {
+        '4.5': '1.125rem'
+      },
+      width: {
+        '4.5': '1.125rem',
+        '57': '14.313rem',
+        '65': '16.25rem'
+      },
+      margin: {
+        '13': '3.25rem'
       }
     }
   },
