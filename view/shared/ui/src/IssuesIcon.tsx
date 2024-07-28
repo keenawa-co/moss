@@ -1,13 +1,13 @@
-import { twMerge } from 'tailwind-merge'
+import { twMerge } from "tailwind-merge";
 
 interface IssuesIconProps {
-  className?: string
+  className?: string;
 }
 
 export const IssuesIcon = ({ className }: IssuesIconProps) => {
   return (
     <svg
-      className={twMerge('flex items-center fill-current', className)}
+      className={twMerge("flex items-center fill-current", className)}
       viewBox="0 0 16 16"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
@@ -18,7 +18,7 @@ export const IssuesIcon = ({ className }: IssuesIconProps) => {
         clip-rule="evenodd"
       />
     </svg>
-  )
-}
+  );
+};
 
-export default IssuesIcon
+export default IssuesIcon;

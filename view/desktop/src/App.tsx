@@ -1,7 +1,7 @@
-import { About, Content, DraggableTopBar, Home, Menu, Properties, RootLayout, Sidebar } from '@/components'
-import { Suspense } from 'react'
-import { BrowserRouter, Route, Routes } from 'react-router-dom'
-import './i18n'
+import { About, Content, DraggableTopBar, Home, Menu, Properties, RootLayout, Sidebar } from "@/components";
+import { Suspense } from "react";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import "./i18n";
 import {
   HomeIcon,
   Icon,
@@ -14,15 +14,15 @@ import {
   DocumentationIcon,
   TempSearchComponent,
   SearchIcon,
-  SearchShortcutIcon
-} from '../../shared/ui/src'
-import StatusBar from './components/StatusBar'
+  SearchShortcutIcon,
+} from "../../shared/ui/src";
+import StatusBar from "./components/StatusBar";
 
 enum State {
-  Default = 'text-stone-500',
-  Hover = 'text-stone-600',
-  Active = 'text-olive-700',
-  Disabled = 'text-stone-500 bg-opacity-50'
+  Default = "text-stone-500",
+  Hover = "text-stone-600",
+  Active = "text-olive-700",
+  Disabled = "text-stone-500 bg-opacity-50",
 }
 
 function App() {
@@ -95,7 +95,7 @@ function App() {
         </Content>
       </RootLayout>
     </>
-  )
+  );
 }
 
-export default App
+export default App;

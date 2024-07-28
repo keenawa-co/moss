@@ -1,14 +1,14 @@
-import type { Meta, StoryObj } from '../../../storybook/node_modules/@storybook/react'
-import Example from './Example'
+import type { Meta, StoryObj } from "../../../storybook/node_modules/@storybook/react";
+import Example from "./Example";
 
 const meta = {
-  title: 'Web/Example',
+  title: "Web/Example",
   component: Example,
-  tags: ['autodocs'],
-  parameters: {}
-} satisfies Meta<typeof Example>
+  tags: ["autodocs"],
+  parameters: {},
+} satisfies Meta<typeof Example>;
 
-export default meta
-type Story = StoryObj<typeof meta>
+export default meta;
+type Story = StoryObj<typeof meta>;
 
-export const ExampleComponent: Story = {}
+export const ExampleComponent: Story = {};

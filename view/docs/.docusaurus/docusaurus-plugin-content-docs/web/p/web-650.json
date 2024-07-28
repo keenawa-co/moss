@@ -1,1 +1,27 @@
-{"version":{"pluginId":"web","version":"current","label":"Next","banner":null,"badge":false,"noIndex":false,"className":"docs-version-current","isLast":true,"docsSidebars":{"tutorialSidebar":[{"type":"link","label":"web index(must have)","href":"/web/","docId":"index","unlisted":false},{"type":"link","label":"web docs","href":"/web/web_doc","docId":"web_doc","unlisted":false}]},"docs":{"index":{"id":"index","title":"web index(must have)","description":"without index.md docusaurus won't see any docs","sidebar":"tutorialSidebar"},"web_doc":{"id":"web_doc","title":"web docs","description":"","sidebar":"tutorialSidebar"}}}}
+{
+  "version": {
+    "pluginId": "web",
+    "version": "current",
+    "label": "Next",
+    "banner": null,
+    "badge": false,
+    "noIndex": false,
+    "className": "docs-version-current",
+    "isLast": true,
+    "docsSidebars": {
+      "tutorialSidebar": [
+        { "type": "link", "label": "web index(must have)", "href": "/web/", "docId": "index", "unlisted": false },
+        { "type": "link", "label": "web docs", "href": "/web/web_doc", "docId": "web_doc", "unlisted": false }
+      ]
+    },
+    "docs": {
+      "index": {
+        "id": "index",
+        "title": "web index(must have)",
+        "description": "without index.md docusaurus won't see any docs",
+        "sidebar": "tutorialSidebar"
+      },
+      "web_doc": { "id": "web_doc", "title": "web docs", "description": "", "sidebar": "tutorialSidebar" }
+    }
+  }
+}

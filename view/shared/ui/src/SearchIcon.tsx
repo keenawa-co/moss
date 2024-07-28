@@ -1,13 +1,13 @@
-import { twMerge } from 'tailwind-merge'
+import { twMerge } from "tailwind-merge";
 
 interface SearchIconProps {
-  className?: string
+  className?: string;
 }
 
 export const SearchIcon = ({ className }: SearchIconProps) => {
   return (
     <svg
-      className={twMerge('flex items-center fill-current', className)}
+      className={twMerge("flex items-center fill-current", className)}
       viewBox="0 0 16 16"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
@@ -23,7 +23,7 @@ export const SearchIcon = ({ className }: SearchIconProps) => {
         d="M11.6 11.6C11.8637 11.3364 12.291 11.3364 12.5546 11.6L16.0021 15.0476C16.2657 15.3112 16.2657 15.7386 16.0021 16.0022C15.7385 16.2658 15.3111 16.2658 15.0475 16.0022L11.6 12.5546C11.3364 12.291 11.3364 11.8636 11.6 11.6Z"
       />
     </svg>
-  )
-}
+  );
+};
 
-export default SearchIcon
+export default SearchIcon;

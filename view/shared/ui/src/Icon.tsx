@@ -1,15 +1,15 @@
-import { twMerge } from 'tailwind-merge'
-import { ComponentPropsWithoutRef } from 'react'
+import { twMerge } from "tailwind-merge";
+import { ComponentPropsWithoutRef } from "react";
 
-export const Icon = ({ className, children, ...props }: ComponentPropsWithoutRef<'div'>) => {
+export const Icon = ({ className, children, ...props }: ComponentPropsWithoutRef<"div">) => {
   return (
     <div
-      className={twMerge('opacity-80 group-hover:opacity-100 group-focus:opacity-100 transition', className)}
+      className={twMerge("opacity-80 group-hover:opacity-100 group-focus:opacity-100 transition", className)}
       {...props}
     >
       {children}
     </div>
-  )
-}
+  );
+};
 
-export default Icon
+export default Icon;

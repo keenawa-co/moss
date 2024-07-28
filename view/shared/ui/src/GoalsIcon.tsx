@@ -1,13 +1,13 @@
-import { twMerge } from 'tailwind-merge'
+import { twMerge } from "tailwind-merge";
 
 interface GoalsIconProps {
-  className?: string
+  className?: string;
 }
 
 export const GoalsIcon = ({ className }: GoalsIconProps) => {
   return (
     <svg
-      className={twMerge('flex items-center', className)}
+      className={twMerge("flex items-center", className)}
       viewBox="0 0 16 16"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
@@ -18,7 +18,7 @@ export const GoalsIcon = ({ className }: GoalsIconProps) => {
         strokeLinecap="round"
       />
     </svg>
-  )
-}
+  );
+};
 
-export default GoalsIcon
+export default GoalsIcon;
