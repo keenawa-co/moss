@@ -4,7 +4,7 @@
     "build": {
       "dependsOn": ["^build"],
       "inputs": ["$TURBO_DEFAULT$", ".env*", "!**/*.stories.{tsx,jsx,mdx}", "!src-tauri/**", "!node_modules/**"],
-      "outputs": ["dist/**", ".next/**", "!.next/cache/**"]
+      "outputs": ["dist/**", "build/**", ".next/**", "!.next/cache/**"]
     },
     "build:storybook": {},
     "lint": {},

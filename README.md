@@ -46,7 +46,7 @@ pnpm next dev
 
 ```sh
 cd .\view\docs\
-pnpm next dev
+pnpm start
 ```
 
 - Generate monorepo project dependency graph:
