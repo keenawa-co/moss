@@ -1,43 +1,43 @@
-import { useTranslation } from 'react-i18next'
-import { commands, SessionInfoDTO } from '../bindings'
-import React, { useEffect, useState } from 'react'
-import { listen } from '@tauri-apps/api/event'
+import { useTranslation } from "react-i18next";
+import { commands, SessionInfoDTO } from "../bindings";
+import React, { useEffect, useState } from "react";
+import { listen } from "@tauri-apps/api/event";
 
 export const Home: React.FC = () => {
-  const { t } = useTranslation(['ns1', 'ns2'])
-  const [sessionInfo, setSessionInfo] = useState<SessionInfoDTO | null>(null)
-  const [data, setData] = useState<number | null>(null)
+  const { t } = useTranslation(["ns1", "ns2"]);
+  const [sessionInfo, setSessionInfo] = useState<SessionInfoDTO | null>(null);
+  const [data, setData] = useState<number | null>(null);
 
   useEffect(() => {
-    const unlisten = listen<number>('data-stream', (event) => {
-      setData(event.payload)
-    })
+    const unlisten = listen<number>("data-stream", (event) => {
+      setData(event.payload);
+    });
 
     return () => {
-      unlisten.then((f) => f())
-    }
-  }, [])
+      unlisten.then((f) => f());
+    };
+  }, []);
 
   useEffect(() => {
     if (sessionInfo) {
-      console.log('Session restored:', sessionInfo)
+      console.log("Session restored:", sessionInfo);
     }
-  }, [sessionInfo])
+  }, [sessionInfo]);
 
   const handleRestoreSession = async () => {
     try {
-      let response = await commands.restoreSession(null)
-      if (response.status === 'ok') {
-        setSessionInfo(response.data)
+      let response = await commands.restoreSession(null);
+      if (response.status === "ok") {
+        setSessionInfo(response.data);
       }
     } catch (error) {
-      console.error('Failed to restore session:', error)
+      console.error("Failed to restore session:", error);
     }
-  }
+  };
 
   return (
     <main>
-      <h1>{t('title')}</h1>
+      <h1>{t("title")}</h1>
 
       {sessionInfo ? (
         <div>
@@ -52,11 +52,11 @@ export const Home: React.FC = () => {
         Restore Session
       </button>
 
-      <span>{t('description.part1')}</span>
-      <span>{t('description.part1', { ns: 'ns2' })}</span>
+      <span>{t("description.part1")}</span>
+      <span>{t("description.part1", { ns: "ns2" })}</span>
       {data !== null && <p>Received data: {data}</p>}
     </main>
-  )
-}
+  );
+};
 
-export default Home
+export default Home;

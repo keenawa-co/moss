@@ -1,13 +1,13 @@
-import { twMerge } from 'tailwind-merge'
+import { twMerge } from "tailwind-merge";
 
 interface CodeIconProps {
-  className?: string
+  className?: string;
 }
 
 export const CodeIcon = ({ className }: CodeIconProps) => {
   return (
     <svg
-      className={twMerge('flex items-center fill-current', className)}
+      className={twMerge("flex items-center fill-current", className)}
       viewBox="0 0 16 16"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
@@ -23,7 +23,7 @@ export const CodeIcon = ({ className }: CodeIconProps) => {
         d="M10.7446 2.27177C11.1054 2.36532 11.3221 2.7337 11.2286 3.09456L8.07856 15.2446C7.98501 15.6054 7.61663 15.8221 7.25576 15.7286C6.8949 15.635 6.67821 15.2666 6.77177 14.9058L9.92177 2.75576C10.0153 2.3949 10.3837 2.17821 10.7446 2.27177Z"
       />
     </svg>
-  )
-}
+  );
+};
 
-export default CodeIcon
+export default CodeIcon;
