@@ -66,13 +66,20 @@ pub enum ConfigurationTarget {
 pub struct ConfigurationOverride {
     identifier: String,
     _keys: Vec<String>,
-    contents: HashMap<String, Value>,
+    content: HashMap<String, Value>,
 }
 
 #[derive(Debug, Clone)]
 pub struct ConfigurationModel {
+    // OPTIMIZE:
+    // Use a prefix tree to split keys into prefixes. The separator can be . or /.
+    // A prefix tree will allow you to quickly find sections of the configuration
+    //
+    // NOTE: It is important to note that if the prefix tree separator is / then
+    // this may conflict with the current implementation of storing override identifiers.
+    //
     content: HashMap<String, Value>,
-    keys: Vec<String>,
+    keys: Vec<String>, // TODO: consider to use HashSet
     overrides: Vec<ConfigurationOverride>,
     overridden_configurations: Arc<ArcSwap<HashMap<String, Arc<ConfigurationModel>>>>,
 }
@@ -146,7 +153,7 @@ impl ConfigurationModel {
         self.overrides
             .iter()
             .find(|override_data| override_data.identifier == identifier)
-            .map(|override_data| override_data.contents.clone())
+            .map(|override_data| override_data.content.clone())
     }
 
     pub fn merge(&self, others: &[Arc<ConfigurationModel>]) -> Self {
@@ -259,7 +266,7 @@ impl ConfigurationParser {
         let mut result = vec![ConfigurationOverride {
             identifier: formatted_identifier.to_string(),
             _keys: override_keys,
-            contents: parsed_override_content,
+            content: parsed_override_content,
         }];
         result.extend(override_overrides);
 
@@ -292,6 +299,26 @@ impl ConfigurationParser {
     }
 }
 
+pub struct InspectedConfigurationValue {
+    pub key: String,
+    pub value: Option<serde_json::Value>,
+    pub overrides: Vec<ConfigurationOverride>,
+    default_configuration: Arc<ConfigurationModel>,
+    policy_configuration: Arc<ConfigurationModel>,
+}
+
+impl InspectedConfigurationValue {
+    // TODO: Rewrite using override keys and getting sections
+    pub fn get_default_value(&self, key: &str) -> Option<&serde_json::Value> {
+        self.default_configuration.get_value(key)
+    }
+
+    // TODO: Rewrite using override keys and getting sections
+    pub fn get_policy_value(&self, key: &str) -> Option<&serde_json::Value> {
+        self.policy_configuration.get_value(key)
+    }
+}
+
 #[derive(Debug)]
 pub struct Configuration {
     default_configuration: Arc<ConfigurationModel>,
@@ -320,9 +347,55 @@ impl Configuration {
         }
     }
 
+    // TODO: implement `section` functionality
+
     pub fn get_value(&self, key: &str, overrider_identifier: Option<&str>) -> Option<Value> {
-        let consolidated_conf = self.get_consolidated_configuration(overrider_identifier);
-        consolidated_conf.get_value(key).cloned()
+        let consolidated_model = self.get_consolidated_configuration(overrider_identifier);
+        consolidated_model.get_value(key).cloned()
+    }
+
+    pub fn inspect(
+        &self,
+        key: String,
+        overrider_identifier: Option<&str>,
+    ) -> InspectedConfigurationValue {
+        let consolidated_model = self.get_consolidated_configuration(overrider_identifier);
+        let value = {
+            if let Some(value) = consolidated_model.get_value(&key) {
+                Some(value.clone())
+            } else {
+                None
+            }
+        };
+
+        let mut overrides = Vec::new();
+
+        for configuration_override in &consolidated_model.overrides {
+            for configuration_override_key in &configuration_override._keys {
+                if &key == configuration_override_key {
+                    let content = {
+                        let mut this = HashMap::new();
+                        let value = configuration_override.content.get(&key).unwrap(); // TODO: handle panic here (should never happen)
+                        this.insert(key.clone(), value.clone());
+                        this
+                    };
+
+                    overrides.push(ConfigurationOverride {
+                        identifier: configuration_override.identifier.clone(),
+                        _keys: vec![key.clone()],
+                        content,
+                    })
+                }
+            }
+        }
+
+        InspectedConfigurationValue {
+            key,
+            value,
+            overrides,
+            default_configuration: Arc::clone(&self.default_configuration),
+            policy_configuration: Arc::clone(&self.policy_configuration),
+        }
     }
 
     pub fn get_consolidated_configuration(

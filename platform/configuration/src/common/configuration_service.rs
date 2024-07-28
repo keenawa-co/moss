@@ -98,7 +98,7 @@ struct ConfigurationWriteJob {
 }
 
 #[derive(Debug)]
-struct ConfigurationWriteJobProcessor {}
+struct ConfigurationWriteJobProcessor;
 
 #[async_trait]
 impl Processor<ConfigurationWriteJob> for ConfigurationWriteJobProcessor {
