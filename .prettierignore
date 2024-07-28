@@ -1,8 +1,10 @@
 target/
+obsolete/
 .turbo/
 .vscode/
 
 view/desktop/public
+
 
 *.rs
 
