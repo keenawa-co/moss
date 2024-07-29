@@ -1,11 +1,11 @@
-import type { ComponentPropsWithoutRef } from 'react'
-import { twMerge } from 'tailwind-merge'
+import type { ComponentPropsWithoutRef } from "react";
+import { twMerge } from "tailwind-merge";
 
-const StatusBar = ({ branch, className }: { branch?: string } & ComponentPropsWithoutRef<'div'>) => {
+const StatusBar = ({ branch, className }: { branch?: string } & ComponentPropsWithoutRef<"div">) => {
   return (
     <div
       className={twMerge(
-        'flex justify-end [&>*:first-child]:mr-auto w-full items-center px-5 bg-olive-900 text-stone-50 text-xs',
+        "flex justify-end [&>*:first-child]:mr-auto w-full items-center px-5 bg-olive-800 text-stone-50 text-xs",
         className
       )}
     >
@@ -88,20 +88,20 @@ const StatusBar = ({ branch, className }: { branch?: string } & ComponentPropsWi
         <span>About</span>
       </StatusBarButton>
     </div>
-  )
-}
+  );
+};
 
-export default StatusBar
+export default StatusBar;
 
-function StatusBarButton({ children, className }: ComponentPropsWithoutRef<'button'>) {
+function StatusBarButton({ children, className }: ComponentPropsWithoutRef<"button">) {
   return (
     <button
       className={twMerge(
-        'flex items-center gap-2 hover:bg-white hover:bg-opacity-10 focus:bg-white focus:bg-opacity-10 transition px-2.5 py-0.5',
+        "flex items-center gap-2 hover:bg-white hover:bg-opacity-10 focus:bg-white focus:bg-opacity-10 transition px-2.5 py-0.5",
         className
       )}
     >
       {children}
     </button>
-  )
+  );
 }

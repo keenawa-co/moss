@@ -26,12 +26,8 @@
   "frontMatter": {
     "slug": "mdx-blog-post",
     "title": "MDX Blog Post",
-    "authors": [
-      "slorber"
-    ],
-    "tags": [
-      "docusaurus"
-    ]
+    "authors": ["slorber"],
+    "tags": ["docusaurus"]
   },
   "unlisted": false,
   "prevItem": {

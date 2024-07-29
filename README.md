@@ -55,39 +55,6 @@ pnpm start
 pnpm turbo run build --graph
 ```
 
-Gives:
-
-```sh
-digraph {
-        compound = "true"
-        newrank = "true"
-        subgraph "root" {
-                "[root] @repo/eslint-config#build" -> "[root] ___ROOT___"
-                "[root] @repo/tailwind-config#build" -> "[root] @repo/typescript-config#build"
-                "[root] @repo/typescript-config#build" -> "[root] ___ROOT___"
-                "[root] @repo/ui#build" -> "[root] @repo/eslint-config#build"
-                "[root] @repo/ui#build" -> "[root] @repo/tailwind-config#build"
-                "[root] @repo/ui#build" -> "[root] @repo/typescript-config#build"
-                "[root] desktop#build" -> "[root] @repo/eslint-config#build"
-                "[root] desktop#build" -> "[root] @repo/tailwind-config#build"
-                "[root] desktop#build" -> "[root] @repo/typescript-config#build"
-                "[root] desktop#build" -> "[root] @repo/ui#build"
-                "[root] docs#build" -> "[root] @repo/eslint-config#build"
-                "[root] docs#build" -> "[root] @repo/tailwind-config#build"
-                "[root] docs#build" -> "[root] @repo/typescript-config#build"
-                "[root] docs#build" -> "[root] @repo/ui#build"
-                "[root] storybook#build" -> "[root] @repo/eslint-config#build"
-                "[root] storybook#build" -> "[root] @repo/tailwind-config#build"
-                "[root] storybook#build" -> "[root] @repo/typescript-config#build"
-                "[root] storybook#build" -> "[root] @repo/ui#build"
-                "[root] web#build" -> "[root] @repo/eslint-config#build"
-                "[root] web#build" -> "[root] @repo/tailwind-config#build"
-                "[root] web#build" -> "[root] @repo/typescript-config#build"
-                "[root] web#build" -> "[root] @repo/ui#build"
-        }
-}
-```
-
 ## Turborepo Tailwind CSS starter
 
 This is an official starter Turborepo.
