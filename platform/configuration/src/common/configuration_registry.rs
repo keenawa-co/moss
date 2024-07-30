@@ -165,6 +165,11 @@ pub enum StringPresentationFormatType {
     Singleline,
 }
 
+#[derive(Debug, Clone)]
+pub struct PropertyPolicy {
+    pub name: String,
+}
+
 /// Struct representing a schema for a configuration property.
 /// This struct defines the metadata and constraints for a configuration setting.
 #[derive(Debug, Clone)]
@@ -198,6 +203,8 @@ pub struct ConfigurationPropertySchema {
     /// - Use `deprecated` to mark property as deprecated.
     /// - Use `beta` to mark property that are in beta testing.
     pub tags: Option<String>,
+
+    pub policy: Option<PropertyPolicy>,
 
     /// Minimum number of properties in the schema.
     pub max_properties: Option<usize>,
@@ -250,6 +257,7 @@ impl Default for ConfigurationPropertySchema {
             schemable: Some(true),
             deprecated: Some(false),
             tags: None,
+            policy: None,
             max_properties: None,
             min_properties: None,
             array_items: None,
