@@ -338,16 +338,6 @@ pub struct ConfigurationDiff {
     removed: Vec<String>,
 }
 
-impl ConfigurationDiff {
-    fn new() -> Self {
-        Self {
-            added: Vec::new(),
-            modified: Vec::new(),
-            removed: Vec::new(),
-        }
-    }
-}
-
 impl Configuration {
     pub fn new(
         default_model: Arc<ConfigurationModel>,

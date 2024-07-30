@@ -14,8 +14,7 @@ arc-swap.workspace = true
 schemars.workspace = true
 tracing.workspace = true
 hashbrown = { workspace = true, features = ["serde"] }
-
 serde = { workspace = true, features = ["derive"] }
 serde_json.workspace = true
-
 tokio = { workspace = true, features = [] }
+radix_trie.workspace = true

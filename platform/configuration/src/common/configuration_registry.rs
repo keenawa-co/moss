@@ -62,6 +62,105 @@ pub struct SourceInfo {
     pub display_name: Option<String>,
 }
 
+/// A struct representing a configuration key with optional overrides.
+#[derive(Debug, PartialEq, Eq)]
+struct Key {
+    /// A set of overrides for specific contexts.
+    override_for: HashSet<String>,
+    /// The identifier string for the key, potentially with sub-identifiers.
+    ident: String,
+}
+
+impl Key {
+    fn parse(s: &str) -> Result<Self, String> {
+        let mut overrides = HashSet::new();
+        let mut remaining = s;
+
+        while remaining.starts_with('[') {
+            if let Some(end) = remaining.find(']') {
+                let override_ = &remaining[1..end];
+                overrides.insert(override_.to_string());
+                remaining = &remaining[end + 1..];
+            } else {
+                return Err("Mismatched brackets in override section".to_string());
+            }
+        }
+
+        if remaining.starts_with('.') {
+            remaining = &remaining[1..];
+        }
+
+        Ok(Key {
+            override_for: overrides,
+            ident: remaining.to_string(),
+        })
+    }
+}
+
+/// A macro to create a `Key` struct with optional overrides and sub-identifiers.
+///
+/// # Examples
+///
+/// Basic usage with no overrides:
+///
+/// ```rust
+/// let key = key!(editor.fontSize);
+/// assert_eq!(key.override_for.is_empty(), true);
+/// assert_eq!(key.ident, "editor.fontSize");
+/// ```
+///
+/// Usage with a single override:
+///
+/// ```rust
+/// let key = key!([rust].editor.fontSize);
+/// assert!(key.override_for.contains("rust"));
+/// assert_eq!(key.ident, "editor.fontSize");
+/// ```
+///
+/// Usage with multiple overrides:
+///
+/// ```rust
+/// let key = key!([typescript][javascript].editor.fontSize);
+/// assert!(key.override_for.contains("typescript"));
+/// assert!(key.override_for.contains("javascript"));
+/// assert_eq!(key.ident, "editor.fontSize");
+/// ```
+#[macro_export]
+macro_rules! key {
+    // Collect overrides and construct the Key with sub-identifiers
+    (@collect_overrides [$($override:ident)+] $ident:ident $(. $subident:ident)*) => {{
+        let mut overrides = HashSet::new();
+        $(
+            overrides.insert(stringify!($override).to_string());
+        )+
+        let ident = concat!(stringify!($ident), $(concat!(".", stringify!($subident))),*).to_string();
+        Key {
+            override_for: overrides,
+            ident,
+        }
+    }};
+
+    // Handle a single override
+    ([$override:ident] . $($tail:tt)*) => {
+        key!(@collect_overrides [$override] $($tail)*)
+    };
+
+    // Handle multiple overrides
+    ([$first:ident] $([$rest:ident])+ . $($tail:tt)*) => {
+        key!(@collect_overrides [$first $($rest)+] $($tail)*)
+    };
+
+    // Handle the case without overrides and with sub-identifiers
+    ($ident:ident $(. $subident:ident)*) => {{
+        let overrides: HashSet<String> = HashSet::new();
+        let ident = concat!(stringify!($ident), $(concat!(".", stringify!($subident))),*).to_string();
+        Key {
+            override_for: overrides,
+            ident,
+        }
+    }};
+}
+
 pub trait Keyable: ToString {
     fn as_straight_key(&self) -> Option<String> {
         Some(self.to_string())
@@ -84,13 +183,13 @@ impl Keyable for &str {
 
 #[derive(Debug, Clone)]
 pub struct CompositeKey {
-    pub r#override: String,
+    pub override_id: String,
     pub key: String,
 }
 
 impl ToString for CompositeKey {
     fn to_string(&self) -> String {
-        format!("[{}].{}", self.r#override, self.key)
+        format!("[{}].{}", self.override_id, self.key)
     }
 }
 
@@ -154,7 +253,7 @@ impl PropertyMap {
         self.table.insert(key.to_string(), value);
 
         if let Some(composite_key) = key.as_composite_key() {
-            self.overrides.insert(composite_key.r#override);
+            self.overrides.insert(composite_key.override_id);
         }
     }
 }
@@ -179,7 +278,7 @@ pub struct ConfigurationPropertySchema {
     /// The scope of the configuration property, indicating the level at which it applies.
     pub scope: Option<ConfigurationScope>,
     /// The type of the configuration property, specifying the kind of value it holds.
-    pub r#type: Option<ConfigurationNodeType>,
+    pub typ: Option<ConfigurationNodeType>,
     /// The order in which the configuration property appears in the settings UI.
     pub order: Option<usize>,
     /// The default value of the configuration property, if any.
@@ -248,7 +347,7 @@ impl Default for ConfigurationPropertySchema {
         Self {
             id: None,
             scope: Some(ConfigurationScope::Window),
-            r#type: Some(ConfigurationNodeType::Null),
+            typ: Some(ConfigurationNodeType::Null),
             order: None,
             default: Some(default_default_value),
             description: None,
@@ -577,5 +676,140 @@ impl ConfigurationRegistry {
         _default_configurations: Vec<ConfigurationDefaults>,
     ) -> HashSet<String> {
         unimplemented!()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_key_with_multiple_overrides_and_subidentifiers() {
+        let key = key!([typescript][javascript].editor.fontSize);
+        let mut expected_overrides = HashSet::new();
+        expected_overrides.insert("typescript".to_string());
+        expected_overrides.insert("javascript".to_string());
+        let expected_key = Key {
+            override_for: expected_overrides,
+            ident: "editor.fontSize".to_string(),
+        };
+        assert_eq!(key, expected_key);
+    }
+
+    #[test]
+    fn test_key_with_single_override_and_subidentifiers() {
+        let key = key!([rust].editor.fontSize);
+        let mut expected_overrides = HashSet::new();
+        expected_overrides.insert("rust".to_string());
+        let expected_key = Key {
+            override_for: expected_overrides,
+            ident: "editor.fontSize".to_string(),
+        };
+        assert_eq!(key, expected_key);
+    }
+
+    #[test]
+    fn test_key_with_multiple_subidentifiers() {
+        let key = key!(editor.fontSize.lineHeight);
+        let expected_overrides = HashSet::new();
+        let expected_key = Key {
+            override_for: expected_overrides,
+            ident: "editor.fontSize.lineHeight".to_string(),
+        };
+        assert_eq!(key, expected_key);
+    }
+
+    #[test]
+    fn test_key_with_single_identifier() {
+        let key = key!(editor);
+        let expected_overrides = HashSet::new();
+        let expected_key = Key {
+            override_for: expected_overrides,
+            ident: "editor".to_string(),
+        };
+        assert_eq!(key, expected_key);
+    }
+
+    #[test]
+    fn test_parse_with_multiple_overrides_and_subidentifiers() {
+        let s = "[typescript][javascript].editor.fontSize";
+        let key = Key::parse(s).unwrap();
+        let mut expected_overrides = HashSet::new();
+        expected_overrides.insert("typescript".to_string());
+        expected_overrides.insert("javascript".to_string());
+        let expected_key = Key {
+            override_for: expected_overrides,
+            ident: "editor.fontSize".to_string(),
+        };
+        assert_eq!(key, expected_key);
+    }
+
+    #[test]
+    fn test_parse_with_single_override_and_subidentifiers() {
+        let s = "[rust].editor.fontSize";
+        let key = Key::parse(s).unwrap();
+        let mut expected_overrides = HashSet::new();
+        expected_overrides.insert("rust".to_string());
+        let expected_key = Key {
+            override_for: expected_overrides,
+            ident: "editor.fontSize".to_string(),
+        };
+        assert_eq!(key, expected_key);
+    }
+
+    #[test]
+    fn test_parse_with_multiple_subidentifiers() {
+        let s = "editor.fontSize.lineHeight";
+        let key = Key::parse(s).unwrap();
+        let expected_key = Key {
+            override_for: HashSet::new(),
+            ident: "editor.fontSize.lineHeight".to_string(),
+        };
+        assert_eq!(key, expected_key);
+    }
+
+    #[test]
+    fn test_parse_with_single_identifier() {
+        let s = "editor";
+        let key = Key::parse(s).unwrap();
+        let expected_key = Key {
+            override_for: HashSet::new(),
+            ident: "editor".to_string(),
+        };
+        assert_eq!(key, expected_key);
+    }
+
+    #[test]
+    fn test_parse_with_multiple_overrides_single_subidentifier() {
+        let s = "[typescript][javascript].editor";
+        let key = Key::parse(s).unwrap();
+        let mut expected_overrides = HashSet::new();
+        expected_overrides.insert("typescript".to_string());
+        expected_overrides.insert("javascript".to_string());
+        let expected_key = Key {
+            override_for: expected_overrides,
+            ident: "editor".to_string(),
+        };
+        assert_eq!(key, expected_key);
+    }
+
+    #[test]
+    fn test_parse_with_single_override_single_identifier() {
+        let s = "[rust].editor";
+        let key = Key::parse(s).unwrap();
+        let mut expected_overrides = HashSet::new();
+        expected_overrides.insert("rust".to_string());
+        let expected_key = Key {
+            override_for: expected_overrides,
+            ident: "editor".to_string(),
+        };
+        assert_eq!(key, expected_key);
+    }
+
+    #[test]
+    fn test_parse_with_invalid_format() {
+        let s = "[rust.editor.fontSize";
+        let result = Key::parse(s);
+        assert!(result.is_err());
     }
 }

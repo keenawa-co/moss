@@ -108,12 +108,6 @@ pub fn run(ctx: &mut AppContextCompact) -> tauri::Result<()> {
         Arc::new(db)
     });
 
-    // TODO: move to log service
-    // let subscriber = FmtSubscriber::builder()
-    //     .with_max_level(Level::TRACE)
-    //     .finish();
-    // tracing::subscriber::set_global_default(subscriber).expect("setting default subscriber failed");
-
     let mut registry = ConfigurationRegistry::new();
 
     let editor_configuration = ConfigurationNode {
@@ -132,7 +126,7 @@ pub fn run(ctx: &mut AppContextCompact) -> tauri::Result<()> {
                 "editor.fontSize".to_string(),
                 ConfigurationPropertySchema {
                     scope: Some(ConfigurationScope::Resource),
-                    r#type: Some(ConfigurationNodeType::Number),
+                    typ: Some(ConfigurationNodeType::Number),
                     order: Some(1),
                     default: Some(serde_json::Value::Number(serde_json::Number::from(12))),
                     description: Some("Controls the font size in pixels.".to_string()),
@@ -143,7 +137,7 @@ pub fn run(ctx: &mut AppContextCompact) -> tauri::Result<()> {
                 "editor.lineHeight".to_string(),
                 ConfigurationPropertySchema {
                     scope: Some(ConfigurationScope::Resource),
-                    r#type: Some(ConfigurationNodeType::Number),
+                    typ: Some(ConfigurationNodeType::Number),
                     order: Some(2),
                     default: Some(serde_json::Value::Number(serde_json::Number::from(20))),
                     description: Some("Controls the line height.".to_string()),
@@ -172,7 +166,7 @@ pub fn run(ctx: &mut AppContextCompact) -> tauri::Result<()> {
                 let mut properties = PropertyMap::new();
                 let font_size = ConfigurationPropertySchema {
                     scope: Some(ConfigurationScope::Resource),
-                    r#type: Some(ConfigurationNodeType::Number),
+                    typ: Some(ConfigurationNodeType::Number),
                     order: Some(1),
                     default: Some(serde_json::Value::Number(serde_json::Number::from(12))),
                     description: Some("Controls the font size in pixels.".to_string()),
@@ -184,15 +178,15 @@ pub fn run(ctx: &mut AppContextCompact) -> tauri::Result<()> {
 
                 properties.insert(
                     CompositeKey {
+                        override_id: "mossql".to_string(),
                         key: "editor.fontSize".to_string(),
-                        r#override: "mossql".to_string(),
                     },
                     font_size.clone(),
                 );
                 properties.insert(
                     CompositeKey {
                         key: "editor.fontSize".to_string(),
-                        r#override: "mossql/test".to_string(),
+                        override_id: "mossql/test".to_string(),
                     },
                     font_size,
                 );
@@ -228,6 +222,8 @@ pub fn run(ctx: &mut AppContextCompact) -> tauri::Result<()> {
             this
         },
     };
+
+    dbg!(&registry);
 
     ctx.block_on(|_| async {
         let config_service = ConfigurationService::new(

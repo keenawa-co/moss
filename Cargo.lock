@@ -1472,6 +1472,7 @@ dependencies = [
  "hashbrown 0.7.2",
  "lazy-regex",
  "parking_lot",
+ "radix_trie",
  "schemars",
  "serde",
  "serde_json",
