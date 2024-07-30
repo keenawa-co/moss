@@ -1,6 +1,6 @@
 use anyhow::Result;
 use arc_swap::{ArcSwap, ArcSwapOption};
-use hashbrown::HashMap;
+use hashbrown::{HashMap, HashSet};
 use lazy_regex::{Lazy, Regex};
 use serde_json::Value;
 use std::{fs::File, io::Read, path::PathBuf, sync::Arc, vec};
@@ -86,12 +86,12 @@ pub struct ConfigurationModel {
 
 impl ConfigurationModel {
     pub fn new(
-        contents: HashMap<String, Value>,
+        content: HashMap<String, Value>,
         keys: Vec<String>,
         overrides: Vec<ConfigurationOverride>,
     ) -> Self {
         Self {
-            content: contents,
+            content,
             keys,
             overrides,
             overridden_configurations: Arc::new(ArcSwap::new(Arc::new(HashMap::new()))),
@@ -105,6 +105,10 @@ impl ConfigurationModel {
             overrides: Vec::new(),
             overridden_configurations: Arc::new(ArcSwap::new(Arc::new(HashMap::new()))),
         }
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.content.len() == 0 && self.keys.len() == 0 && self.overrides.len() == 0
     }
 
     pub fn get_keys(&self) -> &Vec<String> {
@@ -184,8 +188,6 @@ static OVERRIDE_PROPERTY_REGEX: &'static Lazy<Regex> = regex!(r"^(\[.*\])+$");
 pub struct ConfigurationParser {
     registry: Arc<ConfigurationRegistry>,
 }
-
-pub struct ConfigurationParserSettings {}
 
 impl ConfigurationParser {
     pub fn new(registry: Arc<ConfigurationRegistry>) -> Self {
@@ -323,10 +325,27 @@ impl InspectedConfigurationValue {
 pub struct Configuration {
     default_configuration: Arc<ConfigurationModel>,
     policy_configuration: Arc<ConfigurationModel>,
-    user_configuration: Arc<ConfigurationModel>,
+    user_configuration: ArcSwap<ConfigurationModel>,
     workspace_configuration: Arc<ConfigurationModel>,
     inmem_configuration: Arc<ConfigurationModel>,
     consolidated_configuration: ArcSwapOption<ConfigurationModel>,
+}
+
+// TODO: add overrides
+pub struct ConfigurationDiff {
+    added: Vec<String>,
+    modified: Vec<String>,
+    removed: Vec<String>,
+}
+
+impl ConfigurationDiff {
+    fn new() -> Self {
+        Self {
+            added: Vec::new(),
+            modified: Vec::new(),
+            removed: Vec::new(),
+        }
+    }
 }
 
 impl Configuration {
@@ -340,7 +359,7 @@ impl Configuration {
         Configuration {
             default_configuration: default_model,
             policy_configuration: policy_model,
-            user_configuration: Arc::new(user_model),
+            user_configuration: ArcSwap::new(Arc::new(user_model)),
             workspace_configuration: Arc::new(workspace_model),
             inmem_configuration: Arc::new(inmem_model),
             consolidated_configuration: ArcSwapOption::from(None),
@@ -350,18 +369,27 @@ impl Configuration {
     // TODO: implement `section` functionality
 
     pub fn get_value(&self, key: &str, overrider_identifier: Option<&str>) -> Option<Value> {
-        let consolidated_model = self.get_consolidated_configuration(overrider_identifier);
+        let mut consolidated_model = self.get_consolidated_configuration();
+
+        self.consolidated_configuration
+            .store(Some(Arc::clone(&consolidated_model)));
+
+        if let Some(identifier) = overrider_identifier {
+            consolidated_model = consolidated_model.r#override(identifier);
+        }
+
         consolidated_model.get_value(key).cloned()
     }
 
     pub fn inspect(
         &self,
-        key: String,
-        overrider_identifier: Option<&str>,
+        key: &str,
+        _overrider_identifier: Option<&str>,
     ) -> InspectedConfigurationValue {
-        let consolidated_model = self.get_consolidated_configuration(overrider_identifier);
+        let consolidated_model = self.get_consolidated_configuration();
+
         let value = {
-            if let Some(value) = consolidated_model.get_value(&key) {
+            if let Some(value) = consolidated_model.get_value(key) {
                 Some(value.clone())
             } else {
                 None
@@ -375,14 +403,14 @@ impl Configuration {
                 if &key == configuration_override_key {
                     let content = {
                         let mut this = HashMap::new();
-                        let value = configuration_override.content.get(&key).unwrap(); // TODO: handle panic here (should never happen)
-                        this.insert(key.clone(), value.clone());
+                        let value = configuration_override.content.get(key).unwrap(); // TODO: handle panic here (should never happen)
+                        this.insert(key.to_string(), value.clone());
                         this
                     };
 
                     overrides.push(ConfigurationOverride {
                         identifier: configuration_override.identifier.clone(),
-                        _keys: vec![key.clone()],
+                        _keys: vec![key.to_string()],
                         content,
                     })
                 }
@@ -390,7 +418,7 @@ impl Configuration {
         }
 
         InspectedConfigurationValue {
-            key,
+            key: key.to_string(),
             value,
             overrides,
             default_configuration: Arc::clone(&self.default_configuration),
@@ -398,37 +426,46 @@ impl Configuration {
         }
     }
 
-    pub fn get_consolidated_configuration(
+    pub fn update_user_configuration(
         &self,
-        overrider_identifier: Option<&str>,
-    ) -> Arc<ConfigurationModel> {
-        if let Some(config) = self.consolidated_configuration.load_full().as_ref() {
-            if let Some(identifier) = overrider_identifier {
-                return config.r#override(identifier.trim_start_matches('/'));
-            }
+        new_model: Arc<ConfigurationModel>,
+    ) -> ConfigurationDiff {
+        let diff = Self::compare(self.user_configuration.load_full(), Arc::clone(&new_model));
+        self.user_configuration.swap(new_model);
+        self.consolidated_configuration.swap(None);
 
+        diff
+    }
+
+    fn compare(old: Arc<ConfigurationModel>, new: Arc<ConfigurationModel>) -> ConfigurationDiff {
+        let old_keys: HashSet<_> = old.keys.iter().cloned().collect();
+        let new_keys: HashSet<_> = new.keys.iter().cloned().collect();
+
+        ConfigurationDiff {
+            added: new_keys.difference(&old_keys).cloned().collect(),
+            removed: old_keys.difference(&new_keys).cloned().collect(),
+            modified: old_keys
+                .intersection(&new_keys)
+                .filter(|key| match (old.get_value(key), new.get_value(key)) {
+                    (Some(old_value), Some(new_value)) => old_value != new_value,
+                    _ => false,
+                })
+                .cloned()
+                .collect(),
+        }
+    }
+
+    pub fn get_consolidated_configuration(&self) -> Arc<ConfigurationModel> {
+        if let Some(config) = self.consolidated_configuration.load_full().as_ref() {
             return Arc::clone(config);
         }
 
-        let new_configuration = {
-            let merged_configuration = self.default_configuration.merge(&[
-                Arc::clone(&self.user_configuration),
+        self.default_configuration
+            .merge(&[
+                Arc::clone(&self.user_configuration.load_full()),
                 Arc::clone(&self.workspace_configuration),
                 Arc::clone(&self.inmem_configuration),
-                // Values ​​defined through policies have the highest priority.
-                Arc::clone(&self.policy_configuration),
-            ]);
-
-            Arc::new(merged_configuration)
-        };
-
-        self.consolidated_configuration
-            .store(Some(Arc::clone(&new_configuration)));
-
-        if let Some(identifier) = overrider_identifier {
-            return new_configuration.r#override(identifier);
-        }
-
-        new_configuration
+            ])
+            .into()
     }
 }

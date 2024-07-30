@@ -1,17 +1,17 @@
 {
   "window.restoreTab": true,
   "window.restoreFullScreen": false,
-  "editor.fontSize": 42,
+  "project.monitoring.exclude": [
+    "/Users/g10z3r/Project/4rchr4y/moss/target",
+    "/Users/g10z3r/Project/4rchr4y/moss/view",
+    "/Users/g10z3r/Project/4rchr4y/moss/.git",
+    "/Users/g10z3r/Project/4rchr4y/moss/.vscode"
+  ],
   "[mossql]": {
     "editor.fontSize": 16,
     "[test]": {
       "editor.fontSize": 18
     }
   },
-  "project.monitoring.exclude": [
-    "/Users/g10z3r/Project/4rchr4y/moss/target",
-    "/Users/g10z3r/Project/4rchr4y/moss/view",
-    "/Users/g10z3r/Project/4rchr4y/moss/.git",
-    "/Users/g10z3r/Project/4rchr4y/moss/.vscode"
-  ]
+  "editor.fontSize": 15
 }

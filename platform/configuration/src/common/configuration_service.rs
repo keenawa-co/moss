@@ -71,16 +71,59 @@ impl ConfigurationService {
             configuration_policy,
         })
     }
+
+    fn reload_configuration(&self) -> Result<()> {
+        let user_configuration_model = self
+            .user_configuration
+            .load_configuration()
+            .context("failed to load user configuration model")?;
+
+        // TODO: use the resulting difference to identify and notify those parts of the application whose configurations have changed
+        let _diff = self
+            .configuration
+            .update_user_configuration(Arc::new(user_configuration_model));
+
+        Ok(())
+    }
 }
 
+#[async_trait]
 impl AbstractConfigurationService for ConfigurationService {
     fn get_value(&self, key: &str, overrider_identifier: Option<&str>) -> Option<Value> {
         self.configuration.get_value(key, overrider_identifier)
     }
 
     /// NOTE: The function only works to update non-object values ​​at the root level
-    fn update_value(&self, key: impl Keyable, value: serde_json::Value) -> Result<()> {
-        Ok(self.configuration_editing.write(key.to_string(), value)?)
+    async fn update_value(&self, key: impl Keyable + Send, value: serde_json::Value) -> Result<()> {
+        // TODO:
+        // - Use pointer instead of key
+        // - Check if the setting being changed is a USER level setting
+        // - Check the key policy (can it be overwritten, etc.)
+
+        let key_str = key.to_string();
+
+        let inspected_value = self.configuration.inspect(&key_str, None);
+        if inspected_value.get_policy_value(&key.to_string()).is_some() {
+            return Err(anyhow!(
+                "value `{}` is protected by policy and cannot be overwritten.",
+                key.to_string()
+            ));
+        }
+
+        if inspected_value
+            .get_default_value(&key_str)
+            .map_or(false, |default_value| default_value == &value)
+        {
+            self.configuration_editing
+                .write(key.to_string(), None)
+                .await;
+        } else {
+            self.configuration_editing
+                .write(key.to_string(), Some(value))
+                .await;
+        }
+
+        Ok(self.reload_configuration()?)
     }
 }
 
@@ -141,18 +184,13 @@ impl ConfigurationEditingService {
         }
     }
 
-    fn write(&self, key: impl Keyable, value: serde_json::Value) -> Result<()> {
-        // TODO:
-        // - Use pointer instead of key
-        // - Check if the setting being changed is a USER level setting
-        // - Check the key policy (can it be overwritten, etc.)
-        // - Check if the value being set is equal to the default value. If this is the case,
-        //    then the setting should be removed from the file, as it no longer makes sense.
-
-        Ok(self.queue.enqueue(ConfigurationWriteJob {
-            key: key.to_string(),
-            value: Some(value),
-            resource: self.edited_resource.clone(),
-        }))
+    async fn write(&self, key: impl Keyable, value: Option<serde_json::Value>) {
+        self.queue
+            .enqueue(ConfigurationWriteJob {
+                key: key.to_string(),
+                value,
+                resource: self.edited_resource.clone(),
+            })
+            .await
     }
 }
