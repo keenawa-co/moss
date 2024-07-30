@@ -85,6 +85,31 @@ impl ConfigurationService {
 
         Ok(())
     }
+
+    async fn do_update_value(&self, key: &str, value: &serde_json::Value) -> Result<()> {
+        let inspected_value = self.configuration.inspect(&key, None);
+        if inspected_value.get_policy_value(&key.to_string()).is_some() {
+            return Err(anyhow!(
+                "value `{}` is protected by policy and cannot be overwritten.",
+                key.to_string()
+            ));
+        }
+
+        if inspected_value
+            .get_default_value(&key)
+            .map_or(false, |default_value| default_value == value)
+        {
+            self.configuration_editing
+                .write(key.to_string(), None)
+                .await;
+        } else {
+            self.configuration_editing
+                .write(key.to_string(), Some(value.clone()))
+                .await;
+        }
+
+        Ok(())
+    }
 }
 
 #[async_trait]
@@ -98,29 +123,9 @@ impl AbstractConfigurationService for ConfigurationService {
         // TODO:
         // - Use pointer instead of key
         // - Check if the setting being changed is a USER level setting
-        // - Check the key policy (can it be overwritten, etc.)
 
-        let key_str = key.to_string();
-
-        let inspected_value = self.configuration.inspect(&key_str, None);
-        if inspected_value.get_policy_value(&key.to_string()).is_some() {
-            return Err(anyhow!(
-                "value `{}` is protected by policy and cannot be overwritten.",
-                key.to_string()
-            ));
-        }
-
-        if inspected_value
-            .get_default_value(&key_str)
-            .map_or(false, |default_value| default_value == &value)
-        {
-            self.configuration_editing
-                .write(key.to_string(), None)
-                .await;
-        } else {
-            self.configuration_editing
-                .write(key.to_string(), Some(value))
-                .await;
+        for k in key.to_key().distinct() {
+            self.do_update_value(&k, &value).await?;
         }
 
         Ok(self.reload_configuration()?)
@@ -184,10 +189,10 @@ impl ConfigurationEditingService {
         }
     }
 
-    async fn write(&self, key: impl Keyable, value: Option<serde_json::Value>) {
+    async fn write(&self, key: String, value: Option<serde_json::Value>) {
         self.queue
             .enqueue(ConfigurationWriteJob {
-                key: key.to_string(),
+                key,
                 value,
                 resource: self.edited_resource.clone(),
             })

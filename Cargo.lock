@@ -1471,6 +1471,7 @@ dependencies = [
  "base",
  "hashbrown 0.7.2",
  "lazy-regex",
+ "moss_base",
  "parking_lot",
  "radix_trie",
  "schemars",

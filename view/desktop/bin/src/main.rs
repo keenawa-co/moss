@@ -18,18 +18,20 @@ use tauri_specta::{collect_commands, collect_events, ts};
 use tracing::error;
 // use tracing_subscriber::FmtSubscriber;
 use configuration::common::{
-    configuration_policy::{ConfigurationPolicy, ConfigurationPolicyService},
-    configuration_registry::{
-        CompositeKey, ConfigurationNodeType, ConfigurationScope, PropertyMap, PropertyPolicy,
-        SourceInfo,
-    },
-};
-use configuration::common::{
     configuration_registry::{
         ConfigurationNode, ConfigurationPropertySchema, ConfigurationRegistry,
     },
     configuration_service::ConfigurationService,
     AbstractConfigurationService,
+};
+use configuration::{
+    common::{
+        configuration_policy::{ConfigurationPolicy, ConfigurationPolicyService},
+        configuration_registry::{
+            ConfigurationNodeType, ConfigurationScope, PropertyMap, PropertyPolicy, SourceInfo,
+        },
+    },
+    key,
 };
 
 #[tauri::command(async)]
@@ -164,7 +166,7 @@ pub fn run(ctx: &mut AppContextCompact) -> tauri::Result<()> {
 
             properties: {
                 let mut properties = PropertyMap::new();
-                let font_size = ConfigurationPropertySchema {
+                let font_size_property_schema = ConfigurationPropertySchema {
                     scope: Some(ConfigurationScope::Resource),
                     typ: Some(ConfigurationNodeType::Number),
                     order: Some(1),
@@ -177,18 +179,8 @@ pub fn run(ctx: &mut AppContextCompact) -> tauri::Result<()> {
                 };
 
                 properties.insert(
-                    CompositeKey {
-                        override_id: "mossql".to_string(),
-                        key: "editor.fontSize".to_string(),
-                    },
-                    font_size.clone(),
-                );
-                properties.insert(
-                    CompositeKey {
-                        key: "editor.fontSize".to_string(),
-                        override_id: "mossql/test".to_string(),
-                    },
-                    font_size,
+                    key!([mossql].editor.fontSize),
+                    font_size_property_schema.clone(),
                 );
                 Some(properties)
             },

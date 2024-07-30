@@ -5,6 +5,7 @@ edition = "2021"
 
 
 [dependencies]
+moss_base.workspace = true
 base.workspace = true
 parking_lot.workspace = true
 lazy-regex.workspace = true

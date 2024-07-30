@@ -2,6 +2,7 @@ use std::sync::Arc;
 
 use hashbrown::{HashMap, HashSet};
 use lazy_regex::Regex as LazyRegex;
+use moss_base::collection::MaybeExtend;
 use serde_json::Value;
 
 type Regex = LazyRegex;
@@ -62,17 +63,39 @@ pub struct SourceInfo {
     pub display_name: Option<String>,
 }
 
+pub trait Keyable {
+    fn to_key(&self) -> Key;
+}
+
 /// A struct representing a configuration key with optional overrides.
-#[derive(Debug, PartialEq, Eq)]
-struct Key {
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Key {
     /// A set of overrides for specific contexts.
-    override_for: HashSet<String>,
+    pub override_for: Option<HashSet<String>>,
     /// The identifier string for the key, potentially with sub-identifiers.
-    ident: String,
+    pub ident: String,
+}
+
+impl Keyable for Key {
+    fn to_key(&self) -> Key {
+        self.clone()
+    }
 }
 
 impl Key {
-    fn parse(s: &str) -> Result<Self, String> {
+    pub fn distinct(&self) -> Vec<String> {
+        self.override_for.as_ref().map_or_else(
+            || vec![self.ident.clone()],
+            |overrides| {
+                overrides
+                    .iter()
+                    .map(|override_ident| format!("[{}].{}", override_ident, self.ident))
+                    .collect()
+            },
+        )
+    }
+
+    pub fn parse(s: &str) -> Result<Self, String> {
         let mut overrides = HashSet::new();
         let mut remaining = s;
 
@@ -91,7 +114,11 @@ impl Key {
         }
 
         Ok(Key {
-            override_for: overrides,
+            override_for: if overrides.is_empty() {
+                None
+            } else {
+                Some(overrides)
+            },
             ident: remaining.to_string(),
         })
     }
@@ -129,13 +156,16 @@ impl Key {
 macro_rules! key {
     // Collect overrides and construct the Key with sub-identifiers
     (@collect_overrides [$($override:ident)+] $ident:ident $(. $subident:ident)*) => {{
+        use hashbrown::HashSet;
+
+
         let mut overrides = HashSet::new();
         $(
             overrides.insert(stringify!($override).to_string());
         )+
         let ident = concat!(stringify!($ident), $(concat!(".", stringify!($subident))),*).to_string();
-        Key {
-            override_for: overrides,
+        $crate::common::configuration_registry::Key {
+            override_for: if overrides.is_empty() { None } else { Some(overrides) },
             ident,
         }
     }};
@@ -152,50 +182,32 @@ macro_rules! key {
 
     // Handle the case without overrides and with sub-identifiers
     ($ident:ident $(. $subident:ident)*) => {{
+        use hashbrown::HashSet;
+
         let overrides: HashSet<String> = HashSet::new();
         let ident = concat!(stringify!($ident), $(concat!(".", stringify!($subident))),*).to_string();
-        Key {
-            override_for: overrides,
+        $crate::common::configuration_registry::Key {
+            override_for: if overrides.is_empty() { None } else { Some(overrides) },
             ident,
         }
     }};
 }
 
-pub trait Keyable: ToString {
-    fn as_straight_key(&self) -> Option<String> {
-        Some(self.to_string())
-    }
-
-    fn as_composite_key(&self) -> Option<CompositeKey>;
-}
-
 impl Keyable for String {
-    fn as_composite_key(&self) -> Option<CompositeKey> {
-        None
+    fn to_key(&self) -> Key {
+        Key {
+            override_for: None,
+            ident: self.clone(),
+        }
     }
 }
 
 impl Keyable for &str {
-    fn as_composite_key(&self) -> Option<CompositeKey> {
-        None
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct CompositeKey {
-    pub override_id: String,
-    pub key: String,
-}
-
-impl ToString for CompositeKey {
-    fn to_string(&self) -> String {
-        format!("[{}].{}", self.override_id, self.key)
-    }
-}
-
-impl Keyable for CompositeKey {
-    fn as_composite_key(&self) -> Option<CompositeKey> {
-        Some(self.clone())
+    fn to_key(&self) -> Key {
+        Key {
+            override_for: None,
+            ident: self.to_string(),
+        }
     }
 }
 
@@ -249,12 +261,14 @@ impl PropertyMap {
         self.table.extend(item.table);
     }
 
-    pub fn insert(&mut self, key: impl Keyable, value: ConfigurationPropertySchema) {
-        self.table.insert(key.to_string(), value);
+    pub fn insert(&mut self, k: impl Keyable, value: ConfigurationPropertySchema) {
+        let key = k.to_key();
 
-        if let Some(composite_key) = key.as_composite_key() {
-            self.overrides.insert(composite_key.override_id);
+        for k in key.distinct() {
+            self.table.insert(k, value.clone());
         }
+
+        self.overrides.maybe_extend(key.override_for);
     }
 }
 
@@ -690,7 +704,7 @@ mod tests {
         expected_overrides.insert("typescript".to_string());
         expected_overrides.insert("javascript".to_string());
         let expected_key = Key {
-            override_for: expected_overrides,
+            override_for: Some(expected_overrides),
             ident: "editor.fontSize".to_string(),
         };
         assert_eq!(key, expected_key);
@@ -702,7 +716,7 @@ mod tests {
         let mut expected_overrides = HashSet::new();
         expected_overrides.insert("rust".to_string());
         let expected_key = Key {
-            override_for: expected_overrides,
+            override_for: Some(expected_overrides),
             ident: "editor.fontSize".to_string(),
         };
         assert_eq!(key, expected_key);
@@ -713,7 +727,7 @@ mod tests {
         let key = key!(editor.fontSize.lineHeight);
         let expected_overrides = HashSet::new();
         let expected_key = Key {
-            override_for: expected_overrides,
+            override_for: Some(expected_overrides),
             ident: "editor.fontSize.lineHeight".to_string(),
         };
         assert_eq!(key, expected_key);
@@ -724,7 +738,7 @@ mod tests {
         let key = key!(editor);
         let expected_overrides = HashSet::new();
         let expected_key = Key {
-            override_for: expected_overrides,
+            override_for: Some(expected_overrides),
             ident: "editor".to_string(),
         };
         assert_eq!(key, expected_key);
@@ -738,7 +752,7 @@ mod tests {
         expected_overrides.insert("typescript".to_string());
         expected_overrides.insert("javascript".to_string());
         let expected_key = Key {
-            override_for: expected_overrides,
+            override_for: Some(expected_overrides),
             ident: "editor.fontSize".to_string(),
         };
         assert_eq!(key, expected_key);
@@ -751,7 +765,7 @@ mod tests {
         let mut expected_overrides = HashSet::new();
         expected_overrides.insert("rust".to_string());
         let expected_key = Key {
-            override_for: expected_overrides,
+            override_for: Some(expected_overrides),
             ident: "editor.fontSize".to_string(),
         };
         assert_eq!(key, expected_key);
@@ -762,7 +776,7 @@ mod tests {
         let s = "editor.fontSize.lineHeight";
         let key = Key::parse(s).unwrap();
         let expected_key = Key {
-            override_for: HashSet::new(),
+            override_for: None,
             ident: "editor.fontSize.lineHeight".to_string(),
         };
         assert_eq!(key, expected_key);
@@ -773,7 +787,7 @@ mod tests {
         let s = "editor";
         let key = Key::parse(s).unwrap();
         let expected_key = Key {
-            override_for: HashSet::new(),
+            override_for: None,
             ident: "editor".to_string(),
         };
         assert_eq!(key, expected_key);
@@ -787,7 +801,7 @@ mod tests {
         expected_overrides.insert("typescript".to_string());
         expected_overrides.insert("javascript".to_string());
         let expected_key = Key {
-            override_for: expected_overrides,
+            override_for: Some(expected_overrides),
             ident: "editor".to_string(),
         };
         assert_eq!(key, expected_key);
@@ -800,7 +814,7 @@ mod tests {
         let mut expected_overrides = HashSet::new();
         expected_overrides.insert("rust".to_string());
         let expected_key = Key {
-            override_for: expected_overrides,
+            override_for: Some(expected_overrides),
             ident: "editor".to_string(),
         };
         assert_eq!(key, expected_key);
