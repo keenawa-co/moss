@@ -1,9 +1,5 @@
-use std::sync::Arc;
-
 use arc_swap::ArcSwapOption;
-use hashbrown::HashMap;
-use schemars::schema;
-use serde_json::Value;
+use std::sync::Arc;
 
 use super::{
     configuration_model::ConfigurationModel, configuration_registry::ConfigurationRegistry,
@@ -36,7 +32,7 @@ impl DefaultConfiguration {
 
         for (key, property) in properties {
             if let Some(default_value) = &property.schema.default {
-                new_model.set_value(key.clone(), default_value.clone());
+                new_model.set_value(format!("$.{}", key.clone()), default_value.clone());
             }
         }
 

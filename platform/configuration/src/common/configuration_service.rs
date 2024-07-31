@@ -1,11 +1,11 @@
 use anyhow::{Context as AnyhowContext, Result};
 use base::queue::{thread_backend::ThreadBackend, Processor, Queue};
 use lazy_regex::Lazy;
-use serde_json::{json, Value};
+use serde_json::Value;
 use std::{
-    fs::{File, OpenOptions},
+    fs::OpenOptions,
     io::{Read, Seek, SeekFrom, Write},
-    path::{Path, PathBuf},
+    path::PathBuf,
     sync::Arc,
 };
 
@@ -115,6 +115,7 @@ impl ConfigurationService {
 #[async_trait]
 impl AbstractConfigurationService for ConfigurationService {
     fn get_value(&self, key: &str, overrider_identifier: Option<&str>) -> Option<Value> {
+        dbg!(&self.configuration);
         self.configuration.get_value(key, overrider_identifier)
     }
 

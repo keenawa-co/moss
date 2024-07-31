@@ -2,6 +2,8 @@ use anyhow::Result;
 use arc_swap::{ArcSwap, ArcSwapOption};
 use hashbrown::{HashMap, HashSet};
 use lazy_regex::{Lazy, Regex};
+use moss_base::collection::Extend;
+use radix_trie::{Trie, TrieCommon};
 use serde_json::Value;
 use std::{fs::File, io::Read, path::PathBuf, sync::Arc, vec};
 
@@ -78,15 +80,15 @@ pub struct ConfigurationModel {
     // NOTE: It is important to note that if the prefix tree separator is / then
     // this may conflict with the current implementation of storing override identifiers.
     //
-    content: HashMap<String, Value>,
-    keys: Vec<String>, // TODO: consider to use HashSet
+    content: Trie<String, Value>,
+    keys: Vec<String>, // TODO: get rid
     overrides: Vec<ConfigurationOverride>,
     overridden_configurations: Arc<ArcSwap<HashMap<String, Arc<ConfigurationModel>>>>,
 }
 
 impl ConfigurationModel {
     pub fn new(
-        content: HashMap<String, Value>,
+        content: Trie<String, Value>,
         keys: Vec<String>,
         overrides: Vec<ConfigurationOverride>,
     ) -> Self {
@@ -100,7 +102,7 @@ impl ConfigurationModel {
 
     pub fn empty() -> Self {
         Self {
-            content: HashMap::new(),
+            content: Trie::new(),
             keys: Vec::new(),
             overrides: Vec::new(),
             overridden_configurations: Arc::new(ArcSwap::new(Arc::new(HashMap::new()))),
@@ -108,7 +110,7 @@ impl ConfigurationModel {
     }
 
     pub fn is_empty(&self) -> bool {
-        self.content.len() == 0 && self.keys.len() == 0 && self.overrides.len() == 0
+        self.content.is_empty() && self.keys.len() == 0 && self.overrides.len() == 0
     }
 
     pub fn get_keys(&self) -> &Vec<String> {
@@ -166,7 +168,7 @@ impl ConfigurationModel {
         let mut merged_overrides = self.overrides.clone();
 
         for other in others {
-            merged_content.extend(other.content.clone());
+            merged_content.extend(other.content.iter());
 
             let new_keys: Vec<String> = other
                 .keys
@@ -197,7 +199,7 @@ impl ConfigurationParser {
     pub fn parse(&self, content: &str) -> Result<ConfigurationModel> {
         let root_map: HashMap<String, Value> = serde_json::from_str(content)?;
         let mut root_overrides: Vec<ConfigurationOverride> = Vec::new();
-        let mut root_contents: HashMap<String, Value> = HashMap::new();
+        let mut root_contents: Trie<String, Value> = Trie::new();
         let mut root_keys: Vec<String> = Vec::new();
 
         let configuration_properties = self.registry.get_configuration_properties();
@@ -215,7 +217,7 @@ impl ConfigurationParser {
                         continue;
                     }
 
-                    root_contents.insert(key.clone(), value.clone());
+                    root_contents.insert(format!("$.{}", key.clone()), value.clone());
                     root_keys.push(key.clone());
                 }
                 None => {

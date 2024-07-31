@@ -100,7 +100,9 @@ pub fn run(ctx: &mut AppContextCompact) -> tauri::Result<()> {
     });
 
     let db = ctx.block_on(|ctx| async {
-        let db = Surreal::new::<Ws>("127.0.0.1:8000").await.unwrap();
+        let db = Surreal::new::<Ws>("127.0.0.1:8000")
+            .await
+            .expect("failed to connect to db");
         // let db = Surreal::new::<File>("../rocksdb").await.unwrap();
         db.use_ns("moss").use_db("compass").await.unwrap();
 
@@ -166,22 +168,33 @@ pub fn run(ctx: &mut AppContextCompact) -> tauri::Result<()> {
 
             properties: {
                 let mut properties = PropertyMap::new();
-                let font_size_property_schema = ConfigurationPropertySchema {
-                    scope: Some(ConfigurationScope::Resource),
-                    typ: Some(ConfigurationNodeType::Number),
-                    order: Some(1),
-                    default: Some(serde_json::Value::Number(serde_json::Number::from(12))),
-                    description: Some("Controls the font size in pixels.".to_string()),
-                    protected_from_contribution: Some(false),
-                    allow_for_only_restricted_source: Some(false),
-                    schemable: Some(true),
-                    ..Default::default()
-                };
 
                 properties.insert(
                     key!([mossql].editor.fontSize),
-                    font_size_property_schema.clone(),
+                    ConfigurationPropertySchema {
+                        scope: Some(ConfigurationScope::Resource),
+                        typ: Some(ConfigurationNodeType::Number),
+                        order: Some(1),
+                        default: Some(serde_json::Value::Number(serde_json::Number::from(12))),
+                        description: Some("Controls the font size in pixels.".to_string()),
+                        protected_from_contribution: Some(false),
+                        allow_for_only_restricted_source: Some(false),
+                        schemable: Some(true),
+                        ..Default::default()
+                    },
                 );
+                properties.insert(
+                    key!([mossql].editor.lineHeight),
+                    ConfigurationPropertySchema {
+                        scope: Some(ConfigurationScope::Resource),
+                        typ: Some(ConfigurationNodeType::Number),
+                        order: Some(2),
+                        default: Some(serde_json::Value::Number(serde_json::Number::from(30))),
+                        description: Some("Controls the line height.".to_string()),
+                        ..Default::default()
+                    },
+                );
+
                 Some(properties)
             },
             description: None,

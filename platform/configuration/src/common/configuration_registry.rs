@@ -95,23 +95,34 @@ impl Key {
         )
     }
 
+    /// Parses a string to create a `Key` instance using regular expressions.
+    /// The expected format is `[override1][override2].ident.subident`.
     pub fn parse(s: &str) -> Result<Self, String> {
+        let re = regex!(r"(\[([^\]]+)\])|([^.]+)");
         let mut overrides = HashSet::new();
-        let mut remaining = s;
+        let mut ident_parts = Vec::new();
+        let remaining = s;
 
-        while remaining.starts_with('[') {
-            if let Some(end) = remaining.find(']') {
-                let override_ = &remaining[1..end];
-                overrides.insert(override_.to_string());
-                remaining = &remaining[end + 1..];
-            } else {
-                return Err("Mismatched brackets in override section".to_string());
+        // Check for mismatched brackets
+        let open_brackets = remaining.matches('[').count();
+        let close_brackets = remaining.matches(']').count();
+        if open_brackets != close_brackets {
+            return Err("Mismatched brackets in override section".to_string());
+        }
+
+        for cap in re.captures_iter(remaining) {
+            if let Some(override_) = cap.get(2) {
+                overrides.insert(override_.as_str().to_string());
+            } else if let Some(ident_part) = cap.get(3) {
+                ident_parts.push(ident_part.as_str());
             }
         }
 
-        if remaining.starts_with('.') {
-            remaining = &remaining[1..];
+        if ident_parts.is_empty() {
+            return Err("Missing identifier".to_string());
         }
+
+        let ident = ident_parts.join(".");
 
         Ok(Key {
             override_for: if overrides.is_empty() {
@@ -119,7 +130,7 @@ impl Key {
             } else {
                 Some(overrides)
             },
-            ident: remaining.to_string(),
+            ident,
         })
     }
 }
