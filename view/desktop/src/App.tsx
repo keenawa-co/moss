@@ -2,7 +2,7 @@ import { About, Content, DraggableTopBar, Home, Menu, Properties, RootLayout, Si
 import { Suspense } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import "./i18n";
-import "@shared/fonts.css";
+import "@/shared/fonts.css";
 import {
   HomeIcon,
   Icon,
