@@ -1,0 +1,22 @@
+{
+  "id": "index",
+  "title": "shared index(must have)",
+  "description": "without index.md docusaurus won't see any docs",
+  "source": "@site/../shared/docs/index.md",
+  "sourceDirName": ".",
+  "slug": "/",
+  "permalink": "/shared/",
+  "draft": false,
+  "unlisted": false,
+  "tags": [],
+  "version": "current",
+  "sidebarPosition": 1,
+  "frontMatter": {
+    "sidebar_position": 1
+  },
+  "sidebar": "tutorialSidebar",
+  "next": {
+    "title": "shared docs",
+    "permalink": "/shared/shared_doc"
+  }
+}
