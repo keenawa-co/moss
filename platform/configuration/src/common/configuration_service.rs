@@ -9,6 +9,8 @@ use std::{
     sync::Arc,
 };
 
+use crate::common::utl;
+
 use super::{
     configuration_default::DefaultConfiguration,
     configuration_model::{
@@ -95,6 +97,8 @@ impl ConfigurationService {
             ));
         }
 
+        dbg!(&inspected_value);
+
         if inspected_value
             .get_default_value(&key)
             .map_or(false, |default_value| default_value == value)
@@ -115,7 +119,7 @@ impl ConfigurationService {
 #[async_trait]
 impl AbstractConfigurationService for ConfigurationService {
     fn get_value(&self, key: &str, overrider_identifier: Option<&str>) -> Option<Value> {
-        dbg!(&self.configuration);
+        // dbg!(&self.configuration);
         self.configuration.get_value(key, overrider_identifier)
     }
 

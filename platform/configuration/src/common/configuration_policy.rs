@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use arc_swap::{access::Access, ArcSwap};
+use arc_swap::ArcSwap;
 use hashbrown::HashMap;
 
 use super::{

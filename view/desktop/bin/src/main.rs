@@ -228,7 +228,7 @@ pub fn run(ctx: &mut AppContextCompact) -> tauri::Result<()> {
         },
     };
 
-    dbg!(&registry);
+    // dbg!(&registry);
 
     ctx.block_on(|_| async {
         let config_service = ConfigurationService::new(
@@ -241,14 +241,14 @@ pub fn run(ctx: &mut AppContextCompact) -> tauri::Result<()> {
         let value = config_service.get_value("editor.fontSize", None);
         println!("Value `editor.fontSize` form None: {:?}", value);
 
-        let value = config_service.get_value("editor.lineHeight", None);
-        println!("Value `editor.lineHeight` form None: {:?}", value);
+        // let value = config_service.get_value("editor.lineHeight", None);
+        // println!("Value `editor.lineHeight` form None: {:?}", value);
 
         let value = config_service.get_value("editor.fontSize", Some("mossql"));
         println!("Value `editor.fontSize` form `mossql`: {:?}", value);
 
-        let value = config_service.get_value("editor.fontSize", Some("mossql/test"));
-        println!("Value `editor.fontSize` form `mossql/test`: {:?}", value);
+        // let value = config_service.get_value("editor.fontSize", Some("mossql/test"));
+        // println!("Value `editor.fontSize` form `mossql/test`: {:?}", value);
 
         config_service
             .update_value(

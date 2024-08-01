@@ -7,6 +7,7 @@ pub mod configuration_policy;
 pub mod configuration_registry;
 pub mod configuration_service;
 pub mod policy;
+pub mod utl;
 
 #[async_trait]
 pub trait AbstractConfigurationService {
