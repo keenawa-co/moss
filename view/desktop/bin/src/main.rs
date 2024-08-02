@@ -241,25 +241,22 @@ pub fn run(ctx: &mut AppContextCompact) -> tauri::Result<()> {
         let value = config_service.get_value("editor.fontSize", None);
         println!("Value `editor.fontSize` form None: {:?}", value);
 
-        // let value = config_service.get_value("editor.lineHeight", None);
-        // println!("Value `editor.lineHeight` form None: {:?}", value);
+        let value = config_service.get_value("editor.lineHeight", None);
+        println!("Value `editor.lineHeight` form None: {:?}", value);
 
         let value = config_service.get_value("editor.fontSize", Some("mossql"));
         println!("Value `editor.fontSize` form `mossql`: {:?}", value);
 
-        // let value = config_service.get_value("editor.fontSize", Some("mossql/test"));
-        // println!("Value `editor.fontSize` form `mossql/test`: {:?}", value);
+        // config_service
+        //     .update_value(
+        //         "editor.fontSize",
+        //         serde_json::Value::Number(serde_json::Number::from(15)),
+        //     )
+        //     .await
+        //     .unwrap();
 
-        config_service
-            .update_value(
-                "editor.fontSize",
-                serde_json::Value::Number(serde_json::Number::from(15)),
-            )
-            .await
-            .unwrap();
-
-        let value = config_service.get_value("editor.fontSize", None);
-        println!("Value `editor.fontSize` form None (after): {:?}", value);
+        // let value = config_service.get_value("editor.fontSize", None);
+        // println!("Value `editor.fontSize` form None (after): {:?}", value);
     });
 
     let (invoke_handler, register_events) = {

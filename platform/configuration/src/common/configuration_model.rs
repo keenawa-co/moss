@@ -138,7 +138,7 @@ impl ConfigurationModel {
     // }
 
     pub fn merge(&self, others: &[Arc<ConfigurationModel>]) -> Self {
-        let mut result = ConfigurationModel::empty();
+        let mut result = self.clone();
 
         for other in others {
             result.content.extend(other.content.iter());
@@ -146,6 +146,7 @@ impl ConfigurationModel {
             let new_keys: Vec<String> = other
                 .keys
                 .iter()
+                .map(|k| dbg!(k))
                 .filter(|key| !result.keys.contains(key))
                 .cloned()
                 .collect();
@@ -313,7 +314,7 @@ pub struct Configuration {
 }
 
 // TODO: add overrides
-pub struct ConfigurationDiff {
+pub struct ConfigurationDifference {
     pub added: Vec<String>,
     pub modified: Vec<String>,
     pub removed: Vec<String>,
@@ -388,7 +389,7 @@ impl Configuration {
     pub fn update_user_configuration(
         &self,
         new_model: Arc<ConfigurationModel>,
-    ) -> ConfigurationDiff {
+    ) -> ConfigurationDifference {
         let diff = Self::compare(self.user_configuration.load_full(), Arc::clone(&new_model));
         self.user_configuration.swap(new_model);
         self.consolidated_configuration.swap(None);
@@ -396,11 +397,14 @@ impl Configuration {
         diff
     }
 
-    fn compare(old: Arc<ConfigurationModel>, new: Arc<ConfigurationModel>) -> ConfigurationDiff {
+    fn compare(
+        old: Arc<ConfigurationModel>,
+        new: Arc<ConfigurationModel>,
+    ) -> ConfigurationDifference {
         let old_keys: HashSet<_> = old.keys.iter().cloned().collect();
         let new_keys: HashSet<_> = new.keys.iter().cloned().collect();
 
-        ConfigurationDiff {
+        ConfigurationDifference {
             added: new_keys.difference(&old_keys).cloned().collect(),
             removed: old_keys.difference(&new_keys).cloned().collect(),
             modified: old_keys
@@ -418,6 +422,8 @@ impl Configuration {
         if let Some(config) = self.consolidated_configuration.load_full().as_ref() {
             return Arc::clone(config);
         }
+
+        dbg!(&self.default_configuration);
 
         let consolidated_model = self
             .default_configuration
