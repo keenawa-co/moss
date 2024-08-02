@@ -88,9 +88,17 @@ impl ConfigurationService {
         Ok(())
     }
 
-    async fn do_update_value(&self, key: &str, value: &serde_json::Value) -> Result<()> {
+    async fn do_update_value(
+        &self,
+        key: &str,
+        value: &Value,
+        overrider_ident: Option<&str>,
+    ) -> Result<()> {
         let inspected_value = self.configuration.inspect(&key, None);
-        if inspected_value.get_policy_value(&key.to_string()).is_some() {
+        if inspected_value
+            .get_policy_value(&key, overrider_ident)
+            .is_some()
+        {
             return Err(anyhow!(
                 "value `{}` is protected by policy and cannot be overwritten.",
                 key.to_string()
@@ -98,7 +106,7 @@ impl ConfigurationService {
         }
 
         if inspected_value
-            .get_default_value(&key)
+            .get_default_value(&key, overrider_ident)
             .map_or(false, |default_value| default_value == value)
         {
             self.configuration_editing
@@ -121,13 +129,18 @@ impl AbstractConfigurationService for ConfigurationService {
     }
 
     /// NOTE: The function only works to update non-object values ​​at the root level
-    async fn update_value(&self, key: impl Keyable + Send, value: serde_json::Value) -> Result<()> {
+    async fn update_value(
+        &self,
+        key: &str,
+        value: Value,
+        overrider_ident: Option<&str>,
+    ) -> Result<()> {
         // TODO:
         // - Use pointer instead of key
         // - Check if the setting being changed is a USER level setting
 
         for k in key.to_key().distinct() {
-            self.do_update_value(&k, &value).await?;
+            self.do_update_value(&k, &value, overrider_ident).await?;
         }
 
         Ok(self.reload_configuration()?)

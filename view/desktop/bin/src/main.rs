@@ -228,8 +228,6 @@ pub fn run(ctx: &mut AppContextCompact) -> tauri::Result<()> {
         },
     };
 
-    // dbg!(&registry);
-
     ctx.block_on(|_| async {
         let config_service = ConfigurationService::new(
             Arc::new(registry),

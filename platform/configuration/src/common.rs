@@ -1,5 +1,4 @@
 use anyhow::Result;
-use configuration_registry::Keyable;
 
 pub mod configuration_default;
 pub mod configuration_model;
@@ -13,5 +12,11 @@ pub mod utl;
 pub trait AbstractConfigurationService {
     fn get_value(&self, key: &str, overrider_identifier: Option<&str>)
         -> Option<serde_json::Value>;
-    async fn update_value(&self, key: impl Keyable + Send, value: serde_json::Value) -> Result<()>;
+
+    async fn update_value(
+        &self,
+        key: &str,
+        value: serde_json::Value,
+        overrider_ident: Option<&str>,
+    ) -> Result<()>;
 }

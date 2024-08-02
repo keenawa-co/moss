@@ -115,13 +115,13 @@ impl ConfigurationModel {
         &self.keys
     }
 
-    pub fn get_value(&self, key: &str) -> Option<&Value> {
-        self.content.get(&format!("$.{}", key))
-    }
-
-    pub fn get_overridden_value(&self, key: &str, identifier: &str) -> Option<&Value> {
-        self.content_overrides
-            .get(&format!("$.[{}].{}", identifier, key))
+    pub fn get_value(&self, key: &str, override_ident: Option<&str>) -> Option<&Value> {
+        if let Some(ident) = override_ident {
+            self.content_overrides
+                .get(&format!("$.[{}].{}", ident, key))
+        } else {
+            self.content.get(&format!("$.{}", key))
+        }
     }
 
     pub fn set_value(&mut self, key: String, value: serde_json::Value) {
@@ -293,13 +293,21 @@ impl InspectedConfigurationValue {
         &self.value
     }
     // TODO: Rewrite using override keys and getting sections
-    pub fn get_default_value(&self, key: &str) -> Option<&serde_json::Value> {
-        self.default_configuration.get_value(key)
+    pub fn get_default_value(
+        &self,
+        key: &str,
+        overrider_ident: Option<&str>,
+    ) -> Option<&serde_json::Value> {
+        self.default_configuration.get_value(key, overrider_ident)
     }
 
     // TODO: Rewrite using override keys and getting sections
-    pub fn get_policy_value(&self, key: &str) -> Option<&serde_json::Value> {
-        self.policy_configuration.get_value(key)
+    pub fn get_policy_value(
+        &self,
+        key: &str,
+        overrider_ident: Option<&str>,
+    ) -> Option<&serde_json::Value> {
+        self.policy_configuration.get_value(key, overrider_ident)
     }
 }
 
@@ -340,30 +348,16 @@ impl Configuration {
 
     // TODO: implement `section` functionality
 
-    pub fn get_value(&self, key: &str, overrider_identifier: Option<&str>) -> Option<Value> {
+    pub fn get_value(&self, key: &str, overrider_ident: Option<&str>) -> Option<Value> {
         let consolidated_model = self.get_consolidated_configuration();
 
-        if let Some(ident) = overrider_identifier {
-            consolidated_model.get_overridden_value(key, ident).cloned()
-        } else {
-            consolidated_model.get_value(key).cloned()
-        }
+        consolidated_model.get_value(key, overrider_ident).cloned()
     }
 
-    pub fn inspect(
-        &self,
-        key: &str,
-        _overrider_identifier: Option<&str>,
-    ) -> InspectedConfigurationValue {
+    pub fn inspect(&self, key: &str, overrider_ident: Option<&str>) -> InspectedConfigurationValue {
         let consolidated_model = self.get_consolidated_configuration();
 
-        let value = {
-            if let Some(value) = consolidated_model.get_value(key) {
-                Some(value.clone())
-            } else {
-                None
-            }
-        };
+        let value = consolidated_model.get_value(key, overrider_ident).cloned();
 
         let mut inspected_value = InspectedConfigurationValue {
             key: key.to_string(),
@@ -409,10 +403,12 @@ impl Configuration {
             removed: old_keys.difference(&new_keys).cloned().collect(),
             modified: old_keys
                 .intersection(&new_keys)
-                .filter(|key| match (old.get_value(key), new.get_value(key)) {
-                    (Some(old_value), Some(new_value)) => old_value != new_value,
-                    _ => false,
-                })
+                .filter(
+                    |key| match (old.get_value(key, None), new.get_value(key, None)) {
+                        (Some(old_value), Some(new_value)) => old_value != new_value,
+                        _ => false,
+                    },
+                )
                 .cloned()
                 .collect(),
         }
