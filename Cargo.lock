@@ -38,12 +38,6 @@ checksum = "f26201604c87b1e01bd3d98f8d5d9a8fcbb815e8cedb41ffccbeb4bf593a35fe"
 
 [[package]]
 name = "ahash"
-version = "0.3.8"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e8fd72866655d1904d6b0997d0b07ba561047d070fbe29de039031c641b61217"
-
-[[package]]
-name = "ahash"
 version = "0.7.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "891477e0c6a8957309ee5c45a6368af3ae14bb510732d2684ffa19af310920f9"
@@ -195,7 +189,7 @@ dependencies = [
  "derive_more",
  "flume",
  "futures",
- "hashbrown 0.7.2",
+ "hashbrown 0.14.5",
  "objc",
  "parking",
  "parking_lot",
@@ -1469,7 +1463,7 @@ dependencies = [
  "arc-swap",
  "async-trait",
  "base",
- "hashbrown 0.7.2",
+ "hashbrown 0.14.5",
  "lazy-regex",
  "moss_base",
  "parking_lot",
@@ -1775,7 +1769,7 @@ dependencies = [
  "app",
  "configuration",
  "futures",
- "hashbrown 0.7.2",
+ "hashbrown 0.14.5",
  "macos-trampoline",
  "mimalloc",
  "parking_lot",
@@ -2882,17 +2876,6 @@ dependencies = [
 
 [[package]]
 name = "hashbrown"
-version = "0.7.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "96282e96bfcd3da0d3aa9938bedf1e50df3269b6db08b4876d2da0bb1a0841cf"
-dependencies = [
- "ahash 0.3.8",
- "autocfg",
- "serde",
-]
-
-[[package]]
-name = "hashbrown"
 version = "0.12.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8a9ee70c43aaf417c914396645a0fa852624801b24ebb7ae78fe8272889ac888"
@@ -3930,7 +3913,7 @@ dependencies = [
 name = "moss_base"
 version = "0.1.0"
 dependencies = [
- "hashbrown 0.7.2",
+ "hashbrown 0.14.5",
  "radix_trie",
 ]
 
@@ -4096,7 +4079,7 @@ dependencies = [
  "futures-util",
  "graphql_mac",
  "graphql_utl",
- "hashbrown 0.7.2",
+ "hashbrown 0.14.5",
  "http 1.1.0",
  "jsonwebtoken",
  "mac 0.1.0",
@@ -5110,7 +5093,7 @@ dependencies = [
  "fs",
  "futures",
  "graphql_utl",
- "hashbrown 0.7.2",
+ "hashbrown 0.14.5",
  "mac 0.1.0",
  "notify",
  "parking_lot",
@@ -8973,7 +8956,7 @@ dependencies = [
  "anyhow",
  "arc-swap",
  "configuration",
- "hashbrown 0.7.2",
+ "hashbrown 0.14.5",
  "lazy-regex",
  "lazy_static",
  "parking_lot",
@@ -8991,7 +8974,7 @@ dependencies = [
  "async-graphql",
  "async-trait",
  "fs",
- "hashbrown 0.7.2",
+ "hashbrown 0.14.5",
  "jsonpath_lib",
  "mac 0.1.0",
  "sea-orm",
