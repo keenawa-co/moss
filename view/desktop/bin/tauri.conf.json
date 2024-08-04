@@ -13,10 +13,24 @@
     "windows": [
       {
         "title": "Moss Compass",
-        "width": 800,
-        "height": 600,
+        "hiddenTitle": true,
+        "width": 1400,
+        "height": 750,
+        "minWidth": 768,
+        "minHeight": 500,
         "resizable": true,
-        "fullscreen": false
+        "fullscreen": false,
+        "alwaysOnTop": false,
+        "focus": false,
+        "dragDropEnabled": true,
+        "decorations": true,
+        "transparent": true,
+        "center": true,
+        "windowEffects": {
+          "effects": ["sidebar"],
+          "state": "followsWindowActiveState",
+          "radius": 9
+        }
       }
     ],
     "security": {

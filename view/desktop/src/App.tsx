@@ -16,11 +16,14 @@ import {
   SearchIcon,
   SearchShortcutIcon,
 } from "../../shared/ui/src";
+import { twMerge } from "tailwind-merge";
 import StatusBar from "./components/StatusBar";
 
-enum State {
+enum IconState {
   Default = "text-stone-500",
-  Hover = "text-stone-600",
+  DefaultStroke = "stroke-stone-500",
+  Hover = "hover:text-stone-600",
+  HoverStroke = "stroke-stone-600",
   Active = "text-olive-700",
   Disabled = "text-stone-500 bg-opacity-50",
 }
@@ -32,7 +35,7 @@ function App() {
         <Sidebar className="p-0">
           <MenuItem className="group bg-stone-200 mt-13 mb-3.5">
             <Icon className="h-4.5 w-4.5">
-              <SearchIcon className="text-stone-500 hover:text-stone-600" />
+              <SearchIcon className={twMerge(IconState.Default, IconState.Hover)} />
             </Icon>
             <IconTitle className="text-stone-900 text-xs" title="Search..." />
             <Icon className="h-4.5 w-5 ml-28">
@@ -41,37 +44,37 @@ function App() {
           </MenuItem>
           <MenuItem className="group">
             <Icon className="h-4.5 w-4.5">
-              <HomeIcon className="text-stone-500 hover:text-stone-600" />
+              <HomeIcon className={twMerge(IconState.Default, IconState.Hover)} />
             </Icon>
             <IconTitle className="text-stone-900 text-sm" title="Home" />
           </MenuItem>
           <MenuItem className="group">
             <Icon className="h-4.5 w-4.5">
-              <IssuesIcon className="text-stone-500 hover:text-stone-600" />
+              <IssuesIcon className={twMerge(IconState.Default, IconState.Hover)} />
             </Icon>
             <IconTitle className="text-stone-900 text-sm" title="Issues" />
           </MenuItem>
           <MenuItem className="group">
             <Icon className="h-4.5 w-4.5">
-              <CodeIcon className="text-stone-500 hover:text-stone-600" />
+              <CodeIcon className={twMerge(IconState.Default, IconState.Hover)} />
             </Icon>
             <IconTitle className="text-stone-900 text-sm" title="Code" />
           </MenuItem>
           <MenuItem className="group">
             <Icon className="h-4.5 w-4.5">
-              <GoalsIcon className="stroke-stone-500 hover:stroke-stone-600" />
+              <GoalsIcon className={twMerge(IconState.DefaultStroke, IconState.HoverStroke)} />
             </Icon>
             <IconTitle className="text-stone-900 text-sm" title="Goals" />
           </MenuItem>
           <MenuItem className="group">
             <Icon className="h-4.5 w-4.5">
-              <ReportsIcon className="text-stone-500 hover:text-stone-600" />
+              <ReportsIcon className={twMerge(IconState.Default, IconState.Hover)} />
             </Icon>
             <IconTitle className="text-stone-900 text-sm" title="Reports" />
           </MenuItem>
           <MenuItem className="group">
             <Icon className="h-4.5 w-4.5">
-              <DocumentationIcon className="text-stone-500 hover:text-stone-600" />
+              <DocumentationIcon className={twMerge(IconState.Default, IconState.Hover)} />
             </Icon>
             <IconTitle className="text-stone-900 text-sm" title="Documentation" />
           </MenuItem>

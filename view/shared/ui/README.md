@@ -11,6 +11,7 @@
 - **pNPM** (package manager)
 - **Storybook** (workshop for building, testing, documenting and sharing UI components)
 - **Turborepo** (smart monorepo build system / monorepo orchestrator) solves monorepos' scaling problem. Its remote cache stores the result of all your tasks, meaning that your CI never needs to do the same work twice. Visualize dependency graphs. Remote Vercel caching.
+- **husky** Automatically lint commit messages, code, and run tests upon committing or pushing.
 
 # Architecture
 
