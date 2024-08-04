@@ -1,31 +1,143 @@
 use anyhow::Result;
 use arc_swap::{ArcSwap, ArcSwapOption};
-use hashbrown::HashMap;
+use hashbrown::{HashMap, HashSet};
 use lazy_regex::{Lazy, Regex};
+use moss_base::collection::Extend;
+use radix_trie::{Trie, TrieCommon};
 use serde_json::Value;
-use std::{fs::File, io::Read, path::PathBuf, sync::Arc, vec};
+use std::{fs::File, io::Read, path::PathBuf, sync::Arc};
 
 use super::configuration_registry::ConfigurationRegistry;
+
+pub struct AttributeName {
+    pub override_ident: Option<String>,
+    pub name: Option<String>,
+}
+
+impl AttributeName {
+    pub(super) fn format(name: impl std::fmt::Display) -> String {
+        format!("$.{}", name)
+    }
+
+    pub(super) fn format_with_override(
+        name: impl std::fmt::Display,
+        override_ident: impl std::fmt::Display,
+    ) -> String {
+        format!("$.[{}].{}", override_ident, name)
+    }
+
+    pub fn must_get_name(&self) -> String {
+        self.name
+            .clone()
+            .unwrap_or(String::from("<undefined_attribute_name>"))
+    }
+
+    pub fn is_with_override(&self) -> bool {
+        self.override_ident.is_some()
+    }
+}
+
+impl ToString for AttributeName {
+    fn to_string(&self) -> String {
+        let mut result = String::from("$.");
+
+        let override_part = self
+            .override_ident
+            .as_ref()
+            .map_or(String::new(), |ident| format!("[{}]", ident));
+
+        let name_part = self.name.as_ref().map_or(String::new(), |name| {
+            if self.override_ident.is_some() {
+                format!(".{}", name)
+            } else {
+                name.clone()
+            }
+        });
+
+        result.push_str(&override_part);
+        result.push_str(&name_part);
+
+        result
+    }
+}
+
+/// A macro to create an `AttributeName` struct with optional override identifier or name.
+///
+/// # Examples
+///
+/// Basic usage with no overrides:
+///
+/// ```rust
+/// let attribute_name = attribute_name!(editor.fontSize);
+/// assert_eq!(attribute_name.override_ident, None);
+/// assert_eq!(attribute_name.name, Some("editor.fontSize".to_string()));
+/// ```
+///
+/// Usage with an override:
+///
+/// ```rust
+/// let attribute_name = attribute_name!([rust].editor.fontSize);
+/// assert_eq!(attribute_name.override_ident, Some("rust".to_string()));
+/// assert_eq!(attribute_name.name, Some("editor.fontSize".to_string()));
+/// ```
+///
+/// Usage with an override only:
+///
+/// ```rust
+/// let attribute_name = attribute_name!([rust]);
+/// assert_eq!(attribute_name.override_ident, Some("rust".to_string()));
+/// assert_eq!(attribute_name.name, None);
+/// ```
+#[macro_export]
+macro_rules! attribute_name {
+    // Handle override with sub-identifiers
+    ([$override:ident] . $ident:ident $(. $subident:ident)*) => {{
+        let override_ident = Some(stringify!($override).to_string());
+        let name = Some(concat!(stringify!($ident), $(concat!(".", stringify!($subident))),*).to_string());
+        $crate::common::configuration_model::AttributeName {
+            override_ident,
+            name,
+        }
+    }};
+
+    // Handle override without sub-identifiers
+    ([$override:ident]) => {{
+        let override_ident = Some(stringify!($override).to_string());
+        $crate::common::configuration_model::AttributeName {
+            override_ident,
+            name: None,
+        }
+    }};
+
+    // Handle no override with sub-identifiers
+    ($ident:ident $(. $subident:ident)*) => {{
+        let name = Some(concat!(stringify!($ident), $(concat!(".", stringify!($subident))),*).to_string());
+        $crate::common::configuration_model::AttributeName {
+            override_ident: None,
+            name,
+        }
+    }};
+}
 
 // TODO:
 // - Use a kernel/fs to work with the file system
 // - Use a LogService.
 // - Use a PolicyService
 pub struct UserConfiguration {
-    content_parser: Arc<ConfigurationParser>,
-    configuration_resource: PathBuf,
+    parser: Arc<ConfigurationParser>,
+    resource: PathBuf,
 }
 
 impl UserConfiguration {
     pub fn new(file_path: &PathBuf, content_parser: Arc<ConfigurationParser>) -> Self {
         Self {
-            content_parser,
-            configuration_resource: file_path.clone(),
+            parser: content_parser,
+            resource: file_path.clone(),
         }
     }
 
     pub fn load_configuration(&self) -> Result<ConfigurationModel> {
-        let mut file = File::open(&self.configuration_resource)?;
+        let mut file = File::open(&self.resource)?;
         let mut content = String::new();
         file.read_to_string(&mut content)?;
 
@@ -33,7 +145,7 @@ impl UserConfiguration {
             content = String::from("{}")
         }
 
-        Ok(self.content_parser.parse(&content)?)
+        Ok(self.parser.parse(&content)?)
     }
 }
 
@@ -62,109 +174,83 @@ pub enum ConfigurationTarget {
     Memory,
 }
 
-#[derive(Debug, Clone)]
-pub struct ConfigurationOverride {
-    identifier: String,
-    _keys: Vec<String>,
-    contents: HashMap<String, Value>,
+#[derive(Debug)]
+pub struct ConfigurationModel {
+    pub(super) content: Trie<String, Value>,
+    pub(super) names: Vec<String>,
+    pub(super) overrides: Vec<String>,
 }
 
-#[derive(Debug, Clone)]
-pub struct ConfigurationModel {
-    content: HashMap<String, Value>,
-    keys: Vec<String>,
-    overrides: Vec<ConfigurationOverride>,
-    overridden_configurations: Arc<ArcSwap<HashMap<String, Arc<ConfigurationModel>>>>,
+impl Clone for ConfigurationModel {
+    fn clone(&self) -> Self {
+        ConfigurationModel {
+            content: self.content.clone(),
+            names: self.names.clone(),
+            overrides: self.overrides.clone(),
+        }
+    }
 }
 
 impl ConfigurationModel {
-    pub fn new(
-        contents: HashMap<String, Value>,
-        keys: Vec<String>,
-        overrides: Vec<ConfigurationOverride>,
-    ) -> Self {
+    pub fn new(content: Trie<String, Value>, names: Vec<String>, overrides: Vec<String>) -> Self {
         Self {
-            content: contents,
-            keys,
+            content,
+            names,
             overrides,
-            overridden_configurations: Arc::new(ArcSwap::new(Arc::new(HashMap::new()))),
         }
     }
 
     pub fn empty() -> Self {
         Self {
-            content: HashMap::new(),
-            keys: Vec::new(),
+            content: Trie::new(),
+            names: Vec::new(),
             overrides: Vec::new(),
-            overridden_configurations: Arc::new(ArcSwap::new(Arc::new(HashMap::new()))),
         }
     }
 
-    pub fn get_value(&self, key: &str) -> Option<&Value> {
-        self.content.get(key)
+    pub fn is_empty(&self) -> bool {
+        self.content.is_empty() && self.names.len() == 0 && self.overrides.len() == 0
     }
 
-    pub fn set_value(&mut self, key: String, value: serde_json::Value) {
-        self.content.insert(key.clone(), value);
-        self.keys.push(key);
+    pub fn get_attribute_names(&self) -> &Vec<String> {
+        &self.names
     }
 
-    fn r#override(&self, identifier: &str) -> Arc<Self> {
-        let current_overrides = self.overridden_configurations.load_full();
-
-        if let Some(override_model) = current_overrides.get(identifier) {
-            return Arc::clone(override_model);
-        }
-
-        let new_override = Arc::new(self.create_overridden_configuration(identifier));
-
-        let mut new_overrides = HashMap::clone(&*current_overrides);
-        new_overrides.insert(identifier.to_string(), Arc::clone(&new_override));
-
-        self.overridden_configurations
-            .store(Arc::new(new_overrides));
-
-        new_override
+    pub fn get_value(&self, attribute_name: &AttributeName) -> Option<&Value> {
+        dbg!(&attribute_name.to_string());
+        self.content.get(&attribute_name.to_string())
     }
 
-    fn create_overridden_configuration(&self, identifier: &str) -> Self {
-        if let Some(override_content) = self.get_override_identifier_content(identifier) {
-            let mut content = self.content.clone();
-            content.extend(override_content);
-
-            ConfigurationModel::new(content, self.keys.clone(), self.overrides.clone())
-        } else {
-            self.clone()
-        }
+    pub fn set_value(&mut self, attribute_name: String, value: serde_json::Value) {
+        self.content.insert(attribute_name.clone(), value);
+        self.names.push(attribute_name);
     }
 
-    fn get_override_identifier_content(&self, identifier: &str) -> Option<HashMap<String, Value>> {
-        self.overrides
-            .iter()
-            .find(|override_data| override_data.identifier == identifier)
-            .map(|override_data| override_data.contents.clone())
-    }
+    // TODO:
+    // fn get_override_identifier_content(&self, identifier: &str) -> Option<HashMap<String, Value>> {
+    //     self.overrides
+    //         .iter()
+    //         .find(|override_data| override_data.identifier == identifier)
+    //         .map(|override_data| override_data.content.clone())
+    // }
 
     pub fn merge(&self, others: &[Arc<ConfigurationModel>]) -> Self {
-        let mut merged_content = self.content.clone();
-        let mut merged_keys = self.keys.clone();
-        let mut merged_overrides = self.overrides.clone();
+        let mut result = self.clone();
 
         for other in others {
-            merged_content.extend(other.content.clone());
-
-            let new_keys: Vec<String> = other
-                .keys
-                .iter()
-                .filter(|key| !merged_keys.contains(key))
-                .cloned()
-                .collect();
-
-            merged_keys.extend(new_keys);
-            merged_overrides.extend(other.overrides.clone());
+            result.content.extend(other.content.iter());
+            result.names.extend(
+                other
+                    .names
+                    .iter()
+                    .filter(|key| !result.names.contains(key))
+                    .cloned()
+                    .collect::<Vec<String>>(),
+            );
+            result.overrides.extend(other.overrides.clone());
         }
 
-        ConfigurationModel::new(merged_content, merged_keys, merged_overrides)
+        result
     }
 }
 
@@ -174,7 +260,11 @@ pub struct ConfigurationParser {
     registry: Arc<ConfigurationRegistry>,
 }
 
-pub struct ConfigurationParserSettings {}
+struct ConfigurationOverride {
+    ident: String,
+    attribute_names: Vec<String>,
+    content: Trie<String, serde_json::Value>,
+}
 
 impl ConfigurationParser {
     pub fn new(registry: Arc<ConfigurationRegistry>) -> Self {
@@ -182,171 +272,298 @@ impl ConfigurationParser {
     }
 
     pub fn parse(&self, content: &str) -> Result<ConfigurationModel> {
-        let root_map: HashMap<String, Value> = serde_json::from_str(content)?;
-        let mut root_overrides: Vec<ConfigurationOverride> = Vec::new();
-        let mut root_contents: HashMap<String, Value> = HashMap::new();
-        let mut root_keys: Vec<String> = Vec::new();
+        let raw_content: HashMap<String, Value> = serde_json::from_str(content)?;
+        let mut model = ConfigurationModel::empty();
 
-        let configuration_properties = self.registry.get_configuration_properties();
+        for (attribute_name, value) in &raw_content {
+            if OVERRIDE_PROPERTY_REGEX.is_match(attribute_name) {
+                if let Some(override_definition) = self.process_override(attribute_name, value) {
+                    model.overrides.push(override_definition.ident);
+                    model.content.extend(override_definition.content.iter());
+                }
 
-        for (key, value) in &root_map {
-            if OVERRIDE_PROPERTY_REGEX.is_match(key) {
-                root_overrides.extend(self.handle_override(key, value, None));
                 continue;
             }
 
-            match configuration_properties.get(key) {
-                Some(registered_property) => {
-                    if registered_property.is_protected() {
-                        println!("Property `{}` is protected from contribution", key);
-                        continue;
-                    }
-
-                    root_contents.insert(key.clone(), value.clone());
-                    root_keys.push(key.clone());
-                }
-                None => {
-                    println!("Unknown property `{}` was detected", key);
-                    continue;
-                }
+            if self.inspect_attribute(attribute_name) {
+                model.set_value(AttributeName::format(attribute_name), value.clone());
             }
         }
 
-        let result = ConfigurationModel::new(root_contents, root_keys, root_overrides);
-
-        Ok(result)
+        Ok(model)
     }
 
-    fn handle_override(
+    // TODO: return diags
+    // TODO: use logs, not println
+    fn inspect_attribute(&self, attribute_name: &str) -> bool {
+        let configuration_properties = self.registry.get_configuration_properties();
+
+        match configuration_properties.get(attribute_name) {
+            Some(registered_property) => {
+                if registered_property.is_protected() {
+                    println!(
+                        "Property `{}` is protected from contribution",
+                        attribute_name
+                    );
+                    return false;
+                }
+
+                true
+            }
+            None => {
+                println!("Unknown property `{}` was detected", attribute_name);
+                return false;
+            }
+        }
+    }
+
+    fn process_override(
         &self,
-        key: &str,
+        attribute_name: &str,
         value: &Value,
-        parent_identifier: Option<&str>,
-    ) -> Vec<ConfigurationOverride> {
+    ) -> Option<ConfigurationOverride> {
         let content = if let Value::Object(obj) = value {
             obj
         } else {
             // If the override is not an object, then we don't want to handle it in any way.
-            return vec![];
+            return None;
         };
 
         let override_identifiers = self.registry.get_override_identifiers();
-        let formatted_identifier = {
-            let trimmed_key = key.trim_matches(|c| c == '[' || c == ']');
+        let formatted_identifier = attribute_name.trim_matches(|c| c == '[' || c == ']');
 
-            if let Some(parent_id) = parent_identifier {
-                format!("{}/{}", parent_id, trimmed_key)
-            } else {
-                trimmed_key.to_string()
-            }
-        };
-
-        if override_identifiers.get(&formatted_identifier).is_none() {
+        if override_identifiers.get(formatted_identifier).is_none() {
             println!(
                 "Unknown override identifier `{}` was detected",
                 formatted_identifier
             );
-            return vec![];
+            return None;
         }
 
-        let (override_overrides, parsed_override_content, override_keys) =
-            self.extract_override_content_and_keys(Some(&formatted_identifier), content);
+        let mut result = ConfigurationOverride {
+            ident: formatted_identifier.to_string(),
+            attribute_names: Vec::new(),
+            content: Trie::new(),
+        };
 
-        let mut result = vec![ConfigurationOverride {
-            identifier: formatted_identifier.to_string(),
-            _keys: override_keys,
-            contents: parsed_override_content,
-        }];
-        result.extend(override_overrides);
-
-        result
-    }
-
-    fn extract_override_content_and_keys(
-        &self,
-        current_identifier: Option<&str>,
-        content: &serde_json::Map<std::string::String, Value>,
-    ) -> (
-        Vec<ConfigurationOverride>,
-        HashMap<String, Value>,
-        Vec<String>,
-    ) {
-        let mut override_overrides = Vec::new();
-        let mut override_content = HashMap::new();
-        let mut override_keys = Vec::new();
-
-        for (key, value) in content {
-            if OVERRIDE_PROPERTY_REGEX.is_match(key) {
-                override_overrides.extend(self.handle_override(key, value, current_identifier));
-            } else {
-                override_content.insert(key.clone(), value.clone());
-                override_keys.push(key.clone());
+        for (attribute_name, value) in content {
+            if self.inspect_attribute(attribute_name) {
+                // let formatted_key = format!("$.[{}].{}", formatted_identifier, attribute_name);
+                let formatted_key =
+                    AttributeName::format_with_override(attribute_name, formatted_identifier);
+                result.content.insert(formatted_key.clone(), value.clone());
+                result.attribute_names.push(formatted_key);
             }
         }
 
-        (override_overrides, override_content, override_keys)
+        Some(result)
+    }
+}
+
+#[derive(Debug)]
+pub struct InspectedConfigurationValue {
+    attribute_name: String,
+    value: Option<serde_json::Value>,
+    seen_in_overrides: Vec<String>,
+    default_configuration: Arc<ConfigurationModel>,
+    policy_configuration: Arc<ConfigurationModel>,
+}
+
+impl InspectedConfigurationValue {
+    pub fn attribute_name(&self) -> &str {
+        &self.attribute_name
+    }
+
+    pub fn value(&self) -> &Option<serde_json::Value> {
+        &self.value
+    }
+    // TODO: Rewrite using override keys and getting sections
+    pub fn get_default_value(&self, attribute_name: &AttributeName) -> Option<&serde_json::Value> {
+        self.default_configuration.get_value(attribute_name)
+    }
+
+    // TODO: Rewrite using override keys and getting sections
+    pub fn get_policy_value(&self, attribute_name: &AttributeName) -> Option<&serde_json::Value> {
+        self.policy_configuration.get_value(attribute_name)
     }
 }
 
 #[derive(Debug)]
 pub struct Configuration {
     default_configuration: Arc<ConfigurationModel>,
-    user_configuration: Arc<ConfigurationModel>,
+    policy_configuration: Arc<ConfigurationModel>,
+    user_configuration: ArcSwap<ConfigurationModel>,
     workspace_configuration: Arc<ConfigurationModel>,
     inmem_configuration: Arc<ConfigurationModel>,
     consolidated_configuration: ArcSwapOption<ConfigurationModel>,
 }
 
+// TODO: add overrides
+pub struct ConfigurationDifference {
+    pub added: Vec<String>,
+    pub modified: Vec<String>,
+    pub removed: Vec<String>,
+}
+
 impl Configuration {
     pub fn new(
-        default_conf: Arc<ConfigurationModel>,
-        user_conf: ConfigurationModel,
-        workspace_conf: ConfigurationModel,
-        inmem_conf: ConfigurationModel,
+        default_model: Arc<ConfigurationModel>,
+        policy_model: Arc<ConfigurationModel>,
+        user_model: ConfigurationModel,
+        workspace_model: ConfigurationModel,
+        inmem_model: ConfigurationModel,
     ) -> Self {
         Configuration {
-            default_configuration: default_conf,
-            user_configuration: Arc::new(user_conf),
-            workspace_configuration: Arc::new(workspace_conf),
-            inmem_configuration: Arc::new(inmem_conf),
+            default_configuration: default_model,
+            policy_configuration: policy_model,
+            user_configuration: ArcSwap::new(Arc::new(user_model)),
+            workspace_configuration: Arc::new(workspace_model),
+            inmem_configuration: Arc::new(inmem_model),
             consolidated_configuration: ArcSwapOption::from(None),
         }
     }
 
-    pub fn get_value(&self, key: &str, overrider_identifier: Option<&str>) -> Option<Value> {
-        let consolidated_conf = self.get_consolidated_configuration(overrider_identifier);
-        consolidated_conf.get_value(key).cloned()
+    // TODO: implement `section` functionality
+
+    pub fn get_value(&self, attribute_name: &AttributeName) -> Option<Value> {
+        let consolidated_model = self.get_consolidated_configuration();
+
+        consolidated_model.get_value(attribute_name).cloned()
     }
 
-    pub fn get_consolidated_configuration(
-        &self,
-        overrider_identifier: Option<&str>,
-    ) -> Arc<ConfigurationModel> {
-        if let Some(config) = self.consolidated_configuration.load_full().as_ref() {
-            if let Some(identifier) = overrider_identifier {
-                return config.r#override(identifier.trim_start_matches('/'));
-            }
+    pub fn inspect(&self, attribute_name: &AttributeName) -> InspectedConfigurationValue {
+        let consolidated_model = self.get_consolidated_configuration();
 
+        let value = consolidated_model.get_value(attribute_name).cloned();
+
+        let mut inspected_value = InspectedConfigurationValue {
+            attribute_name: attribute_name.to_string(),
+            value,
+            seen_in_overrides: Vec::new(),
+            default_configuration: Arc::clone(&self.default_configuration),
+            policy_configuration: Arc::clone(&self.policy_configuration),
+        };
+
+        if !attribute_name.is_with_override() {
+            for ident in consolidated_model.overrides.iter() {
+                if consolidated_model.overrides.contains(&format!(
+                    "$.[{}].{}",
+                    ident,
+                    attribute_name.must_get_name()
+                )) {
+                    inspected_value.seen_in_overrides.push(ident.to_string());
+                }
+            }
+        }
+
+        inspected_value
+    }
+
+    pub fn update_user_configuration(
+        &self,
+        new_model: Arc<ConfigurationModel>,
+    ) -> ConfigurationDifference {
+        let diff = Self::compare(self.user_configuration.load_full(), Arc::clone(&new_model));
+        self.user_configuration.swap(new_model);
+        self.consolidated_configuration.swap(None);
+
+        diff
+    }
+
+    fn compare(
+        old: Arc<ConfigurationModel>,
+        new: Arc<ConfigurationModel>,
+    ) -> ConfigurationDifference {
+        let old_names: HashSet<_> = old.names.iter().cloned().collect();
+        let new_names: HashSet<_> = new.names.iter().cloned().collect();
+
+        ConfigurationDifference {
+            added: new_names.difference(&old_names).cloned().collect(),
+            removed: old_names.difference(&new_names).cloned().collect(),
+            modified: old_names
+                .intersection(&new_names)
+                .filter(
+                    |name| match (old.content.get(*name), new.content.get(*name)) {
+                        (Some(old_value), Some(new_value)) => old_value != new_value,
+                        _ => false,
+                    },
+                )
+                .cloned()
+                .collect(),
+        }
+    }
+
+    pub fn get_consolidated_configuration(&self) -> Arc<ConfigurationModel> {
+        if let Some(config) = self.consolidated_configuration.load_full().as_ref() {
             return Arc::clone(config);
         }
 
-        let new_configuration = {
-            let merged_configuration = self.default_configuration.merge(&[
-                Arc::clone(&self.user_configuration),
+        dbg!(&self.default_configuration);
+
+        let consolidated_model = self
+            .default_configuration
+            .merge(&[
+                Arc::clone(&self.user_configuration.load_full()),
                 Arc::clone(&self.workspace_configuration),
                 Arc::clone(&self.inmem_configuration),
-            ]);
-
-            Arc::new(merged_configuration)
-        };
+            ])
+            .into();
 
         self.consolidated_configuration
-            .store(Some(Arc::clone(&new_configuration)));
+            .store(Some(Arc::clone(&consolidated_model)));
 
-        if let Some(identifier) = overrider_identifier {
-            return new_configuration.r#override(identifier);
-        }
+        consolidated_model
+    }
+}
 
-        new_configuration
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn test_no_override_with_identifiers() {
+        let name = attribute_name!(editor.fontSize);
+        assert_eq!(name.override_ident, None);
+        assert_eq!(name.name, Some("editor.fontSize".to_string()));
+    }
+
+    #[test]
+    fn test_no_override_with_section_only() {
+        let name = attribute_name!(editor);
+        assert_eq!(name.override_ident, None);
+        assert_eq!(name.name, Some("editor".to_string()));
+    }
+
+    #[test]
+    fn test_single_override_with_identifiers() {
+        let name = attribute_name!([rust].editor.fontSize);
+        assert_eq!(name.override_ident, Some("rust".to_string()));
+        assert_eq!(name.name, Some("editor.fontSize".to_string()));
+    }
+
+    #[test]
+    fn test_single_override_only() {
+        let name = attribute_name!([rust]);
+        assert_eq!(name.override_ident, Some("rust".to_string()));
+        assert_eq!(name.name, None);
+    }
+
+    #[test]
+    fn test_no_override_with_multiple_identifiers() {
+        let name = attribute_name!(config.window.size);
+        assert_eq!(name.override_ident, None);
+        assert_eq!(name.name, Some("config.window.size".to_string()));
+    }
+
+    #[test]
+    fn test_single_override_with_multiple_identifiers() {
+        let name = attribute_name!([javascript].config.window.size);
+        assert_eq!(name.override_ident, Some("javascript".to_string()));
+        assert_eq!(name.name, Some("config.window.size".to_string()));
+    }
+
+    #[test]
+    fn test_single_override_only_with_no_identifiers() {
+        let name = attribute_name!([typescript]);
+        assert_eq!(name.override_ident, Some("typescript".to_string()));
+        assert_eq!(name.name, None);
     }
 }

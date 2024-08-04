@@ -51,6 +51,8 @@ rustflags = ["-C", "target-cpu=native"]
 [workspace.dependencies]
 fs = { path = "kernel/fs" }
 
+moss_base = { path = "lib/moss_base" }
+
 base = { path = "platform/base" }
 configuration = { path = "platform/configuration" }
 workbench = { path = "platform/workbench" }
@@ -81,17 +83,17 @@ chrono = "0.4"
 notify = "6.1.1"
 url = "2.5.0"
 nanoid = "0.4"
-hashbrown = "0.7.2"
+hashbrown = "0.14.5"
 ahash = "0.8.11"
 sha2 = "0.10.8"
 arc-swap = "1.7.1"
 radix_trie = "0.2.1"
 parking_lot = "0.12.3"
 derive_more = "0.99.17"
-async-executor = "1.4"
+async-executor = "1.13"
 ctor = "0.2.8"
 strum = "0.26"
-lazy-regex = "3.1.0"
+lazy-regex = "3.2.0"
 
 tokio = "1"
 tokio-util = "0.7"
@@ -106,7 +108,7 @@ flume = "0.11.0"
 
 serde = "1.0"
 serde_json = "1.0"
-serde_with = "3.8.1"
+serde_with = "3.9.0"
 jsonpath_lib = "0.3.0"
 toml = "0.8.12"
 schemars = "0.8.21"

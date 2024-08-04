@@ -2,6 +2,7 @@ use std::sync::Arc;
 
 use hashbrown::{HashMap, HashSet};
 use lazy_regex::Regex as LazyRegex;
+use moss_base::collection::MaybeExtend;
 use serde_json::Value;
 
 type Regex = LazyRegex;
@@ -56,48 +57,136 @@ impl ConfigurationNodeType {
     }
 }
 
-#[derive(Debug, Clone)]
-pub struct SourceInfo {
-    pub id: String,
-    pub display_name: Option<String>,
+/// A struct representing a configuration property key with optional overrides.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct PropertyKey {
+    /// A set of overrides for specific contexts.
+    pub override_for: Option<HashSet<String>>,
+    /// The identifier string for the key, potentially with sub-identifiers.
+    pub ident: String,
 }
 
-pub trait Keyable: ToString {
-    fn as_straight_key(&self) -> Option<String> {
-        Some(self.to_string())
+impl PropertyKey {
+    pub fn distinct(&self) -> Vec<String> {
+        self.override_for.as_ref().map_or_else(
+            || vec![self.ident.clone()],
+            |overrides| {
+                overrides
+                    .iter()
+                    .map(|override_ident| format!("[{}].{}", override_ident, self.ident))
+                    .collect()
+            },
+        )
     }
 
-    fn as_composite_key(&self) -> Option<CompositeKey>;
-}
+    // OPTIMIZE: rewrite parsing using regular expressions
+    /// Parses a string to create a `Key` instance using regular expressions.
+    /// The expected format is `[override1][override2].ident.subident`.
+    pub fn parse(s: &str) -> Result<Self, String> {
+        let re = regex!(r"(\[([^\]]+)\])|([^.]+)");
+        let mut overrides = HashSet::new();
+        let mut ident_parts = Vec::new();
+        let remaining = s;
 
-impl Keyable for String {
-    fn as_composite_key(&self) -> Option<CompositeKey> {
-        None
+        // Check for mismatched brackets
+        let open_brackets = remaining.matches('[').count();
+        let close_brackets = remaining.matches(']').count();
+        if open_brackets != close_brackets {
+            return Err("Mismatched brackets in override section".to_string());
+        }
+
+        for cap in re.captures_iter(remaining) {
+            if let Some(override_) = cap.get(2) {
+                overrides.insert(override_.as_str().to_string());
+            } else if let Some(ident_part) = cap.get(3) {
+                ident_parts.push(ident_part.as_str());
+            }
+        }
+
+        if ident_parts.is_empty() {
+            return Err("Missing identifier".to_string());
+        }
+
+        let ident = ident_parts.join(".");
+
+        Ok(PropertyKey {
+            override_for: if overrides.is_empty() {
+                None
+            } else {
+                Some(overrides)
+            },
+            ident,
+        })
     }
 }
 
-impl Keyable for &str {
-    fn as_composite_key(&self) -> Option<CompositeKey> {
-        None
-    }
-}
+/// A macro to create a `Key` struct with optional overrides and sub-identifiers.
+///
+/// # Examples
+///
+/// Basic usage with no overrides:
+///
+/// ```rust
+/// let key = property_key!(editor.fontSize);
+/// assert_eq!(key.override_for.is_empty(), true);
+/// assert_eq!(key.ident, "editor.fontSize");
+/// ```
+///
+/// Usage with a single override:
+///
+/// ```rust
+/// let key = property_key!([rust].editor.fontSize);
+/// assert!(key.override_for.contains("rust"));
+/// assert_eq!(key.ident, "editor.fontSize");
+/// ```
+///
+/// Usage with multiple overrides:
+///
+/// ```rust
+/// let key = property_key!([typescript][javascript].editor.fontSize);
+/// assert!(key.override_for.contains("typescript"));
+/// assert!(key.override_for.contains("javascript"));
+/// assert_eq!(key.ident, "editor.fontSize");
+/// ```
+#[macro_export]
+macro_rules! property_key {
+    // Collect overrides and construct the Key with sub-identifiers
+    (@collect_overrides [$($override:ident)+] $ident:ident $(. $subident:ident)*) => {{
+        use hashbrown::HashSet;
 
-#[derive(Debug, Clone)]
-pub struct CompositeKey {
-    pub r#override: String,
-    pub key: String,
-}
 
-impl ToString for CompositeKey {
-    fn to_string(&self) -> String {
-        format!("[{}].{}", self.r#override, self.key)
-    }
-}
+        let mut overrides = HashSet::new();
+        $(
+            overrides.insert(stringify!($override).to_string());
+        )+
+        let ident = concat!(stringify!($ident), $(concat!(".", stringify!($subident))),*).to_string();
+        $crate::common::configuration_registry::PropertyKey {
+            override_for: if overrides.is_empty() { None } else { Some(overrides) },
+            ident,
+        }
+    }};
 
-impl Keyable for CompositeKey {
-    fn as_composite_key(&self) -> Option<CompositeKey> {
-        Some(self.clone())
-    }
+    // Handle a single override
+    ([$override:ident] . $($tail:tt)*) => {
+        property_key!(@collect_overrides [$override] $($tail)*)
+    };
+
+    // Handle multiple overrides
+    ([$first:ident] $([$rest:ident])+ . $($tail:tt)*) => {
+        property_key!(@collect_overrides [$first $($rest)+] $($tail)*)
+    };
+
+    // Handle the case without overrides and with sub-identifiers
+    ($ident:ident $(. $subident:ident)*) => {{
+        use hashbrown::HashSet;
+
+        let overrides: HashSet<String> = HashSet::new();
+        let ident = concat!(stringify!($ident), $(concat!(".", stringify!($subident))),*).to_string();
+        $crate::common::configuration_registry::PropertyKey {
+            override_for: if overrides.is_empty() { None } else { Some(overrides) },
+            ident,
+        }
+    }};
 }
 
 #[derive(Debug, Clone)]
@@ -150,12 +239,12 @@ impl PropertyMap {
         self.table.extend(item.table);
     }
 
-    pub fn insert(&mut self, key: impl Keyable, value: ConfigurationPropertySchema) {
-        self.table.insert(key.to_string(), value);
-
-        if let Some(composite_key) = key.as_composite_key() {
-            self.overrides.insert(composite_key.r#override);
+    pub fn insert(&mut self, key: PropertyKey, value: ConfigurationPropertySchema) {
+        for k in key.distinct() {
+            self.table.insert(k, value.clone());
         }
+
+        self.overrides.maybe_extend(key.override_for);
     }
 }
 
@@ -163,6 +252,11 @@ impl PropertyMap {
 pub enum StringPresentationFormatType {
     Multiline,
     Singleline,
+}
+
+#[derive(Debug, Clone)]
+pub struct PropertyPolicy {
+    pub name: String,
 }
 
 /// Struct representing a schema for a configuration property.
@@ -174,7 +268,7 @@ pub struct ConfigurationPropertySchema {
     /// The scope of the configuration property, indicating the level at which it applies.
     pub scope: Option<ConfigurationScope>,
     /// The type of the configuration property, specifying the kind of value it holds.
-    pub r#type: Option<ConfigurationNodeType>,
+    pub typ: Option<ConfigurationNodeType>,
     /// The order in which the configuration property appears in the settings UI.
     pub order: Option<usize>,
     /// The default value of the configuration property, if any.
@@ -198,6 +292,8 @@ pub struct ConfigurationPropertySchema {
     /// - Use `deprecated` to mark property as deprecated.
     /// - Use `beta` to mark property that are in beta testing.
     pub tags: Option<String>,
+
+    pub policy: Option<PropertyPolicy>,
 
     /// Minimum number of properties in the schema.
     pub max_properties: Option<usize>,
@@ -241,7 +337,7 @@ impl Default for ConfigurationPropertySchema {
         Self {
             id: None,
             scope: Some(ConfigurationScope::Window),
-            r#type: Some(ConfigurationNodeType::Null),
+            typ: Some(ConfigurationNodeType::Null),
             order: None,
             default: Some(default_default_value),
             description: None,
@@ -250,6 +346,7 @@ impl Default for ConfigurationPropertySchema {
             schemable: Some(true),
             deprecated: Some(false),
             tags: None,
+            policy: None,
             max_properties: None,
             min_properties: None,
             array_items: None,
@@ -266,6 +363,12 @@ impl Default for ConfigurationPropertySchema {
             enum_item_labels: None,
         }
     }
+}
+
+#[derive(Debug, Clone)]
+pub struct ConfigurationSource {
+    pub id: String,
+    pub display_name: Option<String>,
 }
 
 /// Struct representing a configuration node.
@@ -288,7 +391,7 @@ pub struct ConfigurationNode {
     /// Sub-nodes of the configuration node.
     pub parent_of: Option<Vec<ConfigurationNode>>,
 
-    pub source: Option<SourceInfo>,
+    pub source: Option<ConfigurationSource>,
 }
 
 /// Struct representing default configurations.
@@ -301,13 +404,13 @@ pub struct ConfigurationDefaults {
     /// The source of the default configurations.
     /// This optional field indicates the origin of these default configurations, such as an extension or a specific configuration context.
     /// It provides context for the default values and helps track their origin.
-    pub source: Option<SourceInfo>,
+    pub source: Option<ConfigurationSource>,
 }
 
 #[derive(Debug, Clone)]
 pub struct RegisteredConfigurationPropertySchema {
     pub schema: Arc<ConfigurationPropertySchema>,
-    pub source: Option<SourceInfo>,
+    pub source: Option<ConfigurationSource>,
 }
 
 impl RegisteredConfigurationPropertySchema {
@@ -317,7 +420,7 @@ impl RegisteredConfigurationPropertySchema {
 }
 
 impl RegisteredConfigurationPropertySchema {
-    fn new(property: ConfigurationPropertySchema, source: Option<SourceInfo>) -> Self {
+    fn new(property: ConfigurationPropertySchema, source: Option<ConfigurationSource>) -> Self {
         let registered_property = Self {
             schema: Arc::new(property),
             source,
@@ -337,7 +440,7 @@ pub struct ConfigurationDefaultOverrideValue {
     /// The source of the override.
     /// This optional field indicates the origin of the override, such as an extension or user-defined configuration.
     /// It helps track where the override came from and provides context for the overridden value.
-    pub source: Option<SourceInfo>,
+    pub source: Option<ConfigurationSource>,
 }
 
 /// Struct to store schema information for configuration settings.
@@ -413,60 +516,60 @@ pub struct ConfigurationRegistry {
     /// Map of configuration properties.
     /// This hashmap stores the properties of configurations, indexed by their keys.
     /// Each property includes metadata such as type, scope, default values, and descriptions.
-    configuration_properties: HashMap<String, RegisteredConfigurationPropertySchema>,
+    properties: HashMap<String, RegisteredConfigurationPropertySchema>,
 
     /// List of configuration nodes contributed.
     /// This map contains all configuration nodes that have been registered to the registry.
     /// Configuration nodes can include multiple properties and sub-nodes.
-    configuration_contributors: HashMap<String, Arc<ConfigurationNode>>,
+    contributors: HashMap<String, Arc<ConfigurationNode>>,
 
     /// Set of override identifiers.
     /// This set contains identifiers that are used to specify configurations that can override default values.
     /// Override identifiers are used to create specialized settings for different scopes or contexts.
-    override_identifiers: HashSet<String>,
+    overrides: HashSet<String>,
 
     /// Storage for configuration schemas.
     /// This structure stores the schema definitions for all settings, organized by their scope (e.g., platform, machine, window, resource).
     /// It is used to generate and manage the JSON schema for configuration properties.
-    configuration_schema_storage: ConfigurationSchemaStorage,
+    schema_storage: ConfigurationSchemaStorage,
 
     /// Map of excluded configuration properties.
     /// This hashmap stores properties that are explicitly excluded from the configuration registry.
     /// These properties are not included in the configuration schema and are not available for users to configure.
-    excluded_configuration_properties: HashMap<String, RegisteredConfigurationPropertySchema>,
+    excluded_properties: HashMap<String, RegisteredConfigurationPropertySchema>,
 }
 
 impl ConfigurationRegistry {
     pub fn new() -> Self {
         Self {
             registered_configuration_defaults: Vec::new(),
-            configuration_properties: HashMap::new(),
-            configuration_contributors: HashMap::new(),
+            properties: HashMap::new(),
+            contributors: HashMap::new(),
             configuration_defaults_overrides: HashMap::new(),
-            override_identifiers: HashSet::new(),
-            configuration_schema_storage: ConfigurationSchemaStorage::empty(),
-            excluded_configuration_properties: HashMap::new(),
+            overrides: HashSet::new(),
+            schema_storage: ConfigurationSchemaStorage::empty(),
+            excluded_properties: HashMap::new(),
         }
     }
 
     pub fn get_configuration_properties(
         &self,
     ) -> &HashMap<String, RegisteredConfigurationPropertySchema> {
-        &self.configuration_properties
+        &self.properties
     }
 
     pub fn get_excluded_configuration_properties(
         &self,
     ) -> &HashMap<String, RegisteredConfigurationPropertySchema> {
-        &self.excluded_configuration_properties
+        &self.excluded_properties
     }
 
     pub fn get_override_identifiers(&self) -> &HashSet<String> {
-        &self.override_identifiers
+        &self.overrides
     }
 
     pub fn register_configuration(&mut self, configuration: ConfigurationNode) {
-        self.configuration_contributors
+        self.contributors
             .insert(configuration.id.clone(), Arc::new(configuration.clone()));
         self.register_json_configuration(&configuration);
 
@@ -491,8 +594,7 @@ impl ConfigurationRegistry {
             .unwrap_or(PropertyMap::new());
 
         // TODO: validate incoming override identifiers before extend
-        self.override_identifiers
-            .extend(node_properties.overrides.clone());
+        self.overrides.extend(node_properties.overrides.clone());
 
         for (key, property) in &node_properties {
             if validate && !self.validate_property(&property) {
@@ -516,10 +618,9 @@ impl ConfigurationRegistry {
             );
 
             if property.schemable.unwrap_or(true) {
-                self.configuration_properties
-                    .insert(key.clone(), registered_property);
+                self.properties.insert(key.clone(), registered_property);
             } else {
-                self.excluded_configuration_properties
+                self.excluded_properties
                     .insert(key.clone(), registered_property);
             }
         }
@@ -543,8 +644,7 @@ impl ConfigurationRegistry {
         if let Some(properties) = &configuration.properties {
             for (key, property) in properties {
                 if property.schemable.unwrap_or(true) {
-                    self.configuration_schema_storage
-                        .update_schema(key, property);
+                    self.schema_storage.update_schema(key, property);
                 }
             }
         }
@@ -569,5 +669,140 @@ impl ConfigurationRegistry {
         _default_configurations: Vec<ConfigurationDefaults>,
     ) -> HashSet<String> {
         unimplemented!()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_key_with_multiple_overrides_and_sub_identifiers() {
+        let key = property_key!([typescript][javascript].editor.fontSize);
+        let mut expected_overrides = HashSet::new();
+        expected_overrides.insert("typescript".to_string());
+        expected_overrides.insert("javascript".to_string());
+        let expected_key = PropertyKey {
+            override_for: Some(expected_overrides),
+            ident: "editor.fontSize".to_string(),
+        };
+        assert_eq!(key, expected_key);
+    }
+
+    #[test]
+    fn test_key_with_single_override_and_sub_identifiers() {
+        let key = property_key!([rust].editor.fontSize);
+        let mut expected_overrides = HashSet::new();
+        expected_overrides.insert("rust".to_string());
+        let expected_key = PropertyKey {
+            override_for: Some(expected_overrides),
+            ident: "editor.fontSize".to_string(),
+        };
+        assert_eq!(key, expected_key);
+    }
+
+    #[test]
+    fn test_key_with_multiple_sub_identifiers() {
+        let key = property_key!(editor.fontSize.lineHeight);
+        let expected_overrides = HashSet::new();
+        let expected_key = PropertyKey {
+            override_for: Some(expected_overrides),
+            ident: "editor.fontSize.lineHeight".to_string(),
+        };
+        assert_eq!(key, expected_key);
+    }
+
+    #[test]
+    fn test_key_with_single_identifier() {
+        let key = property_key!(editor);
+        let expected_overrides = HashSet::new();
+        let expected_key = PropertyKey {
+            override_for: Some(expected_overrides),
+            ident: "editor".to_string(),
+        };
+        assert_eq!(key, expected_key);
+    }
+
+    #[test]
+    fn test_parse_with_multiple_overrides_and_sub_identifiers() {
+        let s = "[typescript][javascript].editor.fontSize";
+        let key = PropertyKey::parse(s).unwrap();
+        let mut expected_overrides = HashSet::new();
+        expected_overrides.insert("typescript".to_string());
+        expected_overrides.insert("javascript".to_string());
+        let expected_key = PropertyKey {
+            override_for: Some(expected_overrides),
+            ident: "editor.fontSize".to_string(),
+        };
+        assert_eq!(key, expected_key);
+    }
+
+    #[test]
+    fn test_parse_with_single_override_and_sub_identifiers() {
+        let s = "[rust].editor.fontSize";
+        let key = PropertyKey::parse(s).unwrap();
+        let mut expected_overrides = HashSet::new();
+        expected_overrides.insert("rust".to_string());
+        let expected_key = PropertyKey {
+            override_for: Some(expected_overrides),
+            ident: "editor.fontSize".to_string(),
+        };
+        assert_eq!(key, expected_key);
+    }
+
+    #[test]
+    fn test_parse_with_multiple_sub_identifiers() {
+        let s = "editor.fontSize.lineHeight";
+        let key = PropertyKey::parse(s).unwrap();
+        let expected_key = PropertyKey {
+            override_for: None,
+            ident: "editor.fontSize.lineHeight".to_string(),
+        };
+        assert_eq!(key, expected_key);
+    }
+
+    #[test]
+    fn test_parse_with_single_identifier() {
+        let s = "editor";
+        let key = PropertyKey::parse(s).unwrap();
+        let expected_key = PropertyKey {
+            override_for: None,
+            ident: "editor".to_string(),
+        };
+        assert_eq!(key, expected_key);
+    }
+
+    #[test]
+    fn test_parse_with_multiple_overrides_single_sub_identifier() {
+        let s = "[typescript][javascript].editor";
+        let key = PropertyKey::parse(s).unwrap();
+        let mut expected_overrides = HashSet::new();
+        expected_overrides.insert("typescript".to_string());
+        expected_overrides.insert("javascript".to_string());
+        let expected_key = PropertyKey {
+            override_for: Some(expected_overrides),
+            ident: "editor".to_string(),
+        };
+        assert_eq!(key, expected_key);
+    }
+
+    #[test]
+    fn test_parse_with_single_override_single_identifier() {
+        let s = "[rust].editor";
+        let key = PropertyKey::parse(s).unwrap();
+        let mut expected_overrides = HashSet::new();
+        expected_overrides.insert("rust".to_string());
+        let expected_key = PropertyKey {
+            override_for: Some(expected_overrides),
+            ident: "editor".to_string(),
+        };
+        assert_eq!(key, expected_key);
+    }
+
+    #[test]
+    fn test_parse_with_invalid_format() {
+        let s = "[rust.editor.fontSize";
+        let result = PropertyKey::parse(s);
+        assert!(result.is_err());
     }
 }

@@ -47,16 +47,14 @@ where
         }
     }
 
-    pub fn enqueue(&self, job: T)
+    pub fn enqueue(&self, job: T) -> Task<()>
     where
         T: Send + 'static,
     {
         let processor = Arc::clone(&self.processor);
 
-        self.backend
-            .spawn(async move {
-                processor.process(job).await;
-            })
-            .detach();
+        self.backend.spawn(async move {
+            processor.process(job).await;
+        })
     }
 }
