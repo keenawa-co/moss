@@ -1471,7 +1471,9 @@ dependencies = [
  "base",
  "hashbrown 0.7.2",
  "lazy-regex",
+ "moss_base",
  "parking_lot",
+ "radix_trie",
  "schemars",
  "serde",
  "serde_json",
@@ -3929,6 +3931,7 @@ name = "moss_base"
 version = "0.1.0"
 dependencies = [
  "hashbrown 0.7.2",
+ "radix_trie",
 ]
 
 [[package]]

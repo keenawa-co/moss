@@ -18,18 +18,22 @@ use tauri_specta::{collect_commands, collect_events, ts};
 use tracing::error;
 // use tracing_subscriber::FmtSubscriber;
 use configuration::common::{
-    configuration_policy::{ConfigurationPolicy, ConfigurationPolicyService},
-    configuration_registry::{
-        CompositeKey, ConfigurationNodeType, ConfigurationScope, PropertyMap, PropertyPolicy,
-        SourceInfo,
-    },
-};
-use configuration::common::{
     configuration_registry::{
         ConfigurationNode, ConfigurationPropertySchema, ConfigurationRegistry,
     },
     configuration_service::ConfigurationService,
     AbstractConfigurationService,
+};
+use configuration::{
+    attribute_name,
+    common::{
+        configuration_policy::ConfigurationPolicyService,
+        configuration_registry::{
+            ConfigurationNodeType, ConfigurationScope, ConfigurationSource, PropertyMap,
+            PropertyPolicy,
+        },
+    },
+    property_key,
 };
 
 #[tauri::command(async)]
@@ -98,7 +102,9 @@ pub fn run(ctx: &mut AppContextCompact) -> tauri::Result<()> {
     });
 
     let db = ctx.block_on(|ctx| async {
-        let db = Surreal::new::<Ws>("127.0.0.1:8000").await.unwrap();
+        let db = Surreal::new::<Ws>("127.0.0.1:8000")
+            .await
+            .expect("failed to connect to db");
         // let db = Surreal::new::<File>("../rocksdb").await.unwrap();
         db.use_ns("moss").use_db("compass").await.unwrap();
 
@@ -108,12 +114,6 @@ pub fn run(ctx: &mut AppContextCompact) -> tauri::Result<()> {
         Arc::new(db)
     });
 
-    // TODO: move to log service
-    // let subscriber = FmtSubscriber::builder()
-    //     .with_max_level(Level::TRACE)
-    //     .finish();
-    // tracing::subscriber::set_global_default(subscriber).expect("setting default subscriber failed");
-
     let mut registry = ConfigurationRegistry::new();
 
     let editor_configuration = ConfigurationNode {
@@ -122,17 +122,17 @@ pub fn run(ctx: &mut AppContextCompact) -> tauri::Result<()> {
         order: Some(1),
         r#type: Default::default(),
         scope: Default::default(),
-        source: Some(SourceInfo {
+        source: Some(ConfigurationSource {
             id: "moss.core".to_string(),
             display_name: Some("Moss Core".to_string()),
         }),
         properties: {
             let mut properties = PropertyMap::new();
             properties.insert(
-                "editor.fontSize".to_string(),
+                property_key!(editor.fontSize),
                 ConfigurationPropertySchema {
                     scope: Some(ConfigurationScope::Resource),
-                    r#type: Some(ConfigurationNodeType::Number),
+                    typ: Some(ConfigurationNodeType::Number),
                     order: Some(1),
                     default: Some(serde_json::Value::Number(serde_json::Number::from(12))),
                     description: Some("Controls the font size in pixels.".to_string()),
@@ -140,10 +140,10 @@ pub fn run(ctx: &mut AppContextCompact) -> tauri::Result<()> {
                 },
             );
             properties.insert(
-                "editor.lineHeight".to_string(),
+                property_key!(editor.lineHeight),
                 ConfigurationPropertySchema {
                     scope: Some(ConfigurationScope::Resource),
-                    r#type: Some(ConfigurationNodeType::Number),
+                    typ: Some(ConfigurationNodeType::Number),
                     order: Some(2),
                     default: Some(serde_json::Value::Number(serde_json::Number::from(20))),
                     description: Some("Controls the line height.".to_string()),
@@ -163,39 +163,40 @@ pub fn run(ctx: &mut AppContextCompact) -> tauri::Result<()> {
             order: Some(1),
             r#type: Default::default(),
             scope: Default::default(),
-            source: Some(SourceInfo {
+            source: Some(ConfigurationSource {
                 id: "moss.core".to_string(),
                 display_name: Some("Moss Core".to_string()),
             }),
 
             properties: {
                 let mut properties = PropertyMap::new();
-                let font_size = ConfigurationPropertySchema {
-                    scope: Some(ConfigurationScope::Resource),
-                    r#type: Some(ConfigurationNodeType::Number),
-                    order: Some(1),
-                    default: Some(serde_json::Value::Number(serde_json::Number::from(12))),
-                    description: Some("Controls the font size in pixels.".to_string()),
-                    protected_from_contribution: Some(false),
-                    allow_for_only_restricted_source: Some(false),
-                    schemable: Some(true),
-                    ..Default::default()
-                };
 
                 properties.insert(
-                    CompositeKey {
-                        key: "editor.fontSize".to_string(),
-                        r#override: "mossql".to_string(),
+                    property_key!([mossql].editor.fontSize),
+                    ConfigurationPropertySchema {
+                        scope: Some(ConfigurationScope::Resource),
+                        typ: Some(ConfigurationNodeType::Number),
+                        order: Some(1),
+                        default: Some(serde_json::Value::Number(serde_json::Number::from(12))),
+                        description: Some("Controls the font size in pixels.".to_string()),
+                        protected_from_contribution: Some(false),
+                        allow_for_only_restricted_source: Some(false),
+                        schemable: Some(true),
+                        ..Default::default()
                     },
-                    font_size.clone(),
                 );
                 properties.insert(
-                    CompositeKey {
-                        key: "editor.fontSize".to_string(),
-                        r#override: "mossql/test".to_string(),
+                    property_key!([mossql].editor.lineHeight),
+                    ConfigurationPropertySchema {
+                        scope: Some(ConfigurationScope::Resource),
+                        typ: Some(ConfigurationNodeType::Number),
+                        order: Some(2),
+                        default: Some(serde_json::Value::Number(serde_json::Number::from(30))),
+                        description: Some("Controls the line height.".to_string()),
+                        ..Default::default()
                     },
-                    font_size,
                 );
+
                 Some(properties)
             },
             description: None,
@@ -237,28 +238,25 @@ pub fn run(ctx: &mut AppContextCompact) -> tauri::Result<()> {
         )
         .unwrap();
 
-        let value = config_service.get_value("editor.fontSize", None);
+        let value = config_service.get_value(attribute_name!(editor.fontSize));
         println!("Value `editor.fontSize` form None: {:?}", value);
 
-        let value = config_service.get_value("editor.lineHeight", None);
+        let value = config_service.get_value(attribute_name!(editor.lineHeight));
         println!("Value `editor.lineHeight` form None: {:?}", value);
 
-        let value = config_service.get_value("editor.fontSize", Some("mossql"));
+        let value = config_service.get_value(attribute_name!([mossql].editor.fontSize));
         println!("Value `editor.fontSize` form `mossql`: {:?}", value);
 
-        let value = config_service.get_value("editor.fontSize", Some("mossql/test"));
-        println!("Value `editor.fontSize` form `mossql/test`: {:?}", value);
+        // config_service
+        //     .update_value(
+        //         "editor.fontSize",
+        //         serde_json::Value::Number(serde_json::Number::from(15)),
+        //     )
+        //     .await
+        //     .unwrap();
 
-        config_service
-            .update_value(
-                "editor.fontSize",
-                serde_json::Value::Number(serde_json::Number::from(15)),
-            )
-            .await
-            .unwrap();
-
-        let value = config_service.get_value("editor.fontSize", None);
-        println!("Value `editor.fontSize` form None (after): {:?}", value);
+        // let value = config_service.get_value("editor.fontSize", None);
+        // println!("Value `editor.fontSize` form None (after): {:?}", value);
     });
 
     let (invoke_handler, register_events) = {

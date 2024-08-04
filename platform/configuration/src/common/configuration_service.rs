@@ -1,21 +1,21 @@
 use anyhow::{Context as AnyhowContext, Result};
 use base::queue::{thread_backend::ThreadBackend, Processor, Queue};
 use lazy_regex::Lazy;
-use serde_json::{json, Value};
+use serde_json::Value;
 use std::{
-    fs::{File, OpenOptions},
+    fs::OpenOptions,
     io::{Read, Seek, SeekFrom, Write},
-    path::{Path, PathBuf},
+    path::PathBuf,
     sync::Arc,
 };
 
 use super::{
     configuration_default::DefaultConfiguration,
     configuration_model::{
-        Configuration, ConfigurationModel, ConfigurationParser, UserConfiguration,
+        AttributeName, Configuration, ConfigurationModel, ConfigurationParser, UserConfiguration,
     },
     configuration_policy::{ConfigurationPolicy, ConfigurationPolicyService},
-    configuration_registry::{ConfigurationRegistry, Keyable},
+    configuration_registry::ConfigurationRegistry,
     AbstractConfigurationService,
 };
 
@@ -85,44 +85,46 @@ impl ConfigurationService {
 
         Ok(())
     }
-}
 
-#[async_trait]
-impl AbstractConfigurationService for ConfigurationService {
-    fn get_value(&self, key: &str, overrider_identifier: Option<&str>) -> Option<Value> {
-        self.configuration.get_value(key, overrider_identifier)
-    }
-
-    /// NOTE: The function only works to update non-object values ​​at the root level
-    async fn update_value(&self, key: impl Keyable + Send, value: serde_json::Value) -> Result<()> {
-        // TODO:
-        // - Use pointer instead of key
-        // - Check if the setting being changed is a USER level setting
-        // - Check the key policy (can it be overwritten, etc.)
-
-        let key_str = key.to_string();
-
-        let inspected_value = self.configuration.inspect(&key_str, None);
-        if inspected_value.get_policy_value(&key.to_string()).is_some() {
+    async fn do_update_value(&self, attribute_name: &AttributeName, value: &Value) -> Result<()> {
+        let inspected_value = self.configuration.inspect(attribute_name);
+        if inspected_value.get_policy_value(attribute_name).is_some() {
             return Err(anyhow!(
                 "value `{}` is protected by policy and cannot be overwritten.",
-                key.to_string()
+                attribute_name.to_string()
             ));
         }
 
         if inspected_value
-            .get_default_value(&key_str)
-            .map_or(false, |default_value| default_value == &value)
+            .get_default_value(&attribute_name)
+            .map_or(false, |default_value| default_value == value)
         {
             self.configuration_editing
-                .write(key.to_string(), None)
+                .write(attribute_name.to_string(), None)
                 .await;
         } else {
             self.configuration_editing
-                .write(key.to_string(), Some(value))
+                .write(attribute_name.to_string(), Some(value.clone()))
                 .await;
         }
 
+        Ok(())
+    }
+}
+
+#[async_trait]
+impl AbstractConfigurationService for ConfigurationService {
+    fn get_value(&self, attribute_name: AttributeName) -> Option<Value> {
+        self.configuration.get_value(&attribute_name)
+    }
+
+    /// NOTE: The function only works to update non-object values ​​at the root level
+    async fn update_value(&self, attribute_name: AttributeName, value: &Value) -> Result<()> {
+        // TODO:
+        // - Use pointer instead of key
+        // - Check if the setting being changed is a USER level setting
+
+        self.do_update_value(&attribute_name, value).await?;
         Ok(self.reload_configuration()?)
     }
 }
@@ -184,10 +186,10 @@ impl ConfigurationEditingService {
         }
     }
 
-    async fn write(&self, key: impl Keyable, value: Option<serde_json::Value>) {
+    async fn write(&self, key: String, value: Option<serde_json::Value>) {
         self.queue
             .enqueue(ConfigurationWriteJob {
-                key: key.to_string(),
+                key,
                 value,
                 resource: self.edited_resource.clone(),
             })

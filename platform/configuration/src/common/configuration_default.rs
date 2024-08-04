@@ -1,12 +1,10 @@
+use arc_swap::ArcSwapOption;
+use radix_trie::Trie;
 use std::sync::Arc;
 
-use arc_swap::ArcSwapOption;
-use hashbrown::HashMap;
-use schemars::schema;
-use serde_json::Value;
-
 use super::{
-    configuration_model::ConfigurationModel, configuration_registry::ConfigurationRegistry,
+    configuration_model::{AttributeName, ConfigurationModel},
+    configuration_registry::ConfigurationRegistry,
 };
 
 pub struct DefaultConfiguration {
@@ -31,12 +29,21 @@ impl DefaultConfiguration {
     }
 
     fn reset_configuration_model(&self) {
-        let mut new_model = ConfigurationModel::empty();
         let properties = self.configuration_registry.get_configuration_properties();
+        let mut new_model = ConfigurationModel {
+            content: Trie::new(),
+            names: Vec::new(),
+            overrides: self
+                .configuration_registry
+                .get_override_identifiers()
+                .iter()
+                .cloned()
+                .collect(),
+        };
 
         for (key, property) in properties {
             if let Some(default_value) = &property.schema.default {
-                new_model.set_value(key.clone(), default_value.clone());
+                new_model.set_value(AttributeName::format(key), default_value.clone());
             }
         }
 

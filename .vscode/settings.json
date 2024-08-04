@@ -29,6 +29,7 @@
     "smol",
     "specta",
     "sqlx",
+    "subident",
     "surql",
     "surrealdb",
     "tablename",

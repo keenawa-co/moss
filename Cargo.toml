@@ -51,6 +51,8 @@ rustflags = ["-C", "target-cpu=native"]
 [workspace.dependencies]
 fs = { path = "kernel/fs" }
 
+moss_base = { path = "lib/moss_base" }
+
 base = { path = "platform/base" }
 configuration = { path = "platform/configuration" }
 workbench = { path = "platform/workbench" }
