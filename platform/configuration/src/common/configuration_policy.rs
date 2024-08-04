@@ -57,7 +57,7 @@ impl ConfigurationPolicy {
         let configuration_properties = self.registry.get_configuration_properties();
         let mut property_policies = HashMap::new();
 
-        for key in model.get_keys() {
+        for key in model.get_attribute_names() {
             let property = if let Some(property) = configuration_properties.get(key) {
                 property
             } else {

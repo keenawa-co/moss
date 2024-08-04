@@ -9,15 +9,13 @@ use std::{
     sync::Arc,
 };
 
-use crate::common::utl;
-
 use super::{
     configuration_default::DefaultConfiguration,
     configuration_model::{
-        Configuration, ConfigurationModel, ConfigurationParser, UserConfiguration,
+        AttributeName, Configuration, ConfigurationModel, ConfigurationParser, UserConfiguration,
     },
     configuration_policy::{ConfigurationPolicy, ConfigurationPolicyService},
-    configuration_registry::{ConfigurationRegistry, Keyable},
+    configuration_registry::ConfigurationRegistry,
     AbstractConfigurationService,
 };
 
@@ -88,33 +86,25 @@ impl ConfigurationService {
         Ok(())
     }
 
-    async fn do_update_value(
-        &self,
-        key: &str,
-        value: &Value,
-        overrider_ident: Option<&str>,
-    ) -> Result<()> {
-        let inspected_value = self.configuration.inspect(&key, None);
-        if inspected_value
-            .get_policy_value(&key, overrider_ident)
-            .is_some()
-        {
+    async fn do_update_value(&self, attribute_name: &AttributeName, value: &Value) -> Result<()> {
+        let inspected_value = self.configuration.inspect(attribute_name);
+        if inspected_value.get_policy_value(attribute_name).is_some() {
             return Err(anyhow!(
                 "value `{}` is protected by policy and cannot be overwritten.",
-                key.to_string()
+                attribute_name.to_string()
             ));
         }
 
         if inspected_value
-            .get_default_value(&key, overrider_ident)
+            .get_default_value(&attribute_name)
             .map_or(false, |default_value| default_value == value)
         {
             self.configuration_editing
-                .write(key.to_string(), None)
+                .write(attribute_name.to_string(), None)
                 .await;
         } else {
             self.configuration_editing
-                .write(key.to_string(), Some(value.clone()))
+                .write(attribute_name.to_string(), Some(value.clone()))
                 .await;
         }
 
@@ -124,25 +114,17 @@ impl ConfigurationService {
 
 #[async_trait]
 impl AbstractConfigurationService for ConfigurationService {
-    fn get_value(&self, key: &str, overrider_identifier: Option<&str>) -> Option<Value> {
-        self.configuration.get_value(key, overrider_identifier)
+    fn get_value(&self, attribute_name: AttributeName) -> Option<Value> {
+        self.configuration.get_value(&attribute_name)
     }
 
     /// NOTE: The function only works to update non-object values ​​at the root level
-    async fn update_value(
-        &self,
-        key: &str,
-        value: Value,
-        overrider_ident: Option<&str>,
-    ) -> Result<()> {
+    async fn update_value(&self, attribute_name: AttributeName, value: &Value) -> Result<()> {
         // TODO:
         // - Use pointer instead of key
         // - Check if the setting being changed is a USER level setting
 
-        for k in key.to_key().distinct() {
-            self.do_update_value(&k, &value, overrider_ident).await?;
-        }
-
+        self.do_update_value(&attribute_name, value).await?;
         Ok(self.reload_configuration()?)
     }
 }
