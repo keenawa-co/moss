@@ -9,23 +9,6 @@ export const RootLayout = ({ children, className, ...props }: ComponentProps<"ma
   );
 };
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 export const Sidebar = ({ className, children, ...props }: ComponentProps<"aside">) => {
   return (
     <aside
