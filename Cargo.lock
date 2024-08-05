@@ -9001,6 +9001,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "workspace_configuration"
+version = "0.1.0"
+
+[[package]]
 name = "wry"
 version = "0.41.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
