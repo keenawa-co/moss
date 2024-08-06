@@ -23,6 +23,7 @@
     "react": "^18.2.0"
   },
   "devDependencies": {
+    "@radix-ui/react-tooltip": "^1.1.2",
     "@repo/eslint-config": "workspace:*",
     "@repo/tailwind-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
@@ -35,11 +36,9 @@
     "typescript": "^5.3.3"
   },
   "dependencies": {
-    "@radix-ui/react-tooltip": "^1.1.2",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "lucide-react": "^0.418.0",
-    "native-keymap": "^3.3.5",
     "tailwindcss-animate": "^1.0.7"
   }
 }
