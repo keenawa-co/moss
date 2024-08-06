@@ -1,14 +1,4 @@
-import {
-  About,
-  Content,
-  DraggableTopBar,
-  Home,
-  Menu,
-  Properties,
-  RootLayout,
-  Sidebar,
-  MacOsTrafficLights,
-} from "@/components";
+import { About, Content, DraggableTitleBar, Home, Menu, Properties, RootLayout, Sidebar } from "@/components";
 import { Suspense } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import "./i18n";
@@ -41,17 +31,18 @@ enum IconState {
 }
 
 const os = "macOS"; //useOperatingSystem();
-const showControls = true; //window.location.search.includes("showControls");
+//const showControls = true; //window.location.search.includes("showControls");
 
 let isMacOs = os == "macOS";
 
 console.log("os------------------->" + os);
-console.log("showControls------------------->" + showControls);
+//console.log("showControls------------------->" + showControls);
 
 function App() {
   return (
     <>
       <RootLayout>
+        <DraggableTitleBar />
         <Sidebar className="p-0">
           <MenuItem className="group bg-zinc-200 mt-13 mb-3.5">
             <Icon className="h-4.5 w-4.5">
@@ -112,10 +103,6 @@ function App() {
           </MenuItem>
         </Sidebar>
 
-        <div data-tauri-drag-region className={twMerge("shrink-0", isMacOs && "h-7")}>
-          {showControls && <MacOsTrafficLights className="absolute left-[13px] top-[13px] z-50" />}
-        </div>
-
         <Content className="relative flex flex-col">
           <Suspense fallback="loading">
             <BrowserRouter>
@@ -126,12 +113,11 @@ function App() {
               </Routes>
             </BrowserRouter>
           </Suspense>
-
-          <StatusBar
-            className="sticky bottom-0 mt-auto"
-            branch="MOSSMVP-37-Backend-Migrate-existing-backend-in-Tauri"
-          />
         </Content>
+        <StatusBar
+          className="absolute w-full bottom-0 h-5.5"
+          branch="MOSSMVP-37-Backend-Migrate-existing-backend-in-Tauri"
+        />
       </RootLayout>
     </>
   );

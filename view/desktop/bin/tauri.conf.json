@@ -20,11 +20,12 @@
         "height": 750,
         "minWidth": 768,
         "minHeight": 500,
+        "decorations": false,
         "alwaysOnTop": false,
         "focus": false,
         "dragDropEnabled": true,
-        "decorations": false,
         "center": true,
+        "transparent": true,
         "windowEffects": {
           "effects": ["sidebar"],
           "state": "followsWindowActiveState",

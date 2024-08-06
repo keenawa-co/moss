@@ -27,6 +27,7 @@ const config: Omit<Config, "content"> = {
       },
       height: {
         "4.5": "1.125rem",
+        "5.5": "1.375rem",
       },
       width: {
         "4.5": "1.125rem",
@@ -35,6 +36,7 @@ const config: Omit<Config, "content"> = {
       },
       margin: {
         "13": "3.25rem",
+        "5.5": "1.375rem",
       },
     },
   },
