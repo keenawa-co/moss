@@ -9,3 +9,4 @@ export * from "./ReportsIcon";
 export * from "./DocumentationIcon";
 export * from "./SearchIcon";
 export * from "./SearchShortcutIcon";
+export * from "./Tooltip";
