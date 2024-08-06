@@ -3,7 +3,7 @@ import Tooltip from "./Tooltip";
 import "./styles.css";
 
 const meta = {
-  title: "Shared/TooltipDemo",
+  title: "Shared/Tooltip",
   component: Tooltip,
   parameters: {
     layout: "centered",
