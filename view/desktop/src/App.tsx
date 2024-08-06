@@ -40,8 +40,8 @@ enum IconState {
   Disabled = "text-zinc-500 bg-opacity-50",
 }
 
-const os = "macOS"; //useOperatingSystem();
-const showControls = true; //window.location.search.includes("showControls");
+const os = useOperatingSystem();
+const showControls = window.location.search.includes("showControls");
 
 let isMacOs = os == "macOS";
 
