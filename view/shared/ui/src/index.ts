@@ -9,3 +9,8 @@ export * from "./ReportsIcon";
 export * from "./DocumentationIcon";
 export * from "./SearchIcon";
 export * from "./SearchShortcutIcon";
+export * from "./SettingsIcon";
+export * from "./QuickSearchIcon";
+export * from "./MacOsCloseIcon";
+export * from "./MacOsFullScreenIcon";
+export * from "./MacOsMinimizeIcon";
