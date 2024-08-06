@@ -34,7 +34,7 @@ export interface TooltipOptions {
   portal?: Pick<TooltipPrimitive.TooltipPortalProps, "forceMount" | "container">;
 }
 
-const Tooltip = ({
+export const Tooltip = ({
   label,
   shortcut, //TODO shortcut doesn't have any functionality
   options,
@@ -50,16 +50,16 @@ const Tooltip = ({
   return (
     <TooltipPrimitive.Provider {...options?.provider}>
       <TooltipPrimitive.Root {...options?.root}>
-        <TooltipPrimitive.Trigger asChild>{children}</TooltipPrimitive.Trigger>
+        <TooltipPrimitive.Trigger>{children}</TooltipPrimitive.Trigger>
         <TooltipPrimitive.Content
           className={cn(
             `z-50 overflow-hidden flex gap-2.5 bg-black text-white py-1 px-2 -mb-px rounded-md shadow-md text-xs max-w-44
-              data-[state=closed]:animate-out 
-              data-[state=closed]:fade-out-0 
-              data-[state=closed]:zoom-out-95 
-              data-[side=bottom]:slide-in-from-top-2 
-              data-[side=left]:slide-in-from-right-2 
-              data-[side=right]:slide-in-from-left-2 
+              data-[state=closed]:animate-out
+              data-[state=closed]:fade-out-0
+              data-[state=closed]:zoom-out-95
+              data-[side=bottom]:slide-in-from-top-2
+              data-[side=left]:slide-in-from-right-2
+              data-[side=right]:slide-in-from-left-2
               data-[side=top]:slide-in-from-bottom-2`,
             className
           )}
