@@ -9003,6 +9003,11 @@ dependencies = [
 [[package]]
 name = "workspace_configuration"
 version = "0.1.0"
+dependencies = [
+ "configuration",
+ "serde_json",
+ "workspace",
+]
 
 [[package]]
 name = "wry"
