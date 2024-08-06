@@ -29,7 +29,7 @@ serde = { workspace = true, features = ["derive"] }
 hashbrown = { workspace = true, features = ["serde"] }
 
 specta = "=2.0.0-rc.12"
-tauri = { version = "=2.0.0-beta.23", features = ["specta"] }
+tauri = { version = "=2.0.0-beta.23", features = [ "macos-private-api", "specta"] }
 tauri-specta = { git = "https://github.com/oscartbeaumont/tauri-specta", rev = "a49885967adc01c80e33962e3ecac25fe7497839", features = [
     "typescript",
 ] }

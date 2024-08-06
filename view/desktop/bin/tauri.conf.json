@@ -10,6 +10,8 @@
     "beforeBuildCommand": "pnpm build"
   },
   "app": {
+    "withGlobalTauri": true,
+    "macOSPrivateApi": true,
     "windows": [
       {
         "title": "Moss Compass",
@@ -21,7 +23,7 @@
         "alwaysOnTop": false,
         "focus": false,
         "dragDropEnabled": true,
-        "decorations": true,
+        "decorations": false,
         "center": true,
         "windowEffects": {
           "effects": ["sidebar"],
