@@ -13,6 +13,7 @@
     "Keyable",
     "keymap",
     "libc",
+    "lucide",
     "mimalloc",
     "mossland",
     "mossql",
@@ -26,6 +27,7 @@
     "schemable",
     "seaorm",
     "sess",
+    "shadcn",
     "smol",
     "specta",
     "sqlx",
@@ -90,4 +92,5 @@
       "mode": "auto"
     }
   ],
+
 }
