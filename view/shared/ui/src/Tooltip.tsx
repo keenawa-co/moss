@@ -52,7 +52,7 @@ const Tooltip = ({
         <TooltipPrimitive.Trigger asChild>{children}</TooltipPrimitive.Trigger>
         <TooltipPrimitive.Content
           className={cn(
-            `z-50 overflow-hidden border-none flex gap-2.5 bg-black text-white py-1 px-2 rounded-md shadow-md text-xs leading-3 max-w-44
+            `z-50 overflow-hidden border-none flex gap-2.5 bg-neutral-800 text-white py-1 px-2 rounded-md shadow-md text-xs  max-w-44 box-border
               data-[state=closed]:animate-out 
               data-[state=closed]:fade-out-0 
               data-[state=closed]:zoom-out-95 
