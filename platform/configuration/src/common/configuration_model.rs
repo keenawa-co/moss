@@ -409,16 +409,16 @@ impl Configuration {
     pub fn new(
         default_model: Arc<ConfigurationModel>,
         policy_model: Arc<ConfigurationModel>,
-        user_model: ConfigurationModel,
-        workspace_model: ConfigurationModel,
-        inmem_model: ConfigurationModel,
+        user_model: Arc<ConfigurationModel>,
+        workspace_model: Arc<ConfigurationModel>,
+        inmem_model: Arc<ConfigurationModel>,
     ) -> Self {
         Configuration {
             default_configuration: default_model,
             policy_configuration: policy_model,
-            user_configuration: ArcSwap::new(Arc::new(user_model)),
-            workspace_configuration: Arc::new(workspace_model),
-            inmem_configuration: Arc::new(inmem_model),
+            user_configuration: ArcSwap::new(user_model),
+            workspace_configuration: workspace_model,
+            inmem_configuration: inmem_model,
             consolidated_configuration: ArcSwapOption::from(None),
         }
     }
