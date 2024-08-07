@@ -38,12 +38,14 @@ export const Tooltip = ({
   label,
   shortcut, //TODO shortcut doesn't have any functionality
   options,
+  noArrow = false,
   children,
   className,
 }: {
   label?: string;
   shortcut?: string[];
   options?: TooltipOptions;
+  noArrow?: boolean;
   className?: string;
   children?: React.ReactNode;
 }) => {
@@ -66,8 +68,10 @@ export const Tooltip = ({
           {...options?.content}
         >
           {options?.portal && <TooltipPrimitive.Portal {...options?.portal} />}
-          {options?.arrow && <TooltipPrimitive.Arrow {...options?.arrow} />}
+          {noArrow === false && <TooltipPrimitive.Arrow className="bg-inherit " {...options?.arrow} />}
+
           <div>{label}</div>
+
           {shortcut && (
             <div className="text-neutral-400 uppercase self-center">
               {shortcut.map((s) => (

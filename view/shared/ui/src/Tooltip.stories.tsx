@@ -39,13 +39,11 @@ export const ALotOfText: Story = {
   render: (args) => <TooltipTemplate {...args} />,
 };
 
-export const WithArrow: Story = {
+export const NoArrow: Story = {
   args: {
     shortcut: ["⌘", "s"],
     label: "Settings",
-    options: {
-      arrow: {},
-    },
+    noArrow: true,
   },
   render: (args) => <TooltipTemplate {...args} />,
 };
