@@ -14,7 +14,7 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-const TooltipTemplate = (args: any) => <Tooltip {...args}>Tooltip</Tooltip>;
+const TooltipTemplate = (args: any) => <Tooltip {...args}>Hover me!</Tooltip>;
 
 export const WithShortcut: Story = {
   args: {
@@ -138,6 +138,19 @@ export const IconTrigger: Story = {
           d="M10.7446 2.27177C11.1054 2.36532 11.3221 2.7337 11.2286 3.09456L8.07856 15.2446C7.98501 15.6054 7.61663 15.8221 7.25576 15.7286C6.8949 15.635 6.67821 15.2666 6.77177 14.9058L9.92177 2.75576C10.0153 2.3949 10.3837 2.17821 10.7446 2.27177Z"
         />
       </svg>
+    </Tooltip>
+  ),
+};
+
+export const TriggerAsChild: Story = {
+  args: {
+    shortcut: ["⌘", "s"],
+    label: "Settings",
+    asChild: true,
+  },
+  render: (args) => (
+    <Tooltip {...args}>
+      <button>Hover me!</button>
     </Tooltip>
   ),
 };
