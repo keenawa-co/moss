@@ -14,3 +14,4 @@ export * from "./QuickSearchIcon";
 export * from "./MacOsCloseIcon";
 export * from "./MacOsFullScreenIcon";
 export * from "./MacOsMinimizeIcon";
+export * from "./Tooltip";

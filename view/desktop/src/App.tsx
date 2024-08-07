@@ -12,6 +12,7 @@ import {
 import { Suspense } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import "./i18n";
+import "../../shared/fonts.css";
 import {
   HomeIcon,
   Icon,
