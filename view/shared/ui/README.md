@@ -1,3 +1,7 @@
+# Moss
+
+Cross-platform code analyzer.
+
 # Technologies
 
 - **Tauri** (framework for building desktop applications using JS, HTML, and CSS)
