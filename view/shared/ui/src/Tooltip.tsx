@@ -39,6 +39,7 @@ export const Tooltip = ({
   shortcut, //TODO shortcut doesn't have any functionality
   options,
   noArrow = false,
+  asChild = false,
   children,
   className,
 }: {
@@ -46,16 +47,17 @@ export const Tooltip = ({
   shortcut?: string[];
   options?: TooltipOptions;
   noArrow?: boolean;
+  asChild?: boolean;
   className?: string;
   children?: React.ReactNode;
 }) => {
   return (
     <TooltipPrimitive.Provider {...options?.provider}>
       <TooltipPrimitive.Root {...options?.root}>
-        <TooltipPrimitive.Trigger>{children}</TooltipPrimitive.Trigger>
+        <TooltipPrimitive.Trigger asChild={asChild}>{children}</TooltipPrimitive.Trigger>
         <TooltipPrimitive.Content
           className={cn(
-            `z-50 overflow-hidden flex gap-2.5 bg-black text-white py-1 px-2 -mb-px rounded-md shadow-md text-xs max-w-44
+            `z-50 overflow-hidden flex gap-2.5 bg-[#1E1E1E] text-white py-1 px-2 -mb-px rounded-md shadow-md text-xs max-w-44
               data-[state=closed]:animate-out
               data-[state=closed]:fade-out-0
               data-[state=closed]:zoom-out-95
