@@ -300,6 +300,8 @@ pub fn run(ctx: &mut AppContextCompact) -> tauri::Result<()> {
             Ok(())
         })
         .menu(menu::setup_window_menu)
+        //.plugin(tauri_plugin_os::init())
+        //.plugin(tauri_plugin_window::init())
         .build(tauri::generate_context!())?
         .run(|_, _| {});
 

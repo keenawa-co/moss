@@ -41,9 +41,6 @@ opt-level = 3
 panic = "abort"
 codegen-units = 1
 
-[profile.dev.package.sqlx-macros]
-opt-level = 3
-
 
 [build]
 rustflags = ["-C", "target-cpu=native"]
@@ -55,7 +52,6 @@ moss_base = { path = "lib/moss_base" }
 
 base = { path = "platform/base" }
 configuration = { path = "platform/configuration" }
-workbench = { path = "platform/workbench" }
 
 bus = { path = "kernel/bus" }
 mac = { path = "lib/mac" }
