@@ -3,23 +3,6 @@
   "identifier": "default",
   "description": "enables the default permissions",
   "windows": ["main"],
-  "permissions": [
-    "app:default",
-    "event:default",
-    "image:default",
-    "menu:default",
-    "path:default",
-    "resources:default",
-    "window:default",
-    "tray:default",
-    "webview:default",
-    "window:allow-close",
-    "window:allow-create",
-    "window:allow-maximize",
-    "window:allow-minimize",
-    "window:allow-toggle-maximize",
-    "window:allow-start-dragging",
-    "webview:allow-internal-toggle-devtools"
-  ],
+  "permissions": ["shell:allow-open", "core:default"],
   "platforms": ["macOS", "linux", "windows"]
 }

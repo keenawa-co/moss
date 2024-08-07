@@ -26,7 +26,7 @@ export const commands = {
 
 /** user-defined events **/
 
-/** user-defined statics **/
+/** user-defined constants **/
 
 /** user-defined types **/
 
@@ -37,7 +37,7 @@ export type SessionInfoDTO = { created_at: string; project: ProjectDTO; session:
 
 /** tauri-specta globals **/
 
-import { invoke as TAURI_INVOKE } from "@tauri-apps/api/core";
+import { invoke as TAURI_INVOKE, Channel as TAURI_CHANNEL } from "@tauri-apps/api/core";
 import * as TAURI_API_EVENT from "@tauri-apps/api/event";
 import { type WebviewWindow as __WebviewWindow__ } from "@tauri-apps/api/webviewWindow";
 
