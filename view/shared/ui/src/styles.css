@@ -12,12 +12,6 @@
     --color-bg-primary: hsla(0, 0%, 100%);
   }
 
-  /*
-  * {
-    @apply .transition-colors duration-500 ease-in-out;
-  }
-  */
-
   html,
   body {
     .theme-black {
