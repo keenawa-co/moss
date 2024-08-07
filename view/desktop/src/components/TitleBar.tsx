@@ -1,12 +1,12 @@
 import { twMerge } from "tailwind-merge";
 import { WindowTitlebar } from "@/components";
 
-interface DraggableTitleBarProps {
+interface TitleBarProps {
   showControls?: string;
   isMacOs?: boolean;
 }
 
-export const DraggableTitleBar = ({}: DraggableTitleBarProps) => {
+export const TitleBar = ({}: TitleBarProps) => {
   return (
     <header data-tauri-drag-region className={twMerge("absolute inset-0 h-11 bg-zinc-100")}>
       <WindowTitlebar />

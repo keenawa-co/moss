@@ -14,6 +14,7 @@ export function WindowTitlebar({
 }: WindowTitlebarProps) {
   const [osType, setOsType] = useState<OsType | undefined>(undefined);
 
+  // for macOS testing: setOsType("macos");
   useEffect(() => {
     getOsType().then((type) => {
       setOsType(type);
@@ -25,7 +26,7 @@ export function WindowTitlebar({
     (controlsOrder === "platform" && windowControlsProps?.platform === "macos") ||
     (controlsOrder === "system" && osType === "macos");
 
-  const customProps = (ml: string) => {
+  const customProps = (style: string) => {
     if (windowControlsProps?.justify !== undefined) return windowControlsProps;
 
     const {
@@ -35,7 +36,7 @@ export function WindowTitlebar({
     } = windowControlsProps || {};
     return {
       justify: false,
-      className: cn(windowControlsClassName, ml),
+      className: cn(windowControlsClassName, style),
       ...restProps,
     };
   };
@@ -48,7 +49,7 @@ export function WindowTitlebar({
     >
       {left ? (
         <>
-          <WindowControls {...customProps("ml-0")} />
+          <WindowControls {...customProps("absolute ml-2 mt-3 z-50")} />
           {children}
         </>
       ) : (

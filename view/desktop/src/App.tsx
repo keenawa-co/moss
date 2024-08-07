@@ -1,4 +1,4 @@
-import { About, Content, DraggableTitleBar, Home, Menu, RootLayout, Sidebar, WindowControls } from "@/components";
+import { About, Content, TitleBar, Home, Menu, RootLayout, Sidebar } from "@/components";
 import { Suspense } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import "./i18n";
@@ -34,7 +34,7 @@ function App() {
   return (
     <>
       <RootLayout>
-        <DraggableTitleBar />
+        <TitleBar />
         <Sidebar className="p-0">
           <MenuItem className="group bg-zinc-200 mt-13 mb-3.5">
             <Icon className="h-4.5 w-4.5">
