@@ -20,7 +20,6 @@ import {
 } from "../../shared/ui/src";
 import { twMerge } from "tailwind-merge";
 import StatusBar from "./components/StatusBar";
-import { useOperatingSystem } from "./hooks/useOperatingSystem";
 
 enum IconState {
   Default = "text-zinc-500",
@@ -30,14 +29,6 @@ enum IconState {
   Active = "text-olive-700",
   Disabled = "text-zinc-500 bg-opacity-50",
 }
-
-const os = "macOS"; //useOperatingSystem();
-//const showControls = true; //window.location.search.includes("showControls");
-
-let isMacOs = os == "macOS";
-
-console.log("os------------------->" + os);
-//console.log("showControls------------------->" + showControls);
 
 function App() {
   return (
@@ -114,7 +105,6 @@ function App() {
               </Routes>
             </BrowserRouter>
           </Suspense>
-          <WindowControls />
         </Content>
         <StatusBar
           className="absolute w-full bottom-0 h-5.5"
