@@ -1,4 +1,14 @@
-import { About, Content, DraggableTitleBar, Home, Menu, Properties, RootLayout, Sidebar } from "@/components";
+import {
+  About,
+  Content,
+  DraggableTitleBar,
+  Home,
+  Menu,
+  Properties,
+  RootLayout,
+  Sidebar,
+  WindowControls,
+} from "@/components";
 import { Suspense } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import "./i18n";
@@ -113,6 +123,7 @@ function App() {
               </Routes>
             </BrowserRouter>
           </Suspense>
+          <WindowControls />
         </Content>
         <StatusBar
           className="absolute w-full bottom-0 h-5.5"
