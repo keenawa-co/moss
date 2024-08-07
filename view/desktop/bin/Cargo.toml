@@ -10,10 +10,10 @@ rust-version = "1.70"
 
 [lib]
 name = "app_lib"
-crate-type = ["staticlib", "cdylib", "rlib"]
+crate-type = ["lib", "cdylib", "staticlib"]
 
 [build-dependencies]
-tauri-build = { version = "2.0.0-beta.17", features = [] }
+tauri-build = { version = "2.0.0-rc", features = [] }
 
 [dependencies]
 futures.workspace = true
@@ -21,6 +21,7 @@ anyhow.workspace = true
 app.workspace = true
 configuration.workspace = true
 parking_lot.workspace = true
+tracing.workspace = true
 surrealdb = { workspace = true, features = ["kv-rocksdb"] }
 strum = { workspace = true, features = ["derive"] }
 tokio = { workspace = true, features = ["full"] }
@@ -28,14 +29,13 @@ serde_json.workspace = true
 serde = { workspace = true, features = ["derive"] }
 hashbrown = { workspace = true, features = ["serde"] }
 
-specta = "=2.0.0-rc.12"
-tauri = { version = "=2.0.0-beta.23", features = [ "macos-private-api", "specta"] }
-tauri-specta = { git = "https://github.com/oscartbeaumont/tauri-specta", rev = "a49885967adc01c80e33962e3ecac25fe7497839", features = [
-    "typescript",
-] }
-# tauri-specta = { version = "2.0.0-rc.11", features = ["typescript"] }
-tracing.workspace = true
+tauri = { version = "2.0.0-rc", features = ["macos-private-api"] }
+tauri-plugin-shell = "2.0.0-rc"
+tauri-plugin-os = "2.0.0-rc.0"
 
+specta = "2.0.0-rc.20"
+specta-typescript = "0.0.7"
+tauri-specta = { version = "2.0.0-rc.12", features = ["typescript"] }
 
 [target.'cfg(any(target_os = "linux", target_os = "macos"))'.dependencies]
 mimalloc = { version = "0.1.39", default-features = false }

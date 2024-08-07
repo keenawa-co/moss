@@ -1,18 +1,8 @@
-import {
-  About,
-  Content,
-  DraggableTitleBar,
-  Home,
-  Menu,
-  Properties,
-  RootLayout,
-  Sidebar,
-  WindowControls,
-} from "@/components";
+import { About, Content, DraggableTitleBar, Home, Menu, RootLayout, Sidebar, WindowControls } from "@/components";
 import { Suspense } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import "./i18n";
-import "../../shared/fonts.css";
+import "../../shared/ui/src/fonts.css";
 import {
   HomeIcon,
   Icon,
