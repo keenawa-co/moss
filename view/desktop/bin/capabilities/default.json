@@ -20,5 +20,6 @@
     "window:allow-toggle-maximize",
     "window:allow-start-dragging",
     "webview:allow-internal-toggle-devtools"
-  ]
+  ],
+  "platforms": ["macOS", "linux", "windows"]
 }
