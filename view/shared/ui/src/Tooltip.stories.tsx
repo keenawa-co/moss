@@ -14,11 +14,7 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-const TooltipTemplate = (args: any) => (
-  <Tooltip {...args}>
-    <button>Tooltip</button>
-  </Tooltip>
-);
+const TooltipTemplate = (args: any) => <Tooltip {...args}>Tooltip</Tooltip>;
 
 export const WithShortcut: Story = {
   args: {
