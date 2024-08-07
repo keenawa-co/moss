@@ -64,7 +64,7 @@ export const SideBottom: Story = {
 export const AlignStart: Story = {
   args: {
     shortcut: ["⌘", "s"],
-    label: "Settings",
+    label: "Settings and some other stuff",
     options: {
       content: {
         align: "start",
