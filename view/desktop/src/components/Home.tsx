@@ -2,6 +2,7 @@ import { useTranslation } from "react-i18next";
 import { commands, SessionInfoDTO } from "../bindings";
 import React, { useEffect, useState } from "react";
 import { listen } from "@tauri-apps/api/event";
+import { Tooltip, CodeIcon } from "../../../shared/ui/src";
 
 export const Home: React.FC = () => {
   const { t } = useTranslation(["ns1", "ns2"]);
@@ -55,6 +56,12 @@ export const Home: React.FC = () => {
       <span>{t("description.part1")}</span>
       <span>{t("description.part1", { ns: "ns2" })}</span>
       {data !== null && <p>Received data: {data}</p>}
+
+      <div>
+        <Tooltip label="Test">
+          <CodeIcon className="fill-red-500 w-4" />
+        </Tooltip>
+      </div>
     </main>
   );
 };
