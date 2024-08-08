@@ -3,7 +3,7 @@ import { cn } from "./libs/utils";
 import { TauriAppWindowProvider } from "./contexts";
 import { Gnome, MacOS, Windows } from "./controls";
 import { getOsType } from "./libs/plugin-os";
-import type { WindowControlsProps } from "../types";
+import type { WindowControlsProps } from "./types";
 
 export function WindowControls({
   platform,

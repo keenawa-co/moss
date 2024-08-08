@@ -39,7 +39,6 @@ export const TauriAppWindowProvider: React.FC<TauriAppWindowProviderProps> = ({ 
     }
   }, []);
 
-  // Update the isWindowMaximized state when the window is resized
   const updateIsWindowMaximized = useCallback(async () => {
     if (appWindow) {
       const _isWindowMaximized = await appWindow.isMaximized();
@@ -63,7 +62,6 @@ export const TauriAppWindowProvider: React.FC<TauriAppWindowProviderProps> = ({ 
         };
         listen();
 
-        // Cleanup the listener when the component unmounts
         return () => unlisten && unlisten();
       }
     });
@@ -98,7 +96,6 @@ export const TauriAppWindowProvider: React.FC<TauriAppWindowProviderProps> = ({ 
     }
   };
 
-  // Provide the context values to the children components
   return (
     <TauriAppWindowContext.Provider
       value={{
