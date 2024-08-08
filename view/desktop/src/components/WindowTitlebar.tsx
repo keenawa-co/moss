@@ -1,9 +1,9 @@
 import type { OsType } from "@tauri-apps/plugin-os";
 import { useEffect, useState } from "react";
-import { cn } from "./libs/utils";
-import { getOsType } from "./libs/plugin-os";
+import { cn } from "./window-controls/libs/utils";
+import { getOsType } from "./window-controls/libs/plugin-os";
 import type { WindowTitlebarProps } from "./types";
-import { WindowControls } from "./WindowControls";
+import { WindowControls } from "./window-controls/WindowControls";
 
 export function WindowTitlebar({
   children,
