@@ -4,6 +4,11 @@
   "scripts": {
     "build": "turbo build",
     "dev": "turbo dev",
+    "desktop": "cd view/desktop && pnpm tauri dev",
+    "sb": "cd view/storybook && pnpm dev",
+    "doc": "cd view/docs && pnpm dev",
+    "web": "cd view/web && pnpm dev",
+    "desktop-web": "cd view/desktop && pnpm vite dev",
     "lint": "turbo lint",
     "type-check": "turbo type-check",
     "clean": "turbo clean",

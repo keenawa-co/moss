@@ -13,8 +13,8 @@ use app_lib::{
 use hashbrown::HashMap;
 use std::{path::PathBuf, sync::Arc};
 use surrealdb::{engine::remote::ws::Ws, Surreal};
-use tauri::{App, AppHandle, Manager, State};
-use tauri_specta::{collect_commands, collect_events, ts};
+use tauri::{App, AppHandle, Emitter, Manager, State};
+use tauri_specta::{collect_commands, collect_events};
 use tracing::error;
 // use tracing_subscriber::FmtSubscriber;
 use configuration::common::{
@@ -259,34 +259,50 @@ pub fn run(ctx: &mut AppContextCompact) -> tauri::Result<()> {
         // println!("Value `editor.fontSize` form None (after): {:?}", value);
     });
 
-    let (invoke_handler, register_events) = {
-        let builder = ts::builder()
-            .events(collect_events![])
-            .commands(collect_commands![
-                create_project,
-                restore_session,
-                app_ready,
-            ])
-            .config(specta::ts::ExportConfig::new().formatter(specta::ts::formatter::prettier));
+    // let (invoke_handler, register_events) = {
+    //     let builder = ts::builder()
+    //         .events(collect_events![])
+    //         .commands(collect_commands![
+    //             create_project,
+    //             restore_session,
+    //             app_ready,
+    //         ]);
+    //     // .config(specta::ts::ExportConfig::new().formatter(specta::ts::formatter::prettier));
 
-        #[cfg(debug_assertions)]
-        let builder = builder.path("../src/bindings.ts");
+    //     #[cfg(debug_assertions)]
+    //     let builder = builder.path("../src/bindings.ts");
 
-        builder.build().unwrap()
-    };
+    //     builder.build().unwrap()
+    // };
+
+    let mut builder = tauri_specta::Builder::<tauri::Wry>::new()
+        .events(collect_events![])
+        .commands(collect_commands![
+            create_project,
+            restore_session,
+            app_ready
+        ]);
+
+    #[cfg(debug_assertions)] // <- Only export on non-release builds
+    builder
+        .export(
+            specta_typescript::Typescript::default(),
+            "../src/bindings.ts",
+        )
+        .expect("Failed to export typescript bindings");
 
     tauri::Builder::default()
         .manage(AppState {
             project_service: ProjectService::new(db.clone()),
             session_service: SessionService::new(db.clone()),
         })
-        .invoke_handler(invoke_handler)
+        // .invoke_handler(invoke_handler)
         .setup(move |app: &mut App| {
             let app_handle = app.handle().clone();
 
             tokio::task::block_in_place(|| {
                 tauri::async_runtime::block_on(async move {
-                    register_events(app);
+                    // register_events(app);
 
                     // Example stream data emitting
                     tokio::spawn(async move {
@@ -300,6 +316,7 @@ pub fn run(ctx: &mut AppContextCompact) -> tauri::Result<()> {
             Ok(())
         })
         .menu(menu::setup_window_menu)
+        .plugin(tauri_plugin_os::init())
         .build(tauri::generate_context!())?
         .run(|_, _| {});
 

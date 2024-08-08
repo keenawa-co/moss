@@ -17,36 +17,31 @@ pnpm turbo dev
 - Run desktop app:
 
 ```sh
-cd .\view\desktop\
-pnpm tauri dev
+pnpm desktop
 ```
 
 - Run desktop web app:
 
 ```sh
-cd .\view\desktop\
-pnpm vite dev
+pnpm desktop-web
 ```
 
 - Run storybook app:
 
 ```sh
-cd .\view\storybook\
-pnpm storybook dev
+pnpm sb
 ```
 
 - Run web app:
 
 ```sh
-cd .\view\web\
-pnpm next dev
+pnpm web
 ```
 
 - Run docs app:
 
 ```sh
-cd .\view\docs\
-pnpm start
+pnpm doki
 ```
 
 - Generate monorepo project dependency graph:
