@@ -3,9 +3,9 @@ import { twMerge } from "tailwind-merge";
 
 const StatusBar = ({ branch, className }: { branch?: string } & ComponentPropsWithoutRef<"div">) => {
   return (
-    <div
+    <footer
       className={twMerge(
-        "flex justify-end [&>*:first-child]:mr-auto w-full items-center px-5 bg-olive-800 text-stone-50 text-xs",
+        "flex justify-end [&>*:first-child]:mr-auto items-center px-5 bg-sky-800 text-stone-50 text-xs",
         className
       )}
     >
@@ -87,7 +87,7 @@ const StatusBar = ({ branch, className }: { branch?: string } & ComponentPropsWi
         </svg>
         <span>About</span>
       </StatusBarButton>
-    </div>
+    </footer>
   );
 };
 

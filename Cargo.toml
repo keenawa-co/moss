@@ -35,17 +35,16 @@ members = [
     "view/desktop/workbench/service/workspace_configuration",
 ]
 
-[profile.release]
+# [profile.release]
 # This makes the compiled code faster and smaller, but it makes 
 # compiling slower, so it's only enabled in release mode.
-lto = false
-opt-level = 3
-panic = "abort"
-codegen-units = 1
+# lto = false
+# opt-level = 3
+# panic = "abort"
+# codegen-units = 1
 
 [profile.dev.package.sqlx-macros]
 opt-level = 3
-
 
 [build]
 rustflags = ["-C", "target-cpu=native"]

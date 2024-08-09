@@ -12,7 +12,7 @@ export const RootLayout = ({ children, className, ...props }: ComponentProps<"ma
 export const Sidebar = ({ className, children, ...props }: ComponentProps<"aside">) => {
   return (
     <aside
-      className={twMerge("flex flex-col w-65 h-full bg-stone-100", className)}
+      className={twMerge("flex flex-col w-65 mt-11 mb-5.5 bg-zinc-100", className)}
       //className={twMerge('w-[200px] mt-8 h-[100vh + 10px] overflow-auto bg-bgPrimary', className)}
       {...props}
     >
@@ -22,7 +22,7 @@ export const Sidebar = ({ className, children, ...props }: ComponentProps<"aside
 };
 
 export const Content = forwardRef<HTMLDivElement, ComponentProps<"div">>(({ children, className, ...props }, ref) => (
-  <div ref={ref} className={twMerge("mt-8 flex-1 overflow-auto bg-bgPrimary", className)} {...props}>
+  <div ref={ref} className={twMerge("mt-11 mb-5.5 flex-1 overflow-auto bg-bgPrimary", className)} {...props}>
     {children}
   </div>
 ));

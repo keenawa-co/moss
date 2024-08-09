@@ -1,9 +1,9 @@
-import type { Meta, StoryObj } from "../../../storybook/node_modules/@storybook/react";
+import type { Meta, StoryObj } from "@storybook/react";
 import "../assets/index.css";
 import StatusBar from "./StatusBar";
 
 const meta = {
-  title: "desktop/ui/StatusBar",
+  title: "desktop/StatusBar",
   component: StatusBar,
   tags: ["autodocs"],
   parameters: {
