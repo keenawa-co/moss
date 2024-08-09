@@ -26,6 +26,16 @@
   },
 ```
 
+## Manuals
+
+### How to setup a shortcut to a path
+
+Change the following files:
+
+- vite.config.ts
+- tsconfig.app.json
+- .eslintrc.json
+
 # React + TypeScript + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.

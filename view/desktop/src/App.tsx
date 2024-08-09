@@ -2,7 +2,7 @@ import { About, Content, TitleBar, Home, Menu, RootLayout, Sidebar } from "@/com
 import { Suspense } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import "./i18n";
-import "../../shared/ui/src/fonts.css";
+import "@/shared/fonts.css";
 import {
   HomeIcon,
   Icon,
@@ -17,7 +17,7 @@ import {
   SearchShortcutIcon,
   SettingsIcon,
   QuickSearchIcon,
-} from "../../shared/ui/src";
+} from "@/shared";
 import { twMerge } from "tailwind-merge";
 import StatusBar from "./components/StatusBar";
 
