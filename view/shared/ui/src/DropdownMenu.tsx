@@ -30,6 +30,29 @@ const DropdownMenuTrigger: React.FC<DropdownMenuTriggerProps> = DropdownMenuPrim
 
 const DropdownMenuGroup: React.FC<DropdownMenuGroupProps> = DropdownMenuPrimitive.Group;
 
+const DropdownMenuPortal: React.FC<DropdownMenuPortalProps> = DropdownMenuPrimitive.Portal;
+
+const DropdownMenuArrow: React.FC<DropdownMenuArrowProps> = DropdownMenuPrimitive.Arrow;
+
+const DropdownMenuIconWrapper = ({ children }: { children: React.ReactNode }) => {
+  return <div className="absolute left-1 size-4 *:size-4">{children}</div>;
+};
+
+const DropdownMenuLabel = ({ children, className, ...props }: DropdownMenuLabelProps) => (
+  <DropdownMenuPrimitive.Label className={cn("py-[3px] font-semibold", className)} {...props}>
+    {children}
+  </DropdownMenuPrimitive.Label>
+);
+
+const DropdownMenuSeparator = ({ fullWidth, className }: DropdownMenuSeparatorProps) => (
+  <DropdownMenuPrimitive.Separator className={cn("my-2 h-px bg-[#383838]", { "ml-7": !fullWidth }, className)} />
+);
+
+// TODO add functionality for DropdownMenuShortcut
+const DropdownMenuShortcut = ({ className, ...props }: React.HTMLAttributes<HTMLSpanElement>) => {
+  return <span className={cn("ml-auto opacity-60", className)} {...props} />;
+};
+
 // CONTENT
 
 const DropdownMenuContent = ({
@@ -158,31 +181,6 @@ const DropdownMenuRadioItem = ({ className, children, ...props }: DropdownMenuRa
     {children}
   </DropdownMenuPrimitive.RadioItem>
 );
-
-// OTHER
-
-const DropdownMenuPortal: React.FC<DropdownMenuPortalProps> = DropdownMenuPrimitive.Portal;
-
-const DropdownMenuArrow: React.FC<DropdownMenuArrowProps> = DropdownMenuPrimitive.Arrow;
-
-const DropdownMenuIconWrapper = ({ children }: { children: React.ReactNode }) => {
-  return <div className="absolute left-1 size-4 *:size-4">{children}</div>;
-};
-
-const DropdownMenuLabel = ({ children, className, ...props }: DropdownMenuLabelProps) => (
-  <DropdownMenuPrimitive.Label className={cn("py-[3px] font-semibold", className)} {...props}>
-    {children}
-  </DropdownMenuPrimitive.Label>
-);
-
-const DropdownMenuSeparator = ({ fullWidth, className }: DropdownMenuSeparatorProps) => (
-  <DropdownMenuPrimitive.Separator className={cn("my-2 h-px bg-[#383838]", { "ml-7": !fullWidth }, className)} />
-);
-
-// TODO add functionality for DropdownMenuShortcut
-const DropdownMenuShortcut = ({ className, ...props }: React.HTMLAttributes<HTMLSpanElement>) => {
-  return <span className={cn("ml-auto opacity-60", className)} {...props} />;
-};
 
 export {
   DropdownMenu,
