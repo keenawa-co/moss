@@ -217,7 +217,6 @@ impl ConfigurationModel {
     }
 
     pub fn get_value(&self, attribute_name: &AttributeName) -> Option<&Value> {
-        dbg!(&attribute_name.to_string());
         self.content.get(&attribute_name.to_string())
     }
 
@@ -497,8 +496,6 @@ impl Configuration {
         if let Some(config) = self.consolidated_configuration.load_full().as_ref() {
             return Arc::clone(config);
         }
-
-        dbg!(&self.default_configuration);
 
         let consolidated_model = self
             .default_configuration
