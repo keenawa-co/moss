@@ -10,3 +10,4 @@ export * from "./DocumentationIcon";
 export * from "./SearchIcon";
 export * from "./SearchShortcutIcon";
 export * from "./Tooltip";
+export * from "./DropdownMenu";
