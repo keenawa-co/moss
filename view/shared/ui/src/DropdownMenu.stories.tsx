@@ -72,7 +72,6 @@ export const Default: Story = {
   render: () => (
     <DropdownMenu>
       <DropdownMenuTrigger>Click me!</DropdownMenuTrigger>
-
       <DropdownMenuContent>
         <DropdownMenuItem>
           <DropdownMenuLabel>My Account</DropdownMenuLabel>
@@ -184,7 +183,7 @@ export const Default: Story = {
   ),
 };
 
-export const Figma: Story = {
+export const ExampleFromFigma: Story = {
   render: () => (
     <DropdownMenu>
       <DropdownMenuTrigger>Click me!</DropdownMenuTrigger>
@@ -272,7 +271,7 @@ export const Figma: Story = {
   ),
 };
 
-export const Label: Story = {
+export const Labels: Story = {
   render: () => (
     <DropdownMenu>
       <DropdownMenuTrigger>Click me!</DropdownMenuTrigger>
@@ -330,6 +329,23 @@ export const Groups: Story = {
             <DropdownMenuLabel>2 - Group item</DropdownMenuLabel>
           </DropdownMenuItem>
         </DropdownMenuGroup>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  ),
+};
+
+export const WithArrow: Story = {
+  render: () => (
+    <DropdownMenu>
+      <DropdownMenuTrigger>Click me!</DropdownMenuTrigger>
+
+      <DropdownMenuContent>
+        <DropdownMenuItem>
+          <DropdownMenuLabel>Menu item 1</DropdownMenuLabel>
+        </DropdownMenuItem>
+        <DropdownMenuItem>
+          <DropdownMenuLabel>Menu item 2</DropdownMenuLabel>
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   ),
