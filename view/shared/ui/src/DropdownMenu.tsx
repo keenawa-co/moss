@@ -100,6 +100,7 @@ const DropdownMenuSubTrigger = ({ className, children, ...props }: DropdownMenuS
   </DropdownMenuPrimitive.SubTrigger>
 );
 
+// TODO add style change without icon
 const DropdownMenuSubContent = ({ className, children, ...props }: DropdownMenuSubContentProps) => (
   <DropdownMenuPrimitive.SubContent
     sideOffset={16 || props.sideOffset}
