@@ -160,7 +160,7 @@ macro_rules! property_key {
             overrides.insert(stringify!($override).to_string());
         )+
         let ident = concat!(stringify!($ident), $(concat!(".", stringify!($subident))),*).to_string();
-        $crate::configuration_registry::PropertyKey {
+        $crate::platform_configuration_registry::PropertyKey {
             override_for: if overrides.is_empty() { None } else { Some(overrides) },
             ident,
         }
@@ -182,7 +182,7 @@ macro_rules! property_key {
 
         let overrides: HashSet<String> = HashSet::new();
         let ident = concat!(stringify!($ident), $(concat!(".", stringify!($subident))),*).to_string();
-        $crate::configuration_registry::PropertyKey {
+        $crate::platform_configuration_registry::PropertyKey {
             override_for: if overrides.is_empty() { None } else { Some(overrides) },
             ident,
         }

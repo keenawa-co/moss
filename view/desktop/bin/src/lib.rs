@@ -7,17 +7,17 @@ use anyhow::Result;
 use app::context_compact::AppContextCompact;
 use hashbrown::HashMap;
 use platform_configuration_common::{
-    configuration_policy::ConfigurationPolicyService,
-    configuration_registry::{
+    platform_configuration_policy::ConfigurationPolicyService,
+    platform_configuration_registry::{
         ConfigurationNodeType, ConfigurationScope, ConfigurationSource, PropertyMap, PropertyPolicy,
     },
     property_key,
 };
 use platform_configuration_common::{
-    configuration_registry::{
+    platform_configuration_registry::{
         ConfigurationNode, ConfigurationPropertySchema, ConfigurationRegistry,
     },
-    configuration_service::ConfigurationService,
+    platform_configuration_service::ConfigurationService,
 };
 use platform_formation_common::service_group::ServiceGroup;
 use platform_window_tgui::window::NativeWindowConfiguration;

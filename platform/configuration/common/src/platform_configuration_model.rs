@@ -7,7 +7,7 @@ use radix_trie::{Trie, TrieCommon};
 use serde_json::Value;
 use std::{fs::File, io::Read, path::PathBuf, sync::Arc};
 
-use super::configuration_registry::ConfigurationRegistry;
+use super::platform_configuration_registry::ConfigurationRegistry;
 
 pub struct AttributeName {
     pub override_ident: Option<String>,
@@ -94,7 +94,7 @@ macro_rules! attribute_name {
     ([$override:ident] . $ident:ident $(. $subident:ident)*) => {{
         let override_ident = Some(stringify!($override).to_string());
         let name = Some(concat!(stringify!($ident), $(concat!(".", stringify!($subident))),*).to_string());
-        $crate::configuration_model::AttributeName {
+        $crate::platform_configuration_model::AttributeName {
             override_ident,
             name,
         }
@@ -103,7 +103,7 @@ macro_rules! attribute_name {
     // Handle override without sub-identifiers
     ([$override:ident]) => {{
         let override_ident = Some(stringify!($override).to_string());
-        $crate::configuration_model::AttributeName {
+        $crate::platform_configuration_model::AttributeName {
             override_ident,
             name: None,
         }
@@ -112,7 +112,7 @@ macro_rules! attribute_name {
     // Handle no override with sub-identifiers
     ($ident:ident $(. $subident:ident)*) => {{
         let name = Some(concat!(stringify!($ident), $(concat!(".", stringify!($subident))),*).to_string());
-        $crate::configuration_model::AttributeName {
+        $crate::platform_configuration_model::AttributeName {
             override_ident: None,
             name,
         }

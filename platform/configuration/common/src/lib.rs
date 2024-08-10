@@ -1,8 +1,8 @@
-pub mod configuration_default;
-pub mod configuration_model;
-pub mod configuration_policy;
-pub mod configuration_registry;
-pub mod configuration_service;
+pub mod platform_configuration_default;
+pub mod platform_configuration_model;
+pub mod platform_configuration_policy;
+pub mod platform_configuration_registry;
+pub mod platform_configuration_service;
 pub mod policy;
 
 #[macro_use]
@@ -15,7 +15,7 @@ extern crate async_trait;
 extern crate lazy_regex;
 
 use anyhow::Result;
-use configuration_model::AttributeName;
+use platform_configuration_model::AttributeName;
 
 #[async_trait]
 pub trait AbstractConfigurationService {

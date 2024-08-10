@@ -4,9 +4,9 @@ use arc_swap::ArcSwap;
 use hashbrown::HashMap;
 
 use super::{
-    configuration_default::DefaultConfiguration,
-    configuration_model::ConfigurationModel,
-    configuration_registry::{ConfigurationRegistry, PropertyPolicy},
+    platform_configuration_default::DefaultConfiguration,
+    platform_configuration_model::ConfigurationModel,
+    platform_configuration_registry::{ConfigurationRegistry, PropertyPolicy},
     policy::{PolicyDefinitionType, PolicyService},
 };
 

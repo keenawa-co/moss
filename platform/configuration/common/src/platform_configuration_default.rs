@@ -3,8 +3,8 @@ use radix_trie::Trie;
 use std::sync::Arc;
 
 use super::{
-    configuration_model::{AttributeName, ConfigurationModel},
-    configuration_registry::ConfigurationRegistry,
+    platform_configuration_model::{AttributeName, ConfigurationModel},
+    platform_configuration_registry::ConfigurationRegistry,
 };
 
 pub struct DefaultConfiguration {

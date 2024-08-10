@@ -10,12 +10,12 @@ use std::{
 };
 
 use super::{
-    configuration_default::DefaultConfiguration,
-    configuration_model::{
+    platform_configuration_default::DefaultConfiguration,
+    platform_configuration_model::{
         AttributeName, Configuration, ConfigurationModel, ConfigurationParser, UserConfiguration,
     },
-    configuration_policy::{ConfigurationPolicy, ConfigurationPolicyService},
-    configuration_registry::ConfigurationRegistry,
+    platform_configuration_policy::{ConfigurationPolicy, ConfigurationPolicyService},
+    platform_configuration_registry::ConfigurationRegistry,
     AbstractConfigurationService,
 };
 
