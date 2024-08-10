@@ -288,7 +288,7 @@ impl DesktopMain {
         )
         .unwrap();
 
-        service_group.set(config_service);
+        service_group.insert(config_service);
 
         let builder = tauri_specta::Builder::<tauri::Wry>::new()
             .events(collect_events![])

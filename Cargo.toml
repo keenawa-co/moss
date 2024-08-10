@@ -86,6 +86,7 @@ net = { path = "net" }
 clap = "4.5.4"
 
 libc = "0.2.155"
+fnv = "1.0.7"
 thiserror = "1.0"
 anyhow = "1.0"
 bitflags = "2.5.0"

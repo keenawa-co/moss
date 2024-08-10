@@ -1,52 +1,48 @@
-use std::{
-    any::{Any, TypeId},
-    cell::RefCell,
-    rc::Rc,
-    sync::Arc,
-};
+use fnv::FnvHashMap;
+use std::any::{Any, TypeId};
 
-use hashbrown::HashMap;
+#[derive(Default)]
+pub struct ServiceGroup(FnvHashMap<TypeId, Box<dyn Any + Sync + Send>>);
 
-trait ArcDowncaster {
-    fn downcast<T: 'static + Any>(self: Arc<Self>) -> Result<Arc<T>, Arc<Self>>;
-}
+impl std::ops::Deref for ServiceGroup {
+    type Target = FnvHashMap<TypeId, Box<dyn Any + Sync + Send>>;
 
-impl ArcDowncaster for dyn Any {
-    fn downcast<T: 'static + Any>(self: Arc<Self>) -> Result<Arc<T>, Arc<Self>> {
-        if self.is::<T>() {
-            let ptr = Arc::into_raw(self) as *const T;
-            Ok(unsafe { Arc::from_raw(ptr) })
-        } else {
-            Err(self)
-        }
+    fn deref(&self) -> &Self::Target {
+        &self.0
     }
 }
 
-pub struct ServiceGroup(Rc<RefCell<HashMap<TypeId, Arc<dyn Any>>>>);
+impl std::fmt::Debug for ServiceGroup {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        f.debug_tuple("ServiceGroup").finish()
+    }
+}
 
-impl ServiceGroup {
+impl<'a> ServiceGroup {
     pub fn new() -> Self {
-        Self(Rc::new(RefCell::new(HashMap::new())))
+        Self(FnvHashMap::default())
     }
 
-    pub fn has<T: 'static + Any>(&self) -> bool {
-        let type_id = TypeId::of::<T>();
-        self.0.borrow().contains_key(&type_id)
+    pub fn has<T: Any + Send + Sync>(&self) -> bool {
+        self.0.contains_key(&TypeId::of::<T>())
     }
 
-    pub fn set<T: 'static + Any>(&self, service: T) {
-        let type_id = TypeId::of::<T>();
-        self.0.borrow_mut().insert(type_id, Arc::new(service));
+    pub fn insert<T: Any + Send + Sync>(&mut self, service: T) {
+        self.0.insert(TypeId::of::<T>(), Box::new(service));
     }
 
-    pub fn get<T: 'static + Any>(&self) -> Arc<T> {
-        let type_id = TypeId::of::<T>();
+    pub fn get_unchecked<T: Any + Send + Sync>(&'a self) -> &'a T {
+        self.get_opt::<T>().unwrap_or_else(|| {
+            panic!(
+                "Service with type `{}` does not exist",
+                std::any::type_name::<T>()
+            )
+        })
+    }
+
+    pub fn get_opt<T: Any + Send + Sync>(&'a self) -> Option<&'a T> {
         self.0
-            .borrow()
-            .get(&type_id)
-            .expect("Service not found")
-            .clone()
-            .downcast::<T>()
-            .expect("Failed to downcast service")
+            .get(&TypeId::of::<T>())
+            .and_then(|d| d.downcast_ref::<T>())
     }
 }
