@@ -1,8 +1,9 @@
 import { About, Content, TitleBar, Home, Menu, RootLayout, Sidebar } from "@/components";
 import { Suspense } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
+
 import "./i18n";
-import "@/shared/fonts.css";
+import "@repo/ui/fonts.css";
 import {
   HomeIcon,
   Icon,
@@ -17,7 +18,7 @@ import {
   SearchShortcutIcon,
   SettingsIcon,
   QuickSearchIcon,
-} from "@/shared";
+} from "@repo/ui";
 import { twMerge } from "tailwind-merge";
 import StatusBar from "./components/StatusBar";
 
