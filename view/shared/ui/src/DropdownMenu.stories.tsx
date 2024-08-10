@@ -22,19 +22,12 @@ import {
   DropdownMenuTrigger,
 } from "./DropdownMenu";
 
-import {
-  User,
-  CreditCard,
-  Settings,
-  Keyboard,
-  Users,
-  UserPlus,
-  Mail,
-  MessageSquare,
-  PlusCircle,
-  Plus,
-  LogOut,
-} from "lucide-react";
+import Icon from "./Icon";
+import HomeIcon from "./HomeIcon";
+import IssuesIcon from "./IssuesIcon";
+import ReportsIcon from "./ReportsIcon";
+import SearchIcon from "./SearchIcon";
+import CodeIcon from "./CodeIcon";
 
 import { useState } from "react";
 
@@ -73,35 +66,39 @@ export const Default: Story = {
     <DropdownMenu>
       <DropdownMenuTrigger>Click me!</DropdownMenuTrigger>
       <DropdownMenuContent>
-        <DropdownMenuItem>
-          <DropdownMenuLabel>My Account</DropdownMenuLabel>
-        </DropdownMenuItem>
-        <DropdownMenuSeparator />
         <DropdownMenuGroup>
           <DropdownMenuItem>
             <DropdownMenuIconWrapper>
-              <User />
+              <Icon>
+                <HomeIcon />
+              </Icon>
             </DropdownMenuIconWrapper>
             <span>Profile</span>
             <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
           </DropdownMenuItem>
           <DropdownMenuItem>
             <DropdownMenuIconWrapper>
-              <CreditCard />
+              <Icon>
+                <IssuesIcon />
+              </Icon>
             </DropdownMenuIconWrapper>
             <span>Billing</span>
             <DropdownMenuShortcut>⌘B</DropdownMenuShortcut>
           </DropdownMenuItem>
           <DropdownMenuItem>
             <DropdownMenuIconWrapper>
-              <Settings />
+              <Icon>
+                <ReportsIcon />
+              </Icon>
             </DropdownMenuIconWrapper>
             <span>Settings</span>
             <DropdownMenuShortcut>⌘S</DropdownMenuShortcut>
           </DropdownMenuItem>
           <DropdownMenuItem>
             <DropdownMenuIconWrapper>
-              <Keyboard />
+              <Icon>
+                <SearchIcon />
+              </Icon>
             </DropdownMenuIconWrapper>
             <span>Keyboard shortcuts</span>
             <DropdownMenuShortcut>⌘K</DropdownMenuShortcut>
@@ -113,7 +110,9 @@ export const Default: Story = {
         <DropdownMenuGroup>
           <DropdownMenuItem>
             <DropdownMenuIconWrapper>
-              <Users />
+              <Icon>
+                <CodeIcon />
+              </Icon>
             </DropdownMenuIconWrapper>
             Team
           </DropdownMenuItem>
@@ -121,7 +120,9 @@ export const Default: Story = {
           <DropdownMenuSub>
             <DropdownMenuSubTrigger>
               <DropdownMenuIconWrapper>
-                <UserPlus />
+                <Icon>
+                  <CodeIcon />
+                </Icon>
               </DropdownMenuIconWrapper>
               <span>Invite users</span>
             </DropdownMenuSubTrigger>
@@ -129,20 +130,26 @@ export const Default: Story = {
               <DropdownMenuSubContent>
                 <DropdownMenuItem>
                   <DropdownMenuIconWrapper>
-                    <Mail />
+                    <Icon>
+                      <HomeIcon />
+                    </Icon>
                   </DropdownMenuIconWrapper>
                   <span>Email</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
                   <DropdownMenuIconWrapper>
-                    <MessageSquare />
+                    <Icon>
+                      <HomeIcon />
+                    </Icon>
                   </DropdownMenuIconWrapper>
                   <span>Message</span>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem>
                   <DropdownMenuIconWrapper>
-                    <PlusCircle />
+                    <Icon>
+                      <HomeIcon />
+                    </Icon>
                   </DropdownMenuIconWrapper>
                   <span>More...</span>
                 </DropdownMenuItem>
@@ -150,13 +157,28 @@ export const Default: Story = {
             </DropdownMenuPortal>
           </DropdownMenuSub>
 
-          <DropdownMenuItem>
-            <DropdownMenuIconWrapper>
-              <Plus />
-            </DropdownMenuIconWrapper>
-            <span>New Team</span>
-            <DropdownMenuShortcut>⌘+T</DropdownMenuShortcut>
-          </DropdownMenuItem>
+          <DropdownMenuSub>
+            <DropdownMenuSubTrigger>
+              <DropdownMenuIconWrapper>
+                <Icon>
+                  <HomeIcon />
+                </Icon>
+              </DropdownMenuIconWrapper>
+              <span>New team</span>
+            </DropdownMenuSubTrigger>
+            <DropdownMenuSubContent>
+              <DropdownMenuItem>
+                <span>Email</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <span>Message</span>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem>
+                <span>More...</span>
+              </DropdownMenuItem>
+            </DropdownMenuSubContent>
+          </DropdownMenuSub>
         </DropdownMenuGroup>
 
         <DropdownMenuSeparator />
@@ -173,7 +195,9 @@ export const Default: Story = {
         <DropdownMenuSeparator />
         <DropdownMenuItem>
           <DropdownMenuIconWrapper>
-            <LogOut />
+            <Icon>
+              <HomeIcon />
+            </Icon>
           </DropdownMenuIconWrapper>
           <span>Log out</span>
           <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
@@ -196,7 +220,9 @@ export const ExampleFromFigma: Story = {
           <DropdownMenuSubContent>
             <DropdownMenuItem>
               <DropdownMenuIconWrapper>
-                <PlusCircle />
+                <Icon>
+                  <HomeIcon />
+                </Icon>
               </DropdownMenuIconWrapper>
               <span>More...</span>
             </DropdownMenuItem>
@@ -210,7 +236,9 @@ export const ExampleFromFigma: Story = {
           <DropdownMenuSubContent>
             <DropdownMenuItem>
               <DropdownMenuIconWrapper>
-                <PlusCircle />
+                <Icon>
+                  <HomeIcon />
+                </Icon>
               </DropdownMenuIconWrapper>
               <span>More...</span>
             </DropdownMenuItem>
@@ -224,7 +252,9 @@ export const ExampleFromFigma: Story = {
           <DropdownMenuSubContent>
             <DropdownMenuItem>
               <DropdownMenuIconWrapper>
-                <PlusCircle />
+                <Icon>
+                  <HomeIcon />
+                </Icon>
               </DropdownMenuIconWrapper>
               <span>More...</span>
             </DropdownMenuItem>
@@ -238,7 +268,9 @@ export const ExampleFromFigma: Story = {
           <DropdownMenuSubContent>
             <DropdownMenuItem>
               <DropdownMenuIconWrapper>
-                <PlusCircle />
+                <Icon>
+                  <HomeIcon />
+                </Icon>
               </DropdownMenuIconWrapper>
               <span>More...</span>
             </DropdownMenuItem>
@@ -271,29 +303,6 @@ export const ExampleFromFigma: Story = {
   ),
 };
 
-export const Labels: Story = {
-  render: () => (
-    <DropdownMenu>
-      <DropdownMenuTrigger>Click me!</DropdownMenuTrigger>
-
-      <DropdownMenuContent>
-        <DropdownMenuItem>
-          <DropdownMenuIconWrapper>
-            <User />
-          </DropdownMenuIconWrapper>
-          <DropdownMenuLabel>Label with icon</DropdownMenuLabel>
-        </DropdownMenuItem>
-
-        <DropdownMenuSeparator />
-
-        <DropdownMenuItem>
-          <DropdownMenuLabel>Label</DropdownMenuLabel>
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
-  ),
-};
-
 export const Groups: Story = {
   render: () => (
     <DropdownMenu>
@@ -301,33 +310,31 @@ export const Groups: Story = {
 
       <DropdownMenuContent>
         <DropdownMenuGroup>
-          <DropdownMenuItem>
-            <DropdownMenuLabel>Groups don't really add any styles or functionality :(</DropdownMenuLabel>
-          </DropdownMenuItem>
+          <DropdownMenuItem>Groups don't really add any styles or functionality :(</DropdownMenuItem>
         </DropdownMenuGroup>
 
         <DropdownMenuGroup>
           <DropdownMenuItem>
             <DropdownMenuIconWrapper>
-              <User />
+              <Icon>
+                <HomeIcon />
+              </Icon>
             </DropdownMenuIconWrapper>
-            <DropdownMenuLabel>1 - Group item with icon</DropdownMenuLabel>
+            1 - Group item with icon
           </DropdownMenuItem>
-          <DropdownMenuItem>
-            <DropdownMenuLabel>1 - Group item</DropdownMenuLabel>
-          </DropdownMenuItem>
+          <DropdownMenuItem>1 - Group item</DropdownMenuItem>
         </DropdownMenuGroup>
 
         <DropdownMenuGroup>
           <DropdownMenuItem>
             <DropdownMenuIconWrapper>
-              <User />
+              <Icon>
+                <HomeIcon />
+              </Icon>
             </DropdownMenuIconWrapper>
-            <DropdownMenuLabel>2 - Group item with icon</DropdownMenuLabel>
+            2 - Group item with icon
           </DropdownMenuItem>
-          <DropdownMenuItem>
-            <DropdownMenuLabel>2 - Group item</DropdownMenuLabel>
-          </DropdownMenuItem>
+          <DropdownMenuItem>2 - Group item</DropdownMenuItem>
         </DropdownMenuGroup>
       </DropdownMenuContent>
     </DropdownMenu>
@@ -340,12 +347,8 @@ export const WithArrow: Story = {
       <DropdownMenuTrigger>Click me!</DropdownMenuTrigger>
 
       <DropdownMenuContent>
-        <DropdownMenuItem>
-          <DropdownMenuLabel>Menu item 1</DropdownMenuLabel>
-        </DropdownMenuItem>
-        <DropdownMenuItem>
-          <DropdownMenuLabel>Menu item 2</DropdownMenuLabel>
-        </DropdownMenuItem>
+        <DropdownMenuItem>Menu item 1</DropdownMenuItem>
+        <DropdownMenuItem>Menu item 2</DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   ),
@@ -360,14 +363,19 @@ export const DropdownMenuSubExample: Story = {
         <DropdownMenuSub>
           <DropdownMenuSubTrigger>
             <DropdownMenuIconWrapper>
-              <PlusCircle />
+              <Icon>
+                <HomeIcon />
+              </Icon>
             </DropdownMenuIconWrapper>
             Sub trigger with icon
           </DropdownMenuSubTrigger>
+
           <DropdownMenuSubContent>
             <DropdownMenuItem>
               <DropdownMenuIconWrapper>
-                <PlusCircle />
+                <Icon>
+                  <HomeIcon />
+                </Icon>
               </DropdownMenuIconWrapper>
               More...
             </DropdownMenuItem>
@@ -379,7 +387,9 @@ export const DropdownMenuSubExample: Story = {
           <DropdownMenuSubContent>
             <DropdownMenuItem>
               <DropdownMenuIconWrapper>
-                <PlusCircle />
+                <Icon>
+                  <HomeIcon />
+                </Icon>
               </DropdownMenuIconWrapper>
               More...
             </DropdownMenuItem>
@@ -391,31 +401,41 @@ export const DropdownMenuSubExample: Story = {
           <DropdownMenuSubContent>
             <DropdownMenuItem>
               <DropdownMenuIconWrapper>
-                <PlusCircle />
+                <Icon>
+                  <HomeIcon />
+                </Icon>
               </DropdownMenuIconWrapper>
               More...
             </DropdownMenuItem>
             <DropdownMenuItem>
               <DropdownMenuIconWrapper>
-                <PlusCircle />
+                <Icon>
+                  <HomeIcon />
+                </Icon>
               </DropdownMenuIconWrapper>
               More...
             </DropdownMenuItem>
             <DropdownMenuItem>
               <DropdownMenuIconWrapper>
-                <PlusCircle />
+                <Icon>
+                  <HomeIcon />
+                </Icon>
               </DropdownMenuIconWrapper>
               More...
             </DropdownMenuItem>
             <DropdownMenuItem>
               <DropdownMenuIconWrapper>
-                <PlusCircle />
+                <Icon>
+                  <HomeIcon />
+                </Icon>
               </DropdownMenuIconWrapper>
               More...
             </DropdownMenuItem>
             <DropdownMenuItem>
               <DropdownMenuIconWrapper>
-                <PlusCircle />
+                <Icon>
+                  <HomeIcon />
+                </Icon>
               </DropdownMenuIconWrapper>
               More...
             </DropdownMenuItem>
@@ -427,44 +447,58 @@ export const DropdownMenuSubExample: Story = {
           <DropdownMenuSubContent>
             <DropdownMenuItem>
               <DropdownMenuIconWrapper>
-                <PlusCircle />
+                <Icon>
+                  <HomeIcon />
+                </Icon>
               </DropdownMenuIconWrapper>
               More...
             </DropdownMenuItem>
 
             <DropdownMenuItem>
               <DropdownMenuIconWrapper>
-                <PlusCircle />
+                <Icon>
+                  <HomeIcon />
+                </Icon>
               </DropdownMenuIconWrapper>
               More... More
             </DropdownMenuItem>
             <DropdownMenuItem>
               <DropdownMenuIconWrapper>
-                <PlusCircle />
+                <Icon>
+                  <HomeIcon />
+                </Icon>
               </DropdownMenuIconWrapper>
               More... More... More
             </DropdownMenuItem>
             <DropdownMenuItem>
               <DropdownMenuIconWrapper>
-                <PlusCircle />
+                <Icon>
+                  <HomeIcon />
+                </Icon>
               </DropdownMenuIconWrapper>
               More... More... More... More...
             </DropdownMenuItem>
             <DropdownMenuItem>
               <DropdownMenuIconWrapper>
-                <PlusCircle />
+                <Icon>
+                  <HomeIcon />
+                </Icon>
               </DropdownMenuIconWrapper>
               More... More... More... More... More...
             </DropdownMenuItem>
             <DropdownMenuItem>
               <DropdownMenuIconWrapper>
-                <PlusCircle />
+                <Icon>
+                  <HomeIcon />
+                </Icon>
               </DropdownMenuIconWrapper>
               More... More... More... More... More... More...
             </DropdownMenuItem>
             <DropdownMenuItem>
               <DropdownMenuIconWrapper>
-                <PlusCircle />
+                <Icon>
+                  <HomeIcon />
+                </Icon>
               </DropdownMenuIconWrapper>
               More... More... More... More... More... More... More
             </DropdownMenuItem>
@@ -654,23 +688,6 @@ export const Radio: Story = {
               </DropdownMenuRadioItem>
             ))}
           </DropdownMenuRadioGroup>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    );
-  },
-};
-
-export const Separators: Story = {
-  render: () => {
-    return (
-      <DropdownMenu>
-        <DropdownMenuTrigger>Click me!</DropdownMenuTrigger>
-        <DropdownMenuContent>
-          <DropdownMenuItem>Full width separator</DropdownMenuItem>
-          <DropdownMenuSeparator fullWidth />
-          <DropdownMenuItem>Shortened separator</DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem>Lorem ipsum dolor</DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
     );
