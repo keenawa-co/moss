@@ -1456,26 +1456,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "configuration"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "arc-swap",
- "async-trait",
- "base",
- "hashbrown 0.14.5",
- "lazy-regex",
- "moss_base",
- "parking_lot",
- "radix_trie",
- "schemars",
- "serde",
- "serde_json",
- "tokio",
- "tracing",
-]
-
-[[package]]
 name = "const-oid"
 version = "0.9.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1767,12 +1747,12 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "app",
- "configuration",
  "futures",
  "hashbrown 0.14.5",
  "macos-trampoline",
  "mimalloc",
  "parking_lot",
+ "platform_configuration_common",
  "platform_formation_common",
  "platform_window_tgui",
  "serde",
@@ -5021,6 +5001,26 @@ name = "pkg-config"
 version = "0.3.30"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d231b230927b5e4ad203db57bbcbee2802f6bce620b1e4a9024a07d94e2907ec"
+
+[[package]]
+name = "platform_configuration_common"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "arc-swap",
+ "async-trait",
+ "base",
+ "hashbrown 0.14.5",
+ "lazy-regex",
+ "moss_base",
+ "parking_lot",
+ "radix_trie",
+ "schemars",
+ "serde",
+ "serde_json",
+ "tokio",
+ "tracing",
+]
 
 [[package]]
 name = "platform_formation_common"
@@ -9131,21 +9131,23 @@ dependencies = [
 ]
 
 [[package]]
-name = "workbench_service_configuration"
+name = "workbench_service_configuration_common"
 version = "0.1.0"
 dependencies = [
- "anyhow",
- "configuration",
+ "platform_configuration_common",
  "serde_json",
- "workspace",
 ]
+
+[[package]]
+name = "workbench_service_configuration_tgui"
+version = "0.1.0"
 
 [[package]]
 name = "workbench_tgui"
 version = "0.1.0"
 dependencies = [
  "anyhow",
- "configuration",
+ "platform_configuration_common",
  "platform_formation_common",
  "serde",
  "specta",

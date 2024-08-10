@@ -5,23 +5,20 @@ pub mod service;
 
 use anyhow::Result;
 use app::context_compact::AppContextCompact;
-use configuration::common::{
+use hashbrown::HashMap;
+use platform_configuration_common::{
+    configuration_policy::ConfigurationPolicyService,
+    configuration_registry::{
+        ConfigurationNodeType, ConfigurationScope, ConfigurationSource, PropertyMap, PropertyPolicy,
+    },
+    property_key,
+};
+use platform_configuration_common::{
     configuration_registry::{
         ConfigurationNode, ConfigurationPropertySchema, ConfigurationRegistry,
     },
     configuration_service::ConfigurationService,
 };
-use configuration::{
-    common::{
-        configuration_policy::ConfigurationPolicyService,
-        configuration_registry::{
-            ConfigurationNodeType, ConfigurationScope, ConfigurationSource, PropertyMap,
-            PropertyPolicy,
-        },
-    },
-    property_key,
-};
-use hashbrown::HashMap;
 use platform_formation_common::service_group::ServiceGroup;
 use platform_window_tgui::window::NativeWindowConfiguration;
 use service::project_service::ProjectService;
@@ -227,7 +224,7 @@ impl DesktopMain {
 
         let policy_service = ConfigurationPolicyService {
             definitions: {
-                use configuration::common::policy::PolicyDefinitionType;
+                use platform_configuration_common::policy::PolicyDefinitionType;
 
                 let mut this = HashMap::new();
 

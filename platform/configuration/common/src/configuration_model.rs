@@ -94,7 +94,7 @@ macro_rules! attribute_name {
     ([$override:ident] . $ident:ident $(. $subident:ident)*) => {{
         let override_ident = Some(stringify!($override).to_string());
         let name = Some(concat!(stringify!($ident), $(concat!(".", stringify!($subident))),*).to_string());
-        $crate::common::configuration_model::AttributeName {
+        $crate::configuration_model::AttributeName {
             override_ident,
             name,
         }
@@ -103,7 +103,7 @@ macro_rules! attribute_name {
     // Handle override without sub-identifiers
     ([$override:ident]) => {{
         let override_ident = Some(stringify!($override).to_string());
-        $crate::common::configuration_model::AttributeName {
+        $crate::configuration_model::AttributeName {
             override_ident,
             name: None,
         }
@@ -112,7 +112,7 @@ macro_rules! attribute_name {
     // Handle no override with sub-identifiers
     ($ident:ident $(. $subident:ident)*) => {{
         let name = Some(concat!(stringify!($ident), $(concat!(".", stringify!($subident))),*).to_string());
-        $crate::common::configuration_model::AttributeName {
+        $crate::configuration_model::AttributeName {
             override_ident: None,
             name,
         }

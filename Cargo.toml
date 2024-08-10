@@ -20,7 +20,7 @@ members = [
     "platform/base",
     "platform/window/tgui",
     "platform/formation/common",
-    "platform/configuration",
+    "platform/configuration/common",
 
 
     "platform/conf",
@@ -35,7 +35,8 @@ members = [
     "view/desktop/bin",
 
     "view/shared/workbench/tgui",
-    "view/shared/workbench/service/configuration",
+    "view/shared/workbench/service/configuration/common",
+    "view/shared/workbench/service/configuration/tgui",
 
 
 ]
@@ -60,13 +61,14 @@ fs = { path = "kernel/fs" }
 moss_base = { path = "lib/moss_base" }
 
 base = { path = "platform/base" }
-configuration = { path = "platform/configuration" }
 
 platform_window_tgui = { path = "platform/window/tgui" }
+platform_configuration_common = { path = "platform/configuration/common" }
 platform_formation_common = { path = "platform/formation/common" }
 
 workbench_tgui = { path = "view/shared/workbench/tgui" }
-workbench_service_configuration = { path = "view/shared/workbench/service/configuration" }
+workbench_service_configuration_common = { path = "view/shared/workbench/service/configuration/common" }
+workbench_service_configuration_tgui = { path = "view/shared/workbench/service/configuration/tgui" }
 
 bus = { path = "kernel/bus" }
 mac = { path = "lib/mac" }

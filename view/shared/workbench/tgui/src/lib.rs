@@ -1,7 +1,6 @@
 use anyhow::Result;
-use configuration::{
-    attribute_name,
-    common::{configuration_service::ConfigurationService, AbstractConfigurationService},
+use platform_configuration_common::{
+    attribute_name, configuration_service::ConfigurationService, AbstractConfigurationService,
 };
 use platform_formation_common::service_group::ServiceGroup;
 use specta::Type;

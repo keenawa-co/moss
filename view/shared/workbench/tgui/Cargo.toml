@@ -11,5 +11,4 @@ specta.workspace = true
 anyhow.workspace = true
 
 platform_formation_common.workspace = true
-
-configuration.workspace = true
+platform_configuration_common.workspace = true
