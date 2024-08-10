@@ -10,13 +10,13 @@ use configuration::common::{
 };
 use workspace::Workspace;
 
-pub struct WorkspaceService {
+pub struct WorkspaceConfigurationService {
     // workspace: Workspace,
     configuration: WorkspaceConfiguration,
     initialized: bool,
 }
 
-impl WorkspaceService {
+impl WorkspaceConfigurationService {
     pub fn new(
         registry: Arc<ConfigurationRegistry>,
         policy_service: ConfigurationPolicyService,

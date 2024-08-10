@@ -34,8 +34,9 @@ members = [
 
     "view/desktop/bin",
 
-    "view/shared/workbench/service/configuration",
     "view/shared/workbench/tgui",
+    "view/shared/workbench/service/configuration",
+
 
 ]
 
@@ -84,7 +85,7 @@ mossctl = { path = "mossctl" }
 net = { path = "net" }
 
 clap = "4.5.4"
-
+specta = "2.0.0-rc.20"
 libc = "0.2.155"
 fnv = "1.0.7"
 thiserror = "1.0"

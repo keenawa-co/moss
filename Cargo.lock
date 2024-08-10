@@ -9147,6 +9147,8 @@ dependencies = [
  "anyhow",
  "configuration",
  "platform_formation_common",
+ "serde",
+ "specta",
 ]
 
 [[package]]

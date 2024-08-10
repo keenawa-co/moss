@@ -8,11 +8,26 @@ export const Home: React.FC = () => {
   const { t } = useTranslation(["ns1", "ns2"]);
   const [sessionInfo, setSessionInfo] = useState<SessionInfoDTO | null>(null);
   const [data, setData] = useState<number | null>(null);
+  const [workbenchState, setWorkbenchState] = useState<string>("empty");
+
+  let getWorkbenchState = async () => {
+    try {
+      const response = await commands.workbenchGetState();
+      console.log(response);
+      if (response.status === "ok") {
+        setWorkbenchState(response.data);
+      }
+    } catch (err) {
+      console.error("Failed to get workbench state:", err);
+    }
+  };
 
   useEffect(() => {
     const unlisten = listen<number>("data-stream", (event) => {
       setData(event.payload);
     });
+
+    getWorkbenchState();
 
     return () => {
       unlisten.then((f) => f());
@@ -48,6 +63,10 @@ export const Home: React.FC = () => {
       ) : (
         <p>No session</p>
       )}
+
+      <p>
+        Workspace: <span className="bg-red-500 text-zinc-900"> {workbenchState}</span>
+      </p>
 
       <button className="bg-red-500" onClick={handleRestoreSession}>
         Restore Session

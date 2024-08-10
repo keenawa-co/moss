@@ -10,10 +10,8 @@ use configuration::common::{
         ConfigurationNode, ConfigurationPropertySchema, ConfigurationRegistry,
     },
     configuration_service::ConfigurationService,
-    AbstractConfigurationService,
 };
 use configuration::{
-    attribute_name,
     common::{
         configuration_policy::ConfigurationPolicyService,
         configuration_registry::{
@@ -31,14 +29,9 @@ use service::session_service::SessionService;
 use std::path::PathBuf;
 use std::sync::Arc;
 use surrealdb::{engine::remote::ws::Ws, Surreal};
-use surrealdb::{
-    method::Query,
-    opt::{IntoEndpoint, IntoQuery},
-    Connection,
-};
 use tauri::{App, AppHandle, Emitter, Manager, State};
 use tauri_specta::{collect_commands, collect_events};
-use workbench_tgui::Workbench;
+use workbench_tgui::{Workbench, WorkbenchState};
 
 use crate::service::{
     project_service::{CreateProjectInput, ProjectDTO},
@@ -50,6 +43,12 @@ extern crate serde;
 
 #[macro_use]
 extern crate tracing;
+
+#[tauri::command(async)]
+#[specta::specta]
+async fn workbench_get_state(state: State<'_, AppState>) -> Result<WorkbenchState, String> {
+    Ok(state.workbench.get_state())
+}
 
 #[tauri::command(async)]
 #[specta::specta]
@@ -279,7 +278,7 @@ impl DesktopMain {
         //     println!("Value `editor.fontSize` form None (after): {:?}", value);
         // });
 
-        let service_group = ServiceGroup::new();
+        let mut service_group = ServiceGroup::new();
 
         let config_service = ConfigurationService::new(
             Arc::new(registry),
@@ -293,6 +292,7 @@ impl DesktopMain {
         let builder = tauri_specta::Builder::<tauri::Wry>::new()
             .events(collect_events![])
             .commands(collect_commands![
+                workbench_get_state,
                 create_project,
                 restore_session,
                 app_ready
@@ -312,7 +312,7 @@ impl DesktopMain {
                 project_service: ProjectService::new(db.clone()),
                 session_service: SessionService::new(db.clone()),
             })
-            // .invoke_handler(invoke_handler)
+            .invoke_handler(builder.invoke_handler())
             .setup(move |app: &mut App| {
                 let app_handle = app.handle().clone();
 
@@ -335,25 +335,6 @@ impl DesktopMain {
             .run(|_, _| {});
 
         Ok(())
-    }
-}
-
-pub struct SurrealClient<C: Connection>(Surreal<C>);
-
-impl<C: Connection> SurrealClient<C> {
-    pub async fn new<P>(
-        address: impl IntoEndpoint<P, Client = C>,
-        ns: impl Into<String>,
-        db: impl Into<String>,
-    ) -> Result<Self> {
-        let client = Surreal::new::<P>(address).await?;
-        client.use_ns(ns).use_db(db).await?;
-
-        Ok(Self(client))
-    }
-
-    pub fn query(&self, query: impl IntoQuery) -> Query<C> {
-        self.query(query)
     }
 }
 
