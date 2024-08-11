@@ -5,7 +5,7 @@ on:
     branches: ["MOSSMVP-120-CI-Optimizing-documentation-deployment"]
     paths:
       - "view/docs/**"
-      - "shared/**"
+      - "view/shared/**"
 
   workflow_dispatch:
 
@@ -44,11 +44,11 @@ jobs:
         run: pnpm install --no-frozen-lockfile
         working-directory: ./view/docs
 
-      - name: Build with Turbo
-        run: pnpm turbo run build --filter=docs
+      - name: Build
+        run: pnpm build
+        working-directory: ./view/docs
 
       - name: Upload build artifacts
-        if: success()
         uses: actions/upload-artifact@v4
         with:
           name: build-artifacts
