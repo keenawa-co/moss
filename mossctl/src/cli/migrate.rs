@@ -17,5 +17,3 @@ pub async fn cmd_migration_up(MigrateUpCmdArgs {}: MigrateUpCmdArgs) -> anyhow::
 
     Ok(())
 }
-
-// REMOVE: unrelated change that should NOT trigger the pipeline

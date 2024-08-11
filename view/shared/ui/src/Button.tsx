@@ -35,5 +35,3 @@ export const Button = ({ primary = false, size = "medium", backgroundColor, labe
     </button>
   );
 };
-
-// REMOVE: related change that should trigger the pipeline
