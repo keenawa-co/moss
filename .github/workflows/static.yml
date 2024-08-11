@@ -2,7 +2,10 @@ name: Deploy static content to Pages
 
 on:
   push:
-    branches: ["main"]
+    branches: ["MOSSMVP-120-CI-Optimizing-documentation-deployment"]
+    paths:
+      - "view/docs/**"
+      - "shared/**"
 
   workflow_dispatch:
 
@@ -41,11 +44,11 @@ jobs:
         run: pnpm install --no-frozen-lockfile
         working-directory: ./view/docs
 
-      - name: Build
-        run: pnpm build
-        working-directory: ./view/docs
+      - name: Build with Turbo
+        run: pnpm turbo run build --filter=view/docs
 
       - name: Upload build artifacts
+        if: success()
         uses: actions/upload-artifact@v4
         with:
           name: build-artifacts
