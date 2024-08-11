@@ -37,3 +37,5 @@ export default function Home(): JSX.Element {
     </Layout>
   );
 }
+
+// REMOVE: only for CI/CD testing
