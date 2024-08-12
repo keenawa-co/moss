@@ -15,6 +15,8 @@ import {
   SearchIcon,
 } from "../../../shared/ui/src";
 
+import { Typescript, Acc } from "../../../shared/icons/build";
+
 export const Home: React.FC = () => {
   const { t } = useTranslation(["ns1", "ns2"]);
   const [sessionInfo, setSessionInfo] = useState<SessionInfoDTO | null>(null);
@@ -92,6 +94,11 @@ export const Home: React.FC = () => {
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
+      </div>
+
+      <div>
+        <Typescript className="text-6xl" />
+        <Acc className="text-6xl" />
       </div>
     </main>
   );
