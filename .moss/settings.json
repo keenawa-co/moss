@@ -2,7 +2,7 @@
   "window.restoreTab": true,
   "window.restoreFullScreen": false,
   "[mossql]": {
-    "editor.fontSize": 16
+    "editor.fontSize": 18
   },
-  "editor.fontSize": 15
+  "editor.fontSize": 14
 }

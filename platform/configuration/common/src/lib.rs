@@ -1,12 +1,21 @@
-use anyhow::Result;
-use configuration_model::AttributeName;
-
 pub mod configuration_default;
 pub mod configuration_model;
 pub mod configuration_policy;
 pub mod configuration_registry;
 pub mod configuration_service;
 pub mod policy;
+
+#[macro_use]
+extern crate anyhow;
+
+#[macro_use]
+extern crate async_trait;
+
+#[macro_use]
+extern crate lazy_regex;
+
+use anyhow::Result;
+use configuration_model::AttributeName;
 
 #[async_trait]
 pub trait AbstractConfigurationService {
