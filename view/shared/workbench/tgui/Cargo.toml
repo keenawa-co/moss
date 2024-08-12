@@ -7,8 +7,10 @@ edition = "2021"
 [dependencies]
 serde = { workspace = true, features = ["derive"] }
 specta.workspace = true
-
 anyhow.workspace = true
+
 
 platform_formation_common.workspace = true
 platform_configuration_common.workspace = true
+
+workbench_service_configuration_tgui.workspace = true

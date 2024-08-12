@@ -1,7 +1,7 @@
 use std::path::PathBuf;
 
 pub struct Workspace {
-    pub id: String,
+    pub id: Option<String>,
     pub folders: Vec<String>,
-    pub configuration: PathBuf,
+    pub configuration_uri: Option<PathBuf>,
 }

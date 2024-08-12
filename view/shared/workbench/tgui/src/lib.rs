@@ -1,10 +1,10 @@
 use anyhow::Result;
 use platform_configuration_common::{
-    attribute_name, platform_configuration_service::ConfigurationService,
-    AbstractConfigurationService,
+    attribute_name, configuration_service::ConfigurationService, AbstractConfigurationService,
 };
 use platform_formation_common::service_group::ServiceGroup;
 use specta::Type;
+use workbench_service_configuration_tgui::configuration_service::WorkspaceConfigurationService;
 
 #[macro_use]
 extern crate serde;
@@ -18,8 +18,8 @@ pub enum WorkbenchState {
 pub struct Workbench {}
 
 impl Workbench {
-    pub fn new(service_group: ServiceGroup) -> Result<Self> {
-        let config_service = service_group.get_unchecked::<ConfigurationService>();
+    pub fn new(mut service_group: ServiceGroup) -> Result<Self> {
+        let config_service = service_group.get_unchecked::<WorkspaceConfigurationService>();
 
         let value = config_service.get_value(attribute_name!(editor.fontSize));
         println!("Value `editor.fontSize` form None: {:?}", value);

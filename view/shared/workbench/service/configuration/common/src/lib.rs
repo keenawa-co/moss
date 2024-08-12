@@ -1,1 +1,1 @@
-pub mod workbench_service_configuration_model;
+pub mod configuration_model;

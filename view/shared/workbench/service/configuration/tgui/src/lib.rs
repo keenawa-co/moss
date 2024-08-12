@@ -1,14 +1,7 @@
-pub fn add(left: usize, right: usize) -> usize {
-    left + right
-}
+pub mod configuration_service;
 
-#[cfg(test)]
-mod tests {
-    use super::*;
+#[macro_use]
+extern crate anyhow;
 
-    #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
-    }
-}
+#[macro_use]
+extern crate async_trait;

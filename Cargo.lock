@@ -1768,7 +1768,9 @@ dependencies = [
  "tauri-specta",
  "tokio",
  "tracing",
+ "workbench_service_configuration_tgui",
  "workbench_tgui",
+ "workspace",
 ]
 
 [[package]]
@@ -9141,6 +9143,14 @@ dependencies = [
 [[package]]
 name = "workbench_service_configuration_tgui"
 version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "async-trait",
+ "platform_configuration_common",
+ "serde_json",
+ "workbench_service_configuration_common",
+ "workspace",
+]
 
 [[package]]
 name = "workbench_tgui"
@@ -9151,6 +9161,7 @@ dependencies = [
  "platform_formation_common",
  "serde",
  "specta",
+ "workbench_service_configuration_tgui",
 ]
 
 [[package]]

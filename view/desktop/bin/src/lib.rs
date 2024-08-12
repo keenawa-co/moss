@@ -7,17 +7,17 @@ use anyhow::Result;
 use app::context_compact::AppContextCompact;
 use hashbrown::HashMap;
 use platform_configuration_common::{
-    platform_configuration_policy::ConfigurationPolicyService,
-    platform_configuration_registry::{
+    configuration_policy::ConfigurationPolicyService,
+    configuration_registry::{
         ConfigurationNodeType, ConfigurationScope, ConfigurationSource, PropertyMap, PropertyPolicy,
     },
     property_key,
 };
 use platform_configuration_common::{
-    platform_configuration_registry::{
+    configuration_registry::{
         ConfigurationNode, ConfigurationPropertySchema, ConfigurationRegistry,
     },
-    platform_configuration_service::ConfigurationService,
+    configuration_service::ConfigurationService,
 };
 use platform_formation_common::service_group::ServiceGroup;
 use platform_window_tgui::window::NativeWindowConfiguration;
@@ -28,7 +28,9 @@ use std::sync::Arc;
 use surrealdb::{engine::remote::ws::Ws, Surreal};
 use tauri::{App, AppHandle, Emitter, Manager, State};
 use tauri_specta::{collect_commands, collect_events};
+use workbench_service_configuration_tgui::configuration_service::WorkspaceConfigurationService;
 use workbench_tgui::{Workbench, WorkbenchState};
+use workspace::Workspace;
 
 use crate::service::{
     project_service::{CreateProjectInput, ProjectDTO},
@@ -88,6 +90,24 @@ async fn restore_session(
     }
 }
 
+pub struct MockStorageService {}
+
+struct SimpleWindowState {
+    workspace_uri: Option<String>,
+}
+
+impl MockStorageService {
+    fn new() -> Self {
+        Self {}
+    }
+
+    fn get_last_window_state(&self) -> SimpleWindowState {
+        SimpleWindowState {
+            workspace_uri: Some("workspace_path_hash".to_string()),
+        }
+    }
+}
+
 pub struct DesktopMain {
     native_window_configuration: NativeWindowConfiguration,
 }
@@ -130,161 +150,7 @@ impl DesktopMain {
             Arc::new(db)
         });
 
-        let mut registry = ConfigurationRegistry::new();
-
-        let editor_configuration = ConfigurationNode {
-            id: "editor".to_string(),
-            title: Some("Editor".to_string()),
-            order: Some(1),
-            r#type: Default::default(),
-            scope: Default::default(),
-            source: Some(ConfigurationSource {
-                id: "moss.core".to_string(),
-                display_name: Some("Moss Core".to_string()),
-            }),
-            properties: {
-                let mut properties = PropertyMap::new();
-                properties.insert(
-                    property_key!(editor.fontSize),
-                    ConfigurationPropertySchema {
-                        scope: Some(ConfigurationScope::Resource),
-                        typ: Some(ConfigurationNodeType::Number),
-                        order: Some(1),
-                        default: Some(serde_json::Value::Number(serde_json::Number::from(12))),
-                        description: Some("Controls the font size in pixels.".to_string()),
-                        ..Default::default()
-                    },
-                );
-                properties.insert(
-                    property_key!(editor.lineHeight),
-                    ConfigurationPropertySchema {
-                        scope: Some(ConfigurationScope::Resource),
-                        typ: Some(ConfigurationNodeType::Number),
-                        order: Some(2),
-                        default: Some(serde_json::Value::Number(serde_json::Number::from(20))),
-                        description: Some("Controls the line height.".to_string()),
-                        policy: Some(PropertyPolicy {
-                            name: "editorLineHeightPolicy".to_string(),
-                        }),
-                        ..Default::default()
-                    },
-                );
-
-                Some(properties)
-            },
-            description: None,
-            parent_of: Some(vec![ConfigurationNode {
-                id: "mossql".to_string(),
-                title: Some("MossQL".to_string()),
-                order: Some(1),
-                r#type: Default::default(),
-                scope: Default::default(),
-                source: Some(ConfigurationSource {
-                    id: "moss.core".to_string(),
-                    display_name: Some("Moss Core".to_string()),
-                }),
-
-                properties: {
-                    let mut properties = PropertyMap::new();
-
-                    properties.insert(
-                        property_key!([mossql].editor.fontSize),
-                        ConfigurationPropertySchema {
-                            scope: Some(ConfigurationScope::Resource),
-                            typ: Some(ConfigurationNodeType::Number),
-                            order: Some(1),
-                            default: Some(serde_json::Value::Number(serde_json::Number::from(12))),
-                            description: Some("Controls the font size in pixels.".to_string()),
-                            protected_from_contribution: Some(false),
-                            allow_for_only_restricted_source: Some(false),
-                            schemable: Some(true),
-                            ..Default::default()
-                        },
-                    );
-                    properties.insert(
-                        property_key!([mossql].editor.lineHeight),
-                        ConfigurationPropertySchema {
-                            scope: Some(ConfigurationScope::Resource),
-                            typ: Some(ConfigurationNodeType::Number),
-                            order: Some(2),
-                            default: Some(serde_json::Value::Number(serde_json::Number::from(30))),
-                            description: Some("Controls the line height.".to_string()),
-                            ..Default::default()
-                        },
-                    );
-
-                    Some(properties)
-                },
-                description: None,
-                parent_of: None,
-            }]),
-        };
-
-        registry.register_configuration(editor_configuration);
-
-        let policy_service = ConfigurationPolicyService {
-            definitions: {
-                use platform_configuration_common::policy::PolicyDefinitionType;
-
-                let mut this = HashMap::new();
-
-                this.insert(
-                    "editorLineHeightPolicy".to_string(),
-                    PolicyDefinitionType::Number,
-                );
-
-                this
-            },
-            policies: {
-                let mut this = HashMap::new();
-                this.insert(
-                    "editorLineHeightPolicy".to_string(),
-                    serde_json::Value::Number(serde_json::Number::from(45)),
-                );
-
-                this
-            },
-        };
-
-        // ctx.block_on(|_| async {
-        //     let config_service = ConfigurationService::new(
-        //         Arc::new(registry),
-        //         policy_service,
-        //         &PathBuf::from("../../../.moss/settings.json"),
-        //     )
-        //     .unwrap();
-
-        //     let value = config_service.get_value(attribute_name!(editor.fontSize));
-        //     println!("Value `editor.fontSize` form None: {:?}", value);
-
-        //     let value = config_service.get_value(attribute_name!(editor.lineHeight));
-        //     println!("Value `editor.lineHeight` form None: {:?}", value);
-
-        //     let value = config_service.get_value(attribute_name!([mossql].editor.fontSize));
-        //     println!("Value `editor.fontSize` form `mossql`: {:?}", value);
-
-        //     config_service
-        //         .update_value(
-        //             "editor.fontSize",
-        //             serde_json::Value::Number(serde_json::Number::from(15)),
-        //         )
-        //         .await
-        //         .unwrap();
-
-        //     let value = config_service.get_value("editor.fontSize", None);
-        //     println!("Value `editor.fontSize` form None (after): {:?}", value);
-        // });
-
-        let mut service_group = ServiceGroup::new();
-
-        let config_service = ConfigurationService::new(
-            Arc::new(registry),
-            policy_service,
-            &PathBuf::from("../../../.moss/settings.json"),
-        )
-        .unwrap();
-
-        service_group.insert(config_service);
+        let service_group = self.initialize_service_group()?;
 
         let builder = tauri_specta::Builder::<tauri::Wry>::new()
             .events(collect_events![])
@@ -333,6 +199,163 @@ impl DesktopMain {
 
         Ok(())
     }
+
+    fn initialize_service_group(&self) -> Result<ServiceGroup> {
+        let registry = Arc::new(configuration_schema_registration(
+            ConfigurationRegistry::new(),
+        ));
+
+        let policy_service = ConfigurationPolicyService {
+            definitions: {
+                use platform_configuration_common::policy::PolicyDefinitionType;
+
+                let mut this = HashMap::new();
+
+                this.insert(
+                    "editorLineHeightPolicy".to_string(),
+                    PolicyDefinitionType::Number,
+                );
+
+                this
+            },
+            policies: {
+                let mut this = HashMap::new();
+                this.insert(
+                    "editorLineHeightPolicy".to_string(),
+                    serde_json::Value::Number(serde_json::Number::from(45)),
+                );
+
+                this
+            },
+        };
+
+        let mut service_group = ServiceGroup::new();
+
+        let storage_service = MockStorageService::new();
+
+        let window_state = storage_service.get_last_window_state();
+
+        let workspace = self.restore_workspace(window_state.workspace_uri);
+
+        let workspace_configuration_service =
+            WorkspaceConfigurationService::new(workspace, Arc::clone(&registry), policy_service);
+
+        service_group.insert(workspace_configuration_service);
+
+        Ok(service_group)
+    }
+
+    // TODO: use Workbench tgui workspace, not platform
+    fn restore_workspace(&self, workspace_uri: Option<String>) -> Workspace {
+        if let Some(uri) = workspace_uri {
+            Workspace {
+                id: Some(uri.clone()),
+                folders: vec![],
+                configuration_uri: Some(PathBuf::from(format!("{uri}/.moss/moss.json"))),
+            }
+        } else {
+            Workspace {
+                id: None,
+                folders: vec![],
+                configuration_uri: None,
+            }
+        }
+    }
+}
+
+// TODO: get rid
+fn configuration_schema_registration(mut registry: ConfigurationRegistry) -> ConfigurationRegistry {
+    let editor_configuration = ConfigurationNode {
+        id: "editor".to_string(),
+        title: Some("Editor".to_string()),
+        order: Some(1),
+        r#type: Default::default(),
+        scope: Default::default(),
+        source: Some(ConfigurationSource {
+            id: "moss.core".to_string(),
+            display_name: Some("Moss Core".to_string()),
+        }),
+        properties: {
+            let mut properties = PropertyMap::new();
+            properties.insert(
+                property_key!(editor.fontSize),
+                ConfigurationPropertySchema {
+                    scope: Some(ConfigurationScope::Resource),
+                    typ: Some(ConfigurationNodeType::Number),
+                    order: Some(1),
+                    default: Some(serde_json::Value::Number(serde_json::Number::from(12))),
+                    description: Some("Controls the font size in pixels.".to_string()),
+                    ..Default::default()
+                },
+            );
+            properties.insert(
+                property_key!(editor.lineHeight),
+                ConfigurationPropertySchema {
+                    scope: Some(ConfigurationScope::Resource),
+                    typ: Some(ConfigurationNodeType::Number),
+                    order: Some(2),
+                    default: Some(serde_json::Value::Number(serde_json::Number::from(20))),
+                    description: Some("Controls the line height.".to_string()),
+                    policy: Some(PropertyPolicy {
+                        name: "editorLineHeightPolicy".to_string(),
+                    }),
+                    ..Default::default()
+                },
+            );
+
+            Some(properties)
+        },
+        description: None,
+        parent_of: Some(vec![ConfigurationNode {
+            id: "mossql".to_string(),
+            title: Some("MossQL".to_string()),
+            order: Some(1),
+            r#type: Default::default(),
+            scope: Default::default(),
+            source: Some(ConfigurationSource {
+                id: "moss.core".to_string(),
+                display_name: Some("Moss Core".to_string()),
+            }),
+
+            properties: {
+                let mut properties = PropertyMap::new();
+
+                properties.insert(
+                    property_key!([mossql].editor.fontSize),
+                    ConfigurationPropertySchema {
+                        scope: Some(ConfigurationScope::Resource),
+                        typ: Some(ConfigurationNodeType::Number),
+                        order: Some(1),
+                        default: Some(serde_json::Value::Number(serde_json::Number::from(12))),
+                        description: Some("Controls the font size in pixels.".to_string()),
+                        protected_from_contribution: Some(false),
+                        allow_for_only_restricted_source: Some(false),
+                        schemable: Some(true),
+                        ..Default::default()
+                    },
+                );
+                properties.insert(
+                    property_key!([mossql].editor.lineHeight),
+                    ConfigurationPropertySchema {
+                        scope: Some(ConfigurationScope::Resource),
+                        typ: Some(ConfigurationNodeType::Number),
+                        order: Some(2),
+                        default: Some(serde_json::Value::Number(serde_json::Number::from(30))),
+                        description: Some("Controls the line height.".to_string()),
+                        ..Default::default()
+                    },
+                );
+
+                Some(properties)
+            },
+            description: None,
+            parent_of: None,
+        }]),
+    };
+
+    registry.register_configuration(editor_configuration);
+
+    registry
 }
 
 pub struct AppState {
