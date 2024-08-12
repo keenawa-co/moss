@@ -97,8 +97,8 @@ export const Home: React.FC = () => {
       </div>
 
       <div>
-        <Typescript className="text-6xl" />
-        <Acc className="text-6xl" />
+        <Typescript className="text-6xl " />
+        <Acc className="text-6xl *:fill-yellow-600" />
       </div>
     </main>
   );
