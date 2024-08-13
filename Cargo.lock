@@ -9157,11 +9157,14 @@ name = "workbench_tgui"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "hashbrown 0.14.5",
  "platform_configuration_common",
  "platform_formation_common",
  "serde",
+ "serde_json",
  "specta",
  "workbench_service_configuration_tgui",
+ "workspace",
 ]
 
 [[package]]

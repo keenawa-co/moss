@@ -5,4 +5,4 @@ count:
 
 .PHONY: cleanup
 cleanup:
-	git branch -vv | grep ': gone]' | awk '{print $1}'
+	git branch --merged | grep -Ev "(^\*|master|main|dev)" | xargs git branch -d

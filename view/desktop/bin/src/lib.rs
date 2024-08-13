@@ -5,32 +5,26 @@ pub mod service;
 
 use anyhow::Result;
 use app::context_compact::AppContextCompact;
-use hashbrown::HashMap;
+use platform_configuration_common::configuration_registry::{
+    ConfigurationNode, ConfigurationPropertySchema, ConfigurationRegistry,
+};
 use platform_configuration_common::{
-    configuration_policy::ConfigurationPolicyService,
     configuration_registry::{
         ConfigurationNodeType, ConfigurationScope, ConfigurationSource, PropertyMap, PropertyPolicy,
     },
     property_key,
 };
-use platform_configuration_common::{
-    configuration_registry::{
-        ConfigurationNode, ConfigurationPropertySchema, ConfigurationRegistry,
-    },
-    configuration_service::ConfigurationService,
-};
 use platform_formation_common::service_group::ServiceGroup;
 use platform_window_tgui::window::NativeWindowConfiguration;
 use service::project_service::ProjectService;
 use service::session_service::SessionService;
-use std::path::PathBuf;
+use std::env;
 use std::sync::Arc;
 use surrealdb::{engine::remote::ws::Ws, Surreal};
 use tauri::{App, AppHandle, Emitter, Manager, State};
 use tauri_specta::{collect_commands, collect_events};
-use workbench_service_configuration_tgui::configuration_service::WorkspaceConfigurationService;
 use workbench_tgui::{Workbench, WorkbenchState};
-use workspace::Workspace;
+use workspace::WorkspaceId;
 
 use crate::service::{
     project_service::{CreateProjectInput, ProjectDTO},
@@ -93,7 +87,7 @@ async fn restore_session(
 pub struct MockStorageService {}
 
 struct SimpleWindowState {
-    workspace_uri: Option<String>,
+    workspace_id: WorkspaceId,
 }
 
 impl MockStorageService {
@@ -103,7 +97,7 @@ impl MockStorageService {
 
     fn get_last_window_state(&self) -> SimpleWindowState {
         SimpleWindowState {
-            workspace_uri: Some("workspace_path_hash".to_string()),
+            workspace_id: WorkspaceId::Some("workspace_path_hash".to_string()),
         }
     }
 }
@@ -152,6 +146,22 @@ impl DesktopMain {
 
         let service_group = self.initialize_service_group()?;
 
+        let window_state = service_group
+            .get_unchecked::<MockStorageService>()
+            .get_last_window_state();
+
+        let configuration_registry =
+            configuration_schema_registration(ConfigurationRegistry::new());
+
+        let mut workbench = Workbench::new(service_group, window_state.workspace_id)?;
+        workbench.initialize(configuration_registry)?;
+
+        let app_state = AppState {
+            workbench,
+            project_service: ProjectService::new(db.clone()),
+            session_service: SessionService::new(db.clone()),
+        };
+
         let builder = tauri_specta::Builder::<tauri::Wry>::new()
             .events(collect_events![])
             .commands(collect_commands![
@@ -170,11 +180,7 @@ impl DesktopMain {
             .expect("Failed to export typescript bindings");
 
         tauri::Builder::default()
-            .manage(AppState {
-                workbench: Workbench::new(service_group)?,
-                project_service: ProjectService::new(db.clone()),
-                session_service: SessionService::new(db.clone()),
-            })
+            .manage(app_state)
             .invoke_handler(builder.invoke_handler())
             .setup(move |app: &mut App| {
                 let app_handle = app.handle().clone();
@@ -201,65 +207,13 @@ impl DesktopMain {
     }
 
     fn initialize_service_group(&self) -> Result<ServiceGroup> {
-        let registry = Arc::new(configuration_schema_registration(
-            ConfigurationRegistry::new(),
-        ));
-
-        let policy_service = ConfigurationPolicyService {
-            definitions: {
-                use platform_configuration_common::policy::PolicyDefinitionType;
-
-                let mut this = HashMap::new();
-
-                this.insert(
-                    "editorLineHeightPolicy".to_string(),
-                    PolicyDefinitionType::Number,
-                );
-
-                this
-            },
-            policies: {
-                let mut this = HashMap::new();
-                this.insert(
-                    "editorLineHeightPolicy".to_string(),
-                    serde_json::Value::Number(serde_json::Number::from(45)),
-                );
-
-                this
-            },
-        };
-
         let mut service_group = ServiceGroup::new();
 
         let storage_service = MockStorageService::new();
 
-        let window_state = storage_service.get_last_window_state();
-
-        let workspace = self.restore_workspace(window_state.workspace_uri);
-
-        let workspace_configuration_service =
-            WorkspaceConfigurationService::new(workspace, Arc::clone(&registry), policy_service);
-
-        service_group.insert(workspace_configuration_service);
+        service_group.insert(storage_service);
 
         Ok(service_group)
-    }
-
-    // TODO: use Workbench tgui workspace, not platform
-    fn restore_workspace(&self, workspace_uri: Option<String>) -> Workspace {
-        if let Some(uri) = workspace_uri {
-            Workspace {
-                id: Some(uri.clone()),
-                folders: vec![],
-                configuration_uri: Some(PathBuf::from(format!("{uri}/.moss/moss.json"))),
-            }
-        } else {
-            Workspace {
-                id: None,
-                folders: vec![],
-                configuration_uri: None,
-            }
-        }
     }
 }
 

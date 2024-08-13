@@ -6,10 +6,13 @@ edition = "2021"
 
 [dependencies]
 serde = { workspace = true, features = ["derive"] }
+serde_json.workspace = true
+
 specta.workspace = true
 anyhow.workspace = true
+hashbrown.workspace = true
 
-
+workspace.workspace = true
 platform_formation_common.workspace = true
 platform_configuration_common.workspace = true
 
