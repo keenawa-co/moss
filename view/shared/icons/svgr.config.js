@@ -1,12 +1,27 @@
 // https://react-svgr.com/docs/options/
 module.exports = {
+  outDir: "build",
   icon: true,
   expandProps: true,
-  typescript: true,
   ref: false,
-  ext: "tsx",
+  typescript: true,
   replaceAttrValues: {
-    color: "currentColor",
-    fill: "currentColor",
+    "#808080": "currentColor",
+  },
+
+  // https://svgo.dev/docs/plugins/
+  svgo: true,
+  svgoConfig: {
+    plugins: [
+      {
+        name: "preset-default",
+        params: {
+          overrides: {
+            removeViewBox: false,
+            convertColors: false,
+          },
+        },
+      },
+    ],
   },
 };
