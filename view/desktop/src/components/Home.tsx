@@ -72,7 +72,7 @@ export const Home: React.FC = () => {
 
       <div>
         <Tooltip label="Test">
-          <CodeIcon className="fill-red-500 w-4" />
+          <Icon icon="Code" />
         </Tooltip>
       </div>
 
@@ -83,9 +83,7 @@ export const Home: React.FC = () => {
           <DropdownMenuContent>
             <DropdownMenuItem>
               <DropdownMenuIconWrapper>
-                <Icon>
-                  <SearchIcon className="text-red-600" />
-                </Icon>
+                <Icon icon="Search" />
               </DropdownMenuIconWrapper>
               Menu item 1
             </DropdownMenuItem>
@@ -96,9 +94,9 @@ export const Home: React.FC = () => {
         </DropdownMenu>
       </div>
 
-      <div>
-        <Typescript className="text-6xl" />
-        <Acc className="text-6xl" />
+      <div className="flex">
+        <Acc className="text-6xl hover:*:fill-green-500" />
+        <Icon icon="NewProject" className="text-6xl text-red-600 hover:fill-green-500" />
       </div>
     </main>
   );
