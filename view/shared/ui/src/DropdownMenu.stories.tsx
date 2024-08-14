@@ -23,11 +23,6 @@ import {
 } from "./DropdownMenu";
 
 import Icon from "./Icon";
-import HomeIcon from "./HomeIcon";
-import IssuesIcon from "./IssuesIcon";
-import ReportsIcon from "./ReportsIcon";
-import SearchIcon from "./SearchIcon";
-import CodeIcon from "./CodeIcon";
 
 import { useState } from "react";
 
@@ -69,36 +64,28 @@ export const Default: Story = {
         <DropdownMenuGroup>
           <DropdownMenuItem>
             <DropdownMenuIconWrapper>
-              <Icon>
-                <HomeIcon />
-              </Icon>
+              <Icon className="text-white" icon="Home1" />
             </DropdownMenuIconWrapper>
             <span>Profile</span>
             <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
           </DropdownMenuItem>
           <DropdownMenuItem>
             <DropdownMenuIconWrapper>
-              <Icon>
-                <IssuesIcon />
-              </Icon>
+              <Icon className="text-white" icon="Issues" />
             </DropdownMenuIconWrapper>
             <span>Billing</span>
             <DropdownMenuShortcut>⌘B</DropdownMenuShortcut>
           </DropdownMenuItem>
           <DropdownMenuItem>
             <DropdownMenuIconWrapper>
-              <Icon>
-                <ReportsIcon />
-              </Icon>
+              <Icon className="text-white" icon="Reports" />
             </DropdownMenuIconWrapper>
             <span>Settings</span>
             <DropdownMenuShortcut>⌘S</DropdownMenuShortcut>
           </DropdownMenuItem>
           <DropdownMenuItem>
             <DropdownMenuIconWrapper>
-              <Icon>
-                <SearchIcon />
-              </Icon>
+              <Icon className="text-white" icon="Search" />
             </DropdownMenuIconWrapper>
             <span>Keyboard shortcuts</span>
             <DropdownMenuShortcut>⌘K</DropdownMenuShortcut>
@@ -110,9 +97,7 @@ export const Default: Story = {
         <DropdownMenuGroup>
           <DropdownMenuItem>
             <DropdownMenuIconWrapper>
-              <Icon>
-                <CodeIcon />
-              </Icon>
+              <Icon className="text-white" icon="Code" />
             </DropdownMenuIconWrapper>
             Team
           </DropdownMenuItem>
@@ -120,9 +105,7 @@ export const Default: Story = {
           <DropdownMenuSub>
             <DropdownMenuSubTrigger>
               <DropdownMenuIconWrapper>
-                <Icon>
-                  <CodeIcon />
-                </Icon>
+                <Icon className="text-white" icon="Code" />
               </DropdownMenuIconWrapper>
               <span>Invite users</span>
             </DropdownMenuSubTrigger>
@@ -130,26 +113,20 @@ export const Default: Story = {
               <DropdownMenuSubContent>
                 <DropdownMenuItem>
                   <DropdownMenuIconWrapper>
-                    <Icon>
-                      <HomeIcon />
-                    </Icon>
+                    <Icon className="text-white" icon="Home1" />
                   </DropdownMenuIconWrapper>
                   <span>Email</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
                   <DropdownMenuIconWrapper>
-                    <Icon>
-                      <HomeIcon />
-                    </Icon>
+                    <Icon className="text-white" icon="Home1" />
                   </DropdownMenuIconWrapper>
                   <span>Message</span>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem>
                   <DropdownMenuIconWrapper>
-                    <Icon>
-                      <HomeIcon />
-                    </Icon>
+                    <Icon className="text-white" icon="Home1" />
                   </DropdownMenuIconWrapper>
                   <span>More...</span>
                 </DropdownMenuItem>
@@ -160,9 +137,7 @@ export const Default: Story = {
           <DropdownMenuSub>
             <DropdownMenuSubTrigger>
               <DropdownMenuIconWrapper>
-                <Icon>
-                  <HomeIcon />
-                </Icon>
+                <Icon className="text-white" icon="Home1" />
               </DropdownMenuIconWrapper>
               <span>New team</span>
             </DropdownMenuSubTrigger>
@@ -195,9 +170,7 @@ export const Default: Story = {
         <DropdownMenuSeparator />
         <DropdownMenuItem>
           <DropdownMenuIconWrapper>
-            <Icon>
-              <HomeIcon />
-            </Icon>
+            <Icon className="text-white" icon="Home1" />
           </DropdownMenuIconWrapper>
           <span>Log out</span>
           <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
@@ -220,9 +193,7 @@ export const ExampleFromFigma: Story = {
           <DropdownMenuSubContent>
             <DropdownMenuItem>
               <DropdownMenuIconWrapper>
-                <Icon>
-                  <HomeIcon />
-                </Icon>
+                <Icon className="text-white" icon="Home1" />
               </DropdownMenuIconWrapper>
               <span>More...</span>
             </DropdownMenuItem>
@@ -236,9 +207,7 @@ export const ExampleFromFigma: Story = {
           <DropdownMenuSubContent>
             <DropdownMenuItem>
               <DropdownMenuIconWrapper>
-                <Icon>
-                  <HomeIcon />
-                </Icon>
+                <Icon className="text-white" icon="Home1" />
               </DropdownMenuIconWrapper>
               <span>More...</span>
             </DropdownMenuItem>
@@ -252,9 +221,7 @@ export const ExampleFromFigma: Story = {
           <DropdownMenuSubContent>
             <DropdownMenuItem>
               <DropdownMenuIconWrapper>
-                <Icon>
-                  <HomeIcon />
-                </Icon>
+                <Icon className="text-white" icon="Home1" />
               </DropdownMenuIconWrapper>
               <span>More...</span>
             </DropdownMenuItem>
@@ -268,9 +235,7 @@ export const ExampleFromFigma: Story = {
           <DropdownMenuSubContent>
             <DropdownMenuItem>
               <DropdownMenuIconWrapper>
-                <Icon>
-                  <HomeIcon />
-                </Icon>
+                <Icon className="text-white" icon="Home1" />
               </DropdownMenuIconWrapper>
               <span>More...</span>
             </DropdownMenuItem>
@@ -316,9 +281,7 @@ export const Groups: Story = {
         <DropdownMenuGroup>
           <DropdownMenuItem>
             <DropdownMenuIconWrapper>
-              <Icon>
-                <HomeIcon />
-              </Icon>
+              <Icon className="text-white" icon="Home1" />
             </DropdownMenuIconWrapper>
             1 - Group item with icon
           </DropdownMenuItem>
@@ -328,9 +291,7 @@ export const Groups: Story = {
         <DropdownMenuGroup>
           <DropdownMenuItem>
             <DropdownMenuIconWrapper>
-              <Icon>
-                <HomeIcon />
-              </Icon>
+              <Icon className="text-white" icon="Home1" />
             </DropdownMenuIconWrapper>
             2 - Group item with icon
           </DropdownMenuItem>
@@ -363,9 +324,7 @@ export const DropdownMenuSubExample: Story = {
         <DropdownMenuSub>
           <DropdownMenuSubTrigger>
             <DropdownMenuIconWrapper>
-              <Icon>
-                <HomeIcon />
-              </Icon>
+              <Icon className="text-white" icon="Home1" />
             </DropdownMenuIconWrapper>
             Sub trigger with icon
           </DropdownMenuSubTrigger>
@@ -373,9 +332,7 @@ export const DropdownMenuSubExample: Story = {
           <DropdownMenuSubContent>
             <DropdownMenuItem>
               <DropdownMenuIconWrapper>
-                <Icon>
-                  <HomeIcon />
-                </Icon>
+                <Icon className="text-white" icon="Home1" />
               </DropdownMenuIconWrapper>
               More...
             </DropdownMenuItem>
@@ -387,9 +344,7 @@ export const DropdownMenuSubExample: Story = {
           <DropdownMenuSubContent>
             <DropdownMenuItem>
               <DropdownMenuIconWrapper>
-                <Icon>
-                  <HomeIcon />
-                </Icon>
+                <Icon className="text-white" icon="Home1" />
               </DropdownMenuIconWrapper>
               More...
             </DropdownMenuItem>
@@ -401,41 +356,31 @@ export const DropdownMenuSubExample: Story = {
           <DropdownMenuSubContent>
             <DropdownMenuItem>
               <DropdownMenuIconWrapper>
-                <Icon>
-                  <HomeIcon />
-                </Icon>
+                <Icon className="text-white" icon="Home1" />
               </DropdownMenuIconWrapper>
               More...
             </DropdownMenuItem>
             <DropdownMenuItem>
               <DropdownMenuIconWrapper>
-                <Icon>
-                  <HomeIcon />
-                </Icon>
+                <Icon className="text-white" icon="Home1" />
               </DropdownMenuIconWrapper>
               More...
             </DropdownMenuItem>
             <DropdownMenuItem>
               <DropdownMenuIconWrapper>
-                <Icon>
-                  <HomeIcon />
-                </Icon>
+                <Icon className="text-white" icon="Home1" />
               </DropdownMenuIconWrapper>
               More...
             </DropdownMenuItem>
             <DropdownMenuItem>
               <DropdownMenuIconWrapper>
-                <Icon>
-                  <HomeIcon />
-                </Icon>
+                <Icon className="text-white" icon="Home1" />
               </DropdownMenuIconWrapper>
               More...
             </DropdownMenuItem>
             <DropdownMenuItem>
               <DropdownMenuIconWrapper>
-                <Icon>
-                  <HomeIcon />
-                </Icon>
+                <Icon className="text-white" icon="Home1" />
               </DropdownMenuIconWrapper>
               More...
             </DropdownMenuItem>
@@ -447,58 +392,44 @@ export const DropdownMenuSubExample: Story = {
           <DropdownMenuSubContent>
             <DropdownMenuItem>
               <DropdownMenuIconWrapper>
-                <Icon>
-                  <HomeIcon />
-                </Icon>
+                <Icon className="text-white" icon="Home1" />
               </DropdownMenuIconWrapper>
               More...
             </DropdownMenuItem>
 
             <DropdownMenuItem>
               <DropdownMenuIconWrapper>
-                <Icon>
-                  <HomeIcon />
-                </Icon>
+                <Icon className="text-white" icon="Home1" />
               </DropdownMenuIconWrapper>
               More... More
             </DropdownMenuItem>
             <DropdownMenuItem>
               <DropdownMenuIconWrapper>
-                <Icon>
-                  <HomeIcon />
-                </Icon>
+                <Icon className="text-white" icon="Home1" />
               </DropdownMenuIconWrapper>
               More... More... More
             </DropdownMenuItem>
             <DropdownMenuItem>
               <DropdownMenuIconWrapper>
-                <Icon>
-                  <HomeIcon />
-                </Icon>
+                <Icon className="text-white" icon="Home1" />
               </DropdownMenuIconWrapper>
               More... More... More... More...
             </DropdownMenuItem>
             <DropdownMenuItem>
               <DropdownMenuIconWrapper>
-                <Icon>
-                  <HomeIcon />
-                </Icon>
+                <Icon className="text-white" icon="Home1" />
               </DropdownMenuIconWrapper>
               More... More... More... More... More...
             </DropdownMenuItem>
             <DropdownMenuItem>
               <DropdownMenuIconWrapper>
-                <Icon>
-                  <HomeIcon />
-                </Icon>
+                <Icon className="text-white" icon="Home1" />
               </DropdownMenuIconWrapper>
               More... More... More... More... More... More...
             </DropdownMenuItem>
             <DropdownMenuItem>
               <DropdownMenuIconWrapper>
-                <Icon>
-                  <HomeIcon />
-                </Icon>
+                <Icon className="text-white" icon="Home1" />
               </DropdownMenuIconWrapper>
               More... More... More... More... More... More... More
             </DropdownMenuItem>
