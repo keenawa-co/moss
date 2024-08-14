@@ -1,15 +1,21 @@
-import { twMerge } from "tailwind-merge";
 import { ComponentPropsWithoutRef } from "react";
+import * as icons from "../../icons/build";
+import { cn } from "./lib/utils";
 
-export const Icon = ({ className, children, ...props }: ComponentPropsWithoutRef<"div">) => {
-  return (
-    <div
-      className={twMerge("opacity-80 group-hover:opacity-100 group-focus:opacity-100 transition", className)}
-      {...props}
-    >
-      {children}
-    </div>
-  );
+export type Icons = keyof typeof icons;
+
+export const Icon = ({
+  icon,
+  className,
+
+  ...props
+}: {
+  icon: Icons;
+  className?: string;
+} & ComponentPropsWithoutRef<"svg">) => {
+  const IconTag = icons[icon];
+
+  return <IconTag className={cn("text-zinc-500 hover:text-zinc-600", className)} {...props} />;
 };
 
 export default Icon;
