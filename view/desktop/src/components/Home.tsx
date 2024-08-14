@@ -93,7 +93,7 @@ export const Home: React.FC = () => {
       </div>
 
       <div className="flex">
-        <Acc className="text-6xl hover:*:fill-green-500" />
+        <Icon icon="Accessibility" className="text-6xl hover:*:fill-green-500" />
         <Icon icon="NewProject" className="text-6xl text-red-600 hover:fill-green-500" />
       </div>
     </main>
