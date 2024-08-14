@@ -4,7 +4,6 @@ import React, { useEffect, useState } from "react";
 import { listen } from "@tauri-apps/api/event";
 import {
   Tooltip,
-  CodeIcon,
   DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuContent,
@@ -12,7 +11,6 @@ import {
   DropdownMenuLabel,
   DropdownMenuIconWrapper,
   Icon,
-  SearchIcon,
 } from "../../../shared/ui/src";
 
 import { Typescript, Acc } from "../../../shared/icons/build";

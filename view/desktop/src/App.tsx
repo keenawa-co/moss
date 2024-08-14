@@ -3,21 +3,7 @@ import { Suspense } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import "./i18n";
 import "../../shared/ui/src/fonts.css";
-import {
-  HomeIcon,
-  Icon,
-  MenuItem,
-  IconTitle,
-  IssuesIcon,
-  CodeIcon,
-  GoalsIcon,
-  ReportsIcon,
-  DocumentationIcon,
-  SearchIcon,
-  SearchShortcutIcon,
-  SettingsIcon,
-  QuickSearchIcon,
-} from "../../shared/ui/src";
+import { Icon, MenuItem, IconTitle } from "../../shared/ui/src";
 import { twMerge } from "tailwind-merge";
 import StatusBar from "./components/StatusBar";
 
