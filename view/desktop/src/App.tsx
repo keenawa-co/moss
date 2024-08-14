@@ -22,10 +22,10 @@ import { twMerge } from "tailwind-merge";
 import StatusBar from "./components/StatusBar";
 
 enum IconState {
-  Default = "text-zinc-500",
-  DefaultStroke = "stroke-zinc-500",
-  Hover = "hover:text-zinc-600",
-  HoverStroke = "hover:stroke-zinc-600",
+  Default = "group-text-zinc-500",
+  DefaultStroke = "group-stroke-zinc-500",
+  Hover = "group-hover:text-red-600",
+  HoverStroke = "group-hover:stroke-zinc-600",
   Active = "text-olive-700",
   Disabled = "text-zinc-500 bg-opacity-50",
 }
@@ -37,60 +37,48 @@ function App() {
         <TitleBar />
         <Sidebar className="p-0">
           <MenuItem className="group bg-zinc-200 mt-13 mb-3.5">
-            <Icon className="h-4.5 w-4.5">
-              <SearchIcon className={twMerge(IconState.Default, IconState.Hover)} />
-            </Icon>
+            <Icon icon="Search" className={twMerge("h-4.5 w-4.5", IconState.Default, IconState.Hover)} />
             <IconTitle className="text-zinc-900 text-xs bg-zin" title="Search..." />
-            <Icon className="h-4.5 w-5 ml-28">
-              <SearchShortcutIcon className="text-zinc-500 hover:text-zinc-600" />
-            </Icon>
+            <Icon icon="SearchShortcut" className="text-zinc-500 hover:text-zinc-600 h-4.5 w-5 ml-28" />
           </MenuItem>
+
           <MenuItem className="group">
-            <Icon className="h-4.5 w-4.5">
-              <HomeIcon className={twMerge(IconState.Default, IconState.Hover)} />
-            </Icon>
+            <Icon icon="Home1" className={twMerge(IconState.Default, IconState.Hover)} />
             <IconTitle className="text-zinc-900 text-sm" title="Home" />
           </MenuItem>
+
           <MenuItem className="group">
-            <Icon className="h-4.5 w-4.5">
-              <IssuesIcon className={twMerge(IconState.Default, IconState.Hover)} />
-            </Icon>
+            <Icon icon="Issues" className={twMerge(IconState.Default, IconState.Hover)} />
             <IconTitle className="text-zinc-900 text-sm" title="Issues" />
           </MenuItem>
+
           <MenuItem className="group">
-            <Icon className="h-4.5 w-4.5">
-              <CodeIcon className={twMerge(IconState.Default, IconState.Hover)} />
-            </Icon>
+            <Icon icon="Code" className={twMerge(IconState.Default, IconState.Hover)} />
             <IconTitle className="text-zinc-900 text-sm" title="Code" />
           </MenuItem>
+
           <MenuItem className="group">
-            <Icon className="h-4.5 w-4.5">
-              <GoalsIcon className={twMerge(IconState.DefaultStroke, IconState.HoverStroke)} />
-            </Icon>
+            <Icon icon="Goals" className={twMerge(IconState.Default, IconState.Hover)} />
             <IconTitle className="text-zinc-900 text-sm" title="Goals" />
           </MenuItem>
+
           <MenuItem className="group">
-            <Icon className="h-4.5 w-4.5">
-              <ReportsIcon className={twMerge(IconState.Default, IconState.Hover)} />
-            </Icon>
+            <Icon icon="Reports" className={twMerge(IconState.Default, IconState.Hover)} />
             <IconTitle className="text-zinc-900 text-sm" title="Reports" />
           </MenuItem>
+
           <MenuItem className="group">
-            <Icon className="h-4.5 w-4.5">
-              <DocumentationIcon className={twMerge(IconState.Default, IconState.Hover)} />
-            </Icon>
+            <Icon icon="Documentation" className={twMerge(IconState.Default, IconState.Hover)} />
             <IconTitle className="text-zinc-900 text-sm" title="Documentation" />
           </MenuItem>
+
           <MenuItem className="group">
-            <Icon className="h-4.5 w-4.5">
-              <SettingsIcon className={twMerge(IconState.Default, IconState.Hover)} />
-            </Icon>
+            <Icon icon="Settings" className={twMerge(IconState.Default, IconState.Hover)} />
             <IconTitle className="text-zinc-900 text-sm" title="Settings" />
           </MenuItem>
+
           <MenuItem className="group">
-            <Icon className="h-4.5 w-4.5">
-              <QuickSearchIcon className="stroke-zinc-500 hover:stroke-zinc-600" />
-            </Icon>
+            <Icon icon="QuickSearch" className={twMerge(IconState.Default, IconState.Hover)} />
             <IconTitle className="text-zinc-900 text-sm" title="Quick Search" />
           </MenuItem>
         </Sidebar>
