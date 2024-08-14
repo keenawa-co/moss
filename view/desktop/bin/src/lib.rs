@@ -219,11 +219,14 @@ impl DesktopMain {
 
 // TODO: get rid
 fn configuration_schema_registration(mut registry: ConfigurationRegistry) -> ConfigurationRegistry {
+    // let r = &workbench_tgui::workbench_tgui_contrib::WORKBENCH_TGUI_WINDOW;
+    // registry.register_configuration();
+
     let editor_configuration = ConfigurationNode {
         id: "editor".to_string(),
         title: Some("Editor".to_string()),
         order: Some(1),
-        r#type: Default::default(),
+        typ: Default::default(),
         scope: Default::default(),
         source: Some(ConfigurationSource {
             id: "moss.core".to_string(),
@@ -264,7 +267,7 @@ fn configuration_schema_registration(mut registry: ConfigurationRegistry) -> Con
             id: "mossql".to_string(),
             title: Some("MossQL".to_string()),
             order: Some(1),
-            r#type: Default::default(),
+            typ: Default::default(),
             scope: Default::default(),
             source: Some(ConfigurationSource {
                 id: "moss.core".to_string(),

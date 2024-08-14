@@ -381,7 +381,7 @@ pub struct ConfigurationNode {
     /// The order in which the configuration node appears.
     pub order: Option<usize>,
     /// The type of the configuration node.
-    pub r#type: Option<ConfigurationNodeType>,
+    pub typ: Option<ConfigurationNodeType>,
     /// The title of the configuration node.
     pub title: Option<String>,
     /// The description of the configuration node.

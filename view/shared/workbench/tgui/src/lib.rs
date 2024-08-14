@@ -1,3 +1,5 @@
+pub mod workbench_tgui_contrib;
+
 use std::{cell::RefCell, path::PathBuf, sync::Arc};
 
 use anyhow::Result;
@@ -13,6 +15,9 @@ use workspace::{Workspace, WorkspaceId};
 
 #[macro_use]
 extern crate serde;
+
+#[macro_use]
+extern crate lazy_static;
 
 #[derive(Debug, Type, Serialize)]
 pub enum WorkbenchState {
