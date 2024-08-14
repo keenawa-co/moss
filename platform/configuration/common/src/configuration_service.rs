@@ -29,14 +29,14 @@ pub struct ConfigurationService<'a> {
 
 impl<'a> ConfigurationService<'a> {
     pub fn new(
-        registry: Arc<ConfigurationRegistry<'a>>,
+        registry: &'a ConfigurationRegistry<'a>,
         policy_service: ConfigurationPolicyService,
         config_file_path: &PathBuf,
     ) -> Result<Self> {
-        let parser = ConfigurationParser::new(Arc::clone(&registry));
+        let parser = ConfigurationParser::new(&registry);
         let user_configuration = UserConfiguration::new(config_file_path, Arc::new(parser));
 
-        let default_configuration = DefaultConfiguration::new(Arc::clone(&registry));
+        let default_configuration = DefaultConfiguration::new(&registry);
         default_configuration.initialize();
 
         let user_configuration_model = user_configuration
@@ -47,8 +47,7 @@ impl<'a> ConfigurationService<'a> {
             .context("failed to get default configuration model".to_string())
             .context("default was not initialized correctly")?;
 
-        let mut configuration_policy =
-            ConfigurationPolicy::new(Arc::clone(&registry), policy_service);
+        let mut configuration_policy = ConfigurationPolicy::new(&registry, policy_service);
         configuration_policy.initialize(&default_configuration);
 
         let policy_configuration_model = configuration_policy.get_model();

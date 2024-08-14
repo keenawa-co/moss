@@ -180,15 +180,19 @@ impl DesktopMain {
             .manage(app_state)
             .invoke_handler(builder.invoke_handler())
             .setup(move |app: &mut App| {
+                let app_state: State<AppState> = app.state();
+
                 let app_handle = app.handle().clone();
                 let window = app.get_webview_window("main").unwrap();
 
-                window
-                    .set_size(tauri::Size::Logical(tauri::LogicalSize {
-                        width: 800.0,
-                        height: 750.0,
-                    }))
-                    .unwrap();
+                // app_state.workbench.set_window_size(window).unwrap();
+
+                // window
+                //     .set_size(tauri::Size::Logical(tauri::LogicalSize {
+                //         width: 800.0,
+                //         height: 750.0,
+                //     }))
+                //     .unwrap();
 
                 tokio::task::block_in_place(|| {
                     tauri::async_runtime::block_on(async move {
@@ -220,104 +224,6 @@ impl DesktopMain {
 
         Ok(service_group)
     }
-}
-
-// TODO: get rid
-fn configuration_schema_registration(mut registry: ConfigurationRegistry) -> ConfigurationRegistry {
-    // let r = &workbench_tgui::workbench_tgui_contrib::WORKBENCH_TGUI_WINDOW;
-    // registry.register_configuration();
-
-    let editor_configuration = ConfigurationNode {
-        id: "editor".to_string(),
-        title: Some("Editor".to_string()),
-        order: Some(1),
-        typ: Default::default(),
-        scope: Default::default(),
-        source: Some(ConfigurationSource {
-            id: "moss.core".to_string(),
-            display_name: Some("Moss Core".to_string()),
-        }),
-        properties: {
-            let mut properties = PropertyMap::new();
-            properties.insert(
-                property_key!(editor.fontSize),
-                ConfigurationPropertySchema {
-                    scope: Some(ConfigurationScope::Resource),
-                    typ: Some(ConfigurationNodeType::Number),
-                    order: Some(1),
-                    default: Some(serde_json::Value::Number(serde_json::Number::from(12))),
-                    description: Some("Controls the font size in pixels.".to_string()),
-                    ..Default::default()
-                },
-            );
-            properties.insert(
-                property_key!(editor.lineHeight),
-                ConfigurationPropertySchema {
-                    scope: Some(ConfigurationScope::Resource),
-                    typ: Some(ConfigurationNodeType::Number),
-                    order: Some(2),
-                    default: Some(serde_json::Value::Number(serde_json::Number::from(20))),
-                    description: Some("Controls the line height.".to_string()),
-                    policy: Some(PropertyPolicy {
-                        name: "editorLineHeightPolicy".to_string(),
-                    }),
-                    ..Default::default()
-                },
-            );
-
-            Some(properties)
-        },
-        description: None,
-        parent_of: Some(vec![ConfigurationNode {
-            id: "mossql".to_string(),
-            title: Some("MossQL".to_string()),
-            order: Some(1),
-            typ: Default::default(),
-            scope: Default::default(),
-            source: Some(ConfigurationSource {
-                id: "moss.core".to_string(),
-                display_name: Some("Moss Core".to_string()),
-            }),
-
-            properties: {
-                let mut properties = PropertyMap::new();
-
-                properties.insert(
-                    property_key!([mossql].editor.fontSize),
-                    ConfigurationPropertySchema {
-                        scope: Some(ConfigurationScope::Resource),
-                        typ: Some(ConfigurationNodeType::Number),
-                        order: Some(1),
-                        default: Some(serde_json::Value::Number(serde_json::Number::from(12))),
-                        description: Some("Controls the font size in pixels.".to_string()),
-                        protected_from_contribution: Some(false),
-                        allow_for_only_restricted_source: Some(false),
-                        schemable: Some(true),
-                        ..Default::default()
-                    },
-                );
-                properties.insert(
-                    property_key!([mossql].editor.lineHeight),
-                    ConfigurationPropertySchema {
-                        scope: Some(ConfigurationScope::Resource),
-                        typ: Some(ConfigurationNodeType::Number),
-                        order: Some(2),
-                        default: Some(serde_json::Value::Number(serde_json::Number::from(30))),
-                        description: Some("Controls the line height.".to_string()),
-                        ..Default::default()
-                    },
-                );
-
-                Some(properties)
-            },
-            description: None,
-            parent_of: None,
-        }]),
-    };
-
-    registry.register_configuration(editor_configuration);
-
-    registry
 }
 
 pub struct AppState<'a> {

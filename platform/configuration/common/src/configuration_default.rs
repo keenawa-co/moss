@@ -9,11 +9,11 @@ use super::{
 
 pub struct DefaultConfiguration<'a> {
     configuration_model: ArcSwapOption<ConfigurationModel>,
-    configuration_registry: Arc<ConfigurationRegistry<'a>>,
+    configuration_registry: &'a ConfigurationRegistry<'a>,
 }
 
 impl<'a> DefaultConfiguration<'a> {
-    pub fn new(registry: Arc<ConfigurationRegistry<'a>>) -> Self {
+    pub fn new(registry: &'a ConfigurationRegistry<'a>) -> Self {
         Self {
             configuration_model: ArcSwapOption::from(None),
             configuration_registry: registry,

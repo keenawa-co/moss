@@ -12,6 +12,7 @@ specta.workspace = true
 anyhow.workspace = true
 hashbrown.workspace = true
 lazy_static.workspace = true
+tauri.workspace = true
 
 workspace.workspace = true
 platform_formation_common.workspace = true

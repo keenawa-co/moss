@@ -86,6 +86,8 @@ app = { path = "platform/app" }
 mossctl = { path = "mossctl" }
 net = { path = "net" }
 
+tauri = "2.0.0-rc"
+
 clap = "4.5.4"
 specta = "2.0.0-rc.20"
 libc = "0.2.155"

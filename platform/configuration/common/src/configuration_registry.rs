@@ -510,7 +510,7 @@ pub struct ConfigurationRegistry<'a> {
     /// List of configuration nodes contributed.
     /// This map contains all configuration nodes that have been registered to the registry.
     /// Configuration nodes can include multiple properties and sub-nodes.
-    contributors: HashMap<String, Arc<ConfigurationNode>>,
+    contributors: HashMap<String, &'a ConfigurationNode>,
 
     /// Set of override identifiers.
     /// This set contains identifiers that are used to specify configurations that can override default values.
@@ -552,9 +552,9 @@ impl<'a> ConfigurationRegistry<'a> {
         &self.override_identifiers
     }
 
-    pub fn register_configuration(&mut self, configuration: ConfigurationNode) {
+    pub fn register_configuration(&mut self, configuration: &'a ConfigurationNode) {
         self.contributors
-            .insert(configuration.id.clone(), Arc::new(configuration.clone()));
+            .insert(configuration.id.clone(), configuration);
         self.register_json_configuration(&configuration);
 
         let _properties = self.do_configuration_registration(&configuration, false);

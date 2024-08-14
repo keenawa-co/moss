@@ -28,6 +28,26 @@ lazy_static! {
                 },
             );
             properties.insert(
+                property_key!(window.restoreTab),
+                Schema {
+                    typ: Some(Type::Number),
+                    default: Some(serde_json::Value::Bool(true)),
+                    description: None,
+                    ..Default::default()
+                },
+            );
+            properties.insert(
+                property_key!(window.defaultWidth),
+                Schema {
+                    typ: Some(Type::Number),
+                     // BUG: when this parameter is specified, the setting is not included in the consolidation model
+                    // schemable: Some(false),
+                    default: Some(serde_json::Value::Number(serde_json::Number::from(1400))),
+                    description: Some("The default window width".to_string()),
+                    ..Default::default()
+                },
+            );
+            properties.insert(
                 property_key!(window.minWidth),
                 Schema {
                     typ: Some(Type::Number),
@@ -35,6 +55,18 @@ lazy_static! {
                     schemable: Some(false),
                     default: Some(serde_json::Value::Number(serde_json::Number::from(800))),
                     description: Some("The minimal window width".to_string()),
+                    ..Default::default()
+                },
+            );
+            properties.insert(
+                property_key!(window.defaultHeight),
+                Schema {
+                    typ: Some(Type::Number),
+                    protected_from_contribution: Some(true),
+                    // BUG: when this parameter is specified, the setting is not included in the consolidation model
+                    // schemable: Some(false),
+                    default: Some(serde_json::Value::Number(serde_json::Number::from(750))),
+                    description: Some("The default window height".to_string()),
                     ..Default::default()
                 },
             );

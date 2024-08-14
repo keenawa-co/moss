@@ -256,7 +256,7 @@ impl ConfigurationModel {
 static OVERRIDE_PROPERTY_REGEX: &'static Lazy<Regex> = regex!(r"^(\[.*\])+$");
 
 pub struct ConfigurationParser<'a> {
-    registry: Arc<ConfigurationRegistry<'a>>,
+    registry: &'a ConfigurationRegistry<'a>,
 }
 
 struct ConfigurationOverride {
@@ -266,7 +266,7 @@ struct ConfigurationOverride {
 }
 
 impl<'a> ConfigurationParser<'a> {
-    pub fn new(registry: Arc<ConfigurationRegistry<'a>>) -> Self {
+    pub fn new(registry: &'a ConfigurationRegistry<'a>) -> Self {
         Self { registry }
     }
 
@@ -426,6 +426,8 @@ impl Configuration {
 
     pub fn get_value(&self, attribute_name: &AttributeName) -> Option<Value> {
         let consolidated_model = self.get_consolidated_configuration();
+
+        dbg!(&consolidated_model);
 
         consolidated_model.get_value(attribute_name).cloned()
     }

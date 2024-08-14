@@ -12,13 +12,13 @@ use super::{
 
 pub struct ConfigurationPolicy<'a> {
     model: ArcSwap<ConfigurationModel>,
-    registry: Arc<ConfigurationRegistry<'a>>,
+    registry: &'a ConfigurationRegistry<'a>,
     policy_service: ConfigurationPolicyService,
 }
 
 impl<'a> ConfigurationPolicy<'a> {
     pub fn new(
-        registry: Arc<ConfigurationRegistry<'a>>,
+        registry: &'a ConfigurationRegistry<'a>,
         policy_service: ConfigurationPolicyService,
     ) -> Self {
         Self {

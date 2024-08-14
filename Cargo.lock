@@ -9164,6 +9164,7 @@ dependencies = [
  "serde",
  "serde_json",
  "specta",
+ "tauri",
  "workbench_service_configuration_tgui",
  "workspace",
 ]

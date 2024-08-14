@@ -22,12 +22,12 @@ pub struct WorkspaceConfigurationService {
 impl WorkspaceConfigurationService {
     pub fn new(
         workspace: Workspace,
-        registry: Arc<ConfigurationRegistry>,
+        registry: &ConfigurationRegistry,
         policy_service: ConfigurationPolicyService,
     ) -> Self {
-        let parser = ConfigurationParser::new(Arc::clone(&registry)); // TODO: platform ConfigurationParser?
+        let parser = ConfigurationParser::new(&registry); // TODO: platform ConfigurationParser?
 
-        let default_configuration = DefaultConfiguration::new(Arc::clone(&registry)); // TODO: use WorkspaceDefaultConfiguration
+        let default_configuration = DefaultConfiguration::new(&registry); // TODO: use WorkspaceDefaultConfiguration
         default_configuration.initialize();
 
         // TODO: use UserDataProfileService
@@ -46,8 +46,7 @@ impl WorkspaceConfigurationService {
             .context("default was not initialized correctly")
             .unwrap();
 
-        let mut configuration_policy =
-            ConfigurationPolicy::new(Arc::clone(&registry), policy_service);
+        let mut configuration_policy = ConfigurationPolicy::new(&registry, policy_service);
         configuration_policy.initialize(&default_configuration);
 
         let policy_configuration_model = configuration_policy.get_model();

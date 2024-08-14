@@ -9,6 +9,7 @@ use platform_configuration_common::{
 };
 use platform_formation_common::service_registry::ServiceRegistry;
 use specta::Type;
+use tauri::WebviewWindow;
 use workbench_service_configuration_tgui::configuration_service::WorkspaceConfigurationService;
 use workbench_tgui_contrib::WORKBENCH_TGUI_WINDOW;
 use workspace::{Workspace, WorkspaceId};
@@ -28,16 +29,16 @@ pub enum WorkbenchState {
 pub struct Workbench<'a> {
     workspace_id: WorkspaceId,
     service_registry: ServiceRegistry,
-    configuration_registry: Arc<ConfigurationRegistry<'a>>,
+    configuration_registry: ConfigurationRegistry<'a>,
 }
 
 impl<'a> Workbench<'a> {
     pub fn new(service_registry: ServiceRegistry, workspace_id: WorkspaceId) -> Result<Self> {
-        let mut configuration_registry = Arc::new(ConfigurationRegistry::new());
+        let mut configuration_registry = ConfigurationRegistry::new();
 
-        // configuration_registry
-        //     .borrow_mut()
-        //     .register_configuration(WORKBENCH_TGUI_WINDOW.clone());
+        configuration_registry
+            .borrow_mut()
+            .register_configuration(&WORKBENCH_TGUI_WINDOW);
 
         Ok(Self {
             workspace_id,
@@ -53,8 +54,8 @@ impl<'a> Workbench<'a> {
             .service_registry
             .get_unchecked::<WorkspaceConfigurationService>();
 
-        let value = config_service.get_value(attribute_name!(editor.fontSize));
-        println!("Value `editor.fontSize` form None: {:?}", value);
+        let value = config_service.get_value(attribute_name!(window.defaultWidth));
+        println!("Value `window.defaultWidth` form None: {:?}", value);
 
         Ok(())
     }
@@ -88,7 +89,7 @@ impl<'a> Workbench<'a> {
 
         let workspace_configuration_service = WorkspaceConfigurationService::new(
             workspace,
-            Arc::clone(&self.configuration_registry),
+            &self.configuration_registry,
             configuration_policy_service,
         );
 
@@ -123,6 +124,28 @@ impl<'a> Workbench<'a> {
                 }
             }
         }
+    }
+
+    pub fn set_window_size(&self, window: WebviewWindow) -> Result<()> {
+        use tauri::{LogicalSize, Size::Logical};
+
+        let config_service = self
+            .service_registry
+            .get_unchecked::<WorkspaceConfigurationService>();
+
+        let value = config_service
+            .get_value(attribute_name!(window.defaultWidth))
+            .unwrap()
+            .as_i64()
+            .unwrap();
+
+        window
+            .set_size(Logical(LogicalSize {
+                width: value as f64,
+                height: 750.0,
+            }))
+            .unwrap();
+        Ok(())
     }
 
     pub fn get_state(&self) -> WorkbenchState {
