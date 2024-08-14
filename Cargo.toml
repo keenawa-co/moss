@@ -18,8 +18,10 @@ members = [
     "lib/types",
 
     "platform/base",
-    "platform/configuration",
-    "platform/workbench",
+    "platform/window/tgui",
+    "platform/formation/common",
+    "platform/configuration/common",
+
 
     "platform/conf",
     "platform/pwd",
@@ -31,6 +33,12 @@ members = [
     "net",
 
     "view/desktop/bin",
+
+    "view/shared/workbench/tgui",
+    "view/shared/workbench/service/configuration/common",
+    "view/shared/workbench/service/configuration/tgui",
+
+
 ]
 
 # [profile.release]
@@ -53,8 +61,14 @@ fs = { path = "kernel/fs" }
 moss_base = { path = "lib/moss_base" }
 
 base = { path = "platform/base" }
-configuration = { path = "platform/configuration" }
-workbench = { path = "platform/workbench" }
+
+platform_window_tgui = { path = "platform/window/tgui" }
+platform_configuration_common = { path = "platform/configuration/common" }
+platform_formation_common = { path = "platform/formation/common" }
+
+workbench_tgui = { path = "view/shared/workbench/tgui" }
+workbench_service_configuration_common = { path = "view/shared/workbench/service/configuration/common" }
+workbench_service_configuration_tgui = { path = "view/shared/workbench/service/configuration/tgui" }
 
 bus = { path = "kernel/bus" }
 mac = { path = "lib/mac" }
@@ -73,8 +87,9 @@ mossctl = { path = "mossctl" }
 net = { path = "net" }
 
 clap = "4.5.4"
-
+specta = "2.0.0-rc.20"
 libc = "0.2.155"
+fnv = "1.0.7"
 thiserror = "1.0"
 anyhow = "1.0"
 bitflags = "2.5.0"
