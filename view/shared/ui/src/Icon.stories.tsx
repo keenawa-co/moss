@@ -29,7 +29,7 @@ export const Default: Story = {
   },
 };
 
-export const IconWithoutCurrentColor: Story = {
+export const IconWithoutChangeableColor: Story = {
   args: {
     icon: "NewProject",
     className: "text-6xl text-red-300",
