@@ -10,7 +10,7 @@ import StatusBar from "./components/StatusBar";
 enum IconState {
   Default = "group-text-zinc-500",
   DefaultStroke = "group-stroke-zinc-500",
-  Hover = "group-hover:text-red-600",
+  Hover = "group-hover:text-zinc-600",
   HoverStroke = "group-hover:stroke-zinc-600",
   Active = "text-olive-700",
   Disabled = "text-zinc-500 bg-opacity-50",
@@ -25,7 +25,7 @@ function App() {
           <MenuItem className="group bg-zinc-200 mt-13 mb-3.5">
             <Icon icon="Search" className={twMerge("h-4.5 w-4.5", IconState.Default, IconState.Hover)} />
             <IconTitle className="text-zinc-900 text-xs bg-zin" title="Search..." />
-            <Icon icon="SearchShortcut" className="text-zinc-500 hover:text-zinc-600 h-4.5 w-5 ml-28" />
+            <Icon icon="SearchShortcut" className="fill-zinc-500  group-hover:fill-zinc-600 text-3xl ml-auto pr-2" />
           </MenuItem>
 
           <MenuItem className="group">
