@@ -19,17 +19,17 @@ use super::{
     AbstractConfigurationService,
 };
 
-pub struct ConfigurationService {
-    default_configuration: DefaultConfiguration,
-    user_configuration: UserConfiguration,
+pub struct ConfigurationService<'a> {
+    default_configuration: DefaultConfiguration<'a>,
+    user_configuration: UserConfiguration<'a>,
     configuration: Configuration,
     configuration_editing: ConfigurationEditingService,
-    configuration_policy: ConfigurationPolicy,
+    configuration_policy: ConfigurationPolicy<'a>,
 }
 
-impl ConfigurationService {
+impl<'a> ConfigurationService<'a> {
     pub fn new(
-        registry: Arc<ConfigurationRegistry>,
+        registry: Arc<ConfigurationRegistry<'a>>,
         policy_service: ConfigurationPolicyService,
         config_file_path: &PathBuf,
     ) -> Result<Self> {
@@ -113,7 +113,7 @@ impl ConfigurationService {
 }
 
 #[async_trait]
-impl AbstractConfigurationService for ConfigurationService {
+impl<'a> AbstractConfigurationService for ConfigurationService<'a> {
     fn get_value(&self, attribute_name: AttributeName) -> Option<Value> {
         self.configuration.get_value(&attribute_name)
     }

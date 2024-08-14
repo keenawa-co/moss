@@ -14,7 +14,7 @@ use platform_configuration_common::{
     },
     property_key,
 };
-use platform_formation_common::service_group::ServiceGroup;
+use platform_formation_common::service_registry::ServiceRegistry;
 use platform_window_tgui::window::NativeWindowConfiguration;
 use service::project_service::ProjectService;
 use service::session_service::SessionService;
@@ -39,7 +39,7 @@ extern crate tracing;
 
 #[tauri::command(async)]
 #[specta::specta]
-async fn workbench_get_state(state: State<'_, AppState>) -> Result<WorkbenchState, String> {
+async fn workbench_get_state(state: State<'_, AppState<'_>>) -> Result<WorkbenchState, String> {
     Ok(state.workbench.get_state())
 }
 
@@ -53,7 +53,7 @@ async fn app_ready(app_handle: AppHandle) {
 #[tauri::command(async)]
 #[specta::specta]
 async fn create_project(
-    state: State<'_, AppState>,
+    state: State<'_, AppState<'_>>,
     input: CreateProjectInput,
 ) -> Result<Option<ProjectDTO>, String> {
     match state.project_service.create_project(&input).await {
@@ -70,7 +70,7 @@ async fn create_project(
 #[tauri::command(async)]
 #[specta::specta]
 async fn restore_session(
-    state: State<'_, AppState>,
+    state: State<'_, AppState<'_>>,
     project_source: Option<String>,
 ) -> Result<Option<SessionInfoDTO>, String> {
     match state.session_service.restore_session(project_source).await {
@@ -150,11 +150,8 @@ impl DesktopMain {
             .get_unchecked::<MockStorageService>()
             .get_last_window_state();
 
-        let configuration_registry =
-            configuration_schema_registration(ConfigurationRegistry::new());
-
         let mut workbench = Workbench::new(service_group, window_state.workspace_id)?;
-        workbench.initialize(configuration_registry)?;
+        workbench.initialize()?;
 
         let app_state = AppState {
             workbench,
@@ -184,6 +181,14 @@ impl DesktopMain {
             .invoke_handler(builder.invoke_handler())
             .setup(move |app: &mut App| {
                 let app_handle = app.handle().clone();
+                let window = app.get_webview_window("main").unwrap();
+
+                window
+                    .set_size(tauri::Size::Logical(tauri::LogicalSize {
+                        width: 800.0,
+                        height: 750.0,
+                    }))
+                    .unwrap();
 
                 tokio::task::block_in_place(|| {
                     tauri::async_runtime::block_on(async move {
@@ -206,8 +211,8 @@ impl DesktopMain {
         Ok(())
     }
 
-    fn initialize_service_group(&self) -> Result<ServiceGroup> {
-        let mut service_group = ServiceGroup::new();
+    fn initialize_service_group(&self) -> Result<ServiceRegistry> {
+        let mut service_group = ServiceRegistry::new();
 
         let storage_service = MockStorageService::new();
 
@@ -315,8 +320,8 @@ fn configuration_schema_registration(mut registry: ConfigurationRegistry) -> Con
     registry
 }
 
-pub struct AppState {
-    pub workbench: Workbench,
+pub struct AppState<'a> {
+    pub workbench: Workbench<'a>,
     pub project_service: ProjectService,
     pub session_service: SessionService,
 }

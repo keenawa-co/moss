@@ -500,19 +500,8 @@ impl ConfigurationSchemaStorage {
 
 /// Registry to manage configurations and their schemas.
 #[derive(Debug)]
-pub struct ConfigurationRegistry {
-    #[allow(unused)] // Designed for future expansion
-    /// List of registered default configurations.
-    /// These configurations define standard default values for various settings that can be
-    /// overridden by users or other configurations.
-    registered_configuration_defaults: Vec<ConfigurationDefaults>,
-
-    #[allow(unused)] // Designed for future expansion
-    /// Map of configuration default overrides.
-    /// This hashmap stores overridden default values for configuration properties, indexed by their keys.
-    /// Overrides can come from different sources and can change the default values defined in `registered_configuration_defaults`.
-    configuration_defaults_overrides: HashMap<String, ConfigurationDefaultOverrideValue>,
-
+pub struct ConfigurationRegistry<'a> {
+    t: &'a str,
     /// Map of configuration properties.
     /// This hashmap stores the properties of configurations, indexed by their keys.
     /// Each property includes metadata such as type, scope, default values, and descriptions.
@@ -526,7 +515,7 @@ pub struct ConfigurationRegistry {
     /// Set of override identifiers.
     /// This set contains identifiers that are used to specify configurations that can override default values.
     /// Override identifiers are used to create specialized settings for different scopes or contexts.
-    overrides: HashSet<String>,
+    override_identifiers: HashSet<String>,
 
     /// Storage for configuration schemas.
     /// This structure stores the schema definitions for all settings, organized by their scope (e.g., platform, machine, window, resource).
@@ -539,33 +528,28 @@ pub struct ConfigurationRegistry {
     excluded_properties: HashMap<String, RegisteredConfigurationPropertySchema>,
 }
 
-impl ConfigurationRegistry {
+impl<'a> ConfigurationRegistry<'a> {
     pub fn new() -> Self {
         Self {
-            registered_configuration_defaults: Vec::new(),
+            t: "",
             properties: HashMap::new(),
             contributors: HashMap::new(),
-            configuration_defaults_overrides: HashMap::new(),
-            overrides: HashSet::new(),
+            override_identifiers: HashSet::new(),
             schema_storage: ConfigurationSchemaStorage::empty(),
             excluded_properties: HashMap::new(),
         }
     }
 
-    pub fn get_configuration_properties(
-        &self,
-    ) -> &HashMap<String, RegisteredConfigurationPropertySchema> {
+    pub fn properties(&self) -> &HashMap<String, RegisteredConfigurationPropertySchema> {
         &self.properties
     }
 
-    pub fn get_excluded_configuration_properties(
-        &self,
-    ) -> &HashMap<String, RegisteredConfigurationPropertySchema> {
+    pub fn excluded_properties(&self) -> &HashMap<String, RegisteredConfigurationPropertySchema> {
         &self.excluded_properties
     }
 
-    pub fn get_override_identifiers(&self) -> &HashSet<String> {
-        &self.overrides
+    pub fn override_identifiers(&self) -> &HashSet<String> {
+        &self.override_identifiers
     }
 
     pub fn register_configuration(&mut self, configuration: ConfigurationNode) {
@@ -594,7 +578,8 @@ impl ConfigurationRegistry {
             .unwrap_or(PropertyMap::new());
 
         // TODO: validate incoming override identifiers before extend
-        self.overrides.extend(node_properties.overrides.clone());
+        self.override_identifiers
+            .extend(node_properties.overrides.clone());
 
         for (key, property) in &node_properties {
             if validate && !self.validate_property(&property) {

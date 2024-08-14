@@ -123,13 +123,13 @@ macro_rules! attribute_name {
 // - Use a kernel/fs to work with the file system
 // - Use a LogService.
 // - Use a PolicyService
-pub struct UserConfiguration {
-    parser: Arc<ConfigurationParser>,
+pub struct UserConfiguration<'a> {
+    parser: Arc<ConfigurationParser<'a>>,
     resource: PathBuf,
 }
 
-impl UserConfiguration {
-    pub fn new(file_path: &PathBuf, content_parser: Arc<ConfigurationParser>) -> Self {
+impl<'a> UserConfiguration<'a> {
+    pub fn new(file_path: &PathBuf, content_parser: Arc<ConfigurationParser<'a>>) -> Self {
         Self {
             parser: content_parser,
             resource: file_path.clone(),
@@ -255,8 +255,8 @@ impl ConfigurationModel {
 
 static OVERRIDE_PROPERTY_REGEX: &'static Lazy<Regex> = regex!(r"^(\[.*\])+$");
 
-pub struct ConfigurationParser {
-    registry: Arc<ConfigurationRegistry>,
+pub struct ConfigurationParser<'a> {
+    registry: Arc<ConfigurationRegistry<'a>>,
 }
 
 struct ConfigurationOverride {
@@ -265,8 +265,8 @@ struct ConfigurationOverride {
     content: Trie<String, serde_json::Value>,
 }
 
-impl ConfigurationParser {
-    pub fn new(registry: Arc<ConfigurationRegistry>) -> Self {
+impl<'a> ConfigurationParser<'a> {
+    pub fn new(registry: Arc<ConfigurationRegistry<'a>>) -> Self {
         Self { registry }
     }
 
@@ -295,7 +295,7 @@ impl ConfigurationParser {
     // TODO: return diags
     // TODO: use logs, not println
     fn inspect_attribute(&self, attribute_name: &str) -> bool {
-        let configuration_properties = self.registry.get_configuration_properties();
+        let configuration_properties = self.registry.properties();
 
         match configuration_properties.get(attribute_name) {
             Some(registered_property) => {
@@ -328,7 +328,7 @@ impl ConfigurationParser {
             return None;
         };
 
-        let override_identifiers = self.registry.get_override_identifiers();
+        let override_identifiers = self.registry.override_identifiers();
         let formatted_identifier = attribute_name.trim_matches(|c| c == '[' || c == ']');
 
         if override_identifiers.get(formatted_identifier).is_none() {

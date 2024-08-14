@@ -27,6 +27,28 @@ lazy_static! {
                     ..Default::default()
                 },
             );
+            properties.insert(
+                property_key!(window.minWidth),
+                Schema {
+                    typ: Some(Type::Number),
+                    protected_from_contribution: Some(true),
+                    schemable: Some(false),
+                    default: Some(serde_json::Value::Number(serde_json::Number::from(800))),
+                    description: Some("The minimal window width".to_string()),
+                    ..Default::default()
+                },
+            );
+            properties.insert(
+                property_key!(window.minHeight),
+                Schema {
+                    typ: Some(Type::Number),
+                    protected_from_contribution: Some(true),
+                    schemable: Some(false),
+                    default: Some(serde_json::Value::Number(serde_json::Number::from(500))),
+                    description: Some("The minimal window height".to_string()),
+                    ..Default::default()
+                },
+            );
 
             Some(properties)
         },

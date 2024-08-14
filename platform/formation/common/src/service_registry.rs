@@ -2,9 +2,9 @@ use fnv::FnvHashMap;
 use std::any::{Any, TypeId};
 
 #[derive(Default)]
-pub struct ServiceGroup(FnvHashMap<TypeId, Box<dyn Any + Sync + Send>>);
+pub struct ServiceRegistry(FnvHashMap<TypeId, Box<dyn Any + Sync + Send>>);
 
-impl std::ops::Deref for ServiceGroup {
+impl std::ops::Deref for ServiceRegistry {
     type Target = FnvHashMap<TypeId, Box<dyn Any + Sync + Send>>;
 
     fn deref(&self) -> &Self::Target {
@@ -12,13 +12,13 @@ impl std::ops::Deref for ServiceGroup {
     }
 }
 
-impl std::fmt::Debug for ServiceGroup {
+impl std::fmt::Debug for ServiceRegistry {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         f.debug_tuple("ServiceGroup").finish()
     }
 }
 
-impl<'a> ServiceGroup {
+impl<'a> ServiceRegistry {
     pub fn new() -> Self {
         Self(FnvHashMap::default())
     }
