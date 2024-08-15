@@ -25,11 +25,26 @@ type Story = StoryObj<typeof meta>;
 export const Default: Story = {
   args: {
     icon: "Home1",
-    className: "text-6xl text-zinc-300",
+    className: "text-6xl",
   },
 };
 
-export const IconWithoutChangeableColor: Story = {
+export const Stroke: Story = {
+  args: {
+    icon: "Home1",
+    className: "text-6xl  stroke-1 stroke-red-500",
+    viewBox: "-1 0 18 17",
+  },
+};
+
+export const Fill: Story = {
+  args: {
+    icon: "Home1",
+    className: "text-6xl text-green-300",
+  },
+};
+
+export const WithoutDefaultColor: Story = {
   args: {
     icon: "NewProject",
     className: "text-6xl text-red-300",
