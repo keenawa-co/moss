@@ -32,7 +32,7 @@ lazy_static! {
                 Schema {
                     typ: Some(Type::Number),
                     default: Some(serde_json::Value::Bool(true)),
-                    description: None,
+                    description: Some("Determines whether the window should restore the last opened tab on the next launch".to_string()),
                     ..Default::default()
                 },
             );
@@ -40,21 +40,8 @@ lazy_static! {
                 property_key!(window.defaultWidth),
                 Schema {
                     typ: Some(Type::Number),
-                     // BUG: when this parameter is specified, the setting is not included in the consolidation model
-                    // schemable: Some(false),
                     default: Some(serde_json::Value::Number(serde_json::Number::from(1400))),
-                    description: Some("The default window width".to_string()),
-                    ..Default::default()
-                },
-            );
-            properties.insert(
-                property_key!(window.minWidth),
-                Schema {
-                    typ: Some(Type::Number),
-                    protected_from_contribution: Some(true),
-                    schemable: Some(false),
-                    default: Some(serde_json::Value::Number(serde_json::Number::from(800))),
-                    description: Some("The minimal window width".to_string()),
+                    description: Some("The default window width in logical pixels".to_string()),
                     ..Default::default()
                 },
             );
@@ -63,10 +50,21 @@ lazy_static! {
                 Schema {
                     typ: Some(Type::Number),
                     protected_from_contribution: Some(true),
-                    // BUG: when this parameter is specified, the setting is not included in the consolidation model
-                    // schemable: Some(false),
                     default: Some(serde_json::Value::Number(serde_json::Number::from(750))),
-                    description: Some("The default window height".to_string()),
+                    description: Some("The default window height in logical pixels".to_string()),
+                    ..Default::default()
+                },
+            );
+            properties.insert(
+                property_key!(window.minWidth),
+                Schema {
+                    typ: Some(Type::Number),
+                    protected_from_contribution: Some(true),
+                    included: Some(false),
+                    default: Some(serde_json::Value::Number(serde_json::Number::from(800))),
+                    description: Some(
+                        "The minimal allowable window width in logical pixels".to_string(),
+                    ),
                     ..Default::default()
                 },
             );
@@ -75,9 +73,11 @@ lazy_static! {
                 Schema {
                     typ: Some(Type::Number),
                     protected_from_contribution: Some(true),
-                    schemable: Some(false),
+                    included: Some(false),
                     default: Some(serde_json::Value::Number(serde_json::Number::from(500))),
-                    description: Some("The minimal window height".to_string()),
+                    description: Some(
+                        "The minimal allowable window height in logical pixels".to_string(),
+                    ),
                     ..Default::default()
                 },
             );
