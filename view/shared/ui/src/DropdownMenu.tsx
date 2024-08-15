@@ -30,7 +30,7 @@ const ItemStyles =
   "py-2 px-2 hover:bg-[#0a99ff] group rounded-lg relative flex gap-3.5 select-none items-center outline-none transition-colors data-[disabled]:pointer-events-none data-[disabled]:opacity-50";
 const ContentStyles =
   "z-50 overflow-hidden rounded-xl bg-[#1E1E1E] py-1.5 px-1.5 shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2";
-const IconStyles = "group-hover:text-white w-4 h-4";
+const IconStyles = "text-white hover:text-white w-4 h-4";
 
 const DropdownMenu: React.FC<DropdownMenuProps> = DropdownMenuPrimitive.Root;
 
