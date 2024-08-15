@@ -31,9 +31,9 @@ export const Default: Story = {
 
 export const Stroke: Story = {
   args: {
-    icon: "Home1",
-    className: "text-6xl  stroke-1 stroke-red-500",
-    viewBox: "-1 0 18 17",
+    icon: "Goals",
+    className: "text-6xl stroke-1 stroke-red-500",
+    viewBox: "0 0 20 20",
   },
 };
 
