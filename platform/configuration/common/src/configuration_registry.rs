@@ -283,7 +283,7 @@ pub struct ConfigurationPropertySchema {
     pub allow_for_only_restricted_source: Option<bool>,
     /// Indicates if the configuration property is included in the registry.
     /// If false, the property is excluded from the configuration registry.
-    pub schemable: Option<bool>,
+    pub included: Option<bool>,
     /// Indicates that a property is deprecated.
     pub deprecated: Option<bool>,
     /// Tags associated with the property:
@@ -343,7 +343,7 @@ impl Default for ConfigurationPropertySchema {
             description: None,
             protected_from_contribution: Some(false),
             allow_for_only_restricted_source: Some(false),
-            schemable: Some(true),
+            included: Some(true),
             deprecated: Some(false),
             tags: None,
             policy: None,
@@ -501,7 +501,6 @@ impl ConfigurationSchemaStorage {
 /// Registry to manage configurations and their schemas.
 #[derive(Debug)]
 pub struct ConfigurationRegistry<'a> {
-    t: &'a str,
     /// Map of configuration properties.
     /// This hashmap stores the properties of configurations, indexed by their keys.
     /// Each property includes metadata such as type, scope, default values, and descriptions.
@@ -531,7 +530,6 @@ pub struct ConfigurationRegistry<'a> {
 impl<'a> ConfigurationRegistry<'a> {
     pub fn new() -> Self {
         Self {
-            t: "",
             properties: HashMap::new(),
             contributors: HashMap::new(),
             override_identifiers: HashSet::new(),
@@ -602,7 +600,7 @@ impl<'a> ConfigurationRegistry<'a> {
                 configuration.source.clone(),
             );
 
-            if property.schemable.unwrap_or(true) {
+            if property.included.unwrap_or(true) {
                 self.properties.insert(key.clone(), registered_property);
             } else {
                 self.excluded_properties
@@ -628,7 +626,7 @@ impl<'a> ConfigurationRegistry<'a> {
     fn register_json_configuration(&mut self, configuration: &ConfigurationNode) {
         if let Some(properties) = &configuration.properties {
             for (key, property) in properties {
-                if property.schemable.unwrap_or(true) {
+                if property.included.unwrap_or(true) {
                     self.schema_storage.update_schema(key, property);
                 }
             }

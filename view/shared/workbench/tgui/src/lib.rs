@@ -126,23 +126,33 @@ impl<'a> Workbench<'a> {
         }
     }
 
-    pub fn set_window_size(&self, window: WebviewWindow) -> Result<()> {
+    pub fn apply_configuration_window_size(&self, window: WebviewWindow) -> Result<()> {
         use tauri::{LogicalSize, Size::Logical};
 
         let config_service = self
             .service_registry
             .get_unchecked::<WorkspaceConfigurationService>();
 
-        let value = config_service
+        let width_value = config_service
             .get_value(attribute_name!(window.defaultWidth))
-            .unwrap()
+            .expect(
+                "The default window width size must be set in the workbench configuration schema",
+            )
             .as_i64()
-            .unwrap();
+            .expect("The default window width size must be a number");
+
+        let height_value = config_service
+            .get_value(attribute_name!(window.defaultHeight))
+            .expect(
+                "The default window height size must be set in the workbench configuration schema",
+            )
+            .as_i64()
+            .expect("The default window height size must be a number");
 
         window
             .set_size(Logical(LogicalSize {
-                width: value as f64,
-                height: 750.0,
+                width: width_value as f64,
+                height: height_value as f64,
             }))
             .unwrap();
         Ok(())
