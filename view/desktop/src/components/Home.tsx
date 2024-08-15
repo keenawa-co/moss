@@ -9,7 +9,6 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuIconWrapper,
   Icon,
 } from "../../../shared/ui/src";
 
@@ -98,12 +97,7 @@ export const Home: React.FC = () => {
           <DropdownMenuTrigger>Click me!</DropdownMenuTrigger>
 
           <DropdownMenuContent>
-            <DropdownMenuItem>
-              <DropdownMenuIconWrapper>
-                <Icon icon="Search" />
-              </DropdownMenuIconWrapper>
-              Menu item 1
-            </DropdownMenuItem>
+            <DropdownMenuItem icon="Search">Menu item 1</DropdownMenuItem>
             <DropdownMenuItem>
               <DropdownMenuLabel>Menu item 2</DropdownMenuLabel>
             </DropdownMenuItem>

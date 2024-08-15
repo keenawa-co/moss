@@ -42,10 +42,6 @@ const DropdownMenuPortal: React.FC<DropdownMenuPortalProps> = DropdownMenuPrimit
 
 const DropdownMenuArrow: React.FC<DropdownMenuArrowProps> = DropdownMenuPrimitive.Arrow;
 
-const DropdownMenuIconWrapper = ({ children }: { children: React.ReactNode }) => {
-  return <div className="absolute text-white left-2.5 size-3.5 *:size-3.5">{children}</div>;
-};
-
 const DropdownMenuLabel = ({ children, className, ...props }: DropdownMenuLabelProps) => (
   <DropdownMenuPrimitive.Label className={cn(ItemStyles, TextStyles, "font-semibold", className)} {...props}>
     {children}
@@ -170,5 +166,4 @@ export {
   DropdownMenuSubTrigger,
   DropdownMenuRadioGroup,
   DropdownMenuArrow,
-  DropdownMenuIconWrapper,
 };
