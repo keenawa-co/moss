@@ -37,3 +37,7 @@ A monorepo is a single repository containing multiple distinct projects, with we
 - `client`: A [TypeScript](https://www.typescriptlang.org/) client library to handle dataflow via RPC between UI and the Rust core.
 - `config`: `eslint` configurations (includes `eslint-config-next`, `eslint-config-prettier` and all `tsconfig.json` configs used throughout the monorepo).
 - `ui`: A [React](https://reactjs.org) Shared component library.
+
+### Icons
+
+To add new icon add **`.svg`** file to `view/shared/icons/assets` directory and than run `pnpm build` inside `view/shared/icons`

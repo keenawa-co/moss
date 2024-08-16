@@ -8,7 +8,6 @@ import {
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuGroup,
-  DropdownMenuIconWrapper,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuPortal,
@@ -23,11 +22,6 @@ import {
 } from "./DropdownMenu";
 
 import Icon from "./Icon";
-import HomeIcon from "./HomeIcon";
-import IssuesIcon from "./IssuesIcon";
-import ReportsIcon from "./ReportsIcon";
-import SearchIcon from "./SearchIcon";
-import CodeIcon from "./CodeIcon";
 
 import { useState } from "react";
 
@@ -67,39 +61,19 @@ export const Default: Story = {
       <DropdownMenuTrigger>Click me!</DropdownMenuTrigger>
       <DropdownMenuContent>
         <DropdownMenuGroup>
-          <DropdownMenuItem>
-            <DropdownMenuIconWrapper>
-              <Icon>
-                <HomeIcon />
-              </Icon>
-            </DropdownMenuIconWrapper>
+          <DropdownMenuItem icon="Home1">
             <span>Profile</span>
             <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
           </DropdownMenuItem>
-          <DropdownMenuItem>
-            <DropdownMenuIconWrapper>
-              <Icon>
-                <IssuesIcon />
-              </Icon>
-            </DropdownMenuIconWrapper>
+          <DropdownMenuItem icon="Issues">
             <span>Billing</span>
             <DropdownMenuShortcut>⌘B</DropdownMenuShortcut>
           </DropdownMenuItem>
-          <DropdownMenuItem>
-            <DropdownMenuIconWrapper>
-              <Icon>
-                <ReportsIcon />
-              </Icon>
-            </DropdownMenuIconWrapper>
+          <DropdownMenuItem icon="Reports">
             <span>Settings</span>
             <DropdownMenuShortcut>⌘S</DropdownMenuShortcut>
           </DropdownMenuItem>
-          <DropdownMenuItem>
-            <DropdownMenuIconWrapper>
-              <Icon>
-                <SearchIcon />
-              </Icon>
-            </DropdownMenuIconWrapper>
+          <DropdownMenuItem icon="Search">
             <span>Keyboard shortcuts</span>
             <DropdownMenuShortcut>⌘K</DropdownMenuShortcut>
           </DropdownMenuItem>
@@ -108,49 +82,22 @@ export const Default: Story = {
         <DropdownMenuSeparator />
 
         <DropdownMenuGroup>
-          <DropdownMenuItem>
-            <DropdownMenuIconWrapper>
-              <Icon>
-                <CodeIcon />
-              </Icon>
-            </DropdownMenuIconWrapper>
-            Team
-          </DropdownMenuItem>
+          <DropdownMenuItem icon="Code">Team</DropdownMenuItem>
 
           <DropdownMenuSub>
-            <DropdownMenuSubTrigger>
-              <DropdownMenuIconWrapper>
-                <Icon>
-                  <CodeIcon />
-                </Icon>
-              </DropdownMenuIconWrapper>
+            <DropdownMenuSubTrigger icon="Code">
               <span>Invite users</span>
             </DropdownMenuSubTrigger>
             <DropdownMenuPortal>
               <DropdownMenuSubContent>
-                <DropdownMenuItem>
-                  <DropdownMenuIconWrapper>
-                    <Icon>
-                      <HomeIcon />
-                    </Icon>
-                  </DropdownMenuIconWrapper>
+                <DropdownMenuItem icon="Home1">
                   <span>Email</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
-                  <DropdownMenuIconWrapper>
-                    <Icon>
-                      <HomeIcon />
-                    </Icon>
-                  </DropdownMenuIconWrapper>
                   <span>Message</span>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>
-                  <DropdownMenuIconWrapper>
-                    <Icon>
-                      <HomeIcon />
-                    </Icon>
-                  </DropdownMenuIconWrapper>
+                <DropdownMenuItem icon="Home1">
                   <span>More...</span>
                 </DropdownMenuItem>
               </DropdownMenuSubContent>
@@ -158,12 +105,7 @@ export const Default: Story = {
           </DropdownMenuSub>
 
           <DropdownMenuSub>
-            <DropdownMenuSubTrigger>
-              <DropdownMenuIconWrapper>
-                <Icon>
-                  <HomeIcon />
-                </Icon>
-              </DropdownMenuIconWrapper>
+            <DropdownMenuSubTrigger icon="Home1">
               <span>New team</span>
             </DropdownMenuSubTrigger>
             <DropdownMenuSubContent>
@@ -193,12 +135,7 @@ export const Default: Story = {
           <span>API</span>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>
-          <DropdownMenuIconWrapper>
-            <Icon>
-              <HomeIcon />
-            </Icon>
-          </DropdownMenuIconWrapper>
+        <DropdownMenuItem icon="Home1">
           <span>Log out</span>
           <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
         </DropdownMenuItem>
@@ -218,12 +155,7 @@ export const ExampleFromFigma: Story = {
             <span>File</span>
           </DropdownMenuSubTrigger>
           <DropdownMenuSubContent>
-            <DropdownMenuItem>
-              <DropdownMenuIconWrapper>
-                <Icon>
-                  <HomeIcon />
-                </Icon>
-              </DropdownMenuIconWrapper>
+            <DropdownMenuItem icon="Home1">
               <span>More...</span>
             </DropdownMenuItem>
           </DropdownMenuSubContent>
@@ -234,12 +166,7 @@ export const ExampleFromFigma: Story = {
             <span>Edit</span>
           </DropdownMenuSubTrigger>
           <DropdownMenuSubContent>
-            <DropdownMenuItem>
-              <DropdownMenuIconWrapper>
-                <Icon>
-                  <HomeIcon />
-                </Icon>
-              </DropdownMenuIconWrapper>
+            <DropdownMenuItem icon="Home1">
               <span>More...</span>
             </DropdownMenuItem>
           </DropdownMenuSubContent>
@@ -250,12 +177,7 @@ export const ExampleFromFigma: Story = {
             <span>View</span>
           </DropdownMenuSubTrigger>
           <DropdownMenuSubContent>
-            <DropdownMenuItem>
-              <DropdownMenuIconWrapper>
-                <Icon>
-                  <HomeIcon />
-                </Icon>
-              </DropdownMenuIconWrapper>
+            <DropdownMenuItem icon="Home1">
               <span>More...</span>
             </DropdownMenuItem>
           </DropdownMenuSubContent>
@@ -266,12 +188,7 @@ export const ExampleFromFigma: Story = {
             <span>Window</span>
           </DropdownMenuSubTrigger>
           <DropdownMenuSubContent>
-            <DropdownMenuItem>
-              <DropdownMenuIconWrapper>
-                <Icon>
-                  <HomeIcon />
-                </Icon>
-              </DropdownMenuIconWrapper>
+            <DropdownMenuItem icon="Home1">
               <span>More...</span>
             </DropdownMenuItem>
           </DropdownMenuSubContent>
@@ -280,16 +197,14 @@ export const ExampleFromFigma: Story = {
         <DropdownMenuSeparator />
 
         <DropdownMenuItem>
-          <DropdownMenuIconWrapper>
-            <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path
-                d="M3.14961 8.32461H2.47461V6.61461C2.47461 6.11056 2.47461 5.85854 2.5727 5.66602C2.65899 5.49667 2.79667 5.35899 2.96602 5.2727C3.15854 5.17461 3.41056 5.17461 3.91461 5.17461H6.07461V4.04961C6.07461 3.17976 6.77976 2.47461 7.64961 2.47461C8.51946 2.47461 9.22461 3.17976 9.22461 4.04961V5.17461L11.3846 5.17461C11.8887 5.17461 12.1407 5.17461 12.3332 5.2727C12.5025 5.35899 12.6402 5.49667 12.7265 5.66602C12.8246 5.85854 12.8246 6.11056 12.8246 6.61461V8.77461H13.9496C14.8195 8.77461 15.5246 9.47976 15.5246 10.3496C15.5246 11.2195 14.8195 11.9246 13.9496 11.9246H12.8246V14.0846C12.8246 14.5887 12.8246 14.8407 12.7265 15.0332C12.6402 15.2025 12.5025 15.3402 12.3332 15.4265C12.1407 15.5246 11.8887 15.5246 11.3846 15.5246H9.67461V14.8496C9.67461 13.7312 8.76799 12.8246 7.64961 12.8246C6.53123 12.8246 5.62461 13.7312 5.62461 14.8496V15.5246H3.91461C3.41056 15.5246 3.15854 15.5246 2.96602 15.4265C2.79667 15.3402 2.65899 15.2025 2.5727 15.0332C2.47461 14.8407 2.47461 14.5887 2.47461 14.0846V12.3746H3.14961C4.26799 12.3746 5.17461 11.468 5.17461 10.3496C5.17461 9.23123 4.26799 8.32461 3.14961 8.32461Z"
-                stroke="#FAFAFA"
-                stroke-width="1.15"
-                stroke-linejoin="round"
-              />
-            </svg>
-          </DropdownMenuIconWrapper>
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path
+              d="M3.14961 8.32461H2.47461V6.61461C2.47461 6.11056 2.47461 5.85854 2.5727 5.66602C2.65899 5.49667 2.79667 5.35899 2.96602 5.2727C3.15854 5.17461 3.41056 5.17461 3.91461 5.17461H6.07461V4.04961C6.07461 3.17976 6.77976 2.47461 7.64961 2.47461C8.51946 2.47461 9.22461 3.17976 9.22461 4.04961V5.17461L11.3846 5.17461C11.8887 5.17461 12.1407 5.17461 12.3332 5.2727C12.5025 5.35899 12.6402 5.49667 12.7265 5.66602C12.8246 5.85854 12.8246 6.11056 12.8246 6.61461V8.77461H13.9496C14.8195 8.77461 15.5246 9.47976 15.5246 10.3496C15.5246 11.2195 14.8195 11.9246 13.9496 11.9246H12.8246V14.0846C12.8246 14.5887 12.8246 14.8407 12.7265 15.0332C12.6402 15.2025 12.5025 15.3402 12.3332 15.4265C12.1407 15.5246 11.8887 15.5246 11.3846 15.5246H9.67461V14.8496C9.67461 13.7312 8.76799 12.8246 7.64961 12.8246C6.53123 12.8246 5.62461 13.7312 5.62461 14.8496V15.5246H3.91461C3.41056 15.5246 3.15854 15.5246 2.96602 15.4265C2.79667 15.3402 2.65899 15.2025 2.5727 15.0332C2.47461 14.8407 2.47461 14.5887 2.47461 14.0846V12.3746H3.14961C4.26799 12.3746 5.17461 11.468 5.17461 10.3496C5.17461 9.23123 4.26799 8.32461 3.14961 8.32461Z"
+              stroke="#FAFAFA"
+              stroke-width="1.15"
+              stroke-linejoin="round"
+            />
+          </svg>
           <span>Extensions</span>
           <DropdownMenuShortcut>⇧⌘E</DropdownMenuShortcut>
         </DropdownMenuItem>
@@ -314,41 +229,14 @@ export const Groups: Story = {
         </DropdownMenuGroup>
 
         <DropdownMenuGroup>
-          <DropdownMenuItem>
-            <DropdownMenuIconWrapper>
-              <Icon>
-                <HomeIcon />
-              </Icon>
-            </DropdownMenuIconWrapper>
-            1 - Group item with icon
-          </DropdownMenuItem>
+          <DropdownMenuItem icon="Home1">1 - Group item with icon</DropdownMenuItem>
           <DropdownMenuItem>1 - Group item</DropdownMenuItem>
         </DropdownMenuGroup>
 
         <DropdownMenuGroup>
-          <DropdownMenuItem>
-            <DropdownMenuIconWrapper>
-              <Icon>
-                <HomeIcon />
-              </Icon>
-            </DropdownMenuIconWrapper>
-            2 - Group item with icon
-          </DropdownMenuItem>
+          <DropdownMenuItem icon="Home1">2 - Group item with icon</DropdownMenuItem>
           <DropdownMenuItem>2 - Group item</DropdownMenuItem>
         </DropdownMenuGroup>
-      </DropdownMenuContent>
-    </DropdownMenu>
-  ),
-};
-
-export const WithArrow: Story = {
-  render: () => (
-    <DropdownMenu>
-      <DropdownMenuTrigger>Click me!</DropdownMenuTrigger>
-
-      <DropdownMenuContent>
-        <DropdownMenuItem>Menu item 1</DropdownMenuItem>
-        <DropdownMenuItem>Menu item 2</DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   ),
@@ -361,147 +249,42 @@ export const DropdownMenuSubExample: Story = {
 
       <DropdownMenuContent>
         <DropdownMenuSub>
-          <DropdownMenuSubTrigger>
-            <DropdownMenuIconWrapper>
-              <Icon>
-                <HomeIcon />
-              </Icon>
-            </DropdownMenuIconWrapper>
-            Sub trigger with icon
-          </DropdownMenuSubTrigger>
+          <DropdownMenuSubTrigger icon="Home1">Sub trigger with icon</DropdownMenuSubTrigger>
 
           <DropdownMenuSubContent>
-            <DropdownMenuItem>
-              <DropdownMenuIconWrapper>
-                <Icon>
-                  <HomeIcon />
-                </Icon>
-              </DropdownMenuIconWrapper>
-              More...
-            </DropdownMenuItem>
+            <DropdownMenuItem icon="Home1">More...</DropdownMenuItem>
           </DropdownMenuSubContent>
         </DropdownMenuSub>
 
         <DropdownMenuSub>
           <DropdownMenuSubTrigger>Some content</DropdownMenuSubTrigger>
           <DropdownMenuSubContent>
-            <DropdownMenuItem>
-              <DropdownMenuIconWrapper>
-                <Icon>
-                  <HomeIcon />
-                </Icon>
-              </DropdownMenuIconWrapper>
-              More...
-            </DropdownMenuItem>
+            <DropdownMenuItem icon="Home1">More...</DropdownMenuItem>
           </DropdownMenuSubContent>
         </DropdownMenuSub>
 
         <DropdownMenuSub>
           <DropdownMenuSubTrigger>More content</DropdownMenuSubTrigger>
           <DropdownMenuSubContent>
-            <DropdownMenuItem>
-              <DropdownMenuIconWrapper>
-                <Icon>
-                  <HomeIcon />
-                </Icon>
-              </DropdownMenuIconWrapper>
-              More...
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              <DropdownMenuIconWrapper>
-                <Icon>
-                  <HomeIcon />
-                </Icon>
-              </DropdownMenuIconWrapper>
-              More...
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              <DropdownMenuIconWrapper>
-                <Icon>
-                  <HomeIcon />
-                </Icon>
-              </DropdownMenuIconWrapper>
-              More...
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              <DropdownMenuIconWrapper>
-                <Icon>
-                  <HomeIcon />
-                </Icon>
-              </DropdownMenuIconWrapper>
-              More...
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              <DropdownMenuIconWrapper>
-                <Icon>
-                  <HomeIcon />
-                </Icon>
-              </DropdownMenuIconWrapper>
-              More...
-            </DropdownMenuItem>
+            <DropdownMenuItem icon="Home1">More...</DropdownMenuItem>
+            <DropdownMenuItem icon="Home1">More...</DropdownMenuItem>
+            <DropdownMenuItem icon="Home1">More...</DropdownMenuItem>
+            <DropdownMenuItem icon="Home1">More...</DropdownMenuItem>
+            <DropdownMenuItem icon="Home1">More...</DropdownMenuItem>
           </DropdownMenuSubContent>
         </DropdownMenuSub>
 
         <DropdownMenuSub>
           <DropdownMenuSubTrigger>A lot more content</DropdownMenuSubTrigger>
           <DropdownMenuSubContent>
-            <DropdownMenuItem>
-              <DropdownMenuIconWrapper>
-                <Icon>
-                  <HomeIcon />
-                </Icon>
-              </DropdownMenuIconWrapper>
-              More...
-            </DropdownMenuItem>
+            <DropdownMenuItem icon="Home1">More...</DropdownMenuItem>
 
-            <DropdownMenuItem>
-              <DropdownMenuIconWrapper>
-                <Icon>
-                  <HomeIcon />
-                </Icon>
-              </DropdownMenuIconWrapper>
-              More... More
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              <DropdownMenuIconWrapper>
-                <Icon>
-                  <HomeIcon />
-                </Icon>
-              </DropdownMenuIconWrapper>
-              More... More... More
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              <DropdownMenuIconWrapper>
-                <Icon>
-                  <HomeIcon />
-                </Icon>
-              </DropdownMenuIconWrapper>
-              More... More... More... More...
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              <DropdownMenuIconWrapper>
-                <Icon>
-                  <HomeIcon />
-                </Icon>
-              </DropdownMenuIconWrapper>
-              More... More... More... More... More...
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              <DropdownMenuIconWrapper>
-                <Icon>
-                  <HomeIcon />
-                </Icon>
-              </DropdownMenuIconWrapper>
-              More... More... More... More... More... More...
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              <DropdownMenuIconWrapper>
-                <Icon>
-                  <HomeIcon />
-                </Icon>
-              </DropdownMenuIconWrapper>
-              More... More... More... More... More... More... More
-            </DropdownMenuItem>
+            <DropdownMenuItem icon="Home1">More... More</DropdownMenuItem>
+            <DropdownMenuItem icon="Home1">More... More... More</DropdownMenuItem>
+            <DropdownMenuItem icon="Home1">More... More... More... More...</DropdownMenuItem>
+            <DropdownMenuItem icon="Home1">More... More... More... More... More...</DropdownMenuItem>
+            <DropdownMenuItem icon="Home1">More... More... More... More... More... More...</DropdownMenuItem>
+            <DropdownMenuItem icon="Home1">More... More... More... More... More... More... More</DropdownMenuItem>
           </DropdownMenuSubContent>
         </DropdownMenuSub>
       </DropdownMenuContent>
