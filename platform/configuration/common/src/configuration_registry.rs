@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 use hashbrown::{HashMap, HashSet};
 use lazy_regex::Regex as LazyRegex;
-use moss_base::collection::MaybeExtend;
+use moss_std::collection::MaybeExtend;
 use serde_json::Value;
 
 type Regex = LazyRegex;
@@ -277,15 +277,15 @@ pub struct ConfigurationPropertySchema {
     pub description: Option<String>,
     /// Indicates if the configuration property is protected from contributions by extensions.
     /// If true, the property cannot be overridden by contributions.
-    pub protected_from_contribution: Option<bool>,
+    pub protected_from_contribution: bool,
     /// Specifies if the configuration property is allowed only for restricted sources.
     /// If true, the property can only be set by trusted sources.
-    pub allow_for_only_restricted_source: Option<bool>,
+    pub allow_for_only_restricted_source: bool,
     /// Indicates if the configuration property is included in the registry.
     /// If false, the property is excluded from the configuration registry.
-    pub included: Option<bool>,
+    pub included: bool,
     /// Indicates that a property is deprecated.
-    pub deprecated: Option<bool>,
+    pub deprecated: bool,
     /// Tags associated with the property:
     /// - For filtering
     /// - Use `experimental` to mark property as experimental.
@@ -341,10 +341,10 @@ impl Default for ConfigurationPropertySchema {
             order: None,
             default: Some(default_default_value),
             description: None,
-            protected_from_contribution: Some(false),
-            allow_for_only_restricted_source: Some(false),
-            included: Some(true),
-            deprecated: Some(false),
+            protected_from_contribution: false,
+            allow_for_only_restricted_source: false,
+            included: true,
+            deprecated: false,
             tags: None,
             policy: None,
             max_properties: None,
@@ -414,8 +414,8 @@ pub struct RegisteredConfigurationPropertySchema {
 }
 
 impl RegisteredConfigurationPropertySchema {
-    pub fn is_protected(&self) -> bool {
-        self.schema.protected_from_contribution.unwrap_or(false)
+    pub fn is_protected_from_contribution(&self) -> bool {
+        self.schema.protected_from_contribution
     }
 }
 
@@ -592,7 +592,7 @@ impl<'a> ConfigurationRegistry<'a> {
             } else {
                 property_schema.scope = Some(node_scope_or_default.clone());
                 property_schema.allow_for_only_restricted_source =
-                    Some(property.allow_for_only_restricted_source.unwrap_or(false));
+                    property.allow_for_only_restricted_source;
             }
 
             let registered_property = RegisteredConfigurationPropertySchema::new(
@@ -600,7 +600,7 @@ impl<'a> ConfigurationRegistry<'a> {
                 configuration.source.clone(),
             );
 
-            if property.included.unwrap_or(true) {
+            if property.included {
                 self.properties.insert(key.clone(), registered_property);
             } else {
                 self.excluded_properties
@@ -626,7 +626,7 @@ impl<'a> ConfigurationRegistry<'a> {
     fn register_json_configuration(&mut self, configuration: &ConfigurationNode) {
         if let Some(properties) = &configuration.properties {
             for (key, property) in properties {
-                if property.included.unwrap_or(true) {
+                if property.included {
                     self.schema_storage.update_schema(key, property);
                 }
             }
