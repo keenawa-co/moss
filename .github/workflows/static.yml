@@ -3,9 +3,6 @@ name: Deploy static content to Pages
 on:
   push:
     branches: ["MOSSMVP-120-CI-Optimizing-documentation-deployment"]
-    paths:
-      - "view/docs/**"
-      - "shared/**"
 
   workflow_dispatch:
 
@@ -40,12 +37,27 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: "pnpm"
 
-      - name: Install dependencies
-        run: pnpm install --no-frozen-lockfile
-        working-directory: ./view/docs
+      - name: Cache pnpm store
+        uses: actions/cache@v4
+        with:
+          path: ~/.pnpm-store
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('view/docs/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-
 
-      - name: Build with Turbo
-        run: pnpm turbo run build --filter=docs
+      - name: Cache build output
+        id: cache-build
+        uses: actions/cache@v4
+        with:
+          path: ./view/docs/build
+          key: ${{ runner.os }}-build-${{ hashFiles('view/docs/**', 'shared/**') }}
+          restore-keys: |
+            ${{ runner.os }}-build-
+
+      - name: Build
+        run: pnpm build
+        working-directory: ./view/docs
+        if: steps.cache-build.outputs.cache-hit != 'true'
 
       - name: Upload build artifacts
         if: success()
