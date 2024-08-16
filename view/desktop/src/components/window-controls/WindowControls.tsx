@@ -45,7 +45,7 @@ export function WindowControls({
       case "macos":
         return <MacOS className={cn(customClass, justify && "ml-0")} {...props} />;
       case "gnome":
-        return <Gnome className={cn(customClass, justify && "ml-auto")} {...props} />;
+        return <Gnome className={cn(customClass, justify && "ml-auto", "pt-2.5")} {...props} />;
       default:
         return <Windows className={cn(customClass, justify && "ml-auto")} {...props} />;
     }
