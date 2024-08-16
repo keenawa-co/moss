@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { commands, SessionInfoDTO } from "../bindings";
+import { commands, SessionInfoDTO } from "@/bindings";
 import React, { useEffect, useState } from "react";
 import { listen } from "@tauri-apps/api/event";
 import {
@@ -10,9 +10,7 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
   Icon,
-} from "../../../shared/ui/src";
-
-import { Typescript, Acc } from "../../../shared/icons/build";
+} from "@repo/ui";
 
 export const Home: React.FC = () => {
   const { t } = useTranslation(["ns1", "ns2"]);

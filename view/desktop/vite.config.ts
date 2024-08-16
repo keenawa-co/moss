@@ -12,10 +12,10 @@ export default defineConfig({
   assetsInclude: "src/renderer/assets/**",
   resolve: {
     alias: {
+      "@": resolve("src"),
       "@/hooks": resolve("src/hooks"),
       "@/assets": resolve("src/assets"),
       "@/components": resolve("src/components"),
-      "@/shared": resolve(__dirname, "../shared/ui/src"),
     },
   },
 });

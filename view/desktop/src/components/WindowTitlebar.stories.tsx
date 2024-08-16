@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { WindowTitlebar } from "./WindowTitlebar";
-import { Menu, LogoSvg } from "./test-components/TestComponents";
-import "../assets/index.css";
+import { WindowTitlebar } from "@/components/WindowTitlebar";
+import { Menu, LogoSvg } from "@/components/test-components/TestComponents";
+import "@/assets/index.css";
 
 const meta = {
   title: "desktop/WindowTitlebar",

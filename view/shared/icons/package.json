@@ -1,4 +1,7 @@
 {
+  "name": "@repo/icons",
+  "exports": {
+  },
   "scripts": {
     "build": "rimraf build && svgr -d build assets"
   },

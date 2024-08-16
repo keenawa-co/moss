@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import { cn } from "./libs/utils";
-import { TauriAppWindowProvider } from "./contexts";
-import { Gnome, MacOS, Windows } from "./controls";
-import { getOsType } from "./libs/plugin-os";
-import type { WindowControlsProps } from "./types";
+import { cn } from "@/components/window-controls/libs/utils";
+import { TauriAppWindowProvider } from "@/components/window-controls/contexts";
+import { Gnome, MacOS, Windows } from "@/components/window-controls/controls";
+import { getOsType } from "@/components/window-controls/libs/plugin-os";
+import type { WindowControlsProps } from "@/components/window-controls/types";
 
 export function WindowControls({
   platform,
