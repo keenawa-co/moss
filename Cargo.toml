@@ -8,7 +8,7 @@ members = [
     "kernel/bus",
     "kernel/fs",
 
-    "lib/moss_base",
+    "lib/moss_std",
 
     "lib/async_utl",
     "lib/seaorm_utl",
@@ -58,7 +58,7 @@ rustflags = ["-C", "target-cpu=native"]
 [workspace.dependencies]
 fs = { path = "kernel/fs" }
 
-moss_base = { path = "lib/moss_base" }
+moss_std = { path = "lib/moss_std" }
 
 base = { path = "platform/base" }
 

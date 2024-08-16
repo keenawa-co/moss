@@ -185,14 +185,10 @@ impl DesktopMain {
                 let app_handle = app.handle().clone();
                 let window = app.get_webview_window("main").unwrap();
 
-                // app_state.workbench.set_window_size(window).unwrap();
-
-                // window
-                //     .set_size(tauri::Size::Logical(tauri::LogicalSize {
-                //         width: 800.0,
-                //         height: 750.0,
-                //     }))
-                //     .unwrap();
+                app_state
+                    .workbench
+                    .apply_configuration_window_size(window)
+                    .unwrap();
 
                 tokio::task::block_in_place(|| {
                     tauri::async_runtime::block_on(async move {

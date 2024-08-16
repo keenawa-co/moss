@@ -3933,7 +3933,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "moss_base"
+name = "moss_std"
 version = "0.1.0"
 dependencies = [
  "hashbrown 0.14.5",
@@ -5014,7 +5014,7 @@ dependencies = [
  "base",
  "hashbrown 0.14.5",
  "lazy-regex",
- "moss_base",
+ "moss_std",
  "parking_lot",
  "radix_trie",
  "schemars",

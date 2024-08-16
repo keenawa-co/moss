@@ -2,7 +2,7 @@ use anyhow::Result;
 use arc_swap::{ArcSwap, ArcSwapOption};
 use hashbrown::{HashMap, HashSet};
 use lazy_regex::{Lazy, Regex};
-use moss_base::collection::Extend;
+use moss_std::collection::Extend;
 use radix_trie::{Trie, TrieCommon};
 use serde_json::Value;
 use std::{fs::File, io::Read, path::PathBuf, sync::Arc};
@@ -299,7 +299,7 @@ impl<'a> ConfigurationParser<'a> {
 
         match configuration_properties.get(attribute_name) {
             Some(registered_property) => {
-                if registered_property.is_protected() {
+                if registered_property.is_protected_from_contribution() {
                     println!(
                         "Property `{}` is protected from contribution",
                         attribute_name
