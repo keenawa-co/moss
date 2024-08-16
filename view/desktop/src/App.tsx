@@ -1,7 +1,6 @@
 import { About, Content, TitleBar, Home, Menu, RootLayout, Sidebar } from "@/components";
 import { Suspense } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-
 import "@/i18n";
 import "@repo/ui/src/fonts.css";
 import { Icon, MenuItem, IconTitle } from "@repo/ui";
