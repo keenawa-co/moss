@@ -1,4 +1,5 @@
 import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu";
+import { Icons } from "./Icon";
 
 export interface DropdownMenuProps extends DropdownMenuPrimitive.DropdownMenuProps {}
 
@@ -43,7 +44,9 @@ export interface DropdownMenuItemProps
   extends Pick<
     DropdownMenuPrimitive.DropdownMenuItemProps,
     "disabled" | "onSelect" | "textValue" | "className" | "children"
-  > {}
+  > {
+  icon?: Icons;
+}
 
 export interface DropdownMenuCheckboxItemProps
   extends Pick<
@@ -68,10 +71,9 @@ export interface DropdownMenuSeparatorProps
 }
 
 export interface DropdownMenuSubTriggerProps
-  extends Pick<
-    DropdownMenuPrimitive.DropdownMenuSubTriggerProps,
-    "disabled" | "textValue" | "className" | "children"
-  > {}
+  extends Pick<DropdownMenuPrimitive.DropdownMenuSubTriggerProps, "disabled" | "textValue" | "className" | "children"> {
+  icon?: Icons;
+}
 
 export interface DropdownMenuRadioGroupProps
   extends Pick<

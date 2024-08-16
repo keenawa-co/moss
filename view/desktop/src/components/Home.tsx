@@ -4,16 +4,15 @@ import React, { useEffect, useState } from "react";
 import { listen } from "@tauri-apps/api/event";
 import {
   Tooltip,
-  CodeIcon,
   DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuIconWrapper,
   Icon,
-  SearchIcon,
 } from "../../../shared/ui/src";
+
+import { Typescript, Acc } from "../../../shared/icons/build";
 
 export const Home: React.FC = () => {
   const { t } = useTranslation(["ns1", "ns2"]);
@@ -89,7 +88,7 @@ export const Home: React.FC = () => {
 
       <div>
         <Tooltip label="Test">
-          <CodeIcon className="fill-red-500 w-4" />
+          <Icon icon="Code" />
         </Tooltip>
       </div>
 
@@ -98,19 +97,17 @@ export const Home: React.FC = () => {
           <DropdownMenuTrigger>Click me!</DropdownMenuTrigger>
 
           <DropdownMenuContent>
-            <DropdownMenuItem>
-              <DropdownMenuIconWrapper>
-                <Icon>
-                  <SearchIcon className="text-red-600" />
-                </Icon>
-              </DropdownMenuIconWrapper>
-              Menu item 1
-            </DropdownMenuItem>
+            <DropdownMenuItem icon="Search">Menu item 1</DropdownMenuItem>
             <DropdownMenuItem>
               <DropdownMenuLabel>Menu item 2</DropdownMenuLabel>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
+      </div>
+
+      <div className="flex">
+        <Icon icon="Accessibility" className="text-6xl hover:*:fill-green-500" />
+        <Icon icon="NewProject" className="text-6xl text-red-600 hover:fill-green-500" />
       </div>
     </main>
   );
