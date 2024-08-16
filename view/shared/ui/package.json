@@ -14,9 +14,9 @@
   },
   "license": "MIT",
   "scripts": {
-    "build": "cp ./src/fonts.css ./dist/fonts.css && tailwindcss -i ./src/styles.css -o ./dist/index.css",
+    "build": "mkdir -p ./dist && cp ./src/fonts.css ./dist/fonts.css && tailwindcss -i ./src/styles.css -o ./dist/index.css",
     "lint": "eslint src/",
-    "dev": " cp ./src/fonts.css ./dist/fonts.css && tailwindcss  -i ./src/styles.css -o ./dist/index.css --watch",
+    "dev": "mkdir -p ./dist && cp ./src/fonts.css ./dist/fonts.css && tailwindcss  -i ./src/styles.css -o ./dist/index.css --watch",
     "type-check": "tsc --noEmit"
   },
   "peerDependencies": {
