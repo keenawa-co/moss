@@ -2,11 +2,11 @@ import { About, Content, TitleBar, Home, Menu, RootLayout, Sidebar } from "@/com
 import { Suspense } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 
-import "./i18n";
-import "../../shared/ui/src/fonts.css";
-import { Icon, MenuItem, IconTitle } from "../../shared/ui/src";
+import "@/i18n";
+import "@repo/ui/src/fonts.css";
+import { Icon, MenuItem, IconTitle } from "@repo/ui";
 import { twMerge } from "tailwind-merge";
-import StatusBar from "./components/StatusBar";
+import StatusBar from "@/components/StatusBar";
 
 enum IconState {
   Default = "group-text-zinc-500",

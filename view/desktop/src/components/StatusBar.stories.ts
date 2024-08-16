@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import "../assets/index.css";
+import "@/assets/index.css";
 import StatusBar from "./StatusBar";
 
 const meta = {

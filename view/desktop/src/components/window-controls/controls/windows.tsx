@@ -1,8 +1,8 @@
 import { useContext, type HTMLProps } from "react";
-import { Icons } from "../components/icons";
-import TauriAppWindowContext from "../contexts/plugin-window";
-import { cn } from "../libs/utils";
-import { Button } from "../components/button";
+import { Icons } from "@/components/window-controls/components/icons";
+import TauriAppWindowContext from "@/components/window-controls/contexts/plugin-window";
+import { cn } from "@/components/window-controls/libs/utils";
+import { Button } from "@/components/window-controls/components/button";
 
 export function Windows({ className, ...props }: HTMLProps<HTMLDivElement>) {
   const { isWindowMaximized, minimizeWindow, maximizeWindow, closeWindow } = useContext(TauriAppWindowContext);

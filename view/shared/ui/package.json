@@ -8,6 +8,8 @@
     "dist"
   ],
   "exports": {
+    ".": "./src/index.ts",
+    "./src/fonts.css": "./src/fonts.css",
     "./styles.css": "./dist/index.css",
     "./card": "./src/card.tsx",
     "./fonts.css": "./dist/fonts.css"

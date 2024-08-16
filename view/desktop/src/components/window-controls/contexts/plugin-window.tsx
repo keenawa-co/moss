@@ -1,6 +1,6 @@
 import type { Window } from "@tauri-apps/api/window";
 import React, { createContext, useCallback, useEffect, useState } from "react";
-import { getOsType } from "../libs/plugin-os";
+import { getOsType } from "@/components/window-controls/libs/plugin-os";
 
 interface TauriAppWindowContextType {
   appWindow: Window | null;
