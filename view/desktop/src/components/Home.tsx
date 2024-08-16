@@ -2,17 +2,42 @@ import { useTranslation } from "react-i18next";
 import { commands, SessionInfoDTO } from "../bindings";
 import React, { useEffect, useState } from "react";
 import { listen } from "@tauri-apps/api/event";
-import { Tooltip, CodeIcon } from "../../../shared/ui/src";
+import {
+  Tooltip,
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  Icon,
+} from "../../../shared/ui/src";
+
+import { Typescript, Acc } from "../../../shared/icons/build";
 
 export const Home: React.FC = () => {
   const { t } = useTranslation(["ns1", "ns2"]);
   const [sessionInfo, setSessionInfo] = useState<SessionInfoDTO | null>(null);
   const [data, setData] = useState<number | null>(null);
+  const [workbenchState, setWorkbenchState] = useState<string>("empty");
+
+  let getWorkbenchState = async () => {
+    try {
+      const response = await commands.workbenchGetState();
+      console.log(response);
+      if (response.status === "ok") {
+        setWorkbenchState(response.data);
+      }
+    } catch (err) {
+      console.error("Failed to get workbench state:", err);
+    }
+  };
 
   useEffect(() => {
     const unlisten = listen<number>("data-stream", (event) => {
       setData(event.payload);
     });
+
+    getWorkbenchState();
 
     return () => {
       unlisten.then((f) => f());
@@ -49,6 +74,10 @@ export const Home: React.FC = () => {
         <p>No session</p>
       )}
 
+      <p>
+        Workspace: <span className="bg-red-500 text-zinc-900"> {workbenchState}</span>
+      </p>
+
       <button className="bg-red-500" onClick={handleRestoreSession}>
         Restore Session
       </button>
@@ -59,8 +88,26 @@ export const Home: React.FC = () => {
 
       <div>
         <Tooltip label="Test">
-          <CodeIcon className="fill-red-500 w-4" />
+          <Icon icon="Code" />
         </Tooltip>
+      </div>
+
+      <div>
+        <DropdownMenu>
+          <DropdownMenuTrigger>Click me!</DropdownMenuTrigger>
+
+          <DropdownMenuContent>
+            <DropdownMenuItem icon="Search">Menu item 1</DropdownMenuItem>
+            <DropdownMenuItem>
+              <DropdownMenuLabel>Menu item 2</DropdownMenuLabel>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+
+      <div className="flex">
+        <Icon icon="Accessibility" className="text-6xl hover:*:fill-green-500" />
+        <Icon icon="NewProject" className="text-6xl text-red-600 hover:fill-green-500" />
       </div>
     </main>
   );

@@ -3,6 +3,14 @@
 /** user-defined commands **/
 
 export const commands = {
+  async workbenchGetState(): Promise<Result<WorkbenchState, string>> {
+    try {
+      return { status: "ok", data: await TAURI_INVOKE("workbench_get_state") };
+    } catch (e) {
+      if (e instanceof Error) throw e;
+      else return { status: "error", error: e as any };
+    }
+  },
   async createProject(input: CreateProjectInput): Promise<Result<ProjectDTO | null, string>> {
     try {
       return { status: "ok", data: await TAURI_INVOKE("create_project", { input }) };
@@ -34,6 +42,7 @@ export type CreateProjectInput = { source: string; repository: string | null };
 export type ProjectDTO = { id: string; source: string; repository: string | null; created_at: string };
 export type SessionDTO = { id: string };
 export type SessionInfoDTO = { created_at: string; project: ProjectDTO; session: SessionDTO };
+export type WorkbenchState = "Empty" | "Workspace";
 
 /** tauri-specta globals **/
 
