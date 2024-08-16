@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import "@/assets/index.css";
-import StatusBar from "./StatusBar";
+import StatusBar from "@/components/StatusBar";
 
 const meta = {
   title: "desktop/StatusBar",
