@@ -16,7 +16,7 @@
   },
   "license": "MIT",
   "scripts": {
-    "build": "copy .\\src\\fonts.css .\\dist\\fonts.css && tailwindcss -i .\\src\\styles.css -o .\\dist\\index.css",
+    "build": "cp ./src/fonts.css ./dist/fonts.css && tailwindcss -i ./src/styles.css -o ./dist/index.css",
     "lint": "eslint src/",
     "dev": " cp ./src/fonts.css ./dist/fonts.css && tailwindcss  -i ./src/styles.css -o ./dist/index.css --watch",
     "type-check": "tsc --noEmit"

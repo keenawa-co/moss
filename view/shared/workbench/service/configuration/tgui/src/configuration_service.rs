@@ -31,15 +31,9 @@ impl WorkspaceConfigurationService {
         default_configuration.initialize();
 
         // TODO: use UserDataProfileService
-        let config_file_path = &PathBuf::from(&format!(
-            "{}/.moss/settings.json",
-            std::env::var("HOME").unwrap()
-        ));
+        let config_file_path = &std::path::PathBuf::from("C:/Users/semjonov/.moss/settings.json");
         let user_configuration = UserConfiguration::new(config_file_path, Arc::new(parser));
-        let user_configuration_model = user_configuration
-            .load_configuration()
-            .context("failed to load user configuration model")
-            .unwrap();
+        let user_configuration_model = ConfigurationModel::empty();
         let default_configuration_model = default_configuration
             .get_configuration_model()
             .context("failed to get default configuration model".to_string())
