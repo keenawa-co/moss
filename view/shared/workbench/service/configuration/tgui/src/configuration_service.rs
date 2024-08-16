@@ -36,10 +36,14 @@ impl WorkspaceConfigurationService {
             std::env::var("HOME").unwrap()
         ));
         let user_configuration = UserConfiguration::new(config_file_path, Arc::new(parser));
-        let user_configuration_model = ConfigurationModel::empty();
         let user_configuration_model = user_configuration
             .load_configuration()
             .context("failed to load user configuration model")
+            .unwrap();
+        let default_configuration_model = default_configuration
+            .get_configuration_model()
+            .context("failed to get default configuration model".to_string())
+            .context("default was not initialized correctly")
             .unwrap();
 
         let mut configuration_policy =
