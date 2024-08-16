@@ -22,9 +22,21 @@ jobs:
     strategy:
       matrix:
         node-version: [18.19.x]
+    # ENV vars for Turborepo Remote Caching
+    env:
+      TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+      TURBO_TEAM: ${{ vars.TURBO_TEAM }}
 
     steps:
       - uses: actions/checkout@v4
+
+      - name: Cache turbo build setup
+        uses: actions/cache@v4
+        with:
+          path: .turbo
+          key: ${{ runner.os }}-turbo-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-turbo-
 
       - name: Install pnpm
         uses: pnpm/action-setup@v4
@@ -37,19 +49,13 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: "pnpm"
 
-      - name: Cache build output
-        id: cache-build
-        uses: actions/cache@v4
-        with:
-          path: ./view/docs/build
-          key: ${{ runner.os }}-build-${{ hashFiles('view/docs/**', 'shared/**') }}
-          restore-keys: |
-            ${{ runner.os }}-build-
-
-      - name: Build
-        run: pnpm build
+      - name: Install dependencies
+        run: pnpm install --no-frozen-lockfile
         working-directory: ./view/docs
-        if: steps.cache-build.outputs.cache-hit != 'true'
+
+      - name: Build with Turbo
+        run: pnpm turbo run build --filter=docs
+        working-directory: ./view/docs
 
       - name: Upload build artifacts
         if: success()
