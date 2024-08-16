@@ -55,7 +55,6 @@ jobs:
 
       - name: Build with Turbo
         run: pnpm turbo run build --filter=docs
-        working-directory: ./view/docs
 
       - name: Upload build artifacts
         if: success()
