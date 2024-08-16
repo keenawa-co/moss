@@ -49,12 +49,12 @@ const DropdownMenuLabel = ({ children, className, ...props }: DropdownMenuLabelP
 );
 
 const DropdownMenuSeparator = ({ className }: DropdownMenuSeparatorProps) => (
-  <DropdownMenuPrimitive.Separator className={cn("h-px mx-0.5  my-2 bg-[#383838]", className)} />
+  <DropdownMenuPrimitive.Separator className={cn("h-px mx-0.5 my-2 bg-[#383838]", className)} />
 );
 
 // TODO add functionality for DropdownMenuShortcut
 const DropdownMenuShortcut = ({ className, ...props }: React.HTMLAttributes<HTMLSpanElement>) => {
-  return <span className={cn("ml-auto opacity-60", className)} {...props} />;
+  return <span className={cn("ml-auto opacity-60 font-shortcut font-normal", className)} {...props} />;
 };
 
 // CONTENT
