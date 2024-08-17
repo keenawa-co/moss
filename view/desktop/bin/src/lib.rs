@@ -146,7 +146,7 @@ impl<'a> DesktopMain<'a> {
             Arc::new(db)
         });
 
-        let service_group = self.initialize_service_group()?;
+        let service_group = self.initialize_service_registry()?;
 
         let window_state = service_group
             .get_unchecked::<MockStorageService>()
@@ -213,18 +213,18 @@ impl<'a> DesktopMain<'a> {
         Ok(())
     }
 
-    fn initialize_service_group(&self) -> Result<ServiceRegistry> {
-        let mut service_group = ServiceRegistry::new();
+    fn initialize_service_registry(&self) -> Result<ServiceRegistry> {
+        let mut service_registry = ServiceRegistry::new();
 
         let storage_service = MockStorageService::new();
 
         let environment_service =
             NativeEnvironmentService::new(&self.native_window_configuration.home_dir);
 
-        service_group.insert(storage_service);
-        service_group.insert(environment_service);
+        service_registry.insert(storage_service);
+        service_registry.insert(environment_service);
 
-        Ok(service_group)
+        Ok(service_registry)
     }
 }
 
