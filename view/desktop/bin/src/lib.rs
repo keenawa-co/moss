@@ -5,32 +5,27 @@ pub mod service;
 
 use anyhow::Result;
 use app::context_compact::AppContextCompact;
-use hashbrown::HashMap;
+use platform_configuration_common::configuration_registry::{
+    ConfigurationNode, ConfigurationPropertySchema, ConfigurationRegistry,
+};
 use platform_configuration_common::{
-    configuration_policy::ConfigurationPolicyService,
     configuration_registry::{
         ConfigurationNodeType, ConfigurationScope, ConfigurationSource, PropertyMap, PropertyPolicy,
     },
     property_key,
 };
-use platform_configuration_common::{
-    configuration_registry::{
-        ConfigurationNode, ConfigurationPropertySchema, ConfigurationRegistry,
-    },
-    configuration_service::ConfigurationService,
-};
-use platform_formation_common::service_group::ServiceGroup;
+use platform_formation_common::service_registry::ServiceRegistry;
 use platform_window_tgui::window::NativeWindowConfiguration;
 use service::project_service::ProjectService;
 use service::session_service::SessionService;
-use std::path::PathBuf;
+use std::env;
 use std::sync::Arc;
 use surrealdb::{engine::remote::ws::Ws, Surreal};
 use tauri::{App, AppHandle, Emitter, Manager, State};
 use tauri_specta::{collect_commands, collect_events};
-use workbench_service_configuration_tgui::configuration_service::WorkspaceConfigurationService;
+use workbench_service_environment_tgui::environment_service::NativeEnvironmentService;
 use workbench_tgui::{Workbench, WorkbenchState};
-use workspace::Workspace;
+use workspace::WorkspaceId;
 
 use crate::service::{
     project_service::{CreateProjectInput, ProjectDTO},
@@ -45,7 +40,7 @@ extern crate tracing;
 
 #[tauri::command(async)]
 #[specta::specta]
-async fn workbench_get_state(state: State<'_, AppState>) -> Result<WorkbenchState, String> {
+async fn workbench_get_state(state: State<'_, AppState<'_>>) -> Result<WorkbenchState, String> {
     Ok(state.workbench.get_state())
 }
 
@@ -59,7 +54,7 @@ async fn app_ready(app_handle: AppHandle) {
 #[tauri::command(async)]
 #[specta::specta]
 async fn create_project(
-    state: State<'_, AppState>,
+    state: State<'_, AppState<'_>>,
     input: CreateProjectInput,
 ) -> Result<Option<ProjectDTO>, String> {
     match state.project_service.create_project(&input).await {
@@ -76,7 +71,7 @@ async fn create_project(
 #[tauri::command(async)]
 #[specta::specta]
 async fn restore_session(
-    state: State<'_, AppState>,
+    state: State<'_, AppState<'_>>,
     project_source: Option<String>,
 ) -> Result<Option<SessionInfoDTO>, String> {
     match state.session_service.restore_session(project_source).await {
@@ -93,7 +88,7 @@ async fn restore_session(
 pub struct MockStorageService {}
 
 struct SimpleWindowState {
-    workspace_uri: Option<String>,
+    workspace_id: WorkspaceId,
 }
 
 impl MockStorageService {
@@ -103,17 +98,18 @@ impl MockStorageService {
 
     fn get_last_window_state(&self) -> SimpleWindowState {
         SimpleWindowState {
-            workspace_uri: Some("workspace_path_hash".to_string()),
+            workspace_id: WorkspaceId::Some("workspace_path_hash".to_string()),
         }
     }
 }
 
-pub struct DesktopMain {
-    native_window_configuration: NativeWindowConfiguration,
+pub struct DesktopMain<'a> {
+    native_window_configuration: NativeWindowConfiguration<'a>,
 }
 
-impl DesktopMain {
-    pub fn new(configuration: NativeWindowConfiguration) -> Self {
+impl<'a> DesktopMain<'a> {
+    pub fn new(configuration: NativeWindowConfiguration<'a>) -> Self {
+        dbg!(&configuration);
         Self {
             native_window_configuration: configuration,
         }
@@ -150,7 +146,20 @@ impl DesktopMain {
             Arc::new(db)
         });
 
-        let service_group = self.initialize_service_group()?;
+        let service_group = self.initialize_service_registry()?;
+
+        let window_state = service_group
+            .get_unchecked::<MockStorageService>()
+            .get_last_window_state();
+
+        let mut workbench = Workbench::new(service_group, window_state.workspace_id)?;
+        workbench.initialize()?;
+
+        let app_state = AppState {
+            workbench,
+            project_service: ProjectService::new(db.clone()),
+            session_service: SessionService::new(db.clone()),
+        };
 
         let builder = tauri_specta::Builder::<tauri::Wry>::new()
             .events(collect_events![])
@@ -171,14 +180,18 @@ impl DesktopMain {
 
         tauri::Builder::default()
             .plugin(tauri_plugin_fs::init())
-            .manage(AppState {
-                workbench: Workbench::new(service_group)?,
-                project_service: ProjectService::new(db.clone()),
-                session_service: SessionService::new(db.clone()),
-            })
+            .manage(app_state)
             .invoke_handler(builder.invoke_handler())
             .setup(move |app: &mut App| {
+                let app_state: State<AppState> = app.state();
+
                 let app_handle = app.handle().clone();
+                let window = app.get_webview_window("main").unwrap();
+
+                app_state
+                    .workbench
+                    .apply_configuration_window_size(window)
+                    .unwrap();
 
                 tokio::task::block_in_place(|| {
                     tauri::async_runtime::block_on(async move {
@@ -201,166 +214,23 @@ impl DesktopMain {
         Ok(())
     }
 
-    fn initialize_service_group(&self) -> Result<ServiceGroup> {
-        let registry = Arc::new(configuration_schema_registration(
-            ConfigurationRegistry::new(),
-        ));
-
-        let policy_service = ConfigurationPolicyService {
-            definitions: {
-                use platform_configuration_common::policy::PolicyDefinitionType;
-
-                let mut this = HashMap::new();
-
-                this.insert(
-                    "editorLineHeightPolicy".to_string(),
-                    PolicyDefinitionType::Number,
-                );
-
-                this
-            },
-            policies: {
-                let mut this = HashMap::new();
-                this.insert(
-                    "editorLineHeightPolicy".to_string(),
-                    serde_json::Value::Number(serde_json::Number::from(45)),
-                );
-
-                this
-            },
-        };
-
-        let mut service_group = ServiceGroup::new();
+    fn initialize_service_registry(&self) -> Result<ServiceRegistry> {
+        let mut service_registry = ServiceRegistry::new();
 
         let storage_service = MockStorageService::new();
 
-        let window_state = storage_service.get_last_window_state();
+        let environment_service =
+            NativeEnvironmentService::new(&self.native_window_configuration.home_dir);
 
-        let workspace = self.restore_workspace(window_state.workspace_uri);
+        service_registry.insert(storage_service);
+        service_registry.insert(environment_service);
 
-        let workspace_configuration_service =
-            WorkspaceConfigurationService::new(workspace, Arc::clone(&registry), policy_service);
-
-        service_group.insert(workspace_configuration_service);
-
-        Ok(service_group)
-    }
-
-    // TODO: use Workbench tgui workspace, not platform
-    fn restore_workspace(&self, workspace_uri: Option<String>) -> Workspace {
-        if let Some(uri) = workspace_uri {
-            Workspace {
-                id: Some(uri.clone()),
-                folders: vec![],
-                configuration_uri: Some(PathBuf::from(format!("{uri}/.moss/moss.json"))),
-            }
-        } else {
-            Workspace {
-                id: None,
-                folders: vec![],
-                configuration_uri: None,
-            }
-        }
+        Ok(service_registry)
     }
 }
 
-// TODO: get rid
-fn configuration_schema_registration(mut registry: ConfigurationRegistry) -> ConfigurationRegistry {
-    let editor_configuration = ConfigurationNode {
-        id: "editor".to_string(),
-        title: Some("Editor".to_string()),
-        order: Some(1),
-        r#type: Default::default(),
-        scope: Default::default(),
-        source: Some(ConfigurationSource {
-            id: "moss.core".to_string(),
-            display_name: Some("Moss Core".to_string()),
-        }),
-        properties: {
-            let mut properties = PropertyMap::new();
-            properties.insert(
-                property_key!(editor.fontSize),
-                ConfigurationPropertySchema {
-                    scope: Some(ConfigurationScope::Resource),
-                    typ: Some(ConfigurationNodeType::Number),
-                    order: Some(1),
-                    default: Some(serde_json::Value::Number(serde_json::Number::from(12))),
-                    description: Some("Controls the font size in pixels.".to_string()),
-                    ..Default::default()
-                },
-            );
-            properties.insert(
-                property_key!(editor.lineHeight),
-                ConfigurationPropertySchema {
-                    scope: Some(ConfigurationScope::Resource),
-                    typ: Some(ConfigurationNodeType::Number),
-                    order: Some(2),
-                    default: Some(serde_json::Value::Number(serde_json::Number::from(20))),
-                    description: Some("Controls the line height.".to_string()),
-                    policy: Some(PropertyPolicy {
-                        name: "editorLineHeightPolicy".to_string(),
-                    }),
-                    ..Default::default()
-                },
-            );
-
-            Some(properties)
-        },
-        description: None,
-        parent_of: Some(vec![ConfigurationNode {
-            id: "mossql".to_string(),
-            title: Some("MossQL".to_string()),
-            order: Some(1),
-            r#type: Default::default(),
-            scope: Default::default(),
-            source: Some(ConfigurationSource {
-                id: "moss.core".to_string(),
-                display_name: Some("Moss Core".to_string()),
-            }),
-
-            properties: {
-                let mut properties = PropertyMap::new();
-
-                properties.insert(
-                    property_key!([mossql].editor.fontSize),
-                    ConfigurationPropertySchema {
-                        scope: Some(ConfigurationScope::Resource),
-                        typ: Some(ConfigurationNodeType::Number),
-                        order: Some(1),
-                        default: Some(serde_json::Value::Number(serde_json::Number::from(12))),
-                        description: Some("Controls the font size in pixels.".to_string()),
-                        protected_from_contribution: Some(false),
-                        allow_for_only_restricted_source: Some(false),
-                        schemable: Some(true),
-                        ..Default::default()
-                    },
-                );
-                properties.insert(
-                    property_key!([mossql].editor.lineHeight),
-                    ConfigurationPropertySchema {
-                        scope: Some(ConfigurationScope::Resource),
-                        typ: Some(ConfigurationNodeType::Number),
-                        order: Some(2),
-                        default: Some(serde_json::Value::Number(serde_json::Number::from(30))),
-                        description: Some("Controls the line height.".to_string()),
-                        ..Default::default()
-                    },
-                );
-
-                Some(properties)
-            },
-            description: None,
-            parent_of: None,
-        }]),
-    };
-
-    registry.register_configuration(editor_configuration);
-
-    registry
-}
-
-pub struct AppState {
-    pub workbench: Workbench,
+pub struct AppState<'a> {
+    pub workbench: Workbench<'a>,
     pub project_service: ProjectService,
     pub session_service: SessionService,
 }

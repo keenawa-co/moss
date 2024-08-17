@@ -1,3 +1,5 @@
+use std::io;
+use std::rc::Rc;
 use std::{path::PathBuf, sync::Arc};
 
 use anyhow::Context;
@@ -11,6 +13,7 @@ use platform_configuration_common::{
     configuration_registry::ConfigurationRegistry,
     AbstractConfigurationService,
 };
+use platform_user_profile_common::user_profile_service::UserProfileService as PlatformUserProfileService;
 use workbench_service_configuration_common::configuration_model::WorkspaceConfiguration;
 use workspace::Workspace;
 
@@ -20,22 +23,19 @@ pub struct WorkspaceConfigurationService {
 }
 
 impl WorkspaceConfigurationService {
-    pub fn new(
+    pub fn new<'a>(
         workspace: Workspace,
-        registry: Arc<ConfigurationRegistry>,
+        registry: &'a ConfigurationRegistry,
         policy_service: ConfigurationPolicyService,
+        user_configuration_resource: &PathBuf,
     ) -> Self {
-        let parser = ConfigurationParser::new(Arc::clone(&registry)); // TODO: platform ConfigurationParser?
+        let parser = ConfigurationParser::new(&registry); // TODO: platform ConfigurationParser?
 
-        let default_configuration = DefaultConfiguration::new(Arc::clone(&registry)); // TODO: use WorkspaceDefaultConfiguration
+        let default_configuration = DefaultConfiguration::new(&registry); // TODO: use WorkspaceDefaultConfiguration
         default_configuration.initialize();
 
-        // TODO: use UserDataProfileService
-        let config_file_path = &PathBuf::from(&format!(
-            "{}/.moss/settings.json",
-            std::env::var("HOME").unwrap()
-        ));
-        let user_configuration = UserConfiguration::new(config_file_path, Arc::new(parser));
+        let user_configuration =
+            UserConfiguration::new(user_configuration_resource, Arc::new(parser));
         let user_configuration_model = user_configuration
             .load_configuration()
             .context("failed to load user configuration model")
@@ -46,8 +46,7 @@ impl WorkspaceConfigurationService {
             .context("default was not initialized correctly")
             .unwrap();
 
-        let mut configuration_policy =
-            ConfigurationPolicy::new(Arc::clone(&registry), policy_service);
+        let mut configuration_policy = ConfigurationPolicy::new(&registry, policy_service);
         configuration_policy.initialize(&default_configuration);
 
         let policy_configuration_model = configuration_policy.get_model();

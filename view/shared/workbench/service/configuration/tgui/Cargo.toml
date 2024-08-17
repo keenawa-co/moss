@@ -12,5 +12,7 @@ serde_json.workspace = true
 
 workspace.workspace = true
 
+platform_user_profile_common.workspace = true
 platform_configuration_common.workspace = true
 workbench_service_configuration_common.workspace = true
+workbench_service_user_profile_tgui.workspace = true

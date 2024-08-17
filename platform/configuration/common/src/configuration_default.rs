@@ -7,13 +7,13 @@ use super::{
     configuration_registry::ConfigurationRegistry,
 };
 
-pub struct DefaultConfiguration {
+pub struct DefaultConfiguration<'a> {
     configuration_model: ArcSwapOption<ConfigurationModel>,
-    configuration_registry: Arc<ConfigurationRegistry>,
+    configuration_registry: &'a ConfigurationRegistry<'a>,
 }
 
-impl DefaultConfiguration {
-    pub fn new(registry: Arc<ConfigurationRegistry>) -> Self {
+impl<'a> DefaultConfiguration<'a> {
+    pub fn new(registry: &'a ConfigurationRegistry<'a>) -> Self {
         Self {
             configuration_model: ArcSwapOption::from(None),
             configuration_registry: registry,
@@ -29,13 +29,13 @@ impl DefaultConfiguration {
     }
 
     fn reset_configuration_model(&self) {
-        let properties = self.configuration_registry.get_configuration_properties();
+        let properties = self.configuration_registry.properties();
         let mut new_model = ConfigurationModel {
             content: Trie::new(),
             names: Vec::new(),
             overrides: self
                 .configuration_registry
-                .get_override_identifiers()
+                .override_identifiers()
                 .iter()
                 .cloned()
                 .collect(),

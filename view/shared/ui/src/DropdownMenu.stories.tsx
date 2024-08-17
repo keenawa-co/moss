@@ -21,11 +21,9 @@ import {
   DropdownMenuTrigger,
 } from "./DropdownMenu";
 
-import Icon from "./Icon";
-
 import { useState } from "react";
 
-const meta = {
+const meta: Meta<typeof DropdownMenu> = {
   title: "Shared/DropdownMenu",
   component: DropdownMenu,
   parameters: {
@@ -50,7 +48,7 @@ const meta = {
       </div>
     ),
   ],
-} satisfies Meta<typeof DropdownMenu>;
+};
 
 export default meta;
 type Story = StoryObj<typeof meta>;

@@ -8,7 +8,7 @@ members = [
     "kernel/bus",
     "kernel/fs",
 
-    "lib/moss_base",
+    "lib/moss_std",
 
     "lib/async_utl",
     "lib/seaorm_utl",
@@ -21,7 +21,8 @@ members = [
     "platform/window/tgui",
     "platform/formation/common",
     "platform/configuration/common",
-
+    "platform/user_profile/common",
+    "platform/environment/common",
 
     "platform/conf",
     "platform/pwd",
@@ -37,7 +38,8 @@ members = [
     "view/shared/workbench/tgui",
     "view/shared/workbench/service/configuration/common",
     "view/shared/workbench/service/configuration/tgui",
-
+    "view/shared/workbench/service/user_profile/tgui",
+    "view/shared/workbench/service/environment/tgui",
 
 ]
 
@@ -58,17 +60,21 @@ rustflags = ["-C", "target-cpu=native"]
 [workspace.dependencies]
 fs = { path = "kernel/fs" }
 
-moss_base = { path = "lib/moss_base" }
+moss_std = { path = "lib/moss_std" }
 
 base = { path = "platform/base" }
 
 platform_window_tgui = { path = "platform/window/tgui" }
 platform_configuration_common = { path = "platform/configuration/common" }
 platform_formation_common = { path = "platform/formation/common" }
+platform_user_profile_common = { path = "platform/user_profile/common" }
+platform_environment_common = { path = "platform/environment/common" }
 
 workbench_tgui = { path = "view/shared/workbench/tgui" }
 workbench_service_configuration_common = { path = "view/shared/workbench/service/configuration/common" }
 workbench_service_configuration_tgui = { path = "view/shared/workbench/service/configuration/tgui" }
+workbench_service_user_profile_tgui = { path = "view/shared/workbench/service/user_profile/tgui" }
+workbench_service_environment_tgui = { path = "view/shared/workbench/service/environment/tgui" }
 
 bus = { path = "kernel/bus" }
 mac = { path = "lib/mac" }
@@ -85,6 +91,8 @@ app = { path = "platform/app" }
 
 mossctl = { path = "mossctl" }
 net = { path = "net" }
+
+tauri = "2.0.0-rc"
 
 clap = "4.5.4"
 specta = "2.0.0-rc.20"
@@ -108,6 +116,8 @@ async-executor = "1.13"
 ctor = "0.2.8"
 strum = "0.26"
 lazy-regex = "3.2.0"
+dunce = "1.0.5"
+sysinfo = "0.31.2"
 
 tokio = "1"
 tokio-util = "0.7"
