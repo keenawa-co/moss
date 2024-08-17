@@ -1,5 +1,5 @@
 import type { ButtonHTMLAttributes } from "react";
-import { cn } from "../libs/utils";
+import { cn } from "@/components/window-controls/libs/utils";
 
 export function Button({ className, children, ...props }: ButtonHTMLAttributes<HTMLButtonElement>) {
   return (

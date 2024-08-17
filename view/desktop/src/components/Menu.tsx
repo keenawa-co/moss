@@ -1,10 +1,9 @@
 // TODO: Info
 // Trans component can also be used for translation
-import { Button } from "@/components";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Trans, useTranslation } from "react-i18next";
 import { NavLink } from "react-router-dom";
-import { LANGUAGES } from "../constants/index";
+import { LANGUAGES } from "@/constants/index";
 
 const isActive = ({ isActive }: any) => `link ${isActive ? "active" : ""}`;
 
@@ -40,9 +39,9 @@ export const Menu = () => {
   const themes = ["black", "orange", "purple", "green", "blue"];
   const [theme, setTheme] = useState<string>(themes[0]);
 
-  const switchTheme = (newTheme: string) => {
-    setTheme(newTheme);
-  };
+  //const switchTheme = (newTheme: string) => {
+  //  setTheme(newTheme);
+  //};
 
   const onChangeLTheme = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const newTheme = e.target.value;

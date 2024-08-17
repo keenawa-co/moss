@@ -1,8 +1,8 @@
 import { useContext, useEffect, useState, type HTMLProps } from "react";
-import { Icons } from "../components/icons";
-import { cn } from "../libs/utils";
-import { Button } from "../components/button";
-import { TauriAppWindowContext } from "../contexts";
+import { Icons } from "@/components/window-controls/components/icons";
+import { cn } from "@/components/window-controls/libs/utils";
+import { Button } from "@/components/window-controls/components/button";
+import { TauriAppWindowContext } from "@/components/window-controls/contexts";
 
 export function MacOS({ className, ...props }: HTMLProps<HTMLDivElement>) {
   const { minimizeWindow, maximizeWindow, fullscreenWindow, closeWindow } = useContext(TauriAppWindowContext);
