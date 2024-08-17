@@ -3,3 +3,4 @@ export * from "./MenuItem";
 export * from "./IconTitle";
 export * from "./Tooltip";
 export * from "./DropdownMenu";
+export * from "./Badge";
