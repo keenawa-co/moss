@@ -26,6 +26,12 @@ pnpm desktop
 pnpm desktop-web
 ```
 
+- Start SurrealDB:
+
+```sh
+pnpm sd
+```
+
 - Run storybook app:
 
 ```sh
