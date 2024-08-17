@@ -1,5 +1,5 @@
 {
-  "about": "About me",
+  "settings": "Settings",
   "home": "Home",
   "title": "Multi-language app",  
   "user": "My name is: {{name}}",

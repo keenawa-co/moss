@@ -1,6 +1,6 @@
 interface Resources {
   ns1: {
-    about: "Über mich";
+    settings: "Einstellungen";
     home: "Heim";
     title: "Mehrsprachige App";
     user: "Mein Name ist: {{name}}";

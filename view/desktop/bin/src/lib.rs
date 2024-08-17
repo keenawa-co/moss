@@ -170,6 +170,7 @@ impl DesktopMain {
             .expect("Failed to export typescript bindings");
 
         tauri::Builder::default()
+            .plugin(tauri_plugin_fs::init())
             .manage(AppState {
                 workbench: Workbench::new(service_group)?,
                 project_service: ProjectService::new(db.clone()),

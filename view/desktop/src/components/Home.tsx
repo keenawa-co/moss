@@ -60,7 +60,7 @@ export const Home: React.FC = () => {
   };
 
   return (
-    <main>
+    <main className={`theme-${localStorage.getItem("theme")}`}>
       <h1>{t("title")}</h1>
 
       {sessionInfo ? (
@@ -75,13 +75,16 @@ export const Home: React.FC = () => {
       <p>
         Workspace: <span className="bg-red-500 text-zinc-900"> {workbenchState}</span>
       </p>
+      <br />
 
       <button className="bg-red-500" onClick={handleRestoreSession}>
         Restore Session
       </button>
+      <br />
 
       <span>{t("description.part1")}</span>
-      <span>{t("description.part1", { ns: "ns2" })}</span>
+      <br />
+      <span className="bg-secondary">{t("description.part1", { ns: "ns2" })}</span>
       {data !== null && <p>Received data: {data}</p>}
 
       <div>
