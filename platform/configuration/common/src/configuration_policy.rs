@@ -10,15 +10,15 @@ use super::{
     policy::{PolicyDefinitionType, PolicyService},
 };
 
-pub struct ConfigurationPolicy {
+pub struct ConfigurationPolicy<'a> {
     model: ArcSwap<ConfigurationModel>,
-    registry: Arc<ConfigurationRegistry>,
+    registry: &'a ConfigurationRegistry<'a>,
     policy_service: ConfigurationPolicyService,
 }
 
-impl ConfigurationPolicy {
+impl<'a> ConfigurationPolicy<'a> {
     pub fn new(
-        registry: Arc<ConfigurationRegistry>,
+        registry: &'a ConfigurationRegistry<'a>,
         policy_service: ConfigurationPolicyService,
     ) -> Self {
         Self {
@@ -54,7 +54,7 @@ impl ConfigurationPolicy {
         &self,
         model: Arc<ConfigurationModel>,
     ) -> HashMap<String, &PropertyPolicy> {
-        let configuration_properties = self.registry.get_configuration_properties();
+        let configuration_properties = self.registry.properties();
         let mut property_policies = HashMap::new();
 
         for key in model.get_attribute_names() {

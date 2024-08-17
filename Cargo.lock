@@ -1769,6 +1769,7 @@ dependencies = [
  "tokio",
  "tracing",
  "workbench_service_configuration_tgui",
+ "workbench_service_environment_tgui",
  "workbench_tgui",
  "workspace",
 ]
@@ -1909,9 +1910,9 @@ dependencies = [
 
 [[package]]
 name = "dunce"
-version = "1.0.4"
+version = "1.0.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "56ce8c6da7551ec6c462cbaf3bfbc75131ebbfa1c944aeaa9dab51ca1c5f0c3b"
+checksum = "92773504d58c093f6de2459af4af33faa518c13451eb8f2b5698ed3d36e7c813"
 
 [[package]]
 name = "dyn-clone"
@@ -3933,9 +3934,10 @@ dependencies = [
 ]
 
 [[package]]
-name = "moss_base"
+name = "moss_std"
 version = "0.1.0"
 dependencies = [
+ "dunce",
  "hashbrown 0.14.5",
  "radix_trie",
 ]
@@ -4187,6 +4189,15 @@ dependencies = [
  "mio 0.8.11",
  "walkdir",
  "windows-sys 0.48.0",
+]
+
+[[package]]
+name = "ntapi"
+version = "0.4.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e8a3895c6391c39d7fe7ebc444a87eb2991b2a0bc718fdabd071eec617fc68e4"
+dependencies = [
+ "winapi",
 ]
 
 [[package]]
@@ -5014,7 +5025,7 @@ dependencies = [
  "base",
  "hashbrown 0.14.5",
  "lazy-regex",
- "moss_base",
+ "moss_std",
  "parking_lot",
  "radix_trie",
  "schemars",
@@ -5025,6 +5036,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "platform_environment_common"
+version = "0.1.0"
+
+[[package]]
 name = "platform_formation_common"
 version = "0.1.0"
 dependencies = [
@@ -5032,8 +5047,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "platform_user_profile_common"
+version = "0.1.0"
+
+[[package]]
 name = "platform_window_tgui"
 version = "0.1.0"
+dependencies = [
+ "sysinfo",
+]
 
 [[package]]
 name = "plist"
@@ -7307,6 +7329,20 @@ dependencies = [
 ]
 
 [[package]]
+name = "sysinfo"
+version = "0.31.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d4115055da5f572fff541dd0c4e61b0262977f453cc9fe04be83aba25a89bdab"
+dependencies = [
+ "core-foundation-sys",
+ "libc",
+ "memchr",
+ "ntapi",
+ "rayon",
+ "windows 0.57.0",
+]
+
+[[package]]
 name = "system-configuration"
 version = "0.5.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -9147,9 +9183,25 @@ dependencies = [
  "anyhow",
  "async-trait",
  "platform_configuration_common",
+ "platform_user_profile_common",
  "serde_json",
  "workbench_service_configuration_common",
+ "workbench_service_user_profile_tgui",
  "workspace",
+]
+
+[[package]]
+name = "workbench_service_environment_tgui"
+version = "0.1.0"
+dependencies = [
+ "platform_environment_common",
+]
+
+[[package]]
+name = "workbench_service_user_profile_tgui"
+version = "0.1.0"
+dependencies = [
+ "platform_user_profile_common",
 ]
 
 [[package]]
@@ -9157,11 +9209,19 @@ name = "workbench_tgui"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "hashbrown 0.14.5",
+ "lazy_static",
  "platform_configuration_common",
  "platform_formation_common",
+ "platform_user_profile_common",
  "serde",
+ "serde_json",
  "specta",
+ "tauri",
  "workbench_service_configuration_tgui",
+ "workbench_service_environment_tgui",
+ "workbench_service_user_profile_tgui",
+ "workspace",
 ]
 
 [[package]]

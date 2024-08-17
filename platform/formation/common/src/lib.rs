@@ -1,1 +1,1 @@
-pub mod service_group;
+pub mod service_registry;

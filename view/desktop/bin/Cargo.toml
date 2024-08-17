@@ -30,6 +30,7 @@ platform_formation_common.workspace = true
 
 workbench_tgui.workspace = true
 workbench_service_configuration_tgui.workspace = true
+workbench_service_environment_tgui.workspace = true
 
 surrealdb = { workspace = true, features = ["kv-rocksdb"] }
 strum = { workspace = true, features = ["derive"] }
@@ -38,7 +39,7 @@ serde_json.workspace = true
 serde = { workspace = true, features = ["derive"] }
 hashbrown = { workspace = true, features = ["serde"] }
 
-tauri = { version = "2.0.0-rc", features = ["macos-private-api"] }
+tauri = { workspace = true, features = ["macos-private-api"] }
 tauri-plugin-shell = "2.0.0-rc"
 tauri-plugin-os = "2.0.0-rc.0"
 

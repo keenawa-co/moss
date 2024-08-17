@@ -1,4 +1,5 @@
 {
+  "window.defaultWidth": 800,
   "window.restoreTab": true,
   "window.restoreFullScreen": false,
   "[mossql]": {

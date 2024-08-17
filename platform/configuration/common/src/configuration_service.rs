@@ -19,24 +19,24 @@ use super::{
     AbstractConfigurationService,
 };
 
-pub struct ConfigurationService {
-    default_configuration: DefaultConfiguration,
-    user_configuration: UserConfiguration,
+pub struct ConfigurationService<'a> {
+    default_configuration: DefaultConfiguration<'a>,
+    user_configuration: UserConfiguration<'a>,
     configuration: Configuration,
     configuration_editing: ConfigurationEditingService,
-    configuration_policy: ConfigurationPolicy,
+    configuration_policy: ConfigurationPolicy<'a>,
 }
 
-impl ConfigurationService {
+impl<'a> ConfigurationService<'a> {
     pub fn new(
-        registry: Arc<ConfigurationRegistry>,
+        registry: &'a ConfigurationRegistry<'a>,
         policy_service: ConfigurationPolicyService,
         config_file_path: &PathBuf,
     ) -> Result<Self> {
-        let parser = ConfigurationParser::new(Arc::clone(&registry));
+        let parser = ConfigurationParser::new(&registry);
         let user_configuration = UserConfiguration::new(config_file_path, Arc::new(parser));
 
-        let default_configuration = DefaultConfiguration::new(Arc::clone(&registry));
+        let default_configuration = DefaultConfiguration::new(&registry);
         default_configuration.initialize();
 
         let user_configuration_model = user_configuration
@@ -47,8 +47,7 @@ impl ConfigurationService {
             .context("failed to get default configuration model".to_string())
             .context("default was not initialized correctly")?;
 
-        let mut configuration_policy =
-            ConfigurationPolicy::new(Arc::clone(&registry), policy_service);
+        let mut configuration_policy = ConfigurationPolicy::new(&registry, policy_service);
         configuration_policy.initialize(&default_configuration);
 
         let policy_configuration_model = configuration_policy.get_model();
@@ -113,7 +112,7 @@ impl ConfigurationService {
 }
 
 #[async_trait]
-impl AbstractConfigurationService for ConfigurationService {
+impl<'a> AbstractConfigurationService for ConfigurationService<'a> {
     fn get_value(&self, attribute_name: AttributeName) -> Option<Value> {
         self.configuration.get_value(&attribute_name)
     }

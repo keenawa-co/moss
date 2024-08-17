@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 use hashbrown::{HashMap, HashSet};
 use lazy_regex::Regex as LazyRegex;
-use moss_base::collection::MaybeExtend;
+use moss_std::collection::MaybeExtend;
 use serde_json::Value;
 
 type Regex = LazyRegex;
@@ -277,15 +277,15 @@ pub struct ConfigurationPropertySchema {
     pub description: Option<String>,
     /// Indicates if the configuration property is protected from contributions by extensions.
     /// If true, the property cannot be overridden by contributions.
-    pub protected_from_contribution: Option<bool>,
+    pub protected_from_contribution: bool,
     /// Specifies if the configuration property is allowed only for restricted sources.
     /// If true, the property can only be set by trusted sources.
-    pub allow_for_only_restricted_source: Option<bool>,
+    pub allow_for_only_restricted_source: bool,
     /// Indicates if the configuration property is included in the registry.
     /// If false, the property is excluded from the configuration registry.
-    pub schemable: Option<bool>,
+    pub included: bool,
     /// Indicates that a property is deprecated.
-    pub deprecated: Option<bool>,
+    pub deprecated: bool,
     /// Tags associated with the property:
     /// - For filtering
     /// - Use `experimental` to mark property as experimental.
@@ -341,10 +341,10 @@ impl Default for ConfigurationPropertySchema {
             order: None,
             default: Some(default_default_value),
             description: None,
-            protected_from_contribution: Some(false),
-            allow_for_only_restricted_source: Some(false),
-            schemable: Some(true),
-            deprecated: Some(false),
+            protected_from_contribution: false,
+            allow_for_only_restricted_source: false,
+            included: true,
+            deprecated: false,
             tags: None,
             policy: None,
             max_properties: None,
@@ -381,7 +381,7 @@ pub struct ConfigurationNode {
     /// The order in which the configuration node appears.
     pub order: Option<usize>,
     /// The type of the configuration node.
-    pub r#type: Option<ConfigurationNodeType>,
+    pub typ: Option<ConfigurationNodeType>,
     /// The title of the configuration node.
     pub title: Option<String>,
     /// The description of the configuration node.
@@ -414,8 +414,8 @@ pub struct RegisteredConfigurationPropertySchema {
 }
 
 impl RegisteredConfigurationPropertySchema {
-    pub fn is_protected(&self) -> bool {
-        self.schema.protected_from_contribution.unwrap_or(false)
+    pub fn is_protected_from_contribution(&self) -> bool {
+        self.schema.protected_from_contribution
     }
 }
 
@@ -500,19 +500,7 @@ impl ConfigurationSchemaStorage {
 
 /// Registry to manage configurations and their schemas.
 #[derive(Debug)]
-pub struct ConfigurationRegistry {
-    #[allow(unused)] // Designed for future expansion
-    /// List of registered default configurations.
-    /// These configurations define standard default values for various settings that can be
-    /// overridden by users or other configurations.
-    registered_configuration_defaults: Vec<ConfigurationDefaults>,
-
-    #[allow(unused)] // Designed for future expansion
-    /// Map of configuration default overrides.
-    /// This hashmap stores overridden default values for configuration properties, indexed by their keys.
-    /// Overrides can come from different sources and can change the default values defined in `registered_configuration_defaults`.
-    configuration_defaults_overrides: HashMap<String, ConfigurationDefaultOverrideValue>,
-
+pub struct ConfigurationRegistry<'a> {
     /// Map of configuration properties.
     /// This hashmap stores the properties of configurations, indexed by their keys.
     /// Each property includes metadata such as type, scope, default values, and descriptions.
@@ -521,12 +509,12 @@ pub struct ConfigurationRegistry {
     /// List of configuration nodes contributed.
     /// This map contains all configuration nodes that have been registered to the registry.
     /// Configuration nodes can include multiple properties and sub-nodes.
-    contributors: HashMap<String, Arc<ConfigurationNode>>,
+    contributors: HashMap<String, &'a ConfigurationNode>,
 
     /// Set of override identifiers.
     /// This set contains identifiers that are used to specify configurations that can override default values.
     /// Override identifiers are used to create specialized settings for different scopes or contexts.
-    overrides: HashSet<String>,
+    override_identifiers: HashSet<String>,
 
     /// Storage for configuration schemas.
     /// This structure stores the schema definitions for all settings, organized by their scope (e.g., platform, machine, window, resource).
@@ -539,38 +527,32 @@ pub struct ConfigurationRegistry {
     excluded_properties: HashMap<String, RegisteredConfigurationPropertySchema>,
 }
 
-impl ConfigurationRegistry {
+impl<'a> ConfigurationRegistry<'a> {
     pub fn new() -> Self {
         Self {
-            registered_configuration_defaults: Vec::new(),
             properties: HashMap::new(),
             contributors: HashMap::new(),
-            configuration_defaults_overrides: HashMap::new(),
-            overrides: HashSet::new(),
+            override_identifiers: HashSet::new(),
             schema_storage: ConfigurationSchemaStorage::empty(),
             excluded_properties: HashMap::new(),
         }
     }
 
-    pub fn get_configuration_properties(
-        &self,
-    ) -> &HashMap<String, RegisteredConfigurationPropertySchema> {
+    pub fn properties(&self) -> &HashMap<String, RegisteredConfigurationPropertySchema> {
         &self.properties
     }
 
-    pub fn get_excluded_configuration_properties(
-        &self,
-    ) -> &HashMap<String, RegisteredConfigurationPropertySchema> {
+    pub fn excluded_properties(&self) -> &HashMap<String, RegisteredConfigurationPropertySchema> {
         &self.excluded_properties
     }
 
-    pub fn get_override_identifiers(&self) -> &HashSet<String> {
-        &self.overrides
+    pub fn override_identifiers(&self) -> &HashSet<String> {
+        &self.override_identifiers
     }
 
-    pub fn register_configuration(&mut self, configuration: ConfigurationNode) {
+    pub fn register_configuration(&mut self, configuration: &'a ConfigurationNode) {
         self.contributors
-            .insert(configuration.id.clone(), Arc::new(configuration.clone()));
+            .insert(configuration.id.clone(), configuration);
         self.register_json_configuration(&configuration);
 
         let _properties = self.do_configuration_registration(&configuration, false);
@@ -594,7 +576,8 @@ impl ConfigurationRegistry {
             .unwrap_or(PropertyMap::new());
 
         // TODO: validate incoming override identifiers before extend
-        self.overrides.extend(node_properties.overrides.clone());
+        self.override_identifiers
+            .extend(node_properties.overrides.clone());
 
         for (key, property) in &node_properties {
             if validate && !self.validate_property(&property) {
@@ -609,7 +592,7 @@ impl ConfigurationRegistry {
             } else {
                 property_schema.scope = Some(node_scope_or_default.clone());
                 property_schema.allow_for_only_restricted_source =
-                    Some(property.allow_for_only_restricted_source.unwrap_or(false));
+                    property.allow_for_only_restricted_source;
             }
 
             let registered_property = RegisteredConfigurationPropertySchema::new(
@@ -617,7 +600,7 @@ impl ConfigurationRegistry {
                 configuration.source.clone(),
             );
 
-            if property.schemable.unwrap_or(true) {
+            if property.included {
                 self.properties.insert(key.clone(), registered_property);
             } else {
                 self.excluded_properties
@@ -643,7 +626,7 @@ impl ConfigurationRegistry {
     fn register_json_configuration(&mut self, configuration: &ConfigurationNode) {
         if let Some(properties) = &configuration.properties {
             for (key, property) in properties {
-                if property.schemable.unwrap_or(true) {
+                if property.included {
                     self.schema_storage.update_schema(key, property);
                 }
             }
