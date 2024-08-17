@@ -6,6 +6,7 @@ pub enum WorkspaceId {
     Some(String),
 }
 
+#[derive(Debug)]
 pub struct Workspace {
     pub id: WorkspaceId,
     pub folders: Vec<String>,

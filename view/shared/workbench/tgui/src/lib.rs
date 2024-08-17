@@ -8,9 +8,12 @@ use platform_configuration_common::{
     configuration_registry::ConfigurationRegistry, AbstractConfigurationService,
 };
 use platform_formation_common::service_registry::ServiceRegistry;
+use platform_user_profile_common::user_profile_service::UserProfileService as PlatformUserProfileService;
 use specta::Type;
 use tauri::WebviewWindow;
 use workbench_service_configuration_tgui::configuration_service::WorkspaceConfigurationService;
+use workbench_service_environment_tgui::environment_service::NativeEnvironmentService;
+use workbench_service_user_profile_tgui::user_profile_service::UserProfileService;
 use workbench_tgui_contrib::WORKBENCH_TGUI_WINDOW;
 use workspace::{Workspace, WorkspaceId};
 
@@ -87,10 +90,17 @@ impl<'a> Workbench<'a> {
             },
         };
 
+        let nes = self
+            .service_registry
+            .get_unchecked::<NativeEnvironmentService>();
+
+        let user_profile_service = UserProfileService::new(nes.user_home_dir().clone()).unwrap();
+
         let workspace_configuration_service = WorkspaceConfigurationService::new(
             workspace,
             &self.configuration_registry,
             configuration_policy_service,
+            &user_profile_service.default_profile().settings_resource,
         );
 
         self.service_registry

@@ -23,6 +23,7 @@ use std::sync::Arc;
 use surrealdb::{engine::remote::ws::Ws, Surreal};
 use tauri::{App, AppHandle, Emitter, Manager, State};
 use tauri_specta::{collect_commands, collect_events};
+use workbench_service_environment_tgui::environment_service::NativeEnvironmentService;
 use workbench_tgui::{Workbench, WorkbenchState};
 use workspace::WorkspaceId;
 
@@ -102,12 +103,13 @@ impl MockStorageService {
     }
 }
 
-pub struct DesktopMain {
-    native_window_configuration: NativeWindowConfiguration,
+pub struct DesktopMain<'a> {
+    native_window_configuration: NativeWindowConfiguration<'a>,
 }
 
-impl DesktopMain {
-    pub fn new(configuration: NativeWindowConfiguration) -> Self {
+impl<'a> DesktopMain<'a> {
+    pub fn new(configuration: NativeWindowConfiguration<'a>) -> Self {
+        dbg!(&configuration);
         Self {
             native_window_configuration: configuration,
         }
@@ -216,7 +218,11 @@ impl DesktopMain {
 
         let storage_service = MockStorageService::new();
 
+        let environment_service =
+            NativeEnvironmentService::new(&self.native_window_configuration.home_dir);
+
         service_group.insert(storage_service);
+        service_group.insert(environment_service);
 
         Ok(service_group)
     }

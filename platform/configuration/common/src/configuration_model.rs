@@ -427,8 +427,6 @@ impl Configuration {
     pub fn get_value(&self, attribute_name: &AttributeName) -> Option<Value> {
         let consolidated_model = self.get_consolidated_configuration();
 
-        dbg!(&consolidated_model);
-
         consolidated_model.get_value(attribute_name).cloned()
     }
 
