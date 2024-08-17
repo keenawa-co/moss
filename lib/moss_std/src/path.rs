@@ -50,6 +50,8 @@ pub fn normalize(path: impl AsRef<Path>) -> PathBuf {
 
                 #[cfg(windows)]
                 {
+                    use std::fs;
+
                     let new_path = ret.join(c);
                     if let Ok(metadata) = fs::symlink_metadata(&new_path) {
                         if metadata.file_type().is_symlink() {
