@@ -1,8 +1,4 @@
-use std::{
-    borrow::Cow,
-    ffi::OsString,
-    path::{Component, Path, PathBuf, MAIN_SEPARATOR_STR},
-};
+use std::path::{Component, Path, PathBuf};
 
 /// Normalizes a given file path by removing redundant components such as `.` and `..`,
 /// handling symbolic links correctly, and simplifying the path according to the operating system's rules.

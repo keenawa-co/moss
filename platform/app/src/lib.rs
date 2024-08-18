@@ -1,17 +1,9 @@
-// pub mod context;
 pub mod context_compact;
 pub mod context_model;
-pub mod event;
-
 mod executor;
-// mod platform;
 
-// use context::{AppCell, AppContext};
 use context_compact::{AppCellCompact, AppContextCompact};
-use std::{
-    cell::{RefMut},
-    rc::Rc,
-};
+use std::{cell::RefMut, rc::Rc};
 
 #[macro_use]
 extern crate anyhow;
