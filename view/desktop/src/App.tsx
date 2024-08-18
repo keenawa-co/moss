@@ -20,6 +20,7 @@ enum IconState {
 
 type Theme = {
   name: string;
+  type: string;
   colors: {
     primary: string;
     secondary: string;
@@ -28,7 +29,7 @@ type Theme = {
 };
 
 let themes = await readThemeDirectories();
-if (themes.length === 0) {
+if (themes.length > 0) {
   console.dir(themes);
 }
 
