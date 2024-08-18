@@ -1,3 +1,4 @@
 pub mod collection;
-pub mod mac;
-pub mod path;
+pub mod exec;
+pub mod fmt;
+pub mod os;
