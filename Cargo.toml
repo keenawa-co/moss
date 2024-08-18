@@ -7,13 +7,11 @@ members = [
     "lib/async_utl",
 
 
-    "platform/base",
-    "platform/window/tgui",
-    "platform/formation/common",
-    "platform/configuration/common",
-    "platform/user_profile/common",
-    "platform/environment/common",
-
+    "platform/formation",
+    "platform/configuration",
+    "platform/user_profile",
+    "platform/environment",
+    "platform/utl",
     "platform/workspace",
     "platform/app",
 
@@ -43,13 +41,12 @@ fs = { path = "kernel/fs" }
 
 moss_std = { path = "lib/moss_std" }
 
-base = { path = "platform/base" }
-
-platform_window_tgui = { path = "platform/window/tgui" }
-platform_configuration_common = { path = "platform/configuration/common" }
-platform_formation_common = { path = "platform/formation/common" }
-platform_user_profile_common = { path = "platform/user_profile/common" }
-platform_environment_common = { path = "platform/environment/common" }
+platform_utl = { path = "platform/utl" }
+platform_configuration = { path = "platform/configuration" }
+platform_formation = { path = "platform/formation" }
+platform_user_profile = { path = "platform/user_profile" }
+platform_environment = { path = "platform/environment" }
+platform_workspace = { path = "platform/workspace" }
 
 workbench_tgui = { path = "view/shared/workbench/tgui" }
 workbench_service_configuration_common = { path = "view/shared/workbench/service/configuration/common" }
@@ -59,7 +56,7 @@ workbench_service_environment_tgui = { path = "view/shared/workbench/service/env
 
 async_utl = { path = "lib/async_utl" }
 project = { path = "platform/project" }
-workspace = { path = "platform/workspace" }
+
 app = { path = "platform/app" }
 
 tauri = "2.0.0-rc"

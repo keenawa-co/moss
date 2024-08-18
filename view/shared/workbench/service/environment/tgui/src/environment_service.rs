@@ -1,6 +1,6 @@
 use std::path::PathBuf;
 
-use platform_environment_common::environment_model::Environment;
+use platform_environment::environment_model::Environment;
 
 pub struct NativeEnvironmentService {
     user_home_dir: PathBuf,

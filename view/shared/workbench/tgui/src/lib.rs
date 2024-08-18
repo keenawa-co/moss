@@ -1,21 +1,22 @@
-pub mod workbench_tgui_contrib;
+pub mod contribution;
+pub mod window;
 
-use std::{borrow::BorrowMut, cell::RefCell, path::PathBuf, sync::Arc};
+use std::{borrow::BorrowMut, path::PathBuf};
 
 use anyhow::Result;
-use platform_configuration_common::{
+use contribution::WORKBENCH_TGUI_WINDOW;
+use platform_configuration::{
     attribute_name, configuration_policy::ConfigurationPolicyService,
     configuration_registry::ConfigurationRegistry, AbstractConfigurationService,
 };
-use platform_formation_common::service_registry::ServiceRegistry;
-use platform_user_profile_common::user_profile_service::UserProfileService as PlatformUserProfileService;
+use platform_formation::service_registry::ServiceRegistry;
+use platform_user_profile::user_profile_service::UserProfileService as PlatformUserProfileService;
+use platform_workspace::{Workspace, WorkspaceId};
 use specta::Type;
 use tauri::WebviewWindow;
 use workbench_service_configuration_tgui::configuration_service::WorkspaceConfigurationService;
 use workbench_service_environment_tgui::environment_service::NativeEnvironmentService;
 use workbench_service_user_profile_tgui::user_profile_service::UserProfileService;
-use workbench_tgui_contrib::WORKBENCH_TGUI_WINDOW;
-use workspace::{Workspace, WorkspaceId};
 
 #[macro_use]
 extern crate serde;
@@ -68,7 +69,7 @@ impl<'a> Workbench<'a> {
 
         let configuration_policy_service = ConfigurationPolicyService {
             definitions: {
-                use platform_configuration_common::policy::PolicyDefinitionType;
+                use platform_configuration::policy::PolicyDefinitionType;
 
                 let mut this = hashbrown::HashMap::new();
 

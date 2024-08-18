@@ -548,18 +548,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "base"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "async-task",
- "async-trait",
- "flume",
- "once_cell",
- "smol",
-]
-
-[[package]]
 name = "base64"
 version = "0.21.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1425,9 +1413,9 @@ dependencies = [
  "macos-trampoline",
  "mimalloc",
  "parking_lot",
- "platform_configuration_common",
- "platform_formation_common",
- "platform_window_tgui",
+ "platform_configuration",
+ "platform_formation",
+ "platform_workspace",
  "serde",
  "serde_json",
  "specta",
@@ -1444,7 +1432,6 @@ dependencies = [
  "workbench_service_configuration_tgui",
  "workbench_service_environment_tgui",
  "workbench_tgui",
- "workspace",
 ]
 
 [[package]]
@@ -4346,17 +4333,17 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d231b230927b5e4ad203db57bbcbee2802f6bce620b1e4a9024a07d94e2907ec"
 
 [[package]]
-name = "platform_configuration_common"
+name = "platform_configuration"
 version = "0.1.0"
 dependencies = [
  "anyhow",
  "arc-swap",
  "async-trait",
- "base",
  "hashbrown 0.14.5",
  "lazy-regex",
  "moss_std",
  "parking_lot",
+ "platform_utl",
  "radix_trie",
  "serde",
  "serde_json",
@@ -4365,26 +4352,35 @@ dependencies = [
 ]
 
 [[package]]
-name = "platform_environment_common"
+name = "platform_environment"
 version = "0.1.0"
 
 [[package]]
-name = "platform_formation_common"
+name = "platform_formation"
 version = "0.1.0"
 dependencies = [
  "fnv",
 ]
 
 [[package]]
-name = "platform_user_profile_common"
+name = "platform_user_profile"
 version = "0.1.0"
 
 [[package]]
-name = "platform_window_tgui"
+name = "platform_utl"
 version = "0.1.0"
 dependencies = [
- "sysinfo",
+ "anyhow",
+ "async-task",
+ "async-trait",
+ "flume",
+ "once_cell",
+ "smol",
 ]
+
+[[package]]
+name = "platform_workspace"
+version = "0.1.0"
 
 [[package]]
 name = "plist"
@@ -7872,7 +7868,7 @@ dependencies = [
 name = "workbench_service_configuration_common"
 version = "0.1.0"
 dependencies = [
- "platform_configuration_common",
+ "platform_configuration",
  "serde_json",
 ]
 
@@ -7882,26 +7878,26 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "async-trait",
- "platform_configuration_common",
- "platform_user_profile_common",
+ "platform_configuration",
+ "platform_user_profile",
+ "platform_workspace",
  "serde_json",
  "workbench_service_configuration_common",
  "workbench_service_user_profile_tgui",
- "workspace",
 ]
 
 [[package]]
 name = "workbench_service_environment_tgui"
 version = "0.1.0"
 dependencies = [
- "platform_environment_common",
+ "platform_environment",
 ]
 
 [[package]]
 name = "workbench_service_user_profile_tgui"
 version = "0.1.0"
 dependencies = [
- "platform_user_profile_common",
+ "platform_user_profile",
 ]
 
 [[package]]
@@ -7911,22 +7907,19 @@ dependencies = [
  "anyhow",
  "hashbrown 0.14.5",
  "lazy_static",
- "platform_configuration_common",
- "platform_formation_common",
- "platform_user_profile_common",
+ "platform_configuration",
+ "platform_formation",
+ "platform_user_profile",
+ "platform_workspace",
  "serde",
  "serde_json",
  "specta",
+ "sysinfo",
  "tauri",
  "workbench_service_configuration_tgui",
  "workbench_service_environment_tgui",
  "workbench_service_user_profile_tgui",
- "workspace",
 ]
-
-[[package]]
-name = "workspace"
-version = "0.1.0"
 
 [[package]]
 name = "wry"

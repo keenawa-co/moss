@@ -1,4 +1,4 @@
-use platform_configuration_common::{
+use platform_configuration::{
     configuration_registry::{
         ConfigurationNode, ConfigurationNodeType as Type,
         ConfigurationPropertySchema as PropertySchema, PropertyMap,

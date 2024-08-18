@@ -1,5 +1,5 @@
 [package]
-name = "platform_configuration_common"
+name = "platform_configuration"
 version = "0.1.0"
 edition = "2021"
 
@@ -7,7 +7,7 @@ edition = "2021"
 
 [dependencies]
 moss_std.workspace = true
-base.workspace = true
+platform_utl.workspace = true
 parking_lot.workspace = true
 lazy-regex.workspace = true
 async-trait.workspace = true

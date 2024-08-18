@@ -1,5 +1,5 @@
 [package]
-name = "platform_environment_common"
+name = "platform_user_profile"
 version = "0.1.0"
 edition = "2021"
 
