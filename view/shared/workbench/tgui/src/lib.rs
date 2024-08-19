@@ -1,7 +1,7 @@
 pub mod contribution;
 pub mod window;
 
-use std::{borrow::BorrowMut, path::PathBuf};
+use std::{borrow::BorrowMut, path::PathBuf, sync::Arc};
 
 use anyhow::Result;
 use contribution::WORKBENCH_TGUI_WINDOW;
@@ -10,6 +10,9 @@ use platform_configuration::{
     configuration_registry::ConfigurationRegistry, AbstractConfigurationService,
 };
 use platform_formation::service_registry::ServiceRegistry;
+use platform_fs::disk::file_system_service::{
+    AbstractDiskFileSystemService, DiskFileSystemService,
+};
 use platform_user_profile::user_profile_service::UserProfileService as PlatformUserProfileService;
 use platform_workspace::{Workspace, WorkspaceId};
 use specta::Type;
@@ -51,8 +54,8 @@ impl<'a> Workbench<'a> {
         })
     }
 
-    pub fn initialize(&mut self) -> Result<()> {
-        self.initialize_services()?;
+    pub async fn initialize(&mut self) -> Result<()> {
+        self.initialize_services().await?;
 
         let config_service = self
             .service_registry
@@ -64,7 +67,7 @@ impl<'a> Workbench<'a> {
         Ok(())
     }
 
-    fn initialize_services(&mut self) -> Result<()> {
+    async fn initialize_services(&mut self) -> Result<()> {
         let workspace = self.restore_workspace();
 
         let configuration_policy_service = ConfigurationPolicyService {
@@ -91,11 +94,18 @@ impl<'a> Workbench<'a> {
             },
         };
 
-        let nes = self
+        let fs_service = self
+            .service_registry
+            .get_unchecked::<Arc<DiskFileSystemService>>();
+        let environment_service = self
             .service_registry
             .get_unchecked::<NativeEnvironmentService>();
 
-        let user_profile_service = UserProfileService::new(nes.user_home_dir().clone()).unwrap();
+        let user_profile_service = UserProfileService::new(
+            environment_service.user_home_dir().clone(),
+            Arc::clone(&fs_service) as Arc<dyn AbstractDiskFileSystemService>,
+        )
+        .await?;
 
         let workspace_configuration_service = WorkspaceConfigurationService::new(
             workspace,
