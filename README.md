@@ -36,8 +36,7 @@ sudo apt install libsoup-3.0-dev
 - Before running any applications, ensure that SurrealDB is started:
 
 ```sh
-cd ./view/desktop/
-surreal start file:rocksdb
+cd ./view/desktop/ && surreal start file:rocksdb
 ```
 
 - Run all apps:
@@ -80,51 +79,6 @@ pnpm doc
 
 ```sh
 pnpm turbo run build --graph
-```
-
-## What's inside?
-
-### Project Folder Structure
-
-The Moss project is organized into several key directories, each serving a distinct purpose in the development process. Below is a detailed description of the folder structure:
-
-```
-platform
-│
-├── view
-│   ├── docs
-│   │   └── Documentation website built with [Docusaurus](https://docusaurus.io/). This site hosts the project documentation.
-│   │
-│   ├── storybook
-│   │   └── [Storybook](https://storybook.js.org/) setup for developing and showcasing UI components in isolation.
-│   │
-│   ├── shared
-│       ├── ui
-│       │   └── Shared UI components such as buttons, texts, and other reusable elements.
-│       │
-│       ├── web
-│       │   └── Web application code.
-│       │
-│       └── desktop
-│           └── Desktop application code. The desktop app is built with TypeScript and [Tauri](https://tauri.app/).
-│
-├── platform
-│   └── Backend code for the Moss platform.
-│
-├── kernel
-│   └── Rust abstractions over OS kernel functions, such as filesystem (fs) and bus operations. (CONFIRMED)
-│
-├── lib
-│   └── **(Pending Confirmation)**: The exact purpose of this directory is unclear and requires further clarification.
-│
-├── mossctl
-│   └── **(Pending Confirmation)**: The exact role of this directory is unclear and needs further clarification.
-│
-├── net
-│   └── This directory contains Rust networking functions (CONFIRM!!)
-│
-└── src
-    └── Rust entry point for the application.
 ```
 
 ### Key Notes:
