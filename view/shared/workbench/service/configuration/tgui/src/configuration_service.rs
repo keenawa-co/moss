@@ -1,10 +1,6 @@
-use std::io;
-use std::rc::Rc;
-use std::{path::PathBuf, sync::Arc};
-
 use anyhow::Context;
 use anyhow::Result;
-use platform_configuration_common::{
+use platform_configuration::{
     configuration_default::DefaultConfiguration,
     configuration_model::{
         AttributeName, ConfigurationModel, ConfigurationParser, UserConfiguration,
@@ -13,9 +9,9 @@ use platform_configuration_common::{
     configuration_registry::ConfigurationRegistry,
     AbstractConfigurationService,
 };
-use platform_user_profile_common::user_profile_service::UserProfileService as PlatformUserProfileService;
+use platform_workspace::Workspace;
+use std::{path::PathBuf, sync::Arc};
 use workbench_service_configuration_common::configuration_model::WorkspaceConfiguration;
-use workspace::Workspace;
 
 pub struct WorkspaceConfigurationService {
     workspace: Workspace,

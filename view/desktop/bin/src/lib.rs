@@ -5,17 +5,8 @@ pub mod service;
 
 use anyhow::Result;
 use app::context_compact::AppContextCompact;
-use platform_configuration_common::configuration_registry::{
-    ConfigurationNode, ConfigurationPropertySchema, ConfigurationRegistry,
-};
-use platform_configuration_common::{
-    configuration_registry::{
-        ConfigurationNodeType, ConfigurationScope, ConfigurationSource, PropertyMap, PropertyPolicy,
-    },
-    property_key,
-};
-use platform_formation_common::service_registry::ServiceRegistry;
-use platform_window_tgui::window::NativeWindowConfiguration;
+use platform_formation::service_registry::ServiceRegistry;
+use platform_workspace::WorkspaceId;
 use service::project_service::ProjectService;
 use service::session_service::SessionService;
 use std::env;
@@ -24,8 +15,8 @@ use surrealdb::{engine::remote::ws::Ws, Surreal};
 use tauri::{App, AppHandle, Emitter, Manager, State};
 use tauri_specta::{collect_commands, collect_events};
 use workbench_service_environment_tgui::environment_service::NativeEnvironmentService;
+use workbench_tgui::window::NativeWindowConfiguration;
 use workbench_tgui::{Workbench, WorkbenchState};
-use workspace::WorkspaceId;
 
 use crate::service::{
     project_service::{CreateProjectInput, ProjectDTO},

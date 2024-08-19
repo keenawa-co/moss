@@ -1,5 +1,5 @@
-use platform_user_profile_common::user_profile_service::UserProfileService as PlatformUserProfileService;
-use platform_user_profile_common::UserProfile;
+use platform_user_profile::user_profile_service::UserProfileService as PlatformUserProfileService;
+use platform_user_profile::UserProfile;
 use std::{
     fs::{self, File},
     io,

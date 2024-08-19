@@ -1,37 +1,16 @@
-[package]
-name = "moss"
-version = "0.1.0"
-edition = "2021"
-
 [workspace]
 members = [
-    "kernel/bus",
     "kernel/fs",
 
     "lib/moss_std",
 
-    "lib/async_utl",
-    "lib/seaorm_utl",
-    "lib/graphql_mac",
-    "lib/graphql_utl",
-    "lib/mac",
-    "lib/types",
-
-    "platform/base",
-    "platform/window/tgui",
-    "platform/formation/common",
-    "platform/configuration/common",
-    "platform/user_profile/common",
-    "platform/environment/common",
-
-    "platform/conf",
-    "platform/pwd",
+    "platform/formation",
+    "platform/configuration",
+    "platform/user_profile",
+    "platform/environment",
+    "platform/utl",
     "platform/workspace",
-    "platform/project",
     "platform/app",
-
-    "mossctl",
-    "net",
 
     "view/desktop/bin",
 
@@ -40,35 +19,30 @@ members = [
     "view/shared/workbench/service/configuration/tgui",
     "view/shared/workbench/service/user_profile/tgui",
     "view/shared/workbench/service/environment/tgui",
-
 ]
 
-# [profile.release]
-# This makes the compiled code faster and smaller, but it makes 
-# compiling slower, so it's only enabled in release mode.
-# lto = false
-# opt-level = 3
-# panic = "abort"
-# codegen-units = 1
+[profile.dev]
+split-debuginfo = "unpacked"
+debug = "limited"
+codegen-units = 16
 
-[profile.dev.package.sqlx-macros]
-opt-level = 3
+[profile.release]
+debug = "limited"
+lto = "thin"
+codegen-units = 1
 
-[build]
-rustflags = ["-C", "target-cpu=native"]
 
 [workspace.dependencies]
 fs = { path = "kernel/fs" }
 
 moss_std = { path = "lib/moss_std" }
 
-base = { path = "platform/base" }
-
-platform_window_tgui = { path = "platform/window/tgui" }
-platform_configuration_common = { path = "platform/configuration/common" }
-platform_formation_common = { path = "platform/formation/common" }
-platform_user_profile_common = { path = "platform/user_profile/common" }
-platform_environment_common = { path = "platform/environment/common" }
+platform_utl = { path = "platform/utl" }
+platform_configuration = { path = "platform/configuration" }
+platform_formation = { path = "platform/formation" }
+platform_user_profile = { path = "platform/user_profile" }
+platform_environment = { path = "platform/environment" }
+platform_workspace = { path = "platform/workspace" }
 
 workbench_tgui = { path = "view/shared/workbench/tgui" }
 workbench_service_configuration_common = { path = "view/shared/workbench/service/configuration/common" }
@@ -76,99 +50,45 @@ workbench_service_configuration_tgui = { path = "view/shared/workbench/service/c
 workbench_service_user_profile_tgui = { path = "view/shared/workbench/service/user_profile/tgui" }
 workbench_service_environment_tgui = { path = "view/shared/workbench/service/environment/tgui" }
 
-bus = { path = "kernel/bus" }
-mac = { path = "lib/mac" }
-async_utl = { path = "lib/async_utl" }
-seaorm_utl = { path = "lib/seaorm_utl" }
-graphql_utl = { path = "lib/graphql_utl" }
-graphql_mac = { path = "lib/graphql_mac" }
-types = { path = "lib/types" }
-conf = { path = "platform/conf" }
-pwd = { path = "platform/pwd" }
 project = { path = "platform/project" }
-workspace = { path = "platform/workspace" }
+
 app = { path = "platform/app" }
 
-mossctl = { path = "mossctl" }
-net = { path = "net" }
-
 tauri = "2.0.0-rc"
-
-clap = "4.5.4"
 specta = "2.0.0-rc.20"
 libc = "0.2.155"
 fnv = "1.0.7"
 thiserror = "1.0"
 anyhow = "1.0"
-bitflags = "2.5.0"
 chrono = "0.4"
 notify = "6.1.1"
-url = "2.5.0"
 nanoid = "0.4"
 hashbrown = "0.14.5"
 ahash = "0.8.11"
-sha2 = "0.10.8"
 arc-swap = "1.7.1"
 radix_trie = "0.2.1"
 parking_lot = "0.12.3"
 derive_more = "0.99.17"
 async-executor = "1.13"
-ctor = "0.2.8"
 strum = "0.26"
 lazy-regex = "3.2.0"
 dunce = "1.0.5"
 sysinfo = "0.31.2"
-
 tokio = "1"
 tokio-util = "0.7"
 tokio-stream = "0.1.15"
 async-stream = "0.3.5"
 smol = "2.0.0"
-
 futures = "0.3"
-futures-util = "0.3"
 async-task = "4.7.1"
 flume = "0.11.0"
-
 serde = "1.0"
 serde_json = "1.0"
-serde_with = "3.9.0"
-jsonpath_lib = "0.3.0"
-toml = "0.8.12"
-schemars = "0.8.21"
-
 async-trait = "0.1"
 once_cell = "1.19"
 lazy_static = "1.4.0"
-
 surrealdb = "1.5.3"
-
 tracing = "0.1"
 opentelemetry = "0.22.0"
 tracing-opentelemetry = "0.23.0"
 tracing-subscriber = "0.3.18"
-
-sea-orm = "0.12"
-sea-orm-migration = "0.12.0"
-
-async-graphql = "7.0"
-graphql-parser = "0.4.0"
-
-axum = "0.7"
-async-graphql-axum = "7.0"
-axum-server = "0.6"
-tower = "0.4"
-tower-http = "0.5.2"
-http = "1.1.0"
-jsonwebtoken = "9.3.0"
-
-[dependencies]
-project.workspace = true
-mossctl.workspace = true
-anyhow.workspace = true
-app.workspace = true
-once_cell.workspace = true
-tokio = { workspace = true, features = ["full"] }
-
-[target.'cfg(any(target_os = "linux", target_os = "macos"))'.dependencies]
-mimalloc = { version = "0.1.39", default-features = false }

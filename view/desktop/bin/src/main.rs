@@ -3,8 +3,8 @@
 
 use app::{context_compact::AppContextCompact, AppCompact};
 use app_lib::DesktopMain;
-use platform_window_tgui::window::{NativeWindowConfiguration, PlatformInfo};
 use tracing::error;
+use workbench_tgui::window::{NativePlatformInfo, NativeWindowConfiguration};
 
 fn main() {
     AppCompact::new().run(|ctx: &mut AppContextCompact| {
@@ -15,7 +15,7 @@ fn main() {
         let configuration = NativeWindowConfiguration {
             home_dir,
             full_screen: false,
-            platform_info: PlatformInfo::new(),
+            platform_info: NativePlatformInfo::new(),
         };
 
         if let Err(err) = DesktopMain::new(configuration).open(ctx) {
