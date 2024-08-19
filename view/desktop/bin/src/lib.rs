@@ -10,6 +10,7 @@ use platform_fs::disk::file_system_service::DiskFileSystemService;
 use platform_workspace::WorkspaceId;
 use service::project_service::ProjectService;
 use service::session_service::SessionService;
+use std::borrow::Cow;
 use std::env;
 use std::sync::Arc;
 use surrealdb::{engine::remote::ws::Ws, Surreal};
@@ -210,14 +211,14 @@ impl<'a> DesktopMain<'a> {
         Ok(())
     }
 
-    fn initialize_service_registry(&self) -> Result<ServiceRegistry> {
+    fn initialize_service_registry(&'a self) -> Result<ServiceRegistry> {
         let mut service_registry = ServiceRegistry::new();
 
         let mock_storage_service = MockStorageService::new();
 
         let fs_service = DiskFileSystemService::new();
         let environment_service =
-            NativeEnvironmentService::new(&self.native_window_configuration.home_dir);
+            NativeEnvironmentService::new(self.native_window_configuration.home_dir.clone());
 
         service_registry.insert(mock_storage_service);
         service_registry.insert(environment_service);

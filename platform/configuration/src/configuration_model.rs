@@ -3,9 +3,10 @@ use arc_swap::{ArcSwap, ArcSwapOption};
 use hashbrown::{HashMap, HashSet};
 use lazy_regex::{Lazy, Regex};
 use moss_std::collection::Extend;
+use platform_fs::disk::file_system_service::AbstractDiskFileSystemService;
 use radix_trie::{Trie, TrieCommon};
 use serde_json::Value;
-use std::{fs::File, io::Read, path::PathBuf, sync::Arc};
+use std::{io::Read, path::PathBuf, sync::Arc};
 
 use super::configuration_registry::ConfigurationRegistry;
 
@@ -125,19 +126,26 @@ macro_rules! attribute_name {
 // - Use a PolicyService
 pub struct UserConfiguration<'a> {
     parser: Arc<ConfigurationParser<'a>>,
-    resource: PathBuf,
+    resource: &'a PathBuf,
+
+    fs_service: Arc<dyn AbstractDiskFileSystemService>,
 }
 
 impl<'a> UserConfiguration<'a> {
-    pub fn new(file_path: &PathBuf, content_parser: Arc<ConfigurationParser<'a>>) -> Self {
+    pub fn new(
+        file_path: &'a PathBuf,
+        content_parser: Arc<ConfigurationParser<'a>>,
+        fs_service: Arc<dyn AbstractDiskFileSystemService>,
+    ) -> Self {
         Self {
             parser: content_parser,
-            resource: file_path.clone(),
+            resource: file_path,
+            fs_service,
         }
     }
 
-    pub fn load_configuration(&self) -> Result<ConfigurationModel> {
-        let mut file = File::open(&self.resource)?;
+    pub async fn load_configuration(&self) -> Result<ConfigurationModel> {
+        let mut file = self.fs_service.read_file(&self.resource).await?;
         let mut content = String::new();
         file.read_to_string(&mut content)?;
 

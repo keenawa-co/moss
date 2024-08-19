@@ -7560,6 +7560,7 @@ dependencies = [
  "anyhow",
  "async-trait",
  "platform_configuration",
+ "platform_fs",
  "platform_user_profile",
  "platform_workspace",
  "serde_json",

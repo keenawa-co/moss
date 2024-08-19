@@ -110,6 +110,7 @@ impl AbstractFileSystemService for DiskFileSystemService {
         Ok(())
     }
 
+    // OPTIMIZE: read with cursor
     async fn read_file(&self, path: &PathBuf) -> Result<Box<dyn io::Read>> {
         Ok(Box::new(std::fs::File::open(path)?))
     }

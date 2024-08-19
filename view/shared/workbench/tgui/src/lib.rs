@@ -112,7 +112,9 @@ impl<'a> Workbench<'a> {
             &self.configuration_registry,
             configuration_policy_service,
             &user_profile_service.default_profile().settings_resource,
-        );
+            Arc::clone(&fs_service) as Arc<dyn AbstractDiskFileSystemService>,
+        )
+        .await;
 
         self.service_registry
             .insert(workspace_configuration_service);
