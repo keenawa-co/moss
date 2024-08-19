@@ -1,6 +1,10 @@
 # Moss
 
 - [Contributing](#contributing)
+- [Requirements](#requirements)
+- [Usage](#usage)
+- [Project Folder Structure](#project-folder-structure)
+- [Key Notes](#key-notes)
 
 ## Contributing
 
