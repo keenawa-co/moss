@@ -1,10 +1,10 @@
 use anyhow::Context;
 use anyhow::Result;
+use platform_configuration::configuration_parser::ConfigurationParser;
+use platform_configuration::user_settings::UserSettings;
 use platform_configuration::{
     configuration_default::DefaultConfiguration,
-    configuration_model::{
-        AttributeName, ConfigurationModel, ConfigurationParser, UserConfiguration,
-    },
+    configuration_model::{AttributeName, ConfigurationModel},
     configuration_policy::{ConfigurationPolicy, ConfigurationPolicyService},
     configuration_registry::ConfigurationRegistry,
     AbstractConfigurationService,
@@ -33,7 +33,7 @@ impl WorkspaceConfigurationService {
         default_configuration.initialize();
 
         let user_configuration =
-            UserConfiguration::new(user_configuration_resource, Arc::new(parser), fs_service);
+            UserSettings::new(user_configuration_resource, Arc::new(parser), fs_service);
         let user_configuration_model = user_configuration
             .load_configuration()
             .await

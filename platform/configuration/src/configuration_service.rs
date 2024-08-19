@@ -10,11 +10,11 @@ use std::{
     sync::Arc,
 };
 
+use crate::{configuration_parser::ConfigurationParser, user_settings::UserSettings};
+
 use super::{
     configuration_default::DefaultConfiguration,
-    configuration_model::{
-        AttributeName, Configuration, ConfigurationModel, ConfigurationParser, UserConfiguration,
-    },
+    configuration_model::{AttributeName, Configuration, ConfigurationModel},
     configuration_policy::{ConfigurationPolicy, ConfigurationPolicyService},
     configuration_registry::ConfigurationRegistry,
     AbstractConfigurationService,
@@ -22,7 +22,7 @@ use super::{
 
 pub struct ConfigurationService<'a> {
     default_configuration: DefaultConfiguration<'a>,
-    user_configuration: UserConfiguration<'a>,
+    user_configuration: UserSettings<'a>,
     configuration: Configuration,
     configuration_editing: ConfigurationEditingService,
     configuration_policy: ConfigurationPolicy<'a>,
@@ -36,8 +36,7 @@ impl<'a> ConfigurationService<'a> {
         fs_service: Arc<dyn AbstractDiskFileSystemService>,
     ) -> Result<Self> {
         let parser = ConfigurationParser::new(&registry);
-        let user_configuration =
-            UserConfiguration::new(config_file_path, Arc::new(parser), fs_service);
+        let user_configuration = UserSettings::new(config_file_path, Arc::new(parser), fs_service);
 
         let default_configuration = DefaultConfiguration::new(&registry);
         default_configuration.initialize();
