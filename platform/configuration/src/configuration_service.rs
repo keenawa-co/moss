@@ -1,5 +1,6 @@
 use anyhow::{Context as AnyhowContext, Result};
 use lazy_regex::Lazy;
+use platform_fs::disk::file_system_service::AbstractDiskFileSystemService;
 use platform_utl::queue::{thread_backend::ThreadBackend, Processor, Queue};
 use serde_json::Value;
 use std::{
@@ -9,11 +10,11 @@ use std::{
     sync::Arc,
 };
 
+use crate::{configuration_parser::ConfigurationParser, user_settings::UserSettings};
+
 use super::{
     configuration_default::DefaultConfiguration,
-    configuration_model::{
-        AttributeName, Configuration, ConfigurationModel, ConfigurationParser, UserConfiguration,
-    },
+    configuration_model::{AttributeName, Configuration, ConfigurationModel},
     configuration_policy::{ConfigurationPolicy, ConfigurationPolicyService},
     configuration_registry::ConfigurationRegistry,
     AbstractConfigurationService,
@@ -21,26 +22,28 @@ use super::{
 
 pub struct ConfigurationService<'a> {
     default_configuration: DefaultConfiguration<'a>,
-    user_configuration: UserConfiguration<'a>,
+    user_configuration: UserSettings<'a>,
     configuration: Configuration,
     configuration_editing: ConfigurationEditingService,
     configuration_policy: ConfigurationPolicy<'a>,
 }
 
 impl<'a> ConfigurationService<'a> {
-    pub fn new(
+    pub async fn new(
         registry: &'a ConfigurationRegistry<'a>,
         policy_service: ConfigurationPolicyService,
-        config_file_path: &PathBuf,
+        config_file_path: &'a PathBuf,
+        fs_service: Arc<dyn AbstractDiskFileSystemService>,
     ) -> Result<Self> {
         let parser = ConfigurationParser::new(&registry);
-        let user_configuration = UserConfiguration::new(config_file_path, Arc::new(parser));
+        let user_configuration = UserSettings::new(config_file_path, Arc::new(parser), fs_service);
 
         let default_configuration = DefaultConfiguration::new(&registry);
         default_configuration.initialize();
 
         let user_configuration_model = user_configuration
             .load_configuration()
+            .await
             .context("failed to load user configuration model")?;
         let default_configuration_model = default_configuration
             .get_configuration_model()
@@ -71,10 +74,11 @@ impl<'a> ConfigurationService<'a> {
         })
     }
 
-    fn reload_configuration(&self) -> Result<()> {
+    async fn reload_configuration(&self) -> Result<()> {
         let user_configuration_model = self
             .user_configuration
             .load_configuration()
+            .await
             .context("failed to load user configuration model")?;
 
         // TODO: use the resulting difference to identify and notify those parts of the application whose configurations have changed
@@ -124,7 +128,7 @@ impl<'a> AbstractConfigurationService for ConfigurationService<'a> {
         // - Check if the setting being changed is a USER level setting
 
         self.do_update_value(&attribute_name, value).await?;
-        Ok(self.reload_configuration()?)
+        Ok(self.reload_configuration().await?)
     }
 }
 

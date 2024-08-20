@@ -1,9 +1,11 @@
 pub mod configuration_default;
 pub mod configuration_model;
+pub mod configuration_parser;
 pub mod configuration_policy;
 pub mod configuration_registry;
 pub mod configuration_service;
 pub mod policy;
+pub mod user_settings;
 
 #[macro_use]
 extern crate anyhow;

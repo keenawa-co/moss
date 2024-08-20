@@ -7,7 +7,10 @@ edition = "2021"
 
 [dependencies]
 moss_std.workspace = true
+
 platform_utl.workspace = true
+platform_fs = { workspace = true, features = ["disk"] }
+
 parking_lot.workspace = true
 lazy-regex.workspace = true
 async-trait.workspace = true

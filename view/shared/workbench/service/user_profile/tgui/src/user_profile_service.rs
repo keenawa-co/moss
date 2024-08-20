@@ -1,57 +1,80 @@
-use platform_user_profile::user_profile_service::UserProfileService as PlatformUserProfileService;
-use platform_user_profile::UserProfile;
-use std::{
-    fs::{self, File},
-    io,
-    path::PathBuf,
+use anyhow::Result;
+use arc_swap::ArcSwap;
+use platform_fs::{
+    common::file_system_service::CreateOptions,
+    disk::file_system_service::AbstractDiskFileSystemService,
 };
+use platform_user_profile::user_profile_service::UserProfile;
+use platform_user_profile::user_profile_service::UserProfileService as PlatformUserProfileService;
+use std::path::PathBuf;
+use std::sync::Arc;
 
-// TODO: use fs service
 pub struct UserProfileService {
-    default_profile: UserProfile,
+    default_profile: Arc<UserProfile>,
+    current_profile: ArcSwap<UserProfile>,
+
+    fs_service: Arc<dyn AbstractDiskFileSystemService>,
 }
 
 impl UserProfileService {
-    pub fn new(home_dir: PathBuf) -> io::Result<Self> {
+    pub async fn new(
+        home_dir: PathBuf,
+        fs_service: Arc<dyn AbstractDiskFileSystemService>,
+    ) -> Result<Self> {
         let config_dir = home_dir.join(".config").join("moss");
 
         let settings_resource = config_dir
             .join("user")
             .join("default")
             .join("settings.json");
-        if !settings_resource.exists() {
+
+        if fs_service.file_exists(&settings_resource).await {
             if let Some(parent) = settings_resource.parent() {
-                fs::create_dir_all(parent)?;
+                fs_service.create_dir(&parent.to_path_buf()).await?;
             }
 
-            File::create(&settings_resource)?;
+            fs_service
+                .create_file(
+                    &settings_resource,
+                    CreateOptions {
+                        overwrite: true,
+                        ignore_if_exists: false,
+                    },
+                )
+                .await?;
         }
 
+        let default_profile = Arc::new(UserProfile {
+            home: home_dir,
+            settings_resource,
+        });
+
         Ok(Self {
-            default_profile: UserProfile {
-                home: home_dir,
-                settings_resource,
-            },
+            default_profile: Arc::clone(&default_profile),
+            current_profile: ArcSwap::new(Arc::clone(&default_profile)),
+            fs_service,
         })
     }
 }
 
+#[async_trait]
 impl<'a> PlatformUserProfileService<'a> for UserProfileService {
-    type Error = io::Error;
-
     fn default_profile(&'a self) -> &'a UserProfile {
         &self.default_profile
     }
 
-    fn create_profile(&self, home: std::path::PathBuf) -> Result<UserProfile, Self::Error> {
+    async fn create_profile(&self, _home: &PathBuf) -> Result<UserProfile> {
         todo!()
     }
 
-    fn delete_profile(&self) -> Result<(), Self::Error> {
+    async fn delete_profile(&self) -> Result<()> {
         todo!()
     }
 
-    fn cleanup(&self) -> Result<(), Self::Error> {
-        todo!()
+    async fn cleanup(&self) -> Result<()> {
+        Ok(self
+            .fs_service
+            .truncate_file(&self.current_profile.load().settings_resource)
+            .await?)
     }
 }

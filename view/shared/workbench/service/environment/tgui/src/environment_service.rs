@@ -8,7 +8,7 @@ pub struct NativeEnvironmentService {
 }
 
 impl NativeEnvironmentService {
-    pub fn new(home_dir: &PathBuf) -> Self {
+    pub fn new(home_dir: PathBuf) -> Self {
         let config_dir = home_dir.join(".config").join("moss");
 
         let platform_environment = Environment {
@@ -22,7 +22,7 @@ impl NativeEnvironmentService {
         };
 
         Self {
-            user_home_dir: home_dir.clone(),
+            user_home_dir: home_dir,
             platform_environment,
         }
     }
