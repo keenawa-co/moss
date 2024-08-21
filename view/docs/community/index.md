@@ -2,7 +2,7 @@
 sidebar_position: 1
 ---
 
-# Overwiew
+# Overview
 
 Community docs are located in `view/docs/community`
 
