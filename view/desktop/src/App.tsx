@@ -20,10 +20,12 @@ enum IconState {
 
 function App() {
   const myRef = useRef<ImperativePanelGroupHandle>(null);
+
   return (
     <>
       <RootLayout>
         <TitleBar />
+
         <ResizablePanelGroup
           direction="horizontal"
           autoSaveId="RootLayout"
@@ -87,7 +89,6 @@ function App() {
 
           <ResizableHandle
             onDoubleClick={() => {
-              console.log(myRef.current);
               myRef.current?.setLayout([14.5, 100 - 14.5]);
             }}
           />
