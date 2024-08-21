@@ -48,13 +48,13 @@ const ResizableHandle = React.forwardRef<
         data-[panel-group-direction=vertical]:after:translate-x-0 
         [&[data-panel-group-direction=vertical]>div]:rotate-90
 
-      data-[resize-handle-state=hover]:bg-blue-400
-      
-      data-[panel-group-direction=vertical][data-resize-handle-state=drag]:w-full 
-      data-[panel-group-direction=vertical][data-resize-handle-state=drag]:h-[3px] 
+        data-[resize-handle-state=hover]:bg-blue-400
+        
+        data-[panel-group-direction=vertical][data-resize-handle-state=drag]:w-full 
+        data-[panel-group-direction=vertical][data-resize-handle-state=drag]:h-[3px] 
 
-      data-[panel-group-direction=horizontal][data-resize-handle-state=drag]:w-[3px] 
-      data-[panel-group-direction=horizontal][data-resize-handle-state=drag]:bg-blue-400
+        data-[panel-group-direction=horizontal][data-resize-handle-state=drag]:w-[3px] 
+        data-[panel-group-direction=horizontal][data-resize-handle-state=drag]:bg-blue-400
     `,
         className
       )}
