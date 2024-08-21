@@ -6,7 +6,7 @@ import "@repo/ui/src/fonts.css";
 import { Icon, MenuItem, IconTitle } from "@repo/ui";
 import { twMerge } from "tailwind-merge";
 import StatusBar from "@/components/StatusBar";
-import { ResizablePanel, ResizablePanelGroup, ResizableHandle } from "./components/Resizable";
+import { ResizablePanel, ResizablePanelGroup, ResizableHandle } from "./components/ResizablePanel";
 import { ImperativePanelGroupHandle } from "react-resizable-panels";
 
 enum IconState {

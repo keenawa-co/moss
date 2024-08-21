@@ -1,12 +1,12 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "./Resizable";
+import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "./ResizablePanel";
 import { render } from "react-dom";
 
 // api reference https://github.com/bvaughn/react-resizable-panels/tree/main/packages/react-resizable-panels#props
 // more examples https://react-resizable-panels.vercel.app/
 
 const meta = {
-  title: "desktop/Resizable",
+  title: "desktop/ResizablePanel",
   component: ResizablePanelGroup,
   tags: ["autodocs"],
   parameters: {
