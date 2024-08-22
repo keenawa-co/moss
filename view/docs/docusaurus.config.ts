@@ -58,6 +58,7 @@ const config: Config = {
         sidebarPath: "./sidebars.ts",
       },
     ],
+    // NOTE: commented-out code left as an example
     // [
     //   "@docusaurus/plugin-content-docs",
     //   {
@@ -76,6 +77,7 @@ const config: Config = {
         src: "img/logo.svg",
       },
       items: [
+        // NOTE: commented-out code left as an example
         // {
         //   type: "docSidebar",
         //   sidebarId: "tutorialSidebar",
@@ -102,6 +104,7 @@ const config: Config = {
             },
           ],
         },
+        // NOTE: commented-out code left as an example
         // {
         //   title: "Community",
         //   items: [
