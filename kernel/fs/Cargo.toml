@@ -9,7 +9,6 @@ libc.workspace = true
 anyhow.workspace = true
 async-trait.workspace = true
 futures.workspace = true
-bus.workspace = true
 tokio = { workspace = true, features = ["full", "sync"] }
 smol.workspace = true
 notify.workspace = true

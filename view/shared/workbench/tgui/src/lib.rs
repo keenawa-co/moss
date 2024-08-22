@@ -1,21 +1,25 @@
-pub mod workbench_tgui_contrib;
+pub mod contribution;
+pub mod window;
 
-use std::{borrow::BorrowMut, cell::RefCell, path::PathBuf, sync::Arc};
+use std::{borrow::BorrowMut, path::PathBuf, sync::Arc};
 
 use anyhow::Result;
-use platform_configuration_common::{
+use contribution::WORKBENCH_TGUI_WINDOW;
+use platform_configuration::{
     attribute_name, configuration_policy::ConfigurationPolicyService,
     configuration_registry::ConfigurationRegistry, AbstractConfigurationService,
 };
-use platform_formation_common::service_registry::ServiceRegistry;
-use platform_user_profile_common::user_profile_service::UserProfileService as PlatformUserProfileService;
+use platform_formation::service_registry::ServiceRegistry;
+use platform_fs::disk::file_system_service::{
+    AbstractDiskFileSystemService, DiskFileSystemService,
+};
+use platform_user_profile::user_profile_service::UserProfileService as PlatformUserProfileService;
+use platform_workspace::{Workspace, WorkspaceId};
 use specta::Type;
 use tauri::WebviewWindow;
 use workbench_service_configuration_tgui::configuration_service::WorkspaceConfigurationService;
 use workbench_service_environment_tgui::environment_service::NativeEnvironmentService;
 use workbench_service_user_profile_tgui::user_profile_service::UserProfileService;
-use workbench_tgui_contrib::WORKBENCH_TGUI_WINDOW;
-use workspace::{Workspace, WorkspaceId};
 
 #[macro_use]
 extern crate serde;
@@ -50,8 +54,8 @@ impl<'a> Workbench<'a> {
         })
     }
 
-    pub fn initialize(&mut self) -> Result<()> {
-        self.initialize_services()?;
+    pub async fn initialize(&mut self) -> Result<()> {
+        self.initialize_services().await?;
 
         let config_service = self
             .service_registry
@@ -63,12 +67,12 @@ impl<'a> Workbench<'a> {
         Ok(())
     }
 
-    fn initialize_services(&mut self) -> Result<()> {
+    async fn initialize_services(&mut self) -> Result<()> {
         let workspace = self.restore_workspace();
 
         let configuration_policy_service = ConfigurationPolicyService {
             definitions: {
-                use platform_configuration_common::policy::PolicyDefinitionType;
+                use platform_configuration::policy::PolicyDefinitionType;
 
                 let mut this = hashbrown::HashMap::new();
 
@@ -90,18 +94,27 @@ impl<'a> Workbench<'a> {
             },
         };
 
-        let nes = self
+        let fs_service = self
+            .service_registry
+            .get_unchecked::<Arc<DiskFileSystemService>>();
+        let environment_service = self
             .service_registry
             .get_unchecked::<NativeEnvironmentService>();
 
-        let user_profile_service = UserProfileService::new(nes.user_home_dir().clone()).unwrap();
+        let user_profile_service = UserProfileService::new(
+            environment_service.user_home_dir().clone(),
+            Arc::clone(&fs_service) as Arc<dyn AbstractDiskFileSystemService>,
+        )
+        .await?;
 
         let workspace_configuration_service = WorkspaceConfigurationService::new(
             workspace,
             &self.configuration_registry,
             configuration_policy_service,
             &user_profile_service.default_profile().settings_resource,
-        );
+            Arc::clone(&fs_service) as Arc<dyn AbstractDiskFileSystemService>,
+        )
+        .await;
 
         self.service_registry
             .insert(workspace_configuration_service);

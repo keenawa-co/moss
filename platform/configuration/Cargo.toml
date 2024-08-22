@@ -1,0 +1,24 @@
+[package]
+name = "platform_configuration"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+moss_std.workspace = true
+
+platform_utl.workspace = true
+platform_fs = { workspace = true, features = ["disk"] }
+
+parking_lot.workspace = true
+lazy-regex.workspace = true
+async-trait.workspace = true
+anyhow.workspace = true
+arc-swap.workspace = true
+tracing.workspace = true
+hashbrown = { workspace = true, features = ["serde"] }
+serde = { workspace = true, features = ["derive"] }
+serde_json.workspace = true
+tokio = { workspace = true, features = [] }
+radix_trie.workspace = true

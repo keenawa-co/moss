@@ -6,4 +6,9 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-platform_user_profile_common.workspace = true
+anyhow.workspace = true
+async-trait.workspace = true
+arc-swap.workspace = true
+
+platform_user_profile.workspace = true
+platform_fs.workspace = true

@@ -1,9 +1,9 @@
 use std::sync::Arc;
 
-use platform_configuration_common::configuration_model::{
+use platform_configuration::configuration_model::{
     AttributeName, Configuration as PlatformConfiguration, ConfigurationModel,
-    ConfigurationParser as PlatformConfigurationParser,
 };
+use platform_configuration::configuration_parser::ConfigurationParser as PlatformConfigurationParser;
 use serde_json::Value;
 
 pub struct WorkspaceConfigurationParser<'a> {

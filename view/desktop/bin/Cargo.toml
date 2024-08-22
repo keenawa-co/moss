@@ -19,14 +19,14 @@ tauri-build = { version = "2.0.0-rc", features = [] }
 futures.workspace = true
 anyhow.workspace = true
 app.workspace = true
-workspace.workspace = true
 
 parking_lot.workspace = true
 tracing.workspace = true
 
-platform_window_tgui.workspace = true
-platform_configuration_common.workspace = true
-platform_formation_common.workspace = true
+platform_workspace.workspace = true
+platform_configuration.workspace = true
+platform_formation.workspace = true
+platform_fs.workspace = true
 
 workbench_tgui.workspace = true
 workbench_service_configuration_tgui.workspace = true

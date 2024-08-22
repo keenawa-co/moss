@@ -8,4 +8,4 @@ edition = "2021"
 [dependencies]
 serde_json.workspace = true
 
-platform_configuration_common.workspace = true
+platform_configuration.workspace = true

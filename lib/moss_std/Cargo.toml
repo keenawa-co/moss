@@ -8,3 +8,4 @@ edition = "2021"
 hashbrown = { workspace = true, features = [] }
 radix_trie.workspace = true
 dunce.workspace = true
+async-trait.workspace = true
