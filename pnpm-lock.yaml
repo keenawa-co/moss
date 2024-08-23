@@ -47,9 +47,6 @@ importers:
       '@tauri-apps/plugin-shell':
         specifier: '>=2.0.0-rc.0'
         version: 2.0.0-rc.0
-      deepmerge:
-        specifier: ^4.3.1
-        version: 4.3.1
       install:
         specifier: ^0.13.0
         version: 0.13.0
@@ -265,6 +262,9 @@ importers:
       clsx:
         specifier: ^2.1.1
         version: 2.1.1
+      deepmerge:
+        specifier: ^4.3.1
+        version: 4.3.1
       lucide-react:
         specifier: ^0.418.0
         version: 0.418.0(react@18.3.1)

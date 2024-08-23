@@ -41,7 +41,6 @@ export default function ThemeProvider(props: Props) {
     props.updateRGBOnChange ? [themeRGB] : []
   );
 
-  // Converts the theme from RGB to Hex
   const convertThemeRGBToHex = useCallback((): IThemeColors => {
     const hexThemeRGB: IThemeColors = {};
     Object.keys(themeRGB).forEach((key) => {

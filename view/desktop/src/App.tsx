@@ -1,17 +1,12 @@
 import { Settings, Content, TitleBar, Home, Menu, RootLayout, Sidebar } from "@/components";
-import ThemeProvider from "@/components/tailwind/context";
 import { Suspense, useState } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import "@/i18n";
 import "@repo/ui/src/fonts.css";
-import { Icon, MenuItem, IconTitle } from "@repo/ui";
 import { twMerge } from "tailwind-merge";
 import StatusBar from "@/components/StatusBar";
 
-import { IThemeRGB } from "@/components/tailwind/types";
-import { tailwindColorTheme as lightTheme } from "@/components/tailwind/theme/light/colors";
-import { tailwindColorTheme as darkTheme } from "@/components/tailwind/theme/dark/colors";
-import { tailwindColorTheme as testTheme } from "@/components/tailwind/theme/test/colors";
+import { Icon, MenuItem, IconTitle, IThemeRGB, ThemeProvider, lightTheme, darkTheme, testTheme } from "@repo/ui";
 
 enum IconState {
   Default = "group-text-primary",

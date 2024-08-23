@@ -11,6 +11,19 @@ const extendedTailwindColors = {
 };
 
 export const staticColors = {
+  olive: {
+    50: "#FAF9E0",
+    100: "#F5F2C2",
+    200: "#EBE586",
+    300: "#E0D849",
+    400: "#D7CF1A",
+    500: "#C0B60B",
+    600: "#A39B09",
+    700: "#807707",
+    800: "#5D5405",
+    900: "#3A3203",
+    950: "#1A1A00",
+  },
   coral: {
     50: "#FFE2D9",
     400: "#FF7042",

@@ -1,5 +1,4 @@
-// TODO: Info
-// Trans component can also be used for translation
+// FIXME: Trans component can also be used for translation
 import { Trans, useTranslation } from "react-i18next";
 import { NavLink } from "react-router-dom";
 import { LANGUAGES } from "@/constants/index";
@@ -7,37 +6,12 @@ import { LANGUAGES } from "@/constants/index";
 const isActive = ({ isActive }: any) => `link ${isActive ? "active" : ""}`;
 
 export const Menu = () => {
-  // Translation
   const { i18n, t } = useTranslation();
 
   const onChangeLang = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const lang_code = e.target.value;
     i18n.changeLanguage(lang_code);
   };
-
-  /* Dark Mode
-  const [darkMode, setDarkMode] = useState<boolean | undefined>(undefined)
-
-  const switchMode = () => {
-    setDarkMode(!darkMode)
-  }
-
-  useEffect(() => {
-    if (darkMode) {
-      localStorage.setItem('darkMode', 'true')
-      window.document.documentElement.classList.add('dark')
-    } else if (darkMode === false) {
-      localStorage.setItem('darkMode', 'false')
-      window.document.documentElement.classList.remove('dark')
-    } else {
-      setDarkMode(localStorage.getItem('darkMode') === 'true')
-    }
-  }, [darkMode])
-  */
-
-  //const switchTheme = (newTheme: string) => {
-  //  setTheme(newTheme);
-  //};
 
   return (
     <nav>

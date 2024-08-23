@@ -1,16 +1,14 @@
+import type { Config } from "tailwindcss";
 import sharedConfig from "@repo/tailwind-config";
 import tailwindTypography from "@tailwindcss/typography";
-import { mergeConfig } from "./src/components/tailwind/mergeConfig";
 
-const config = mergeConfig({
-  content: ["./src/**/*.{js,ts,jsx,tsx,css}", "../shared/ui/src/**/*.{js,ts,jsx,tsx,mdx,css}"],
+const config: Pick<Config, "content" | "presets" | "theme" | "plugins"> = {
+  content: ["./src/**/*.{js,ts,jsx,tsx}", "../shared/ui/src/**/*.{js,ts,jsx,tsx,mdx}"],
   presets: [sharedConfig],
   theme: {
-    extend: {
-      //transitionProperty: { width: "width" },
-    },
+    extend: {},
   },
   plugins: [tailwindTypography],
-});
+};
 
 export default config;
