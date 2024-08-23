@@ -3,3 +3,5 @@ export const LANGUAGES = [
   { label: "Deutsche", code: "de" },
   { label: "Русский", code: "ru" },
 ];
+
+export const THEMES = ["light", "dark", "test"];

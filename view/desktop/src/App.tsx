@@ -7,6 +7,7 @@ import { twMerge } from "tailwind-merge";
 import StatusBar from "@/components/StatusBar";
 import { getTheme } from "@/utils";
 import { Icon, MenuItem, IconTitle, ThemeProvider } from "@repo/ui";
+import { THEMES } from "@/constants/index";
 
 enum IconState {
   Default = "group-text-primary",
@@ -18,10 +19,9 @@ enum IconState {
 }
 
 function App() {
-  const themes = ["light", "dark", "test"];
   const [theme, setTheme] = useState<string>(() => {
     const savedTheme = localStorage.getItem("theme");
-    return savedTheme && themes.includes(savedTheme) ? savedTheme : themes[0];
+    return savedTheme && THEMES.includes(savedTheme) ? savedTheme : THEMES[0];
   });
 
   useEffect(() => {
@@ -94,7 +94,7 @@ function App() {
                 <Menu />
                 <Routes>
                   <Route path="/" element={<Home />} />
-                  <Route path="/settings" element={<Settings themes={themes} />} />
+                  <Route path="/settings" element={<Settings />} />
                 </Routes>
               </BrowserRouter>
             </Suspense>
