@@ -2,7 +2,9 @@ interface Resources {
   ns1: {
     settings: "Einstellungen";
     home: "Heim";
-    title: "Mehrsprachige App";
+    title: "Moss Studio";
+    selectTheme: "Thema auswählen:";
+    selectLanguage: "Sprache auswählen:";
     user: "Mein Name ist: {{name}}";
     description: {
       part1: "Willkommen, um mit <1>react-i18next</1> völlig typsicher zu reagieren.";

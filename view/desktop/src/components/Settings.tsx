@@ -10,15 +10,13 @@ export const Settings: React.FC<SettingsProps> = ({ themes }) => {
   return (
     <main>
       <div>
-        <h3>Select language:</h3>
+        <h3>{t("selectLanguage")}</h3>
         <LanguageSelector />
       </div>
       <div>
-        <h3>Select theme:</h3>
+        <h3>{t("selectTheme")}</h3>
         <ThemeSelector themes={themes} />
       </div>
-      <span className="text-primary">{t("description.part1")}</span>
-      <span className="text-primary">{t("description.part1", { ns: "ns2" })}</span>
     </main>
   );
 };
