@@ -7,6 +7,8 @@ export interface IThemeRGB {
   "rgb-page-background"?: string;
   "rgb-statusbar-background"?: string;
 
+  "rgb-windows-close-button-background"?: string;
+
   "rgb-window-controls-linux-background"?: string;
   "rgb-window-controls-linux-text"?: string;
   "rgb-window-controls-linux-background-hover"?: string;
@@ -20,6 +22,8 @@ export interface IThemeVariables {
   "--color-page-background": string;
   "--color-statusbar-background": string;
 
+  "--color-windows-close-button-background": string;
+
   "--color-window-controls-linux-background": string;
   "--color-window-controls-linux-text": string;
   "--color-window-controls-linux-background-hover": string;
@@ -32,6 +36,8 @@ export interface IThemeColors {
   "toolbar-background"?: string;
   "page-background"?: string;
   "statusbar-background"?: string;
+
+  "windows-close-button-background"?: string;
 
   "window-controls-linux-background"?: string;
   "window-controls-linux-text"?: string;

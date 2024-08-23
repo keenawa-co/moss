@@ -7,6 +7,8 @@ export const tailwindColorTheme: IThemeRGB = {
   "rgb-page-background": "227, 54, 245",
   "rgb-statusbar-background": "63, 11, 69",
 
+  "rgb-windows-close-button-background": "196, 43, 28", // #c42b1c
+
   "rgb-window-controls-linux-background": "218, 218, 218", // #dadada
   "rgb-window-controls-linux-text": "61, 61, 61", // #3d3d3d
   "rgb-window-controls-linux-background-hover": "209, 209, 209", // #d1d1d1

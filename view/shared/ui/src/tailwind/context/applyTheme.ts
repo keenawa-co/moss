@@ -25,6 +25,8 @@ function mapTheme(rgb: IThemeRGB): IThemeVariables {
     "--color-page-background": rgb["rgb-page-background"] ?? "",
     "--color-statusbar-background": rgb["rgb-statusbar-background"] ?? "",
 
+    "--color-windows-close-button-background": rgb["rgb-windows-close-button-background"] ?? "",
+
     "--color-window-controls-linux-background": rgb["rgb-window-controls-linux-background"] ?? "",
     "--color-window-controls-linux-text": rgb["rgb-window-controls-linux-text"] ?? "",
     "--color-window-controls-linux-background-hover": rgb["rgb-window-controls-linux-background-hover"] ?? "",

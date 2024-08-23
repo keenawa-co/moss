@@ -122,6 +122,8 @@ const configurableColors: IThemeColors = {
   "page-background": withOpacity("--color-page-background"),
   "statusbar-background": withOpacity("--color-statusbar-background"),
 
+  "windows-close-button-background": withOpacity("--color-windows-close-button-background"),
+
   "window-controls-linux-background": withOpacity("--color-window-controls-linux-background"),
   "window-controls-linux-text": withOpacity("--color-window-controls-linux-text"),
   "window-controls-linux-background-hover": withOpacity("--color-window-controls-linux-background-hover"),
