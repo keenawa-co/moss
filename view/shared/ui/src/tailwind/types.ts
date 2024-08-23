@@ -6,6 +6,11 @@ export interface IThemeRGB {
   "rgb-toolbar-background"?: string;
   "rgb-page-background"?: string;
   "rgb-statusbar-background"?: string;
+
+  "rgb-window-controls-linux-background"?: string;
+  "rgb-window-controls-linux-text"?: string;
+  "rgb-window-controls-linux-background-hover"?: string;
+  "rgb-window-controls-linux-background-active"?: string;
 }
 
 export interface IThemeVariables {
@@ -14,6 +19,11 @@ export interface IThemeVariables {
   "--color-toolbar-background": string;
   "--color-page-background": string;
   "--color-statusbar-background": string;
+
+  "--color-window-controls-linux-background": string;
+  "--color-window-controls-linux-text": string;
+  "--color-window-controls-linux-background-hover": string;
+  "--color-window-controls-linux-background-active": string;
 }
 
 export interface IThemeColors {
@@ -22,4 +32,9 @@ export interface IThemeColors {
   "toolbar-background"?: string;
   "page-background"?: string;
   "statusbar-background"?: string;
+
+  "window-controls-linux-background"?: string;
+  "window-controls-linux-text"?: string;
+  "window-controls-linux-background-hover"?: string;
+  "window-controls-linux-background-active"?: string;
 }

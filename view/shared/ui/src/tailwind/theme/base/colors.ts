@@ -121,6 +121,11 @@ const configurableColors: IThemeColors = {
   "toolbar-background": withOpacity("--color-toolbar-background"),
   "page-background": withOpacity("--color-page-background"),
   "statusbar-background": withOpacity("--color-statusbar-background"),
+
+  "window-controls-linux-background": withOpacity("--color-window-controls-linux-background"),
+  "window-controls-linux-text": withOpacity("--color-window-controls-linux-text"),
+  "window-controls-linux-background-hover": withOpacity("--color-window-controls-linux-background-hover"),
+  "window-controls-linux-background-active": withOpacity("--color-window-controls-linux-background-active"),
 };
 
 const colors = {

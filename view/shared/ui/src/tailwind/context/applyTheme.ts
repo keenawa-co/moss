@@ -24,6 +24,11 @@ function mapTheme(rgb: IThemeRGB): IThemeVariables {
     "--color-toolbar-background": rgb["rgb-toolbar-background"] ?? "",
     "--color-page-background": rgb["rgb-page-background"] ?? "",
     "--color-statusbar-background": rgb["rgb-statusbar-background"] ?? "",
+
+    "--color-window-controls-linux-background": rgb["rgb-window-controls-linux-background"] ?? "",
+    "--color-window-controls-linux-text": rgb["rgb-window-controls-linux-text"] ?? "",
+    "--color-window-controls-linux-background-hover": rgb["rgb-window-controls-linux-background-hover"] ?? "",
+    "--color-window-controls-linux-background-active": rgb["rgb-window-controls-linux-background-active"] ?? "",
   };
 }
 
