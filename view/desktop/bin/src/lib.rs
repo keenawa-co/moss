@@ -177,6 +177,7 @@ impl<'a> DesktopMain<'a> {
             .expect("Failed to export typescript bindings");
 
         tauri::Builder::default()
+            .plugin(tauri_plugin_fs::init())
             .manage(app_state)
             .invoke_handler(builder.invoke_handler())
             .setup(move |app: &mut App| {

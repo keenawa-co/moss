@@ -9,14 +9,16 @@
     "build": "tsc -b && vite build",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
-    "interface": "i18next-resources-for-ts interface -i ./public/locales/de -o ./src/@types/resources.d.ts",
-    "jsonnet": "jsonnet test.jsonnet -o test.json"
+    "interface": "i18next-resources-for-ts interface -i ./public/locales/de -o ./src/@types/resources.d.ts"
   },
   "dependencies": {
     "@repo/ui": "workspace:*",
+    "@tailwindcss/nesting": "0.0.0-insiders.565cd3e",
     "@tauri-apps/api": ">=2.0.0-rc.0",
+    "@tauri-apps/plugin-fs": "2.0.0-rc.0",
     "@tauri-apps/plugin-os": "2.0.0-rc.0",
     "@tauri-apps/plugin-shell": ">=2.0.0-rc.0",
+    "install": "^0.13.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },

@@ -9,7 +9,6 @@
   $ pnpm run lint
   $ pnpm run preview
   $ pnpm run interface #generate i18next translation interface
-  $ pnpm run jsonnet #convert test jsonnet file to json file
   $ pnpm --prefix ../storybook run storybook #start Storybook
 ```
 
@@ -21,8 +20,7 @@
     "build": "tsc -b && vite build",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
-    "interface": "i18next-resources-for-ts interface -i ./public/locales/de -o ./src/@types/resources.d.ts",
-    "jsonnet": "jsonnet test.jsonnet -o test.json"
+    "interface": "i18next-resources-for-ts interface -i ./public/locales/de -o ./src/@types/resources.d.ts"
   },
 ```
 

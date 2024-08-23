@@ -61,7 +61,7 @@ export const Home: React.FC = () => {
 
   return (
     <main>
-      <h1>{t("title")}</h1>
+      <h1 className="text-primary">{t("title")}</h1>
 
       {sessionInfo ? (
         <div>
@@ -72,27 +72,30 @@ export const Home: React.FC = () => {
         <p>No session</p>
       )}
 
-      <p>
-        Workspace: <span className="bg-red-500 text-zinc-900"> {workbenchState}</span>
+      <p className="text-primary">
+        Workspace: <span className="bg-red-500 text-primary"> {workbenchState}</span>
       </p>
+      <br />
 
-      <button className="bg-red-500" onClick={handleRestoreSession}>
+      <button className="bg-red-500 text-primary" onClick={handleRestoreSession}>
         Restore Session
       </button>
+      <br />
 
-      <span>{t("description.part1")}</span>
-      <span>{t("description.part1", { ns: "ns2" })}</span>
+      <span className="text-primary">{t("description.part1")}</span>
+      <br />
+      <span className="bg-secondary text-primary">{t("description.part1", { ns: "ns2" })}</span>
       {data !== null && <p>Received data: {data}</p>}
 
       <div>
-        <Tooltip label="Test">
+        <Tooltip label="Test" className="text-primary">
           <Icon icon="Code" />
         </Tooltip>
       </div>
 
       <div>
         <DropdownMenu>
-          <DropdownMenuTrigger>Click me!</DropdownMenuTrigger>
+          <DropdownMenuTrigger className="text-primary">Click me!</DropdownMenuTrigger>
 
           <DropdownMenuContent>
             <DropdownMenuItem icon="Search">Menu item 1</DropdownMenuItem>
