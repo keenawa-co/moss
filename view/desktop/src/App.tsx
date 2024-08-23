@@ -1,12 +1,12 @@
 import { Settings, Content, TitleBar, Home, Menu, RootLayout, Sidebar } from "@/components";
-import { Suspense, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import "@/i18n";
 import "@repo/ui/src/fonts.css";
 import { twMerge } from "tailwind-merge";
 import StatusBar from "@/components/StatusBar";
-
-import { Icon, MenuItem, IconTitle, IThemeRGB, ThemeProvider, lightTheme, darkTheme, testTheme } from "@repo/ui";
+import { getTheme } from "@/utils";
+import { Icon, MenuItem, IconTitle, ThemeProvider } from "@repo/ui";
 
 enum IconState {
   Default = "group-text-primary",
@@ -18,28 +18,21 @@ enum IconState {
 }
 
 function App() {
-  function getTheme(theme: string): IThemeRGB {
-    switch (theme) {
-      case "light":
-        return lightTheme;
-      case "dark":
-        return darkTheme;
-      case "test":
-        return testTheme;
-      default:
-        return lightTheme;
-    }
-  }
-
   const themes = ["light", "dark", "test"];
-  const [theme, setTheme] = useState<string>(themes[0]);
+  const [theme, setTheme] = useState<string>(() => {
+    const savedTheme = localStorage.getItem("theme");
+    return savedTheme && themes.includes(savedTheme) ? savedTheme : themes[0];
+  });
 
-  const onChangeLTheme = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const newTheme = e.target.value;
-    setTheme(newTheme);
-  };
-
-  console.log("---------------->" + theme);
+  useEffect(() => {
+    window.addEventListener("storage", () => {
+      const storedTheme = localStorage.getItem("theme");
+      console.log(storedTheme);
+      if (storedTheme) {
+        setTheme(storedTheme);
+      }
+    });
+  }, []);
 
   return (
     <>
@@ -101,19 +94,10 @@ function App() {
                 <Menu />
                 <Routes>
                   <Route path="/" element={<Home />} />
-                  <Route path="/settings" element={<Settings />} />
+                  <Route path="/settings" element={<Settings themes={themes} />} />
                 </Routes>
               </BrowserRouter>
             </Suspense>
-            <div>
-              <select className="bg-pink-300 text-primary" defaultValue={themes[0]} onChange={onChangeLTheme}>
-                {themes.map((t) => (
-                  <option key={t} value={t}>
-                    {t}
-                  </option>
-                ))}
-              </select>
-            </div>
           </Content>
 
           <StatusBar
@@ -125,5 +109,4 @@ function App() {
     </>
   );
 }
-
 export default App;

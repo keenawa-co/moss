@@ -7,3 +7,5 @@ export * from "./window-controls/WindowControls";
 export * from "./WindowTitlebar";
 export * from "./TitleBar";
 export * from "./Settings";
+export * from "./LanguageSelector";
+export * from "./ThemeSelector";
