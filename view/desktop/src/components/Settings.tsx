@@ -32,8 +32,8 @@ export const Settings: React.FC = () => {
 
   return (
     <main>
-      <span>{t("description.part1")}</span>
-      <span>{t("description.part1", { ns: "ns2" })}</span>
+      <span className="text-primary">{t("description.part1")}</span>
+      <span className="text-primary">{t("description.part1", { ns: "ns2" })}</span>
     </main>
   );
 };

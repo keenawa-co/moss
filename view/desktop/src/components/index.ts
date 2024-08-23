@@ -7,3 +7,4 @@ export * from "./window-controls/WindowControls";
 export * from "./WindowTitlebar";
 export * from "./TitleBar";
 export * from "./Settings";
+export { default as ThemeProvider, useThemeContext } from "./tailwind/context";

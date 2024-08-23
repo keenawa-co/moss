@@ -49,13 +49,13 @@ export function WindowTitlebar({
     >
       {left ? (
         <>
-          <WindowControls {...customProps("absolute ml-2 mt-3 z-50")} />
+          <WindowControls {...customProps("absolute ml-2 mt-3 z-50 text-primary")} />
           {children}
         </>
       ) : (
         <>
           {children}
-          <WindowControls {...customProps("ml-auto")} />
+          <WindowControls {...customProps("ml-auto text-primary")} />
         </>
       )}
     </div>

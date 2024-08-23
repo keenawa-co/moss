@@ -14,10 +14,13 @@
   },
   "dependencies": {
     "@repo/ui": "workspace:*",
+    "@tailwindcss/nesting": "0.0.0-insiders.565cd3e",
     "@tauri-apps/api": ">=2.0.0-rc.0",
     "@tauri-apps/plugin-fs": "2.0.0-rc.0",
     "@tauri-apps/plugin-os": "2.0.0-rc.0",
     "@tauri-apps/plugin-shell": ">=2.0.0-rc.0",
+    "deepmerge": "^4.3.1",
+    "install": "^0.13.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },

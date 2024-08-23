@@ -3,7 +3,7 @@ import { twMerge } from "tailwind-merge";
 
 export const RootLayout = ({ children, className, ...props }: ComponentProps<"main">) => {
   return (
-    <main className={twMerge("flex flex-row h-screen", className)} {...props}>
+    <main className={twMerge("flex flex-row h-screen bg-page-background", className)} {...props}>
       {children}
     </main>
   );
@@ -12,7 +12,7 @@ export const RootLayout = ({ children, className, ...props }: ComponentProps<"ma
 export const Sidebar = ({ className, children, ...props }: ComponentProps<"aside">) => {
   return (
     <aside
-      className={twMerge("flex flex-col w-65 mt-11 mb-5.5 bg-zinc-100", className)}
+      className={twMerge("flex flex-col w-65 mt-11 mb-5.5 bg-sidebar-background", className)}
       //className={twMerge('w-[200px] mt-8 h-[100vh + 10px] overflow-auto bg-bgPrimary', className)}
       {...props}
     >
