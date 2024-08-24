@@ -360,6 +360,9 @@ importers:
       '@storybook/addon-themes':
         specifier: ^8.1.11
         version: 8.2.4(storybook@8.2.4(@babel/preset-env@7.24.8(@babel/core@7.24.9)))
+      '@storybook/addon-viewport':
+        specifier: ^8.2.9
+        version: 8.2.9(storybook@8.2.4(@babel/preset-env@7.24.8(@babel/core@7.24.9)))
       '@storybook/blocks':
         specifier: ^8.1.11
         version: 8.2.4(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(storybook@8.2.4(@babel/preset-env@7.24.8(@babel/core@7.24.9)))
@@ -2318,6 +2321,11 @@ packages:
     resolution: {integrity: sha512-58DcoX0xGpWlJfc0iLDjggkVPYzT4JdCZA2ioK9SQXQMsUzGFwR5PAAJv1tivYp7467tNkXvcM3QTb3Q3g8p4g==}
     peerDependencies:
       storybook: ^8.2.4
+
+  '@storybook/addon-viewport@8.2.9':
+    resolution: {integrity: sha512-lyM24+DJEt8R0YZkJKee34NQWv0REACU6lYDalqJNdKS1sEwzLGWxg1hZXnw2JFdBID9NGVvyYU2w6LDozOB0g==}
+    peerDependencies:
+      storybook: ^8.2.9
 
   '@storybook/blocks@8.2.4':
     resolution: {integrity: sha512-Hl2Dpg41YiJLSVXxjEJPjgPShrDJM3RY6HEEOjqTcAADsheX1IHAWXMJSJGMmne3Sew6VdJXPuHBIOFV4suZxg==}
@@ -10792,6 +10800,11 @@ snapshots:
       storybook: 8.2.4(@babel/preset-env@7.24.8(@babel/core@7.24.9))
 
   '@storybook/addon-viewport@8.2.4(storybook@8.2.4(@babel/preset-env@7.24.8(@babel/core@7.24.9)))':
+    dependencies:
+      memoizerific: 1.11.3
+      storybook: 8.2.4(@babel/preset-env@7.24.8(@babel/core@7.24.9))
+
+  '@storybook/addon-viewport@8.2.9(storybook@8.2.4(@babel/preset-env@7.24.8(@babel/core@7.24.9)))':
     dependencies:
       memoizerific: 1.11.3
       storybook: 8.2.4(@babel/preset-env@7.24.8(@babel/core@7.24.9))

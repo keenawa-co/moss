@@ -5,7 +5,7 @@ import "@/i18n";
 import "@repo/ui/src/fonts.css";
 import { twMerge } from "tailwind-merge";
 import StatusBar from "@/components/StatusBar";
-import { getTheme } from "@/utils";
+import { getTheme } from "@repo/ui";
 import { Icon, MenuItem, IconTitle, ThemeProvider } from "@repo/ui";
 import { THEMES } from "@/constants/index";
 import { useTranslation } from "react-i18next";
