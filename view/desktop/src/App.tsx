@@ -5,8 +5,10 @@ import "@/i18n";
 import "@repo/ui/src/fonts.css";
 import { twMerge } from "tailwind-merge";
 import StatusBar from "@/components/StatusBar";
-import { getTheme } from "@/utils";
+import { getTheme } from "@repo/ui";
 import { Icon, MenuItem, IconTitle, ThemeProvider } from "@repo/ui";
+import { THEMES } from "@/constants/index";
+import { useTranslation } from "react-i18next";
 
 enum IconState {
   Default = "group-text-primary",
@@ -18,16 +20,23 @@ enum IconState {
 }
 
 function App() {
-  const themes = ["light", "dark", "test"];
+  const { i18n } = useTranslation();
   const [theme, setTheme] = useState<string>(() => {
     const savedTheme = localStorage.getItem("theme");
-    return savedTheme && themes.includes(savedTheme) ? savedTheme : themes[0];
+    return savedTheme && THEMES.includes(savedTheme) ? savedTheme : THEMES[0];
   });
 
   useEffect(() => {
+    const setLanguageFromLocalStorage = () => {
+      const savedLanguage = localStorage.getItem("language");
+      if (savedLanguage) {
+        i18n.changeLanguage(savedLanguage);
+      }
+    };
+    setLanguageFromLocalStorage();
+
     window.addEventListener("storage", () => {
       const storedTheme = localStorage.getItem("theme");
-      console.log(storedTheme);
       if (storedTheme) {
         setTheme(storedTheme);
       }
@@ -94,7 +103,7 @@ function App() {
                 <Menu />
                 <Routes>
                   <Route path="/" element={<Home />} />
-                  <Route path="/settings" element={<Settings themes={themes} />} />
+                  <Route path="/settings" element={<Settings />} />
                 </Routes>
               </BrowserRouter>
             </Suspense>

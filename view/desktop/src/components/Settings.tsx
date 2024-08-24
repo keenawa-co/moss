@@ -1,10 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { LanguageSelector, ThemeSelector } from "@/components";
-interface SettingsProps {
-  themes: string[];
-}
 
-export const Settings: React.FC<SettingsProps> = ({ themes }) => {
+export const Settings: React.FC = () => {
   const { t } = useTranslation(["ns1", "ns2"]);
 
   return (
@@ -15,7 +12,7 @@ export const Settings: React.FC<SettingsProps> = ({ themes }) => {
       </div>
       <div>
         <h3>{t("selectTheme")}</h3>
-        <ThemeSelector themes={themes} />
+        <ThemeSelector />
       </div>
     </main>
   );
