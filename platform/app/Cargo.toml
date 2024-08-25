@@ -15,7 +15,7 @@ chrono.workspace = true
 derive_more.workspace = true
 async-task.workspace = true
 async-executor.workspace = true
-
+slotmap.workspace = true
 
 serde = { workspace = true, features = ["derive"] }
 serde_json.workspace = true
@@ -27,6 +27,5 @@ futures.workspace = true
 
 tracing.workspace = true
 
-parking = "2.2.0"
-slotmap = "1.0.7"
+
 waker-fn = "1.2.0"

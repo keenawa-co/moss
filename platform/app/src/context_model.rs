@@ -6,10 +6,6 @@ use std::hash::{Hash, Hasher};
 use std::marker::PhantomData;
 use std::sync::atomic::AtomicUsize;
 
-
-
-
-
 slotmap::new_key_type! {
     pub struct EntityId;
 }
@@ -167,10 +163,10 @@ impl<T: 'static> Model<T> {
     }
 }
 
-pub struct ModelContext {}
+// pub struct ModelContext {}
 
-impl ModelContext {
-    pub(crate) fn new() -> Self {
-        Self {}
-    }
-}
+// impl ModelContext {
+//     pub(crate) fn new() -> Self {
+//         Self {}
+//     }
+// }

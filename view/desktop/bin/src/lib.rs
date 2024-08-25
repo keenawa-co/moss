@@ -5,12 +5,15 @@ pub mod service;
 
 use anyhow::Result;
 use app::context_compact::AppContextCompact;
+
+use platform_formation::context::context::Context;
+use platform_formation::context::context::PlatformContext;
+use platform_formation::context::model::Model;
 use platform_formation::service_registry::ServiceRegistry;
 use platform_fs::disk::file_system_service::DiskFileSystemService;
 use platform_workspace::WorkspaceId;
 use service::project_service::ProjectService;
 use service::session_service::SessionService;
-use std::borrow::Cow;
 use std::env;
 use std::sync::Arc;
 use surrealdb::{engine::remote::ws::Ws, Surreal};
@@ -102,7 +105,15 @@ pub struct DesktopMain<'a> {
 
 impl<'a> DesktopMain<'a> {
     pub fn new(configuration: NativeWindowConfiguration<'a>) -> Self {
-        dbg!(&configuration);
+        struct Counter {
+            count: usize,
+        }
+
+        let mut ctx = PlatformContext::new();
+        let counter: Model<Counter> = ctx.new_model(|_ctx| Counter { count: 0 });
+
+        dbg!("1111");
+
         Self {
             native_window_configuration: configuration,
         }

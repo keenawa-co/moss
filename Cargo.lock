@@ -126,7 +126,6 @@ dependencies = [
  "flume",
  "futures",
  "hashbrown 0.14.5",
- "parking",
  "parking_lot",
  "serde",
  "serde_json",
@@ -474,7 +473,7 @@ dependencies = [
  "proc-macro2",
  "quote",
  "regex",
- "rustc-hash",
+ "rustc-hash 1.1.0",
  "shlex",
  "syn 2.0.70",
 ]
@@ -3209,6 +3208,7 @@ dependencies = [
  "dunce",
  "hashbrown 0.14.5",
  "radix_trie",
+ "rustc-hash 2.0.0",
 ]
 
 [[package]]
@@ -4079,7 +4079,12 @@ version = "0.1.0"
 name = "platform_formation"
 version = "0.1.0"
 dependencies = [
+ "anyhow",
+ "derive_more",
  "fnv",
+ "moss_std",
+ "parking_lot",
+ "slotmap",
 ]
 
 [[package]]
@@ -4860,6 +4865,12 @@ name = "rustc-hash"
 version = "1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "08d43f7aa6b08d49f382cde6a7982047c3426db949b1424bc4b7ec9ae12c6ce2"
+
+[[package]]
+name = "rustc-hash"
+version = "2.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "583034fd73374156e66797ed8e5b0d5690409c9226b22d87cb7f19821c05d152"
 
 [[package]]
 name = "rustc_lexer"
