@@ -43,9 +43,9 @@ const config: Config = {
     [
       "@docusaurus/plugin-content-docs",
       {
-        id: "desktop",
-        path: "../desktop/docs",
-        routeBasePath: "desktop",
+        id: "community",
+        path: "./community",
+        routeBasePath: "community",
         sidebarPath: "./sidebars.ts",
       },
     ],
@@ -58,15 +58,16 @@ const config: Config = {
         sidebarPath: "./sidebars.ts",
       },
     ],
-    [
-      "@docusaurus/plugin-content-docs",
-      {
-        id: "shared",
-        path: "../shared/docs",
-        routeBasePath: "shared",
-        sidebarPath: "./sidebars.ts",
-      },
-    ],
+    // NOTE: commented-out code left as an example
+    // [
+    //   "@docusaurus/plugin-content-docs",
+    //   {
+    //     id: "shared",
+    //     path: "../shared/docs",
+    //     routeBasePath: "shared",
+    //     sidebarPath: "./sidebars.ts",
+    //   },
+    // ],
   ],
   themeConfig: {
     navbar: {
@@ -76,16 +77,14 @@ const config: Config = {
         src: "img/logo.svg",
       },
       items: [
-        {
-          type: "docSidebar",
-          sidebarId: "tutorialSidebar",
-          position: "left",
-          label: "Tutorial",
-        },
-        { to: "/desktop", label: "desktop", position: "left" },
-        { to: "/web", label: "web", position: "left" },
-        { to: "/shared", label: "shared", position: "left" },
-        { to: "/blog", label: "blog", position: "left" },
+        // NOTE: commented-out code left as an example
+        // {
+        //   type: "docSidebar",
+        //   sidebarId: "tutorialSidebar",
+        //   position: "left",
+        //   label: "Tutorial",
+        // },
+        { to: "/community", label: "Community", position: "left" },
         {
           href: "https://github.com/4rchr4y/moss",
           label: "Moss",
@@ -100,41 +99,42 @@ const config: Config = {
           title: "Docs",
           items: [
             {
-              label: "Tutorial",
-              to: "/docs/intro",
+              label: "Community",
+              to: "/community",
             },
           ],
         },
-        {
-          title: "Community",
-          items: [
-            {
-              label: "Stack Overflow",
-              href: "https://stackoverflow.com/questions/tagged/docusaurus",
-            },
-            {
-              label: "Discord",
-              href: "https://discordapp.com/invite/docusaurus",
-            },
-            {
-              label: "Twitter",
-              href: "https://twitter.com/docusaurus",
-            },
-          ],
-        },
-        {
-          title: "More",
-          items: [
-            {
-              label: "Blog",
-              to: "/blog",
-            },
-            {
-              label: "GitHub",
-              href: "https://github.com/facebook/docusaurus",
-            },
-          ],
-        },
+        // NOTE: commented-out code left as an example
+        // {
+        //   title: "Community",
+        //   items: [
+        //     {
+        //       label: "Stack Overflow",
+        //       href: "https://stackoverflow.com/questions/tagged/docusaurus",
+        //     },
+        //     {
+        //       label: "Discord",
+        //       href: "https://discordapp.com/invite/docusaurus",
+        //     },
+        //     {
+        //       label: "Twitter",
+        //       href: "https://twitter.com/docusaurus",
+        //     },
+        //   ],
+        // },
+        // {
+        //   title: "More",
+        //   items: [
+        //     {
+        //       label: "Blog",
+        //       to: "/blog",
+        //     },
+        //     {
+        //       label: "GitHub",
+        //       href: "https://github.com/facebook/docusaurus",
+        //     },
+        //   ],
+        // },
       ],
       copyright: `Copyright © ${new Date().getFullYear()} My Project, Inc. Built with Docusaurus.`,
     },

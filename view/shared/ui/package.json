@@ -8,7 +8,7 @@
     "dist"
   ],
   "exports": {
-    ".": "./src/index.ts",
+    ".": "./src/index.ts", 
     "./src/fonts.css": "./src/fonts.css",
     "./styles.css": "./dist/index.css",
     "./card": "./src/card.tsx"
@@ -24,8 +24,8 @@
     "react": "^18.2.0"
   },
   "devDependencies": {
-    "@radix-ui/react-tooltip": "^1.1.2",
     "@radix-ui/react-dropdown-menu": "^2.1.1",
+    "@radix-ui/react-tooltip": "^1.1.2",
     "@repo/eslint-config": "workspace:*",
     "@repo/tailwind-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
@@ -38,9 +38,9 @@
     "typescript": "^5.3.3"
   },
   "dependencies": {
-
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
+    "deepmerge": "^4.3.1",
     "lucide-react": "^0.418.0",
     "tailwindcss-animate": "^1.0.7"
   }
