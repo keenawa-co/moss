@@ -6,14 +6,16 @@ pub mod service;
 use anyhow::Result;
 use app::context_compact::AppContextCompact;
 
-use platform_formation::context::context::Context;
+use parking_lot::Mutex;
+use platform_formation::context::async_context::AsyncContext;
 use platform_formation::context::context::PlatformContext;
-use platform_formation::context::model::Model;
+use platform_formation::context::runtime::PlatformRuntime;
 use platform_formation::service_registry::ServiceRegistry;
 use platform_fs::disk::file_system_service::DiskFileSystemService;
 use platform_workspace::WorkspaceId;
 use service::project_service::ProjectService;
 use service::session_service::SessionService;
+use std::borrow::BorrowMut;
 use std::env;
 use std::sync::Arc;
 use surrealdb::{engine::remote::ws::Ws, Surreal};
@@ -36,8 +38,13 @@ extern crate tracing;
 
 #[tauri::command(async)]
 #[specta::specta]
-async fn workbench_get_state(state: State<'_, AppState<'_>>) -> Result<WorkbenchState, String> {
-    Ok(state.workbench.get_state())
+async fn workbench_get_state(
+    ctx: State<'_, Mutex<AsyncContext>>,
+    state: State<'_, AppState<'_>>,
+) -> Result<WorkbenchState, String> {
+    let mut num = ctx.lock();
+    let r = &mut *num;
+    Ok(state.workbench.get_state(r))
 }
 
 #[tauri::command(async)]
@@ -105,15 +112,6 @@ pub struct DesktopMain<'a> {
 
 impl<'a> DesktopMain<'a> {
     pub fn new(configuration: NativeWindowConfiguration<'a>) -> Self {
-        struct Counter {
-            count: usize,
-        }
-
-        let mut ctx = PlatformContext::new();
-        let counter: Model<Counter> = ctx.new_model(|_ctx| Counter { count: 0 });
-
-        dbg!("1111");
-
         Self {
             native_window_configuration: configuration,
         }
@@ -164,60 +162,69 @@ impl<'a> DesktopMain<'a> {
                 .expect("Failed to initialize the workbench");
         });
 
-        let app_state = AppState {
-            workbench,
-            project_service: ProjectService::new(db.clone()),
-            session_service: SessionService::new(db.clone()),
-        };
+        let rt = PlatformRuntime::new();
 
-        let builder = tauri_specta::Builder::<tauri::Wry>::new()
-            .events(collect_events![])
-            .commands(collect_commands![
-                workbench_get_state,
-                create_project,
-                restore_session,
-                app_ready
-            ]);
+        rt.exec(move |ctx: &mut PlatformContext| {
+            let app_state = AppState {
+                workbench,
+                project_service: ProjectService::new(db.clone()),
+                session_service: SessionService::new(db.clone()),
+            };
 
-        #[cfg(debug_assertions)] // <- Only export on non-release builds
-        builder
-            .export(
-                specta_typescript::Typescript::default(),
-                "../src/bindings.ts",
-            )
-            .expect("Failed to export typescript bindings");
+            let builder = tauri_specta::Builder::<tauri::Wry>::new()
+                .events(collect_events![])
+                .commands(collect_commands![
+                    workbench_get_state,
+                    create_project,
+                    restore_session,
+                    app_ready
+                ]);
 
-        tauri::Builder::default()
-            .manage(app_state)
-            .invoke_handler(builder.invoke_handler())
-            .setup(move |app: &mut App| {
-                let app_state: State<AppState> = app.state();
+            #[cfg(debug_assertions)] // <- Only export on non-release builds
+            builder
+                .export(
+                    specta_typescript::Typescript::default(),
+                    "../src/bindings.ts",
+                )
+                .expect("Failed to export typescript bindings");
 
-                let app_handle = app.handle().clone();
-                let window = app.get_webview_window("main").unwrap();
+            let async_ctx = ctx.to_async();
 
-                app_state
-                    .workbench
-                    .apply_configuration_window_size(window)
-                    .unwrap();
+            tauri::Builder::default()
+                .manage(Mutex::new(async_ctx))
+                .manage(app_state)
+                .invoke_handler(builder.invoke_handler())
+                .setup(move |app: &mut App| {
+                    let app_state: State<AppState> = app.state();
 
-                tokio::task::block_in_place(|| {
-                    tauri::async_runtime::block_on(async move {
-                        // Example stream data emitting
-                        tokio::spawn(async move {
-                            while let Ok(data) = rx.recv().await {
-                                app_handle.emit("data-stream", data).unwrap();
-                            }
+                    let app_handle = app.handle().clone();
+                    app_handle.emit("custom-event", "Hello from Rust!").unwrap();
+                    let window = app.get_webview_window("main").unwrap();
+
+                    app_state
+                        .workbench
+                        .apply_configuration_window_size(window)
+                        .unwrap();
+
+                    tokio::task::block_in_place(|| {
+                        tauri::async_runtime::block_on(async move {
+                            // Example stream data emitting
+                            tokio::spawn(async move {
+                                while let Ok(data) = rx.recv().await {
+                                    app_handle.emit("data-stream", data).unwrap();
+                                }
+                            });
                         });
                     });
-                });
 
-                Ok(())
-            })
-            .menu(menu::setup_window_menu)
-            .plugin(tauri_plugin_os::init())
-            .build(tauri::generate_context!())?
-            .run(|_, _| {});
+                    Ok(())
+                })
+                .menu(menu::setup_window_menu)
+                .plugin(tauri_plugin_os::init())
+                .build(tauri::generate_context!())
+                .unwrap()
+                .run(|_, _| {});
+        });
 
         Ok(())
     }

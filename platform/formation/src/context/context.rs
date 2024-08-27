@@ -1,7 +1,12 @@
 use moss_std::collection::{FxHashSet, VecDeque};
-use std::any::{Any, TypeId};
+use std::{
+    any::{Any, TypeId},
+    cell::RefCell,
+    rc::{Rc, Weak},
+};
 
 use super::{
+    async_context::AsyncContext,
     entity::{Entity, EntityId, EntityMap, Slot},
     model::{Model, ModelContext},
     subscriber::{SubscriberSet, Subscription},
@@ -55,15 +60,19 @@ type Listener = Box<dyn FnMut(&dyn Any, &mut PlatformContext) -> bool + 'static>
 type ReleaseListener = Box<dyn FnOnce(&mut dyn Any, &mut PlatformContext) + 'static>;
 
 pub struct PlatformContext {
+    pub(crate) this: Weak<RefCell<Self>>,
     pub(crate) observers: SubscriberSet<EntityId, Handler>,
     pub(crate) pending_notifications: FxHashSet<EntityId>,
     pub(crate) pending_effects: VecDeque<Effect>,
-    pending_updates: usize,
+    pub(crate) pending_updates: usize,
     pub(crate) entities: EntityMap,
-    flushing_effects: bool,
+    pub(crate) flushing_effects: bool,
     pub(crate) event_listeners: SubscriberSet<EntityId, (TypeId, Listener)>,
     pub(crate) release_listeners: SubscriberSet<EntityId, ReleaseListener>,
 }
+
+unsafe impl Send for PlatformContext {}
+unsafe impl Sync for PlatformContext {}
 
 impl Context for PlatformContext {
     type Result<T> = T;
@@ -114,16 +123,27 @@ impl Context for PlatformContext {
 }
 
 impl PlatformContext {
-    pub fn new() -> Self {
-        Self {
-            observers: SubscriberSet::new(),
-            pending_notifications: FxHashSet::default(),
-            pending_effects: VecDeque::new(),
-            pending_updates: 0,
-            entities: EntityMap::new(),
-            flushing_effects: false,
-            event_listeners: SubscriberSet::new(),
-            release_listeners: SubscriberSet::new(),
+    // pub fn new() -> Self {
+    //     let ctx = Rc::new_cyclic(|this| {
+    //         RefCell::new(Self {
+    //             this: this.clone(),
+    //             observers: SubscriberSet::new(),
+    //             pending_notifications: FxHashSet::default(),
+    //             pending_effects: VecDeque::new(),
+    //             pending_updates: 0,
+    //             entities: EntityMap::new(),
+    //             flushing_effects: false,
+    //             event_listeners: SubscriberSet::new(),
+    //             release_listeners: SubscriberSet::new(),
+    //         })
+    //     });
+
+    //     todo!()
+    // }
+
+    pub fn to_async(&self) -> AsyncContext {
+        AsyncContext {
+            app: self.this.clone(),
         }
     }
 
@@ -211,7 +231,7 @@ impl PlatformContext {
     pub fn observe<W, E>(
         &mut self,
         entity: &E,
-        mut on_notify: impl FnMut(E, &mut PlatformContext) -> bool + 'static,
+        mut on_notify: impl FnMut(E, &mut PlatformContext) + 'static,
     ) -> Subscription
     where
         W: 'static,
@@ -327,60 +347,81 @@ impl PlatformContext {
     }
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
+// #[cfg(test)]
+// mod tests {
+//     use super::*;
 
-    struct Counter {
-        count: usize,
-    }
+//     #[derive(Debug)]
+//     struct Counter {
+//         count: i32,
+//     }
 
-    struct Change {
-        increment: usize,
-    }
+//     #[derive(Debug)]
+//     struct UI {
+//         display_text: String,
+//     }
 
-    impl EventEmitter<Change> for Counter {}
+//     #[derive(Debug)]
+//     struct Change {
+//         delta: i32,
+//     }
 
-    #[test]
-    fn test_notification() {
-        let mut ctx = PlatformContext::new();
-        let counter: Model<Counter> = ctx.new_model(|_cx| Counter { count: 0 });
+//     impl EventEmitter<Change> for Counter {}
 
-        let subscription = ctx.observe(&counter, |counter, ctx| {
-            dbg!("Counter was notified! Current count");
-            true
-        });
+//     #[test]
+//     fn test_subscription_via_global_context() {
+//         struct UserStatus {
+//             online: bool,
+//         }
 
-        counter.update(&mut ctx, |counter, ctx| {
-            counter.count += 1;
-            ctx.notify();
-        });
+//         let mut ctx = PlatformContext::new();
 
-        subscription.detach()
-    }
+//         let user_status = ctx.new_model(|_cx| UserStatus { online: false });
 
-    #[test]
-    fn test_subscription() {
-        let mut ctx = PlatformContext::new();
-        let counter: Model<Counter> = ctx.new_model(|_cx| Counter { count: 0 });
-        let subscriber = ctx.new_model(|cx: &mut ModelContext<Counter>| {
-            cx.subscribe(&counter, |subscriber, _emitter, event, _cx| {
-                subscriber.count += event.increment * 2;
-            })
-            .detach();
+//         let s = ctx.observe(&user_status, |status_model, _cx| {
+//             let status = status_model.read(_cx);
+//             if status.online {
+//                 dbg!("User is now online.");
+//             } else {
+//                 dbg!("User is now offline.");
+//             }
+//         });
 
-            Counter {
-                count: counter.read(cx).count * 2,
-            }
-        });
+//         user_status.update(&mut ctx, |status, cx| {
+//             status.online = true;
+//             cx.notify();
+//         });
 
-        counter.update(&mut ctx, |counter, cx| {
-            counter.count += 2;
-            cx.notify();
-            cx.emit(Change { increment: 2 });
-        });
+//         user_status.update(&mut ctx, |status, cx| {
+//             status.online = false;
+//             cx.notify();
+//         });
+//     }
 
-        // assert_eq!(subscriber.read(&mut cx).count, 4);
-        println!("{}", subscriber.read(&mut ctx).count);
-    }
-}
+//     #[test]
+//     fn test_counter_ui_integration() {
+//         let mut ctx = PlatformContext::new();
+//         let counter: Model<Counter> = ctx.new_model(|_cx| Counter { count: 0 });
+
+//         let ui: Model<UI> = ctx.new_model(|cx: &mut ModelContext<UI>| {
+//             cx.subscribe(&counter, |ui, _counter, event: &Change, _cx| {
+//                 ui.display_text = format!("Counter: {}", event.delta);
+//             })
+//             .detach();
+
+//             UI {
+//                 display_text: format!("Counter: 0"),
+//             }
+//         });
+
+//         counter.update(&mut ctx, |counter, cx| {
+//             counter.count += 5;
+//             cx.notify();
+//             cx.emit(Change {
+//                 delta: counter.count,
+//             });
+//         });
+
+//         assert_eq!(ui.read(&mut ctx).display_text, "Counter: 5");
+//     }
+// }

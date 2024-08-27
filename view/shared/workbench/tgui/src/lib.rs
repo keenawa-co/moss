@@ -9,7 +9,7 @@ use platform_configuration::{
     attribute_name, configuration_policy::ConfigurationPolicyService,
     configuration_registry::ConfigurationRegistry, AbstractConfigurationService,
 };
-use platform_formation::service_registry::ServiceRegistry;
+use platform_formation::{context::async_context::AsyncContext, service_registry::ServiceRegistry};
 use platform_fs::disk::file_system_service::{
     AbstractDiskFileSystemService, DiskFileSystemService,
 };
@@ -181,7 +181,7 @@ impl<'a> Workbench<'a> {
         Ok(())
     }
 
-    pub fn get_state(&self) -> WorkbenchState {
+    pub fn get_state(&self, ctx: &mut AsyncContext) -> WorkbenchState {
         WorkbenchState::Empty
     }
 }
