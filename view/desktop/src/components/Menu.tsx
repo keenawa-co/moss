@@ -15,6 +15,9 @@ export const Menu = () => {
         <NavLink className={isActive + " bg-orange-300 text-primary px-20"} to="/settings">
           {t("settings")}
         </NavLink>
+        <NavLink className={isActive + " bg-yellow-300 text-primary px-20"} to="/logs">
+          logs
+        </NavLink>
       </div>
     </nav>
   );
