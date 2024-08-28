@@ -48,8 +48,6 @@ export const Menu = () => {
     setTheme(newTheme);
   };
 
-  console.log("---------------->" + theme);
-
   return (
     <nav className={`theme-${theme}`}>
       <p>
