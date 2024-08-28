@@ -23,10 +23,10 @@ members = [
     "view/shared/workbench/service/environment/tgui",
 ]
 
-[profile.dev]
-split-debuginfo = "unpacked"
-debug = "limited"
-codegen-units = 16
+# [profile.dev]
+# split-debuginfo = "unpacked"
+# debug = "limited"
+# codegen-units = 16
 
 [profile.release]
 debug = "limited"

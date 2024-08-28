@@ -1,7 +1,8 @@
+use derive_more::{Deref, DerefMut};
 use moss_std::collection::{FxHashSet, VecDeque};
 use std::{
     any::{Any, TypeId},
-    cell::RefCell,
+    cell::{Ref, RefCell, RefMut},
     rc::{Rc, Weak},
 };
 
@@ -16,7 +17,7 @@ pub struct Reservation<T>(pub(crate) Slot<T>);
 
 pub trait EventEmitter<E: Any>: 'static {}
 
-pub trait Context {
+pub trait AnyContext {
     type Result<T>;
 
     fn reserve_model<T: 'static>(&mut self) -> Self::Result<Reservation<T>>;
@@ -51,16 +52,34 @@ pub enum Effect {
         event: Box<dyn Any>,
     },
     Defer {
-        callback: Box<dyn FnOnce(&mut PlatformContext) + 'static>,
+        callback: Box<dyn FnOnce(&mut Context) + 'static>,
     },
 }
 
-type Handler = Box<dyn FnMut(&mut PlatformContext) -> bool + 'static>;
-type Listener = Box<dyn FnMut(&dyn Any, &mut PlatformContext) -> bool + 'static>;
-type ReleaseListener = Box<dyn FnOnce(&mut dyn Any, &mut PlatformContext) + 'static>;
+pub struct ContextCell(pub(crate) RefCell<Context>);
 
-pub struct PlatformContext {
-    pub(crate) this: Weak<RefCell<Self>>,
+impl ContextCell {
+    pub fn borrow(&self) -> ContextRef {
+        ContextRef(self.0.borrow())
+    }
+
+    pub fn borrow_mut(&self) -> ContextRefMut {
+        ContextRefMut(self.0.borrow_mut())
+    }
+}
+
+#[derive(Deref, DerefMut)]
+pub struct ContextRef<'a>(Ref<'a, Context>);
+
+#[derive(Deref, DerefMut)]
+pub struct ContextRefMut<'a>(RefMut<'a, Context>);
+
+type Handler = Box<dyn FnMut(&mut Context) -> bool + 'static>;
+type Listener = Box<dyn FnMut(&dyn Any, &mut Context) -> bool + 'static>;
+type ReleaseListener = Box<dyn FnOnce(&mut dyn Any, &mut Context) + 'static>;
+
+pub struct Context {
+    // pub(crate) this: std::sync::Weak<Self>,
     pub(crate) observers: SubscriberSet<EntityId, Handler>,
     pub(crate) pending_notifications: FxHashSet<EntityId>,
     pub(crate) pending_effects: VecDeque<Effect>,
@@ -71,10 +90,10 @@ pub struct PlatformContext {
     pub(crate) release_listeners: SubscriberSet<EntityId, ReleaseListener>,
 }
 
-unsafe impl Send for PlatformContext {}
-unsafe impl Sync for PlatformContext {}
+unsafe impl Send for Context {}
+unsafe impl Sync for Context {}
 
-impl Context for PlatformContext {
+impl AnyContext for Context {
     type Result<T> = T;
 
     fn reserve_model<T: 'static>(&mut self) -> Self::Result<Reservation<T>> {
@@ -122,32 +141,14 @@ impl Context for PlatformContext {
     }
 }
 
-impl PlatformContext {
-    // pub fn new() -> Self {
-    //     let ctx = Rc::new_cyclic(|this| {
-    //         RefCell::new(Self {
-    //             this: this.clone(),
-    //             observers: SubscriberSet::new(),
-    //             pending_notifications: FxHashSet::default(),
-    //             pending_effects: VecDeque::new(),
-    //             pending_updates: 0,
-    //             entities: EntityMap::new(),
-    //             flushing_effects: false,
-    //             event_listeners: SubscriberSet::new(),
-    //             release_listeners: SubscriberSet::new(),
-    //         })
-    //     });
-
-    //     todo!()
+impl Context {
+    // pub fn to_async(&self) -> AsyncContext {
+    //     AsyncContext {
+    //         app: self.this.clone(),
+    //     }
     // }
 
-    pub fn to_async(&self) -> AsyncContext {
-        AsyncContext {
-            app: self.this.clone(),
-        }
-    }
-
-    pub fn defer(&mut self, f: impl FnOnce(&mut PlatformContext) + 'static) {
+    pub fn defer(&mut self, f: impl FnOnce(&mut Context) + 'static) {
         self.push_effect(Effect::Defer {
             callback: Box::new(f),
         })
@@ -169,7 +170,7 @@ impl PlatformContext {
     pub fn subscribe<T, E, Event>(
         &mut self,
         entity: &E,
-        mut on_event: impl FnMut(E, &Event, &mut PlatformContext) + 'static,
+        mut on_event: impl FnMut(E, &Event, &mut Context) + 'static,
     ) -> Subscription
     where
         T: 'static + EventEmitter<Event>,
@@ -195,7 +196,7 @@ impl PlatformContext {
     pub(crate) fn subscribe_internal<T, E, Evt>(
         &mut self,
         entity: &E,
-        mut on_event: impl FnMut(E, &Evt, &mut PlatformContext) -> bool + 'static,
+        mut on_event: impl FnMut(E, &Evt, &mut Context) -> bool + 'static,
     ) -> Subscription
     where
         T: 'static + EventEmitter<Evt>,
@@ -231,7 +232,7 @@ impl PlatformContext {
     pub fn observe<W, E>(
         &mut self,
         entity: &E,
-        mut on_notify: impl FnMut(E, &mut PlatformContext) + 'static,
+        mut on_notify: impl FnMut(E, &mut Context) + 'static,
     ) -> Subscription
     where
         W: 'static,
@@ -246,7 +247,7 @@ impl PlatformContext {
     pub(crate) fn observe_internal<W, E>(
         &mut self,
         entity: &E,
-        mut on_notify: impl FnMut(E, &mut PlatformContext) -> bool + 'static,
+        mut on_notify: impl FnMut(E, &mut Context) -> bool + 'static,
     ) -> Subscription
     where
         W: 'static,
@@ -266,7 +267,7 @@ impl PlatformContext {
         )
     }
 
-    pub(crate) fn update<R>(&mut self, update: impl FnOnce(&mut PlatformContext) -> R) -> R {
+    pub(crate) fn update<R>(&mut self, update: impl FnOnce(&mut Context) -> R) -> R {
         self.pending_updates += 1;
         let result = update(self);
         if !self.flushing_effects && self.pending_updates == 1 {
@@ -330,7 +331,7 @@ impl PlatformContext {
             .retain(&emitter, |handler| handler(self));
     }
 
-    fn apply_defer_effect(&mut self, callback: Box<dyn FnOnce(&mut PlatformContext) + 'static>) {
+    fn apply_defer_effect(&mut self, callback: Box<dyn FnOnce(&mut Context) + 'static>) {
         callback(self);
     }
 

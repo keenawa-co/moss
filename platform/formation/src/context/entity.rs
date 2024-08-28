@@ -9,7 +9,7 @@ use std::{
 };
 
 use super::{
-    context::{Effect, PlatformContext},
+    context::{Context, Effect},
     model::{AnyModel, Model},
 };
 

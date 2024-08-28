@@ -1,13 +1,9 @@
-use derive_more::{Deref, DerefMut};
-use std::{cell::RefCell, rc::Weak};
+use std::rc::Weak;
 
-use super::context::PlatformContext;
+use super::context::ContextCell;
 
-#[derive(Deref, DerefMut)]
 pub struct AsyncContext {
-    #[deref]
-    #[deref_mut]
-    pub app: Weak<RefCell<PlatformContext>>,
+    pub app: std::sync::Weak<ContextCell>,
 }
 
 unsafe impl Send for AsyncContext {}

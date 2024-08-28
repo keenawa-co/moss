@@ -8,15 +8,16 @@ use app::context_compact::AppContextCompact;
 
 use parking_lot::Mutex;
 use platform_formation::context::async_context::AsyncContext;
-use platform_formation::context::context::PlatformContext;
+use platform_formation::context::context::{AnyContext, Context, ContextCell};
+use platform_formation::context::model::Model;
 use platform_formation::context::runtime::PlatformRuntime;
 use platform_formation::service_registry::ServiceRegistry;
 use platform_fs::disk::file_system_service::DiskFileSystemService;
 use platform_workspace::WorkspaceId;
 use service::project_service::ProjectService;
 use service::session_service::SessionService;
-use std::borrow::BorrowMut;
 use std::env;
+use std::rc::Rc;
 use std::sync::Arc;
 use surrealdb::{engine::remote::ws::Ws, Surreal};
 use tauri::{App, AppHandle, Emitter, Manager, State};
@@ -36,15 +37,33 @@ extern crate serde;
 #[macro_use]
 extern crate tracing;
 
+struct CommandAsyncContext(Arc<Mutex<Context>>);
+
 #[tauri::command(async)]
 #[specta::specta]
-async fn workbench_get_state(
-    ctx: State<'_, Mutex<AsyncContext>>,
+async fn update_font_size(
+    ctx: State<'_, CommandAsyncContext>,
+    app_handle: tauri::AppHandle,
     state: State<'_, AppState<'_>>,
-) -> Result<WorkbenchState, String> {
-    let mut num = ctx.lock();
-    let r = &mut *num;
-    Ok(state.workbench.get_state(r))
+) -> Result<(), String> {
+    let ctx_lock = &mut ctx.0.lock();
+
+    ctx_lock.update_model(&state.workbench, |this, cx| {
+        this.update_conf(cx).unwrap();
+    });
+
+    // let w = state.workbench.update(&mut app, |this, cx| {});
+    // w.update_conf(&mut app);
+    // app_handle.emit("font-size-update-event", 10).unwrap();
+    Ok(())
+}
+
+#[tauri::command(async)]
+#[specta::specta]
+async fn workbench_get_state(state: State<'_, AppState<'_>>) -> Result<WorkbenchState, String> {
+    // Ok(state.workbench.get_state())
+
+    Ok(WorkbenchState::Empty)
 }
 
 #[tauri::command(async)]
@@ -117,11 +136,11 @@ impl<'a> DesktopMain<'a> {
         }
     }
 
-    pub fn open(&self, ctx: &mut AppContextCompact) -> Result<()> {
+    pub fn open(&self, ctx2: &mut AppContextCompact) -> Result<()> {
         // ------ Example stream
         let (tx, mut rx) = tokio::sync::broadcast::channel(16);
 
-        ctx.detach(|_| async move {
+        ctx2.detach(|_| async move {
             let mut interval = tokio::time::interval(tokio::time::Duration::from_secs(1));
             let mut count = 0;
             loop {
@@ -135,7 +154,7 @@ impl<'a> DesktopMain<'a> {
         // ------
 
         // TODO: move to StorageService
-        let db = ctx.block_on(|ctx| async {
+        let db = ctx2.block_on(|ctx| async {
             let db = Surreal::new::<Ws>("127.0.0.1:8000")
                 .await
                 .expect("failed to connect to db");
@@ -154,19 +173,26 @@ impl<'a> DesktopMain<'a> {
             .get_unchecked::<MockStorageService>()
             .get_last_window_state();
 
-        let mut workbench = Workbench::new(service_group, window_state.workspace_id)?;
-        ctx.block_on(|_| async {
-            workbench
-                .initialize()
-                .await
-                .expect("Failed to initialize the workbench");
-        });
-
         let rt = PlatformRuntime::new();
 
-        rt.exec(move |ctx: &mut PlatformContext| {
+        let cx2 = ctx2.clone();
+
+        rt.exec(move |ctx: Arc<Mutex<Context>>| {
+            // let c = ctx;
+
+            let mut ctx_lock = ctx.lock();
+            let mut workbench =
+                Workbench::new(&mut ctx_lock, service_group, window_state.workspace_id).unwrap();
+
+            cx2.block_on(|_| async {
+                workbench
+                    .initialize()
+                    .await
+                    .expect("Failed to initialize the workbench");
+            });
+
             let app_state = AppState {
-                workbench,
+                workbench: ctx_lock.new_model(|_ctx| workbench),
                 project_service: ProjectService::new(db.clone()),
                 session_service: SessionService::new(db.clone()),
             };
@@ -177,34 +203,35 @@ impl<'a> DesktopMain<'a> {
                     workbench_get_state,
                     create_project,
                     restore_session,
-                    app_ready
+                    app_ready,
+                    update_font_size,
                 ]);
 
             #[cfg(debug_assertions)] // <- Only export on non-release builds
             builder
                 .export(
-                    specta_typescript::Typescript::default(),
+                    specta_typescript::Typescript::default()
+                        .formatter(specta_typescript::formatter::prettier),
                     "../src/bindings.ts",
                 )
                 .expect("Failed to export typescript bindings");
 
-            let async_ctx = ctx.to_async();
+            // let async_ctx = ctx.to_async();
 
             tauri::Builder::default()
-                .manage(Mutex::new(async_ctx))
+                .manage(CommandAsyncContext(Arc::clone(&ctx)))
                 .manage(app_state)
                 .invoke_handler(builder.invoke_handler())
                 .setup(move |app: &mut App| {
                     let app_state: State<AppState> = app.state();
 
                     let app_handle = app.handle().clone();
-                    app_handle.emit("custom-event", "Hello from Rust!").unwrap();
                     let window = app.get_webview_window("main").unwrap();
 
-                    app_state
-                        .workbench
-                        .apply_configuration_window_size(window)
-                        .unwrap();
+                    // app_state
+                    //     .workbench
+                    //     .apply_configuration_window_size(window)
+                    //     .unwrap();
 
                     tokio::task::block_in_place(|| {
                         tauri::async_runtime::block_on(async move {
@@ -247,7 +274,7 @@ impl<'a> DesktopMain<'a> {
 }
 
 pub struct AppState<'a> {
-    pub workbench: Workbench<'a>,
+    pub workbench: Model<Workbench<'a>>,
     pub project_service: ProjectService,
     pub session_service: SessionService,
 }

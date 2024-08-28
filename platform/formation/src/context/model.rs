@@ -8,7 +8,7 @@ use std::{
 };
 
 use super::{
-    context::{Context, Effect, EventEmitter, PlatformContext, Reservation},
+    context::{AnyContext, Context, Effect, EventEmitter, Reservation},
     entity::{Entity, EntityId, EntityRefCounts},
     subscriber::Subscription,
     Flatten,
@@ -133,7 +133,7 @@ impl<T: 'static> WeakModel<T> {
         update: impl FnOnce(&mut T, &mut ModelContext<'_, T>) -> R,
     ) -> Result<R>
     where
-        C: Context,
+        C: AnyContext,
         Result<C::Result<R>>: Flatten<R>,
     {
         Flatten::flatten(
@@ -155,7 +155,7 @@ impl<T: 'static> Model<T> {
         }
     }
 
-    pub fn read<'a>(&self, ctx: &'a PlatformContext) -> &'a T {
+    pub fn read<'a>(&self, ctx: &'a Context) -> &'a T {
         ctx.entities.read(self)
     }
 
@@ -165,7 +165,7 @@ impl<T: 'static> Model<T> {
         update: impl FnOnce(&mut T, &mut ModelContext<'_, T>) -> R,
     ) -> C::Result<R>
     where
-        C: Context,
+        C: AnyContext,
     {
         ctx.update_model(self, update)
     }
@@ -175,12 +175,12 @@ impl<T: 'static> Model<T> {
 pub struct ModelContext<'a, T> {
     #[deref]
     #[deref_mut]
-    app: &'a mut PlatformContext,
+    app: &'a mut Context,
     model_state: WeakModel<T>,
 }
 
 impl<'a, T: 'static> ModelContext<'a, T> {
-    pub(crate) fn new(app: &'a mut PlatformContext, model_state: WeakModel<T>) -> Self {
+    pub(crate) fn new(app: &'a mut Context, model_state: WeakModel<T>) -> Self {
         Self { app, model_state }
     }
 
@@ -257,7 +257,7 @@ impl<'a, T: 'static> ModelContext<'a, T> {
     }
 }
 
-impl<'a, T> Context for ModelContext<'a, T> {
+impl<'a, T> AnyContext for ModelContext<'a, T> {
     type Result<U> = U;
 
     fn reserve_model<U: 'static>(&mut self) -> Reservation<U> {
