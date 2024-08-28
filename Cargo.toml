@@ -1,9 +1,11 @@
 [workspace]
+resolver = "2"
 members = [
     "kernel/fs",
 
     "lib/moss_std",
 
+    "platform/fs",
     "platform/formation",
     "platform/configuration",
     "platform/user_profile",
@@ -43,6 +45,7 @@ platform_formation = { path = "platform/formation" }
 platform_user_profile = { path = "platform/user_profile" }
 platform_environment = { path = "platform/environment" }
 platform_workspace = { path = "platform/workspace" }
+platform_fs = { path = "platform/fs" }
 
 workbench_tgui = { path = "view/shared/workbench/tgui" }
 workbench_service_configuration_common = { path = "view/shared/workbench/service/configuration/common" }

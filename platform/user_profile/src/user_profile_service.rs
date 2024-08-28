@@ -1,12 +1,15 @@
+use anyhow::Result;
 use std::path::PathBuf;
 
-use crate::UserProfile;
+pub struct UserProfile {
+    pub home: PathBuf,
+    pub settings_resource: PathBuf,
+}
 
+#[async_trait]
 pub trait UserProfileService<'a> {
-    type Error;
-
     fn default_profile(&'a self) -> &'a UserProfile;
-    fn create_profile(&self, home: PathBuf) -> Result<UserProfile, Self::Error>;
-    fn delete_profile(&self) -> Result<(), Self::Error>;
-    fn cleanup(&self) -> Result<(), Self::Error>;
+    async fn create_profile(&self, home: &PathBuf) -> Result<UserProfile>;
+    async fn delete_profile(&self) -> Result<()>;
+    async fn cleanup(&self) -> Result<()>;
 }

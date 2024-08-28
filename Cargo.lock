@@ -1241,6 +1241,7 @@ dependencies = [
  "parking_lot",
  "platform_configuration",
  "platform_formation",
+ "platform_fs",
  "platform_workspace",
  "serde",
  "serde_json",
@@ -1250,6 +1251,7 @@ dependencies = [
  "surrealdb",
  "tauri",
  "tauri-build",
+ "tauri-plugin-fs",
  "tauri-plugin-os",
  "tauri-plugin-shell",
  "tauri-specta",
@@ -4061,6 +4063,7 @@ dependencies = [
  "lazy-regex",
  "moss_std",
  "parking_lot",
+ "platform_fs",
  "platform_utl",
  "radix_trie",
  "serde",
@@ -4081,8 +4084,23 @@ dependencies = [
 ]
 
 [[package]]
+name = "platform_fs"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "async-trait",
+ "futures",
+ "libc",
+ "smol",
+]
+
+[[package]]
 name = "platform_user_profile"
 version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "async-trait",
+]
 
 [[package]]
 name = "platform_utl"
@@ -6125,6 +6143,25 @@ dependencies = [
 ]
 
 [[package]]
+name = "tauri-plugin-fs"
+version = "2.0.0-rc.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5df6b25b1f2b7b61565e66c4dbee9eb39e5635d2a763206e380e07cc3f601a67"
+dependencies = [
+ "anyhow",
+ "glob",
+ "schemars",
+ "serde",
+ "serde_json",
+ "serde_repr",
+ "tauri",
+ "tauri-plugin",
+ "thiserror",
+ "url",
+ "uuid",
+]
+
+[[package]]
 name = "tauri-plugin-os"
 version = "2.0.0-rc.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -7543,6 +7580,7 @@ dependencies = [
  "anyhow",
  "async-trait",
  "platform_configuration",
+ "platform_fs",
  "platform_user_profile",
  "platform_workspace",
  "serde_json",
@@ -7561,6 +7599,10 @@ dependencies = [
 name = "workbench_service_user_profile_tgui"
 version = "0.1.0"
 dependencies = [
+ "anyhow",
+ "arc-swap",
+ "async-trait",
+ "platform_fs",
  "platform_user_profile",
 ]
 
@@ -7573,6 +7615,7 @@ dependencies = [
  "lazy_static",
  "platform_configuration",
  "platform_formation",
+ "platform_fs",
  "platform_user_profile",
  "platform_workspace",
  "serde",
