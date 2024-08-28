@@ -51,7 +51,7 @@ function App() {
         <TitleBar />
 
         <Resizable proportionalLayout={false}>
-          <ResizablePanel minSize={255} preferredSize={255} snap visible={sideBarVisible}>
+          <ResizablePanel minSize={150} preferredSize={255} snap visible={sideBarVisible}>
             <Sidebar className="p-0 h-full ">
               <MenuItem className="group bg-zinc-200 mt-13 mb-3.5 overflow-hidden">
                 <Icon icon="Search" className={twMerge("h-4.5 w-4.5", IconState.Default, IconState.Hover)} />
