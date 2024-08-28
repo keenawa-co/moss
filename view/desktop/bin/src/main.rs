@@ -3,10 +3,16 @@
 
 use app::{context_compact::AppContextCompact, AppCompact};
 use app_lib::DesktopMain;
-use tracing::error;
+use tracing::{error, event, Level};
 use workbench_tgui::window::{NativePlatformInfo, NativeWindowConfiguration};
 
 fn main() {
+    tracing_subscriber::fmt()
+        .with_max_level(Level::DEBUG)
+        .init();
+    
+    event!(Level::INFO, "inside foo");
+
     AppCompact::new().run(|ctx: &mut AppContextCompact| {
         let home_dir = std::env::var("HOME")
             .expect("Failed to retrieve the $HOME environment variable")
