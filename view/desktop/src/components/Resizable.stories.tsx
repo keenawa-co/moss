@@ -3,7 +3,7 @@ import { render } from "react-dom";
 import { Resizable, ResizablePanel } from "./Resizable";
 import "allotment/dist/style.css";
 import { useState } from "react";
-import { cn } from "@/shared/lib/utils";
+import { cn } from "@/shared/utils/utils";
 
 const meta = {
   title: "desktop/Resizable",
