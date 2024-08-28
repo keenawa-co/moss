@@ -81,7 +81,7 @@ export const Nested: Story = {
   render: () => {
     return (
       <Resizable>
-        <ResizablePanel className="grid place-items-center" maxSize={255}>
+        <ResizablePanel className="grid place-items-center" preferredSize={200} maxSize={400} minSize={100} snap>
           Sidebar
         </ResizablePanel>
         <ResizablePanel className="grid place-items-center">
