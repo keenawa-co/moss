@@ -80,15 +80,18 @@ export const MinMax: Story = {
 export const Nested: Story = {
   render: () => {
     return (
-      <Resizable vertical>
+      <Resizable>
+        <ResizablePanel className="grid place-items-center" maxSize={255}>
+          Sidebar
+        </ResizablePanel>
         <ResizablePanel className="grid place-items-center">
-          <Resizable>
-            <ResizablePanel className="grid place-items-center">One</ResizablePanel>
-            <ResizablePanel className="grid place-items-center">Two</ResizablePanel>
-            <ResizablePanel className="grid place-items-center">Three</ResizablePanel>
+          <Resizable vertical>
+            <ResizablePanel className="grid place-items-center">code</ResizablePanel>
+            <ResizablePanel className="grid place-items-center" minSize={100} snap>
+              terminal
+            </ResizablePanel>
           </Resizable>
         </ResizablePanel>
-        <ResizablePanel className="grid place-items-center">Four</ResizablePanel>
       </Resizable>
     );
   },
