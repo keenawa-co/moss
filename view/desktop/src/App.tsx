@@ -1,5 +1,5 @@
 import { Settings, Content, TitleBar, Home, Menu, RootLayout, Sidebar } from "@/components";
-import { Suspense } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import "@/i18n";
 import "@repo/ui/src/fonts.css";
@@ -9,7 +9,7 @@ import { getTheme } from "@repo/ui";
 import { Icon, MenuItem, IconTitle, ThemeProvider } from "@repo/ui";
 import { THEMES } from "@/constants/index";
 import { useTranslation } from "react-i18next";
-
+import { Resizable, ResizablePanel } from "./components/Resizable";
 enum IconState {
   Default = "group-text-primary",
   DefaultStroke = "group-stroke-zinc-500",
