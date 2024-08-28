@@ -1,4 +1,4 @@
-import { Settings, Content, TitleBar, Home, Menu, RootLayout, Sidebar } from "@/components";
+import { Settings, Content, TitleBar, Home, Menu, RootLayout, Sidebar, Logs } from "@/components";
 import { Suspense, useEffect, useState } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import "@/i18n";
@@ -99,6 +99,7 @@ function App() {
                 <IconTitle className="text-primary text-sm" title="Settings" />
               </MenuItem>
 
+<<<<<<< HEAD
               <MenuItem className="group">
                 <Icon icon="QuickSearch" className={twMerge(IconState.Default, IconState.Hover, "min-w-4")} />
                 <IconTitle className="text-primary text-sm" title="Quick Search" />
@@ -121,6 +122,39 @@ function App() {
         </Resizable>
       </RootLayout>
     </ThemeProvider>
+=======
+            <MenuItem className="group">
+              <Icon icon="Settings" className={twMerge(IconState.Default, IconState.Hover)} />
+              <IconTitle className="text-primary text-sm" title="Settings" />
+            </MenuItem>
+
+            <MenuItem className="group">
+              <Icon icon="QuickSearch" className={twMerge(IconState.Default, IconState.Hover)} />
+              <IconTitle className="text-primary text-sm" title="Quick Search" />
+            </MenuItem>
+          </Sidebar>
+
+          <Content className="relative flex flex-col">
+            <Suspense fallback="loading">
+              <BrowserRouter>
+                <Menu />
+                <Routes>
+                  <Route path="/" element={<Home />} />
+                  <Route path="/settings" element={<Settings />} />
+                  <Route path="/logs" element={<Logs />} />
+                </Routes>
+              </BrowserRouter>
+            </Suspense>
+          </Content>
+
+          <StatusBar
+            className="absolute w-full bottom-0 h-5.5"
+            branch="MOSSMVP-37-Backend-Migrate-existing-backend-in-Tauri"
+          />
+        </RootLayout>
+      </ThemeProvider>
+    </>
+>>>>>>> 0ef1d63c (feat: added temporary Logs page to the desktop app)
   );
 }
 export default App;
