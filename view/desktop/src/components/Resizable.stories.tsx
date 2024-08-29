@@ -156,3 +156,99 @@ export const Controls: Story = {
     );
   },
 };
+
+export const DotsOnTextOverflow: Story = {
+  render: () => {
+    return (
+      <Resizable>
+        <ResizablePanel className="grid place-items-center" preferredSize={100}>
+          <div className="w-full overflow-hidden">
+            {Array(10)
+              .fill(0)
+              .map((_, i) => (
+                <div key={i} className="text-ellipsis whitespace-nowrap overflow-hidden">
+                  Menu item - {i + 1} with a very long name
+                </div>
+              ))}
+          </div>
+        </ResizablePanel>
+        <ResizablePanel className="grid place-items-center">
+          <ol className="list-decimal text-xl">
+            <li>
+              <span className="font-black">Container</span> with your items
+              <span className="font-black"> must have </span>
+              <u>overflow: hidden</u> <span>and </span>
+              <u>width:100%</u>
+            </li>
+            <li>
+              Your <span className="font-black">items must have </span>
+              <u>text-ellipsis</u> <span>and </span>
+              <u>whitespace-nowrap</u> <span>and </span>
+              <u>overflow:hidden</u>
+            </li>
+          </ol>
+        </ResizablePanel>
+      </Resizable>
+    );
+  },
+};
+
+export const OverflowXY: Story = {
+  render: () => {
+    return (
+      <Resizable>
+        <ResizablePanel className="grid place-items-center " preferredSize={200} maxSize={300} snap>
+          <div className="w-full h-full overflow-y-scroll">
+            <div className="text-center h-12 mt-12 mb-4 font-bold">Overflow Y</div>
+            {Array(10)
+              .fill(0)
+              .map((_, i) => (
+                <div key={i} className="text-ellipsis whitespace-nowrap overflow-hidden h-12">
+                  Menu item - {i + 1} with a very long name
+                </div>
+              ))}
+          </div>
+        </ResizablePanel>
+
+        <ResizablePanel maxSize={500}>
+          <div className="w-full h-full overflow-x-scroll flex flex-col justify-center">
+            <div>Overflow X</div>
+            <div className="flex ">
+              <div className=" h-44 min-w-80 w-full bg-[#e50000]"></div>
+              <div className=" h-44 min-w-80 w-full bg-[#ff8d00]"></div>
+              <div className=" h-44 min-w-80 w-full bg-[#ffee00]"></div>
+              <div className=" h-44 min-w-80 w-full bg-[#028121]"></div>
+              <div className=" h-44 min-w-80 w-full bg-[#004cff]"></div>
+              <div className=" h-44 min-w-80 w-full bg-[#770088]"></div>
+            </div>
+          </div>
+        </ResizablePanel>
+
+        <ResizablePanel>
+          <div className="w-full h-full overflow-auto grid grid-cols-[repeat(6,minmax(320px,1fr))] ">
+            <div className=" min-h-80 h-full min-w-80 w-full bg-[#e50000]">Overflow auto</div>
+            <div className=" min-h-80 h-full min-w-80 w-full bg-[#ff8d00]"></div>
+            <div className=" min-h-80 h-full min-w-80 w-full bg-[#ffee00]"></div>
+            <div className=" min-h-80 h-full min-w-80 w-full bg-[#028121]"></div>
+            <div className=" min-h-80 h-full min-w-80 w-full bg-[#004cff]"></div>
+            <div className=" min-h-80 h-full min-w-80 w-full bg-[#770088]"></div>
+
+            <div className=" min-h-80 h-full min-w-80 w-full bg-[#770088]"></div>
+            <div className=" min-h-80 h-full min-w-80 w-full bg-[#004cff]"></div>
+            <div className=" min-h-80 h-full min-w-80 w-full bg-[#028121]"></div>
+            <div className=" min-h-80 h-full min-w-80 w-full bg-[#ffee00]"></div>
+            <div className=" min-h-80 h-full min-w-80 w-full bg-[#ff8d00]"></div>
+            <div className=" min-h-80 h-full min-w-80 w-full bg-[#e50000]"></div>
+
+            <div className=" min-h-80 h-full min-w-80 w-full bg-[#e50000]"></div>
+            <div className=" min-h-80 h-full min-w-80 w-full bg-[#ff8d00]"></div>
+            <div className=" min-h-80 h-full min-w-80 w-full bg-[#ffee00]"></div>
+            <div className=" min-h-80 h-full min-w-80 w-full bg-[#028121]"></div>
+            <div className=" min-h-80 h-full min-w-80 w-full bg-[#004cff]"></div>
+            <div className=" min-h-80 h-full min-w-80 w-full bg-[#770088]"></div>
+          </div>
+        </ResizablePanel>
+      </Resizable>
+    );
+  },
+};
