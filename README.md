@@ -78,7 +78,7 @@ make run-web
 - Run docs app:
 
 ```sh
-pnpm doc
+make run-docs
 ```
 
 - Generate monorepo project dependency graph:
