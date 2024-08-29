@@ -36,7 +36,7 @@ sudo apt install libsoup-3.0-dev
 - Before running any applications, ensure that SurrealDB is started:
 
 ```sh
-cd ./view/desktop/ && surreal start file:rocksdb
+make run-database
 ```
 
 - Run all apps:
@@ -48,31 +48,31 @@ pnpm turbo dev
 - Run desktop app:
 
 ```sh
-pnpm desktop
+make run-desktop
 ```
 
 - Run desktop web app:
 
 ```sh
-pnpm desktop-web
+make run-desktop-web
 ```
 
 - Start SurrealDB:
 
 ```sh
-pnpm sd
+make run-database
 ```
 
 - Run storybook app:
 
 ```sh
-pnpm sb
+make run-storybook
 ```
 
 - Run web app:
 
 ```sh
-pnpm web
+make run-web
 ```
 
 - Run docs app:
