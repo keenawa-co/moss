@@ -56,10 +56,10 @@ function App() {
               <MenuItem className="group bg-zinc-200 mt-13 mb-3.5">
                 <Icon icon="Search" className={twMerge("h-4.5 w-4.5 min-w-4", IconState.Default, IconState.Hover)} />
                 <IconTitle className="text-primary text-xs" title="Search..." />
-                {/* <Icon
+                <Icon
                   icon="SearchShortcut"
                   className="min-w-4  w-4.5 fill-zinc-500 group-hover:fill-zinc-600  ml-auto pr-2"
-                /> */}
+                />
               </MenuItem>
 
               <MenuItem className="group">
