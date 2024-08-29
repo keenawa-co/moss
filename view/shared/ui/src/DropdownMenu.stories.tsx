@@ -43,7 +43,7 @@ const meta: Meta<typeof DropdownMenu> = {
   tags: ["autodocs"],
   decorators: [
     (Story) => (
-      <div className="flex justify-center pt-24">
+      <div className="flex justify-center">
         <Story />
       </div>
     ),
