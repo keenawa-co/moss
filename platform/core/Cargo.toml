@@ -1,0 +1,19 @@
+[package]
+name = "platform_core"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+moss_std.workspace = true
+
+fnv.workspace = true
+slotmap.workspace = true
+parking_lot.workspace = true
+derive_more.workspace = true
+anyhow.workspace = true
+
+[features]
+default = []
+tao = []

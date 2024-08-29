@@ -22,8 +22,7 @@ export const Settings: React.FC = () => {
 
   const handleButtonClick = async () => {
     try {
-      const response = await commands.updateFontSize();
-      console.log(response);
+      const response = await commands.updateFontSize(number);
       if (response.status === "ok") {
         console.log("OK");
       }

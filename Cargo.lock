@@ -1239,6 +1239,7 @@ dependencies = [
  "mimalloc",
  "parking_lot",
  "platform_configuration",
+ "platform_core",
  "platform_formation",
  "platform_fs",
  "platform_workspace",
@@ -4070,6 +4071,18 @@ dependencies = [
  "serde_json",
  "tokio",
  "tracing",
+]
+
+[[package]]
+name = "platform_core"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "derive_more",
+ "fnv",
+ "moss_std",
+ "parking_lot",
+ "slotmap",
 ]
 
 [[package]]
@@ -7625,6 +7638,7 @@ dependencies = [
  "hashbrown 0.14.5",
  "lazy_static",
  "platform_configuration",
+ "platform_core",
  "platform_formation",
  "platform_fs",
  "platform_user_profile",

@@ -7,10 +7,10 @@ use anyhow::Result;
 use app::context_compact::AppContextCompact;
 
 use parking_lot::Mutex;
-use platform_formation::context::async_context::AsyncContext;
-use platform_formation::context::context::{AnyContext, Context, ContextCell};
-use platform_formation::context::model::Model;
-use platform_formation::context::runtime::PlatformRuntime;
+use platform_core::common::{
+    context::{context::Context, entity::Model, AnyContext},
+    runtime::AsyncPlatformRuntime,
+};
 use platform_formation::service_registry::ServiceRegistry;
 use platform_fs::disk::file_system_service::DiskFileSystemService;
 use platform_workspace::WorkspaceId;
@@ -43,26 +43,32 @@ struct CommandAsyncContext(Arc<Mutex<Context>>);
 #[specta::specta]
 async fn update_font_size(
     ctx: State<'_, CommandAsyncContext>,
-    app_handle: tauri::AppHandle,
     state: State<'_, AppState<'_>>,
-) -> Result<(), String> {
-    let ctx_lock = &mut ctx.0.lock();
+    input: i32,
+) -> Result<String, String> {
+    let ctx_lock: &mut Context = &mut ctx.0.lock();
 
-    ctx_lock.update_model(&state.workbench, |this, cx| {
-        this.update_conf(cx).unwrap();
+    state.workbench.update(ctx_lock, |this, cx| {
+        this.update_conf(cx, input as usize).unwrap();
+        cx.notify();
     });
+
+    dbg!("B");
+    // // ctx_lock.update_model(&state.workbench, |this, cx| {
+    //     this.update_conf(cx, input as usize).unwrap();
+    // });
 
     // let w = state.workbench.update(&mut app, |this, cx| {});
     // w.update_conf(&mut app);
     // app_handle.emit("font-size-update-event", 10).unwrap();
-    Ok(())
+    Ok("ping".to_string())
 }
 
 #[tauri::command(async)]
 #[specta::specta]
 async fn workbench_get_state(state: State<'_, AppState<'_>>) -> Result<WorkbenchState, String> {
     // Ok(state.workbench.get_state())
-
+    dbg!(1);
     Ok(WorkbenchState::Empty)
 }
 
@@ -173,13 +179,11 @@ impl<'a> DesktopMain<'a> {
             .get_unchecked::<MockStorageService>()
             .get_last_window_state();
 
-        let rt = PlatformRuntime::new();
+        let rt = AsyncPlatformRuntime::new();
 
         let cx2 = ctx2.clone();
 
         rt.exec(move |ctx: Arc<Mutex<Context>>| {
-            // let c = ctx;
-
             let mut ctx_lock = ctx.lock();
             let mut workbench =
                 Workbench::new(&mut ctx_lock, service_group, window_state.workspace_id).unwrap();
@@ -216,8 +220,7 @@ impl<'a> DesktopMain<'a> {
                 )
                 .expect("Failed to export typescript bindings");
 
-            // let async_ctx = ctx.to_async();
-
+            drop(ctx_lock);
             tauri::Builder::default()
                 .manage(CommandAsyncContext(Arc::clone(&ctx)))
                 .manage(app_state)
@@ -228,10 +231,13 @@ impl<'a> DesktopMain<'a> {
                     let app_handle = app.handle().clone();
                     let window = app.get_webview_window("main").unwrap();
 
-                    // app_state
-                    //     .workbench
-                    //     .apply_configuration_window_size(window)
-                    //     .unwrap();
+                    let ctx_lock: &mut Context = &mut ctx.lock();
+                    app_state.workbench.update(ctx_lock, |this, ctx| {
+                        this.set_configuration_window_size(window).unwrap();
+                        this.set_tao_handle(ctx, Rc::new(app_handle.clone()));
+
+                        ctx.notify();
+                    });
 
                     tokio::task::block_in_place(|| {
                         tauri::async_runtime::block_on(async move {

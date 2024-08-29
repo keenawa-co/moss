@@ -5,6 +5,7 @@ members = [
 
     "lib/moss_std",
 
+    "platform/core",
     "platform/fs",
     "platform/formation",
     "platform/configuration",
@@ -21,6 +22,7 @@ members = [
     "view/shared/workbench/service/configuration/tgui",
     "view/shared/workbench/service/user_profile/tgui",
     "view/shared/workbench/service/environment/tgui",
+
 ]
 
 # [profile.dev]
@@ -39,6 +41,7 @@ fs = { path = "kernel/fs" }
 
 moss_std = { path = "lib/moss_std" }
 
+platform_core = { path = "platform/core" }
 platform_utl = { path = "platform/utl" }
 platform_configuration = { path = "platform/configuration" }
 platform_formation = { path = "platform/formation" }
