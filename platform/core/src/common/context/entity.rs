@@ -12,7 +12,7 @@ use std::{
     },
 };
 
-use super::{context::Context, model_context::ModelContext, AnyContext, FlattenAnyhowResult};
+use super::{model_context::ModelContext, utl::FlattenAnyhowResult, AnyContext, Context};
 
 pub struct AnyModel {
     entity_id: EntityId,

@@ -7,9 +7,12 @@ use anyhow::Result;
 use app::context_compact::AppContextCompact;
 
 use parking_lot::Mutex;
-use platform_core::common::{
-    context::{context::Context, entity::Model, AnyContext},
-    runtime::AsyncPlatformRuntime,
+use platform_core::{
+    common::{
+        context::{entity::Model, AnyContext, Context},
+        runtime::AsyncRuntime,
+    },
+    tao::context::command_context::CommandAsyncContext,
 };
 use platform_formation::service_registry::ServiceRegistry;
 use platform_fs::disk::file_system_service::DiskFileSystemService;
@@ -37,31 +40,21 @@ extern crate serde;
 #[macro_use]
 extern crate tracing;
 
-struct CommandAsyncContext(Arc<Mutex<Context>>);
-
 #[tauri::command(async)]
 #[specta::specta]
 async fn update_font_size(
-    ctx: State<'_, CommandAsyncContext>,
+    cmd_ctx: State<'_, CommandAsyncContext>,
     state: State<'_, AppState<'_>>,
     input: i32,
-) -> Result<String, String> {
-    let ctx_lock: &mut Context = &mut ctx.0.lock();
+) -> Result<(), String> {
+    cmd_ctx.with_mut(|ctx| {
+        state.workbench.update(ctx, |this, cx| {
+            this.update_conf(cx, input as usize).unwrap();
+            cx.notify();
+        });
 
-    state.workbench.update(ctx_lock, |this, cx| {
-        this.update_conf(cx, input as usize).unwrap();
-        cx.notify();
-    });
-
-    dbg!("B");
-    // // ctx_lock.update_model(&state.workbench, |this, cx| {
-    //     this.update_conf(cx, input as usize).unwrap();
-    // });
-
-    // let w = state.workbench.update(&mut app, |this, cx| {});
-    // w.update_conf(&mut app);
-    // app_handle.emit("font-size-update-event", 10).unwrap();
-    Ok("ping".to_string())
+        Ok(())
+    })
 }
 
 #[tauri::command(async)]
@@ -179,11 +172,11 @@ impl<'a> DesktopMain<'a> {
             .get_unchecked::<MockStorageService>()
             .get_last_window_state();
 
-        let rt = AsyncPlatformRuntime::new();
+        let rt = AsyncRuntime::new();
 
         let cx2 = ctx2.clone();
 
-        rt.exec(move |ctx: Arc<Mutex<Context>>| {
+        rt.run(move |ctx: Arc<Mutex<Context>>| {
             let mut ctx_lock = ctx.lock();
             let mut workbench =
                 Workbench::new(&mut ctx_lock, service_group, window_state.workspace_id).unwrap();
@@ -222,7 +215,7 @@ impl<'a> DesktopMain<'a> {
 
             drop(ctx_lock);
             tauri::Builder::default()
-                .manage(CommandAsyncContext(Arc::clone(&ctx)))
+                .manage(CommandAsyncContext::from(Arc::clone(&ctx)))
                 .manage(app_state)
                 .invoke_handler(builder.invoke_handler())
                 .setup(move |app: &mut App| {
