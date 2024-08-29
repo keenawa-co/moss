@@ -1,14 +1,24 @@
+pub mod async_context;
 pub mod entity;
 pub mod model_context;
 pub mod subscription;
 
+mod async_runner;
 mod utl;
 
-use moss_std::collection::{FxHashSet, VecDeque};
-use std::any::{Any, TypeId};
-
+use async_context::AsyncContext;
+use async_runner::{AsyncRunner, Task};
 use entity::{AnyEntity, EntityId, EntityMap, Model, Slot};
 use model_context::ModelContext;
+use moss_std::collection::{FxHashSet, VecDeque};
+use parking_lot::Mutex;
+
+use std::{
+    any::{Any, TypeId},
+    borrow::BorrowMut,
+    future::Future,
+    sync::{Arc, Weak},
+};
 use subscription::{SubscriberSet, Subscription};
 
 pub struct Reservation<T>(pub(crate) Slot<T>);
@@ -59,14 +69,15 @@ type Listener = Box<dyn FnMut(&dyn Any, &mut Context) -> bool + 'static>;
 type ReleaseListener = Box<dyn FnOnce(&mut dyn Any, &mut Context) + 'static>;
 
 pub struct Context {
-    pub(crate) observers: SubscriberSet<EntityId, Handler>,
-    pub(crate) pending_notifications: FxHashSet<EntityId>,
-    pub(crate) pending_effects: VecDeque<Effect>,
-    pub(crate) pending_updates: usize,
-    pub(crate) entities: EntityMap,
-    pub(crate) flushing_effects: bool,
-    pub(crate) event_listeners: SubscriberSet<EntityId, (TypeId, Listener)>,
-    pub(crate) release_listeners: SubscriberSet<EntityId, ReleaseListener>,
+    runner: AsyncRunner,
+    observers: SubscriberSet<EntityId, Handler>,
+    pending_notifications: FxHashSet<EntityId>,
+    pending_effects: VecDeque<Effect>,
+    pending_updates: usize,
+    entities: EntityMap,
+    flushing_effects: bool,
+    event_listeners: SubscriberSet<EntityId, (TypeId, Listener)>,
+    release_listeners: SubscriberSet<EntityId, ReleaseListener>,
 }
 
 unsafe impl Send for Context {}
@@ -123,6 +134,7 @@ impl AnyContext for Context {
 impl Context {
     pub fn new() -> Self {
         Context {
+            runner: AsyncRunner::new(),
             observers: SubscriberSet::new(),
             pending_notifications: FxHashSet::default(),
             pending_effects: VecDeque::new(),
@@ -132,6 +144,25 @@ impl Context {
             event_listeners: SubscriberSet::new(),
             release_listeners: SubscriberSet::new(),
         }
+    }
+
+    pub fn to_async(self) -> AsyncContext {
+        AsyncContext::from(self)
+    }
+
+    pub fn detach<F>(&self, future: F) -> Task<F::Output>
+    where
+        F: Future + Send + 'static,
+        F::Output: Send + 'static,
+    {
+        Task::Spawned(self.runner.spawn(future))
+    }
+
+    pub fn block_on<F>(&self, future: F) -> F::Output
+    where
+        F: Future,
+    {
+        self.runner.block_on(future)
     }
 
     pub fn defer(&mut self, f: impl FnOnce(&mut Context) + 'static) {

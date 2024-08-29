@@ -4080,9 +4080,12 @@ dependencies = [
  "anyhow",
  "derive_more",
  "fnv",
+ "futures",
  "moss_std",
  "parking_lot",
  "slotmap",
+ "smol",
+ "tokio",
 ]
 
 [[package]]

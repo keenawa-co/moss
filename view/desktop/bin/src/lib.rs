@@ -9,7 +9,7 @@ use app::context_compact::AppContextCompact;
 use parking_lot::Mutex;
 use platform_core::{
     common::{
-        context::{entity::Model, AnyContext, Context},
+        context::{async_context::AsyncContext, entity::Model, AnyContext, Context},
         runtime::AsyncRuntime,
     },
     tao::context::command_context::CommandAsyncContext,
@@ -19,9 +19,9 @@ use platform_fs::disk::file_system_service::DiskFileSystemService;
 use platform_workspace::WorkspaceId;
 use service::project_service::ProjectService;
 use service::session_service::SessionService;
-use std::env;
 use std::rc::Rc;
 use std::sync::Arc;
+use std::{env, process::ExitCode};
 use surrealdb::{engine::remote::ws::Ws, Surreal};
 use tauri::{App, AppHandle, Emitter, Manager, State};
 use tauri_specta::{collect_commands, collect_events};
@@ -43,7 +43,7 @@ extern crate tracing;
 #[tauri::command(async)]
 #[specta::specta]
 async fn update_font_size(
-    cmd_ctx: State<'_, CommandAsyncContext>,
+    cmd_ctx: State<'_, AsyncContext>,
     state: State<'_, AppState<'_>>,
     input: i32,
 ) -> Result<(), String> {
@@ -135,11 +135,19 @@ impl<'a> DesktopMain<'a> {
         }
     }
 
-    pub fn open(&self, ctx2: &mut AppContextCompact) -> Result<()> {
+    pub fn run<F>(&self, f: F) -> Result<ExitCode>
+    where
+        F: 'static + FnOnce(&Self, Context) -> Result<ExitCode>,
+    {
+        let ctx = Context::new();
+        f(self, ctx)
+    }
+
+    pub fn open_window(&self, ctx: Context) -> Result<ExitCode> {
         // ------ Example stream
         let (tx, mut rx) = tokio::sync::broadcast::channel(16);
 
-        ctx2.detach(|_| async move {
+        ctx.detach(async move {
             let mut interval = tokio::time::interval(tokio::time::Duration::from_secs(1));
             let mut count = 0;
             loop {
@@ -153,7 +161,7 @@ impl<'a> DesktopMain<'a> {
         // ------
 
         // TODO: move to StorageService
-        let db = ctx2.block_on(|ctx| async {
+        let db = ctx.block_on(async {
             let db = Surreal::new::<Ws>("127.0.0.1:8000")
                 .await
                 .expect("failed to connect to db");
@@ -166,94 +174,213 @@ impl<'a> DesktopMain<'a> {
             Arc::new(db)
         });
 
-        let service_group = self.initialize_service_registry()?;
+        let async_ctx = ctx.to_async();
 
-        let window_state = service_group
-            .get_unchecked::<MockStorageService>()
-            .get_last_window_state();
+        let app_state = async_ctx.with_mut::<Result<AppState>>(|ctx| {
+            let service_group = self.initialize_service_registry()?;
 
-        let rt = AsyncRuntime::new();
+            let window_state = service_group
+                .get_unchecked::<MockStorageService>()
+                .get_last_window_state();
 
-        let cx2 = ctx2.clone();
-
-        rt.run(move |ctx: Arc<Mutex<Context>>| {
-            let mut ctx_lock = ctx.lock();
             let mut workbench =
-                Workbench::new(&mut ctx_lock, service_group, window_state.workspace_id).unwrap();
+                Workbench::new(ctx, service_group, window_state.workspace_id).unwrap();
 
-            cx2.block_on(|_| async {
+            ctx.block_on(async {
                 workbench
                     .initialize()
                     .await
                     .expect("Failed to initialize the workbench");
             });
 
-            let app_state = AppState {
-                workbench: ctx_lock.new_model(|_ctx| workbench),
+            let r = AppState {
+                workbench: ctx.new_model(|_ctx| workbench),
                 project_service: ProjectService::new(db.clone()),
                 session_service: SessionService::new(db.clone()),
             };
 
-            let builder = tauri_specta::Builder::<tauri::Wry>::new()
-                .events(collect_events![])
-                .commands(collect_commands![
-                    workbench_get_state,
-                    create_project,
-                    restore_session,
-                    app_ready,
-                    update_font_size,
-                ]);
+            Ok(r)
+        })?;
 
-            #[cfg(debug_assertions)] // <- Only export on non-release builds
-            builder
-                .export(
-                    specta_typescript::Typescript::default()
-                        .formatter(specta_typescript::formatter::prettier),
-                    "../src/bindings.ts",
-                )
-                .expect("Failed to export typescript bindings");
+        let builder = tauri_specta::Builder::<tauri::Wry>::new()
+            .events(collect_events![])
+            .commands(collect_commands![
+                workbench_get_state,
+                create_project,
+                restore_session,
+                app_ready,
+                update_font_size,
+            ]);
 
-            drop(ctx_lock);
-            tauri::Builder::default()
-                .manage(CommandAsyncContext::from(Arc::clone(&ctx)))
-                .manage(app_state)
-                .invoke_handler(builder.invoke_handler())
-                .setup(move |app: &mut App| {
-                    let app_state: State<AppState> = app.state();
+        #[cfg(debug_assertions)] // <- Only export on non-release builds
+        builder
+            .export(
+                specta_typescript::Typescript::default()
+                    .formatter(specta_typescript::formatter::prettier),
+                "../src/bindings.ts",
+            )
+            .expect("Failed to export typescript bindings");
 
-                    let app_handle = app.handle().clone();
-                    let window = app.get_webview_window("main").unwrap();
+        tauri::Builder::default()
+            .manage(async_ctx)
+            .manage(app_state)
+            .invoke_handler(builder.invoke_handler())
+            .setup(move |app: &mut App| {
+                let app_state: State<AppState> = app.state();
+                let async_ctx: State<AsyncContext> = app.state();
 
-                    let ctx_lock: &mut Context = &mut ctx.lock();
-                    app_state.workbench.update(ctx_lock, |this, ctx| {
-                        this.set_configuration_window_size(window).unwrap();
-                        this.set_tao_handle(ctx, Rc::new(app_handle.clone()));
+                let app_handle = app.handle().clone();
+                let window = app.get_webview_window("main").unwrap();
 
-                        ctx.notify();
-                    });
+                let ctx_lock: &mut Context = &mut async_ctx.lock();
+                app_state.workbench.update(ctx_lock, |this, ctx| {
+                    this.set_configuration_window_size(window).unwrap();
+                    this.set_tao_handle(ctx, Rc::new(app_handle.clone()));
 
-                    tokio::task::block_in_place(|| {
-                        tauri::async_runtime::block_on(async move {
-                            // Example stream data emitting
-                            tokio::spawn(async move {
-                                while let Ok(data) = rx.recv().await {
-                                    app_handle.emit("data-stream", data).unwrap();
-                                }
-                            });
+                    ctx.notify();
+                });
+
+                tokio::task::block_in_place(|| {
+                    tauri::async_runtime::block_on(async move {
+                        // Example stream data emitting
+                        tokio::spawn(async move {
+                            while let Ok(data) = rx.recv().await {
+                                app_handle.emit("data-stream", data).unwrap();
+                            }
                         });
                     });
+                });
 
-                    Ok(())
-                })
-                .menu(menu::setup_window_menu)
-                .plugin(tauri_plugin_os::init())
-                .build(tauri::generate_context!())
-                .unwrap()
-                .run(|_, _| {});
-        });
+                Ok(())
+            })
+            .menu(menu::setup_window_menu)
+            .plugin(tauri_plugin_os::init())
+            .build(tauri::generate_context!())
+            .unwrap()
+            .run(|_, _| {});
 
-        Ok(())
+        Ok(ExitCode::SUCCESS)
     }
+
+    // fn run_old(&self, ctx2: &mut AppContextCompact) -> Result<()> {
+    //     // ------ Example stream
+    //     let (tx, mut rx) = tokio::sync::broadcast::channel(16);
+
+    //     ctx2.detach(|_| async move {
+    //         let mut interval = tokio::time::interval(tokio::time::Duration::from_secs(1));
+    //         let mut count = 0;
+    //         loop {
+    //             interval.tick().await;
+    //             count += 1;
+    //             if tx.send(count).is_err() {
+    //                 break;
+    //             }
+    //         }
+    //     });
+    //     // ------
+
+    //     // TODO: move to StorageService
+    //     let db = ctx2.block_on(|ctx| async {
+    //         let db = Surreal::new::<Ws>("127.0.0.1:8000")
+    //             .await
+    //             .expect("failed to connect to db");
+    //         // let db = Surreal::new::<File>("../rocksdb").await.unwrap();
+    //         db.use_ns("moss").use_db("compass").await.unwrap();
+
+    //         // let schema = include_str!("../schema.surql");
+    //         // db.query(schema).await.unwrap();
+
+    //         Arc::new(db)
+    //     });
+
+    //     let service_group = self.initialize_service_registry()?;
+
+    //     let window_state = service_group
+    //         .get_unchecked::<MockStorageService>()
+    //         .get_last_window_state();
+
+    //     let rt = AsyncRuntime::new();
+
+    //     let cx2 = ctx2.clone();
+
+    //     rt.run(move |ctx: Arc<Context>| {
+    //         let mut ctx_lock = ctx.lock();
+    //         let mut workbench =
+    //             Workbench::new(&mut ctx_lock, service_group, window_state.workspace_id).unwrap();
+
+    //         cx2.block_on(|_| async {
+    //             workbench
+    //                 .initialize()
+    //                 .await
+    //                 .expect("Failed to initialize the workbench");
+    //         });
+
+    //         let app_state = AppState {
+    //             workbench: ctx_lock.new_model(|_ctx| workbench),
+    //             project_service: ProjectService::new(db.clone()),
+    //             session_service: SessionService::new(db.clone()),
+    //         };
+
+    //         let builder = tauri_specta::Builder::<tauri::Wry>::new()
+    //             .events(collect_events![])
+    //             .commands(collect_commands![
+    //                 workbench_get_state,
+    //                 create_project,
+    //                 restore_session,
+    //                 app_ready,
+    //                 update_font_size,
+    //             ]);
+
+    //         #[cfg(debug_assertions)] // <- Only export on non-release builds
+    //         builder
+    //             .export(
+    //                 specta_typescript::Typescript::default()
+    //                     .formatter(specta_typescript::formatter::prettier),
+    //                 "../src/bindings.ts",
+    //             )
+    //             .expect("Failed to export typescript bindings");
+
+    //         drop(ctx_lock);
+    //         tauri::Builder::default()
+    //             .manage(CommandAsyncContext::from(Arc::clone(&ctx)))
+    //             .manage(app_state)
+    //             .invoke_handler(builder.invoke_handler())
+    //             .setup(move |app: &mut App| {
+    //                 let app_state: State<AppState> = app.state();
+
+    //                 let app_handle = app.handle().clone();
+    //                 let window = app.get_webview_window("main").unwrap();
+
+    //                 let ctx_lock: &mut Context = &mut ctx.lock();
+    //                 app_state.workbench.update(ctx_lock, |this, ctx| {
+    //                     this.set_configuration_window_size(window).unwrap();
+    //                     this.set_tao_handle(ctx, Rc::new(app_handle.clone()));
+
+    //                     ctx.notify();
+    //                 });
+
+    //                 tokio::task::block_in_place(|| {
+    //                     tauri::async_runtime::block_on(async move {
+    //                         // Example stream data emitting
+    //                         tokio::spawn(async move {
+    //                             while let Ok(data) = rx.recv().await {
+    //                                 app_handle.emit("data-stream", data).unwrap();
+    //                             }
+    //                         });
+    //                     });
+    //                 });
+
+    //                 Ok(())
+    //             })
+    //             .menu(menu::setup_window_menu)
+    //             .plugin(tauri_plugin_os::init())
+    //             .build(tauri::generate_context!())
+    //             .unwrap()
+    //             .run(|_, _| {});
+    //     });
+
+    //     Ok(())
+    // }
 
     fn initialize_service_registry(&'a self) -> Result<ServiceRegistry> {
         let mut service_registry = ServiceRegistry::new();
