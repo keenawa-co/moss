@@ -177,7 +177,7 @@ export const DotsOnTextOverflow: Story = {
             <li>
               <span className="font-black">Container</span> with your items
               <span className="font-black"> must have </span>
-              <u>overflow: hidden</u> <span>and </span>
+              <u>overflow: hidden</u> <span>and a </span>
               <u>fixed width or width:100%</u>
             </li>
             <li>
