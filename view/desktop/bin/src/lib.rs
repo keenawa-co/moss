@@ -1,18 +1,12 @@
+mod command;
 mod mem;
+mod menu;
+mod service;
 
-pub mod menu;
-pub mod service;
-
-use anyhow::Result;
-use app::context_compact::AppContextCompact;
-
-use parking_lot::Mutex;
-use platform_core::{
-    common::{
-        context::{async_context::AsyncContext, entity::Model, AnyContext, Context},
-        runtime::AsyncRuntime,
-    },
-    tao::context::command_context::CommandAsyncContext,
+use crate::command::{cmd_base, cmd_dummy};
+use anyhow::{Context as ResultContext, Result};
+use platform_core::common::context::{
+    async_context::AsyncContext, entity::Model, AnyContext, Context,
 };
 use platform_formation::service_registry::ServiceRegistry;
 use platform_fs::disk::file_system_service::DiskFileSystemService;
@@ -23,88 +17,17 @@ use std::rc::Rc;
 use std::sync::Arc;
 use std::{env, process::ExitCode};
 use surrealdb::{engine::remote::ws::Ws, Surreal};
-use tauri::{App, AppHandle, Emitter, Manager, State};
+use tauri::{App, Emitter, Manager, State};
 use tauri_specta::{collect_commands, collect_events};
 use workbench_service_environment_tgui::environment_service::NativeEnvironmentService;
-use workbench_tgui::window::NativeWindowConfiguration;
-use workbench_tgui::{Workbench, WorkbenchState};
-
-use crate::service::{
-    project_service::{CreateProjectInput, ProjectDTO},
-    session_service::SessionInfoDTO,
-};
+use workbench_tgui::window::{NativePlatformInfo, NativeWindowConfiguration};
+use workbench_tgui::Workbench;
 
 #[macro_use]
 extern crate serde;
 
 #[macro_use]
 extern crate tracing;
-
-#[tauri::command(async)]
-#[specta::specta]
-async fn update_font_size(
-    cmd_ctx: State<'_, AsyncContext>,
-    state: State<'_, AppState<'_>>,
-    input: i32,
-) -> Result<(), String> {
-    cmd_ctx.with_mut(|ctx| {
-        state.workbench.update(ctx, |this, cx| {
-            this.update_conf(cx, input as usize).unwrap();
-            cx.notify();
-        });
-
-        Ok(())
-    })
-}
-
-#[tauri::command(async)]
-#[specta::specta]
-async fn workbench_get_state(state: State<'_, AppState<'_>>) -> Result<WorkbenchState, String> {
-    // Ok(state.workbench.get_state())
-    dbg!(1);
-    Ok(WorkbenchState::Empty)
-}
-
-#[tauri::command(async)]
-#[specta::specta]
-async fn app_ready(app_handle: AppHandle) {
-    let window = app_handle.get_webview_window("main").unwrap();
-    window.show().unwrap();
-}
-
-#[tauri::command(async)]
-#[specta::specta]
-async fn create_project(
-    state: State<'_, AppState<'_>>,
-    input: CreateProjectInput,
-) -> Result<Option<ProjectDTO>, String> {
-    match state.project_service.create_project(&input).await {
-        Ok(Some(project)) => return Ok(Some(project.into())),
-        Ok(None) => return Ok(None),
-        Err(e) => {
-            let err = format!("An error occurred while creating the project: {e}");
-            error!(err);
-            return Err(err);
-        }
-    }
-}
-
-#[tauri::command(async)]
-#[specta::specta]
-async fn restore_session(
-    state: State<'_, AppState<'_>>,
-    project_source: Option<String>,
-) -> Result<Option<SessionInfoDTO>, String> {
-    match state.session_service.restore_session(project_source).await {
-        Ok(Some(session_info)) => return Ok(Some(session_info.into())),
-        Ok(None) => return Ok(None),
-        Err(e) => {
-            let err = format!("An error occurred while restoring the session: {e}");
-            error!(err);
-            return Err(err);
-        }
-    }
-}
 
 pub struct MockStorageService {}
 
@@ -124,28 +47,43 @@ impl MockStorageService {
     }
 }
 
-pub struct DesktopMain<'a> {
-    native_window_configuration: NativeWindowConfiguration<'a>,
+pub struct AppState<'a> {
+    pub workbench: Model<Workbench<'a>>,
+    pub platform_info: NativePlatformInfo,
+    pub project_service: ProjectService,
+    pub session_service: SessionService,
 }
 
-impl<'a> DesktopMain<'a> {
-    pub fn new(configuration: NativeWindowConfiguration<'a>) -> Self {
+pub struct AppMain {
+    native_window_configuration: NativeWindowConfiguration,
+}
+
+impl AppMain {
+    pub fn new(configuration: NativeWindowConfiguration) -> Self {
         Self {
             native_window_configuration: configuration,
         }
     }
 
-    pub fn run<F>(&self, f: F) -> Result<ExitCode>
+    pub fn run<F>(&self, f: F) -> ExitCode
     where
-        F: 'static + FnOnce(&Self, Context) -> Result<ExitCode>,
+        F: 'static + FnOnce(&Self, Context) -> Result<()>,
     {
         let ctx = Context::new();
-        f(self, ctx)
+
+        if let Err(e) = f(self, ctx) {
+            error!("{}", e);
+            ExitCode::FAILURE
+        } else {
+            ExitCode::SUCCESS
+        }
     }
 
-    pub fn open_window(&self, ctx: Context) -> Result<ExitCode> {
+    pub fn open_main_window(&self, ctx: Context) -> Result<()> {
         // ------ Example stream
-        let (tx, mut rx) = tokio::sync::broadcast::channel(16);
+        // TODO:
+        // Used only as an example implementation. Remove this disgrace as soon as possible.
+        let (tx, rx) = tokio::sync::broadcast::channel(16);
 
         ctx.detach(async move {
             let mut interval = tokio::time::interval(tokio::time::Duration::from_secs(1));
@@ -177,7 +115,7 @@ impl<'a> DesktopMain<'a> {
         let async_ctx = ctx.to_async();
 
         let app_state = async_ctx.with_mut::<Result<AppState>>(|ctx| {
-            let service_group = self.initialize_service_registry()?;
+            let service_group = self.create_service_registry()?;
 
             let window_state = service_group
                 .get_unchecked::<MockStorageService>()
@@ -193,35 +131,41 @@ impl<'a> DesktopMain<'a> {
                     .expect("Failed to initialize the workbench");
             });
 
-            let r = AppState {
+            Ok(AppState {
                 workbench: ctx.new_model(|_ctx| workbench),
+                platform_info: self.native_window_configuration.platform_info.clone(),
                 project_service: ProjectService::new(db.clone()),
                 session_service: SessionService::new(db.clone()),
-            };
-
-            Ok(r)
+            })
         })?;
 
         let builder = tauri_specta::Builder::<tauri::Wry>::new()
             .events(collect_events![])
             .commands(collect_commands![
-                workbench_get_state,
-                create_project,
-                restore_session,
-                app_ready,
-                update_font_size,
+                cmd_dummy::workbench_get_state,
+                cmd_dummy::create_project,
+                cmd_dummy::restore_session,
+                cmd_dummy::app_ready,
+                cmd_dummy::update_font_size,
+                cmd_base::native_platform_info,
             ]);
 
-        #[cfg(debug_assertions)] // <- Only export on non-release builds
-        builder
-            .export(
-                specta_typescript::Typescript::default()
-                    .formatter(specta_typescript::formatter::prettier),
-                "../src/bindings.ts",
-            )
-            .expect("Failed to export typescript bindings");
+        #[cfg(debug_assertions)]
+        self.export_typescript_bindings(&builder)?;
 
-        tauri::Builder::default()
+        Ok(self
+            .initialize_app(async_ctx, app_state, builder, rx)?
+            .run(|_, _| {}))
+    }
+
+    fn initialize_app(
+        &self,
+        async_ctx: AsyncContext,
+        app_state: AppState<'static>,
+        builder: tauri_specta::Builder,
+        mut rx: tokio::sync::broadcast::Receiver<i32>,
+    ) -> Result<App> {
+        let builder = tauri::Builder::default()
             .manage(async_ctx)
             .manage(app_state)
             .invoke_handler(builder.invoke_handler())
@@ -240,6 +184,8 @@ impl<'a> DesktopMain<'a> {
                     ctx.notify();
                 });
 
+                // TODO:
+                // Used only as an example implementation. Remove this disgrace as soon as possible.
                 tokio::task::block_in_place(|| {
                     tauri::async_runtime::block_on(async move {
                         // Example stream data emitting
@@ -255,134 +201,12 @@ impl<'a> DesktopMain<'a> {
             })
             .menu(menu::setup_window_menu)
             .plugin(tauri_plugin_os::init())
-            .build(tauri::generate_context!())
-            .unwrap()
-            .run(|_, _| {});
+            .build(tauri::generate_context!())?;
 
-        Ok(ExitCode::SUCCESS)
+        Ok(builder)
     }
 
-    // fn run_old(&self, ctx2: &mut AppContextCompact) -> Result<()> {
-    //     // ------ Example stream
-    //     let (tx, mut rx) = tokio::sync::broadcast::channel(16);
-
-    //     ctx2.detach(|_| async move {
-    //         let mut interval = tokio::time::interval(tokio::time::Duration::from_secs(1));
-    //         let mut count = 0;
-    //         loop {
-    //             interval.tick().await;
-    //             count += 1;
-    //             if tx.send(count).is_err() {
-    //                 break;
-    //             }
-    //         }
-    //     });
-    //     // ------
-
-    //     // TODO: move to StorageService
-    //     let db = ctx2.block_on(|ctx| async {
-    //         let db = Surreal::new::<Ws>("127.0.0.1:8000")
-    //             .await
-    //             .expect("failed to connect to db");
-    //         // let db = Surreal::new::<File>("../rocksdb").await.unwrap();
-    //         db.use_ns("moss").use_db("compass").await.unwrap();
-
-    //         // let schema = include_str!("../schema.surql");
-    //         // db.query(schema).await.unwrap();
-
-    //         Arc::new(db)
-    //     });
-
-    //     let service_group = self.initialize_service_registry()?;
-
-    //     let window_state = service_group
-    //         .get_unchecked::<MockStorageService>()
-    //         .get_last_window_state();
-
-    //     let rt = AsyncRuntime::new();
-
-    //     let cx2 = ctx2.clone();
-
-    //     rt.run(move |ctx: Arc<Context>| {
-    //         let mut ctx_lock = ctx.lock();
-    //         let mut workbench =
-    //             Workbench::new(&mut ctx_lock, service_group, window_state.workspace_id).unwrap();
-
-    //         cx2.block_on(|_| async {
-    //             workbench
-    //                 .initialize()
-    //                 .await
-    //                 .expect("Failed to initialize the workbench");
-    //         });
-
-    //         let app_state = AppState {
-    //             workbench: ctx_lock.new_model(|_ctx| workbench),
-    //             project_service: ProjectService::new(db.clone()),
-    //             session_service: SessionService::new(db.clone()),
-    //         };
-
-    //         let builder = tauri_specta::Builder::<tauri::Wry>::new()
-    //             .events(collect_events![])
-    //             .commands(collect_commands![
-    //                 workbench_get_state,
-    //                 create_project,
-    //                 restore_session,
-    //                 app_ready,
-    //                 update_font_size,
-    //             ]);
-
-    //         #[cfg(debug_assertions)] // <- Only export on non-release builds
-    //         builder
-    //             .export(
-    //                 specta_typescript::Typescript::default()
-    //                     .formatter(specta_typescript::formatter::prettier),
-    //                 "../src/bindings.ts",
-    //             )
-    //             .expect("Failed to export typescript bindings");
-
-    //         drop(ctx_lock);
-    //         tauri::Builder::default()
-    //             .manage(CommandAsyncContext::from(Arc::clone(&ctx)))
-    //             .manage(app_state)
-    //             .invoke_handler(builder.invoke_handler())
-    //             .setup(move |app: &mut App| {
-    //                 let app_state: State<AppState> = app.state();
-
-    //                 let app_handle = app.handle().clone();
-    //                 let window = app.get_webview_window("main").unwrap();
-
-    //                 let ctx_lock: &mut Context = &mut ctx.lock();
-    //                 app_state.workbench.update(ctx_lock, |this, ctx| {
-    //                     this.set_configuration_window_size(window).unwrap();
-    //                     this.set_tao_handle(ctx, Rc::new(app_handle.clone()));
-
-    //                     ctx.notify();
-    //                 });
-
-    //                 tokio::task::block_in_place(|| {
-    //                     tauri::async_runtime::block_on(async move {
-    //                         // Example stream data emitting
-    //                         tokio::spawn(async move {
-    //                             while let Ok(data) = rx.recv().await {
-    //                                 app_handle.emit("data-stream", data).unwrap();
-    //                             }
-    //                         });
-    //                     });
-    //                 });
-
-    //                 Ok(())
-    //             })
-    //             .menu(menu::setup_window_menu)
-    //             .plugin(tauri_plugin_os::init())
-    //             .build(tauri::generate_context!())
-    //             .unwrap()
-    //             .run(|_, _| {});
-    //     });
-
-    //     Ok(())
-    // }
-
-    fn initialize_service_registry(&'a self) -> Result<ServiceRegistry> {
+    fn create_service_registry(&self) -> Result<ServiceRegistry> {
         let mut service_registry = ServiceRegistry::new();
 
         let mock_storage_service = MockStorageService::new();
@@ -397,10 +221,14 @@ impl<'a> DesktopMain<'a> {
 
         Ok(service_registry)
     }
-}
 
-pub struct AppState<'a> {
-    pub workbench: Model<Workbench<'a>>,
-    pub project_service: ProjectService,
-    pub session_service: SessionService,
+    fn export_typescript_bindings(&self, builder: &tauri_specta::Builder) -> Result<()> {
+        Ok(builder
+            .export(
+                specta_typescript::Typescript::default()
+                    .formatter(specta_typescript::formatter::prettier),
+                "../src/bindings.ts",
+            )
+            .context("Failed to export typescript bindings")?)
+    }
 }
