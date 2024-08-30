@@ -23,6 +23,7 @@ app.workspace = true
 parking_lot.workspace = true
 tracing.workspace = true
 
+platform_core.workspace = true
 platform_workspace.workspace = true
 platform_configuration.workspace = true
 platform_formation.workspace = true

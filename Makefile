@@ -14,13 +14,15 @@ SURREAL = surreal
 	run-desktop-web \
 	run-storybook \
 	run-database \
+	stop-database \
 	run-docs \
 	run-web \
+	check-db \
 	count \
 	cleanup \
 
 
-run-desktop:
+run-desktop: check-db
 	@cd $(DESKTOP_DIR) && $(PNPM) tauri dev
 
 run-desktop-web:
@@ -30,15 +32,24 @@ run-storybook:
 	@cd $(STORYBOOK_DIR) && $(PNPM) dev
 
 run-database:
-	@cd $(DESKTOP_DIR) && $(SURREAL) start file:rocksdb
+	@cd $(DESKTOP_DIR) && $(SURREAL) start file:rocksdb &
+
+stop-database:
+	@pkill -x surreal
 
 run-docs:
 	@cd $(DOCS_DIR) && $(PNPM) dev
 
 run-web:
 	@cd $(WEB_DIR) && $(PNPM) dev
-	
 
+
+# Check if the database is running, if not, start it in the background
+check-db:
+	@if ! pgrep -x "surreal" > /dev/null; then \
+		$(MAKE) run-database; \
+	fi
+	
 # Count lines of Rust code, excluding the 'target' directory
 count:
 	@find . -type f -name '*.rs' | grep -v '/target/' | xargs wc -l

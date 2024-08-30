@@ -1,7 +1,7 @@
 use anyhow::Result;
 use hashbrown::HashMap;
 use lazy_regex::{Lazy, Regex};
-use moss_std::collection::Extend;
+use moss_std::collection::extend::Extend;
 use radix_trie::{Trie, TrieCommon};
 use serde_json::Value;
 

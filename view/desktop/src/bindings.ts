@@ -30,6 +30,14 @@ export const commands = {
   async appReady(): Promise<void> {
     await TAURI_INVOKE("app_ready");
   },
+  async updateFontSize(input: number): Promise<Result<null, string>> {
+    try {
+      return { status: "ok", data: await TAURI_INVOKE("update_font_size", { input }) };
+    } catch (e) {
+      if (e instanceof Error) throw e;
+      else return { status: "error", error: e as any };
+    }
+  },
 };
 
 /** user-defined events **/

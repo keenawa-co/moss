@@ -1,35 +1,30 @@
-use std::{borrow::Cow, path::PathBuf};
+use specta::Type;
+use std::path::PathBuf;
 use sysinfo::System;
 
-#[derive(Debug)]
-pub struct NativePlatformInfo<'a> {
-    pub os: Cow<'a, str>,
-    pub version: Cow<'a, str>,
-    pub hostname: Cow<'a, str>,
+#[derive(Debug, Clone, Type, Serialize)]
+pub struct NativePlatformInfo {
+    pub os: String,
+    pub version: String,
+    pub hostname: String,
 }
 
-impl<'a> NativePlatformInfo<'a> {
+impl NativePlatformInfo {
     pub fn new() -> Self {
         let mut sys = System::new_all();
         sys.refresh_all();
 
         Self {
-            os: System::name()
-                .map(Cow::Owned)
-                .unwrap_or_else(|| Cow::Borrowed("unknown")),
-            version: System::os_version()
-                .map(Cow::Owned)
-                .unwrap_or_else(|| Cow::Borrowed("unknown")),
-            hostname: System::host_name()
-                .map(Cow::Owned)
-                .unwrap_or_else(|| Cow::Borrowed("unknown")),
+            os: System::name().unwrap_or_else(|| "unknown".to_string()),
+            version: System::os_version().unwrap_or_else(|| "unknown".to_string()),
+            hostname: System::host_name().unwrap_or_else(|| "unknown".to_string()),
         }
     }
 }
 
 #[derive(Debug)]
-pub struct NativeWindowConfiguration<'a> {
+pub struct NativeWindowConfiguration {
     pub home_dir: PathBuf,
     pub full_screen: bool,
-    pub platform_info: NativePlatformInfo<'a>,
+    pub platform_info: NativePlatformInfo,
 }

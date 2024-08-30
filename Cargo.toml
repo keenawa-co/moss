@@ -5,6 +5,7 @@ members = [
 
     "lib/moss_std",
 
+    "platform/core",
     "platform/fs",
     "platform/formation",
     "platform/configuration",
@@ -21,12 +22,13 @@ members = [
     "view/shared/workbench/service/configuration/tgui",
     "view/shared/workbench/service/user_profile/tgui",
     "view/shared/workbench/service/environment/tgui",
+
 ]
 
-[profile.dev]
-split-debuginfo = "unpacked"
-debug = "limited"
-codegen-units = 16
+# [profile.dev]
+# split-debuginfo = "unpacked"
+# debug = "limited"
+# codegen-units = 16
 
 [profile.release]
 debug = "limited"
@@ -39,6 +41,7 @@ fs = { path = "kernel/fs" }
 
 moss_std = { path = "lib/moss_std" }
 
+platform_core = { path = "platform/core" }
 platform_utl = { path = "platform/utl" }
 platform_configuration = { path = "platform/configuration" }
 platform_formation = { path = "platform/formation" }
@@ -95,3 +98,5 @@ tracing = "0.1"
 opentelemetry = "0.22.0"
 tracing-opentelemetry = "0.23.0"
 tracing-subscriber = "0.3.18"
+slotmap = "1.0.7"
+rustc-hash = "2.0.0"
