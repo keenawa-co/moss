@@ -12,6 +12,10 @@
   html,
   body {
     @apply font-sans text-primary;
+    overflow: hidden;
+    position: fixed;
+    width: 100vw;
+    height: 100vh;
   }
 
   h1,
