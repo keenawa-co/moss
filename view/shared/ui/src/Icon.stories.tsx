@@ -32,7 +32,7 @@ export const AllVariants: Story = {
       <div className="w-full p-16 flex flex-col gap-6">
         <h2 className="text-3xl font-semibold">All variants</h2>
 
-        <div className="grid grid-cols-4 gap-4">
+        <div className="grid grid-cols-4 gap-4 justify-items-center">
           <div>Default</div>
           <div>Fill</div>
           <div>Stroke</div>

@@ -30,4 +30,8 @@ impl NativeEnvironmentService {
     pub fn user_home_dir(&self) -> &PathBuf {
         &self.user_home_dir
     }
+
+    pub fn platform_environment(&self) -> &Environment {
+        &self.platform_environment
+    }
 }

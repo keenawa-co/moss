@@ -1,5 +1,5 @@
 [package]
-name = "platform_formation"
+name = "platform_core"
 version = "0.1.0"
 edition = "2021"
 
@@ -13,3 +13,9 @@ slotmap.workspace = true
 parking_lot.workspace = true
 derive_more.workspace = true
 anyhow.workspace = true
+tokio.workspace = true
+futures.workspace = true
+smol.workspace = true
+
+[features]
+default = []
