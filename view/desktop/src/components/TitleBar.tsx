@@ -1,5 +1,9 @@
 import { twMerge } from "tailwind-merge";
 import { WindowTitlebar } from "@/components";
+import { getOsType } from "@/components/window-controls/libs/plugin-os";
+import { OsType } from "@tauri-apps/plugin-os";
+import { useEffect, useState } from "react";
+import { cn } from "@/utils";
 
 interface TitleBarProps {
   showControls?: string;
@@ -7,8 +11,21 @@ interface TitleBarProps {
 }
 
 export const TitleBar = ({}: TitleBarProps) => {
+  const [osType, setOsType] = useState<OsType | undefined>(undefined);
+
+  useEffect(() => {
+    getOsType().then((type) => {
+      setOsType(type);
+    });
+  });
+
   return (
-    <header data-tauri-drag-region className={twMerge("inset-0 bg-toolbar-background")}>
+    <header
+      data-tauri-drag-region
+      className={cn("inset-0 bg-toolbar-background", {
+        "rounded-t-lg": osType != "windows",
+      })}
+    >
       <WindowTitlebar />
     </header>
   );

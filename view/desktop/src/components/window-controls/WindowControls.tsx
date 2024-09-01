@@ -13,7 +13,7 @@ export function WindowControls({
   className,
   ...props
 }: WindowControlsProps) {
-  const [osType, setOsType] = useState<string | undefined>(undefined);
+  const [osType, setOsType] = useState<OsType | undefined>(undefined);
 
   // for macOS testing: setOsType("macos");
   useEffect(() => {
