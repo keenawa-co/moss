@@ -8,7 +8,7 @@ interface TitleBarProps {
 
 export const TitleBar = ({}: TitleBarProps) => {
   return (
-    <header data-tauri-drag-region className={twMerge("absolute inset-0 h-11 bg-toolbar-background")}>
+    <header data-tauri-drag-region className={twMerge("inset-0 bg-toolbar-background")}>
       <WindowTitlebar />
     </header>
   );
