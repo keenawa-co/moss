@@ -1,4 +1,4 @@
-pub mod service_registry;
+pub mod common;
 
 #[macro_use]
 extern crate anyhow;

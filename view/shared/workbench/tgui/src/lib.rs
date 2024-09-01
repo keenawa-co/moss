@@ -1,13 +1,16 @@
 pub mod contribution;
 pub mod window;
 
-use std::{borrow::BorrowMut, path::PathBuf, sync::Arc};
+use std::{borrow::BorrowMut, cell::Cell, path::PathBuf, rc::Rc, sync::Arc};
 
 use anyhow::Result;
 use contribution::WORKBENCH_TGUI_WINDOW;
 use platform_configuration::{
     attribute_name, configuration_policy::ConfigurationPolicyService,
     configuration_registry::ConfigurationRegistry, AbstractConfigurationService,
+};
+use platform_core::common::context::{
+    entity::Model, model_context::ModelContext, subscription::Subscription, AnyContext, Context,
 };
 use platform_formation::service_registry::ServiceRegistry;
 use platform_fs::disk::file_system_service::{
@@ -16,7 +19,7 @@ use platform_fs::disk::file_system_service::{
 use platform_user_profile::user_profile_service::UserProfileService as PlatformUserProfileService;
 use platform_workspace::{Workspace, WorkspaceId};
 use specta::Type;
-use tauri::WebviewWindow;
+use tauri::{AppHandle, Emitter, WebviewWindow};
 use workbench_service_configuration_tgui::configuration_service::WorkspaceConfigurationService;
 use workbench_service_environment_tgui::environment_service::NativeEnvironmentService;
 use workbench_service_user_profile_tgui::user_profile_service::UserProfileService;
@@ -25,7 +28,21 @@ use workbench_service_user_profile_tgui::user_profile_service::UserProfileServic
 extern crate serde;
 
 #[macro_use]
+extern crate anyhow;
+
+#[macro_use]
 extern crate lazy_static;
+
+// TODO: this will be removed after testing is complete
+struct MockFontSizeService {
+    size: Cell<usize>,
+}
+
+impl MockFontSizeService {
+    fn update_font_size(&self, value: usize) {
+        self.size.replace(value);
+    }
+}
 
 #[derive(Debug, Type, Serialize)]
 pub enum WorkbenchState {
@@ -37,11 +54,28 @@ pub struct Workbench<'a> {
     workspace_id: WorkspaceId,
     service_registry: ServiceRegistry,
     configuration_registry: ConfigurationRegistry<'a>,
+    // TODO: this will be removed after testing is complete
+    font_size_service: Model<MockFontSizeService>,
+    _observe_font_size_service: Option<Subscription>,
+    tao: Option<Rc<AppHandle>>,
 }
 
 impl<'a> Workbench<'a> {
-    pub fn new(service_registry: ServiceRegistry, workspace_id: WorkspaceId) -> Result<Self> {
+    pub fn new(
+        ctx: &mut Context,
+        service_registry: ServiceRegistry,
+        workspace_id: WorkspaceId,
+    ) -> Result<Self> {
         let mut configuration_registry = ConfigurationRegistry::new();
+
+        let font_service_model = ctx.new_model(|_ctx| MockFontSizeService {
+            size: Cell::new(10),
+        });
+        // let _observe = ctx.observe(&font_service_model, |service_model, _ctx| {
+        //     dbg!("D");
+        //     let s = service_model.read(_ctx);
+        //     dbg!(s.size.get());
+        // });
 
         configuration_registry
             .borrow_mut()
@@ -51,6 +85,9 @@ impl<'a> Workbench<'a> {
             workspace_id,
             service_registry,
             configuration_registry,
+            font_size_service: font_service_model,
+            _observe_font_size_service: None,
+            tao: None,
         })
     }
 
@@ -148,8 +185,19 @@ impl<'a> Workbench<'a> {
             }
         }
     }
+    pub fn set_tao_handle(&mut self, ctx: &mut Context, handle: Rc<AppHandle>) {
+        self.tao = Some(Rc::clone(&handle));
 
-    pub fn apply_configuration_window_size(&self, window: WebviewWindow) -> Result<()> {
+        self._observe_font_size_service =
+            Some(ctx.observe(&self.font_size_service, move |this, cx| {
+                // self.tao = Some(handle);
+                let s = &this.read(cx).size;
+                dbg!("AA");
+                handle.emit("font-size-update-event", s.get()).unwrap();
+            }));
+    }
+
+    pub fn set_configuration_window_size(&self, window: WebviewWindow) -> Result<()> {
         use tauri::{LogicalSize, Size::Logical};
 
         let config_service = self
@@ -183,5 +231,21 @@ impl<'a> Workbench<'a> {
 
     pub fn get_state(&self) -> WorkbenchState {
         WorkbenchState::Empty
+    }
+}
+
+impl<'a> Workbench<'a> {
+    pub fn update_conf(
+        &self,
+        ctx: &mut ModelContext<'_, Workbench<'a>>,
+        value: usize,
+    ) -> Result<()> {
+        ctx.update_model(&self.font_size_service, |this, ctx| {
+            this.update_font_size(value);
+            dbg!("C");
+            ctx.notify();
+        });
+
+        Ok(())
     }
 }
