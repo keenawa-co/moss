@@ -22,7 +22,9 @@ export function WindowControls({
     });
   }, []);
 
-  const customClass = cn("flex", className, hide && (hideMethod === "display" ? "hidden" : "invisible"));
+  const customClass = cn("flex", className, hide && (hideMethod === "display" ? "hidden" : "invisible"), {
+    "rounded-t-lg": osType != "Windows",
+  });
 
   // Determine the default platform based on the operating system if not specified
   if (!platform) {
