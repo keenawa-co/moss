@@ -5,7 +5,7 @@ import StatusBar from "./StatusBar";
 
 export const RootLayout = ({ children, className, ...props }: ComponentProps<"main">) => {
   return (
-    <div className="h-full grid grid-rows-[auto_1fr_auto] bg-red-600 ">
+    <div className="h-full grid grid-rows-[auto_1fr_auto]">
       <TitleBar />
 
       <main className={twMerge("bg-page-background", className)} {...props}>
