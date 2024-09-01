@@ -13,7 +13,14 @@ use platform_fs::disk::file_system_service::DiskFileSystemService;
 use platform_workspace::WorkspaceId;
 use service::project_service::ProjectService;
 use service::session_service::SessionService;
+<<<<<<< HEAD
 use std::rc::Rc;
+=======
+use tracing_subscriber::layer::SubscriberExt;
+use tracing_subscriber::util::SubscriberInitExt;
+use std::borrow::Cow;
+use std::env;
+>>>>>>> 894aa703 (feat: logging init & send them to frontend)
 use std::sync::Arc;
 use std::{env, process::ExitCode};
 use surrealdb::{engine::remote::ws::Ws, Surreal};
@@ -181,11 +188,16 @@ impl AppMain {
                     this.set_configuration_window_size(window).unwrap();
                     this.set_tao_handle(ctx, Rc::new(app_handle.clone()));
 
+<<<<<<< HEAD
                     ctx.notify();
                 });
 
                 // TODO:
                 // Used only as an example implementation. Remove this disgrace as soon as possible.
+=======
+                init_custom_logging(app_handle.clone());
+
+>>>>>>> 894aa703 (feat: logging init & send them to frontend)
                 tokio::task::block_in_place(|| {
                     tauri::async_runtime::block_on(async move {
                         // Example stream data emitting
@@ -222,6 +234,7 @@ impl AppMain {
         Ok(service_registry)
     }
 
+<<<<<<< HEAD
     fn export_typescript_bindings(&self, builder: &tauri_specta::Builder) -> Result<()> {
         Ok(builder
             .export(
@@ -231,4 +244,44 @@ impl AppMain {
             )
             .context("Failed to export typescript bindings")?)
     }
+=======
+fn init_custom_logging(app_handle: tauri::AppHandle) {
+    struct TauriLogWriter {
+        app_handle: tauri::AppHandle,
+    }
+
+    impl std::io::Write for TauriLogWriter {
+        fn write(&mut self, buf: &[u8]) -> std::io::Result<usize> {
+            let log_message = String::from_utf8_lossy(buf).to_string();
+            let _ = self.app_handle.emit("logs-stream", log_message);
+            Ok(buf.len())
+        }
+
+        fn flush(&mut self) -> std::io::Result<()> {
+            Ok(())
+        }
+    }
+
+    tracing_subscriber::registry()
+        .with(
+            tracing_subscriber::fmt::layer()
+            .with_writer(std::io::stdout)
+        )
+        .with(
+    tracing_subscriber::fmt::layer()
+            .with_writer(move || TauriLogWriter {
+                app_handle: app_handle.clone(),
+            })  
+        )
+        .init();
+    
+    event!(tracing::Level::DEBUG, "Logging init");
+    info!("Logging initialized");
+}
+
+pub struct AppState<'a> {
+    pub workbench: Workbench<'a>,
+    pub project_service: ProjectService,
+    pub session_service: SessionService,
+>>>>>>> 894aa703 (feat: logging init & send them to frontend)
 }
