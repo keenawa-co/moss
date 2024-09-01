@@ -51,7 +51,7 @@ function App() {
       <RootLayout>
         <Resizable proportionalLayout={false}>
           <ResizablePanel minSize={100} preferredSize={255} snap visible={sideBarVisible}>
-            <Sidebar className="p-0 h-full w-full">
+            <Sidebar className="p-0 h-full w-full overflow-auto">
               <MenuItem className="group bg-zinc-200 mt-13 mb-3.5">
                 <Icon icon="Search" className={twMerge("h-4.5 w-4.5 min-w-4", IconState.Default, IconState.Hover)} />
                 <IconTitle className="text-primary text-xs" title="Search..." />
@@ -88,7 +88,10 @@ function App() {
 
               <MenuItem className="group">
                 <Icon icon="Documentation" className={twMerge(IconState.Default, IconState.Hover, "min-w-4")} />
-                <IconTitle className="text-primary text-sm" title="Documentation" />
+                <IconTitle
+                  className="text-primary text-sm"
+                  title="Documentation with very long title to trigger overflow X"
+                />
               </MenuItem>
 
               <MenuItem className="group">
