@@ -10,6 +10,8 @@ use platform_fs::disk::file_system_service::DiskFileSystemService;
 use platform_workspace::WorkspaceId;
 use service::project_service::ProjectService;
 use service::session_service::SessionService;
+use tracing_subscriber::layer::SubscriberExt;
+use tracing_subscriber::util::SubscriberInitExt;
 use std::borrow::Cow;
 use std::env;
 use std::sync::Arc;
@@ -191,6 +193,8 @@ impl<'a> DesktopMain<'a> {
                     .apply_configuration_window_size(window)
                     .unwrap();
 
+                init_custom_logging(app_handle.clone());
+
                 tokio::task::block_in_place(|| {
                     tauri::async_runtime::block_on(async move {
                         // Example stream data emitting
@@ -227,6 +231,40 @@ impl<'a> DesktopMain<'a> {
 
         Ok(service_registry)
     }
+}
+
+fn init_custom_logging(app_handle: tauri::AppHandle) {
+    struct TauriLogWriter {
+        app_handle: tauri::AppHandle,
+    }
+
+    impl std::io::Write for TauriLogWriter {
+        fn write(&mut self, buf: &[u8]) -> std::io::Result<usize> {
+            let log_message = String::from_utf8_lossy(buf).to_string();
+            let _ = self.app_handle.emit("logs-stream", log_message);
+            Ok(buf.len())
+        }
+
+        fn flush(&mut self) -> std::io::Result<()> {
+            Ok(())
+        }
+    }
+
+    tracing_subscriber::registry()
+        .with(
+            tracing_subscriber::fmt::layer()
+            .with_writer(std::io::stdout)
+        )
+        .with(
+    tracing_subscriber::fmt::layer()
+            .with_writer(move || TauriLogWriter {
+                app_handle: app_handle.clone(),
+            })  
+        )
+        .init();
+    
+    event!(tracing::Level::DEBUG, "Logging init");
+    info!("Logging initialized");
 }
 
 pub struct AppState<'a> {

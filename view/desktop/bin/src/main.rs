@@ -1,17 +1,17 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
+use std::{borrow::Borrow, io, sync::Arc};
+
 use app::{context_compact::AppContextCompact, AppCompact};
 use app_lib::DesktopMain;
+use tauri::{AppHandle, Emitter};
 use tracing::{error, event, Level};
+use tracing_subscriber::fmt::MakeWriter;
 use workbench_tgui::window::{NativePlatformInfo, NativeWindowConfiguration};
 
 fn main() {
-    tracing_subscriber::fmt()
-        .with_max_level(Level::DEBUG)
-        .init();
-    
-    event!(Level::INFO, "inside foo");
+    event!(Level::INFO, "before run");
 
     AppCompact::new().run(|ctx: &mut AppContextCompact| {
         let home_dir = std::env::var("HOME")
@@ -27,5 +27,8 @@ fn main() {
         if let Err(err) = DesktopMain::new(configuration).open(ctx) {
             error!("{err:#?}")
         }
-    })
+    });
+
+    event!(Level::INFO, "after run");
 }
+
