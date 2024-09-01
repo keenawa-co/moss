@@ -49,7 +49,7 @@ export function WindowTitlebar({
     >
       {left ? (
         <>
-          <WindowControls {...customProps("absolute ml-2 mt-3 z-50")} />
+          <WindowControls {...customProps("ml-2 mt-3 z-50")} />
           {children}
         </>
       ) : (
