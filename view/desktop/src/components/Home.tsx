@@ -100,7 +100,7 @@ export const Home: React.FC = () => {
           <Icon icon="Code" />
         </Tooltip>
       </div>
-      <SessionComponent></SessionComponent>
+      <SessionComponent />
       <div>
         <DropdownMenu>
           <DropdownMenuTrigger className="text-primary">Click me!</DropdownMenuTrigger>
