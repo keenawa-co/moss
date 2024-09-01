@@ -1,12 +1,15 @@
 {
-  "name": "theme",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "name": "@repo/theme",
+  "exports": {
+    ".": "./theme.ts"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC"
+  "devDependencies": {
+    "@repo/typescript-config": "workspace:*"
+  },
+  "dependencies": {
+    "typescript": "^5.5.4"
+  }
 }

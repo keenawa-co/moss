@@ -15,6 +15,9 @@
     },
     {
       "path": "view/shared/ui"
+    },
+    {
+      "path": "sdk-ts/theme"
     }
   ]
 }

@@ -1,8 +1,17 @@
 import { IThemeRGB, IThemeVariables } from "../types";
+import { readAllFilesInDirectory } from "../readThemes";
+import { BaseDirectory } from "@tauri-apps/plugin-fs";
 
 // Should be used to apply the theme to the root element of the app. Will use
 // base colors in `theme/base/colors.ts` if no overrides are provided.
-export default function applyTheme(themeRGB: IThemeRGB) {
+export default async function applyTheme(themeRGB: IThemeRGB) {
+  let themes = readAllFilesInDirectory(BaseDirectory.Resource, "themes");
+
+  for (var theme of await themes) {
+    console.warn("-------------------------->>>>>");
+    console.warn(theme);
+  }
+
   const themeObject: IThemeVariables = mapTheme(themeRGB);
   const root = document.documentElement;
 

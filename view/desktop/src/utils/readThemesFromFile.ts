@@ -1,5 +1,4 @@
 import { exists, BaseDirectory, readTextFile, readDir } from "@tauri-apps/plugin-fs";
-import { safeJsonParse } from "@/utils";
 
 type Theme = {
   name: string;
