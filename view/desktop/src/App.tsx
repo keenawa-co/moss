@@ -10,6 +10,7 @@ import { Icon, MenuItem, IconTitle, ThemeProvider } from "@repo/ui";
 import { THEMES } from "@/constants/index";
 import { useTranslation } from "react-i18next";
 import { Resizable, ResizablePanel } from "./components/Resizable";
+
 enum IconState {
   Default = "group-text-primary",
   DefaultStroke = "group-stroke-zinc-500",
@@ -48,8 +49,6 @@ function App() {
   return (
     <ThemeProvider themeRGBOverrides={getTheme(theme)} updateRGBOnChange>
       <RootLayout>
-        <TitleBar />
-
         <Resizable proportionalLayout={false}>
           <ResizablePanel minSize={100} preferredSize={255} snap visible={sideBarVisible}>
             <Sidebar className="p-0 h-full w-full">
@@ -104,7 +103,7 @@ function App() {
             </Sidebar>
           </ResizablePanel>
           <ResizablePanel>
-            <Content className="relative flex flex-col">
+            <Content className="content relative flex flex-col overflow-auto h-full">
               <Suspense fallback="loading">
                 <BrowserRouter>
                   <Menu />
@@ -117,11 +116,6 @@ function App() {
             </Content>
           </ResizablePanel>
         </Resizable>
-
-        <StatusBar
-          className="absolute w-full bottom-0 h-5.5"
-          branch="MOSSMVP-37-Backend-Migrate-existing-backend-in-Tauri"
-        />
       </RootLayout>
     </ThemeProvider>
   );
