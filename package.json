@@ -8,7 +8,7 @@
     "type-check": "turbo type-check",
     "clean": "turbo clean",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
-    "prepare": "husky",
+    "prepare": "husky --allow-empty",
     "precommit": "lint-staged"
   },
   "lint-staged": {
