@@ -10,6 +10,7 @@
   "exports": {
     ".": "./src/index.ts",
     "./src/fonts.css": "./src/fonts.css",
+    "./src/styles.css": "./src/styles.css",
     "./styles.css": "./dist/index.css",
     "./card": "./src/card.tsx"
   },

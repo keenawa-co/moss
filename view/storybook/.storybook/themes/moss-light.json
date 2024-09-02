@@ -1,0 +1,17 @@
+{
+  "name": "moss-light",
+  "type": "light",
+  "default": true,
+  "colors": {
+    "primary": "#000000",
+    "sidebar.background": "#f4f4f5",
+    "toolbar.background": "#dcdcdb",
+    "page.background": "#f4f4f5",
+    "statusbar.background": "#007acd",
+    "windowsCloseButton.background": "#c42b1c",
+    "windowControlsLinux.background": "#dadada",
+    "windowControlsLinux.text": "#3d3d3d",
+    "windowControlsLinux.hoverBackground": "#d1d1d1",
+    "windowControlsLinux.activeBackground": "#bfbfbf"
+  }
+}

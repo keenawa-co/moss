@@ -1,6 +1,7 @@
 export interface Theme {
   name: string;
   type: string;
+  default: boolean;
   colors: Colors;
 }
 
@@ -218,6 +219,7 @@ const typeMap: any = {
     [
       { json: "name", js: "name", typ: "" },
       { json: "type", js: "type", typ: "" },
+      { json: "default", js: "default", typ: true },
       { json: "colors", js: "colors", typ: r("Colors") },
     ],
     false

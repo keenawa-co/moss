@@ -1,0 +1,17 @@
+{
+  "name": "moss-dark",
+  "type": "dark",
+  "default": false,
+  "colors": {
+    "primary": "#ffffff",
+    "sidebar.background": "#312f2d",
+    "toolbar.background": "#1e2021",
+    "page.background": "#161819",
+    "statusbar.background": "#007acd",
+    "windowsCloseButton.background": "#c42b1c",
+    "windowControlsLinux.background": "#373737",
+    "windowControlsLinux.text": "#ffffff",
+    "windowControlsLinux.hoverBackground": "#424242",
+    "windowControlsLinux.activeBackground": "#565656"
+  }
+}

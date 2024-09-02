@@ -30,7 +30,7 @@ function App() {
 
   useEffect(() => {
     async function fetchThemes() {
-      const fetchedThemes = await readThemesFromFiles(BaseDirectory.Resource, "themes");
+      const fetchedThemes = await readThemesFromFiles(BaseDirectory.Home, "./.moss/themes");
       setThemes(fetchedThemes);
       setThemeNames(fetchedThemes.map((theme) => theme.name));
     }

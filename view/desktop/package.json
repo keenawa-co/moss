@@ -12,7 +12,6 @@
     "interface": "i18next-resources-for-ts interface -i ./public/locales/de -o ./src/@types/resources.d.ts"
   },
   "dependencies": {
-    "@repo/ui": "workspace:*",
     "@tailwindcss/nesting": "0.0.0-insiders.565cd3e",
     "@tauri-apps/api": ">=2.0.0-rc.0",
     "@tauri-apps/plugin-fs": "2.0.0-rc.0",
@@ -26,8 +25,9 @@
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",
     "@repo/tailwind-config": "workspace:*",
-    "@repo/typescript-config": "workspace:*",
     "@repo/theme": "workspace:*",
+    "@repo/typescript-config": "workspace:*",
+    "@repo/ui": "workspace:*",
     "@storybook/react": "^8.2.8",
     "@tailwindcss/typography": "^0.5.13",
     "@tauri-apps/cli": ">=2.0.0-rc.0",

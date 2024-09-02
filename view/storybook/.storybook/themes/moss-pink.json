@@ -1,0 +1,18 @@
+{
+  "name": "moss-pink",
+  "type": "pink",
+  "default": false,
+  "colors": {
+    "primary": "#000000",
+    "sidebar.background": "#ea9df2",
+    "toolbar.background": "#c27dc9",
+    "page.background": "#e336f5",
+    "statusbar.background": "#3f0b45",
+
+    "windowsCloseButton.background": "#c42b1c",
+    "windowControlsLinux.background": "#dadada",
+    "windowControlsLinux.text": "#3d3d3d",
+    "windowControlsLinux.hoverBackground": "#d1d1d1",
+    "windowControlsLinux.activeBackground": "#bfbfbf"
+  }
+}

@@ -26,26 +26,6 @@
     {
       "identifier": "fs:allow-home-read-recursive",
       "allow": [{ "path": "$HOME/.moss/*" }]
-    },
-    {
-      "identifier": "fs:allow-resource-read-recursive",
-      "allow": [{ "path": "$RESOURCE/*" }]
-    },
-    {
-      "identifier": "fs:allow-resource-write-recursive",
-      "allow": [{ "path": "$RESOURCE/*" }]
-    },
-    {
-      "identifier": "fs:allow-resource-meta-recursive",
-      "allow": [{ "path": "$RESOURCE/*" }]
-    },
-    {
-      "identifier": "fs:scope-resource-recursive",
-      "allow": [{ "path": "$RESOURCE/*" }]
-    },
-    {
-      "identifier": "fs:scope-resource-index",
-      "allow": [{ "path": "$RESOURCE/*" }]
     }
   ],
   "platforms": ["macOS", "linux", "windows"]
