@@ -1,7 +1,7 @@
 export interface Theme {
-  name?: string;
-  type?: string;
-  colors?: Colors;
+  name: string;
+  type: string;
+  colors: Colors;
 }
 
 export interface Colors {
@@ -216,9 +216,9 @@ function r(name: string) {
 const typeMap: any = {
   Theme: o(
     [
-      { json: "name", js: "name", typ: u(undefined, "") },
-      { json: "type", js: "type", typ: u(undefined, "") },
-      { json: "colors", js: "colors", typ: u(undefined, r("Colors")) },
+      { json: "name", js: "name", typ: "" },
+      { json: "type", js: "type", typ: "" },
+      { json: "colors", js: "colors", typ: r("Colors") },
     ],
     false
   ),

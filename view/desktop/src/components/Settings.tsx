@@ -4,7 +4,11 @@ import { commands } from "@/bindings";
 import { listen } from "@tauri-apps/api/event";
 import { LanguageSelector, ThemeSelector } from "@/components";
 
-export const Settings: React.FC = () => {
+interface SettingsProps {
+  themes: string[];
+}
+
+export const Settings: React.FC<SettingsProps> = ({ themes }) => {
   const { t } = useTranslation(["ns1", "ns2"]);
 
   const [number, setNumber] = useState<number>(0);
@@ -39,7 +43,7 @@ export const Settings: React.FC = () => {
       </div>
       <div>
         <h3>{t("selectTheme")}</h3>
-        <ThemeSelector />
+        <ThemeSelector themes={themes} />
       </div>
       <div>
         <h3>Update Font Size</h3>

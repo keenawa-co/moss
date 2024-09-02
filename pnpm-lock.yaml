@@ -76,6 +76,9 @@ importers:
       '@repo/tailwind-config':
         specifier: workspace:*
         version: link:../shared/config-tailwind
+      '@repo/theme':
+        specifier: workspace:*
+        version: link:../../sdk-ts/theme
       '@repo/typescript-config':
         specifier: workspace:*
         version: link:../shared/config-typescript

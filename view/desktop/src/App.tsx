@@ -5,11 +5,13 @@ import "@/i18n";
 import "@repo/ui/src/fonts.css";
 import { twMerge } from "tailwind-merge";
 import StatusBar from "@/components/StatusBar";
-import { getTheme } from "@repo/ui";
 import { Icon, MenuItem, IconTitle, ThemeProvider } from "@repo/ui";
-import { THEMES } from "@/constants/index";
 import { useTranslation } from "react-i18next";
 import { Resizable, ResizablePanel } from "./components/Resizable";
+import { readThemesFromFiles } from "@/utils";
+import { BaseDirectory } from "@tauri-apps/plugin-fs";
+import { Theme } from "@repo/theme";
+
 enum IconState {
   Default = "group-text-primary",
   DefaultStroke = "group-stroke-zinc-500",
@@ -23,9 +25,21 @@ function App() {
   const [sideBarVisible, setSideBarVisibility] = useState(true);
 
   const { i18n } = useTranslation();
-  const [theme, setTheme] = useState<string>(() => {
+  const [themes, setThemes] = useState<Theme[]>([]);
+  const [themeNames, setThemeNames] = useState<string[]>([]);
+
+  useEffect(() => {
+    async function fetchThemes() {
+      const fetchedThemes = await readThemesFromFiles(BaseDirectory.Resource, "themes");
+      setThemes(fetchedThemes);
+      setThemeNames(fetchedThemes.map((theme) => theme.name));
+    }
+    fetchThemes();
+  }, []);
+
+  const [selectedTheme, setSelectedTheme] = useState<string>(() => {
     const savedTheme = localStorage.getItem("theme");
-    return savedTheme && THEMES.includes(savedTheme) ? savedTheme : THEMES[0];
+    return savedTheme && themeNames.includes(savedTheme) ? savedTheme : themeNames[0];
   });
 
   useEffect(() => {
@@ -40,13 +54,13 @@ function App() {
     window.addEventListener("storage", () => {
       const storedTheme = localStorage.getItem("theme");
       if (storedTheme) {
-        setTheme(storedTheme);
+        setSelectedTheme(storedTheme);
       }
     });
   }, []);
 
   return (
-    <ThemeProvider themeRGBOverrides={getTheme(theme)} updateRGBOnChange>
+    <ThemeProvider themeOverrides={themes.find((theme) => theme.name === selectedTheme)} updateRGBOnChange>
       <RootLayout>
         <TitleBar />
 
@@ -107,7 +121,7 @@ function App() {
                   <Menu />
                   <Routes>
                     <Route path="/" element={<Home />} />
-                    <Route path="/settings" element={<Settings />} />
+                    <Route path="/settings" element={<Settings themes={themeNames} />} />
                   </Routes>
                 </BrowserRouter>
               </Suspense>

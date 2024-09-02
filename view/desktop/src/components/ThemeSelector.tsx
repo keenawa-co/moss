@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { THEMES } from "@/constants/index";
 
-export const ThemeSelector: React.FC = () => {
+interface ThemeSelectorProps {
+  themes: string[];
+}
+
+export const ThemeSelector: React.FC<ThemeSelectorProps> = ({ themes }) => {
   const [theme, setTheme] = useState<string>(() => {
     const savedTheme = localStorage.getItem("theme");
-    return savedTheme && THEMES.includes(savedTheme) ? savedTheme : THEMES[0];
+    return savedTheme && themes.includes(savedTheme) ? savedTheme : themes[0];
   });
 
   useEffect(() => {
@@ -20,7 +23,7 @@ export const ThemeSelector: React.FC = () => {
   return (
     <div>
       <select className="bg-pink-300 text-primary" defaultValue={theme} onChange={onChangeTheme}>
-        {THEMES.map((t) => (
+        {themes.map((t) => (
           <option key={t} value={t}>
             {t.charAt(0).toUpperCase() + t.slice(1)}
           </option>
