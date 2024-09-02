@@ -1,7 +1,7 @@
 import { BaseDirectory, exists, readTextFile, readDir } from "@tauri-apps/plugin-fs";
 import { Convert, Theme } from "@repo/theme";
 
-export async function readAllFilesInDirectory(baseDirectory: BaseDirectory, themePath: string): Promise<Array<Theme>> {
+export async function readThemesFromFiles(baseDirectory: BaseDirectory, themePath: string): Promise<Array<Theme>> {
   const themes = new Array<Theme>();
 
   if (

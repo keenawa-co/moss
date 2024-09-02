@@ -1,8 +1,11 @@
-import React, { createContext, useCallback, useContext, useEffect, useMemo } from "react";
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { tailwindColorTheme } from "../theme/light/colors";
 import { IThemeColors, IThemeRGB } from "../types";
 import applyTheme from "./applyTheme";
 import { rgbToHex } from "./utils";
+import { readThemesFromFiles } from "../readThemes";
+import { BaseDirectory } from "@tauri-apps/plugin-fs";
+import { Theme } from "@repo/theme";
 
 type Props = {
   children: React.ReactNode;
@@ -25,6 +28,23 @@ const ThemeContext = createContext<ThemeContextType>({
 // ThemedProvider applies tailwind theme default, potentially with provided
 // overrides. Must wrap your app root in this provider to use this library.
 export default function ThemeProvider(props: Props) {
+  const [themes, setThemes] = useState<Theme[]>([]);
+
+  useEffect(() => {
+    async function fetchThemes() {
+      const fetchedThemes = await readThemesFromFiles(BaseDirectory.Resource, "themes");
+      setThemes(fetchedThemes);
+    }
+    fetchThemes();
+  }, []);
+
+  useEffect(() => {
+    for (const theme of themes) {
+      console.warn("-------545454----->>>>>");
+      console.warn(theme);
+    }
+  }, [themes]);
+
   const themeRGB: IThemeRGB = useMemo(() => {
     return {
       ...tailwindColorTheme,
@@ -59,7 +79,6 @@ export default function ThemeProvider(props: Props) {
 
   return <ThemeContext.Provider value={value}>{props.children}</ThemeContext.Provider>;
 }
-
 export function useThemeContext(): ThemeContextType {
   return useContext(ThemeContext);
 }
