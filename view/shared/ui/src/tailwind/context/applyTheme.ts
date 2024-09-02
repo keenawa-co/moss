@@ -8,7 +8,7 @@ export default async function applyTheme(themeRGB: IThemeRGB) {
   let themes = readAllFilesInDirectory(BaseDirectory.Resource, "themes");
 
   for (var theme of await themes) {
-    console.warn("-------------------------->>>>>");
+    console.warn("-------------->>>>>");
     console.warn(theme);
   }
 

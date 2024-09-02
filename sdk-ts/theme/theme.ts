@@ -5,28 +5,46 @@ export interface Theme {
 }
 
 export interface Colors {
-  primary?: string;
-  sidebarBackground?: string;
-  toolbarBackground?: string;
-  pageBackground?: string;
-  statusbarBackground?: string;
-  windowsCloseButtonBackground?: string;
-  windowControlsLinuxBackground?: string;
-  windowControlsLinuxText?: string;
-  windowControlsLinuxHoverBackground?: string;
-  windowControlsLinuxActiveBackground?: string;
+  primary?: HexColor;
+  sidebarBackground?: HexColor;
+  toolbarBackground?: HexColor;
+  pageBackground?: HexColor;
+  statusbarBackground?: HexColor;
+  windowsCloseButtonBackground?: HexColor;
+  windowControlsLinuxBackground?: HexColor;
+  windowControlsLinuxText?: HexColor;
+  windowControlsLinuxHoverBackground?: HexColor;
+  windowControlsLinuxActiveBackground?: HexColor;
 }
+
+type HexColor = string;
 
 // Converts JSON strings to/from your types
 // and asserts the results of JSON.parse at runtime
 export class Convert {
   public static toTheme(json: string): Theme {
-    return cast(JSON.parse(json), r("Theme"));
+    const parsed = JSON.parse(json);
+    this.validateColors(parsed.colors);
+    return cast(parsed, r("Theme"));
   }
 
   public static themeToJson(value: Theme): string {
     return JSON.stringify(uncast(value, r("Theme")), null, 2);
   }
+
+  private static validateColors(colors: Colors | undefined): void {
+    if (colors) {
+      ((<any>Object).entries(colors) as [string, string | undefined][]).forEach(([key, value]) => {
+        if (value && !isValidHexColor(value)) {
+          throw new Error(`Invalid HEX color for ${key}: ${value}`);
+        }
+      });
+    }
+  }
+}
+
+function isValidHexColor(color: string): boolean {
+  return /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(color);
 }
 
 function invalidValue(typ: any, val: any, key: any, parent: any = ""): never {
