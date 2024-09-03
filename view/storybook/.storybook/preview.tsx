@@ -1,8 +1,17 @@
 import { INITIAL_VIEWPORTS } from "@storybook/addon-viewport";
 import type { Preview } from "@storybook/react";
 import React from "react";
-import "../../shared/ui/src/styles.css";
-import { ThemeProvider, getTheme, staticColors } from "../../shared/ui/src";
+import "@repo/ui/src/styles.css";
+import { ThemeProvider, getTheme, staticColors } from "@repo/ui";
+import * as themeFiles from "./themes";
+import { Convert, Theme } from "@repo/theme";
+
+const themes: Theme[] = [];
+for (const themeFile in themeFiles) {
+  themes.push(Convert.toTheme(themeFile));
+}
+
+console.warn(themes);
 
 const preview: Preview = {
   globalTypes: {
@@ -31,7 +40,7 @@ const preview: Preview = {
     },
 
     backgrounds: {
-      default: "blue",
+      default: "lightish",
       values: [
         { name: "light", value: "white" },
         { name: "lightish", value: staticColors.stone["50"] },
@@ -47,7 +56,7 @@ const preview: Preview = {
     (Story, context) => {
       const theme = context.args.theme ?? context.globals.theme;
       return (
-        <ThemeProvider themeRGBOverrides={getTheme(theme)} updateRGBOnChange>
+        <ThemeProvider themeOverrides={getTheme(theme)} updateRGBOnChange>
           <Story />
         </ThemeProvider>
       );

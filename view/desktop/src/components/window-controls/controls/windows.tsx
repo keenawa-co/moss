@@ -4,6 +4,8 @@ import TauriAppWindowContext from "@/components/window-controls/contexts/plugin-
 import { cn } from "@/components/window-controls/libs/utils";
 import { Button } from "@/components/window-controls/components/button";
 
+// FIXME: fix opacity active:bg-windowsCloseButtonBackground/90
+
 export function Windows({ className, ...props }: HTMLProps<HTMLDivElement>) {
   const { isWindowMaximized, minimizeWindow, maximizeWindow, closeWindow } = useContext(TauriAppWindowContext);
 
@@ -27,7 +29,7 @@ export function Windows({ className, ...props }: HTMLProps<HTMLDivElement>) {
       </Button>
       <Button
         onClick={closeWindow}
-        className="max-h-8 w-[46px] cursor-default rounded-none bg-transparent text-primary/90 hover:bg-windows-close-button-background hover:text-white active:bg-windows-close-button-background/90 dark:text-white"
+        className="max-h-8 w-[46px] cursor-default rounded-none bg-transparent text-primary/90 hover:bg-windowsCloseButtonBackground hover:text-white active:bg-windowsCloseButtonBackground/90 dark:text-white"
       >
         <Icons.closeWin />
       </Button>
