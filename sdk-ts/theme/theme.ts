@@ -5,6 +5,8 @@ export interface Theme {
   colors: Colors;
 }
 
+type HexColor = string;
+
 export interface Colors {
   primary?: HexColor;
   sidebarBackground?: HexColor;
@@ -18,7 +20,18 @@ export interface Colors {
   windowControlsLinuxActiveBackground?: HexColor;
 }
 
-type HexColor = string;
+export interface ThemeTailwindVariables {
+  "--color-primary": string;
+  "--color-sidebar-background": string;
+  "--color-toolbar-background": string;
+  "--color-page-background": string;
+  "--color-statusbar-background": string;
+  "--color-windows-close-button-background": string;
+  "--color-window-controls-linux-background": string;
+  "--color-window-controls-linux-text": string;
+  "--color-window-controls-linux-hover-background": string;
+  "--color-window-controls-linux-active-background": string;
+}
 
 // Converts JSON strings to/from your types
 // and asserts the results of JSON.parse at runtime
@@ -44,8 +57,38 @@ export class Convert {
   }
 }
 
+export function mapThemeToTailwindVariables(theme: Theme): ThemeTailwindVariables {
+  return {
+    "--color-primary": theme.colors.primary ? hexToRgb(theme.colors.primary) : "",
+    "--color-sidebar-background": theme.colors.sidebarBackground ? hexToRgb(theme.colors.sidebarBackground) : "",
+    "--color-toolbar-background": theme.colors.toolbarBackground ? hexToRgb(theme.colors.toolbarBackground) : "",
+    "--color-page-background": theme.colors.pageBackground ? hexToRgb(theme.colors.pageBackground) : "",
+    "--color-statusbar-background": theme.colors.statusbarBackground ? hexToRgb(theme.colors.statusbarBackground) : "",
+    "--color-windows-close-button-background": theme.colors.windowsCloseButtonBackground
+      ? hexToRgb(theme.colors.windowsCloseButtonBackground)
+      : "",
+    "--color-window-controls-linux-background": theme.colors.windowControlsLinuxBackground
+      ? hexToRgb(theme.colors.windowControlsLinuxBackground)
+      : "",
+    "--color-window-controls-linux-text": theme.colors.windowControlsLinuxText
+      ? hexToRgb(theme.colors.windowControlsLinuxText)
+      : "",
+    "--color-window-controls-linux-hover-background": theme.colors.windowControlsLinuxHoverBackground
+      ? hexToRgb(theme.colors.windowControlsLinuxHoverBackground)
+      : "",
+    "--color-window-controls-linux-active-background": theme.colors.windowControlsLinuxActiveBackground
+      ? hexToRgb(theme.colors.windowControlsLinuxActiveBackground)
+      : "",
+  };
+}
+
 function isValidHexColor(color: string): boolean {
   return /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(color);
+}
+
+function hexToRgb(hex: string): string {
+  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  return result ? `${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}` : "";
 }
 
 function invalidValue(typ: any, val: any, key: any, parent: any = ""): never {

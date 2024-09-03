@@ -1,9 +1,9 @@
 import merge from "deepmerge";
 import { Config } from "tailwindcss";
-import breakpoints from "./theme/base/breakpoints";
-import colors from "./theme/base/colors";
-import plugins from "./theme/base/plugins";
-import typography from "./theme/base/typography";
+import breakpoints from "./custom-config/breakpoints";
+import colors from "./custom-config/colors";
+import plugins from "./custom-config/plugins";
+import typography from "./custom-config/typography";
 
 const reactComponentsTailwindConfig: Config = {
   content: ["@repo/ui/**/*.{js,ts,jsx,tsx}"],

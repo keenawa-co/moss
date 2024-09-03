@@ -1,5 +1,5 @@
 import tailwindColors from "tailwindcss/colors";
-import { IThemeColors, IThemeVariables } from "../../types";
+import { Colors, ThemeTailwindVariables } from "@repo/theme";
 
 const extendedTailwindColors = {
   amber: tailwindColors.amber,
@@ -115,19 +115,17 @@ export const staticColors = {
   },
 };
 
-const configurableColors: IThemeColors = {
+const configurableColors: Colors = {
   primary: withOpacity("--color-primary"),
-  "sidebar-background": withOpacity("--color-sidebar-background"),
-  "toolbar-background": withOpacity("--color-toolbar-background"),
-  "page-background": withOpacity("--color-page-background"),
-  "statusbar-background": withOpacity("--color-statusbar-background"),
-
-  "windows-close-button-background": withOpacity("--color-windows-close-button-background"),
-
-  "window-controls-linux-background": withOpacity("--color-window-controls-linux-background"),
-  "window-controls-linux-text": withOpacity("--color-window-controls-linux-text"),
-  "window-controls-linux-background-hover": withOpacity("--color-window-controls-linux-background-hover"),
-  "window-controls-linux-background-active": withOpacity("--color-window-controls-linux-background-active"),
+  sidebarBackground: withOpacity("--color-sidebar-background"),
+  toolbarBackground: withOpacity("--color-toolbar-background"),
+  pageBackground: withOpacity("--color-page-background"),
+  statusbarBackground: withOpacity("--color-statusbar-background"),
+  windowsCloseButtonBackground: withOpacity("--color-windows-close-button-background"),
+  windowControlsLinuxBackground: withOpacity("--color-window-controls-linux-background"),
+  windowControlsLinuxText: withOpacity("--color-window-controls-linux-text"),
+  windowControlsLinuxHoverBackground: withOpacity("--color-window-controls-linux-hover-background"),
+  windowControlsLinuxActiveBackground: withOpacity("--color-window-controls-linux-active-background"),
 };
 
 const colors = {
@@ -140,6 +138,6 @@ export default colors;
 
 // Reference for using CSS variables in Tailwind:
 // https://tailwindcss.com/docs/customizing-colors#using-css-variables
-function withOpacity(variableName: keyof IThemeVariables): string {
+function withOpacity(variableName: keyof ThemeTailwindVariables): string {
   return `rgba(var(${variableName}), <alpha-value>)`;
 }

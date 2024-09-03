@@ -5,27 +5,27 @@ interface ThemeSelectorProps {
 }
 
 export const ThemeSelector: React.FC<ThemeSelectorProps> = ({ themes }) => {
-  const [theme, setTheme] = useState<string>(() => {
-    const savedTheme = localStorage.getItem("theme");
-    return savedTheme && themes.includes(savedTheme) ? savedTheme : themes[0];
+  const [selectedTheme, setSelectedTheme] = useState<string>(() => {
+    return localStorage.getItem("theme") || "";
   });
 
   useEffect(() => {
-    localStorage.setItem("theme", theme);
-    dispatchEvent(new Event("storage"));
-  }, [theme]);
+    if (selectedTheme) {
+      localStorage.setItem("theme", selectedTheme);
+      dispatchEvent(new Event("storage"));
+    }
+  }, [selectedTheme]);
 
-  const onChangeTheme = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const newTheme = e.target.value;
-    setTheme(newTheme);
+  const handleThemeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedTheme(e.target.value);
   };
 
   return (
     <div>
-      <select className="bg-pink-300 text-primary" defaultValue={theme} onChange={onChangeTheme}>
-        {themes.map((t) => (
-          <option key={t} value={t}>
-            {t.charAt(0).toUpperCase() + t.slice(1)}
+      <select className="bg-pink-300 text-primary" value={selectedTheme} onChange={handleThemeChange}>
+        {themes.map((theme) => (
+          <option key={theme} value={theme}>
+            {theme.charAt(0).toUpperCase() + theme.slice(1)}
           </option>
         ))}
       </select>
