@@ -1,5 +1,5 @@
 import tailwindColors from "tailwindcss/colors";
-import { Colors, ThemeTailwindVariables } from "@repo/theme";
+import { customTailwindColorVariables } from "@repo/theme";
 
 const extendedTailwindColors = {
   amber: tailwindColors.amber,
@@ -115,29 +115,10 @@ export const staticColors = {
   },
 };
 
-const configurableColors: Colors = {
-  primary: withOpacity("--color-primary"),
-  sidebarBackground: withOpacity("--color-sidebar-background"),
-  toolbarBackground: withOpacity("--color-toolbar-background"),
-  pageBackground: withOpacity("--color-page-background"),
-  statusbarBackground: withOpacity("--color-statusbar-background"),
-  windowsCloseButtonBackground: withOpacity("--color-windows-close-button-background"),
-  windowControlsLinuxBackground: withOpacity("--color-window-controls-linux-background"),
-  windowControlsLinuxText: withOpacity("--color-window-controls-linux-text"),
-  windowControlsLinuxHoverBackground: withOpacity("--color-window-controls-linux-hover-background"),
-  windowControlsLinuxActiveBackground: withOpacity("--color-window-controls-linux-active-background"),
-};
-
 const colors = {
   ...staticColors,
   ...extendedTailwindColors,
-  ...configurableColors,
+  ...customTailwindColorVariables,
 };
 
 export default colors;
-
-// Reference for using CSS variables in Tailwind:
-// https://tailwindcss.com/docs/customizing-colors#using-css-variables
-function withOpacity(variableName: keyof ThemeTailwindVariables): string {
-  return `rgba(var(${variableName}), <alpha-value>)`;
-}

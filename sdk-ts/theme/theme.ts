@@ -1,3 +1,4 @@
+// Theme used for JSON parsing
 export interface Theme {
   name: string;
   type: string;
@@ -5,22 +6,52 @@ export interface Theme {
   colors: Colors;
 }
 
-type HexColor = string;
-
 export interface Colors {
-  primary?: HexColor;
-  sidebarBackground?: HexColor;
-  toolbarBackground?: HexColor;
-  pageBackground?: HexColor;
-  statusbarBackground?: HexColor;
-  windowsCloseButtonBackground?: HexColor;
-  windowControlsLinuxBackground?: HexColor;
-  windowControlsLinuxText?: HexColor;
-  windowControlsLinuxHoverBackground?: HexColor;
-  windowControlsLinuxActiveBackground?: HexColor;
+  primary?: string;
+  sidebarBackground?: string;
+  toolbarBackground?: string;
+  pageBackground?: string;
+  statusbarBackground?: string;
+  windowsCloseButtonBackground?: string;
+  windowControlsLinuxBackground?: string;
+  windowControlsLinuxText?: string;
+  windowControlsLinuxHoverBackground?: string;
+  windowControlsLinuxActiveBackground?: string;
 }
 
-export interface ThemeTailwindVariables {
+const typeMap: any = {
+  Theme: o(
+    [
+      { json: "name", js: "name", typ: "" },
+      { json: "type", js: "type", typ: "" },
+      { json: "default", js: "default", typ: true },
+      { json: "colors", js: "colors", typ: r("Colors") },
+    ],
+    false
+  ),
+  Colors: o(
+    [
+      { json: "primary", js: "primary", typ: u(undefined, "") },
+      { json: "sidebar.background", js: "sidebarBackground", typ: u(undefined, "") },
+      { json: "toolbar.background", js: "toolbarBackground", typ: u(undefined, "") },
+      { json: "page.background", js: "pageBackground", typ: u(undefined, "") },
+      { json: "statusbar.background", js: "statusbarBackground", typ: u(undefined, "") },
+      { json: "windowsCloseButton.background", js: "windowsCloseButtonBackground", typ: u(undefined, "") },
+      { json: "windowControlsLinux.background", js: "windowControlsLinuxBackground", typ: u(undefined, "") },
+      { json: "windowControlsLinux.text", js: "windowControlsLinuxText", typ: u(undefined, "") },
+      { json: "windowControlsLinux.hoverBackground", js: "windowControlsLinuxHoverBackground", typ: u(undefined, "") },
+      {
+        json: "windowControlsLinux.activeBackground",
+        js: "windowControlsLinuxActiveBackground",
+        typ: u(undefined, ""),
+      },
+    ],
+    false
+  ),
+};
+
+// Theme custom CSS variables
+export interface ThemeCssVariables {
   "--color-primary": string;
   "--color-sidebar-background": string;
   "--color-toolbar-background": string;
@@ -33,31 +64,7 @@ export interface ThemeTailwindVariables {
   "--color-window-controls-linux-active-background": string;
 }
 
-// Converts JSON strings to/from your types
-// and asserts the results of JSON.parse at runtime
-export class Convert {
-  public static toTheme(json: string): Theme {
-    const parsed = JSON.parse(json);
-    this.validateColors(parsed.colors);
-    return cast(parsed, r("Theme"));
-  }
-
-  public static themeToJson(value: Theme): string {
-    return JSON.stringify(uncast(value, r("Theme")), null, 2);
-  }
-
-  private static validateColors(colors: Colors | undefined): void {
-    if (colors) {
-      ((<any>Object).entries(colors) as [string, string | undefined][]).forEach(([key, value]) => {
-        if (value && !isValidHexColor(value)) {
-          throw new Error(`Invalid HEX color for ${key}: ${value}`);
-        }
-      });
-    }
-  }
-}
-
-export function mapThemeToTailwindVariables(theme: Theme): ThemeTailwindVariables {
+export function mapThemeToCssVariables(theme: Theme): ThemeCssVariables {
   return {
     "--color-primary": theme.colors.primary ? hexToRgb(theme.colors.primary) : "",
     "--color-sidebar-background": theme.colors.sidebarBackground ? hexToRgb(theme.colors.sidebarBackground) : "",
@@ -82,8 +89,33 @@ export function mapThemeToTailwindVariables(theme: Theme): ThemeTailwindVariable
   };
 }
 
-function isValidHexColor(color: string): boolean {
-  return /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(color);
+// Theme custom Tailwind color variables
+export const customTailwindColorVariables: Colors = {
+  primary: withOpacity("--color-primary"),
+  sidebarBackground: withOpacity("--color-sidebar-background"),
+  toolbarBackground: withOpacity("--color-toolbar-background"),
+  pageBackground: withOpacity("--color-page-background"),
+  statusbarBackground: withOpacity("--color-statusbar-background"),
+  windowsCloseButtonBackground: withOpacity("--color-windows-close-button-background"),
+  windowControlsLinuxBackground: withOpacity("--color-window-controls-linux-background"),
+  windowControlsLinuxText: withOpacity("--color-window-controls-linux-text"),
+  windowControlsLinuxHoverBackground: withOpacity("--color-window-controls-linux-hover-background"),
+  windowControlsLinuxActiveBackground: withOpacity("--color-window-controls-linux-active-background"),
+};
+
+// https://tailwindcss.com/docs/customizing-colors#using-css-variables
+function withOpacity(variableName: keyof ThemeCssVariables): string {
+  return `rgba(var(${variableName}), <alpha-value>)`;
+}
+
+export class Convert {
+  public static toTheme(json: string): Theme {
+    return cast(JSON.parse(json), r("Theme"));
+  }
+
+  public static themeToJson(value: Theme): string {
+    return JSON.stringify(uncast(value, r("Theme")), null, 2);
+  }
 }
 
 function hexToRgb(hex: string): string {
@@ -256,34 +288,3 @@ function m(additional: any) {
 function r(name: string) {
   return { ref: name };
 }
-
-const typeMap: any = {
-  Theme: o(
-    [
-      { json: "name", js: "name", typ: "" },
-      { json: "type", js: "type", typ: "" },
-      { json: "default", js: "default", typ: true },
-      { json: "colors", js: "colors", typ: r("Colors") },
-    ],
-    false
-  ),
-  Colors: o(
-    [
-      { json: "primary", js: "primary", typ: u(undefined, "") },
-      { json: "sidebar.background", js: "sidebarBackground", typ: u(undefined, "") },
-      { json: "toolbar.background", js: "toolbarBackground", typ: u(undefined, "") },
-      { json: "page.background", js: "pageBackground", typ: u(undefined, "") },
-      { json: "statusbar.background", js: "statusbarBackground", typ: u(undefined, "") },
-      { json: "windowsCloseButton.background", js: "windowsCloseButtonBackground", typ: u(undefined, "") },
-      { json: "windowControlsLinux.background", js: "windowControlsLinuxBackground", typ: u(undefined, "") },
-      { json: "windowControlsLinux.text", js: "windowControlsLinuxText", typ: u(undefined, "") },
-      { json: "windowControlsLinux.hoverBackground", js: "windowControlsLinuxHoverBackground", typ: u(undefined, "") },
-      {
-        json: "windowControlsLinux.activeBackground",
-        js: "windowControlsLinuxActiveBackground",
-        typ: u(undefined, ""),
-      },
-    ],
-    false
-  ),
-};

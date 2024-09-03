@@ -31,6 +31,7 @@ function App() {
   const [themes, setThemes] = useState<Theme[]>([]);
   const [selectedTheme, setSelectedTheme] = useState<Theme | undefined>(undefined);
 
+  // Initialize theme
   useEffect(() => {
     const initializeThemes = async () => {
       const fetchedThemes = await fetchThemes();
@@ -58,6 +59,7 @@ function App() {
     initializeThemes();
   }, []);
 
+  // Initialize language
   useEffect(() => {
     const setLanguageFromLocalStorage = () => {
       const savedLanguage = localStorage.getItem("language");
@@ -68,6 +70,7 @@ function App() {
     setLanguageFromLocalStorage();
   }, [i18n]);
 
+  // Handle theme change
   useEffect(() => {
     const handleStorageChange = () => {
       const storedTheme = localStorage.getItem("theme");
