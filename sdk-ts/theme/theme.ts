@@ -66,46 +66,36 @@ export interface ThemeCssVariables {
 
 export function mapThemeToCssVariables(theme: Theme): ThemeCssVariables {
   return {
-    "--color-primary": theme.colors.primary ? hexToRgb(theme.colors.primary) : "",
-    "--color-sidebar-background": theme.colors.sidebarBackground ? hexToRgb(theme.colors.sidebarBackground) : "",
-    "--color-toolbar-background": theme.colors.toolbarBackground ? hexToRgb(theme.colors.toolbarBackground) : "",
-    "--color-page-background": theme.colors.pageBackground ? hexToRgb(theme.colors.pageBackground) : "",
-    "--color-statusbar-background": theme.colors.statusbarBackground ? hexToRgb(theme.colors.statusbarBackground) : "",
-    "--color-windows-close-button-background": theme.colors.windowsCloseButtonBackground
-      ? hexToRgb(theme.colors.windowsCloseButtonBackground)
-      : "",
-    "--color-window-controls-linux-background": theme.colors.windowControlsLinuxBackground
-      ? hexToRgb(theme.colors.windowControlsLinuxBackground)
-      : "",
-    "--color-window-controls-linux-text": theme.colors.windowControlsLinuxText
-      ? hexToRgb(theme.colors.windowControlsLinuxText)
-      : "",
-    "--color-window-controls-linux-hover-background": theme.colors.windowControlsLinuxHoverBackground
-      ? hexToRgb(theme.colors.windowControlsLinuxHoverBackground)
-      : "",
-    "--color-window-controls-linux-active-background": theme.colors.windowControlsLinuxActiveBackground
-      ? hexToRgb(theme.colors.windowControlsLinuxActiveBackground)
-      : "",
+    "--color-primary": theme.colors.primary || "",
+    "--color-sidebar-background": theme.colors.sidebarBackground || "",
+    "--color-toolbar-background": theme.colors.toolbarBackground || "",
+    "--color-page-background": theme.colors.pageBackground || "",
+    "--color-statusbar-background": theme.colors.statusbarBackground || "",
+    "--color-windows-close-button-background": theme.colors.windowsCloseButtonBackground || "",
+    "--color-window-controls-linux-background": theme.colors.windowControlsLinuxBackground || "",
+    "--color-window-controls-linux-text": theme.colors.windowControlsLinuxText || "",
+    "--color-window-controls-linux-hover-background": theme.colors.windowControlsLinuxHoverBackground || "",
+    "--color-window-controls-linux-active-background": theme.colors.windowControlsLinuxActiveBackground || "",
   };
 }
 
 // Theme custom Tailwind color variables
 export const customTailwindColorVariables: Colors = {
-  primary: withOpacity("--color-primary"),
-  sidebarBackground: withOpacity("--color-sidebar-background"),
-  toolbarBackground: withOpacity("--color-toolbar-background"),
-  pageBackground: withOpacity("--color-page-background"),
-  statusbarBackground: withOpacity("--color-statusbar-background"),
-  windowsCloseButtonBackground: withOpacity("--color-windows-close-button-background"),
-  windowControlsLinuxBackground: withOpacity("--color-window-controls-linux-background"),
-  windowControlsLinuxText: withOpacity("--color-window-controls-linux-text"),
-  windowControlsLinuxHoverBackground: withOpacity("--color-window-controls-linux-hover-background"),
-  windowControlsLinuxActiveBackground: withOpacity("--color-window-controls-linux-active-background"),
+  primary: rgbaWithOpacity("--color-primary"),
+  sidebarBackground: rgbaWithOpacity("--color-sidebar-background"),
+  toolbarBackground: rgbaWithOpacity("--color-toolbar-background"),
+  pageBackground: rgbaWithOpacity("--color-page-background"),
+  statusbarBackground: rgbaWithOpacity("--color-statusbar-background"),
+  windowsCloseButtonBackground: rgbaWithOpacity("--color-windows-close-button-background"),
+  windowControlsLinuxBackground: rgbaWithOpacity("--color-window-controls-linux-background"),
+  windowControlsLinuxText: rgbaWithOpacity("--color-window-controls-linux-text"),
+  windowControlsLinuxHoverBackground: rgbaWithOpacity("--color-window-controls-linux-hover-background"),
+  windowControlsLinuxActiveBackground: rgbaWithOpacity("--color-window-controls-linux-active-background"),
 };
 
 // https://tailwindcss.com/docs/customizing-colors#using-css-variables
-function withOpacity(variableName: keyof ThemeCssVariables): string {
-  return `rgba(var(${variableName}), <alpha-value>)`;
+function rgbaWithOpacity(variableName: keyof ThemeCssVariables): string {
+  return `rgba(var(${variableName}))`;
 }
 
 export class Convert {
