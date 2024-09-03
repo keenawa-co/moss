@@ -8,10 +8,10 @@ export interface Theme {
 
 export interface Colors {
   primary?: string;
-  sidebarBackground?: string;
-  toolbarBackground?: string;
+  sideBarBackground?: string;
+  toolBarBackground?: string;
   pageBackground?: string;
-  statusbarBackground?: string;
+  statusBarBackground?: string;
   windowsCloseButtonBackground?: string;
   windowControlsLinuxBackground?: string;
   windowControlsLinuxText?: string;
@@ -32,10 +32,10 @@ const typeMap: any = {
   Colors: o(
     [
       { json: "primary", js: "primary", typ: u(undefined, "") },
-      { json: "sidebar.background", js: "sidebarBackground", typ: u(undefined, "") },
-      { json: "toolbar.background", js: "toolbarBackground", typ: u(undefined, "") },
+      { json: "sideBar.background", js: "sideBarBackground", typ: u(undefined, "") },
+      { json: "toolBar.background", js: "toolBarBackground", typ: u(undefined, "") },
       { json: "page.background", js: "pageBackground", typ: u(undefined, "") },
-      { json: "statusbar.background", js: "statusbarBackground", typ: u(undefined, "") },
+      { json: "statusBar.background", js: "statusBarBackground", typ: u(undefined, "") },
       { json: "windowsCloseButton.background", js: "windowsCloseButtonBackground", typ: u(undefined, "") },
       { json: "windowControlsLinux.background", js: "windowControlsLinuxBackground", typ: u(undefined, "") },
       { json: "windowControlsLinux.text", js: "windowControlsLinuxText", typ: u(undefined, "") },
@@ -56,7 +56,7 @@ export interface ThemeCssVariables {
   "--color-sidebar-background": string;
   "--color-toolbar-background": string;
   "--color-page-background": string;
-  "--color-statusbar-background": string;
+  "--color-statusBar-background": string;
   "--color-windows-close-button-background": string;
   "--color-window-controls-linux-background": string;
   "--color-window-controls-linux-text": string;
@@ -67,10 +67,10 @@ export interface ThemeCssVariables {
 export function mapThemeToCssVariables(theme: Theme): ThemeCssVariables {
   return {
     "--color-primary": theme.colors.primary || "",
-    "--color-sidebar-background": theme.colors.sidebarBackground || "",
-    "--color-toolbar-background": theme.colors.toolbarBackground || "",
+    "--color-sidebar-background": theme.colors.sideBarBackground || "",
+    "--color-toolbar-background": theme.colors.toolBarBackground || "",
     "--color-page-background": theme.colors.pageBackground || "",
-    "--color-statusbar-background": theme.colors.statusbarBackground || "",
+    "--color-statusBar-background": theme.colors.statusBarBackground || "",
     "--color-windows-close-button-background": theme.colors.windowsCloseButtonBackground || "",
     "--color-window-controls-linux-background": theme.colors.windowControlsLinuxBackground || "",
     "--color-window-controls-linux-text": theme.colors.windowControlsLinuxText || "",
@@ -82,10 +82,10 @@ export function mapThemeToCssVariables(theme: Theme): ThemeCssVariables {
 // Theme custom Tailwind color variables
 export const customTailwindColorVariables: Colors = {
   primary: rgbaWithOpacity("--color-primary"),
-  sidebarBackground: rgbaWithOpacity("--color-sidebar-background"),
-  toolbarBackground: rgbaWithOpacity("--color-toolbar-background"),
+  sideBarBackground: rgbaWithOpacity("--color-sidebar-background"),
+  toolBarBackground: rgbaWithOpacity("--color-toolbar-background"),
   pageBackground: rgbaWithOpacity("--color-page-background"),
-  statusbarBackground: rgbaWithOpacity("--color-statusbar-background"),
+  statusBarBackground: rgbaWithOpacity("--color-statusBar-background"),
   windowsCloseButtonBackground: rgbaWithOpacity("--color-windows-close-button-background"),
   windowControlsLinuxBackground: rgbaWithOpacity("--color-window-controls-linux-background"),
   windowControlsLinuxText: rgbaWithOpacity("--color-window-controls-linux-text"),
