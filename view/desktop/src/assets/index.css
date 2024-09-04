@@ -5,6 +5,9 @@
 @tailwind components;
 @tailwind utilities;
 
+#root {
+  height: 100%;
+}
 @layer base {
   * {
     @apply transition-colors duration-500 ease-in-out;
