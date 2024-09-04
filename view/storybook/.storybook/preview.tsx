@@ -6,16 +6,11 @@ import { ThemeProvider, staticColors } from "@repo/ui";
 import * as themeFiles from "./themes";
 import { Convert, Theme } from "@repo/theme";
 
-import mossLight from "./themes/moss-light.json";
-import mossDark from "./themes/moss-dark.json";
-import mossPink from "./themes/moss-pink.json";
-
-console.dir(themeFiles);
-
 const themes: Map<string, Theme> = new Map();
-themes.set(mossLight.name, Convert.toTheme(JSON.stringify(mossLight)));
-themes.set(mossDark.name, Convert.toTheme(JSON.stringify(mossDark)));
-themes.set(mossPink.name, Convert.toTheme(JSON.stringify(mossPink)));
+for (const themeName in themeFiles) {
+  const theme = themeFiles[themeName];
+  themes.set(theme.name, Convert.toTheme(JSON.stringify(theme)));
+}
 
 const preview: Preview = {
   globalTypes: {
