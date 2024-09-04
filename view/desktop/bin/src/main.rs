@@ -1,18 +1,12 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
-use std::{borrow::Borrow, io, sync::Arc};
-
 use app::{context_compact::AppContextCompact, AppCompact};
 use app_lib::DesktopMain;
-use tauri::{AppHandle, Emitter};
-use tracing::{error, event, Level};
-use tracing_subscriber::fmt::MakeWriter;
+use tracing::error;
 use workbench_tgui::window::{NativePlatformInfo, NativeWindowConfiguration};
 
 fn main() {
-    event!(Level::INFO, "before run");
-
     AppCompact::new().run(|ctx: &mut AppContextCompact| {
         let home_dir = std::env::var("HOME")
             .expect("Failed to retrieve the $HOME environment variable")
@@ -28,7 +22,5 @@ fn main() {
             error!("{err:#?}")
         }
     });
-
-    event!(Level::INFO, "after run");
 }
 

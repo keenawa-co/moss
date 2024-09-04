@@ -233,6 +233,7 @@ impl<'a> DesktopMain<'a> {
     }
 }
 
+// An example of how the logging could function
 fn init_custom_logging(app_handle: tauri::AppHandle) {
     struct TauriLogWriter {
         app_handle: tauri::AppHandle,
@@ -251,10 +252,12 @@ fn init_custom_logging(app_handle: tauri::AppHandle) {
     }
 
     tracing_subscriber::registry()
+        // log to stdout
         .with(
             tracing_subscriber::fmt::layer()
             .with_writer(std::io::stdout)
         )
+        // log to frontend
         .with(
     tracing_subscriber::fmt::layer()
             .with_writer(move || TauriLogWriter {
