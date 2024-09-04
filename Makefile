@@ -2,6 +2,7 @@ DESKTOP_DIR = view/desktop
 STORYBOOK_DIR = view/storybook
 DOCS_DIR = view/docs
 WEB_DIR = view/web
+THEME_GENERATOR_DIR = tools/theme-generator
 
 
 PNPM = pnpm
@@ -42,6 +43,9 @@ run-docs:
 
 run-web:
 	@cd $(WEB_DIR) && $(PNPM) dev
+
+run-theme-generator:
+	@cd $(THEME_GENERATOR_DIR) && $(PNPM) start
 
 
 # Check if the database is running, if not, start it in the background

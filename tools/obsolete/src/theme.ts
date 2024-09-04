@@ -1,5 +1,7 @@
-const chroma = require("chroma-js");
-const { getColors } = require("./colors");
+import chroma from "chroma-js";
+import { getColors } from "./colors";
+
+// FIXME: Update this comment
 
 // Choosing colors from primer/primitives
 // There are multiple ways to define what color is used:
@@ -11,25 +13,35 @@ const { getColors } = require("./colors");
 // 3. Per theme. Useful when a certain theme needs an exception
 //    e.g. "textLink.foreground": themes({ light: scale.blue[5], light_high_contrast: scale.blue[5], light_colorblind: scale.blue[5], dark: scale.blue[2], dark_high_contrast: scale.blue[3], dark_colorblind: scale.blue[2], dark_dimmed: scale.blue[3] }),
 
-function getTheme({ theme, name }) {
-  const themes = (options) => options[theme]; // Usage: themes({ light: "lightblue", light_high_contrast: "lightblue", light_colorblind: "lightblue", dark: "darkblue", dark_high_contrast: "darkblue", dark_colorblind: "darkblue", dark_dimmed: "royalblue" })
+export interface ThemeOptions {
+  theme: string;
+  name: string;
+}
+
+interface ThemeConfig {
+  theme: keyof ThemeOptions;
+  name: string;
+}
+
+export function getTheme({ theme, name }: ThemeConfig) {
+  const themes = (options: Partial<ThemeOptions>) => options[theme];
   const rawColors = getColors(theme);
   const color = changeColorToHexAlphas(rawColors);
-  const scale = color.scale; // Usage: scale.blue[6]
+  const scale = color.scale;
 
-  const onlyDark = (color) => {
+  const onlyDark = (color: string): Partial<ThemeOptions> => {
     return themes({ dark: color, dark_high_contrast: color, dark_colorblind: color, dark_dimmed: color });
   };
 
-  const onlyHighContrast = (color) => {
+  const onlyHighContrast = (color: string): Partial<ThemeOptions> => {
     return themes({ light_high_contrast: color, dark_high_contrast: color });
   };
 
-  const onlyDarkHighContrast = (color) => {
+  const onlyDarkHighContrast = (color: string): Partial<ThemeOptions> => {
     return themes({ dark_high_contrast: color });
   };
 
-  const lightDark = (light, dark) => {
+  const lightDark = (light: string, dark: string): ThemeOptions => {
     return themes({
       light: light,
       light_high_contrast: light,
@@ -41,7 +53,7 @@ function getTheme({ theme, name }) {
     });
   };
 
-  const alpha = (color, alpha) => {
+  const alpha = (color: string, alpha: number): string => {
     return chroma(color).alpha(alpha).hex();
   };
 
@@ -201,8 +213,6 @@ function getTheme({ theme, name }) {
       "editorBracketMatch.border": alpha(scale.green[3], 0.6),
       // text selection for High Contrast themes
       "editor.selectionForeground": onlyHighContrast(color.fg.onEmphasis),
-      "editor.selectionBackground": onlyHighContrast(color.neutral.emphasisPlus),
-      "editor.inactiveSelectionBackground": onlyHighContrast(color.neutral.emphasis),
 
       "editorInlayHint.background": alpha(scale.gray[3], 0.2),
       "editorInlayHint.foreground": color.fg.muted,
@@ -681,15 +691,15 @@ function getTheme({ theme, name }) {
 // Convert to hex
 // VS Code doesn't support other formats like hsl, rgba etc.
 
-function changeColorToHexAlphas(obj) {
+function changeColorToHexAlphas(obj: any): any {
   if (typeof obj === "object") {
-    for (var keys in obj) {
-      if (typeof obj[keys] === "object") {
-        changeColorToHexAlphas(obj[keys]);
+    for (const key in obj) {
+      if (typeof obj[key] === "object") {
+        changeColorToHexAlphas(obj[key]);
       } else {
-        let keyValue = obj[keys];
+        const keyValue = obj[key];
         if (chroma.valid(keyValue)) {
-          obj[keys] = chroma(keyValue).hex();
+          obj[key] = chroma(keyValue).hex();
         }
       }
     }
@@ -697,4 +707,4 @@ function changeColorToHexAlphas(obj) {
   return obj;
 }
 
-module.exports = getTheme;
+export default getTheme;

@@ -89,6 +89,12 @@ function App() {
     };
   }, [themes]);
 
+  useEffect(() => {
+    if (!selectedTheme) {
+      console.error("Failed to initialize theme");
+    }
+  }, [selectedTheme]);
+
   return (
     <>
       {!selectedTheme ? (

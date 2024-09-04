@@ -2,3 +2,4 @@ packages:
   - "view/*"
   - "view/shared/*"
   - "sdk-ts/*"
+  - "tools/*"

@@ -18,6 +18,9 @@
     },
     {
       "path": "sdk-ts/theme"
+    },
+    {
+      "path": "tools/theme-generator"
     }
   ]
 }

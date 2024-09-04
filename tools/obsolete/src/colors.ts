@@ -1,12 +1,14 @@
-const lightColors = require("@primer/primitives/dist/json/colors/light.json");
-const lightHighContrastColors = require("@primer/primitives/dist/json/colors/light_high_contrast.json");
-const lightColorblindColors = require("@primer/primitives/dist/json/colors/light_colorblind.json");
-const darkColors = require("@primer/primitives/dist/json/colors/dark.json");
-const darkHighContrastColors = require("@primer/primitives/dist/json/colors/dark_high_contrast.json");
-const darkColorblindColors = require("@primer/primitives/dist/json/colors/dark_colorblind.json");
-const dimmedColors = require("@primer/primitives/dist/json/colors/dark_dimmed.json");
+import lightColors from "@primer/primitives/dist/json/colors/light.json";
+import lightHighContrastColors from "@primer/primitives/dist/json/colors/light_high_contrast.json";
+import lightColorblindColors from "@primer/primitives/dist/json/colors/light_colorblind.json";
+import darkColors from "@primer/primitives/dist/json/colors/dark.json";
+import darkHighContrastColors from "@primer/primitives/dist/json/colors/dark_high_contrast.json";
+import darkColorblindColors from "@primer/primitives/dist/json/colors/dark_colorblind.json";
+import dimmedColors from "@primer/primitives/dist/json/colors/dark_dimmed.json";
 
-function getColors(theme) {
+type ThemeColors = typeof lightColors;
+
+function getColors(theme: string): ThemeColors {
   switch (theme) {
     case "light":
       // Temp override until Primitives are updated
@@ -43,6 +45,4 @@ function getColors(theme) {
   }
 }
 
-module.exports = {
-  getColors,
-};
+export { getColors };
