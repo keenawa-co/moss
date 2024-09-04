@@ -10,6 +10,7 @@ import { Icon, MenuItem, IconTitle, ThemeProvider } from "@repo/ui";
 import { THEMES } from "@/constants/index";
 import { useTranslation } from "react-i18next";
 import { Resizable, ResizablePanel } from "./components/Resizable";
+
 enum IconState {
   Default = "group-text-primary",
   DefaultStroke = "group-stroke-zinc-500",
@@ -48,60 +49,64 @@ function App() {
   return (
     <ThemeProvider themeRGBOverrides={getTheme(theme)} updateRGBOnChange>
       <RootLayout>
-        <TitleBar />
-
         <Resizable proportionalLayout={false}>
-          <ResizablePanel minSize={150} preferredSize={255} snap visible={sideBarVisible}>
-            <Sidebar className="p-0 h-full ">
-              <MenuItem className="group bg-zinc-200 mt-13 mb-3.5 overflow-hidden">
-                <Icon icon="Search" className={twMerge("h-4.5 w-4.5", IconState.Default, IconState.Hover)} />
+          <ResizablePanel minSize={100} preferredSize={255} snap visible={sideBarVisible}>
+            <Sidebar className="p-0 h-full w-full overflow-auto">
+              <MenuItem className="group bg-zinc-200 mt-13 mb-3.5">
+                <Icon icon="Search" className={twMerge("h-4.5 w-4.5 min-w-4", IconState.Default, IconState.Hover)} />
                 <IconTitle className="text-primary text-xs" title="Search..." />
-                <Icon icon="SearchShortcut" className="fill-zinc-500 group-hover:fill-zinc-600 text-3xl ml-auto pr-2" />
+                <Icon
+                  icon="SearchShortcut"
+                  className="min-w-4  w-4.5 fill-zinc-500 group-hover:fill-zinc-600  ml-auto pr-2"
+                />
               </MenuItem>
 
               <MenuItem className="group">
-                <Icon icon="Home1" className={twMerge(IconState.Default, IconState.Hover)} />
+                <Icon icon="Home1" className={twMerge(IconState.Default, IconState.Hover, "min-w-4")} />
                 <IconTitle className="text-primary text-sm" title="Home" />
               </MenuItem>
 
               <MenuItem className="group">
-                <Icon icon="Issues" className={twMerge(IconState.Default, IconState.Hover)} />
+                <Icon icon="Issues" className={twMerge(IconState.Default, IconState.Hover, "min-w-4")} />
                 <IconTitle className="text-primary text-sm" title="Issues" />
               </MenuItem>
 
               <MenuItem className="group">
-                <Icon icon="Code" className={twMerge(IconState.Default, IconState.Hover)} />
+                <Icon icon="Code" className={twMerge(IconState.Default, IconState.Hover, "min-w-4")} />
                 <IconTitle className="text-primary text-sm" title="Code" />
               </MenuItem>
 
               <MenuItem className="group">
-                <Icon icon="Goals" className={twMerge(IconState.Default, IconState.Hover)} />
+                <Icon icon="Goals" className={twMerge(IconState.Default, IconState.Hover, "min-w-4")} />
                 <IconTitle className="text-primary text-sm" title="Goals" />
               </MenuItem>
 
               <MenuItem className="group">
-                <Icon icon="Reports" className={twMerge(IconState.Default, IconState.Hover)} />
+                <Icon icon="Reports" className={twMerge(IconState.Default, IconState.Hover, "min-w-4")} />
                 <IconTitle className="text-primary text-sm" title="Reports" />
               </MenuItem>
 
               <MenuItem className="group">
-                <Icon icon="Documentation" className={twMerge(IconState.Default, IconState.Hover)} />
-                <IconTitle className="text-primary text-sm" title="Documentation" />
+                <Icon icon="Documentation" className={twMerge(IconState.Default, IconState.Hover, "min-w-4")} />
+                <IconTitle
+                  className="text-primary text-sm"
+                  title="Documentation with very long title to trigger overflow X"
+                />
               </MenuItem>
 
               <MenuItem className="group">
-                <Icon icon="Settings" className={twMerge(IconState.Default, IconState.Hover)} />
+                <Icon icon="Settings" className={twMerge(IconState.Default, IconState.Hover, "min-w-4")} />
                 <IconTitle className="text-primary text-sm" title="Settings" />
               </MenuItem>
 
               <MenuItem className="group">
-                <Icon icon="QuickSearch" className={twMerge(IconState.Default, IconState.Hover)} />
+                <Icon icon="QuickSearch" className={twMerge(IconState.Default, IconState.Hover, "min-w-4")} />
                 <IconTitle className="text-primary text-sm" title="Quick Search" />
               </MenuItem>
             </Sidebar>
           </ResizablePanel>
           <ResizablePanel>
-            <Content className="relative flex flex-col">
+            <Content className="content relative flex flex-col overflow-auto h-full">
               <Suspense fallback="loading">
                 <BrowserRouter>
                   <Menu />
@@ -114,11 +119,6 @@ function App() {
             </Content>
           </ResizablePanel>
         </Resizable>
-
-        <StatusBar
-          className="absolute w-full bottom-0 h-5.5"
-          branch="MOSSMVP-37-Backend-Migrate-existing-backend-in-Tauri"
-        />
       </RootLayout>
     </ThemeProvider>
   );

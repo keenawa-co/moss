@@ -12,7 +12,7 @@ import {
   Icon,
 } from "@repo/ui";
 
-export const Home: React.FC = () => {
+const SessionComponent = () => {
   const { t } = useTranslation(["ns1", "ns2"]);
   const [sessionInfo, setSessionInfo] = useState<SessionInfoDTO | null>(null);
   const [data, setData] = useState<number | null>(null);
@@ -60,9 +60,7 @@ export const Home: React.FC = () => {
   };
 
   return (
-    <main>
-      <h1 className="text-primary">{t("title")}</h1>
-
+    <>
       {sessionInfo ? (
         <div>
           <p>Session: {sessionInfo.session.id}</p>
@@ -86,13 +84,23 @@ export const Home: React.FC = () => {
       <br />
       <span className="bg-secondary text-primary">{t("description.part1", { ns: "ns2" })}</span>
       {data !== null && <p>Received data: {data}</p>}
+    </>
+  );
+};
+
+export const Home: React.FC = () => {
+  const { t } = useTranslation(["ns1", "ns2"]);
+
+  return (
+    <div>
+      <h1 className="text-primary">{t("title")}</h1>
 
       <div>
         <Tooltip label="Test" className="text-primary">
           <Icon icon="Code" />
         </Tooltip>
       </div>
-
+      <SessionComponent />
       <div>
         <DropdownMenu>
           <DropdownMenuTrigger className="text-primary">Click me!</DropdownMenuTrigger>
@@ -108,9 +116,18 @@ export const Home: React.FC = () => {
 
       <div className="flex">
         <Icon icon="Accessibility" className="text-6xl hover:*:fill-green-500" />
-        <Icon icon="NewProject" className="text-6xl text-red-600 hover:fill-green-500" />
+        <Icon icon="NewProject" className="text-6xl text-red-700 hover:fill-green-500" />
       </div>
-    </main>
+
+      <div className="w-96 bg-red-600">
+        {new Array(77).fill(0).map((_, index) => (
+          <div>
+            {index} - {Math.random()}
+          </div>
+        ))}
+        <div> last element</div>
+      </div>
+    </div>
   );
 };
 
