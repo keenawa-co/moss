@@ -3,16 +3,15 @@
   "type": "pink",
   "default": false,
   "colors": {
-    "primary": "#000000",
-    "sidebar.background": "#ea9df2",
-    "toolbar.background": "#c27dc9",
-    "page.background": "#e336f5",
-    "statusbar.background": "#3f0b45",
-
-    "windowsCloseButton.background": "#c42b1c",
-    "windowControlsLinux.background": "#dadada",
-    "windowControlsLinux.text": "#3d3d3d",
-    "windowControlsLinux.hoverBackground": "#d1d1d1",
-    "windowControlsLinux.activeBackground": "#bfbfbf"
+    "primary": "0, 0, 0, 1",
+    "sideBar.background": "234, 157, 242, 1",
+    "toolBar.background": "222, 125, 232, 1",
+    "page.background": "227, 54, 245, 1",
+    "statusBar.background": "63, 11, 69, 1",
+    "windowsCloseButton.background": "196, 43, 28, 1",
+    "windowControlsLinux.background": "218, 218, 218, 1",
+    "windowControlsLinux.text": "61, 61, 61, 1",
+    "windowControlsLinux.hoverBackground": "209, 209, 209, 1",
+    "windowControlsLinux.activeBackground": "191, 191, 191, 1"
   }
 }
