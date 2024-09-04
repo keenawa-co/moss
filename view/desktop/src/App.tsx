@@ -1,10 +1,9 @@
-import { Settings, Content, TitleBar, Home, Menu, RootLayout, Sidebar } from "@/components";
+import { Settings, Content, Home, Menu, RootLayout, Sidebar } from "@/components";
 import { Suspense, useEffect, useState } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import "@/i18n";
 import "@repo/ui/src/fonts.css";
 import { twMerge } from "tailwind-merge";
-import StatusBar from "@/components/StatusBar";
 import { Icon, MenuItem, IconTitle, ThemeProvider } from "@repo/ui";
 import { useTranslation } from "react-i18next";
 import { Resizable, ResizablePanel } from "./components/Resizable";
