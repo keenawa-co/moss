@@ -13,12 +13,9 @@ use platform_fs::disk::file_system_service::DiskFileSystemService;
 use platform_workspace::WorkspaceId;
 use service::project_service::ProjectService;
 use service::session_service::SessionService;
-<<<<<<< HEAD
 use std::rc::Rc;
-=======
 use tracing_subscriber::layer::SubscriberExt;
 use tracing_subscriber::util::SubscriberInitExt;
-use std::rc::Rc;
 use std::sync::Arc;
 use std::{env, process::ExitCode};
 use surrealdb::{engine::remote::ws::Ws, Surreal};
@@ -189,13 +186,6 @@ impl AppMain {
                     ctx.notify();
                 });
 
-<<<<<<< HEAD
-                    ctx.notify();
-                });
-
-                // TODO:
-                // Used only as an example implementation. Remove this disgrace as soon as possible.
-=======
                 init_custom_logging(app_handle.clone());
 
                 // TODO:
@@ -246,6 +236,7 @@ impl AppMain {
             .context("Failed to export typescript bindings")?)
     }
 }
+
 
 // An example of how the logging could function
 fn init_custom_logging(app_handle: tauri::AppHandle) {
