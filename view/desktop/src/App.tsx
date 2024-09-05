@@ -1,4 +1,4 @@
-import { Settings, Content, TitleBar, Home, Menu, RootLayout, Sidebar } from "@/components";
+import { Settings, Content, TitleBar, Home, Menu, RootLayout, Sidebar, Logs } from "@/components";
 import { Suspense, useEffect, useState } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import "@/i18n";
@@ -113,6 +113,7 @@ function App() {
                   <Routes>
                     <Route path="/" element={<Home />} />
                     <Route path="/settings" element={<Settings />} />
+                    <Route path="/logs" element={<Logs />} />
                   </Routes>
                 </BrowserRouter>
               </Suspense>
