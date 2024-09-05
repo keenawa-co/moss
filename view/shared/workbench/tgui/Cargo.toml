@@ -13,6 +13,7 @@ anyhow.workspace = true
 hashbrown.workspace = true
 lazy_static.workspace = true
 tauri.workspace = true
+once_cell.workspace = true
 
 platform_core.workspace = true
 platform_fs.workspace = true

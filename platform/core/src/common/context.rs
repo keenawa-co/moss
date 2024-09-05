@@ -69,7 +69,6 @@ type Listener = Box<dyn FnMut(&dyn Any, &mut Context) -> bool + 'static>;
 type ReleaseListener = Box<dyn FnOnce(&mut dyn Any, &mut Context) + 'static>;
 
 pub struct Context {
-    runner: AsyncRunner,
     observers: SubscriberSet<EntityId, Handler>,
     pending_notifications: FxHashSet<EntityId>,
     pending_effects: VecDeque<Effect>,
@@ -118,10 +117,7 @@ impl AnyContext for Context {
         &mut self,
         model: &Model<T>,
         update: impl FnOnce(&mut T, &mut ModelContext<'_, T>) -> R,
-    ) -> R
-    where
-        T: 'static,
-    {
+    ) -> R {
         self.update(|ctx| {
             let mut entity = ctx.entities.lease(model);
             let result = update(&mut entity, &mut ModelContext::new(ctx, model.downgrade()));
@@ -134,7 +130,6 @@ impl AnyContext for Context {
 impl Context {
     pub fn new() -> Self {
         Context {
-            runner: AsyncRunner::new(),
             observers: SubscriberSet::new(),
             pending_notifications: FxHashSet::default(),
             pending_effects: VecDeque::new(),
@@ -150,20 +145,20 @@ impl Context {
         AsyncContext::from(self)
     }
 
-    pub fn detach<F>(&self, future: F) -> Task<F::Output>
-    where
-        F: Future + Send + 'static,
-        F::Output: Send + 'static,
-    {
-        Task::Spawned(self.runner.spawn(future))
-    }
+    // pub fn detach<F>(&self, future: F) -> Task<F::Output>
+    // where
+    //     F: Future + Send + 'static,
+    //     F::Output: Send + 'static,
+    // {
+    //     Task::Spawned(self.runner.spawn(future))
+    // }
 
-    pub fn block_on<F>(&self, future: F) -> F::Output
-    where
-        F: Future,
-    {
-        self.runner.block_on(future)
-    }
+    // pub fn block_on<F>(&self, future: F) -> F::Output
+    // where
+    //     F: Future,
+    // {
+    //     self.runner.block_on(future)
+    // }
 
     pub fn defer(&mut self, f: impl FnOnce(&mut Context) + 'static) {
         self.push_effect(Effect::Defer {
@@ -210,15 +205,15 @@ impl Context {
         subscription
     }
 
-    pub(crate) fn subscribe_internal<T, E, Evt>(
+    pub(crate) fn subscribe_internal<T, E, Ev>(
         &mut self,
         entity: &E,
-        mut on_event: impl FnMut(E, &Evt, &mut Context) -> bool + 'static,
+        mut on_event: impl FnMut(E, &Ev, &mut Context) -> bool + 'static,
     ) -> Subscription
     where
-        T: 'static + EventEmitter<Evt>,
+        T: 'static + EventEmitter<Ev>,
         E: AnyEntity<T>,
-        Evt: 'static,
+        Ev: 'static,
     {
         let entity_id = entity.entity_id();
         let entity = entity.downgrade();
@@ -226,9 +221,9 @@ impl Context {
         self.new_subscription(
             entity_id,
             (
-                TypeId::of::<Evt>(),
+                TypeId::of::<Ev>(),
                 Box::new(move |event, cx| {
-                    let event: &Evt = event.downcast_ref().expect("invalid event type");
+                    let event: &Ev = event.downcast_ref().expect("invalid event type");
                     if let Some(handle) = E::upgrade_from(&entity) {
                         on_event(handle, event, cx)
                     } else {

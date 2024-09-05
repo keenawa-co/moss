@@ -15,11 +15,7 @@ pub async fn update_font_size(
     input: i32,
 ) -> Result<(), String> {
     async_ctx.with_mut(|ctx| {
-        state.workbench.update(ctx, |this, cx| {
-            this.update_conf(cx, input as usize).unwrap();
-            cx.notify();
-        });
-
+        state.workbench.update_conf(ctx, input as usize).unwrap();
         Ok(())
     })
 }

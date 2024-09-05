@@ -211,7 +211,7 @@ pub struct Lease<'a, T> {
     entity_type: PhantomData<T>,
 }
 
-impl<'a, T: 'static> core::ops::Deref for Lease<'a, T> {
+impl<'a, T> core::ops::Deref for Lease<'a, T> {
     type Target = T;
 
     fn deref(&self) -> &Self::Target {
