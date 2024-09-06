@@ -1,10 +1,17 @@
 pub mod contribution;
 pub mod window;
 
-use std::{borrow::BorrowMut, cell::Cell, path::PathBuf, rc::Rc, sync::Arc};
+use std::{
+    borrow::BorrowMut,
+    cell::{Cell, RefCell},
+    path::PathBuf,
+    rc::Rc,
+    sync::Arc,
+};
 
 use anyhow::Result;
 use contribution::WORKBENCH_TGUI_WINDOW;
+use once_cell::unsync::OnceCell;
 use platform_configuration::{
     attribute_name, configuration_policy::ConfigurationPolicyService,
     configuration_registry::ConfigurationRegistry, AbstractConfigurationService,
@@ -50,53 +57,51 @@ pub enum WorkbenchState {
     Workspace,
 }
 
-pub struct Workbench<'a> {
+pub struct Workbench {
     workspace_id: WorkspaceId,
-    service_registry: ServiceRegistry,
-    configuration_registry: ConfigurationRegistry<'a>,
+    service_registry: Rc<RefCell<ServiceRegistry>>,
+    configuration_registry: Model<ConfigurationRegistry>,
     // TODO: this will be removed after testing is complete
     font_size_service: Model<MockFontSizeService>,
-    _observe_font_size_service: Option<Subscription>,
-    tao: Option<Rc<AppHandle>>,
+    _observe_font_size_service: OnceCell<Subscription>,
+    tao_handle: OnceCell<Rc<AppHandle>>,
 }
 
-impl<'a> Workbench<'a> {
+unsafe impl<'a> Sync for Workbench {}
+unsafe impl<'a> Send for Workbench {}
+
+impl<'a> Workbench {
     pub fn new(
         ctx: &mut Context,
         service_registry: ServiceRegistry,
         workspace_id: WorkspaceId,
     ) -> Result<Self> {
-        let mut configuration_registry = ConfigurationRegistry::new();
+        let configuration_registry = ctx.new_model(|_| ConfigurationRegistry::new());
+        ctx.update_model(&configuration_registry, |this, ctx| {
+            this.register_configuration(&WORKBENCH_TGUI_WINDOW);
+
+            ctx.notify();
+        });
 
         let font_service_model = ctx.new_model(|_ctx| MockFontSizeService {
             size: Cell::new(10),
         });
-        // let _observe = ctx.observe(&font_service_model, |service_model, _ctx| {
-        //     dbg!("D");
-        //     let s = service_model.read(_ctx);
-        //     dbg!(s.size.get());
-        // });
-
-        configuration_registry
-            .borrow_mut()
-            .register_configuration(&WORKBENCH_TGUI_WINDOW);
 
         Ok(Self {
             workspace_id,
-            service_registry,
+            service_registry: Rc::new(RefCell::new(service_registry)),
             configuration_registry,
             font_size_service: font_service_model,
-            _observe_font_size_service: None,
-            tao: None,
+            _observe_font_size_service: OnceCell::new(),
+            tao_handle: OnceCell::new(),
         })
     }
 
-    pub async fn initialize(&mut self) -> Result<()> {
-        self.initialize_services().await?;
+    pub async fn initialize(&self, ctx: &mut Context) -> Result<()> {
+        self.initialize_services(ctx).await?;
 
-        let config_service = self
-            .service_registry
-            .get_unchecked::<WorkspaceConfigurationService>();
+        let service_registry = self.service_registry.as_ref().borrow();
+        let config_service = service_registry.get_unchecked::<WorkspaceConfigurationService>();
 
         let value = config_service.get_value(attribute_name!(window.defaultWidth));
         println!("Value `window.defaultWidth` form None: {:?}", value);
@@ -104,7 +109,7 @@ impl<'a> Workbench<'a> {
         Ok(())
     }
 
-    async fn initialize_services(&mut self) -> Result<()> {
+    async fn initialize_services(&self, ctx: &mut Context) -> Result<()> {
         let workspace = self.restore_workspace();
 
         let configuration_policy_service = ConfigurationPolicyService {
@@ -131,12 +136,10 @@ impl<'a> Workbench<'a> {
             },
         };
 
-        let fs_service = self
-            .service_registry
-            .get_unchecked::<Arc<DiskFileSystemService>>();
-        let environment_service = self
-            .service_registry
-            .get_unchecked::<NativeEnvironmentService>();
+        let mut service_registry = self.service_registry.as_ref().borrow_mut();
+
+        let fs_service = service_registry.get_unchecked::<Arc<DiskFileSystemService>>();
+        let environment_service = service_registry.get_unchecked::<NativeEnvironmentService>();
 
         let user_profile_service = UserProfileService::new(
             environment_service.user_home_dir().clone(),
@@ -145,16 +148,19 @@ impl<'a> Workbench<'a> {
         .await?;
 
         let workspace_configuration_service = WorkspaceConfigurationService::new(
+            ctx,
             workspace,
-            &self.configuration_registry,
+            self.configuration_registry.clone(),
             configuration_policy_service,
-            &user_profile_service.default_profile().settings_resource,
+            user_profile_service
+                .default_profile()
+                .settings_resource
+                .clone(),
             Arc::clone(&fs_service) as Arc<dyn AbstractDiskFileSystemService>,
         )
         .await;
 
-        self.service_registry
-            .insert(workspace_configuration_service);
+        service_registry.insert(workspace_configuration_service);
 
         Ok(())
     }
@@ -185,24 +191,28 @@ impl<'a> Workbench<'a> {
             }
         }
     }
-    pub fn set_tao_handle(&mut self, ctx: &mut Context, handle: Rc<AppHandle>) {
-        self.tao = Some(Rc::clone(&handle));
 
-        self._observe_font_size_service =
-            Some(ctx.observe(&self.font_size_service, move |this, cx| {
-                // self.tao = Some(handle);
+    pub fn set_tao_handle(&self, ctx: &mut Context, handle: AppHandle) {
+        let _ = self.tao_handle.set(Rc::new(handle));
+        let tao_handle_clone = Rc::clone(self.tao_handle.get().unwrap());
+
+        let _ = self._observe_font_size_service.set(ctx.observe(
+            &self.font_size_service,
+            move |this, cx| {
                 let s = &this.read(cx).size;
                 dbg!("AA");
-                handle.emit("font-size-update-event", s.get()).unwrap();
-            }));
+                tao_handle_clone
+                    .emit("font-size-update-event", s.get())
+                    .unwrap();
+            },
+        ));
     }
 
     pub fn set_configuration_window_size(&self, window: WebviewWindow) -> Result<()> {
         use tauri::{LogicalSize, Size::Logical};
 
-        let config_service = self
-            .service_registry
-            .get_unchecked::<WorkspaceConfigurationService>();
+        let service_registry = self.service_registry.as_ref().borrow();
+        let config_service = service_registry.get_unchecked::<WorkspaceConfigurationService>();
 
         let width_value = config_service
             .get_value(attribute_name!(window.defaultWidth))
@@ -234,12 +244,8 @@ impl<'a> Workbench<'a> {
     }
 }
 
-impl<'a> Workbench<'a> {
-    pub fn update_conf(
-        &self,
-        ctx: &mut ModelContext<'_, Workbench<'a>>,
-        value: usize,
-    ) -> Result<()> {
+impl<'a> Workbench {
+    pub fn update_conf(&self, ctx: &mut Context, value: usize) -> Result<()> {
         ctx.update_model(&self.font_size_service, |this, ctx| {
             this.update_font_size(value);
             dbg!("C");

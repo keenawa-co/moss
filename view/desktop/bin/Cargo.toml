@@ -18,11 +18,13 @@ tauri-build = { version = "2.0.0-rc", features = [] }
 [dependencies]
 futures.workspace = true
 anyhow.workspace = true
-app.workspace = true
-
+once_cell.workspace = true
 parking_lot.workspace = true
 tracing.workspace = true
 tracing-subscriber.workspace = true
+
+moss_std.workspace = true
+app.workspace = true
 
 platform_core.workspace = true
 platform_workspace.workspace = true
@@ -36,7 +38,7 @@ workbench_service_environment_tgui.workspace = true
 
 surrealdb = { workspace = true, features = ["kv-rocksdb"] }
 strum = { workspace = true, features = ["derive"] }
-tokio = { workspace = true, features = ["full"] }
+tokio = { workspace = true, features = ["full", "macros", "signal"] }
 serde_json.workspace = true
 serde = { workspace = true, features = ["derive"] }
 hashbrown = { workspace = true, features = ["serde"] }

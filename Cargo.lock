@@ -1237,6 +1237,8 @@ dependencies = [
  "hashbrown 0.14.5",
  "macos-trampoline",
  "mimalloc",
+ "moss_std",
+ "once_cell",
  "parking_lot",
  "platform_configuration",
  "platform_core",
@@ -4065,6 +4067,7 @@ dependencies = [
  "lazy-regex",
  "moss_std",
  "parking_lot",
+ "platform_core",
  "platform_fs",
  "platform_utl",
  "radix_trie",
@@ -4099,10 +4102,14 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "derive_more",
+ "flume",
  "fnv",
+ "futures",
+ "hashbrown 0.14.5",
  "moss_std",
  "parking_lot",
  "slotmap",
+ "tokio",
 ]
 
 [[package]]
@@ -7608,6 +7615,7 @@ dependencies = [
  "anyhow",
  "async-trait",
  "platform_configuration",
+ "platform_core",
  "platform_fs",
  "platform_user_profile",
  "platform_workspace",
@@ -7641,6 +7649,7 @@ dependencies = [
  "anyhow",
  "hashbrown 0.14.5",
  "lazy_static",
+ "once_cell",
  "platform_configuration",
  "platform_core",
  "platform_formation",

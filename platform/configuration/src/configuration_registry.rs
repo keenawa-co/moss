@@ -3,6 +3,7 @@ use std::sync::Arc;
 use hashbrown::{HashMap, HashSet};
 use lazy_regex::Regex as LazyRegex;
 use moss_std::collection::extend::MaybeExtend;
+use platform_core::common::context::{entity::Model, Context};
 use serde_json::Value;
 
 type Regex = LazyRegex;
@@ -500,7 +501,7 @@ impl ConfigurationSchemaStorage {
 
 /// Registry to manage configurations and their schemas.
 #[derive(Debug)]
-pub struct ConfigurationRegistry<'a> {
+pub struct ConfigurationRegistry {
     /// Map of configuration properties.
     /// This hashmap stores the properties of configurations, indexed by their keys.
     /// Each property includes metadata such as type, scope, default values, and descriptions.
@@ -509,7 +510,7 @@ pub struct ConfigurationRegistry<'a> {
     /// List of configuration nodes contributed.
     /// This map contains all configuration nodes that have been registered to the registry.
     /// Configuration nodes can include multiple properties and sub-nodes.
-    contributors: HashMap<String, &'a ConfigurationNode>,
+    contributors: HashMap<String, ConfigurationNode>,
 
     /// Set of override identifiers.
     /// This set contains identifiers that are used to specify configurations that can override default values.
@@ -527,7 +528,7 @@ pub struct ConfigurationRegistry<'a> {
     excluded_properties: HashMap<String, RegisteredConfigurationPropertySchema>,
 }
 
-impl<'a> ConfigurationRegistry<'a> {
+impl<'a> ConfigurationRegistry {
     pub fn new() -> Self {
         Self {
             properties: HashMap::new(),
@@ -552,7 +553,7 @@ impl<'a> ConfigurationRegistry<'a> {
 
     pub fn register_configuration(&mut self, configuration: &'a ConfigurationNode) {
         self.contributors
-            .insert(configuration.id.clone(), configuration);
+            .insert(configuration.id.clone(), configuration.clone());
         self.register_json_configuration(&configuration);
 
         let _properties = self.do_configuration_registration(&configuration, false);
