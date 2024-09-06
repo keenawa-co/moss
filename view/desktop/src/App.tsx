@@ -1,19 +1,14 @@
+import "@/i18n";
+import "@repo/ui/src/fonts.css";
 import { Settings, Content, Home, Menu, RootLayout, Sidebar, Logs } from "@/components";
 import { Suspense, useEffect, useState } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import "@/i18n";
-import "@repo/ui/src/fonts.css";
 import { twMerge } from "tailwind-merge";
 import { Icon, MenuItem, IconTitle, ThemeProvider } from "@repo/ui";
 import { useTranslation } from "react-i18next";
 import { Resizable, ResizablePanel } from "./components/Resizable";
 import { Convert, Theme } from "@repo/theme";
 import { commands } from "@/bindings";
-import * as os from "os";
-
-// FIXME: temporary solution
-// const homeDirectory = os.homedir();
-// const themePath = `${homeDirectory}/.config/moss/themes`;
 
 const handleFetchAllThemes = async () => {
   try {
@@ -122,7 +117,11 @@ function App() {
   return (
     <>
       {!selectedTheme ? (
-        <div>Loading...</div>
+        <div className="relative min-h-screen flex bg-storm-800">
+          <div className="container max-w-screen-xl mx-auto flex justify-center items-center text-4xl text-white">
+            Loading...
+          </div>
+        </div>
       ) : (
         <ThemeProvider themeOverrides={selectedTheme} updateOnChange>
           <RootLayout>

@@ -25,9 +25,7 @@ pub async fn read_theme(theme_name: String) -> Result<String, String> {
         .join(".config")
         .join("moss")
         .join("themes")
-        .join(format!("moss-{theme_name}.json"));
-
-    dbg!(&theme_file_path);
+        .join(format!("{theme_name}.json"));
 
     match std::fs::read_to_string(theme_file_path) {
         Ok(content) => Ok(content),
