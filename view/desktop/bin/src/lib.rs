@@ -189,7 +189,7 @@ impl AppMain {
                     ctx.notify();
                 });
 
-                init_custom_logging(app_handle.clone());
+                // init_custom_logging(app_handle.clone());
 
                 // TODO:
                 // Used only as an example implementation. Remove this disgrace as soon as possible.

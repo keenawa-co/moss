@@ -9,8 +9,11 @@ import { useTranslation } from "react-i18next";
 import { Resizable, ResizablePanel } from "./components/Resizable";
 import { Convert, Theme } from "@repo/theme";
 import { commands } from "@/bindings";
+import * as os from "os";
 
-const themePath = "../../../../../tools/theme-generator/themes/";
+// FIXME: temporary solution
+// const homeDirectory = os.homedir();
+// const themePath = `${homeDirectory}/.config/moss/themes`;
 
 const handleFetchAllThemes = async () => {
   try {
@@ -25,9 +28,9 @@ const handleFetchAllThemes = async () => {
   }
 };
 
-const handleReadTheme = async (filePath: string): Promise<Theme> => {
+const handleReadTheme = async (themeName: string): Promise<Theme> => {
   try {
-    let response = await commands.readTheme(filePath);
+    let response = await commands.readTheme(themeName);
     if (response.status === "ok") {
       return Convert.toTheme(response.data);
     }
@@ -66,14 +69,14 @@ function App() {
         let themeToUse: Theme | undefined;
 
         if (savedThemeName) {
-          themeToUse = await handleReadTheme(`${themePath}${savedThemeName}.json`);
+          themeToUse = await handleReadTheme(savedThemeName);
         }
 
         if (themeToUse) {
           setSelectedTheme(themeToUse);
         } else {
           localStorage.setItem("theme", themes[0]);
-          setSelectedTheme(await handleReadTheme(`${themePath}${themes[0]}.json`));
+          setSelectedTheme(await handleReadTheme(themes[0]));
         }
       } catch (error) {
         console.error("Failed to initialize themes:", error);
@@ -99,7 +102,7 @@ function App() {
     const handleStorageChange = async () => {
       const storedTheme = localStorage.getItem("theme");
       if (storedTheme) {
-        setSelectedTheme(await handleReadTheme(`${themePath}${storedTheme}.json`));
+        setSelectedTheme(await handleReadTheme(storedTheme));
       }
     };
 

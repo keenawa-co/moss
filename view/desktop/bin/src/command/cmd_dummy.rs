@@ -1,3 +1,5 @@
+use std::path::PathBuf;
+
 use platform_core::common::context::async_context::AsyncContext;
 use tauri::{AppHandle, Manager, State};
 use workbench_tgui::WorkbenchState;
@@ -18,10 +20,21 @@ pub async fn fetch_all_themes() -> Result<Vec<String>, String> {
 
 #[tauri::command(async)]
 #[specta::specta]
-pub async fn read_theme(file_path: String) -> Result<String, String> {
-    match std::fs::read_to_string(file_path) {
+pub async fn read_theme(theme_name: String) -> Result<String, String> {
+    let theme_file_path = PathBuf::from(std::env::var("HOME").unwrap())
+        .join(".config")
+        .join("moss")
+        .join("themes")
+        .join(format!("moss-{theme_name}.json"));
+
+    dbg!(&theme_file_path);
+
+    match std::fs::read_to_string(theme_file_path) {
         Ok(content) => Ok(content),
-        Err(err) => Err(format!("filed to read theme file: {err}")),
+        Err(err) => {
+            dbg!(&err);
+            Err(format!("filed to read theme file: {err}"))
+        }
     }
 }
 

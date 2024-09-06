@@ -1,6 +1,10 @@
 //import { InputTheme } from "@repo/theme";
 import { existsSync, mkdirSync, writeFileSync } from "fs";
-const themesDirectory = "./themes";
+import * as os from "os";
+
+// FIXME: temporary solution
+const homeDirectory = os.homedir();
+const themesDirectory = `${homeDirectory}/.config/moss/themes`;
 
 export interface InputTheme {
   name: string;
