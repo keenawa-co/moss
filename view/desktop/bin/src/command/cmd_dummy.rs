@@ -11,8 +11,7 @@ use crate::AppState;
 #[specta::specta]
 pub async fn update_font_size(
     async_ctx: State<'_, AsyncContext>,
-    tctx: State<'_, platform_formation::context::Context>,
-    state: State<'_, AppState<'_>>,
+    state: State<'_, AppState>,
     input: i32,
 ) -> Result<(), String> {
     async_ctx.with_mut(|ctx| {
@@ -31,7 +30,7 @@ pub async fn app_ready(app_handle: AppHandle) {
 #[tauri::command(async)]
 #[specta::specta]
 pub async fn create_project(
-    state: State<'_, AppState<'_>>,
+    state: State<'_, AppState>,
     input: CreateProjectInput,
 ) -> Result<Option<ProjectDTO>, String> {
     match state.project_service.create_project(&input).await {
@@ -47,14 +46,14 @@ pub async fn create_project(
 
 #[tauri::command(async)]
 #[specta::specta]
-pub async fn workbench_get_state(state: State<'_, AppState<'_>>) -> Result<WorkbenchState, String> {
+pub async fn workbench_get_state(state: State<'_, AppState>) -> Result<WorkbenchState, String> {
     Ok(WorkbenchState::Empty)
 }
 
 #[tauri::command(async)]
 #[specta::specta]
 pub async fn restore_session(
-    state: State<'_, AppState<'_>>,
+    state: State<'_, AppState>,
     project_source: Option<String>,
 ) -> Result<Option<SessionInfoDTO>, String> {
     match state.session_service.restore_session(project_source).await {

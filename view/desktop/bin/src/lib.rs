@@ -6,7 +6,7 @@ mod service;
 
 use anyhow::{Context as ResultContext, Result};
 use platform_core::common::context::{
-    async_context::AsyncContext, entity::Model, AnyContext, ContextInner,
+    async_context::AsyncContext, entity::Model, AnyContext, Context,
 };
 use platform_formation::service_registry::ServiceRegistry;
 use platform_fs::disk::file_system_service::DiskFileSystemService;
@@ -49,8 +49,8 @@ impl MockStorageService {
     }
 }
 
-pub struct AppState<'a> {
-    pub workbench: Workbench<'a>,
+pub struct AppState {
+    pub workbench: Workbench,
     pub platform_info: NativePlatformInfo,
     pub project_service: ProjectService,
     pub session_service: SessionService,
@@ -69,9 +69,9 @@ impl AppMain {
 
     pub fn run<F>(&self, f: F) -> ExitCode
     where
-        F: 'static + FnOnce(&Self, ContextInner, TokioRuntime) -> Result<()>,
+        F: 'static + FnOnce(&Self, Context, TokioRuntime) -> Result<()>,
     {
-        let ctx = ContextInner::new();
+        let ctx = Context::new();
 
         let runtime = tokio::runtime::Builder::new_multi_thread()
             .enable_all()
@@ -88,7 +88,7 @@ impl AppMain {
         }
     }
 
-    pub fn open_main_window(&self, mut ctx: ContextInner, runtime: TokioRuntime) -> Result<()> {
+    pub fn open_main_window(&self, mut ctx: Context, runtime: TokioRuntime) -> Result<()> {
         // ------ Example stream
         // TODO:
         // Used only as an example implementation. Remove this disgrace as soon as possible.
@@ -158,17 +158,15 @@ impl AppMain {
 
     fn initialize_app(
         &self,
-        ctx: ContextInner,
+        ctx: Context,
         runtime: TokioRuntime,
-        app_state: AppState<'static>,
+        app_state: AppState,
         builder: tauri_specta::Builder,
         mut rx: tokio::sync::broadcast::Receiver<i32>,
     ) -> Result<App> {
-        let tctx = platform_formation::context::Context::new();
         let builder = tauri::Builder::default()
             .manage(ctx.to_async())
             .manage(app_state)
-            .manage(tctx)
             .invoke_handler(builder.invoke_handler())
             .setup(move |app: &mut App| {
                 let app_state: State<AppState> = app.state();
@@ -177,7 +175,7 @@ impl AppMain {
                 let app_handle = app.handle().clone();
                 let window = app.get_webview_window("main").unwrap();
 
-                let ctx_lock: &mut ContextInner = &mut async_ctx.lock();
+                let ctx_lock: &mut Context = &mut async_ctx.lock();
 
                 runtime.block_on(async {
                     app_state
