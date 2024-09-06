@@ -48,14 +48,9 @@ run-theme-generator:
 
 # Check if the database is running, if not, start it in the background
 check-db:
-ifeq ($(OS),Windows_NT)
-	@powershell -Command "if (!(Get-Process surreal -ErrorAction SilentlyContinue)) { Start-Process -NoNewWindow -FilePath 'make' -ArgumentList 'run-database' }"
-else
 	@if ! pgrep -x "surreal" > /dev/null; then \
 		$(MAKE) run-database; \
-	fi
-endif
-	
+	fi	
 	
 # Count lines of Rust code, excluding the 'target' directory
 count:
