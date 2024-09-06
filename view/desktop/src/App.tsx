@@ -30,8 +30,6 @@ function App() {
   const [themes, setThemes] = useState<Theme[]>([]);
   const [selectedTheme, setSelectedTheme] = useState<Theme | undefined>(undefined);
 
-  setSideBarVisibility(true);
-
   // Initialize theme
   useEffect(() => {
     const initializeThemes = async () => {

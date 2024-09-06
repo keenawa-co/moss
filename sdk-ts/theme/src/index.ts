@@ -20,30 +20,42 @@ export interface Colors {
 }
 
 const typeMap: any = {
-  Theme: o(
+  Theme: createPropsWithAdditional(
     [
       { json: "name", js: "name", typ: "" },
       { json: "type", js: "type", typ: "" },
       { json: "default", js: "default", typ: true },
-      { json: "colors", js: "colors", typ: r("Colors") },
+      { json: "colors", js: "colors", typ: createReference("Colors") },
     ],
     false
   ),
-  Colors: o(
+  Colors: createPropsWithAdditional(
     [
-      { json: "primary", js: "primary", typ: u(undefined, "") },
-      { json: "sideBar.background", js: "sideBarBackground", typ: u(undefined, "") },
-      { json: "toolBar.background", js: "toolBarBackground", typ: u(undefined, "") },
-      { json: "page.background", js: "pageBackground", typ: u(undefined, "") },
-      { json: "statusBar.background", js: "statusBarBackground", typ: u(undefined, "") },
-      { json: "windowsCloseButton.background", js: "windowsCloseButtonBackground", typ: u(undefined, "") },
-      { json: "windowControlsLinux.background", js: "windowControlsLinuxBackground", typ: u(undefined, "") },
-      { json: "windowControlsLinux.text", js: "windowControlsLinuxText", typ: u(undefined, "") },
-      { json: "windowControlsLinux.hoverBackground", js: "windowControlsLinuxHoverBackground", typ: u(undefined, "") },
+      { json: "primary", js: "primary", typ: createUnionMembers(undefined, "") },
+      { json: "sideBar.background", js: "sideBarBackground", typ: createUnionMembers(undefined, "") },
+      { json: "toolBar.background", js: "toolBarBackground", typ: createUnionMembers(undefined, "") },
+      { json: "page.background", js: "pageBackground", typ: createUnionMembers(undefined, "") },
+      { json: "statusBar.background", js: "statusBarBackground", typ: createUnionMembers(undefined, "") },
+      {
+        json: "windowsCloseButton.background",
+        js: "windowsCloseButtonBackground",
+        typ: createUnionMembers(undefined, ""),
+      },
+      {
+        json: "windowControlsLinux.background",
+        js: "windowControlsLinuxBackground",
+        typ: createUnionMembers(undefined, ""),
+      },
+      { json: "windowControlsLinux.text", js: "windowControlsLinuxText", typ: createUnionMembers(undefined, "") },
+      {
+        json: "windowControlsLinux.hoverBackground",
+        js: "windowControlsLinuxHoverBackground",
+        typ: createUnionMembers(undefined, ""),
+      },
       {
         json: "windowControlsLinux.activeBackground",
         js: "windowControlsLinuxActiveBackground",
-        typ: u(undefined, ""),
+        typ: createUnionMembers(undefined, ""),
       },
     ],
     false
@@ -53,8 +65,8 @@ const typeMap: any = {
 // Theme custom CSS variables
 export interface ThemeCssVariables {
   "--color-primary": string;
-  "--color-sidebar-background": string;
-  "--color-toolbar-background": string;
+  "--color-sideBar-background": string;
+  "--color-toolBar-background": string;
   "--color-page-background": string;
   "--color-statusBar-background": string;
   "--color-windows-close-button-background": string;
@@ -67,8 +79,8 @@ export interface ThemeCssVariables {
 export function mapThemeToCssVariables(theme: Theme): ThemeCssVariables {
   return {
     "--color-primary": theme.colors.primary || "",
-    "--color-sidebar-background": theme.colors.sideBarBackground || "",
-    "--color-toolbar-background": theme.colors.toolBarBackground || "",
+    "--color-sideBar-background": theme.colors.sideBarBackground || "",
+    "--color-toolBar-background": theme.colors.toolBarBackground || "",
     "--color-page-background": theme.colors.pageBackground || "",
     "--color-statusBar-background": theme.colors.statusBarBackground || "",
     "--color-windows-close-button-background": theme.colors.windowsCloseButtonBackground || "",
@@ -82,8 +94,8 @@ export function mapThemeToCssVariables(theme: Theme): ThemeCssVariables {
 // Theme custom Tailwind color variables
 export const customTailwindColorVariables: Colors = {
   primary: rgbaWithOpacity("--color-primary"),
-  sideBarBackground: rgbaWithOpacity("--color-sidebar-background"),
-  toolBarBackground: rgbaWithOpacity("--color-toolbar-background"),
+  sideBarBackground: rgbaWithOpacity("--color-sideBar-background"),
+  toolBarBackground: rgbaWithOpacity("--color-toolBar-background"),
   pageBackground: rgbaWithOpacity("--color-page-background"),
   statusBarBackground: rgbaWithOpacity("--color-statusBar-background"),
   windowsCloseButtonBackground: rgbaWithOpacity("--color-windows-close-button-background"),
@@ -100,11 +112,11 @@ function rgbaWithOpacity(variableName: keyof ThemeCssVariables): string {
 
 export class Convert {
   public static toTheme(json: string): Theme {
-    return cast(JSON.parse(json), r("Theme"));
+    return cast(JSON.parse(json), createReference("Theme"));
   }
 
   public static themeToJson(value: Theme): string {
-    return JSON.stringify(uncast(value, r("Theme")), null, 2);
+    return JSON.stringify(uncast(value, createReference("Theme")), null, 2);
   }
 }
 
@@ -178,7 +190,7 @@ function transform(val: any, typ: any, getProps: any, key: any = "", parent: any
     if (cases.indexOf(val) !== -1) return val;
     return invalidValue(
       cases.map((a) => {
-        return l(a);
+        return createLiteral(a);
       }),
       val,
       key,
@@ -188,7 +200,7 @@ function transform(val: any, typ: any, getProps: any, key: any = "", parent: any
 
   function transformArray(typ: any, val: any): any {
     // val must be an array with no invalid elements
-    if (!Array.isArray(val)) return invalidValue(l("array"), val, key, parent);
+    if (!Array.isArray(val)) return invalidValue(createLiteral("array"), val, key, parent);
     return val.map((el) => transform(el, typ, getProps));
   }
 
@@ -198,14 +210,14 @@ function transform(val: any, typ: any, getProps: any, key: any = "", parent: any
     }
     const d = new Date(val);
     if (isNaN(d.valueOf())) {
-      return invalidValue(l("Date"), val, key, parent);
+      return invalidValue(createLiteral("Date"), val, key, parent);
     }
     return d;
   }
 
   function transformObject(props: { [k: string]: any }, additional: any, val: any): any {
     if (val === null || typeof val !== "object" || Array.isArray(val)) {
-      return invalidValue(l(ref || "object"), val, key, parent);
+      return invalidValue(createLiteral(ref || "object"), val, key, parent);
     }
     const result: any = {};
     Object.getOwnPropertyNames(props).forEach((key) => {
@@ -255,26 +267,26 @@ function uncast<T>(val: T, typ: any): any {
   return transform(val, typ, jsToJSONProps);
 }
 
-function l(typ: any) {
+function createLiteral(typ: any) {
   return { literal: typ };
 }
 
-function a(typ: any) {
+function createArrayItems(typ: any) {
   return { arrayItems: typ };
 }
 
-function u(...typs: any[]) {
+function createUnionMembers(...typs: any[]) {
   return { unionMembers: typs };
 }
 
-function o(props: any[], additional: any) {
+function createPropsWithAdditional(props: any[], additional: any) {
   return { props, additional };
 }
 
-function m(additional: any) {
+function createPropsArrayWithAdditional(additional: any) {
   return { props: [], additional };
 }
 
-function r(name: string) {
+function createReference(name: string) {
   return { ref: name };
 }
