@@ -1,22 +1,29 @@
 import { INITIAL_VIEWPORTS } from "@storybook/addon-viewport";
 import type { Preview } from "@storybook/react";
 import React from "react";
-import "../../shared/ui/src/styles.css";
-import { ThemeProvider, getTheme, staticColors } from "../../shared/ui/src";
+import "@repo/ui/src/styles.css";
+import { ThemeProvider, staticColors } from "@repo/ui";
+import * as themeFiles from "./themes";
+import { Convert, Theme } from "@repo/theme";
+
+const themes: Map<string, Theme> = new Map();
+for (const themeName in themeFiles) {
+  const theme = themeFiles[themeName];
+  themes.set(theme.name, Convert.toTheme(JSON.stringify(theme)));
+}
 
 const preview: Preview = {
   globalTypes: {
     theme: {
       name: "Theme",
       description: "Global theme for components",
-      defaultValue: "light",
+      defaultValue: Array.from(themes.entries()).find(([_, theme]) => theme.default === true)?.[0] || "moss-light",
       toolbar: {
         icon: "circlehollow",
-        items: [
-          { value: "light", title: "Moss Light" },
-          { value: "dark", title: "Moss Dark" },
-          { value: "test", title: "Moss Test" },
-        ],
+        items: Array.from(themes.keys()).map((themeName) => ({
+          value: themeName,
+          title: themeName,
+        })),
         dynamicTitle: true,
       },
     },
@@ -31,7 +38,7 @@ const preview: Preview = {
     },
 
     backgrounds: {
-      default: "blue",
+      default: "lightish",
       values: [
         { name: "light", value: "white" },
         { name: "lightish", value: staticColors.stone["50"] },
@@ -46,8 +53,9 @@ const preview: Preview = {
   decorators: [
     (Story, context) => {
       const theme = context.args.theme ?? context.globals.theme;
+      console.warn("-------------------->", theme);
       return (
-        <ThemeProvider themeRGBOverrides={getTheme(theme)} updateRGBOnChange>
+        <ThemeProvider themeOverrides={themes.get(theme)} updateOnChange>
           <Story />
         </ThemeProvider>
       );

@@ -1,0 +1,14 @@
+{
+  "name": "@repo/theme-generator",
+  "scripts": {
+    "start": "tsc ./src/index.ts --outDir ./dist && node ./dist/index.js"
+  },
+  "devDependencies": {
+    "@repo/theme": "workspace:*",
+    "@repo/typescript-config": "workspace:*",
+    "@types/node": "^22.5.3"
+  },
+  "dependencies": {
+    "typescript": "^5.3.3"
+  }
+}

@@ -168,6 +168,7 @@ impl AppMain {
         mut rx: tokio::sync::broadcast::Receiver<i32>,
     ) -> Result<App> {
         let builder = tauri::Builder::default()
+            .plugin(tauri_plugin_fs::init())
             .manage(async_ctx)
             .manage(app_state)
             .invoke_handler(builder.invoke_handler())

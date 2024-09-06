@@ -38,6 +38,9 @@ export const commands = {
       else return { status: "error", error: e as any };
     }
   },
+  async nativePlatformInfo(): Promise<NativePlatformInfo> {
+    return await TAURI_INVOKE("native_platform_info");
+  },
 };
 
 /** user-defined events **/
@@ -47,6 +50,7 @@ export const commands = {
 /** user-defined types **/
 
 export type CreateProjectInput = { source: string; repository: string | null };
+export type NativePlatformInfo = { os: string; version: string; hostname: string };
 export type ProjectDTO = { id: string; source: string; repository: string | null; created_at: string };
 export type SessionDTO = { id: string };
 export type SessionInfoDTO = { created_at: string; project: ProjectDTO; session: SessionDTO };
