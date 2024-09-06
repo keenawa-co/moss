@@ -11,6 +11,8 @@ import { readThemesFromFiles } from "@/utils";
 import { BaseDirectory } from "@tauri-apps/plugin-fs";
 import { Theme } from "@repo/theme";
 
+import DockviewPage from "./components/DockviewPage";
+
 async function fetchThemes() {
   return await readThemesFromFiles(BaseDirectory.Home, "./.moss/themes");
 }
@@ -79,6 +81,9 @@ function App() {
           setSelectedTheme(newTheme);
         }
       }
+      // else {
+      //   setSelectedTheme(themes[0]);
+      // }
     };
 
     window.addEventListener("storage", handleStorageChange);
@@ -169,6 +174,7 @@ function App() {
                         <Route path="/" element={<Home />} />
                         <Route path="/settings" element={<Settings themes={themes.map((theme) => theme.name)} />} />
                         <Route path="/logs" element={<Logs />} />
+                        <Route path="/Dockview" element={<DockviewPage />} />
                       </Routes>
                     </BrowserRouter>
                   </Suspense>
