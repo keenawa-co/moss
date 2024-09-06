@@ -8,7 +8,7 @@ use crate::AppState;
 
 #[tauri::command(async)]
 #[specta::specta]
-pub async fn fetch_all_themes(state: State<'_, AppState<'_>>) -> Result<Vec<String>, String> {
+pub async fn fetch_all_themes() -> Result<Vec<String>, String> {
     Ok(vec![
         "moss-dark".to_string(),
         "moss-light".to_string(),
@@ -18,10 +18,7 @@ pub async fn fetch_all_themes(state: State<'_, AppState<'_>>) -> Result<Vec<Stri
 
 #[tauri::command(async)]
 #[specta::specta]
-pub async fn read_theme(
-    state: State<'_, AppState<'_>>,
-    file_path: String,
-) -> Result<String, String> {
+pub async fn read_theme(file_path: String) -> Result<String, String> {
     match std::fs::read_to_string(file_path) {
         Ok(content) => Ok(content),
         Err(err) => Err(format!("filed to read theme file: {err}")),
@@ -71,7 +68,7 @@ pub async fn create_project(
 
 #[tauri::command(async)]
 #[specta::specta]
-pub async fn workbench_get_state(state: State<'_, AppState<'_>>) -> Result<WorkbenchState, String> {
+pub async fn workbench_get_state() -> Result<WorkbenchState, String> {
     Ok(WorkbenchState::Empty)
 }
 
