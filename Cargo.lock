@@ -1257,6 +1257,7 @@ dependencies = [
  "tauri-specta",
  "tokio",
  "tracing",
+ "tracing-subscriber",
  "workbench_service_configuration_tgui",
  "workbench_service_environment_tgui",
  "workbench_tgui",

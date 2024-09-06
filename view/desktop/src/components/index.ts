@@ -2,6 +2,7 @@ export * from "./AppLayout";
 export * from "./Menu";
 export * from "./Home";
 export * from "./Settings";
+export * from "./Logs";
 export * from "./Button";
 export * from "./window-controls/WindowControls";
 export * from "./WindowTitlebar";

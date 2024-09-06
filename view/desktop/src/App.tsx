@@ -1,4 +1,4 @@
-import { Settings, Content, Home, Menu, RootLayout, Sidebar } from "@/components";
+import { Settings, Content, Home, Menu, RootLayout, Sidebar, Logs } from "@/components";
 import { Suspense, useEffect, useState } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import "@/i18n";
@@ -29,6 +29,8 @@ function App() {
   const { i18n } = useTranslation();
   const [themes, setThemes] = useState<Theme[]>([]);
   const [selectedTheme, setSelectedTheme] = useState<Theme | undefined>(undefined);
+
+  setSideBarVisibility(true);
 
   // Initialize theme
   useEffect(() => {
@@ -168,6 +170,7 @@ function App() {
                       <Routes>
                         <Route path="/" element={<Home />} />
                         <Route path="/settings" element={<Settings themes={themes.map((theme) => theme.name)} />} />
+                        <Route path="/logs" element={<Logs />} />
                       </Routes>
                     </BrowserRouter>
                   </Suspense>

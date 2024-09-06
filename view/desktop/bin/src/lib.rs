@@ -14,6 +14,8 @@ use platform_workspace::WorkspaceId;
 use service::project_service::ProjectService;
 use service::session_service::SessionService;
 use std::rc::Rc;
+use tracing_subscriber::layer::SubscriberExt;
+use tracing_subscriber::util::SubscriberInitExt;
 use std::sync::Arc;
 use std::{env, process::ExitCode};
 use surrealdb::{engine::remote::ws::Ws, Surreal};
@@ -185,6 +187,8 @@ impl AppMain {
                     ctx.notify();
                 });
 
+                init_custom_logging(app_handle.clone());
+
                 // TODO:
                 // Used only as an example implementation. Remove this disgrace as soon as possible.
                 tokio::task::block_in_place(|| {
@@ -233,3 +237,42 @@ impl AppMain {
             .context("Failed to export typescript bindings")?)
     }
 }
+
+
+// An example of how the logging could function
+fn init_custom_logging(app_handle: tauri::AppHandle) {
+    struct TauriLogWriter {
+        app_handle: tauri::AppHandle,
+    }
+
+    impl std::io::Write for TauriLogWriter {
+        fn write(&mut self, buf: &[u8]) -> std::io::Result<usize> {
+            let log_message = String::from_utf8_lossy(buf).to_string();
+            let _ = self.app_handle.emit("logs-stream", log_message);
+            Ok(buf.len())
+        }
+
+        fn flush(&mut self) -> std::io::Result<()> {
+            Ok(())
+        }
+    }
+
+    tracing_subscriber::registry()
+        // log to stdout
+        .with(
+            tracing_subscriber::fmt::layer()
+            .with_writer(std::io::stdout)
+        )
+        // log to frontend
+        .with(
+    tracing_subscriber::fmt::layer()
+            .with_writer(move || TauriLogWriter {
+                app_handle: app_handle.clone(),
+            })  
+        )
+        .init();
+    
+    event!(tracing::Level::DEBUG, "Logging init");
+    info!("Logging initialized");
+}
+

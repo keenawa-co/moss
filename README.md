@@ -29,6 +29,7 @@ Based on personal experience, some additional libraries may be required:
 sudo apt install libwebkit2gtk-4.1-dev
 sudo apt install libjavascriptcoregtk-4.1-dev
 sudo apt install libsoup-3.0-dev
+sudo apt install clang
 ```
 
 # Usage
