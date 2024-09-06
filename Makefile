@@ -2,7 +2,7 @@ DESKTOP_DIR = view/desktop
 STORYBOOK_DIR = view/storybook
 DOCS_DIR = view/docs
 WEB_DIR = view/web
-
+THEME_GENERATOR_DIR = tools/theme-generator
 
 PNPM = pnpm
 SURREAL = surreal
@@ -43,12 +43,19 @@ run-docs:
 run-web:
 	@cd $(WEB_DIR) && $(PNPM) dev
 
+run-theme-generator:
+	@cd $(THEME_GENERATOR_DIR) && $(PNPM) start
 
 # Check if the database is running, if not, start it in the background
 check-db:
+ifeq ($(OS),Windows_NT)
+	@powershell -Command "if (!(Get-Process surreal -ErrorAction SilentlyContinue)) { Start-Process -NoNewWindow -FilePath 'make' -ArgumentList 'run-database' }"
+else
 	@if ! pgrep -x "surreal" > /dev/null; then \
 		$(MAKE) run-database; \
 	fi
+endif
+	
 	
 # Count lines of Rust code, excluding the 'target' directory
 count:

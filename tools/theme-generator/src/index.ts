@@ -1,10 +1,6 @@
 //import { InputTheme } from "@repo/theme";
 import { existsSync, mkdirSync, writeFileSync } from "fs";
-import * as os from "os";
-
-const homeDirectory = os.homedir();
-const mossDirectory = `${homeDirectory}/.moss`;
-const themesDirectory = `${mossDirectory}/themes`;
+const themesDirectory = "./themes";
 
 export interface InputTheme {
   name: string;
@@ -95,7 +91,6 @@ async function writeThemeFile(theme: InputTheme): Promise<void> {
 
 async function generateThemeFiles(): Promise<void> {
   try {
-    await ensureDirectoryExists(mossDirectory);
     await ensureDirectoryExists(themesDirectory);
     await Promise.all(themes.map(writeThemeFile));
     console.log("Theme files generated successfully.");

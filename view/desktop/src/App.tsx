@@ -7,13 +7,36 @@ import { twMerge } from "tailwind-merge";
 import { Icon, MenuItem, IconTitle, ThemeProvider } from "@repo/ui";
 import { useTranslation } from "react-i18next";
 import { Resizable, ResizablePanel } from "./components/Resizable";
-import { readThemesFromFiles } from "@/utils";
-import { BaseDirectory } from "@tauri-apps/plugin-fs";
-import { Theme } from "@repo/theme";
+import { Convert, Theme } from "@repo/theme";
+import { commands } from "@/bindings";
 
-async function fetchThemes() {
-  return await readThemesFromFiles(BaseDirectory.Home, ".moss/themes");
-}
+const themePath = "../../../../../tools/theme-generator/themes/";
+
+const handleFetchAllThemes = async () => {
+  try {
+    let response = await commands.fetchAllThemes();
+    if (response.status === "ok") {
+      return response.data;
+    }
+    throw new Error("Failed to fetch themes: Invalid response status");
+  } catch (error) {
+    console.error("Failed to fetch themes:", error);
+    throw error;
+  }
+};
+
+const handleReadTheme = async (filePath: string): Promise<Theme> => {
+  try {
+    let response = await commands.readTheme(filePath);
+    if (response.status === "ok") {
+      return Convert.toTheme(response.data);
+    }
+    throw new Error("Failed to read theme: Invalid response status");
+  } catch (error) {
+    console.error("Failed to read theme:", error);
+    throw error;
+  }
+};
 
 enum IconState {
   Default = "group-text-primary",
@@ -27,31 +50,33 @@ enum IconState {
 function App() {
   const [sideBarVisible, setSideBarVisibility] = useState(true);
   const { i18n } = useTranslation();
-  const [themes, setThemes] = useState<Theme[]>([]);
+  const [themes, setThemes] = useState<string[]>([]);
   const [selectedTheme, setSelectedTheme] = useState<Theme | undefined>(undefined);
 
   // Initialize theme
   useEffect(() => {
     const initializeThemes = async () => {
-      const fetchedThemes = await fetchThemes();
-      setThemes(fetchedThemes);
-
-      const savedThemeName = localStorage.getItem("theme");
-      let themeToUse: Theme | undefined;
-
-      if (savedThemeName) {
-        themeToUse = fetchedThemes.find((theme) => theme.name === savedThemeName);
-      }
-
-      if (!themeToUse) {
-        themeToUse = fetchedThemes.find((theme) => theme.default === true);
-        if (themeToUse && themeToUse.name) {
-          localStorage.setItem("theme", themeToUse.name);
+      try {
+        const allThemes = await handleFetchAllThemes();
+        if (allThemes) {
+          setThemes(allThemes);
         }
-      }
 
-      if (themeToUse) {
-        setSelectedTheme(themeToUse);
+        const savedThemeName = localStorage.getItem("theme");
+        let themeToUse: Theme | undefined;
+
+        if (savedThemeName) {
+          themeToUse = await handleReadTheme(`${themePath}${savedThemeName}.json`);
+        }
+
+        if (themeToUse) {
+          setSelectedTheme(themeToUse);
+        } else {
+          localStorage.setItem("theme", themes[0]);
+          setSelectedTheme(await handleReadTheme(`${themePath}${themes[0]}.json`));
+        }
+      } catch (error) {
+        console.error("Failed to initialize themes:", error);
       }
     };
 
@@ -71,13 +96,10 @@ function App() {
 
   // Handle theme change
   useEffect(() => {
-    const handleStorageChange = () => {
+    const handleStorageChange = async () => {
       const storedTheme = localStorage.getItem("theme");
       if (storedTheme) {
-        const newTheme = themes.find((theme) => theme.name === storedTheme);
-        if (newTheme) {
-          setSelectedTheme(newTheme);
-        }
+        setSelectedTheme(await handleReadTheme(`${themePath}${storedTheme}.json`));
       }
     };
 
@@ -167,7 +189,7 @@ function App() {
                       <Menu />
                       <Routes>
                         <Route path="/" element={<Home />} />
-                        <Route path="/settings" element={<Settings themes={themes.map((theme) => theme.name)} />} />
+                        <Route path="/settings" element={<Settings themes={themes} />} />
                         <Route path="/logs" element={<Logs />} />
                       </Routes>
                     </BrowserRouter>
