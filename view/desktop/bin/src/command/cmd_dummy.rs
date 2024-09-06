@@ -1,4 +1,5 @@
-use anyhow::Result;
+use std::path::PathBuf;
+
 use platform_core::common::context::async_context::AsyncContext;
 use tauri::{AppHandle, Manager, State};
 use workbench_tgui::WorkbenchState;
@@ -6,6 +7,34 @@ use workbench_tgui::WorkbenchState;
 use crate::service::project_service::{CreateProjectInput, ProjectDTO};
 use crate::service::session_service::SessionInfoDTO;
 use crate::AppState;
+
+#[tauri::command(async)]
+#[specta::specta]
+pub async fn fetch_all_themes() -> Result<Vec<String>, String> {
+    Ok(vec![
+        "moss-dark".to_string(),
+        "moss-light".to_string(),
+        "moss-pink".to_string(),
+    ])
+}
+
+#[tauri::command(async)]
+#[specta::specta]
+pub async fn read_theme(theme_name: String) -> Result<String, String> {
+    let theme_file_path = PathBuf::from(std::env::var("HOME").unwrap())
+        .join(".config")
+        .join("moss")
+        .join("themes")
+        .join(format!("{theme_name}.json"));
+
+    match std::fs::read_to_string(theme_file_path) {
+        Ok(content) => Ok(content),
+        Err(err) => {
+            dbg!(&err);
+            Err(format!("filed to read theme file: {err}"))
+        }
+    }
+}
 
 #[tauri::command(async)]
 #[specta::specta]
@@ -50,7 +79,7 @@ pub async fn create_project(
 
 #[tauri::command(async)]
 #[specta::specta]
-pub async fn workbench_get_state(state: State<'_, AppState<'_>>) -> Result<WorkbenchState, String> {
+pub async fn workbench_get_state() -> Result<WorkbenchState, String> {
     Ok(WorkbenchState::Empty)
 }
 

@@ -1,11 +1,7 @@
 use anyhow::{anyhow, Result};
 use specta::Type;
 use std::sync::Arc;
-use surrealdb::{
-    engine::{local::Db, remote::ws::Client},
-    sql::Thing,
-    Surreal,
-};
+use surrealdb::{engine::remote::ws::Client, sql::Thing, Surreal};
 
 use super::project_service::{ProjectDTO, ProjectEntity};
 
