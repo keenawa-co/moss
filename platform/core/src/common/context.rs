@@ -16,7 +16,9 @@ use parking_lot::Mutex;
 use std::{
     any::{Any, TypeId},
     borrow::BorrowMut,
+    cell::RefCell,
     future::Future,
+    rc::Rc,
     sync::{Arc, Weak},
 };
 use subscription::{SubscriberSet, Subscription};
@@ -48,6 +50,27 @@ pub trait AnyContext {
         T: 'static;
 }
 
+pub struct Context {
+    inner: Rc<RefCell<ContextInner>>,
+}
+
+impl Context {
+    pub fn new() -> Self {
+        Context {
+            inner: Rc::new(RefCell::new(ContextInner {
+                observers: SubscriberSet::new(),
+                pending_notifications: FxHashSet::default(),
+                pending_effects: VecDeque::new(),
+                pending_updates: 0,
+                entities: EntityMap::new(),
+                flushing_effects: false,
+                event_listeners: SubscriberSet::new(),
+                release_listeners: SubscriberSet::new(),
+            })),
+        }
+    }
+}
+
 pub trait EventEmitter<E: Any>: 'static {}
 
 pub enum Effect {
@@ -60,15 +83,15 @@ pub enum Effect {
         event: Box<dyn Any>,
     },
     Defer {
-        callback: Box<dyn FnOnce(&mut Context) + 'static>,
+        callback: Box<dyn FnOnce(&mut ContextInner) + 'static>,
     },
 }
 
-type Handler = Box<dyn FnMut(&mut Context) -> bool + 'static>;
-type Listener = Box<dyn FnMut(&dyn Any, &mut Context) -> bool + 'static>;
-type ReleaseListener = Box<dyn FnOnce(&mut dyn Any, &mut Context) + 'static>;
+type Handler = Box<dyn FnMut(&mut ContextInner) -> bool + 'static>;
+type Listener = Box<dyn FnMut(&dyn Any, &mut ContextInner) -> bool + 'static>;
+type ReleaseListener = Box<dyn FnOnce(&mut dyn Any, &mut ContextInner) + 'static>;
 
-pub struct Context {
+pub struct ContextInner {
     observers: SubscriberSet<EntityId, Handler>,
     pending_notifications: FxHashSet<EntityId>,
     pending_effects: VecDeque<Effect>,
@@ -79,10 +102,10 @@ pub struct Context {
     release_listeners: SubscriberSet<EntityId, ReleaseListener>,
 }
 
-unsafe impl Send for Context {}
-unsafe impl Sync for Context {}
+unsafe impl Send for ContextInner {}
+unsafe impl Sync for ContextInner {}
 
-impl AnyContext for Context {
+impl AnyContext for ContextInner {
     type Result<T> = T;
 
     fn reserve_model<T: 'static>(&mut self) -> Self::Result<Reservation<T>> {
@@ -127,9 +150,9 @@ impl AnyContext for Context {
     }
 }
 
-impl Context {
+impl ContextInner {
     pub fn new() -> Self {
-        Context {
+        ContextInner {
             observers: SubscriberSet::new(),
             pending_notifications: FxHashSet::default(),
             pending_effects: VecDeque::new(),
@@ -160,7 +183,7 @@ impl Context {
     //     self.runner.block_on(future)
     // }
 
-    pub fn defer(&mut self, f: impl FnOnce(&mut Context) + 'static) {
+    pub fn defer(&mut self, f: impl FnOnce(&mut ContextInner) + 'static) {
         self.push_effect(Effect::Defer {
             callback: Box::new(f),
         })
@@ -182,7 +205,7 @@ impl Context {
     pub fn subscribe<T, E, Event>(
         &mut self,
         entity: &E,
-        mut on_event: impl FnMut(E, &Event, &mut Context) + 'static,
+        mut on_event: impl FnMut(E, &Event, &mut ContextInner) + 'static,
     ) -> Subscription
     where
         T: 'static + EventEmitter<Event>,
@@ -208,7 +231,7 @@ impl Context {
     pub(crate) fn subscribe_internal<T, E, Ev>(
         &mut self,
         entity: &E,
-        mut on_event: impl FnMut(E, &Ev, &mut Context) -> bool + 'static,
+        mut on_event: impl FnMut(E, &Ev, &mut ContextInner) -> bool + 'static,
     ) -> Subscription
     where
         T: 'static + EventEmitter<Ev>,
@@ -244,7 +267,7 @@ impl Context {
     pub fn observe<W, E>(
         &mut self,
         entity: &E,
-        mut on_notify: impl FnMut(E, &mut Context) + 'static,
+        mut on_notify: impl FnMut(E, &mut ContextInner) + 'static,
     ) -> Subscription
     where
         W: 'static,
@@ -259,7 +282,7 @@ impl Context {
     pub(crate) fn observe_internal<W, E>(
         &mut self,
         entity: &E,
-        mut on_notify: impl FnMut(E, &mut Context) -> bool + 'static,
+        mut on_notify: impl FnMut(E, &mut ContextInner) -> bool + 'static,
     ) -> Subscription
     where
         W: 'static,
@@ -279,7 +302,7 @@ impl Context {
         )
     }
 
-    pub(crate) fn update<R>(&mut self, update: impl FnOnce(&mut Context) -> R) -> R {
+    pub(crate) fn update<R>(&mut self, update: impl FnOnce(&mut ContextInner) -> R) -> R {
         self.pending_updates += 1;
         let result = update(self);
         if !self.flushing_effects && self.pending_updates == 1 {
@@ -343,7 +366,7 @@ impl Context {
             .retain(&emitter, |handler| handler(self));
     }
 
-    fn apply_defer_effect(&mut self, callback: Box<dyn FnOnce(&mut Context) + 'static>) {
+    fn apply_defer_effect(&mut self, callback: Box<dyn FnOnce(&mut ContextInner) + 'static>) {
         callback(self);
     }
 

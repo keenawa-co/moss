@@ -17,7 +17,8 @@ use platform_configuration::{
     configuration_registry::ConfigurationRegistry, AbstractConfigurationService,
 };
 use platform_core::common::context::{
-    entity::Model, model_context::ModelContext, subscription::Subscription, AnyContext, Context,
+    entity::Model, model_context::ModelContext, subscription::Subscription, AnyContext,
+    ContextInner,
 };
 use platform_formation::service_registry::ServiceRegistry;
 use platform_fs::disk::file_system_service::{
@@ -60,7 +61,7 @@ pub enum WorkbenchState {
 pub struct Workbench<'a> {
     workspace_id: WorkspaceId,
     service_registry: Rc<RefCell<ServiceRegistry>>,
-    configuration_registry: ConfigurationRegistry<'a>,
+    configuration_registry: Model<ConfigurationRegistry<'a>>,
     // TODO: this will be removed after testing is complete
     font_size_service: Model<MockFontSizeService>,
     _observe_font_size_service: OnceCell<Subscription>,
@@ -72,19 +73,15 @@ unsafe impl<'a> Send for Workbench<'a> {}
 
 impl<'a> Workbench<'a> {
     pub fn new(
-        ctx: &mut Context,
+        ctx: &mut ContextInner,
         service_registry: ServiceRegistry,
         workspace_id: WorkspaceId,
     ) -> Result<Self> {
-        let mut configuration_registry = ConfigurationRegistry::new();
+        let configuration_registry = ctx.new_model(|_| ConfigurationRegistry::new());
 
         let font_service_model = ctx.new_model(|_ctx| MockFontSizeService {
             size: Cell::new(10),
         });
-
-        configuration_registry
-            .borrow_mut()
-            .register_configuration(&WORKBENCH_TGUI_WINDOW);
 
         Ok(Self {
             workspace_id,
@@ -96,8 +93,12 @@ impl<'a> Workbench<'a> {
         })
     }
 
-    pub async fn initialize(&self, ctx: &mut Context) -> Result<()> {
-        self.initialize_services().await?;
+    pub async fn initialize(&self, ctx: &mut ContextInner) -> Result<()> {
+        ctx.update_model(&self.configuration_registry, |this, ctx| {
+            // this.register_configuration(&WORKBENCH_TGUI_WINDOW);
+        });
+
+        self.initialize_services(ctx).await?;
 
         let service_registry = self.service_registry.as_ref().borrow();
         let config_service = service_registry.get_unchecked::<WorkspaceConfigurationService>();
@@ -108,7 +109,7 @@ impl<'a> Workbench<'a> {
         Ok(())
     }
 
-    async fn initialize_services(&self) -> Result<()> {
+    async fn initialize_services(&self, ctx: &mut ContextInner) -> Result<()> {
         let workspace = self.restore_workspace();
 
         let configuration_policy_service = ConfigurationPolicyService {
@@ -187,7 +188,7 @@ impl<'a> Workbench<'a> {
         }
     }
 
-    pub fn set_tao_handle(&self, ctx: &mut Context, handle: AppHandle) {
+    pub fn set_tao_handle(&self, ctx: &mut ContextInner, handle: AppHandle) {
         let _ = self.tao_handle.set(Rc::new(handle));
         let tao_handle_clone = Rc::clone(self.tao_handle.get().unwrap());
 
@@ -240,7 +241,7 @@ impl<'a> Workbench<'a> {
 }
 
 impl<'a> Workbench<'a> {
-    pub fn update_conf(&self, ctx: &mut Context, value: usize) -> Result<()> {
+    pub fn update_conf(&self, ctx: &mut ContextInner, value: usize) -> Result<()> {
         ctx.update_model(&self.font_size_service, |this, ctx| {
             this.update_font_size(value);
             dbg!("C");

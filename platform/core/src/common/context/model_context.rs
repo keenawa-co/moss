@@ -4,19 +4,19 @@ use std::any::TypeId;
 use super::{
     entity::{AnyEntity, Model, WeakModel},
     subscription::Subscription,
-    AnyContext, Context, Effect, EventEmitter, Reservation,
+    AnyContext, ContextInner, Effect, EventEmitter, Reservation,
 };
 
 #[derive(Deref, DerefMut)]
 pub struct ModelContext<'a, T> {
     #[deref]
     #[deref_mut]
-    app: &'a mut Context,
+    app: &'a mut ContextInner,
     model_state: WeakModel<T>,
 }
 
 impl<'a, T: 'static> ModelContext<'a, T> {
-    pub(crate) fn new(app: &'a mut Context, model_state: WeakModel<T>) -> Self {
+    pub(crate) fn new(app: &'a mut ContextInner, model_state: WeakModel<T>) -> Self {
         Self { app, model_state }
     }
 

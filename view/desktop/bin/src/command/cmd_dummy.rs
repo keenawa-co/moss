@@ -11,6 +11,7 @@ use crate::AppState;
 #[specta::specta]
 pub async fn update_font_size(
     async_ctx: State<'_, AsyncContext>,
+    tctx: State<'_, platform_formation::context::Context>,
     state: State<'_, AppState<'_>>,
     input: i32,
 ) -> Result<(), String> {

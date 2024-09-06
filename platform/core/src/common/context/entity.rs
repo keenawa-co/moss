@@ -12,7 +12,7 @@ use std::{
     },
 };
 
-use super::{model_context::ModelContext, utl::FlattenAnyhowResult, AnyContext, Context};
+use super::{model_context::ModelContext, utl::FlattenAnyhowResult, AnyContext, ContextInner};
 
 pub struct AnyModel {
     entity_id: EntityId,
@@ -155,7 +155,7 @@ impl<T: 'static> Model<T> {
         }
     }
 
-    pub fn read<'a>(&self, ctx: &'a Context) -> &'a T {
+    pub fn read<'a>(&self, ctx: &'a ContextInner) -> &'a T {
         ctx.entities.read(self)
     }
 
