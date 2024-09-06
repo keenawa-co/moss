@@ -12,7 +12,7 @@ import { BaseDirectory } from "@tauri-apps/plugin-fs";
 import { Theme } from "@repo/theme";
 
 async function fetchThemes() {
-  return await readThemesFromFiles(BaseDirectory.Home, "./.moss/themes");
+  return await readThemesFromFiles(BaseDirectory.Home, ".moss/themes");
 }
 
 enum IconState {

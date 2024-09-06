@@ -38,6 +38,22 @@ export const commands = {
       else return { status: "error", error: e as any };
     }
   },
+  async fetchAllThemes(): Promise<Result<string[], string>> {
+    try {
+      return { status: "ok", data: await TAURI_INVOKE("fetch_all_themes") };
+    } catch (e) {
+      if (e instanceof Error) throw e;
+      else return { status: "error", error: e as any };
+    }
+  },
+  async readTheme(filePath: string): Promise<Result<string, string>> {
+    try {
+      return { status: "ok", data: await TAURI_INVOKE("read_theme", { filePath }) };
+    } catch (e) {
+      if (e instanceof Error) throw e;
+      else return { status: "error", error: e as any };
+    }
+  },
   async nativePlatformInfo(): Promise<NativePlatformInfo> {
     return await TAURI_INVOKE("native_platform_info");
   },

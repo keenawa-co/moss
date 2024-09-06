@@ -14,13 +14,13 @@ use platform_workspace::WorkspaceId;
 use service::project_service::ProjectService;
 use service::session_service::SessionService;
 use std::rc::Rc;
-use tracing_subscriber::layer::SubscriberExt;
-use tracing_subscriber::util::SubscriberInitExt;
 use std::sync::Arc;
 use std::{env, process::ExitCode};
 use surrealdb::{engine::remote::ws::Ws, Surreal};
 use tauri::{App, Emitter, Manager, State};
 use tauri_specta::{collect_commands, collect_events};
+use tracing_subscriber::layer::SubscriberExt;
+use tracing_subscriber::util::SubscriberInitExt;
 use workbench_service_environment_tgui::environment_service::NativeEnvironmentService;
 use workbench_tgui::window::{NativePlatformInfo, NativeWindowConfiguration};
 use workbench_tgui::Workbench;
@@ -149,6 +149,8 @@ impl AppMain {
                 cmd_dummy::restore_session,
                 cmd_dummy::app_ready,
                 cmd_dummy::update_font_size,
+                cmd_dummy::fetch_all_themes,
+                cmd_dummy::read_theme,
                 cmd_base::native_platform_info,
             ]);
 
@@ -168,7 +170,7 @@ impl AppMain {
         mut rx: tokio::sync::broadcast::Receiver<i32>,
     ) -> Result<App> {
         let builder = tauri::Builder::default()
-            .plugin(tauri_plugin_fs::init())
+            // .plugin(tauri_plugin_fs::init())
             .manage(async_ctx)
             .manage(app_state)
             .invoke_handler(builder.invoke_handler())
@@ -238,7 +240,6 @@ impl AppMain {
     }
 }
 
-
 // An example of how the logging could function
 fn init_custom_logging(app_handle: tauri::AppHandle) {
     struct TauriLogWriter {
@@ -259,20 +260,15 @@ fn init_custom_logging(app_handle: tauri::AppHandle) {
 
     tracing_subscriber::registry()
         // log to stdout
-        .with(
-            tracing_subscriber::fmt::layer()
-            .with_writer(std::io::stdout)
-        )
+        .with(tracing_subscriber::fmt::layer().with_writer(std::io::stdout))
         // log to frontend
         .with(
-    tracing_subscriber::fmt::layer()
-            .with_writer(move || TauriLogWriter {
+            tracing_subscriber::fmt::layer().with_writer(move || TauriLogWriter {
                 app_handle: app_handle.clone(),
-            })  
+            }),
         )
         .init();
-    
+
     event!(tracing::Level::DEBUG, "Logging init");
     info!("Logging initialized");
 }
-
