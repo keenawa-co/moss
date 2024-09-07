@@ -4,7 +4,6 @@ DOCS_DIR = view/docs
 WEB_DIR = view/web
 THEME_GENERATOR_DIR = tools/theme-generator
 
-
 PNPM = pnpm
 SURREAL = surreal
 
@@ -47,29 +46,16 @@ run-web:
 run-theme-generator:
 	@cd $(THEME_GENERATOR_DIR) && $(PNPM) start
 
-
 # Check if the database is running, if not, start it in the background
 check-db:
-ifeq ($(OS),Windows_NT)
-	@powershell -Command "if (!(Get-Process surreal -ErrorAction SilentlyContinue)) { Start-Process -NoNewWindow -FilePath 'make' -ArgumentList 'run-database' }"
-else
 	@if ! pgrep -x "surreal" > /dev/null; then \
 		$(MAKE) run-database; \
-	fi
-endif
+	fi	
 	
 # Count lines of Rust code, excluding the 'target' directory
 count:
-ifeq ($(OS),Windows_NT)
-	@powershell -Command "Get-ChildItem -Recurse -Filter *.rs | Where-Object { $$_.FullName -notmatch '\\target\\' } | ForEach-Object { (Get-Content $$_.FullName | Measure-Object -Line).Lines } | Measure-Object -Sum | Select-Object -ExpandProperty Sum"
-else
-	find . -type f -name '*.rs' | grep -v '/target/' | xargs wc -l | tail -n 1 | awk '{print $$1}'
-endif
+	@find . -type f -name '*.rs' | grep -v '/target/' | xargs wc -l
 
 # Clean up merged branches except master, main, and dev
 cleanup:
-ifeq ($(OS),Windows_NT)
-	@git branch --merged | findstr /V /C:"*" /C:"master" /C:"main" /C:"dev" | for /F "tokens=*" %i in ('more') do git branch -d %i
-else
 	@git branch --merged | grep -Ev "(^\*|master|main|dev)" | xargs git branch -d
-endif
