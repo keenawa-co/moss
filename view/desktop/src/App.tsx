@@ -100,9 +100,6 @@ function App() {
       if (storedTheme) {
         setSelectedTheme(await handleReadTheme(storedTheme));
       }
-      // else {
-      //   setSelectedTheme(themes[0]);
-      // }
     };
 
     window.addEventListener("storage", handleStorageChange);

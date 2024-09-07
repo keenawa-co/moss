@@ -17,6 +17,29 @@ export interface Colors {
   windowControlsLinuxText?: string;
   windowControlsLinuxHoverBackground?: string;
   windowControlsLinuxActiveBackground?: string;
+
+  dvBackgroundColor?: string;
+  dvPaneviewActiveOutlineColor?: string;
+  dvTabsAndActionsContainerFontSize?: string;
+  dvTabsAndActionsContainerHeight?: string;
+  dvDragOverBackgroundColor?: string;
+  dvDragOverBorderColor?: string;
+  dvTabsContainerScrollbarColor?: string;
+  dvIconHoverBackgroundColor?: string;
+  dvFloatingBoxShadow?: string;
+  dvGroupViewBackgroundColor?: string;
+  dvTabsAndActionsContainerBackgroundColor?: string;
+  dvActivegroupVisiblepanelTabBackgroundColor?: string;
+  dvActivegroupHiddenpanelTabBackgroundColor?: string;
+  dvInactivegroupVisiblepanelTabBackgroundColor?: string;
+  dvInactivegroupHiddenpanelTabBackgroundColor?: string;
+  dvTabDividerColor?: string;
+  dvActivegroupVisiblepanelTabColor?: string;
+  dvActivegroupHiddenpanelTabColor?: string;
+  dvInactivegroupVisiblepanelTabColor?: string;
+  dvInactivegroupHiddenpanelTabColor?: string;
+  dvSeparatorBorder?: string;
+  dvPaneviewHeaderBorderColor?: string;
 }
 
 const typeMap: any = {
@@ -57,6 +80,86 @@ const typeMap: any = {
         js: "windowControlsLinuxActiveBackground",
         typ: createUnionMembers(undefined, ""),
       },
+      {
+        json: "dvTabsAndActionsContainerBackgroundColor",
+        js: "dvTabsAndActionsContainerBackgroundColor",
+        typ: createUnionMembers(undefined, ""),
+      },
+
+      // Adding dv variables here
+      { json: "dvBackgroundColor", js: "dvBackgroundColor", typ: createUnionMembers(undefined, "") },
+      {
+        json: "dvPaneviewActiveOutlineColor",
+        js: "dvPaneviewActiveOutlineColor",
+        typ: createUnionMembers(undefined, ""),
+      },
+      {
+        json: "dvTabsAndActionsContainerFontSize",
+        js: "dvTabsAndActionsContainerFontSize",
+        typ: createUnionMembers(undefined, ""),
+      },
+      {
+        json: "dvTabsAndActionsContainerHeight",
+        js: "dvTabsAndActionsContainerHeight",
+        typ: createUnionMembers(undefined, ""),
+      },
+      { json: "dvDragOverBackgroundColor", js: "dvDragOverBackgroundColor", typ: createUnionMembers(undefined, "") },
+      { json: "dvDragOverBorderColor", js: "dvDragOverBorderColor", typ: createUnionMembers(undefined, "") },
+      {
+        json: "dvTabsContainerScrollbarColor",
+        js: "dvTabsContainerScrollbarColor",
+        typ: createUnionMembers(undefined, ""),
+      },
+      { json: "dvIconHoverBackgroundColor", js: "dvIconHoverBackgroundColor", typ: createUnionMembers(undefined, "") },
+      { json: "dvFloatingBoxShadow", js: "dvFloatingBoxShadow", typ: createUnionMembers(undefined, "") },
+      { json: "dvGroupViewBackgroundColor", js: "dvGroupViewBackgroundColor", typ: createUnionMembers(undefined, "") },
+      {
+        json: "dvActivegroupVisiblepanelTabBackgroundColor",
+        js: "dvActivegroupVisiblepanelTabBackgroundColor",
+        typ: createUnionMembers(undefined, ""),
+      },
+      {
+        json: "dvActivegroupHiddenpanelTabBackgroundColor",
+        js: "dvActivegroupHiddenpanelTabBackgroundColor",
+        typ: createUnionMembers(undefined, ""),
+      },
+      {
+        json: "dvInactivegroupVisiblepanelTabBackgroundColor",
+        js: "dvInactivegroupVisiblepanelTabBackgroundColor",
+        typ: createUnionMembers(undefined, ""),
+      },
+      {
+        json: "dvInactivegroupHiddenpanelTabBackgroundColor",
+        js: "dvInactivegroupHiddenpanelTabBackgroundColor",
+        typ: createUnionMembers(undefined, ""),
+      },
+      { json: "dvTabDividerColor", js: "dvTabDividerColor", typ: createUnionMembers(undefined, "") },
+      {
+        json: "dvActivegroupVisiblepanelTabColor",
+        js: "dvActivegroupVisiblepanelTabColor",
+        typ: createUnionMembers(undefined, ""),
+      },
+      {
+        json: "dvActivegroupHiddenpanelTabColor",
+        js: "dvActivegroupHiddenpanelTabColor",
+        typ: createUnionMembers(undefined, ""),
+      },
+      {
+        json: "dvInactivegroupVisiblepanelTabColor",
+        js: "dvInactivegroupVisiblepanelTabColor",
+        typ: createUnionMembers(undefined, ""),
+      },
+      {
+        json: "dvInactivegroupHiddenpanelTabColor",
+        js: "dvInactivegroupHiddenpanelTabColor",
+        typ: createUnionMembers(undefined, ""),
+      },
+      { json: "dvSeparatorBorder", js: "dvSeparatorBorder", typ: createUnionMembers(undefined, "") },
+      {
+        json: "dvPaneviewHeaderBorderColor",
+        js: "dvPaneviewHeaderBorderColor",
+        typ: createUnionMembers(undefined, ""),
+      },
     ],
     false
   ),
@@ -74,6 +177,29 @@ export interface ThemeCssVariables {
   "--color-window-controls-linux-text": string;
   "--color-window-controls-linux-hover-background": string;
   "--color-window-controls-linux-active-background": string;
+
+  "--dv-background-color"?: string;
+  "--dv-paneview-active-outline-color"?: string;
+  "--dv-tabs-and-actions-container-font-size"?: string;
+  "--dv-tabs-and-actions-container-height"?: string;
+  "--dv-drag-over-background-color"?: string;
+  "--dv-drag-over-border-color"?: string;
+  "--dv-tabs-container-scrollbar-color"?: string;
+  "--dv-icon-hover-background-color"?: string;
+  "--dv-floating-box-shadow"?: string;
+  "--dv-group-view-background-color"?: string;
+  "--dv-tabs-and-actions-container-background-color"?: string;
+  "--dv-activegroup-visiblepanel-tab-background-color"?: string;
+  "--dv-activegroup-hiddenpanel-tab-background-color"?: string;
+  "--dv-inactivegroup-visiblepanel-tab-background-color"?: string;
+  "--dv-inactivegroup-hiddenpanel-tab-background-color"?: string;
+  "--dv-tab-divider-color"?: string;
+  "--dv-activegroup-visiblepanel-tab-color"?: string;
+  "--dv-activegroup-hiddenpanel-tab-color"?: string;
+  "--dv-inactivegroup-visiblepanel-tab-color"?: string;
+  "--dv-inactivegroup-hiddenpanel-tab-color"?: string;
+  "--dv-separator-border"?: string;
+  "--dv-paneview-header-border-color"?: string;
 }
 
 export function mapThemeToCssVariables(theme: Theme): ThemeCssVariables {
@@ -88,6 +214,73 @@ export function mapThemeToCssVariables(theme: Theme): ThemeCssVariables {
     "--color-window-controls-linux-text": theme.colors.windowControlsLinuxText || "",
     "--color-window-controls-linux-hover-background": theme.colors.windowControlsLinuxHoverBackground || "",
     "--color-window-controls-linux-active-background": theme.colors.windowControlsLinuxActiveBackground || "",
+
+    "--dv-background-color": theme.colors?.dvBackgroundColor
+      ? rgbaValueToRgbaString(theme.colors.dvBackgroundColor)
+      : "",
+    "--dv-paneview-active-outline-color": theme.colors?.dvPaneviewActiveOutlineColor
+      ? rgbaValueToRgbaString(theme.colors.dvPaneviewActiveOutlineColor)
+      : "",
+    "--dv-tabs-and-actions-container-font-size": theme.colors?.dvTabsAndActionsContainerFontSize
+      ? rgbaValueToRgbaString(theme.colors.dvTabsAndActionsContainerFontSize)
+      : "",
+    "--dv-tabs-and-actions-container-height": theme.colors?.dvTabsAndActionsContainerHeight
+      ? rgbaValueToRgbaString(theme.colors.dvTabsAndActionsContainerHeight)
+      : "",
+    "--dv-drag-over-background-color": theme.colors?.dvDragOverBackgroundColor
+      ? rgbaValueToRgbaString(theme.colors.dvDragOverBackgroundColor)
+      : "",
+    "--dv-drag-over-border-color": theme.colors?.dvDragOverBorderColor
+      ? rgbaValueToRgbaString(theme.colors.dvDragOverBorderColor)
+      : "",
+    "--dv-tabs-container-scrollbar-color": theme.colors?.dvTabsContainerScrollbarColor
+      ? rgbaValueToRgbaString(theme.colors.dvTabsContainerScrollbarColor)
+      : "",
+    "--dv-icon-hover-background-color": theme.colors?.dvIconHoverBackgroundColor
+      ? rgbaValueToRgbaString(theme.colors.dvIconHoverBackgroundColor)
+      : "",
+    "--dv-floating-box-shadow": theme.colors?.dvFloatingBoxShadow
+      ? rgbaValueToRgbaString(theme.colors.dvFloatingBoxShadow)
+      : "",
+    "--dv-group-view-background-color": theme.colors?.dvGroupViewBackgroundColor
+      ? rgbaValueToRgbaString(theme.colors.dvGroupViewBackgroundColor)
+      : "",
+    "--dv-tabs-and-actions-container-background-color": theme.colors?.dvTabsAndActionsContainerBackgroundColor
+      ? rgbaValueToRgbaString(theme.colors.dvTabsAndActionsContainerBackgroundColor)
+      : "",
+    "--dv-activegroup-visiblepanel-tab-background-color": theme.colors?.dvActivegroupVisiblepanelTabBackgroundColor
+      ? rgbaValueToRgbaString(theme.colors.dvActivegroupVisiblepanelTabBackgroundColor)
+      : "",
+    "--dv-activegroup-hiddenpanel-tab-background-color": theme.colors?.dvActivegroupHiddenpanelTabBackgroundColor
+      ? rgbaValueToRgbaString(theme.colors.dvActivegroupHiddenpanelTabBackgroundColor)
+      : "",
+    "--dv-inactivegroup-visiblepanel-tab-background-color": theme.colors?.dvInactivegroupVisiblepanelTabBackgroundColor
+      ? rgbaValueToRgbaString(theme.colors.dvInactivegroupVisiblepanelTabBackgroundColor)
+      : "",
+    "--dv-inactivegroup-hiddenpanel-tab-background-color": theme.colors?.dvInactivegroupHiddenpanelTabBackgroundColor
+      ? rgbaValueToRgbaString(theme.colors.dvInactivegroupHiddenpanelTabBackgroundColor)
+      : "",
+    "--dv-tab-divider-color": theme.colors?.dvTabDividerColor
+      ? rgbaValueToRgbaString(theme.colors.dvTabDividerColor)
+      : "",
+    "--dv-activegroup-visiblepanel-tab-color": theme.colors?.dvActivegroupVisiblepanelTabColor
+      ? rgbaValueToRgbaString(theme.colors.dvActivegroupVisiblepanelTabColor)
+      : "",
+    "--dv-activegroup-hiddenpanel-tab-color": theme.colors?.dvActivegroupHiddenpanelTabColor
+      ? rgbaValueToRgbaString(theme.colors.dvActivegroupHiddenpanelTabColor)
+      : "",
+    "--dv-inactivegroup-visiblepanel-tab-color": theme.colors?.dvInactivegroupVisiblepanelTabColor
+      ? rgbaValueToRgbaString(theme.colors.dvInactivegroupVisiblepanelTabColor)
+      : "",
+    "--dv-inactivegroup-hiddenpanel-tab-color": theme.colors?.dvInactivegroupHiddenpanelTabColor
+      ? rgbaValueToRgbaString(theme.colors.dvInactivegroupHiddenpanelTabColor)
+      : "",
+    "--dv-separator-border": theme.colors?.dvSeparatorBorder
+      ? rgbaValueToRgbaString(theme.colors.dvSeparatorBorder)
+      : "",
+    "--dv-paneview-header-border-color": theme.colors?.dvPaneviewHeaderBorderColor
+      ? rgbaValueToRgbaString(theme.colors.dvPaneviewHeaderBorderColor)
+      : "",
   };
 }
 
@@ -108,6 +301,10 @@ export const customTailwindColorVariables: Colors = {
 // https://tailwindcss.com/docs/customizing-colors#using-css-variables
 function rgbaWithOpacity(variableName: keyof ThemeCssVariables): string {
   return `rgba(var(${variableName}))`;
+}
+
+function rgbaValueToRgbaString(rgbaValues: string): string {
+  return `rgba(${rgbaValues})`;
 }
 
 export class Convert {
