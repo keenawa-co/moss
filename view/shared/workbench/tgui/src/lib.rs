@@ -17,7 +17,8 @@ use platform_configuration::{
     configuration_registry::ConfigurationRegistry, AbstractConfigurationService,
 };
 use platform_core::common::context::{
-    entity::Model, model_context::ModelContext, subscription::Subscription, AnyContext, Context,
+    async_context::ModernAsyncContext, entity::Model, model_context::ModelContext,
+    subscription::Subscription, AnyContext, Context,
 };
 use platform_formation::service_registry::ServiceRegistry;
 use platform_fs::disk::file_system_service::{
@@ -97,7 +98,12 @@ impl<'a> Workbench {
         })
     }
 
-    pub async fn initialize(&self, ctx: &mut Context) -> Result<()> {
+    pub async fn initialize(&self, async_ctx: ModernAsyncContext) -> Result<()> {
+        let cell = async_ctx
+            .upgrade()
+            .ok_or_else(|| anyhow!("context was released"))?;
+        let ctx: &mut Context = &mut cell.as_ref().borrow_mut();
+
         self.initialize_services(ctx).await?;
 
         let service_registry = self.service_registry.as_ref().borrow();
@@ -245,13 +251,11 @@ impl<'a> Workbench {
 }
 
 impl<'a> Workbench {
-    pub fn update_conf(&self, ctx: &mut Context, value: usize) -> Result<()> {
+    pub fn update_conf(&self, ctx: &ModernAsyncContext, value: usize) -> Result<()> {
         ctx.update_model(&self.font_size_service, |this, ctx| {
             this.update_font_size(value);
             dbg!("C");
             ctx.notify();
-        });
-
-        Ok(())
+        })
     }
 }

@@ -1233,6 +1233,8 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "app",
+ "async-task",
+ "flume",
  "futures",
  "hashbrown 0.14.5",
  "macos-trampoline",
@@ -4081,7 +4083,9 @@ name = "platform_core"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "async-task",
  "derive_more",
+ "flume",
  "fnv",
  "futures",
  "moss_std",

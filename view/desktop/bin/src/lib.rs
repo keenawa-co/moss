@@ -5,14 +5,17 @@ mod menu;
 mod service;
 
 use anyhow::{Context as ResultContext, Result};
-use platform_core::common::context::{
-    async_context::AsyncContext, entity::Model, AnyContext, Context,
-};
+use async_task::Runnable;
+use platform_core::common::context::async_context::ModernAsyncContext;
+use platform_core::common::context::Context;
 use platform_formation::service_registry::ServiceRegistry;
 use platform_fs::disk::file_system_service::DiskFileSystemService;
 use platform_workspace::WorkspaceId;
 use service::project_service::ProjectService;
 use service::session_service::SessionService;
+use std::cell::RefCell;
+use std::future::Future;
+use std::rc::Rc;
 use std::sync::Arc;
 use std::{env, process::ExitCode};
 use surrealdb::{engine::remote::ws::Ws, Surreal};
@@ -50,7 +53,7 @@ impl MockStorageService {
 }
 
 pub struct AppState {
-    pub workbench: Workbench,
+    pub workbench: Arc<Workbench>,
     pub platform_info: NativePlatformInfo,
     pub project_service: ProjectService,
     pub session_service: SessionService,
@@ -67,12 +70,7 @@ impl AppMain {
         }
     }
 
-    pub fn run<F>(&self, f: F) -> ExitCode
-    where
-        F: 'static + FnOnce(&Self, Context, TokioRuntime) -> Result<()>,
-    {
-        let ctx = Context::new();
-
+    pub fn run(&self) -> ExitCode {
         let runtime = tokio::runtime::Builder::new_multi_thread()
             .enable_all()
             .max_blocking_threads(*config::RUNTIME_MAX_BLOCKING_THREADS)
@@ -80,36 +78,48 @@ impl AppMain {
             .build()
             .unwrap();
 
-        if let Err(e) = f(self, ctx, runtime) {
-            error!("{}", e);
-            ExitCode::FAILURE
-        } else {
-            ExitCode::SUCCESS
-        }
+        let (main_tx, main_rx) = flume::unbounded::<Runnable>();
+        let local_set = tokio::task::LocalSet::new();
+        local_set.spawn_local(async move {
+            dbg!("spawn_local 1");
+            while let Ok(runnable) = main_rx.recv_async().await {
+                dbg!("spawn_local 2");
+                runnable.run();
+            }
+        });
+
+        let ctx = Context::new(main_tx);
+
+        runtime.block_on(local_set.run_until(async {
+            if let Err(e) = self.open_main_window(ctx).await {
+                error!("{}", e);
+                ExitCode::FAILURE
+            } else {
+                ExitCode::SUCCESS
+            }
+        }))
     }
 
-    pub fn open_main_window(&self, mut ctx: Context, runtime: TokioRuntime) -> Result<()> {
+    pub async fn open_main_window(&self, ctx: Rc<RefCell<Context>>) -> Result<()> {
         // ------ Example stream
         // TODO:
         // Used only as an example implementation. Remove this disgrace as soon as possible.
         let (tx, rx) = tokio::sync::broadcast::channel(16);
 
-        runtime.spawn(async move {
-            let mut interval = tokio::time::interval(tokio::time::Duration::from_secs(1));
-            let mut count = 0;
-            loop {
-                interval.tick().await;
-                count += 1;
-                if tx.send(count).is_err() {
-                    break;
-                }
+        let mut interval = tokio::time::interval(tokio::time::Duration::from_secs(1));
+        let mut count = 0;
+        loop {
+            interval.tick().await;
+            count += 1;
+            if tx.send(count).is_err() {
+                break;
             }
-        });
+        }
 
         // ------
 
         // TODO: move to StorageService
-        let db = runtime.block_on(async {
+        let db = {
             let db = Surreal::new::<Ws>("127.0.0.1:8000")
                 .await
                 .expect("failed to connect to db");
@@ -120,7 +130,7 @@ impl AppMain {
             // db.query(schema).await.unwrap();
 
             Arc::new(db)
-        });
+        };
 
         let service_group = self.create_service_registry()?;
 
@@ -128,10 +138,14 @@ impl AppMain {
             .get_unchecked::<MockStorageService>()
             .get_last_window_state();
 
-        let workbench = Workbench::new(&mut ctx, service_group, window_state.workspace_id).unwrap();
+        let workbench = {
+            let ctx_mut: &mut Context = &mut ctx.as_ref().borrow_mut();
+
+            Workbench::new(ctx_mut, service_group, window_state.workspace_id).unwrap()
+        };
 
         let app_state = AppState {
-            workbench,
+            workbench: Arc::new(workbench),
             platform_info: self.native_window_configuration.platform_info.clone(),
             project_service: ProjectService::new(db.clone()),
             session_service: SessionService::new(db.clone()),
@@ -151,46 +165,69 @@ impl AppMain {
         #[cfg(debug_assertions)]
         self.export_typescript_bindings(&builder)?;
 
+        let async_ctx = {
+            let ctx = ctx.as_ref().borrow();
+            ctx.to_async()
+        };
+
         Ok(self
-            .initialize_app(ctx, runtime, app_state, builder, rx)?
+            .initialize_app(async_ctx, app_state, builder, rx)?
             .run(|_, _| {}))
     }
 
     fn initialize_app(
         &self,
-        ctx: Context,
-        runtime: TokioRuntime,
+        ctx: ModernAsyncContext,
         app_state: AppState,
         builder: tauri_specta::Builder,
         mut rx: tokio::sync::broadcast::Receiver<i32>,
     ) -> Result<App> {
         let builder = tauri::Builder::default()
-            .manage(ctx.to_async())
+            .manage(ctx)
             .manage(app_state)
             .invoke_handler(builder.invoke_handler())
             .setup(move |app: &mut App| {
                 let app_state: State<AppState> = app.state();
-                let async_ctx: State<AsyncContext> = app.state();
+                let async_ctx: State<ModernAsyncContext> = app.state();
 
                 let app_handle = app.handle().clone();
                 let window = app.get_webview_window("main").unwrap();
 
-                let ctx_lock: &mut Context = &mut async_ctx.lock();
+                let workbench = Arc::clone(&app_state.workbench);
 
-                runtime.block_on(async {
-                    app_state
-                        .workbench
-                        .initialize(ctx_lock)
-                        .await
-                        .expect("Failed to initialize the workbench");
-                });
+                // async_ctx
+                //     .spawn(|ctx| async {
+                //         println!("Hello, World!");
+                //     })
+                //     .detach();
 
-                app_state
-                    .workbench
-                    .set_configuration_window_size(window)
+                async_ctx
+                    .update(|ctx: &mut Context| {
+                        ctx.spawn_local(|cx| async {
+                            // println!("hello from spawn!");
+
+                            workbench
+                                .initialize(cx)
+                                .await
+                                .expect("Failed to initialize the workbench");
+                        })
+                        .detach();
+
+                        app_state
+                            .workbench
+                            .set_configuration_window_size(window)
+                            .unwrap();
+
+                        app_state.workbench.set_tao_handle(ctx, app_handle);
+                    })
                     .unwrap();
 
-                app_state.workbench.set_tao_handle(ctx_lock, app_handle);
+                // app_state
+                //     .workbench
+                //     .set_configuration_window_size(window)
+                //     .unwrap();
+
+                // app_state.workbench.set_tao_handle(ctx_lock, app_handle);
 
                 // TODO:
                 // Used only as an example implementation. Remove this disgrace as soon as possible.

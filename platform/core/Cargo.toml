@@ -16,6 +16,8 @@ anyhow.workspace = true
 tokio = { workspace = true, features = ["full"] }
 futures.workspace = true
 smol.workspace = true
+async-task.workspace = true
+flume.workspace = true
 
 [features]
 default = []
