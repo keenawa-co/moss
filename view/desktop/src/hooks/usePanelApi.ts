@@ -2,7 +2,6 @@ import { DockviewPanelApi } from "dockview";
 import { useEffect, useState } from "react";
 
 export function usePanelApi(api: DockviewPanelApi) {
-  console.log("usePanelApi", api);
   const [state, setState] = useState({
     height: api.height,
     isActive: api.isActive,

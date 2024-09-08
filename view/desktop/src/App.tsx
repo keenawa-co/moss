@@ -193,7 +193,6 @@ function App() {
 
   // actions
   const addDefaultTab = (panel?: PanelNames) => {
-    console.log("addDefaultTab", panel);
     dockviewApi?.addPanel({
       id: `id_${Date.now().toString()}-default-${panel}`,
       title: panel || "Default",
