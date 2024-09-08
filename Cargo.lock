@@ -1445,7 +1445,7 @@ version = "0.14.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3d248bdd43ce613d87415282f69b9bb99d947d290b10962dd6c56233312c2ad5"
 dependencies = [
- "log",
+ "log 0.4.22",
 ]
 
 [[package]]
@@ -1522,7 +1522,7 @@ version = "0.1.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "fcf73e44617eab501beba39234441a194cf138629d3b6447f81f573e1c3d0a13"
 dependencies = [
- "log",
+ "log 0.4.22",
  "rayon",
  "rmp-serde",
  "serde",
@@ -1963,7 +1963,7 @@ checksum = "5cc16584ff22b460a382b7feec54b23d2908d858152e5739a120b949293bd74e"
 dependencies = [
  "cc",
  "libc",
- "log",
+ "log 0.4.22",
  "rustversion",
  "windows 0.48.0",
 ]
@@ -1988,7 +1988,7 @@ dependencies = [
  "float_next_after",
  "geo-types",
  "geographiclib-rs",
- "log",
+ "log 0.4.22",
  "num-traits",
  "robust",
  "rstar",
@@ -2005,7 +2005,7 @@ dependencies = [
  "float_next_after",
  "geo-types",
  "geographiclib-rs",
- "log",
+ "log 0.4.22",
  "num-traits",
  "robust",
  "rstar",
@@ -2339,7 +2339,7 @@ version = "0.26.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "bea68cab48b8459f17cf1c944c67ddc572d272d9f2b274140f223ecb1da4a3b7"
 dependencies = [
- "log",
+ "log 0.4.22",
  "mac",
  "markup5ever",
  "proc-macro2",
@@ -2704,7 +2704,7 @@ dependencies = [
  "cfg-if",
  "combine",
  "jni-sys",
- "log",
+ "log 0.4.22",
  "thiserror",
  "walkdir",
  "windows-sys 0.45.0",
@@ -2877,7 +2877,7 @@ dependencies = [
  "gtk",
  "gtk-sys",
  "libappindicator-sys",
- "log",
+ "log 0.4.22",
 ]
 
 [[package]]
@@ -3000,6 +3000,10 @@ dependencies = [
 
 [[package]]
 name = "log"
+version = "0.1.0"
+
+[[package]]
+name = "log"
 version = "0.4.22"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a7a70ba024b9dc04c27ea2f0c0548feb474ec5c54bba33a7f72f873a39d07b24"
@@ -3057,7 +3061,7 @@ version = "0.11.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7a2629bb1404f3d34c2e921f21fd34ba00b206124c81f65c50b43b6aaefeb016"
 dependencies = [
- "log",
+ "log 0.4.22",
  "phf 0.10.1",
  "phf_codegen 0.10.0",
  "string_cache",
@@ -3186,7 +3190,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a4a650543ca06a924e8b371db273b2756685faae30f8487da1b56505a8f78b0c"
 dependencies = [
  "libc",
- "log",
+ "log 0.4.22",
  "wasi 0.11.0+wasi-snapshot-preview1",
  "windows-sys 0.48.0",
 ]
@@ -3362,7 +3366,7 @@ dependencies = [
  "inotify",
  "kqueue",
  "libc",
- "log",
+ "log 0.4.22",
  "mio 0.8.11",
  "walkdir",
  "windows-sys 0.48.0",
@@ -3677,7 +3681,7 @@ version = "3.8.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ae99c7fa6dd38c7cafe1ec085e804f8f555a2f8659b0dbe03f1f9963a9b51092"
 dependencies = [
- "log",
+ "log 0.4.22",
  "serde",
  "windows-sys 0.52.0",
 ]
@@ -4603,7 +4607,7 @@ dependencies = [
  "hyper-rustls",
  "ipnet",
  "js-sys",
- "log",
+ "log 0.4.22",
  "mime",
  "mime_guess",
  "once_cell",
@@ -4646,7 +4650,7 @@ dependencies = [
  "hyper-util",
  "ipnet",
  "js-sys",
- "log",
+ "log 0.4.22",
  "mime",
  "once_cell",
  "percent-encoding",
@@ -4927,7 +4931,7 @@ version = "0.21.12"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3f56a14d1f48b391359b22f731fd4bd7e43c97f3c50eee276f3aa09c94784d3e"
 dependencies = [
- "log",
+ "log 0.4.22",
  "ring 0.17.8",
  "rustls-webpki",
  "sct",
@@ -5058,7 +5062,7 @@ dependencies = [
  "cssparser",
  "derive_more",
  "fxhash",
- "log",
+ "log 0.4.22",
  "matches",
  "phf 0.8.0",
  "phf_codegen 0.8.0",
@@ -5426,7 +5430,7 @@ dependencies = [
  "core-graphics",
  "foreign-types",
  "js-sys",
- "log",
+ "log 0.4.22",
  "objc2",
  "objc2-app-kit",
  "objc2-foundation",
@@ -5999,7 +6003,7 @@ dependencies = [
  "jni",
  "lazy_static",
  "libc",
- "log",
+ "log 0.4.22",
  "ndk",
  "ndk-context",
  "ndk-sys",
@@ -6060,7 +6064,7 @@ dependencies = [
  "http 1.1.0",
  "jni",
  "libc",
- "log",
+ "log 0.4.22",
  "mime",
  "muda",
  "objc",
@@ -6196,7 +6200,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6b54cfeb26356822d3be3db4282041b03552f573a694b6b28aded7d95c62a039"
 dependencies = [
  "gethostname",
- "log",
+ "log 0.4.22",
  "os_info",
  "serde",
  "serde_json",
@@ -6214,7 +6218,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9209f6c32caec61e156a5616f7d80ba7683ca4a0a5641cbe5d3086ab371aaab2"
 dependencies = [
  "encoding_rs",
- "log",
+ "log 0.4.22",
  "open",
  "os_pipe",
  "regex",
@@ -6257,7 +6261,7 @@ dependencies = [
  "gtk",
  "http 1.1.0",
  "jni",
- "log",
+ "log 0.4.22",
  "percent-encoding",
  "raw-window-handle 0.6.2",
  "softbuffer",
@@ -6301,7 +6305,7 @@ dependencies = [
  "infer",
  "json-patch",
  "kuchikiki",
- "log",
+ "log 0.4.22",
  "memchr",
  "phf 0.11.2",
  "proc-macro2",
@@ -6502,7 +6506,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "212d5dcb2a1ce06d81107c3d0ffa3121fe974b73f068c8282cb1c32328113b6c"
 dependencies = [
  "futures-util",
- "log",
+ "log 0.4.22",
  "rustls",
  "tokio",
  "tokio-rustls",
@@ -6669,7 +6673,7 @@ version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ee855f1f400bd0e5c02d150ae5de3840039a3f54b025156404e34c23c03f47c3"
 dependencies = [
- "log",
+ "log 0.4.22",
  "once_cell",
  "tracing-core",
 ]
@@ -6740,7 +6744,7 @@ dependencies = [
  "data-encoding",
  "http 0.2.12",
  "httparse",
- "log",
+ "log 0.4.22",
  "rand 0.8.5",
  "rustls",
  "sha1",
@@ -7036,7 +7040,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "614d787b966d3989fa7bb98a654e369c762374fd3213d212cfc0251257e747da"
 dependencies = [
  "bumpalo",
- "log",
+ "log 0.4.22",
  "once_cell",
  "proc-macro2",
  "quote",
@@ -7708,7 +7712,7 @@ dependencies = [
  "async_io_stream",
  "futures",
  "js-sys",
- "log",
+ "log 0.4.22",
  "pharos",
  "rustc_version",
  "send_wrapper",

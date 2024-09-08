@@ -22,6 +22,7 @@ members = [
     "view/shared/workbench/service/configuration/tgui",
     "view/shared/workbench/service/user_profile/tgui",
     "view/shared/workbench/service/environment/tgui",
+    "platform/log",
 
 ]
 
@@ -49,6 +50,7 @@ platform_user_profile = { path = "platform/user_profile" }
 platform_environment = { path = "platform/environment" }
 platform_workspace = { path = "platform/workspace" }
 platform_fs = { path = "platform/fs" }
+platform_log = { path = "platform/log" }
 
 workbench_tgui = { path = "view/shared/workbench/tgui" }
 workbench_service_configuration_common = { path = "view/shared/workbench/service/configuration/common" }
