@@ -1,0 +1,7 @@
+[package]
+name = "workbench_service_log"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+platform_log.workspace = true
