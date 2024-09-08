@@ -5,17 +5,26 @@ import {
   DockviewReadyEvent,
   IDockviewPanelHeaderProps,
   IDockviewPanelProps,
+  SerializedDockview,
 } from "dockview";
 import { useEffect, useState } from "react";
 import { Table, usePanelApiMetadata, usePanelHeaderApi } from "./DockviewDebugPanel";
+import * as TestComps from "./TestPages/index";
+
 // default
 const DefaultPanel = (props: IDockviewPanelProps) => {
-  const metadata = usePanelApiMetadata(props.api);
+  // const metadata = usePanelApiMetadata(props.api);
 
-  useEffect(() => {
-    // console.log("custom panel metadata", metadata);
-  }, [metadata]);
-  return <div className={cn(` h-full grid place-items-center`)}>{props.api.title}</div>;
+  // useEffect(() => {
+  //   // console.log("custom panel metadata", metadata);
+  // }, [metadata]);
+  return (
+    <div className={cn(`h-full grid place-items-center text-3xl`)}>
+      <div>
+        {props.api.title} | <span className="font-black text-sky-400">{new Date().getSeconds().toString()}</span>
+      </div>
+    </div>
+  );
 };
 
 // custom
@@ -32,7 +41,7 @@ const CustomTab = (props: IDockviewPanelHeaderProps) => {
     <div
       className={cn(`flex items-center justify-between px-4 h-full`, {
         "bg-olive-300": props.api.isActive,
-        "bg-gray-300": !props.api.isActive,
+        "bg-stone-400": !props.api.isActive,
       })}
     >
       <div>custom tab</div>
@@ -53,11 +62,12 @@ const CustomPanel = (props: IDockviewPanelProps) => {
 
   return (
     <div
-      className={cn(` h-full grid place-items-center`, {
+      className={cn(`h-full flex flex-col justify-center items-center`, {
         "bg-olive-300": props.api.isActive,
         "bg-red-300": !props.api.isActive,
       })}
     >
+      <div className="text-3xl font-bold mb-12">{props.api.isActive ? "Active now" : "Inactive"}</div>
       <Table data={metadata} />
     </div>
   );
@@ -76,34 +86,8 @@ const WatermarkPanel = () => {
 };
 
 const DockviewPanel = () => {
+  console.log(TestComps);
   const [dockviewApi, setDockviewApi] = useState<DockviewApi | null>(null);
-
-  const components = {
-    default: DefaultPanel,
-    custom: CustomPanel,
-    watermark: WatermarkPanel,
-  };
-
-  const tabs = {
-    custom: CustomTab,
-  };
-
-  const addDefaultTab = () => {
-    dockviewApi?.addPanel({
-      id: `id_${Date.now().toString()}`,
-      title: "Default",
-      component: "default",
-    });
-  };
-
-  const addCustomTab = () => {
-    dockviewApi?.addPanel({
-      id: `id_${Date.now().toString()}`,
-      title: "Custom",
-      component: "custom",
-      tabComponent: "custom",
-    });
-  };
 
   const onReady = (event: DockviewReadyEvent) => {
     setDockviewApi(event.api);
@@ -127,26 +111,111 @@ const DockviewPanel = () => {
     });
   };
 
+  // registration
+  const panels = {
+    default: DefaultPanel,
+    custom: CustomPanel,
+    watermark: WatermarkPanel,
+    ...TestComps,
+  };
+
+  const tabs = {
+    custom: CustomTab,
+  };
+
+  // actions
+  const addDefaultTab = () => {
+    dockviewApi?.addPanel({
+      id: `id_${Date.now().toString()}`,
+      title: "Default",
+      component: "default",
+    });
+  };
+
+  const addCustomTab = () => {
+    dockviewApi?.addPanel({
+      id: `id_${Date.now().toString()}`,
+      title: "Custom",
+      component: "custom",
+      tabComponent: "custom",
+    });
+  };
+
+  const saveLayout = () => {
+    if (!dockviewApi) return;
+
+    const layout: SerializedDockview = dockviewApi.toJSON();
+    localStorage.setItem("dockviewLayout", JSON.stringify(layout));
+  };
+
+  const loadLayout = () => {
+    if (!dockviewApi) return;
+
+    const layout = localStorage.getItem("dockviewLayout");
+    if (!layout) {
+      console.log("No layout to load");
+      return;
+    }
+
+    dockviewApi.clear();
+
+    const parsedLayout = JSON.parse(layout) as SerializedDockview;
+    dockviewApi.fromJSON(parsedLayout);
+  };
+
+  const addTestDynamicPanel1 = () => {
+    dockviewApi?.addPanel({
+      id: `id_${Date.now().toString()}`,
+      title: "Test Dynamic 1",
+      component: "TestPage1",
+    });
+  };
+  const addTestDynamicPanel2 = () => {
+    dockviewApi?.addPanel({
+      id: `id_${Date.now().toString()}`,
+      title: "Test Dynamic 2",
+      component: "TestPage2",
+    });
+  };
+
   return (
     <div className="max-h-full">
       <h1>Dockview Page</h1>
 
-      <div className="p-4 bg-green-50 flex gap-4">
-        <button className="border rounded bg-stone-400 hover:bg-sky-500 px-4 py-2" onClick={addDefaultTab}>
-          add default tab
-        </button>
-        <button className="border rounded bg-stone-400 hover:bg-sky-500 px-4 py-2" onClick={addCustomTab}>
-          add custom tab
-        </button>
-        <button className="border rounded bg-stone-400 hover:bg-sky-500 px-4 py-2">3</button>
+      <div className="p-4 flex justify-between">
+        <fieldset className="flex gap-4">
+          <legend>Actions</legend>
+          <button className="border rounded bg-stone-400 hover:bg-sky-500 px-4 py-2" onClick={addDefaultTab}>
+            add default tab
+          </button>
+
+          <button className="border rounded bg-stone-400 hover:bg-sky-500 px-4 py-2" onClick={addCustomTab}>
+            add custom tab
+          </button>
+        </fieldset>
+
+        <fieldset>
+          <legend>Test Dynamic Panel</legend>
+          <button className="border rounded bg-stone-400 hover:bg-sky-500 px-4 py-2" onClick={addTestDynamicPanel1}>
+            add test dynamic panel 1
+          </button>
+          <button className="border rounded bg-stone-400 hover:bg-sky-500 px-4 py-2" onClick={addTestDynamicPanel2}>
+            add test dynamic panel 2
+          </button>
+        </fieldset>
+
+        <fieldset className="flex gap-4">
+          <legend>Layout</legend>
+          <button className="border rounded bg-stone-400 hover:bg-sky-500 px-4 py-2" onClick={saveLayout}>
+            Save
+          </button>
+          <button className="border rounded bg-stone-400 hover:bg-sky-500 px-4 py-2" onClick={loadLayout}>
+            Load
+          </button>
+        </fieldset>
       </div>
 
-      <DockviewReact
-        onReady={onReady}
-        components={components}
-        tabComponents={tabs}
-        watermarkComponent={WatermarkPanel}
-      />
+      <DockviewReact onReady={onReady} components={panels} tabComponents={tabs} watermarkComponent={WatermarkPanel} />
     </div>
   );
 };
