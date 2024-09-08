@@ -80,13 +80,13 @@ const typeMap: any = {
         js: "windowControlsLinuxActiveBackground",
         typ: createUnionMembers(undefined, ""),
       },
+
+      // dv
       {
         json: "dvTabsAndActionsContainerBackgroundColor",
         js: "dvTabsAndActionsContainerBackgroundColor",
         typ: createUnionMembers(undefined, ""),
       },
-
-      // Adding dv variables here
       { json: "dvBackgroundColor", js: "dvBackgroundColor", typ: createUnionMembers(undefined, "") },
       {
         json: "dvPaneviewActiveOutlineColor",
