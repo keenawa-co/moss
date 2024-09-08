@@ -9,8 +9,8 @@ use platform_configuration::{
     configuration_registry::ConfigurationRegistry,
     AbstractConfigurationService,
 };
-use platform_core::common::context::entity::Model;
-use platform_core::common::context::Context;
+use platform_core::context::entity::Model;
+use platform_core::context::Context;
 use platform_fs::disk::file_system_service::AbstractDiskFileSystemService;
 use platform_workspace::Workspace;
 use std::{path::PathBuf, sync::Arc};

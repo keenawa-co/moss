@@ -18,6 +18,8 @@ futures.workspace = true
 smol.workspace = true
 async-task.workspace = true
 flume.workspace = true
+parking.workspace = true
+waker-fn.workspace = true
 
 [features]
 default = []

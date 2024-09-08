@@ -4,24 +4,22 @@ mod mem;
 mod menu;
 mod service;
 
-use anyhow::{Context as ResultContext, Result};
+use anyhow::{Context as _, Result};
 use async_task::Runnable;
-use platform_core::common::context::async_context::ModernAsyncContext;
-use platform_core::common::context::Context;
+use platform_core::context::async_context::ModernAsyncContext;
+use platform_core::context::Context;
 use platform_formation::service_registry::ServiceRegistry;
 use platform_fs::disk::file_system_service::DiskFileSystemService;
 use platform_workspace::WorkspaceId;
 use service::project_service::ProjectService;
 use service::session_service::SessionService;
 use std::cell::RefCell;
-use std::future::Future;
 use std::rc::Rc;
 use std::sync::Arc;
 use std::{env, process::ExitCode};
 use surrealdb::{engine::remote::ws::Ws, Surreal};
-use tauri::{App, Emitter, Manager, State};
+use tauri::{App, Manager, State};
 use tauri_specta::{collect_commands, collect_events};
-use tokio::runtime::Runtime as TokioRuntime;
 use workbench_service_environment_tgui::environment_service::NativeEnvironmentService;
 use workbench_tgui::window::{NativePlatformInfo, NativeWindowConfiguration};
 use workbench_tgui::Workbench;
@@ -81,9 +79,7 @@ impl AppMain {
         let (main_tx, main_rx) = flume::unbounded::<Runnable>();
         let local_set = tokio::task::LocalSet::new();
         local_set.spawn_local(async move {
-            dbg!("spawn_local 1");
             while let Ok(runnable) = main_rx.recv_async().await {
-                dbg!("spawn_local 2");
                 runnable.run();
             }
         });
@@ -101,30 +97,13 @@ impl AppMain {
     }
 
     pub async fn open_main_window(&self, ctx: Rc<RefCell<Context>>) -> Result<()> {
-        // ------ Example stream
-        // TODO:
-        // Used only as an example implementation. Remove this disgrace as soon as possible.
-        let (tx, rx) = tokio::sync::broadcast::channel(16);
-
-        let mut interval = tokio::time::interval(tokio::time::Duration::from_secs(1));
-        let mut count = 0;
-        loop {
-            interval.tick().await;
-            count += 1;
-            if tx.send(count).is_err() {
-                break;
-            }
-        }
-
-        // ------
-
         // TODO: move to StorageService
         let db = {
             let db = Surreal::new::<Ws>("127.0.0.1:8000")
                 .await
                 .expect("failed to connect to db");
             // let db = Surreal::new::<File>("../rocksdb").await.unwrap();
-            db.use_ns("moss").use_db("compass").await.unwrap();
+            db.use_ns("moss").use_db("compass").await?;
 
             // let schema = include_str!("../schema.surql");
             // db.query(schema).await.unwrap();
@@ -141,7 +120,10 @@ impl AppMain {
         let workbench = {
             let ctx_mut: &mut Context = &mut ctx.as_ref().borrow_mut();
 
-            Workbench::new(ctx_mut, service_group, window_state.workspace_id).unwrap()
+            let workbench = Workbench::new(ctx_mut, service_group, window_state.workspace_id)?;
+            workbench.initialize(ctx_mut).await?;
+
+            workbench
         };
 
         let app_state = AppState {
@@ -170,8 +152,16 @@ impl AppMain {
             ctx.to_async()
         };
 
+        async_ctx
+            .spawn_local(|_| async { println!("Hello from awaited spawn!") })
+            .await;
+
+        async_ctx.block_on(async {
+            println!("Hello from blocked!");
+        });
+
         Ok(self
-            .initialize_app(async_ctx, app_state, builder, rx)?
+            .initialize_app(async_ctx, app_state, builder)?
             .run(|_, _| {}))
     }
 
@@ -180,7 +170,6 @@ impl AppMain {
         ctx: ModernAsyncContext,
         app_state: AppState,
         builder: tauri_specta::Builder,
-        mut rx: tokio::sync::broadcast::Receiver<i32>,
     ) -> Result<App> {
         let builder = tauri::Builder::default()
             .manage(ctx)
@@ -190,29 +179,15 @@ impl AppMain {
                 let app_state: State<AppState> = app.state();
                 let async_ctx: State<ModernAsyncContext> = app.state();
 
+                async_ctx
+                    .spawn_local(|_| async { println!("Hello from detached spawn!") })
+                    .detach();
+
                 let app_handle = app.handle().clone();
                 let window = app.get_webview_window("main").unwrap();
 
-                let workbench = Arc::clone(&app_state.workbench);
-
-                // async_ctx
-                //     .spawn(|ctx| async {
-                //         println!("Hello, World!");
-                //     })
-                //     .detach();
-
                 async_ctx
-                    .update(|ctx: &mut Context| {
-                        ctx.spawn_local(|cx| async {
-                            // println!("hello from spawn!");
-
-                            workbench
-                                .initialize(cx)
-                                .await
-                                .expect("Failed to initialize the workbench");
-                        })
-                        .detach();
-
+                    .update(|ctx| {
                         app_state
                             .workbench
                             .set_configuration_window_size(window)
@@ -221,26 +196,6 @@ impl AppMain {
                         app_state.workbench.set_tao_handle(ctx, app_handle);
                     })
                     .unwrap();
-
-                // app_state
-                //     .workbench
-                //     .set_configuration_window_size(window)
-                //     .unwrap();
-
-                // app_state.workbench.set_tao_handle(ctx_lock, app_handle);
-
-                // TODO:
-                // Used only as an example implementation. Remove this disgrace as soon as possible.
-                // tokio::task::block_in_place(|| {
-                //     tauri::async_runtime::block_on(async move {
-                //         // Example stream data emitting
-                //         tokio::spawn(async move {
-                //             while let Ok(data) = rx.recv().await {
-                //                 app_handle.emit("data-stream", data).unwrap();
-                //             }
-                //         });
-                //     });
-                // });
 
                 Ok(())
             })

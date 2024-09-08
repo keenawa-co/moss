@@ -2,7 +2,6 @@ pub mod contribution;
 pub mod window;
 
 use std::{
-    borrow::BorrowMut,
     cell::{Cell, RefCell},
     path::PathBuf,
     rc::Rc,
@@ -16,9 +15,9 @@ use platform_configuration::{
     attribute_name, configuration_policy::ConfigurationPolicyService,
     configuration_registry::ConfigurationRegistry, AbstractConfigurationService,
 };
-use platform_core::common::context::{
-    async_context::ModernAsyncContext, entity::Model, model_context::ModelContext,
-    subscription::Subscription, AnyContext, Context,
+use platform_core::context::{
+    async_context::ModernAsyncContext, entity::Model, subscription::Subscription, AnyContext,
+    Context,
 };
 use platform_formation::service_registry::ServiceRegistry;
 use platform_fs::disk::file_system_service::{
@@ -98,11 +97,11 @@ impl<'a> Workbench {
         })
     }
 
-    pub async fn initialize(&self, async_ctx: ModernAsyncContext) -> Result<()> {
-        let cell = async_ctx
-            .upgrade()
-            .ok_or_else(|| anyhow!("context was released"))?;
-        let ctx: &mut Context = &mut cell.as_ref().borrow_mut();
+    pub async fn initialize(&self, ctx: &mut Context) -> Result<()> {
+        // let cell = async_ctx
+        //     .upgrade()
+        //     .ok_or_else(|| anyhow!("context was released"))?;
+        // let ctx: &mut Context = &mut cell.as_ref().borrow_mut();
 
         self.initialize_services(ctx).await?;
 
@@ -206,7 +205,6 @@ impl<'a> Workbench {
             &self.font_size_service,
             move |this, cx| {
                 let s = &this.read(cx).size;
-                dbg!("AA");
                 tao_handle_clone
                     .emit("font-size-update-event", s.get())
                     .unwrap();
@@ -254,7 +252,6 @@ impl<'a> Workbench {
     pub fn update_conf(&self, ctx: &ModernAsyncContext, value: usize) -> Result<()> {
         ctx.update_model(&self.font_size_service, |this, ctx| {
             this.update_font_size(value);
-            dbg!("C");
             ctx.notify();
         })
     }

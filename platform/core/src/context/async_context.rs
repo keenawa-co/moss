@@ -3,12 +3,8 @@ use derive_more::{Deref, DerefMut};
 use parking_lot::Mutex;
 use std::{cell::RefCell, future::Future, rc::Weak, sync::Arc};
 
-use super::{
-    async_runner::{BackgroundExecutor, LocalExecutor, ModernTask, Task},
-    entity::Model,
-    model_context::ModelContext,
-    AnyContext, Context,
-};
+use super::{entity::Model, model_context::ModelContext, AnyContext, Context};
+use crate::executor::{BackgroundExecutor, MainThreadExecutor, Task};
 
 #[derive(Deref, DerefMut, Clone)]
 pub struct ModernAsyncContext {
@@ -16,7 +12,7 @@ pub struct ModernAsyncContext {
     #[deref_mut]
     pub(super) cell: Weak<RefCell<Context>>,
     pub(super) background_executor: BackgroundExecutor,
-    pub(super) local_executor: LocalExecutor,
+    pub(super) local_executor: MainThreadExecutor,
 }
 
 unsafe impl Send for ModernAsyncContext {}
@@ -45,10 +41,19 @@ impl ModernAsyncContext {
         Ok(ctx.update_model(handle, update))
     }
 
-    pub fn spawn_local<Fut>(
-        &self,
-        f: impl FnOnce(ModernAsyncContext) -> Fut,
-    ) -> ModernTask<Fut::Output>
+    pub fn block_on_with<Fut>(&self, f: impl FnOnce(ModernAsyncContext) -> Fut) -> Fut::Output
+    where
+        Fut: Future + 'static,
+        Fut::Output: 'static,
+    {
+        self.background_executor.block_on(f(self.clone()))
+    }
+
+    pub fn block_on<R>(&self, fut: impl Future<Output = R>) -> R {
+        self.background_executor.block_on(fut)
+    }
+
+    pub fn spawn_local<Fut>(&self, f: impl FnOnce(ModernAsyncContext) -> Fut) -> Task<Fut::Output>
     where
         Fut: Future + 'static,
         Fut::Output: 'static,

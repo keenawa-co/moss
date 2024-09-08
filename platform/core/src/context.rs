@@ -3,27 +3,27 @@ pub mod entity;
 pub mod model_context;
 pub mod subscription;
 
-mod async_runner;
 mod utl;
 
-use async_context::{AsyncContext, ModernAsyncContext};
-use async_runner::{BackgroundExecutor, Dispatcher, LocalExecutor, ModernTask, Task};
+use async_context::ModernAsyncContext;
 use async_task::Runnable;
 use entity::{AnyEntity, EntityId, EntityMap, Model, Slot};
 use flume::Sender;
 use model_context::ModelContext;
 use moss_std::collection::{FxHashSet, VecDeque};
-use parking_lot::Mutex;
-use tokio::task::JoinHandle;
-
 use std::{
     any::{Any, TypeId},
-    borrow::BorrowMut,
     cell::RefCell,
     future::Future,
     rc::{Rc, Weak},
+    sync::Arc,
 };
 use subscription::{SubscriberSet, Subscription};
+
+use crate::{
+    executor::{BackgroundExecutor, MainThreadExecutor, Task},
+    platform::{cross::dispatcher::Dispatcher, AnyDispatcher},
+};
 
 pub struct Reservation<T>(pub(crate) Slot<T>);
 
@@ -75,7 +75,7 @@ type ReleaseListener = Box<dyn FnOnce(&mut dyn Any, &mut Context) + 'static>;
 pub struct Context {
     this: Weak<RefCell<Self>>,
     background_executor: BackgroundExecutor,
-    local_executor: LocalExecutor,
+    local_executor: MainThreadExecutor,
     observers: SubscriberSet<EntityId, Handler>,
     pending_notifications: FxHashSet<EntityId>,
     pending_effects: VecDeque<Effect>,
@@ -133,10 +133,12 @@ impl AnyContext for Context {
 
 impl Context {
     pub fn new(main_sender: Sender<Runnable>) -> Rc<RefCell<Self>> {
-        let dispatcher = Dispatcher::new(main_sender);
+        let dispatcher = Arc::new(Dispatcher::new(main_sender));
 
-        let background_executor = BackgroundExecutor::new(dispatcher.clone());
-        let local_executor = LocalExecutor::new(dispatcher.clone());
+        let background_executor =
+            BackgroundExecutor::new(Arc::clone(&dispatcher) as Arc<dyn AnyDispatcher>);
+        let local_executor =
+            MainThreadExecutor::new(Arc::clone(&dispatcher) as Arc<dyn AnyDispatcher>);
 
         Rc::new_cyclic(|this| {
             RefCell::new(Context {
@@ -155,10 +157,7 @@ impl Context {
         })
     }
 
-    pub fn spawn_local<Fut>(
-        &self,
-        f: impl FnOnce(ModernAsyncContext) -> Fut,
-    ) -> ModernTask<Fut::Output>
+    pub fn spawn_local<Fut>(&self, f: impl FnOnce(ModernAsyncContext) -> Fut) -> Task<Fut::Output>
     where
         Fut: Future + 'static,
         Fut::Output: 'static,
@@ -166,13 +165,9 @@ impl Context {
         self.local_executor.spawn(f(self.to_async()))
     }
 
-    // pub fn spawn_local<F>(future: F) -> Task<F::Output>
-    // where
-    //     F: Future + 'static,
-    //     F::Output: 'static,
-    // {
-    //     Task::Spawned(tokio::task::spawn_local(future))
-    // }
+    pub fn block_on<R>(&self, fut: impl Future<Output = R>) -> R {
+        self.background_executor.block_on(fut)
+    }
 
     pub fn to_async(&self) -> ModernAsyncContext {
         ModernAsyncContext {
@@ -181,21 +176,6 @@ impl Context {
             local_executor: self.local_executor.clone(),
         }
     }
-
-    // pub fn detach<F>(&self, future: F) -> Task<F::Output>
-    // where
-    //     F: Future + Send + 'static,
-    //     F::Output: Send + 'static,
-    // {
-    //     Task::Spawned(self.runner.spawn(future))
-    // }
-
-    // pub fn block_on<F>(&self, future: F) -> F::Output
-    // where
-    //     F: Future,
-    // {
-    //     self.runner.block_on(future)
-    // }
 
     pub fn defer(&mut self, f: impl FnOnce(&mut Context) + 'static) {
         self.push_effect(Effect::Defer {
