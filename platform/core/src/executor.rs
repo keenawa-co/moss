@@ -60,37 +60,33 @@ impl BackgroundExecutor {
         }
     }
 
-    pub fn block_on_internal<R>(
+    pub(crate) fn block_on_internal<R>(
         &self,
-        fut: impl Future<Output = R>,
+        future: impl Future<Output = R>,
         timeout: Option<Duration>,
     ) -> Result<R, impl Future<Output = R>> {
-        let mut fut = Box::pin(fut);
+        let mut future = Box::pin(future);
         if timeout == Some(Duration::ZERO) {
-            return Err(fut);
+            return Err(future);
         }
+        let deadline = timeout.map(|timeout| Instant::now() + timeout);
 
-        let deadline = timeout.map(|t| Instant::now() + t);
         let unparker = self.dispatcher.unparker();
-        let awoken = Arc::new(AtomicBool::new(false));
-        let waker = waker_fn({
-            let awoken = awoken.clone();
-            move || {
-                awoken.store(true, Ordering::SeqCst);
-                unparker.unpark();
-            }
+        let waker = waker_fn(move || {
+            unparker.unpark();
         });
-        let mut ctx = std::task::Context::from_waker(&waker);
+        let mut cx = std::task::Context::from_waker(&waker);
 
         loop {
-            match fut.as_mut().poll(&mut ctx) {
+            match future.as_mut().poll(&mut cx) {
                 Poll::Ready(result) => return Ok(result),
                 Poll::Pending => {
-                    let timeout = deadline.map(|d| d.saturating_duration_since(Instant::now()));
+                    let timeout =
+                        deadline.map(|deadline| deadline.saturating_duration_since(Instant::now()));
                     if !self.dispatcher.park(timeout)
-                        && deadline.is_some_and(|d| d < Instant::now())
+                        && deadline.is_some_and(|deadline| deadline < Instant::now())
                     {
-                        return Err(fut);
+                        return Err(future);
                     }
                 }
             }
@@ -104,10 +100,10 @@ impl BackgroundExecutor {
         self.spawn_internal::<R>(Box::pin(fut))
     }
 
-    fn spawn_internal<R: Send + 'static>(&self, future: AnyFuture<R>) -> Task<R> {
+    fn spawn_internal<R: Send + 'static>(&self, fut: AnyFuture<R>) -> Task<R> {
         let dispatcher = self.dispatcher.clone();
         let (runnable, task) =
-            async_task::spawn_local(future, move |runnable| dispatcher.dispatch(runnable));
+            async_task::spawn(fut, move |runnable| dispatcher.dispatch(runnable));
 
         runnable.schedule();
         Task::Spawned(task)
@@ -128,7 +124,7 @@ impl MainThreadExecutor {
         }
     }
 
-    pub fn spawn<R: 'static>(&self, fut: impl Future<Output = R> + 'static) -> Task<R> {
+    pub fn spawn_local<R: 'static>(&self, fut: impl Future<Output = R> + 'static) -> Task<R> {
         let dispatcher = self.dispatcher.clone();
         fn inner<R: 'static>(
             dispatcher: Arc<dyn AnyDispatcher>,

@@ -12,7 +12,7 @@ pub struct ModernAsyncContext {
     #[deref_mut]
     pub(super) cell: Weak<RefCell<Context>>,
     pub(super) background_executor: BackgroundExecutor,
-    pub(super) local_executor: MainThreadExecutor,
+    pub(super) main_thread_executor: MainThreadExecutor,
 }
 
 unsafe impl Send for ModernAsyncContext {}
@@ -27,6 +27,15 @@ impl ModernAsyncContext {
 
         let mut ctx = cell_mut.borrow_mut();
         Ok(f(&mut ctx))
+    }
+
+    pub fn new_model<T: 'static>(
+        &self,
+        build_model: impl FnOnce(&mut ModelContext<'_, T>) -> T,
+    ) -> Result<Model<T>> {
+        let cell = self.upgrade().ok_or_else(|| anyhow!("app was released"))?;
+        let mut ctx = cell.borrow_mut();
+        Ok(ctx.new_model(build_model))
     }
 
     pub fn update_model<T: 'static, R>(
@@ -58,7 +67,7 @@ impl ModernAsyncContext {
         Fut: Future + 'static,
         Fut::Output: 'static,
     {
-        self.local_executor.spawn(f(self.clone()))
+        self.main_thread_executor.spawn_local(f(self.clone()))
     }
 }
 

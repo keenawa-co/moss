@@ -4088,7 +4088,9 @@ dependencies = [
  "flume",
  "fnv",
  "futures",
+ "lazy_static",
  "moss_std",
+ "once_cell",
  "parking",
  "parking_lot",
  "slotmap",
@@ -4106,15 +4108,14 @@ name = "platform_formation"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "async-task",
  "derive_more",
  "flume",
  "fnv",
- "futures",
- "hashbrown 0.14.5",
  "moss_std",
  "parking_lot",
+ "platform_core",
  "slotmap",
- "tokio",
 ]
 
 [[package]]

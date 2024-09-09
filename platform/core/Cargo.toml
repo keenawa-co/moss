@@ -20,6 +20,8 @@ async-task.workspace = true
 flume.workspace = true
 parking.workspace = true
 waker-fn.workspace = true
+lazy_static.workspace = true
+once_cell.workspace = true
 
 [features]
 default = []

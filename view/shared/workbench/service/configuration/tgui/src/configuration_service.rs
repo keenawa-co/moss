@@ -22,7 +22,7 @@ pub struct WorkspaceConfigurationService {
 }
 
 impl WorkspaceConfigurationService {
-    pub async fn new(
+    pub fn new(
         ctx: &mut Context,
         workspace: Workspace,
         registry: Model<ConfigurationRegistry>,
@@ -39,7 +39,6 @@ impl WorkspaceConfigurationService {
             UserSettings::new(user_configuration_resource, Arc::new(parser), fs_service);
         let user_configuration_model = user_configuration
             .load_configuration(ctx)
-            .await
             .context("failed to load user configuration model")
             .unwrap();
         let default_configuration_model = default_configuration

@@ -8,6 +8,9 @@ use anyhow::{Context as _, Result};
 use async_task::Runnable;
 use platform_core::context::async_context::ModernAsyncContext;
 use platform_core::context::Context;
+use platform_core::platform::cross::client::CrossPlatformClient;
+use platform_core::platform::AnyPlatform;
+use platform_formation::platform::current_platform;
 use platform_formation::service_registry::ServiceRegistry;
 use platform_fs::disk::file_system_service::DiskFileSystemService;
 use platform_workspace::WorkspaceId;
@@ -17,9 +20,11 @@ use std::cell::RefCell;
 use std::rc::Rc;
 use std::sync::Arc;
 use std::{env, process::ExitCode};
+use surrealdb::engine::remote::ws::Client;
 use surrealdb::{engine::remote::ws::Ws, Surreal};
 use tauri::{App, Manager, State};
 use tauri_specta::{collect_commands, collect_events};
+use tokio::sync::Notify;
 use workbench_service_environment_tgui::environment_service::NativeEnvironmentService;
 use workbench_tgui::window::{NativePlatformInfo, NativeWindowConfiguration};
 use workbench_tgui::Workbench;
@@ -58,12 +63,14 @@ pub struct AppState {
 }
 
 pub struct AppMain {
+    platform_client: Rc<CrossPlatformClient>,
     native_window_configuration: NativeWindowConfiguration,
 }
 
 impl AppMain {
     pub fn new(configuration: NativeWindowConfiguration) -> Self {
         Self {
+            platform_client: Rc::new(CrossPlatformClient::new()),
             native_window_configuration: configuration,
         }
     }
@@ -76,40 +83,72 @@ impl AppMain {
             .build()
             .unwrap();
 
-        let (main_tx, main_rx) = flume::unbounded::<Runnable>();
-        let local_set = tokio::task::LocalSet::new();
-        local_set.spawn_local(async move {
-            while let Ok(runnable) = main_rx.recv_async().await {
-                runnable.run();
-            }
-        });
+        // let (main_tx, main_rx) = flume::unbounded::<Runnable>();
 
-        let ctx = Context::new(main_tx);
+        // let notify = Arc::new(Notify::new());
+        // let notify_clone = Arc::clone(&notify);
 
-        runtime.block_on(local_set.run_until(async {
+        // let local_set = tokio::task::LocalSet::new();
+        // local_set.spawn_local(async move {
+        //     while let Ok(runnable) = main_rx.recv_async().await {
+        //         runnable.run();
+        //     }
+
+        //     notify_clone.notify_one();
+        // });
+
+        // let platform_client_clone = self.platform_client.clone();
+
+        // runtime.block_on(local_set.run_until(async {
+        //     let ctx = Context::new(platform_client_clone);
+
+        //     if let Err(e) = self.open_main_window(ctx).await {
+        //         error!("{}", e);
+        //         ExitCode::FAILURE
+        //     } else {
+        //         ExitCode::SUCCESS
+        //     }
+        // }))
+
+        let platform_client_clone = self.platform_client.clone();
+
+        self.platform_client.run(async {
+            let ctx = Context::new(platform_client_clone);
+
             if let Err(e) = self.open_main_window(ctx).await {
                 error!("{}", e);
                 ExitCode::FAILURE
             } else {
                 ExitCode::SUCCESS
             }
-        }))
+        })
+
+        // .block_on(platform_client.local_set.run_until(async {
+        //     let ctx = Context::new(platform_client_clone);
+
+        // if let Err(e) = self.open_main_window(ctx).await {
+        //     error!("{}", e);
+        //     ExitCode::FAILURE
+        // } else {
+        //     ExitCode::SUCCESS
+        // }
+        // }))
     }
 
     pub async fn open_main_window(&self, ctx: Rc<RefCell<Context>>) -> Result<()> {
+        // ctx.as_ref()
+        //     .borrow()
+        //     .background_executor()
+        //     .spawn(async { println!("Hello from detached spawn!") })
+        //     .detach();
+
         // TODO: move to StorageService
-        let db = {
-            let db = Surreal::new::<Ws>("127.0.0.1:8000")
-                .await
-                .expect("failed to connect to db");
-            // let db = Surreal::new::<File>("../rocksdb").await.unwrap();
-            db.use_ns("moss").use_db("compass").await?;
-
-            // let schema = include_str!("../schema.surql");
-            // db.query(schema).await.unwrap();
-
-            Arc::new(db)
-        };
+        let db = Arc::new(
+            ctx.as_ref()
+                .borrow()
+                .background_executor()
+                .block_on(init_db_client())?,
+        );
 
         let service_group = self.create_service_registry()?;
 
@@ -117,14 +156,13 @@ impl AppMain {
             .get_unchecked::<MockStorageService>()
             .get_last_window_state();
 
-        let workbench = {
-            let ctx_mut: &mut Context = &mut ctx.as_ref().borrow_mut();
-
-            let workbench = Workbench::new(ctx_mut, service_group, window_state.workspace_id)?;
-            workbench.initialize(ctx_mut).await?;
-
-            workbench
+        let async_ctx = {
+            let ctx = ctx.as_ref().borrow();
+            ctx.to_async()
         };
+
+        let workbench = Workbench::new(&async_ctx, service_group, window_state.workspace_id)?;
+        workbench.initialize(&async_ctx)?;
 
         let app_state = AppState {
             workbench: Arc::new(workbench),
@@ -147,18 +185,15 @@ impl AppMain {
         #[cfg(debug_assertions)]
         self.export_typescript_bindings(&builder)?;
 
-        let async_ctx = {
-            let ctx = ctx.as_ref().borrow();
-            ctx.to_async()
-        };
-
         async_ctx
             .spawn_local(|_| async { println!("Hello from awaited spawn!") })
             .await;
 
-        async_ctx.block_on(async {
-            println!("Hello from blocked!");
-        });
+        async_ctx
+            .spawn_local(|_| async { println!("Hello from detached spawn!") })
+            .detach();
+
+        async_ctx.block_on(async { println!("Hello from blocked!") });
 
         Ok(self
             .initialize_app(async_ctx, app_state, builder)?
@@ -178,10 +213,6 @@ impl AppMain {
             .setup(move |app: &mut App| {
                 let app_state: State<AppState> = app.state();
                 let async_ctx: State<ModernAsyncContext> = app.state();
-
-                async_ctx
-                    .spawn_local(|_| async { println!("Hello from detached spawn!") })
-                    .detach();
 
                 let app_handle = app.handle().clone();
                 let window = app.get_webview_window("main").unwrap();
@@ -231,4 +262,15 @@ impl AppMain {
             )
             .context("Failed to export typescript bindings")?)
     }
+}
+
+async fn init_db_client() -> Result<Surreal<Client>> {
+    // let db = Surreal::new::<File>("../rocksdb").await.unwrap();
+
+    let db = Surreal::new::<Ws>("127.0.0.1:8000")
+        .await
+        .expect("failed to connect to db");
+    db.use_ns("moss").use_db("compass").await?;
+
+    Ok(db)
 }

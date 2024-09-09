@@ -13,6 +13,7 @@ use model_context::ModelContext;
 use moss_std::collection::{FxHashSet, VecDeque};
 use std::{
     any::{Any, TypeId},
+    borrow::Borrow,
     cell::RefCell,
     future::Future,
     rc::{Rc, Weak},
@@ -22,7 +23,7 @@ use subscription::{SubscriberSet, Subscription};
 
 use crate::{
     executor::{BackgroundExecutor, MainThreadExecutor, Task},
-    platform::{cross::dispatcher::Dispatcher, AnyDispatcher},
+    platform::{cross::dispatcher::Dispatcher, AnyDispatcher, AnyPlatform},
 };
 
 pub struct Reservation<T>(pub(crate) Slot<T>);
@@ -75,7 +76,7 @@ type ReleaseListener = Box<dyn FnOnce(&mut dyn Any, &mut Context) + 'static>;
 pub struct Context {
     this: Weak<RefCell<Self>>,
     background_executor: BackgroundExecutor,
-    local_executor: MainThreadExecutor,
+    main_thread_executor: MainThreadExecutor,
     observers: SubscriberSet<EntityId, Handler>,
     pending_notifications: FxHashSet<EntityId>,
     pending_effects: VecDeque<Effect>,
@@ -132,19 +133,12 @@ impl AnyContext for Context {
 }
 
 impl Context {
-    pub fn new(main_sender: Sender<Runnable>) -> Rc<RefCell<Self>> {
-        let dispatcher = Arc::new(Dispatcher::new(main_sender));
-
-        let background_executor =
-            BackgroundExecutor::new(Arc::clone(&dispatcher) as Arc<dyn AnyDispatcher>);
-        let local_executor =
-            MainThreadExecutor::new(Arc::clone(&dispatcher) as Arc<dyn AnyDispatcher>);
-
+    pub fn new(platform: Rc<dyn AnyPlatform>) -> Rc<RefCell<Self>> {
         Rc::new_cyclic(|this| {
             RefCell::new(Context {
                 this: this.clone(),
-                background_executor,
-                local_executor,
+                background_executor: platform.background_executor().clone(),
+                main_thread_executor: platform.main_thread_executor().clone(),
                 observers: SubscriberSet::new(),
                 pending_notifications: FxHashSet::default(),
                 pending_effects: VecDeque::new(),
@@ -162,18 +156,22 @@ impl Context {
         Fut: Future + 'static,
         Fut::Output: 'static,
     {
-        self.local_executor.spawn(f(self.to_async()))
+        self.main_thread_executor.spawn_local(f(self.to_async()))
     }
 
     pub fn block_on<R>(&self, fut: impl Future<Output = R>) -> R {
         self.background_executor.block_on(fut)
     }
 
+    pub fn background_executor(&self) -> BackgroundExecutor {
+        self.borrow().background_executor.clone()
+    }
+
     pub fn to_async(&self) -> ModernAsyncContext {
         ModernAsyncContext {
             cell: self.this.clone(),
             background_executor: self.background_executor.clone(),
-            local_executor: self.local_executor.clone(),
+            main_thread_executor: self.main_thread_executor.clone(),
         }
     }
 

@@ -1,10 +1,11 @@
 use async_task::Runnable;
-use flume::Sender;
+use flume::{Receiver, Sender};
 use parking::{Parker, Unparker};
 use parking_lot::Mutex;
 use std::sync::Arc;
 use std::thread;
 use std::time::{Duration, Instant};
+use tokio::sync::Notify;
 
 use crate::platform::AnyDispatcher;
 
