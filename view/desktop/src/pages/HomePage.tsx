@@ -10,7 +10,7 @@ import {
   Tooltip,
 } from "@repo/ui";
 import { listen } from "@tauri-apps/api/event";
-import { IDockviewPanelProps } from "dockview-core";
+import { IDockviewPanelProps } from "dockview";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
