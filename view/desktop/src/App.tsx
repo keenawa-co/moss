@@ -79,7 +79,7 @@ const CustomTab = (props: IDockviewPanelHeaderProps) => {
 
   return (
     <div className={cn(`flex items-center justify-between px-4 h-full`, {})}>
-      <div>{props.api.title}</div>
+      <div className="text-primary">{props.api.title}</div>
 
       <div className="ml-4 px-1 hover:bg-red-500 rounded-full" onClick={() => props.api.close()}>
         X
@@ -98,7 +98,7 @@ const CustomPanel = (props: IDockviewPanelProps) => {
   return (
     <div
       className={cn(`h-full flex flex-col justify-center items-center`, {
-        "bg-olive-300": props.api.isActive,
+        "bg-green-300": props.api.isActive,
         "bg-red-300": !props.api.isActive,
       })}
     >
@@ -175,8 +175,6 @@ function App() {
     dockviewApi?.clear();
     addCustomTab("HomePage");
     addCustomTab("SettingsPage");
-    addCustomTab("LogsPage");
-    addCustomTab("LogsPage");
     addCustomTab("LogsPage");
   }, [dockviewApi]);
 
