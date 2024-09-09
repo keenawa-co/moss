@@ -19,7 +19,6 @@
     "@tauri-apps/plugin-shell": ">=2.0.0-rc.0",
     "allotment": "^1.20.2",
     "dockview": "^1.17.1",
-    "dockview-core": "^1.17.1",
     "install": "^0.13.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
