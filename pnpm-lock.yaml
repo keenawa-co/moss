@@ -76,9 +76,6 @@ importers:
       dockview:
         specifier: ^1.17.1
         version: 1.17.1
-      dockview-core:
-        specifier: ^1.17.1
-        version: 1.17.1
       install:
         specifier: ^0.13.0
         version: 0.13.0
