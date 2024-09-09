@@ -78,7 +78,13 @@ const CustomTab = (props: IDockviewPanelHeaderProps) => {
   // }, [metadata]);
 
   return (
-    <div className={cn(`flex items-center justify-between px-4 h-full`, {})}>
+    <div
+      className={cn(`flex items-center justify-between px-4 h-full`, {})}
+      onClick={(event) => {
+        // on mouse middle click
+        if (event.button === 1) props.api.close();
+      }}
+    >
       <div className="text-primary">{props.api.title}</div>
 
       <div className="ml-4 px-1 hover:bg-red-500 rounded-full" onClick={() => props.api.close()}>
