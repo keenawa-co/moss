@@ -1,6 +1,7 @@
 {
   "rust-analyzer.showUnlinkedFileNotification": false,
   "cSpell.words": [
+    "Activegroup",
     "ahash",
     "autodocs",
     "bindgen",
@@ -12,6 +13,8 @@
     "filetree",
     "hashbrown",
     "Hasher",
+    "Hiddenpanel",
+    "Inactivegroup",
     "inmem",
     "jsonwebtoken",
     "Keyable",
@@ -25,6 +28,7 @@
     "oneshot",
     "otlp",
     "overrider",
+    "Paneview",
     "realfs",
     "repr",
     "revisioned",
@@ -50,6 +54,7 @@
     "unpark",
     "unparker",
     "unwatch",
+    "Visiblepanel",
     "worktree"
   ],
   "todohighlight.keywords": [

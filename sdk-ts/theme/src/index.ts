@@ -296,6 +296,31 @@ export const customTailwindColorVariables: Colors = {
   windowControlsLinuxText: rgbaWithOpacity("--color-window-controls-linux-text"),
   windowControlsLinuxHoverBackground: rgbaWithOpacity("--color-window-controls-linux-hover-background"),
   windowControlsLinuxActiveBackground: rgbaWithOpacity("--color-window-controls-linux-active-background"),
+
+  dvBackgroundColor: rgbaWithOpacity("--dv-background-color"),
+  dvPaneviewActiveOutlineColor: rgbaWithOpacity("--dv-paneview-active-outline-color"),
+  dvTabsAndActionsContainerFontSize: rgbaWithOpacity("--dv-tabs-and-actions-container-font-size"),
+  dvTabsAndActionsContainerHeight: rgbaWithOpacity("--dv-tabs-and-actions-container-height"),
+  dvDragOverBackgroundColor: rgbaWithOpacity("--dv-drag-over-background-color"),
+  dvDragOverBorderColor: rgbaWithOpacity("--dv-drag-over-border-color"),
+  dvTabsContainerScrollbarColor: rgbaWithOpacity("--dv-tabs-container-scrollbar-color"),
+  dvIconHoverBackgroundColor: rgbaWithOpacity("--dv-icon-hover-background-color"),
+  dvFloatingBoxShadow: rgbaWithOpacity("--dv-floating-box-shadow"),
+  dvGroupViewBackgroundColor: rgbaWithOpacity("--dv-group-view-background-color"),
+  dvTabsAndActionsContainerBackgroundColor: rgbaWithOpacity("--dv-tabs-and-actions-container-background-color"),
+  dvActivegroupVisiblepanelTabBackgroundColor: rgbaWithOpacity("--dv-activegroup-visiblepanel-tab-background-color"),
+  dvActivegroupHiddenpanelTabBackgroundColor: rgbaWithOpacity("--dv-activegroup-hiddenpanel-tab-background-color"),
+  dvInactivegroupVisiblepanelTabBackgroundColor: rgbaWithOpacity(
+    "--dv-inactivegroup-visiblepanel-tab-background-color"
+  ),
+  dvInactivegroupHiddenpanelTabBackgroundColor: rgbaWithOpacity("--dv-inactivegroup-hiddenpanel-tab-background-color"),
+  dvTabDividerColor: rgbaWithOpacity("--dv-tab-divider-color"),
+  dvActivegroupVisiblepanelTabColor: rgbaWithOpacity("--dv-activegroup-visiblepanel-tab-color"),
+  dvActivegroupHiddenpanelTabColor: rgbaWithOpacity("--dv-activegroup-hiddenpanel-tab-color"),
+  dvInactivegroupVisiblepanelTabColor: rgbaWithOpacity("--dv-inactivegroup-visiblepanel-tab-color"),
+  dvInactivegroupHiddenpanelTabColor: rgbaWithOpacity("--dv-inactivegroup-hiddenpanel-tab-color"),
+  dvSeparatorBorder: rgbaWithOpacity("--dv-separator-border"),
+  dvPaneviewHeaderBorderColor: rgbaWithOpacity("--dv-paneview-header-border-color"),
 };
 
 // https://tailwindcss.com/docs/customizing-colors#using-css-variables
