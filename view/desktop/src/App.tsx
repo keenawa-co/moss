@@ -4,15 +4,20 @@ import "@/i18n";
 import { Convert, Theme } from "@repo/theme";
 import { Icon, IconTitle, MenuItem, ThemeProvider } from "@repo/ui";
 import "@repo/ui/src/fonts.css";
+import {
+  DockviewApi,
+  DockviewReact,
+  DockviewReadyEvent,
+  IDockviewPanelHeaderProps,
+  IDockviewPanelProps,
+} from "dockview";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { twMerge } from "tailwind-merge";
 import { Resizable, ResizablePanel } from "./components/Resizable";
-import { DockviewReact } from "dockview";
-import { IDockviewPanelProps, IDockviewPanelHeaderProps, DockviewApi, DockviewReadyEvent } from "dockview-core";
-import { cn } from "./utils";
-import * as PagesComponents from "./pages/index";
 import { usePanelApi } from "./hooks/usePanelApi";
+import * as PagesComponents from "./pages/index";
+import { cn } from "./utils";
 
 const handleFetchAllThemes = async () => {
   try {
@@ -48,6 +53,7 @@ enum IconState {
   Active = "text-primary",
   Disabled = "text-primary bg-opacity-50",
 }
+
 // DOCKVIEW
 // default
 const DefaultPanel = (props: IDockviewPanelProps) => (
@@ -65,22 +71,17 @@ const WatermarkPanel = () => (
 
 // custom
 const CustomTab = (props: IDockviewPanelHeaderProps) => {
-  const metadata = usePanelApi(props.api);
+  // const metadata = usePanelApi(props.api);
 
-  useEffect(() => {
-    // console.log("custom tab  metadata", metadata);
-  }, [metadata]);
+  // useEffect(() => {
+  //   // console.log("custom tab  metadata", metadata);
+  // }, [metadata]);
 
   return (
-    <div
-      className={cn(`flex items-center justify-between px-4 h-full`, {
-        "bg-olive-300": props.api.isActive,
-        "bg-stone-400": !props.api.isActive,
-      })}
-    >
+    <div className={cn(`flex items-center justify-between px-4 h-full`, {})}>
       <div>{props.api.title}</div>
 
-      <div className="ml-4 px-1 hover:bg-red-500 rounded" onClick={() => props.api.close()}>
+      <div className="ml-4 px-1 hover:bg-red-500 rounded-full" onClick={() => props.api.close()}>
         X
       </div>
     </div>
@@ -171,9 +172,11 @@ function App() {
   };
 
   useEffect(() => {
-    addDefaultTab("HomePage");
-    addDefaultTab("SettingsPage");
-    addDefaultTab("LogsPage");
+    dockviewApi?.clear();
+    addCustomTab("HomePage");
+    addCustomTab("SettingsPage");
+    addCustomTab("LogsPage");
+    addCustomTab("LogsPage");
     addCustomTab("LogsPage");
   }, [dockviewApi]);
 
@@ -194,7 +197,7 @@ function App() {
   // actions
   const addDefaultTab = (panel?: PanelNames) => {
     dockviewApi?.addPanel({
-      id: `id_${Date.now().toString()}-default-${panel}`,
+      id: `id_${Math.random()}-default-${panel}`,
       title: panel || "Default",
       component: panel || "default",
     });
@@ -202,7 +205,7 @@ function App() {
 
   const addCustomTab = (panel?: PanelNames) => {
     dockviewApi?.addPanel({
-      id: `id_${Date.now().toString()}-custom-${panel}`,
+      id: `id_${Math.random()}-custom-${panel}`,
       title: panel || "Custom",
       component: panel || "custom",
       tabComponent: "custom",
