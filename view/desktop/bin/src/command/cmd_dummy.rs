@@ -1,5 +1,6 @@
 use anyhow::Result;
 use platform_core::context::async_context::AsyncContext;
+use std::path::PathBuf;
 use tauri::{AppHandle, Manager, State};
 use workbench_tgui::WorkbenchState;
 
