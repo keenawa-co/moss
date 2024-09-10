@@ -126,6 +126,8 @@ impl AppMain {
                 cmd_dummy::restore_session,
                 cmd_dummy::app_ready,
                 cmd_dummy::update_font_size,
+                cmd_dummy::fetch_all_themes,
+                cmd_dummy::read_theme,
                 cmd_base::native_platform_info,
             ]);
 

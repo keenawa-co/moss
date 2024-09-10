@@ -25,7 +25,7 @@
         "focus": false,
         "dragDropEnabled": true,
         "center": true,
-        "transparent": true,
+        "transparent": false,
         "windowEffects": {
           "effects": ["sidebar"],
           "state": "followsWindowActiveState",

@@ -9,6 +9,34 @@ use crate::AppState;
 
 #[tauri::command(async)]
 #[specta::specta]
+pub async fn fetch_all_themes() -> Result<Vec<String>, String> {
+    Ok(vec![
+        "moss-dark".to_string(),
+        "moss-light".to_string(),
+        "moss-pink".to_string(),
+    ])
+}
+
+#[tauri::command(async)]
+#[specta::specta]
+pub async fn read_theme(theme_name: String) -> Result<String, String> {
+    let theme_file_path = PathBuf::from(std::env::var("HOME").unwrap())
+        .join(".config")
+        .join("moss")
+        .join("themes")
+        .join(format!("{theme_name}.json"));
+
+    match std::fs::read_to_string(theme_file_path) {
+        Ok(content) => Ok(content),
+        Err(err) => {
+            dbg!(&err);
+            Err(format!("filed to read theme file: {err}"))
+        }
+    }
+}
+
+#[tauri::command(async)]
+#[specta::specta]
 pub async fn update_font_size(
     async_ctx: State<'_, AsyncContext>,
     state: State<'_, AppState>,
