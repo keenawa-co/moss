@@ -1,5 +1,5 @@
 import { commands, SessionInfoDTO } from "@/bindings";
-import DockviewPanelLayout from "@/layouts/DockviewPanelLayout";
+import { DockviewPanelLayout } from "@/components";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,7 +11,7 @@ import {
 } from "@repo/ui";
 import { listen } from "@tauri-apps/api/event";
 import { IDockviewPanelProps } from "dockview";
-import { useEffect, useState } from "react";
+import { forwardRef, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 const SessionComponent = () => {
@@ -90,12 +90,13 @@ const SessionComponent = () => {
   );
 };
 
-export const HomePage = (props: IDockviewPanelProps) => {
+export const HomePage = forwardRef((props: IDockviewPanelProps) => {
   const { t } = useTranslation(["ns1", "ns2"]);
 
   return (
     <DockviewPanelLayout>
       <h1 className="text-primary">{t("title")}</h1>
+      <div>props.api.group.id: {props.api.group.id}</div>
 
       <div>
         <Tooltip label="Test" className="text-primary">
@@ -131,4 +132,4 @@ export const HomePage = (props: IDockviewPanelProps) => {
       </div>
     </DockviewPanelLayout>
   );
-};
+});

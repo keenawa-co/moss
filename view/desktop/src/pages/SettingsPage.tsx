@@ -1,9 +1,9 @@
 import { commands } from "@/bindings";
 import { LanguageSelector, ThemeSelector } from "@/components";
-import DockviewPanelLayout from "@/layouts/DockviewPanelLayout";
+import { DockviewPanelLayout } from "@/components";
 import { Convert, Theme } from "@repo/theme";
 import { listen } from "@tauri-apps/api/event";
-import { IDockviewPanelProps } from "dockview-core";
+import { IDockviewPanelProps } from "dockview";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 

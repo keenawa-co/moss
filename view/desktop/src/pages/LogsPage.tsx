@@ -1,6 +1,6 @@
-import DockviewPanelLayout from "@/layouts/DockviewPanelLayout";
+import { DockviewPanelLayout } from "@/components";
 import { listen } from "@tauri-apps/api/event";
-import { IDockviewPanelProps } from "dockview-core";
+import { IDockviewPanelProps } from "dockview";
 import { useEffect, useState } from "react";
 
 export const LogsPage = (props: IDockviewPanelProps) => {
