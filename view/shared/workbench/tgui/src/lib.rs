@@ -16,8 +16,7 @@ use platform_configuration::{
     configuration_registry::ConfigurationRegistry, AbstractConfigurationService,
 };
 use platform_core::context::{
-    async_context::ModernAsyncContext, entity::Model, subscription::Subscription, AnyContext,
-    Context,
+    async_context::AsyncContext, entity::Model, subscription::Subscription, Context,
 };
 use platform_formation::service_registry::ServiceRegistry;
 use platform_fs::disk::file_system_service::{
@@ -72,7 +71,7 @@ unsafe impl<'a> Send for Workbench {}
 
 impl Workbench {
     pub fn new(
-        ctx: &ModernAsyncContext,
+        ctx: &AsyncContext,
         service_registry: ServiceRegistry,
         workspace_id: WorkspaceId,
     ) -> Result<Self> {
@@ -100,7 +99,7 @@ impl Workbench {
         })
     }
 
-    pub fn initialize<'a>(&'a self, ctx: &'a ModernAsyncContext) -> Result<()> {
+    pub fn initialize<'a>(&'a self, ctx: &'a AsyncContext) -> Result<()> {
         // let cell = async_ctx
         //     .upgrade()
         //     .ok_or_else(|| anyhow!("context was released"))?;
@@ -258,7 +257,7 @@ impl Workbench {
 }
 
 impl<'a> Workbench {
-    pub fn update_conf(&self, ctx: &ModernAsyncContext, value: usize) -> Result<()> {
+    pub fn update_conf(&self, ctx: &AsyncContext, value: usize) -> Result<()> {
         ctx.update_model(&self.font_size_service, |this, ctx| {
             this.update_font_size(value);
             ctx.notify();

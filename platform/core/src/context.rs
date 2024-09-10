@@ -5,10 +5,8 @@ pub mod subscription;
 
 mod utl;
 
-use async_context::ModernAsyncContext;
-use async_task::Runnable;
+use async_context::AsyncContext;
 use entity::{AnyEntity, EntityId, EntityMap, Model, Slot};
-use flume::Sender;
 use model_context::ModelContext;
 use moss_std::collection::{FxHashSet, VecDeque};
 use std::{
@@ -17,13 +15,12 @@ use std::{
     cell::RefCell,
     future::Future,
     rc::{Rc, Weak},
-    sync::Arc,
 };
 use subscription::{SubscriberSet, Subscription};
 
 use crate::{
     executor::{BackgroundExecutor, MainThreadExecutor, Task},
-    platform::{cross::dispatcher::Dispatcher, AnyDispatcher, AnyPlatform},
+    platform::AnyPlatform,
 };
 
 pub struct Reservation<T>(pub(crate) Slot<T>);
@@ -151,7 +148,7 @@ impl Context {
         })
     }
 
-    pub fn spawn_local<Fut>(&self, f: impl FnOnce(ModernAsyncContext) -> Fut) -> Task<Fut::Output>
+    pub fn spawn_local<Fut>(&self, f: impl FnOnce(AsyncContext) -> Fut) -> Task<Fut::Output>
     where
         Fut: Future + 'static,
         Fut::Output: 'static,
@@ -167,8 +164,8 @@ impl Context {
         self.borrow().background_executor.clone()
     }
 
-    pub fn to_async(&self) -> ModernAsyncContext {
-        ModernAsyncContext {
+    pub fn to_async(&self) -> AsyncContext {
+        AsyncContext {
             cell: self.this.clone(),
             background_executor: self.background_executor.clone(),
             main_thread_executor: self.main_thread_executor.clone(),

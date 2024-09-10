@@ -1,5 +1,5 @@
 use anyhow::Result;
-use platform_core::context::async_context::{AsyncContext, ModernAsyncContext};
+use platform_core::context::async_context::AsyncContext;
 use tauri::{AppHandle, Manager, State};
 use workbench_tgui::WorkbenchState;
 
@@ -10,7 +10,7 @@ use crate::AppState;
 #[tauri::command(async)]
 #[specta::specta]
 pub async fn update_font_size(
-    async_ctx: State<'_, ModernAsyncContext>,
+    async_ctx: State<'_, AsyncContext>,
     state: State<'_, AppState>,
     input: i32,
 ) -> Result<(), String> {

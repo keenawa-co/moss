@@ -5,12 +5,9 @@ mod menu;
 mod service;
 
 use anyhow::{Context as _, Result};
-use async_task::Runnable;
-use platform_core::context::async_context::ModernAsyncContext;
+use platform_core::context::async_context::AsyncContext;
 use platform_core::context::Context;
 use platform_core::platform::cross::client::CrossPlatformClient;
-use platform_core::platform::AnyPlatform;
-use platform_formation::platform::current_platform;
 use platform_formation::service_registry::ServiceRegistry;
 use platform_fs::disk::file_system_service::DiskFileSystemService;
 use platform_workspace::WorkspaceId;
@@ -24,7 +21,6 @@ use surrealdb::engine::remote::ws::Client;
 use surrealdb::{engine::remote::ws::Ws, Surreal};
 use tauri::{App, Manager, State};
 use tauri_specta::{collect_commands, collect_events};
-use tokio::sync::Notify;
 use workbench_service_environment_tgui::environment_service::NativeEnvironmentService;
 use workbench_tgui::window::{NativePlatformInfo, NativeWindowConfiguration};
 use workbench_tgui::Workbench;
@@ -76,40 +72,6 @@ impl AppMain {
     }
 
     pub fn run(&self) -> ExitCode {
-        let runtime = tokio::runtime::Builder::new_multi_thread()
-            .enable_all()
-            .max_blocking_threads(*config::RUNTIME_MAX_BLOCKING_THREADS)
-            .thread_stack_size(*config::RUNTIME_STACK_SIZE)
-            .build()
-            .unwrap();
-
-        // let (main_tx, main_rx) = flume::unbounded::<Runnable>();
-
-        // let notify = Arc::new(Notify::new());
-        // let notify_clone = Arc::clone(&notify);
-
-        // let local_set = tokio::task::LocalSet::new();
-        // local_set.spawn_local(async move {
-        //     while let Ok(runnable) = main_rx.recv_async().await {
-        //         runnable.run();
-        //     }
-
-        //     notify_clone.notify_one();
-        // });
-
-        // let platform_client_clone = self.platform_client.clone();
-
-        // runtime.block_on(local_set.run_until(async {
-        //     let ctx = Context::new(platform_client_clone);
-
-        //     if let Err(e) = self.open_main_window(ctx).await {
-        //         error!("{}", e);
-        //         ExitCode::FAILURE
-        //     } else {
-        //         ExitCode::SUCCESS
-        //     }
-        // }))
-
         let platform_client_clone = self.platform_client.clone();
 
         self.platform_client.run(async {
@@ -122,26 +84,9 @@ impl AppMain {
                 ExitCode::SUCCESS
             }
         })
-
-        // .block_on(platform_client.local_set.run_until(async {
-        //     let ctx = Context::new(platform_client_clone);
-
-        // if let Err(e) = self.open_main_window(ctx).await {
-        //     error!("{}", e);
-        //     ExitCode::FAILURE
-        // } else {
-        //     ExitCode::SUCCESS
-        // }
-        // }))
     }
 
     pub async fn open_main_window(&self, ctx: Rc<RefCell<Context>>) -> Result<()> {
-        // ctx.as_ref()
-        //     .borrow()
-        //     .background_executor()
-        //     .spawn(async { println!("Hello from detached spawn!") })
-        //     .detach();
-
         // TODO: move to StorageService
         let db = Arc::new(
             ctx.as_ref()
@@ -202,7 +147,7 @@ impl AppMain {
 
     fn initialize_app(
         &self,
-        ctx: ModernAsyncContext,
+        ctx: AsyncContext,
         app_state: AppState,
         builder: tauri_specta::Builder,
     ) -> Result<App> {
@@ -212,7 +157,7 @@ impl AppMain {
             .invoke_handler(builder.invoke_handler())
             .setup(move |app: &mut App| {
                 let app_state: State<AppState> = app.state();
-                let async_ctx: State<ModernAsyncContext> = app.state();
+                let async_ctx: State<AsyncContext> = app.state();
 
                 let app_handle = app.handle().clone();
                 let window = app.get_webview_window("main").unwrap();

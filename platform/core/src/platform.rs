@@ -2,7 +2,7 @@ pub mod cross;
 
 use async_task::Runnable;
 use parking::Unparker;
-use std::{future::Future, pin::Pin, process::ExitCode, time::Duration};
+use std::time::Duration;
 
 use crate::executor::{BackgroundExecutor, MainThreadExecutor};
 

@@ -114,29 +114,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b3d1d046238990b9cf5bcde22a3fb3584ee5cf65fb2765f454ed428c7a0063da"
 
 [[package]]
-name = "app"
-version = "0.1.0"
-dependencies = [
- "ahash 0.8.11",
- "anyhow",
- "async-executor",
- "async-task",
- "chrono",
- "derive_more",
- "flume",
- "futures",
- "hashbrown 0.14.5",
- "parking_lot",
- "serde",
- "serde_json",
- "slotmap",
- "smol",
- "tokio",
- "tracing",
- "waker-fn",
-]
-
-[[package]]
 name = "approx"
 version = "0.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1232,7 +1209,6 @@ name = "desktop"
 version = "0.1.0"
 dependencies = [
  "anyhow",
- "app",
  "async-task",
  "flume",
  "futures",

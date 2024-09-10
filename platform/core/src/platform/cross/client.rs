@@ -1,10 +1,7 @@
 use async_task::Runnable;
 use flume::Receiver;
 use std::future::Future;
-use std::pin::Pin;
-use std::process::ExitCode;
 use std::{cell::RefCell, rc::Rc};
-use tokio::pin;
 use tokio::task::LocalSet;
 
 use crate::{

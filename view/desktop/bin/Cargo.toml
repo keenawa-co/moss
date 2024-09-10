@@ -25,7 +25,6 @@ flume.workspace = true
 async-task.workspace = true
 
 moss_std.workspace = true
-app.workspace = true
 
 platform_core.workspace = true
 platform_workspace.workspace = true

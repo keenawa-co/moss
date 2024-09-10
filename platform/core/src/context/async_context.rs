@@ -1,13 +1,12 @@
 use anyhow::Result;
 use derive_more::{Deref, DerefMut};
-use parking_lot::Mutex;
-use std::{cell::RefCell, future::Future, rc::Weak, sync::Arc};
+use std::{cell::RefCell, future::Future, rc::Weak};
 
 use super::{entity::Model, model_context::ModelContext, AnyContext, Context};
 use crate::executor::{BackgroundExecutor, MainThreadExecutor, Task};
 
 #[derive(Deref, DerefMut, Clone)]
-pub struct ModernAsyncContext {
+pub struct AsyncContext {
     #[deref]
     #[deref_mut]
     pub(super) cell: Weak<RefCell<Context>>,
@@ -15,10 +14,10 @@ pub struct ModernAsyncContext {
     pub(super) main_thread_executor: MainThreadExecutor,
 }
 
-unsafe impl Send for ModernAsyncContext {}
-unsafe impl Sync for ModernAsyncContext {}
+unsafe impl Send for AsyncContext {}
+unsafe impl Sync for AsyncContext {}
 
-impl ModernAsyncContext {
+impl AsyncContext {
     pub fn update<R>(&self, f: impl FnOnce(&mut Context) -> R) -> Result<R> {
         let cell_mut = self
             .cell
@@ -50,7 +49,7 @@ impl ModernAsyncContext {
         Ok(ctx.update_model(handle, update))
     }
 
-    pub fn block_on_with<Fut>(&self, f: impl FnOnce(ModernAsyncContext) -> Fut) -> Fut::Output
+    pub fn block_on_with<Fut>(&self, f: impl FnOnce(AsyncContext) -> Fut) -> Fut::Output
     where
         Fut: Future + 'static,
         Fut::Output: 'static,
@@ -62,65 +61,11 @@ impl ModernAsyncContext {
         self.background_executor.block_on(fut)
     }
 
-    pub fn spawn_local<Fut>(&self, f: impl FnOnce(ModernAsyncContext) -> Fut) -> Task<Fut::Output>
+    pub fn spawn_local<Fut>(&self, f: impl FnOnce(AsyncContext) -> Fut) -> Task<Fut::Output>
     where
         Fut: Future + 'static,
         Fut::Output: 'static,
     {
         self.main_thread_executor.spawn_local(f(self.clone()))
-    }
-}
-
-// impl AnyContext for ModernAsyncContext {
-//     type Result<T> = Result<T>;
-
-//     fn reserve_model<T: 'static>(&mut self) -> Self::Result<super::Reservation<T>> {
-//         todo!()
-//     }
-
-//     fn new_model<T: 'static>(
-//         &mut self,
-//         build_model: impl FnOnce(&mut ModelContext<'_, T>) -> T,
-//     ) -> Self::Result<Model<T>> {
-//         let cell = self
-//             .upgrade()
-//             .ok_or_else(|| anyhow!("context was released"))?;
-//         let mut ctx = cell.borrow_mut();
-//         Ok(ctx.new_model(build_model))
-//     }
-
-//     fn insert_model<T: 'static>(
-//         &mut self,
-//         reservation: super::Reservation<T>,
-//         build_model: impl FnOnce(&mut super::model_context::ModelContext<'_, T>) -> T,
-//     ) -> Self::Result<super::entity::Model<T>> {
-//         todo!()
-//     }
-
-//     fn update_model<T: 'static, R>(
-//         &mut self,
-//         handle: &Model<T>,
-//         update: impl FnOnce(&mut T, &mut ModelContext<'_, T>) -> R,
-//     ) -> Self::Result<R> {
-//         let cell = self
-//             .upgrade()
-//             .ok_or_else(|| anyhow!("context was released"))?;
-//         let mut ctx = cell.borrow_mut();
-//         Ok(ctx.update_model(handle, update))
-//     }
-// }
-
-#[derive(Deref, DerefMut)]
-pub struct AsyncContext(Arc<Mutex<Context>>);
-
-impl From<Context> for AsyncContext {
-    fn from(value: Context) -> Self {
-        AsyncContext(Arc::new(Mutex::new(value)))
-    }
-}
-
-impl AsyncContext {
-    pub fn with_mut<R>(&self, f: impl FnOnce(&mut Context) -> R) -> R {
-        f(&mut self.lock())
     }
 }

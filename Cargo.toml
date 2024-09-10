@@ -13,7 +13,6 @@ members = [
     "platform/environment",
     "platform/utl",
     "platform/workspace",
-    "platform/app",
 
     "view/desktop/bin",
 
@@ -57,8 +56,6 @@ workbench_service_user_profile_tgui = { path = "view/shared/workbench/service/us
 workbench_service_environment_tgui = { path = "view/shared/workbench/service/environment/tgui" }
 
 project = { path = "platform/project" }
-
-app = { path = "platform/app" }
 
 tauri = "2.0.0-rc"
 specta = "2.0.0-rc.20"

@@ -2,7 +2,6 @@ use futures::Future;
 use smol::future::FutureExt;
 use std::marker::PhantomData;
 use std::rc::Rc;
-use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
 use std::time::{Duration, Instant};
 use std::{pin::Pin, task::Poll};
