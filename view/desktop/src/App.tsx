@@ -94,25 +94,6 @@ const CustomTab = (props: IDockviewPanelHeaderProps) => {
   );
 };
 
-const CustomPanel = (props: IDockviewPanelProps) => {
-  const metadata = usePanelApi(props.api);
-
-  useEffect(() => {
-    // console.log("custom panel metadata", metadata);
-  }, [metadata]);
-
-  return (
-    <div
-      className={cn(`h-full flex flex-col justify-center items-center`, {
-        "bg-green-300": props.api.isActive,
-        "bg-red-300": !props.api.isActive,
-      })}
-    >
-      <div className="text-3xl font-bold mb-12">{props.api.isActive ? "Active now" : "Inactive"}</div>
-    </div>
-  );
-};
-
 function App() {
   const [sideBarVisible] = useState(true);
   const { i18n } = useTranslation();
@@ -173,8 +154,18 @@ function App() {
   // DOCKVIEW
   const [dockviewApi, setDockviewApi] = useState<DockviewApi | null>(null);
 
-  const onReady = (event: DockviewReadyEvent) => {
-    setDockviewApi(event.api);
+  const onReady = (e: DockviewReadyEvent) => {
+    e.api.onDidLayoutChange(() => {
+      e.api.groups.forEach((group) => {
+        const set = new Set();
+        group.panels.forEach((panel) => {
+          if (set.has(panel.api.component)) panel.api.close();
+          else set.add(panel.api.component);
+        });
+      });
+    });
+
+    setDockviewApi(e.api);
   };
 
   useEffect(() => {
@@ -188,7 +179,6 @@ function App() {
   const panels = {
     default: DefaultPanel,
     watermark: WatermarkPanel,
-    custom: CustomPanel,
     ...PagesComponents,
   };
 
@@ -199,17 +189,12 @@ function App() {
   };
 
   // actions
-  const addDefaultTab = (panel?: PanelNames) => {
-    dockviewApi?.addPanel({
-      id: `id_${Math.random()}-default-${panel}`,
-      title: panel || "Default",
-      component: panel || "default",
-    });
-  };
 
-  const addCustomTab = (panel?: PanelNames) => {
-    dockviewApi?.addPanel({
-      id: `id_${Math.random()}-custom-${panel}`,
+  const addCustomTab = (panel: PanelNames) => {
+    if (!dockviewApi) return;
+
+    dockviewApi.addPanel({
+      id: `id_${Math.random()}_${panel}`,
       title: panel || "Custom",
       component: panel || "custom",
       tabComponent: "custom",
@@ -242,7 +227,7 @@ function App() {
                     />
                   </MenuItem>
 
-                  <MenuItem className="group" onClick={() => addDefaultTab("HomePage")}>
+                  <MenuItem className="group" onClick={() => addCustomTab("HomePage")}>
                     <Icon icon="Home1" className={twMerge(IconState.Default, IconState.Hover, "min-w-4")} />
                     <IconTitle className="text-primary text-sm" title="Home" />
                   </MenuItem>
@@ -262,7 +247,7 @@ function App() {
                     <IconTitle className="text-primary text-sm" title="Goals" />
                   </MenuItem>
 
-                  <MenuItem className="group" onClick={() => addDefaultTab("LogsPage")}>
+                  <MenuItem className="group" onClick={() => addCustomTab("LogsPage")}>
                     <Icon icon="Reports" className={twMerge(IconState.Default, IconState.Hover, "min-w-4")} />
                     <IconTitle className="text-primary text-sm" title="Logs" />
                   </MenuItem>
@@ -275,7 +260,7 @@ function App() {
                     />
                   </MenuItem>
 
-                  <MenuItem className="group" onClick={() => addDefaultTab("SettingsPage")}>
+                  <MenuItem className="group" onClick={() => addCustomTab("SettingsPage")}>
                     <Icon icon="Settings" className={twMerge(IconState.Default, IconState.Hover, "min-w-4")} />
                     <IconTitle className="text-primary text-sm" title="Settings" />
                   </MenuItem>

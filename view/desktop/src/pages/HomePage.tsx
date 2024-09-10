@@ -96,7 +96,6 @@ export const HomePage = forwardRef((props: IDockviewPanelProps) => {
   return (
     <DockviewPanelLayout>
       <h1 className="text-primary">{t("title")}</h1>
-      <div>props.api.group.id: {props.api.group.id}</div>
 
       <div>
         <Tooltip label="Test" className="text-primary">
