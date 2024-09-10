@@ -11,7 +11,7 @@ import {
 } from "@repo/ui";
 import { listen } from "@tauri-apps/api/event";
 import { IDockviewPanelProps } from "dockview";
-import { forwardRef, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 const SessionComponent = () => {
@@ -90,7 +90,7 @@ const SessionComponent = () => {
   );
 };
 
-export const HomePage = forwardRef((props: IDockviewPanelProps) => {
+export const HomePage = (props: IDockviewPanelProps) => {
   const { t } = useTranslation(["ns1", "ns2"]);
 
   return (
@@ -131,4 +131,4 @@ export const HomePage = forwardRef((props: IDockviewPanelProps) => {
       </div>
     </DockviewPanelLayout>
   );
-});
+};
