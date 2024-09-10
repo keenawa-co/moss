@@ -20,6 +20,26 @@ pub struct AnyModel {
     entity_map: Weak<RwLock<EntityRefCounter>>,
 }
 
+impl Clone for AnyModel {
+    fn clone(&self) -> Self {
+        if let Some(entity_map) = self.entity_map.upgrade() {
+            let entity_map = entity_map.read();
+            let count = entity_map
+                .counts
+                .get(self.entity_id)
+                .expect("detected over-release of a model");
+            let prev_count = count.fetch_add(1, Ordering::SeqCst);
+            assert_ne!(prev_count, 0, "Detected over-release of a model.");
+        }
+
+        Self {
+            entity_id: self.entity_id,
+            entity_type: self.entity_type,
+            entity_map: self.entity_map.clone(),
+        }
+    }
+}
+
 impl AnyModel {
     fn new(id: EntityId, typ: TypeId, entity_map: Weak<RwLock<EntityRefCounter>>) -> Self {
         Self {
@@ -96,6 +116,15 @@ pub struct Model<T> {
 
 unsafe impl<T> Send for Model<T> {}
 unsafe impl<T> Sync for Model<T> {}
+
+impl<T> Clone for Model<T> {
+    fn clone(&self) -> Self {
+        Self {
+            any_model: self.any_model.clone(),
+            entity_type: self.entity_type,
+        }
+    }
+}
 
 impl<T: 'static> AnyEntity<T> for Model<T> {
     type Weak = WeakModel<T>;

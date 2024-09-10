@@ -10,10 +10,11 @@ fn main() -> ExitCode {
         .expect("Failed to retrieve the $HOME environment variable")
         .into();
 
-    AppMain::new(NativeWindowConfiguration {
+    let app = AppMain::new(NativeWindowConfiguration {
         home_dir,
         full_screen: false,
         platform_info: NativePlatformInfo::new(),
-    })
-    .run(AppMain::open_main_window)
+    });
+
+    app.run()
 }

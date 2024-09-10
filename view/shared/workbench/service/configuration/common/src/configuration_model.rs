@@ -6,8 +6,8 @@ use platform_configuration::configuration_model::{
 use platform_configuration::configuration_parser::ConfigurationParser as PlatformConfigurationParser;
 use serde_json::Value;
 
-pub struct WorkspaceConfigurationParser<'a> {
-    platform_parser: PlatformConfigurationParser<'a>,
+pub struct WorkspaceConfigurationParser {
+    platform_parser: PlatformConfigurationParser,
 }
 
 pub struct WorkspaceConfiguration {
