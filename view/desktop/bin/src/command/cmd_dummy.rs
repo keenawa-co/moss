@@ -1,6 +1,6 @@
+use anyhow::Result;
+use platform_core::context::async_context::AsyncContext;
 use std::path::PathBuf;
-
-use platform_core::common::context::async_context::AsyncContext;
 use tauri::{AppHandle, Manager, State};
 use workbench_tgui::WorkbenchState;
 
@@ -40,17 +40,13 @@ pub async fn read_theme(theme_name: String) -> Result<String, String> {
 #[specta::specta]
 pub async fn update_font_size(
     async_ctx: State<'_, AsyncContext>,
-    state: State<'_, AppState<'_>>,
+    state: State<'_, AppState>,
     input: i32,
 ) -> Result<(), String> {
-    async_ctx.with_mut(|ctx| {
-        state.workbench.update(ctx, |this, cx| {
-            this.update_conf(cx, input as usize).unwrap();
-            cx.notify();
-        });
-
-        Ok(())
-    })
+    Ok(state
+        .workbench
+        .update_conf(async_ctx.inner(), input as usize)
+        .map_err(|e| e.to_string())?)
 }
 
 #[tauri::command(async)]
@@ -63,7 +59,7 @@ pub async fn app_ready(app_handle: AppHandle) {
 #[tauri::command(async)]
 #[specta::specta]
 pub async fn create_project(
-    state: State<'_, AppState<'_>>,
+    state: State<'_, AppState>,
     input: CreateProjectInput,
 ) -> Result<Option<ProjectDTO>, String> {
     match state.project_service.create_project(&input).await {
@@ -79,14 +75,14 @@ pub async fn create_project(
 
 #[tauri::command(async)]
 #[specta::specta]
-pub async fn workbench_get_state() -> Result<WorkbenchState, String> {
+pub async fn workbench_get_state(state: State<'_, AppState>) -> Result<WorkbenchState, String> {
     Ok(WorkbenchState::Empty)
 }
 
 #[tauri::command(async)]
 #[specta::specta]
 pub async fn restore_session(
-    state: State<'_, AppState<'_>>,
+    state: State<'_, AppState>,
     project_source: Option<String>,
 ) -> Result<Option<SessionInfoDTO>, String> {
     match state.session_service.restore_session(project_source).await {

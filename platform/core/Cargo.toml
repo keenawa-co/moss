@@ -13,9 +13,15 @@ slotmap.workspace = true
 parking_lot.workspace = true
 derive_more.workspace = true
 anyhow.workspace = true
-tokio.workspace = true
+tokio = { workspace = true, features = ["full"] }
 futures.workspace = true
 smol.workspace = true
+async-task.workspace = true
+flume.workspace = true
+parking.workspace = true
+waker-fn.workspace = true
+lazy_static.workspace = true
+once_cell.workspace = true
 
 [features]
 default = []
