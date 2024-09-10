@@ -2,7 +2,7 @@ use anyhow::Result;
 use hashbrown::HashMap;
 use lazy_regex::{Lazy, Regex};
 use moss_std::collection::extend::Extend;
-use platform_core::common::context::{entity::Model, Context};
+use platform_core::context::{entity::Model, Context};
 use radix_trie::{Trie, TrieCommon};
 use serde_json::Value;
 

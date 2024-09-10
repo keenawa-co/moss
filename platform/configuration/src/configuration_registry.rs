@@ -3,7 +3,7 @@ use std::sync::Arc;
 use hashbrown::{HashMap, HashSet};
 use lazy_regex::Regex as LazyRegex;
 use moss_std::collection::extend::MaybeExtend;
-use platform_core::common::context::{entity::Model, Context};
+use platform_core::context::{entity::Model, Context};
 use serde_json::Value;
 
 type Regex = LazyRegex;

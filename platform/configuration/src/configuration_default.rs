@@ -1,5 +1,5 @@
 use arc_swap::ArcSwapOption;
-use platform_core::common::context::{entity::Model, Context};
+use platform_core::context::{entity::Model, Context};
 use radix_trie::Trie;
 use std::sync::Arc;
 

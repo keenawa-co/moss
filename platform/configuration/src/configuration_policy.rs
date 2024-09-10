@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 use arc_swap::ArcSwap;
 use hashbrown::HashMap;
-use platform_core::common::context::{entity::Model, Context};
+use platform_core::context::{entity::Model, Context};
 
 use super::{
     configuration_default::DefaultConfiguration,

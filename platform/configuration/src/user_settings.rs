@@ -1,5 +1,5 @@
 use anyhow::Result;
-use platform_core::common::context::Context;
+use platform_core::context::Context;
 use platform_fs::disk::file_system_service::AbstractDiskFileSystemService;
 use std::{io::Read, path::PathBuf, sync::Arc};
 
@@ -28,8 +28,8 @@ impl<'a> UserSettings {
         }
     }
 
-    pub async fn load_configuration(&self, ctx: &mut Context) -> Result<ConfigurationModel> {
-        let mut file = self.fs_service.read_file(&self.resource).await?;
+    pub fn load_configuration(&self, ctx: &mut Context) -> Result<ConfigurationModel> {
+        let mut file = ctx.block_on(self.fs_service.read_file(&self.resource))?;
         let mut content = String::new();
         file.read_to_string(&mut content)?;
 

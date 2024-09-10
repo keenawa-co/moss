@@ -114,29 +114,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b3d1d046238990b9cf5bcde22a3fb3584ee5cf65fb2765f454ed428c7a0063da"
 
 [[package]]
-name = "app"
-version = "0.1.0"
-dependencies = [
- "ahash 0.8.11",
- "anyhow",
- "async-executor",
- "async-task",
- "chrono",
- "derive_more",
- "flume",
- "futures",
- "hashbrown 0.14.5",
- "parking_lot",
- "serde",
- "serde_json",
- "slotmap",
- "smol",
- "tokio",
- "tracing",
- "waker-fn",
-]
-
-[[package]]
 name = "approx"
 version = "0.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1232,7 +1209,8 @@ name = "desktop"
 version = "0.1.0"
 dependencies = [
  "anyhow",
- "app",
+ "async-task",
+ "flume",
  "futures",
  "hashbrown 0.14.5",
  "macos-trampoline",
@@ -3727,9 +3705,9 @@ dependencies = [
 
 [[package]]
 name = "parking"
-version = "2.2.0"
+version = "2.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bb813b8af86854136c6922af0598d719255ecb2179515e6e7730d468f05c9cae"
+checksum = "f38d5652c16fde515bb1ecef450ab0f6a219d619a7274976324d5e377f7dceba"
 
 [[package]]
 name = "parking_lot"
@@ -4082,14 +4060,20 @@ name = "platform_core"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "async-task",
  "derive_more",
+ "flume",
  "fnv",
  "futures",
+ "lazy_static",
  "moss_std",
+ "once_cell",
+ "parking",
  "parking_lot",
  "slotmap",
  "smol",
  "tokio",
+ "waker-fn",
 ]
 
 [[package]]
@@ -4101,15 +4085,14 @@ name = "platform_formation"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "async-task",
  "derive_more",
  "flume",
  "fnv",
- "futures",
- "hashbrown 0.14.5",
  "moss_std",
  "parking_lot",
+ "platform_core",
  "slotmap",
- "tokio",
 ]
 
 [[package]]
