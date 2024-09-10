@@ -43,7 +43,7 @@ run-docs:
 run-web:
 	@cd $(WEB_DIR) && $(PNPM) dev
 
-run-theme-generator:
+gen-themes:
 	@cd $(THEME_GENERATOR_DIR) && $(PNPM) start
 
 # Check if the database is running, if not, start it in the background
@@ -53,9 +53,9 @@ check-db:
 	fi	
 	
 # Count lines of Rust code, excluding the 'target' directory
-count:
+count-rust:
 	@find . -type f -name '*.rs' | grep -v '/target/' | xargs wc -l
 
 # Clean up merged branches except master, main, and dev
-cleanup:
+cleanup-git:
 	@git branch --merged | grep -Ev "(^\*|master|main|dev)" | xargs git branch -d
