@@ -10,3 +10,5 @@ view/desktop/public
 
 package*.json
 pnpm-lock.yaml
+
+**/LICENSE-MIT
