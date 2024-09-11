@@ -14,6 +14,7 @@ members = [
     "platform/utl",
     "platform/workspace",
     "platform/app",
+    "platform/log",
 
     "view/desktop/bin",
 
@@ -22,8 +23,7 @@ members = [
     "view/shared/workbench/service/configuration/tgui",
     "view/shared/workbench/service/user_profile/tgui",
     "view/shared/workbench/service/environment/tgui",
-    "platform/log",
-
+    "view/shared/workbench/service/log",
 ]
 
 # [profile.dev]
@@ -57,6 +57,8 @@ workbench_service_configuration_common = { path = "view/shared/workbench/service
 workbench_service_configuration_tgui = { path = "view/shared/workbench/service/configuration/tgui" }
 workbench_service_user_profile_tgui = { path = "view/shared/workbench/service/user_profile/tgui" }
 workbench_service_environment_tgui = { path = "view/shared/workbench/service/environment/tgui" }
+workbench_service_log = { path = "view/shared/workbench/service/log" }
+
 
 project = { path = "platform/project" }
 

@@ -241,34 +241,34 @@ impl AppMain {
 }
 
 // An example of how the logging could function
-fn init_custom_logging(app_handle: tauri::AppHandle) {
-    struct TauriLogWriter {
-        app_handle: tauri::AppHandle,
-    }
+// fn init_custom_logging(app_handle: tauri::AppHandle) {
+//     struct TauriLogWriter {
+//         app_handle: tauri::AppHandle,
+//     }
 
-    impl std::io::Write for TauriLogWriter {
-        fn write(&mut self, buf: &[u8]) -> std::io::Result<usize> {
-            let log_message = String::from_utf8_lossy(buf).to_string();
-            let _ = self.app_handle.emit("logs-stream", log_message);
-            Ok(buf.len())
-        }
+//     impl std::io::Write for TauriLogWriter {
+//         fn write(&mut self, buf: &[u8]) -> std::io::Result<usize> {
+//             let log_message = String::from_utf8_lossy(buf).to_string();
+//             let _ = self.app_handle.emit("logs-stream", log_message);
+//             Ok(buf.len())
+//         }
 
-        fn flush(&mut self) -> std::io::Result<()> {
-            Ok(())
-        }
-    }
+//         fn flush(&mut self) -> std::io::Result<()> {
+//             Ok(())
+//         }
+//     }
 
-    tracing_subscriber::registry()
-        // log to stdout
-        .with(tracing_subscriber::fmt::layer().with_writer(std::io::stdout))
-        // log to frontend
-        .with(
-            tracing_subscriber::fmt::layer().with_writer(move || TauriLogWriter {
-                app_handle: app_handle.clone(),
-            }),
-        )
-        .init();
+//     tracing_subscriber::registry()
+//         // log to stdout
+//         .with(tracing_subscriber::fmt::layer().with_writer(std::io::stdout))
+//         // log to frontend
+//         .with(
+//             tracing_subscriber::fmt::layer().with_writer(move || TauriLogWriter {
+//                 app_handle: app_handle.clone(),
+//             }),
+//         )
+//         .init();
 
-    event!(tracing::Level::DEBUG, "Logging init");
-    info!("Logging initialized");
-}
+//     event!(tracing::Level::DEBUG, "Logging init");
+//     info!("Logging initialized");
+// }
