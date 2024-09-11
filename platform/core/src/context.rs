@@ -8,9 +8,9 @@ mod utl;
 use async_context::AsyncContext;
 use entity::{AnyEntity, EntityId, EntityMap, Model, Slot};
 use model_context::ModelContext;
-use moss_std::collection::{FxHashSet, VecDeque};
+use moss_std::collection::{FxHashMap, FxHashSet, VecDeque};
 use std::{
-    any::{Any, TypeId},
+    any::{type_name, Any, TypeId},
     borrow::Borrow,
     cell::RefCell,
     future::Future,
@@ -20,6 +20,7 @@ use subscription::{SubscriberSet, Subscription};
 
 use crate::{
     executor::{BackgroundExecutor, MainThreadExecutor, Task},
+    global::Global,
     platform::AnyPlatform,
 };
 
@@ -82,6 +83,8 @@ pub struct Context {
     flushing_effects: bool,
     event_listeners: SubscriberSet<EntityId, (TypeId, Listener)>,
     release_listeners: SubscriberSet<EntityId, ReleaseListener>,
+    globals_by_type: FxHashMap<TypeId, Box<dyn Any>>,
+    global_observers: SubscriberSet<TypeId, Handler>,
 }
 
 impl AnyContext for Context {
@@ -144,8 +147,40 @@ impl Context {
                 flushing_effects: false,
                 event_listeners: SubscriberSet::new(),
                 release_listeners: SubscriberSet::new(),
+                globals_by_type: FxHashMap::default(),
+                global_observers: SubscriberSet::new(),
             })
         })
+    }
+
+    pub fn global<G: Global>(&self) -> &G {
+        self.globals_by_type
+            .get(&TypeId::of::<G>())
+            .map(|any_state| any_state.downcast_ref::<G>().unwrap())
+            .ok_or_else(|| anyhow!("no state of type {} exists", type_name::<G>()))
+            .unwrap()
+    }
+
+    pub fn set_global<G: Global>(&mut self, global: G) {
+        let global_type = TypeId::of::<G>();
+
+        // TODO: notify
+        self.globals_by_type.insert(global_type, Box::new(global));
+    }
+
+    pub fn observe_global<G: Global>(
+        &mut self,
+        mut f: impl FnMut(&mut Self) + 'static,
+    ) -> Subscription {
+        let (subscription, activate) = self.global_observers.insert(
+            TypeId::of::<G>(),
+            Box::new(move |ctx| {
+                f(ctx);
+                true
+            }),
+        );
+        self.defer(move |_| activate());
+        subscription
     }
 
     pub fn spawn_local<Fut>(&self, f: impl FnOnce(AsyncContext) -> Fut) -> Task<Fut::Output>
