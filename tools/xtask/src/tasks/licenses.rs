@@ -21,7 +21,7 @@ pub fn run_licenses(_args: LicensesArgs) -> Result<()> {
     const LICENSE_FILES: &[&str] = &["LICENSE-MIT"];
 
     let workspace = load_workspace()?;
-    let root_license = workspace.workspace_root.join(LICENSE_FILES[0]);
+    let default_license = workspace.workspace_root.join(LICENSE_FILES[0]);
 
     for package in workspace.workspace_packages() {
         let crate_dir = package
@@ -29,62 +29,54 @@ pub fn run_licenses(_args: LicensesArgs) -> Result<()> {
             .parent()
             .ok_or_else(|| anyhow!("no crate directory for '{}'", package.name))?;
 
-        if let Some(license_file) = first_license_file(crate_dir, LICENSE_FILES) {
+        if let Some((license_file, license_index)) = first_license_file(crate_dir, LICENSE_FILES) {
+            let root_license = pathdiff::diff_paths(
+                workspace.workspace_root.join(LICENSE_FILES[license_index]),
+                crate_dir,
+            )
+            .expect("Failed to create root license relative path");
             if license_file.is_symlink() {
                 let target = fs::read_link(&license_file)?;
                 if target != root_license {
                     info!("updating symlink for '{}'", package.name);
                     fs::remove_file(&license_file)?;
-                    create_relative_symlink(
-                        &root_license.as_std_path(),
-                        &license_file,
-                        &workspace.workspace_root.as_std_path(),
-                    )?;
+                    create_relative_symlink(&root_license, &license_file)?;
                 }
             } else {
                 info!("replacing file with symlink for '{}'", package.name);
                 fs::remove_file(&license_file)?;
-                create_relative_symlink(
-                    &root_license.as_std_path(),
-                    &license_file,
-                    &workspace.workspace_root.as_std_path(),
-                )?;
+                create_relative_symlink(&root_license, &license_file)?;
             }
         } else {
             info!("creating license symlink for '{}'", package.name);
-            let license_new_path = crate_dir.join(LICENSE_FILES[0]);
-            create_relative_symlink(
-                &root_license.as_std_path(),
-                &license_new_path.as_std_path(),
-                &workspace.workspace_root.as_std_path(),
-            )?;
+            let license_new_path =
+                pathdiff::diff_paths(workspace.workspace_root.join(LICENSE_FILES[0]), crate_dir)
+                    .expect("Failed to create license relative path");
+            create_relative_symlink(&default_license.as_std_path(), &license_new_path)?;
         }
     }
 
     Ok(())
 }
 
-fn first_license_file(path: impl AsRef<Path>, license_files: &[&str]) -> Option<PathBuf> {
-    for license_file in license_files {
+fn first_license_file(path: impl AsRef<Path>, license_files: &[&str]) -> Option<(PathBuf, usize)> {
+    for (index, license_file) in license_files.iter().enumerate() {
         let path_to_license = path.as_ref().join(license_file);
         info!("analyzing '{}'...", path_to_license.display());
         if std::fs::read_link(&path_to_license).is_ok() {
-            return Some(path_to_license);
+            return Some((path_to_license, index));
         }
     }
 
     None
 }
 
-fn create_relative_symlink(src: &Path, dst: &Path, workspace_root: &Path) -> Result<()> {
-    let relative_src = pathdiff::diff_paths(src, dst.parent().unwrap())
-        .ok_or_else(|| anyhow!("failed to create relative path"))?;
-
+fn create_relative_symlink(src: &Path, dst: &Path) -> Result<()> {
     #[cfg(unix)]
-    std::os::unix::fs::symlink(&relative_src, dst)?;
+    std::os::unix::fs::symlink(src, dst)?;
 
     #[cfg(windows)]
-    std::os::windows::fs::symlink_file(&relative_src, dst)?;
+    std::os::windows::fs::symlink_file(src, dst)?;
 
     Ok(())
 }
