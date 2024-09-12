@@ -34,25 +34,25 @@ pub fn run_licenses(_args: LicensesArgs) -> Result<()> {
                 workspace.workspace_root.join(LICENSE_FILES[license_index]),
                 crate_dir,
             )
-            .expect("Failed to create root license relative path");
+            .expect("failed to create relative path for root license");
             if license_file.is_symlink() {
                 let target = fs::read_link(&license_file)?;
                 if target != root_license {
                     info!("updating symlink for '{}'", package.name);
                     fs::remove_file(&license_file)?;
-                    create_relative_symlink(&root_license, &license_file)?;
+                    create_symlink(&root_license, &license_file)?;
                 }
             } else {
                 info!("replacing file with symlink for '{}'", package.name);
                 fs::remove_file(&license_file)?;
-                create_relative_symlink(&root_license, &license_file)?;
+                create_symlink(&root_license, &license_file)?;
             }
         } else {
             info!("creating license symlink for '{}'", package.name);
-            let license_new_path =
-                pathdiff::diff_paths(workspace.workspace_root.join(LICENSE_FILES[0]), crate_dir)
-                    .expect("Failed to create license relative path");
-            create_relative_symlink(&default_license.as_std_path(), &license_new_path)?;
+            let license_new_path = crate_dir.join(LICENSE_FILES[0]);
+            let relative_default_license = pathdiff::diff_paths(&default_license, crate_dir)
+                .ok_or_else(|| anyhow!("failed to create relative path for default license"))?;
+            create_symlink(&relative_default_license, &license_new_path.as_std_path())?;
         }
     }
 
@@ -71,12 +71,14 @@ fn first_license_file(path: impl AsRef<Path>, license_files: &[&str]) -> Option<
     None
 }
 
-fn create_relative_symlink(src: &Path, dst: &Path) -> Result<()> {
-    #[cfg(unix)]
+#[cfg(unix)]
+fn create_symlink(src: &Path, dst: &Path) -> Result<()> {
     std::os::unix::fs::symlink(src, dst)?;
+    Ok(())
+}
 
-    #[cfg(windows)]
+#[cfg(windows)]
+fn create_symlink(src: &Path, dst: &Path) -> Result<()> {
     std::os::windows::fs::symlink_file(src, dst)?;
-
     Ok(())
 }
