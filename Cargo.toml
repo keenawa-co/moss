@@ -90,3 +90,4 @@ waker-fn = "1.2.0"
 cargo_metadata = "0.18"
 cargo_toml = "0.20"
 clap = { version = "4.4", features = ["derive"] }
+pathdiff = "0.2"

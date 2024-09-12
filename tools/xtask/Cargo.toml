@@ -9,3 +9,6 @@ anyhow.workspace = true
 cargo_metadata.workspace = true
 cargo_toml.workspace = true
 clap = { workspace = true, features = ["derive"] }
+tracing.workspace = true
+tracing-subscriber.workspace = true
+pathdiff.workspace = true

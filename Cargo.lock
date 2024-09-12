@@ -7865,6 +7865,9 @@ dependencies = [
  "cargo_metadata",
  "cargo_toml 0.20.4",
  "clap",
+ "pathdiff",
+ "tracing",
+ "tracing-subscriber",
 ]
 
 [[package]]
