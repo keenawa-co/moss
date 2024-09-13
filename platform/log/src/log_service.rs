@@ -1,13 +1,13 @@
-use std::{collections::VecDeque, default, rc::{Rc, Weak}};
+use std::{cell::RefCell, collections::VecDeque, default, rc::{Rc, Weak}};
 
 pub struct LogService {
-    file_logger: Rc<dyn AnyLogger>,
-    buffer_logger: BufferLogger,
-    cli_logger: Rc<dyn AnyLogger>,
+    file_logger: Rc<RefCell<dyn AnyLogger>>,
+    buffer_logger: Rc<RefCell<dyn AnyLogger>>,
+    cli_logger: Rc<RefCell<dyn AnyLogger>>,
 }
 
 impl LogService {
-    pub fn new(file_logger: Rc<dyn AnyLogger>, buffer_logger: Rc<dyn AnyLogger>, cli_logger: Rc<dyn AnyLogger>) -> Self {
+    pub fn new(file_logger: Rc<RefCell<dyn AnyLogger>>, buffer_logger: Rc<RefCell<dyn AnyLogger>>, cli_logger: Rc<RefCell<dyn AnyLogger>>) -> Self {
         Self {
             file_logger,
             buffer_logger,
@@ -16,47 +16,47 @@ impl LogService {
     }
 
     pub fn trace(&self, message: &str) {
-        self.buffer_logger.trace(message);
+        self.buffer_logger.borrow_mut().trace(message);
     }
 
     pub fn debug(&self, message: &str) {
-        self.buffer_logger.debug(message);
+        self.buffer_logger.borrow_mut().debug(message);
     }
 
     pub fn info(&self, message: &str) {
-        self.buffer_logger.info(message);
+        self.buffer_logger.borrow_mut().info(message);
     }
     
     pub fn warning(&self, message: &str) {
-        self.buffer_logger.warning(message);
+        self.buffer_logger.borrow_mut().warning(message);
     }
     
     pub fn error(&self, message: &str) {
-        self.buffer_logger.error(message);
+        self.buffer_logger.borrow_mut().error(message);
     }
 
     pub fn flush_buffer_logger_to_cli(&mut self) {
-        self.buffer_logger.set_target_logger(Rc::clone(&self.cli_logger));
-        self.buffer_logger.flush();
+        self.buffer_logger.borrow_mut().set_target_logger(Rc::clone(&self.cli_logger));
+        self.buffer_logger.borrow_mut().flush();
     }
 }
 
 pub fn create_service() -> LogService {
-    let file_logger: Rc<dyn AnyLogger> = Rc::new(CliLogger::new());
-    let buffer_logger: Rc<dyn AnyLogger> = Rc::new(BufferLogger::new(5000)); // TODO: move this value to config/constant
-    let cli_logger: Rc<dyn AnyLogger> = Rc::new(CliLogger::new());
+    let file_logger: Rc<RefCell<dyn AnyLogger>> = Rc::new(RefCell::new(CliLogger::new()));
+    let buffer_logger: Rc<RefCell<dyn AnyLogger>> = Rc::new(RefCell::new(BufferLogger::new(5000))); // TODO: move this value to config/constant
+    let cli_logger: Rc<RefCell<dyn AnyLogger>> = Rc::new(RefCell::new(CliLogger::new()));
     return LogService::new(file_logger, buffer_logger, cli_logger);
 }
 
 
 pub trait AnyLogger {
-    fn trace(&self, message: &str);
-    fn debug(&self, message: &str);
-    fn info(&self, message: &str);
-    fn warning(&self, message: &str);
-    fn error(&self, message: &str);
+    fn trace(&mut self, message: &str);
+    fn debug(&mut self, message: &str);
+    fn info(&mut self, message: &str);
+    fn warning(&mut self, message: &str);
+    fn error(&mut self, message: &str);
 
-    fn flush(&self);
+    fn flush(&mut self);
     
     
     fn set_level(&mut self, level: LogLevel);
@@ -67,7 +67,7 @@ pub trait AnyLogger {
     fn disable(&mut self);
 
     // Set target to re-direct logs to some other logger (such, as, from buffer to others...)
-    fn set_target_logger(&mut self, logger: Rc<dyn AnyLogger>);
+    fn set_target_logger(&mut self, logger: Rc<RefCell<dyn AnyLogger>>);
 }
 
 #[derive(Debug)]
@@ -101,37 +101,37 @@ impl CliLogger {
 }
 
 impl AnyLogger for CliLogger {
-    fn trace(&self, message: &str) {
+    fn trace(&mut self, message: &str) {
         if self.enabled && matches!(self.level, LogLevel::Trace) {
             println!("{}", (self.formatter)(message, LogLevel::Trace));
         }
     }
 
-    fn debug(&self, message: &str) {
+    fn debug(&mut self, message: &str) {
         if self.enabled && matches!(self.level, LogLevel::Debug | LogLevel::Trace) {
             println!("{}", (self.formatter)(message, LogLevel::Debug));
         }
     }
 
-    fn info(&self, message: &str) {
+    fn info(&mut self, message: &str) {
         if self.enabled && matches!(self.level, LogLevel::Info | LogLevel::Debug | LogLevel::Trace) {
             println!("{}", (self.formatter)(message, LogLevel::Info));
         }
     }
 
-    fn warning(&self, message: &str) {
+    fn warning(&mut self, message: &str) {
         if self.enabled && matches!(self.level, LogLevel::Info | LogLevel::Debug | LogLevel::Trace | LogLevel::Warning ) {
             println!("{}", (self.formatter)(message, LogLevel::Warning));
         }
     }
 
-    fn error(&self, message: &str) {
+    fn error(&mut self, message: &str) {
         if self.enabled && matches!(self.level, LogLevel::Info | LogLevel::Debug | LogLevel::Trace | LogLevel::Warning | LogLevel::Error ) {
             println!("{}", (self.formatter)(message, LogLevel::Error));
         }
     }
 
-    fn flush(&self) {
+    fn flush(&mut self) {
         todo!()
     }
 
@@ -151,7 +151,8 @@ impl AnyLogger for CliLogger {
         self.enabled = false
     }
 
-    fn set_target_logger(&mut self, logger: Rc<dyn AnyLogger>) {        unimplemented!()
+    fn set_target_logger(&mut self, logger: Rc<RefCell<dyn AnyLogger>>) {
+        unimplemented!()
     }
 }
 
@@ -160,7 +161,7 @@ pub struct BufferLogger {
     max_buffer_size: usize,
     enabled: bool,
     level: LogLevel,
-    target_logger: Option<Weak<dyn AnyLogger>>,
+    target_logger: Option<Rc<RefCell<dyn AnyLogger>>>,
 }
 
 pub struct BufferedLogEntry {
@@ -198,38 +199,39 @@ impl BufferLogger {
 }
 
 impl AnyLogger for BufferLogger {
-    fn trace(&self, message: &str) {
+    fn trace(&mut self, message: &str) {
         if self.enabled && matches!(self.level, LogLevel::Trace) {
             self.buffer_log(LogLevel::Trace, message.to_string());
         }
     }
 
-    fn debug(&self, message: &str) {
+    fn debug(&mut self, message: &str) {
         if self.enabled && matches!(self.level, LogLevel::Debug | LogLevel::Trace) {
             self.buffer_log(LogLevel::Debug, message.to_string());
         }
     }
 
-    fn info(&self, message: &str) {
+    fn info(&mut self, message: &str) {
         if self.enabled && matches!(self.level, LogLevel::Info | LogLevel::Debug | LogLevel::Trace) {
             self.buffer_log(LogLevel::Info, message.to_string());
         }
     }
 
-    fn warning(&self, message: &str) {
+    fn warning(&mut self, message: &str) {
         if self.enabled && matches!(self.level, LogLevel::Warning | LogLevel::Info | LogLevel::Debug | LogLevel::Trace) {
             self.buffer_log(LogLevel::Warning, message.to_string());
         }
     }
 
-    fn error(&self, message: &str) {
+    fn error(&mut self, message: &str) {
         if self.enabled && matches!(self.level, LogLevel::Error | LogLevel::Warning | LogLevel::Info | LogLevel::Debug | LogLevel::Trace) {
             self.buffer_log(LogLevel::Error, message.to_string());
         }
     }
 
-    fn flush(&self) {
-        if let Some(ref logger) = self.target_logger {
+    fn flush(&mut self) {
+        if let Some(target_logger) = &self.target_logger {
+            let mut logger = target_logger.borrow_mut(); 
             while let Some(log_entry) = self.buffer.pop_front() {
                 match log_entry.level {
                     LogLevel::Trace => logger.trace(&log_entry.message),
@@ -260,7 +262,7 @@ impl AnyLogger for BufferLogger {
         self.enabled = false;
     }
 
-    fn set_target_logger(&mut self, logger: Rc<dyn AnyLogger>) {
-        self.target_logger = Some(Rc::downgrade(&logger));
+    fn set_target_logger(&mut self, logger: Rc<RefCell<dyn AnyLogger>>) {
+        self.target_logger = Some(logger);
     }
 }
