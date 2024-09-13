@@ -4120,6 +4120,10 @@ dependencies = [
 [[package]]
 name = "platform_log"
 version = "0.1.0"
+dependencies = [
+ "tracing",
+ "tracing-subscriber",
+]
 
 [[package]]
 name = "platform_user_profile"
