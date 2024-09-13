@@ -3,7 +3,6 @@ import { LanguageSelector, ThemeSelector } from "@/components";
 import { DockviewPanelLayout } from "@/components";
 import { Convert, Theme } from "@repo/theme";
 import { listen } from "@tauri-apps/api/event";
-import { IDockviewPanelProps } from "dockview";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -33,7 +32,7 @@ const handleReadTheme = async (themeName: string): Promise<Theme> => {
   }
 };
 
-export const SettingsPage = (props: IDockviewPanelProps) => {
+export const SettingsPage = () => {
   const { t } = useTranslation(["ns1", "ns2"]);
   const { i18n } = useTranslation();
 

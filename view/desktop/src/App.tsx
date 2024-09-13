@@ -4,20 +4,17 @@ import "@/i18n";
 import { Convert, Theme } from "@repo/theme";
 import { Icon, IconTitle, MenuItem, ThemeProvider } from "@repo/ui";
 import "@repo/ui/src/fonts.css";
-import {
-  DockviewApi,
-  DockviewReact,
-  DockviewReadyEvent,
-  IDockviewPanelHeaderProps,
-  IDockviewPanelProps,
-} from "dockview";
+
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { twMerge } from "tailwind-merge";
 import { Resizable, ResizablePanel } from "./components/Resizable";
-import { usePanelApi } from "./hooks/usePanelApi";
+
 import * as PagesComponents from "./pages/index";
 import { cn } from "./utils";
+import LuminoLayoutTest from "./components/LuminoLayout";
+import DockPanel from "./components/LuminoLayout";
+import FlexLayout from "./components/FlexLayout";
 
 const handleFetchAllThemes = async () => {
   try {
@@ -56,9 +53,7 @@ enum IconState {
 
 // DOCKVIEW
 // default
-const DefaultPanel = (props: IDockviewPanelProps) => (
-  <div className={cn(`h-full grid place-items-center text-3xl`)}>{props.api.title}</div>
-);
+const DefaultPanel = () => <div className={cn(`h-full grid place-items-center text-3xl`)}>DefaultPanel</div>;
 
 const WatermarkPanel = () => (
   <div className="h-full w-full grid place-items-center bg-white">
@@ -68,31 +63,6 @@ const WatermarkPanel = () => (
     </div>
   </div>
 );
-
-// custom
-const CustomTab = (props: IDockviewPanelHeaderProps) => {
-  // const metadata = usePanelApi(props.api);
-
-  // useEffect(() => {
-  //   // console.log("custom tab  metadata", metadata);
-  // }, [metadata]);
-
-  return (
-    <div
-      className={cn(`flex items-center justify-between px-4 h-full`, {})}
-      onClick={(event) => {
-        // on mouse middle click
-        if (event.button === 1) props.api.close();
-      }}
-    >
-      <div className="text-primary">{props.api.title}</div>
-
-      <div className="ml-4 px-1 hover:bg-red-500 rounded-full" onClick={() => props.api.close()}>
-        X
-      </div>
-    </div>
-  );
-};
 
 function App() {
   const [sideBarVisible] = useState(true);
@@ -150,55 +120,36 @@ function App() {
   useEffect(() => {
     if (!selectedTheme) console.error("Failed to initialize theme");
   }, [selectedTheme]);
-
-  // DOCKVIEW
-  const [dockviewApi, setDockviewApi] = useState<DockviewApi | null>(null);
-
-  const onReady = (e: DockviewReadyEvent) => {
-    e.api.onDidLayoutChange(() => {
-      e.api.groups.forEach((group) => {
-        const set = new Set();
-        group.panels.forEach((panel) => {
-          if (set.has(panel.api.component)) panel.api.close();
-          else set.add(panel.api.component);
-        });
-      });
-    });
-
-    setDockviewApi(e.api);
-  };
-
-  useEffect(() => {
-    dockviewApi?.clear();
-    addCustomTab("HomePage");
-    addCustomTab("SettingsPage");
-    addCustomTab("LogsPage");
-  }, [dockviewApi]);
-
-  // registration
-  const panels = {
-    default: DefaultPanel,
-    watermark: WatermarkPanel,
-    ...PagesComponents,
-  };
-
-  type PanelNames = keyof typeof panels;
-
-  const tabs = {
-    custom: CustomTab,
-  };
-
-  // actions
-
-  const addCustomTab = (panel: PanelNames) => {
-    if (!dockviewApi) return;
-
-    dockviewApi.addPanel({
-      id: `id_${Math.random()}_${panel}`,
-      title: panel || "Custom",
-      component: panel || "custom",
-      tabComponent: "custom",
-    });
+  const layout: any = {
+    main: {
+      type: "split-area",
+      orientation: "vertical",
+      children: [
+        {
+          type: "split-area",
+          orientation: "horizontal",
+          children: [
+            {
+              type: "tab-area",
+              widgets: ["yellow"],
+              currentIndex: 0,
+            },
+            {
+              type: "tab-area",
+              widgets: ["blue"],
+              currentIndex: 0,
+            },
+          ],
+          sizes: [0.5, 0.5],
+        },
+        {
+          type: "tab-area",
+          widgets: ["red"],
+          currentIndex: 0,
+        },
+      ],
+      sizes: [0.5, 0.5],
+    },
   };
 
   return (
@@ -227,7 +178,7 @@ function App() {
                     />
                   </MenuItem>
 
-                  <MenuItem className="group" onClick={() => addCustomTab("HomePage")}>
+                  <MenuItem className="group">
                     <Icon icon="Home1" className={twMerge(IconState.Default, IconState.Hover, "min-w-4")} />
                     <IconTitle className="text-primary text-sm" title="Home" />
                   </MenuItem>
@@ -247,7 +198,7 @@ function App() {
                     <IconTitle className="text-primary text-sm" title="Goals" />
                   </MenuItem>
 
-                  <MenuItem className="group" onClick={() => addCustomTab("LogsPage")}>
+                  <MenuItem className="group">
                     <Icon icon="Reports" className={twMerge(IconState.Default, IconState.Hover, "min-w-4")} />
                     <IconTitle className="text-primary text-sm" title="Logs" />
                   </MenuItem>
@@ -260,7 +211,7 @@ function App() {
                     />
                   </MenuItem>
 
-                  <MenuItem className="group" onClick={() => addCustomTab("SettingsPage")}>
+                  <MenuItem className="group">
                     <Icon icon="Settings" className={twMerge(IconState.Default, IconState.Hover, "min-w-4")} />
                     <IconTitle className="text-primary text-sm" title="Settings" />
                   </MenuItem>
@@ -273,12 +224,12 @@ function App() {
               </ResizablePanel>
               <ResizablePanel>
                 <Content className="content relative flex flex-col overflow-auto h-full">
-                  <DockviewReact
-                    onReady={onReady}
-                    components={panels}
-                    tabComponents={tabs}
-                    watermarkComponent={panels.watermark}
-                  />
+                  {/* <DockPanel onLayoutChange={console.log} layout={layout}>
+                    <div key="yellow" title="Yellow Title" className="yellow"></div>
+                    <div key="red" title="Red Title" className="red"></div>
+                    <div key="blue" className="blue"></div>
+                  </DockPanel> */}
+                  <FlexLayout />
                 </Content>
               </ResizablePanel>
             </Resizable>

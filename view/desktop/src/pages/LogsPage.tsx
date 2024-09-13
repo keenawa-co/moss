@@ -1,9 +1,8 @@
 import { DockviewPanelLayout } from "@/components";
 import { listen } from "@tauri-apps/api/event";
-import { IDockviewPanelProps } from "dockview";
 import { useEffect, useState } from "react";
 
-export const LogsPage = (props: IDockviewPanelProps) => {
+export const LogsPage = () => {
   const [logs, setLogs] = useState<string[]>([]);
 
   useEffect(() => {

@@ -12,6 +12,9 @@
     "interface": "i18next-resources-for-ts interface -i ./public/locales/de -o ./src/@types/resources.d.ts"
   },
   "dependencies": {
+    "@lumino/default-theme": "^2.1.7",
+    "@lumino/dragdrop": "^2.1.5",
+    "@lumino/widgets": "^2.5.0",
     "@tailwindcss/nesting": "0.0.0-insiders.565cd3e",
     "@tauri-apps/api": ">=2.0.0-rc.0",
     "@tauri-apps/plugin-fs": "2.0.0-rc.0",
@@ -19,6 +22,8 @@
     "@tauri-apps/plugin-shell": ">=2.0.0-rc.0",
     "allotment": "^1.20.2",
     "dockview": "^1.17.1",
+    "flexlayout-react": "^0.7.15",
+    "golden-layout": "^2.6.0",
     "install": "^0.13.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
