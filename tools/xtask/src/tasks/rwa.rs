@@ -5,21 +5,14 @@ use anyhow::Result;
 use clap::Parser;
 use toml::Value;
 
-use tracing::{error, info, warn, Level};
-use tracing_subscriber::FmtSubscriber;
+use tracing::{error, info, warn};
 
-use crate::workspace::load_workspace;
+use cargo_metadata::Metadata;
 
 #[derive(Parser)]
 pub struct RwaArgs {}
 
-pub fn run_rwa(_args: RwaArgs) -> Result<()> {
-    let subscriber = FmtSubscriber::builder()
-        .with_max_level(Level::TRACE)
-        .finish();
-    tracing::subscriber::set_global_default(subscriber).expect("setting default subscriber failed");
-
-    let workspace = load_workspace()?;
+pub fn run_rwa(_args: RwaArgs, workspace: Metadata) -> Result<()> {
     let ignored_deps = load_ignored_dependencies("config.toml")?;
 
     for package in workspace.workspace_packages() {

@@ -4,22 +4,14 @@ use std::path::{Path, PathBuf};
 use anyhow::{anyhow, Result};
 use clap::Parser;
 
-use tracing::{info, Level};
-use tracing_subscriber::FmtSubscriber;
+use tracing::info;
 
-use crate::workspace::load_workspace;
+use cargo_metadata::Metadata;
 
 #[derive(Parser)]
 pub struct LicenseArgs {}
 
-pub fn run_license(_args: LicenseArgs) -> Result<()> {
-    let subscriber = FmtSubscriber::builder()
-        .with_max_level(Level::TRACE)
-        .finish();
-    tracing::subscriber::set_global_default(subscriber).expect("setting default subscriber failed");
-
-    let workspace = load_workspace()?;
-
+pub fn run_license(_args: LicenseArgs, workspace: Metadata) -> Result<()> {
     const LICENSE_FILES: &[&str] = &["LICENSE-MIT"];
     let default_license = workspace.workspace_root.join(LICENSE_FILES[0]);
 
