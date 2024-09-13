@@ -122,7 +122,7 @@ export const HomePage = () => {
 
       <div className="w-96 bg-red-600">
         {new Array(77).fill(0).map((_, index) => (
-          <div>
+          <div key={index}>
             {index} - {Math.random()}
           </div>
         ))}

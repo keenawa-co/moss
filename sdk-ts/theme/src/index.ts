@@ -18,28 +18,28 @@ export interface Colors {
   windowControlsLinuxHoverBackground?: string;
   windowControlsLinuxActiveBackground?: string;
 
-  dvBackgroundColor?: string;
-  dvPaneviewActiveOutlineColor?: string;
-  dvTabsAndActionsContainerFontSize?: string;
-  dvTabsAndActionsContainerHeight?: string;
-  dvDragOverBackgroundColor?: string;
-  dvDragOverBorderColor?: string;
-  dvTabsContainerScrollbarColor?: string;
-  dvIconHoverBackgroundColor?: string;
-  dvFloatingBoxShadow?: string;
-  dvGroupViewBackgroundColor?: string;
-  dvTabsAndActionsContainerBackgroundColor?: string;
-  dvActivegroupVisiblepanelTabBackgroundColor?: string;
-  dvActivegroupHiddenpanelTabBackgroundColor?: string;
-  dvInactivegroupVisiblepanelTabBackgroundColor?: string;
-  dvInactivegroupHiddenpanelTabBackgroundColor?: string;
-  dvTabDividerColor?: string;
-  dvActivegroupVisiblepanelTabColor?: string;
-  dvActivegroupHiddenpanelTabColor?: string;
-  dvInactivegroupVisiblepanelTabColor?: string;
-  dvInactivegroupHiddenpanelTabColor?: string;
-  dvSeparatorBorder?: string;
-  dvPaneviewHeaderBorderColor?: string;
+  dvBackgroundColor: string;
+  dvPaneviewActiveOutlineColor: string;
+  dvTabsAndActionsContainerFontSize: string;
+  dvTabsAndActionsContainerHeight: string;
+  dvDragOverBackgroundColor: string;
+  dvDragOverBorderColor: string;
+  dvTabsContainerScrollbarColor: string;
+  dvIconHoverBackgroundColor: string;
+  dvFloatingBoxShadow: string;
+  dvGroupViewBackgroundColor: string;
+  dvTabsAndActionsContainerBackgroundColor: string;
+  dvActivegroupVisiblepanelTabBackgroundColor: string;
+  dvActivegroupHiddenpanelTabBackgroundColor: string;
+  dvInactivegroupVisiblepanelTabBackgroundColor: string;
+  dvInactivegroupHiddenpanelTabBackgroundColor: string;
+  dvTabDividerColor: string;
+  dvActivegroupVisiblepanelTabColor: string;
+  dvActivegroupHiddenpanelTabColor: string;
+  dvInactivegroupVisiblepanelTabColor: string;
+  dvInactivegroupHiddenpanelTabColor: string;
+  dvSeparatorBorder: string;
+  dvPaneviewHeaderBorderColor: string;
 }
 
 const typeMap: any = {
