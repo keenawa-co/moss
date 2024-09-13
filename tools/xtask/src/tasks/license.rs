@@ -10,17 +10,17 @@ use tracing_subscriber::FmtSubscriber;
 use crate::workspace::load_workspace;
 
 #[derive(Parser)]
-pub struct LicensesArgs {}
+pub struct LicenseArgs {}
 
-pub fn run_licenses(_args: LicensesArgs) -> Result<()> {
+pub fn run_license(_args: LicenseArgs) -> Result<()> {
     let subscriber = FmtSubscriber::builder()
         .with_max_level(Level::TRACE)
         .finish();
     tracing::subscriber::set_global_default(subscriber).expect("setting default subscriber failed");
 
-    const LICENSE_FILES: &[&str] = &["LICENSE-MIT"];
-
     let workspace = load_workspace()?;
+
+    const LICENSE_FILES: &[&str] = &["LICENSE-MIT"];
     let default_license = workspace.workspace_root.join(LICENSE_FILES[0]);
 
     for package in workspace.workspace_packages() {

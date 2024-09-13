@@ -1,0 +1,2 @@
+[rwa.ignore]
+desktop = ["tauri-plugin-shell", "tauri-plugin-os", "tauri-specta", "tauri-plugin-fs"]
