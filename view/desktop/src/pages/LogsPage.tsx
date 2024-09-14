@@ -1,4 +1,3 @@
-import { DockviewPanelLayout } from "@/components";
 import { listen } from "@tauri-apps/api/event";
 import { useEffect, useState } from "react";
 
@@ -18,22 +17,20 @@ export const LogsPage = () => {
   }, []);
 
   return (
-    <DockviewPanelLayout>
-      <main className="p-4">
-        <h1 className="text-primary text-2xl mb-4">Logs</h1>
-        <div className="bg-gray-100 p-4 rounded">
-          {logs.length > 0 ? (
-            logs.map((log, index) => (
-              <p key={index} className="text-primary">
-                {log}
-              </p>
-            ))
-          ) : (
-            <p className="text-secondary">No logs received yet...</p>
-          )}
-        </div>
-      </main>
-    </DockviewPanelLayout>
+    <main className="p-4">
+      <h1 className="text-primary text-2xl mb-4">Logs</h1>
+      <div className="bg-gray-100 p-4 rounded">
+        {logs.length > 0 ? (
+          logs.map((log, index) => (
+            <p key={index} className="text-primary">
+              {log}
+            </p>
+          ))
+        ) : (
+          <p className="text-secondary">No logs received yet...</p>
+        )}
+      </div>
+    </main>
   );
 };
 

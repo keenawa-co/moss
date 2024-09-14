@@ -127,26 +127,24 @@ export const SettingsPage = () => {
   };
 
   return (
-    <DockviewPanelLayout>
-      <main>
-        <div>
-          <h3>{t("selectLanguage")}</h3>
-          <LanguageSelector />
-        </div>
-        <div>
-          <h3>{t("selectTheme")}</h3>
-          <ThemeSelector themes={themes} />
-        </div>
-        <div>
-          <h3>Update Font Size</h3>
-          <input type="number" value={number} onChange={(e) => setNumber(parseInt(e.target.value))} />
-          <button onClick={handleButtonClick}>Update</button>
-        </div>
-        <div>
-          <h3>Font Size</h3>
-          <p>{constantValue}</p>
-        </div>
-      </main>
-    </DockviewPanelLayout>
+    <main>
+      <div>
+        <h3>{t("selectLanguage")}</h3>
+        <LanguageSelector />
+      </div>
+      <div>
+        <h3>{t("selectTheme")}</h3>
+        <ThemeSelector themes={themes} />
+      </div>
+      <div>
+        <h3>Update Font Size</h3>
+        <input type="number" value={number} onChange={(e) => setNumber(parseInt(e.target.value))} />
+        <button onClick={handleButtonClick}>Update</button>
+      </div>
+      <div>
+        <h3>Font Size</h3>
+        <p>{constantValue}</p>
+      </div>
+    </main>
   );
 };

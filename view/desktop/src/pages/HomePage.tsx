@@ -93,7 +93,7 @@ export const HomePage = () => {
   const { t } = useTranslation(["ns1", "ns2"]);
 
   return (
-    <DockviewPanelLayout>
+    <div>
       <h1 className="text-primary">{t("title")}</h1>
 
       <div>
@@ -128,6 +128,6 @@ export const HomePage = () => {
         ))}
         <div> last element</div>
       </div>
-    </DockviewPanelLayout>
+    </div>
   );
 };

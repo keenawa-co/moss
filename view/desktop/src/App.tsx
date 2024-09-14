@@ -9,12 +9,21 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { twMerge } from "tailwind-merge";
 import { Resizable, ResizablePanel } from "./components/Resizable";
-
-import * as PagesComponents from "./pages/index";
+import {
+  addIncrementor,
+  addDecrementor,
+  addWatcher,
+  addLogsPage,
+  addHomePage,
+  addSettingsPage,
+} from "./features/widgets/widgetsSlice";
+import { useAppDispatch } from "./app/store";
 import { cn } from "./utils";
-import LuminoLayoutTest from "./components/LuminoLayout";
-import DockPanel from "./components/LuminoLayout";
-import FlexLayout from "./components/FlexLayout";
+
+import FlexLayoutTest from "./components/FlexLayout";
+import Lumino from "./features/widgets/Lumino";
+import { Provider } from "react-redux";
+import { store } from "./app/store";
 
 const handleFetchAllThemes = async () => {
   try {
@@ -120,38 +129,7 @@ function App() {
   useEffect(() => {
     if (!selectedTheme) console.error("Failed to initialize theme");
   }, [selectedTheme]);
-  const layout: any = {
-    main: {
-      type: "split-area",
-      orientation: "vertical",
-      children: [
-        {
-          type: "split-area",
-          orientation: "horizontal",
-          children: [
-            {
-              type: "tab-area",
-              widgets: ["yellow"],
-              currentIndex: 0,
-            },
-            {
-              type: "tab-area",
-              widgets: ["blue"],
-              currentIndex: 0,
-            },
-          ],
-          sizes: [0.5, 0.5],
-        },
-        {
-          type: "tab-area",
-          widgets: ["red"],
-          currentIndex: 0,
-        },
-      ],
-      sizes: [0.5, 0.5],
-    },
-  };
-
+  const dispatch = useAppDispatch();
   return (
     <>
       {!selectedTheme ? (
@@ -178,7 +156,7 @@ function App() {
                     />
                   </MenuItem>
 
-                  <MenuItem className="group">
+                  <MenuItem className="group" onClick={() => dispatch(addHomePage())}>
                     <Icon icon="Home1" className={twMerge(IconState.Default, IconState.Hover, "min-w-4")} />
                     <IconTitle className="text-primary text-sm" title="Home" />
                   </MenuItem>
@@ -198,7 +176,7 @@ function App() {
                     <IconTitle className="text-primary text-sm" title="Goals" />
                   </MenuItem>
 
-                  <MenuItem className="group">
+                  <MenuItem className="group" onClick={() => dispatch(addLogsPage())}>
                     <Icon icon="Reports" className={twMerge(IconState.Default, IconState.Hover, "min-w-4")} />
                     <IconTitle className="text-primary text-sm" title="Logs" />
                   </MenuItem>
@@ -211,7 +189,7 @@ function App() {
                     />
                   </MenuItem>
 
-                  <MenuItem className="group">
+                  <MenuItem className="group" onClick={() => dispatch(addSettingsPage())}>
                     <Icon icon="Settings" className={twMerge(IconState.Default, IconState.Hover, "min-w-4")} />
                     <IconTitle className="text-primary text-sm" title="Settings" />
                   </MenuItem>
@@ -223,13 +201,9 @@ function App() {
                 </Sidebar>
               </ResizablePanel>
               <ResizablePanel>
-                <Content className="content relative flex flex-col overflow-auto h-full">
-                  {/* <DockPanel onLayoutChange={console.log} layout={layout}>
-                    <div key="yellow" title="Yellow Title" className="yellow"></div>
-                    <div key="red" title="Red Title" className="red"></div>
-                    <div key="blue" className="blue"></div>
-                  </DockPanel> */}
-                  <FlexLayout />
+                <Content className="content relative flex flex-col overflow-auto h-full w-full">
+                  {/* <FlexLayoutTest /> */}
+                  <Lumino />
                 </Content>
               </ResizablePanel>
             </Resizable>
