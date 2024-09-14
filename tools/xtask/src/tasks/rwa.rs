@@ -1,8 +1,9 @@
-use std::collections::HashMap;
-use std::fs;
+use smol::fs;
+use std::{collections::HashMap, io};
 
 use anyhow::Result;
 use clap::Parser;
+use serde::Deserialize;
 use toml::Value;
 
 use tracing::{error, info, warn};
@@ -12,12 +13,24 @@ use cargo_metadata::Metadata;
 #[derive(Parser)]
 pub struct RwaArgs {}
 
-pub fn run_rwa(_args: RwaArgs, workspace: Metadata) -> Result<()> {
-    let ignored_deps = load_ignored_dependencies("config.toml")?;
+#[derive(Deserialize, Default)]
+struct ConfigFile {
+    #[serde(default)]
+    rwa: Rwa,
+}
+
+#[derive(Deserialize, Default)]
+struct Rwa {
+    #[serde(default)]
+    ignore: HashMap<String, Vec<String>>,
+}
+
+pub async fn run_rwa(_args: RwaArgs, workspace: Metadata) -> Result<()> {
+    let ignored_deps = load_ignored_dependencies("config.toml").await?;
 
     for package in workspace.workspace_packages() {
         info!("analyzing '{}'...", package.name);
-        let cargo_toml_content = fs::read_to_string(&package.manifest_path)?;
+        let cargo_toml_content = fs::read_to_string(&package.manifest_path).await?;
         let cargo_toml: Value = toml::from_str(&cargo_toml_content)?;
 
         if let Some(dependencies) = cargo_toml.get("dependencies").and_then(|d| d.as_table()) {
@@ -51,28 +64,13 @@ pub fn run_rwa(_args: RwaArgs, workspace: Metadata) -> Result<()> {
 fn load_ignored_dependencies(config_path: &str) -> Result<HashMap<String, Vec<String>>> {
     let config_content = match fs::read_to_string(config_path) {
         Ok(content) => content,
-        Err(e) if e.kind() == std::io::ErrorKind::NotFound => {
-            warn!("config file not found, continue without ignored dependencies");
+        Err(e) if e.kind() == io::ErrorKind::NotFound => {
+            warn!("Config file not found, continuing without ignored dependencies.");
             return Ok(HashMap::new());
         }
-        Err(e) => return Err(e.into()),
+        Err(e) => return Err(Box::new(e)),
     };
-    let config: Value = toml::from_str(&config_content)?;
 
-    let mut ignored_deps = HashMap::new();
-    if let Some(rwa_ignore) = config.get("rwa").and_then(|rwa| rwa.get("ignore")) {
-        if let Some(table) = rwa_ignore.as_table() {
-            for (crate_name, deps) in table {
-                if let Some(deps_array) = deps.as_array() {
-                    let deps_vec: Vec<String> = deps_array
-                        .iter()
-                        .filter_map(|v| v.as_str().map(String::from))
-                        .collect();
-                    ignored_deps.insert(crate_name.clone(), deps_vec);
-                }
-            }
-        }
-    }
-
-    Ok(ignored_deps)
+    let config: ConfigFile = toml::from_str(&config_content)?;
+    Ok(config.rwa.ignore)
 }

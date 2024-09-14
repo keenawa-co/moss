@@ -22,7 +22,8 @@ enum CliCommand {
     Rwa(tasks::rwa::RwaArgs),
 }
 
-fn main() -> Result<()> {
+#[tokio::main]
+async fn main() -> Result<()> {
     let args = Args::parse();
 
     let subscriber = FmtSubscriber::builder()
@@ -33,7 +34,7 @@ fn main() -> Result<()> {
     let workspace = load_workspace()?;
 
     match args.command {
-        CliCommand::License(args) => tasks::license::run_license(args, workspace),
-        CliCommand::Rwa(args) => tasks::rwa::run_rwa(args, workspace),
+        CliCommand::License(args) => tasks::license::run_license(args, workspace).await,
+        CliCommand::Rwa(args) => tasks::rwa::run_rwa(args, workspace).await,
     }
 }
