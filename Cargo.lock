@@ -4093,6 +4093,7 @@ dependencies = [
  "parking_lot",
  "platform_core",
  "slotmap",
+ "smallvec",
 ]
 
 [[package]]
