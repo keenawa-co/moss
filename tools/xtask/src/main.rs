@@ -19,7 +19,7 @@ struct Args {
 #[derive(Subcommand)]
 enum CliCommand {
     License(tasks::license::LicenseArgs),
-    Rwa(tasks::rwa::RwaArgs),
+    Rwa(tasks::rwa::WorkspaceAuditCommandArgs),
 }
 
 #[tokio::main]

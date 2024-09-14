@@ -1,7 +1,7 @@
 use smol::fs;
 use std::{collections::HashMap, io};
 
-use anyhow::Result;
+use anyhow::{anyhow, Result};
 use clap::Parser;
 use serde::Deserialize;
 use toml::Value;
@@ -11,21 +11,22 @@ use tracing::{error, info, warn};
 use cargo_metadata::Metadata;
 
 #[derive(Parser)]
-pub struct RwaArgs {}
+pub struct WorkspaceAuditCommandArgs {}
 
 #[derive(Deserialize, Default)]
 struct ConfigFile {
     #[serde(default)]
-    rwa: Rwa,
+    rust_workspace_audit: RustWorkspaceAuditBlock,
 }
 
 #[derive(Deserialize, Default)]
-struct Rwa {
+struct RustWorkspaceAuditBlock {
     #[serde(default)]
     ignore: HashMap<String, Vec<String>>,
 }
 
-pub async fn run_rwa(_args: RwaArgs, workspace: Metadata) -> Result<()> {
+pub async fn run_rwa(_args: WorkspaceAuditCommandArgs, workspace: Metadata) -> Result<()> {
+    // FIXME:
     let ignored_deps = load_ignored_dependencies("config.toml").await?;
 
     for package in workspace.workspace_packages() {
@@ -35,7 +36,9 @@ pub async fn run_rwa(_args: RwaArgs, workspace: Metadata) -> Result<()> {
 
         if let Some(dependencies) = cargo_toml.get("dependencies").and_then(|d| d.as_table()) {
             for (dep_name, dep_value) in dependencies {
-                if let Some(ignored_list) = ignored_deps.get(&package.name) {
+                if let Some(ignored_list) =
+                    ignored_deps.rust_workspace_audit.ignore.get(&package.name)
+                {
                     if ignored_list.contains(&dep_name) {
                         info!("ignoring {} dependency in '{}'", dep_name, package.name);
                         continue;
@@ -61,16 +64,15 @@ pub async fn run_rwa(_args: RwaArgs, workspace: Metadata) -> Result<()> {
     Ok(())
 }
 
-fn load_ignored_dependencies(config_path: &str) -> Result<HashMap<String, Vec<String>>> {
-    let config_content = match fs::read_to_string(config_path) {
+async fn load_ignored_dependencies(config_path: &str) -> Result<ConfigFile> {
+    let content_str = match smol::fs::read_to_string(config_path).await {
         Ok(content) => content,
         Err(e) if e.kind() == io::ErrorKind::NotFound => {
             warn!("Config file not found, continuing without ignored dependencies.");
-            return Ok(HashMap::new());
+            return Err(anyhow!("File {config_path} is not wound"));
         }
-        Err(e) => return Err(Box::new(e)),
+        Err(e) => return Err(anyhow!(e)),
     };
 
-    let config: ConfigFile = toml::from_str(&config_content)?;
-    Ok(config.rwa.ignore)
+    Ok(toml::from_str(&content_str)?)
 }

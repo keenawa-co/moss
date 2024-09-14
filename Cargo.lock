@@ -7854,6 +7854,7 @@ dependencies = [
  "anyhow",
  "cargo_metadata",
  "clap",
+ "futures",
  "pathdiff",
  "serde",
  "smol",
