@@ -35,6 +35,6 @@ async fn main() -> Result<()> {
 
     match args.command {
         CliCommand::License(args) => tasks::license::run_license(args, workspace).await,
-        CliCommand::Rwa(args) => tasks::rwa::run_rwa(args, workspace).await,
+        CliCommand::Rwa(args) => tasks::rwa::check_dependencies_job(args, workspace).await,
     }
 }

@@ -1,5 +1,5 @@
 use smol::fs;
-use std::{collections::HashMap, io};
+use std::{collections::HashMap, future::Future, io};
 
 use anyhow::{anyhow, Result};
 use clap::Parser;
@@ -25,7 +25,46 @@ struct RustWorkspaceAuditBlock {
     ignore: HashMap<String, Vec<String>>,
 }
 
-pub async fn run_rwa(_args: WorkspaceAuditCommandArgs, workspace: Metadata) -> Result<()> {
+// pub type ProviderJobCallback = dyn FnOnce() -> (dyn Future<Output = Result<()>> Send + 'static);
+
+pub(crate) struct RustWorkspaceAuditProvider {
+    metadata: Metadata,
+    jobs: Vec<Box<dyn Future<Output = Result<()>> + Send + 'static>>,
+}
+
+impl RustWorkspaceAuditProvider {
+    pub fn new(metadata: Metadata) -> Self {
+        Self {
+            metadata,
+            jobs: vec![],
+        }
+    }
+
+    pub async fn run(&self) -> Result<()> {
+        // 1. vec of tasks
+
+        // let tasks = self.jobs.into_iter().map(|job| {
+        //     // tokio::task::spawn(job)
+        // }).collect::Vec<_>();
+
+        // 2. wait for all tasks and handle result
+
+        // for result in join_all(tasks).await {
+        //     result.map_err(|err| anyhow!(err))??;
+        // }
+
+        unimplemented!()
+    }
+
+    pub fn insert_job(&mut self, job: impl Future<Output = Result<()>> + Send + 'static) {
+        self.jobs.push(Box::new(job))
+    }
+}
+
+pub async fn check_dependencies_job(
+    _args: WorkspaceAuditCommandArgs,
+    workspace: Metadata,
+) -> Result<()> {
     // FIXME:
     let ignored_deps = load_ignored_dependencies("config.toml").await?;
 
