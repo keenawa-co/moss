@@ -7,7 +7,11 @@ use workbench_tgui::window::{NativePlatformInfo, NativeWindowConfiguration};
 
 fn main() -> ExitCode {
     // TODO: remove after the testing is done
-    let mut pl_log_service = platform_log::log_service::create_service();
+    let mut pl_log_service = match platform_log::log_service::create_service() {
+        Ok(logger) => logger,
+        Err(error) => panic!("Error when creating log service: {error:?}"),
+    };
+
     pl_log_service.trace("Trace msg!");
     pl_log_service.debug("Debug msg!");
     pl_log_service.info("Info msg!");

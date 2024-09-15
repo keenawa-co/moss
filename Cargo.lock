@@ -4121,6 +4121,7 @@ dependencies = [
 name = "platform_log"
 version = "0.1.0"
 dependencies = [
+ "chrono",
  "tracing",
  "tracing-subscriber",
 ]
