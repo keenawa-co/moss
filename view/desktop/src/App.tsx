@@ -1,7 +1,7 @@
 import { commands } from "@/bindings";
 import { Content, RootLayout, Sidebar } from "@/components";
 import "@/i18n";
-import { Convert, Theme } from "@repo/theme";
+
 import { Icon, IconTitle, MenuItem, ThemeProvider } from "@repo/ui";
 import "@repo/ui/src/fonts.css";
 
@@ -9,21 +9,13 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { twMerge } from "tailwind-merge";
 import { Resizable, ResizablePanel } from "./components/Resizable";
-import {
-  addIncrementor,
-  addDecrementor,
-  addWatcher,
-  addLogsPage,
-  addHomePage,
-  addSettingsPage,
-} from "./features/widgets/widgetsSlice";
-import { useAppDispatch } from "./app/store";
+
 import { cn } from "./utils";
 
-import FlexLayoutTest from "./components/FlexLayout";
-import Lumino from "./features/widgets/Lumino";
-import { Provider } from "react-redux";
-import { store } from "./app/store";
+import { Convert } from "@repo/theme";
+import { Theme } from "@repo/theme";
+
+import RCDock from "./components/RCdock";
 
 const handleFetchAllThemes = async () => {
   try {
@@ -129,7 +121,7 @@ function App() {
   useEffect(() => {
     if (!selectedTheme) console.error("Failed to initialize theme");
   }, [selectedTheme]);
-  const dispatch = useAppDispatch();
+
   return (
     <>
       {!selectedTheme ? (
@@ -156,7 +148,7 @@ function App() {
                     />
                   </MenuItem>
 
-                  <MenuItem className="group" onClick={() => dispatch(addHomePage())}>
+                  <MenuItem className="group" onClick={() => onAddTab("HomePage")}>
                     <Icon icon="Home1" className={twMerge(IconState.Default, IconState.Hover, "min-w-4")} />
                     <IconTitle className="text-primary text-sm" title="Home" />
                   </MenuItem>
@@ -176,7 +168,7 @@ function App() {
                     <IconTitle className="text-primary text-sm" title="Goals" />
                   </MenuItem>
 
-                  <MenuItem className="group" onClick={() => dispatch(addLogsPage())}>
+                  <MenuItem className="group" onClick={() => onAddTab("LogsPage")}>
                     <Icon icon="Reports" className={twMerge(IconState.Default, IconState.Hover, "min-w-4")} />
                     <IconTitle className="text-primary text-sm" title="Logs" />
                   </MenuItem>
@@ -189,7 +181,7 @@ function App() {
                     />
                   </MenuItem>
 
-                  <MenuItem className="group" onClick={() => dispatch(addSettingsPage())}>
+                  <MenuItem className="group" onClick={() => onAddTab("SettingsPage")}>
                     <Icon icon="Settings" className={twMerge(IconState.Default, IconState.Hover, "min-w-4")} />
                     <IconTitle className="text-primary text-sm" title="Settings" />
                   </MenuItem>
@@ -202,8 +194,8 @@ function App() {
               </ResizablePanel>
               <ResizablePanel>
                 <Content className="content relative flex flex-col overflow-auto h-full w-full">
-                  {/* <FlexLayoutTest /> */}
-                  <Lumino />
+                  {/* <Lumino /> */}
+                  <RCDock />
                 </Content>
               </ResizablePanel>
             </Resizable>
@@ -213,4 +205,5 @@ function App() {
     </>
   );
 }
+
 export default App;
