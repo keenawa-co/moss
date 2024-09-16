@@ -12,7 +12,10 @@ use tracing::{error, info, warn};
 use cargo_metadata::{Metadata, Package};
 
 #[derive(Parser)]
-pub struct WorkspaceAuditCommandArgs {}
+pub struct WorkspaceAuditCommandArgs {
+    #[clap(long, default_value = "config.toml")]
+    config_file: String,
+}
 
 #[derive(Deserialize, Default)]
 struct ConfigFile {
@@ -66,8 +69,7 @@ pub async fn check_dependencies_job(
     _args: WorkspaceAuditCommandArgs,
     workspace: Metadata,
 ) -> Result<()> {
-    // FIXME:
-    let ignored_deps = Arc::new(load_ignored_dependencies("config.toml").await?);
+    let ignored_deps = Arc::new(load_ignored_dependencies(&_args.config_file).await?);
 
     let tasks = workspace
         .packages
