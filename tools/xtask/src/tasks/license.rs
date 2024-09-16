@@ -65,11 +65,11 @@ async fn handle_package_license(
             let target = fs::read_link(&symlink_path).await?;
             if target != root_license_path {
                 info!("updating symlink for '{}'", package.name);
-                update_symlink(&symlink_path, &root_license_path).await?;
+                handle_update_symlink(&symlink_path, &root_license_path).await?;
             }
         } else {
             info!("replacing file with symlink for '{}'", package.name);
-            update_symlink(&symlink_path, &root_license_path).await?;
+            handle_update_symlink(&symlink_path, &root_license_path).await?;
         }
     } else {
         info!("creating license symlink for '{}'", package.name);
@@ -82,7 +82,7 @@ async fn handle_package_license(
     Ok(())
 }
 
-async fn update_symlink(
+async fn handle_update_symlink(
     symlink_path: &PathBuf,
     root_license_path: &PathBuf,
 ) -> Result<(), anyhow::Error> {

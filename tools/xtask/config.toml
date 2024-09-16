@@ -1,2 +1,2 @@
-[rwa.ignore]
+[rust_workspace_audit.ignore]
 desktop = ["tauri-plugin-shell", "tauri-plugin-os", "tauri-specta", "tauri-plugin-fs"]
