@@ -1,10 +1,13 @@
+mod metadata;
 mod tasks;
-mod workspace;
+
+use std::ptr::metadata;
 
 use anyhow::Result;
 use clap::{Parser, Subcommand};
+use tasks::rwa::{check_dependencies_job, RustWorkspaceAuditProvider};
 
-use crate::workspace::load_workspace;
+use crate::metadata::load_cargo_metadata;
 
 use tracing::Level;
 use tracing_subscriber::FmtSubscriber;
@@ -29,15 +32,18 @@ enum CliCommand {
 async fn main() -> Result<()> {
     let args = Args::parse();
 
+    let rws_provider =
+        RustWorkspaceAuditProvider::new(vec![Box::new(check_dependencies_job(args, metadata))]);
+
     let subscriber = FmtSubscriber::builder()
         .with_max_level(Level::TRACE)
         .finish();
     tracing::subscriber::set_global_default(subscriber).expect("setting default subscriber failed");
 
-    let workspace = load_workspace()?;
+    let metadata = load_cargo_metadata()?;
 
     match args.command {
-        CliCommand::License(args) => tasks::license::run_license(args, workspace).await,
-        CliCommand::Rwa(args) => tasks::rwa::check_dependencies_job(args, workspace).await,
+        CliCommand::License(args) => tasks::license::run_license(args, metadata).await,
+        CliCommand::Rwa(args) => tasks::rwa::check_dependencies_job(args, metadata).await,
     }
 }

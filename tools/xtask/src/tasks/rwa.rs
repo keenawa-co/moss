@@ -47,17 +47,15 @@ impl RustWorkspaceAuditProvider {
     pub async fn run(&self) -> Result<()> {
         // 1. vec of tasks
 
-        // let tasks = self.jobs.into_iter().map(|job| {
-        //     // tokio::task::spawn(job)
-        // }).collect::Vec<_>();
+        let tasks = self.jobs.into_iter().map(|job| {
+            tokio::task::spawn(job)
+        }).collect::Vec<_>();
 
         // 2. wait for all tasks and handle result
 
-        // for result in join_all(tasks).await {
-        //     result.map_err(|err| anyhow!(err))??;
-        // }
-
-        unimplemented!()
+        for result in join_all(tasks).await {
+             result.map_err(|err| anyhow!(err))??;
+        }
     }
 
     pub fn insert_job(&mut self, job: impl Future<Output = Result<()>> + Send + 'static) {
@@ -67,14 +65,14 @@ impl RustWorkspaceAuditProvider {
 
 pub async fn check_dependencies_job(
     _args: WorkspaceAuditCommandArgs,
-    workspace: Metadata,
+    metadata: Metadata,
 ) -> Result<()> {
     let ignored_deps = Arc::new(load_ignored_dependencies(&_args.config_file).await?);
 
-    let tasks = workspace
+    let tasks = metadata
         .packages
         .into_iter()
-        .filter(|p| workspace.workspace_members.contains(&p.id))
+        .filter(|p| metadata.workspace_members.contains(&p.id))
         .map(|package| {
             let ignored_deps = ignored_deps.clone();
             tokio::task::spawn(async move {

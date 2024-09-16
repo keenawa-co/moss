@@ -12,16 +12,16 @@ use cargo_metadata::{Metadata, Package};
 #[derive(Parser)]
 pub struct LicenseArgs {}
 
-pub async fn run_license(_args: LicenseArgs, workspace: Metadata) -> Result<()> {
+pub async fn run_license(_args: LicenseArgs, metadata: Metadata) -> Result<()> {
     const LICENSE_FILES: &[&str] = &["LICENSE-MIT"];
-    let default_license = workspace.workspace_root.join(LICENSE_FILES[0]);
+    let default_license = metadata.workspace_root.join(LICENSE_FILES[0]);
 
-    let tasks = workspace
+    let tasks = metadata
         .packages
         .into_iter()
-        .filter(|p| workspace.workspace_members.contains(&p.id))
+        .filter(|p| metadata.workspace_members.contains(&p.id))
         .map(|package| {
-            let workspace_root_clone = workspace.workspace_root.clone();
+            let workspace_root_clone = metadata.workspace_root.clone();
             let default_license_clone = default_license.clone();
             tokio::task::spawn(async move {
                 handle_package_license(
