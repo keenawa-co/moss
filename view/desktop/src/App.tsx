@@ -1,21 +1,17 @@
 import { commands } from "@/bindings";
 import { Content, RootLayout, Sidebar } from "@/components";
 import "@/i18n";
-
+import { Convert, Theme } from "@repo/theme";
 import { Icon, IconTitle, MenuItem, ThemeProvider } from "@repo/ui";
 import "@repo/ui/src/fonts.css";
-
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { twMerge } from "tailwind-merge";
+import RCDock from "./components/RCDock/RCdock";
 import { Resizable, ResizablePanel } from "./components/Resizable";
-
 import { cn } from "./utils";
 
-import { Convert } from "@repo/theme";
-import { Theme } from "@repo/theme";
-
-import RCDock from "./components/RCdock";
+import * as Pages from "./pages";
 
 const handleFetchAllThemes = async () => {
   try {
@@ -121,6 +117,8 @@ function App() {
   useEffect(() => {
     if (!selectedTheme) console.error("Failed to initialize theme");
   }, [selectedTheme]);
+
+  const onAddTab = (Page: keyof typeof Pages) => {};
 
   return (
     <>
