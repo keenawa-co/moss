@@ -1,7 +1,7 @@
 use smol::fs;
-use std::{collections::HashMap, env::consts::ARCH, future::Future, io, sync::Arc};
+use std::{collections::HashMap, future::Future, io, sync::Arc};
 
-use anyhow::{anyhow, Result};
+use anyhow::Result;
 use clap::Parser;
 use futures::future::join_all;
 use serde::Deserialize;
@@ -77,16 +77,40 @@ pub async fn check_dependencies_job(
             let ignored_deps = ignored_deps.clone();
             tokio::task::spawn(async move {
                 info!("analyzing '{}'...", package.name);
-                let cargo_toml_content = fs::read_to_string(&package.manifest_path).await;
-                let cargo_toml: Value = toml::from_str(&cargo_toml_content)?;
-                handle_package_dependencies(cargo_toml, &ignored_deps, package).await
+
+                let cargo_toml_content = match fs::read_to_string(&package.manifest_path).await {
+                    Ok(content) => content,
+                    Err(e) => {
+                        return Err(anyhow!(
+                            "Failed to read manifest file for {}: {}",
+                            package.manifest_path,
+                            e
+                        ));
+                    }
+                };
+
+                let cargo_toml = match toml::from_str(&cargo_toml_content) {
+                    Ok(value) => value,
+                    Err(e) => {
+                        return Err(anyhow!(
+                            "Failed to parse TOML file for {}: {}",
+                            package.manifest_path,
+                            e
+                        ));
+                    }
+                };
+
+                handle_package_dependencies(cargo_toml, &ignored_deps, package).await;
+
+                Ok(())
             })
         })
         .collect::<Vec<_>>();
 
     for result in join_all(tasks).await {
-        result.map_err(|err| anyhow!(err))??;
+        result.map_err(|err| anyhow!(err))??; // TODO: handle and add error!();
     }
+
     Ok(())
 }
 

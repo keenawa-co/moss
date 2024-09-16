@@ -9,6 +9,9 @@ use crate::workspace::load_workspace;
 use tracing::Level;
 use tracing_subscriber::FmtSubscriber;
 
+#[macro_use]
+extern crate anyhow;
+
 #[derive(Parser)]
 #[command(name = "cargo xtask")]
 struct Args {
