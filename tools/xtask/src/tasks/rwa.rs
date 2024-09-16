@@ -108,7 +108,11 @@ pub async fn check_dependencies_job(
         .collect::<Vec<_>>();
 
     for result in join_all(tasks).await {
-        result.map_err(|err| anyhow!(err))??; // TODO: handle and add error!();
+        match result {
+            Ok(Ok(())) => {}
+            Ok(Err(e)) => error!("Error processing package: {}", e),
+            Err(e) => error!("Task panicked: {}", e),
+        }
     }
 
     Ok(())

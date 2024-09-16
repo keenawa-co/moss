@@ -53,13 +53,13 @@ async fn handle_package_license(
         .ok_or_else(|| anyhow!("no crate directory for '{}'", package.name))?;
 
     if let Some((symlink_path, license_index)) =
-        get_first_license_symlink_path(crate_path, license_files)
+        get_first_license_symlink_path(crate_path, license_files).await
     {
         let root_license_path = pathdiff::diff_paths(
             workspace_root.join(license_files[license_index]),
             crate_path,
         )
-        .expect("failed to create relative path for root license");
+        .ok_or_else(|| anyhow!("Failed to create relative path for root license"))?;
 
         if symlink_path.is_symlink() {
             let target = fs::read_link(&symlink_path).await?;
@@ -81,7 +81,6 @@ async fn handle_package_license(
 
     Ok(())
 }
-
 async fn handle_update_symlink(
     symlink_path: &PathBuf,
     root_license_path: &PathBuf,
@@ -91,15 +90,19 @@ async fn handle_update_symlink(
     Ok(())
 }
 
-fn get_first_license_symlink_path(
+async fn get_first_license_symlink_path(
     crate_path: impl AsRef<Path>,
     license_files: &[&str],
 ) -> Option<(PathBuf, usize)> {
-    for (index, license_file) in license_files.iter().enumerate() {
-        let path_to_license = crate_path.as_ref().join(license_file);
+    let crate_path = crate_path.as_ref();
+    for (index, &license_file) in license_files.iter().enumerate() {
+        let path_to_license = crate_path.join(license_file);
         info!("analyzing '{}'...", path_to_license.display());
-        if path_to_license.exists() || std::fs::read_link(&path_to_license).is_ok() {
-            return Some((path_to_license, index));
+        match fs::symlink_metadata(&path_to_license).await {
+            Ok(metadata) if metadata.is_file() || metadata.file_type().is_symlink() => {
+                return Some((path_to_license, index));
+            }
+            _ => continue,
         }
     }
     None
