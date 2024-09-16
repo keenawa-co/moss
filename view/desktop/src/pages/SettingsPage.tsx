@@ -1,6 +1,5 @@
 import { commands } from "@/bindings";
 import { LanguageSelector, ThemeSelector } from "@/components";
-import { DockviewPanelLayout } from "@/components";
 import { Convert, Theme } from "@repo/theme";
 import { listen } from "@tauri-apps/api/event";
 import { useEffect, useState } from "react";

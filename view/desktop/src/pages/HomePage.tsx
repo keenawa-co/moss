@@ -1,5 +1,4 @@
 import { commands, SessionInfoDTO } from "@/bindings";
-import { DockviewPanelLayout } from "@/components";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -91,6 +90,13 @@ const SessionComponent = () => {
 
 export const HomePage = () => {
   const { t } = useTranslation(["ns1", "ns2"]);
+
+  useEffect(() => {
+    console.log("Home page loaded");
+    return () => {
+      console.log("Home page unloaded");
+    };
+  }, []);
 
   return (
     <div>
