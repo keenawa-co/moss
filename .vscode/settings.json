@@ -1,14 +1,12 @@
 {
   "rust-analyzer.showUnlinkedFileNotification": false,
   "cSpell.words": [
-    "Activegroup",
     "ahash",
     "autodocs",
     "bindgen",
     "canonicalize",
     "chrono",
     "Deque",
-    "Dockview",
     "Downcaster",
     "filetree",
     "hashbrown",
@@ -22,7 +20,6 @@
     "Lato",
     "libc",
     "lucide",
-    "Lumino",
     "mimalloc",
     "mossland",
     "mossql",
@@ -56,7 +53,6 @@
     "unparker",
     "unsync",
     "unwatch",
-    "Visiblepanel",
     "worktree"
   ],
   "todohighlight.keywords": [
