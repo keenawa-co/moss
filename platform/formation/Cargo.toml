@@ -18,3 +18,5 @@ anyhow.workspace = true
 
 flume.workspace = true
 async-task.workspace = true
+im.workspace = true
+dyn-clone = "1.0.17"

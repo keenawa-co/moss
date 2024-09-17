@@ -10,3 +10,4 @@ radix_trie.workspace = true
 dunce.workspace = true
 async-trait.workspace = true
 rustc-hash.workspace = true
+im.workspace = true

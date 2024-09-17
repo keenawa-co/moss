@@ -3,7 +3,7 @@ use std::sync::Arc;
 use hashbrown::{HashMap, HashSet};
 use lazy_regex::Regex as LazyRegex;
 use moss_std::collection::extend::MaybeExtend;
-use platform_core::global::Global;
+// use platform_core::global::Global;
 use serde_json::Value;
 
 type Regex = LazyRegex;
@@ -528,7 +528,7 @@ pub struct ConfigurationRegistry {
     excluded_properties: HashMap<String, RegisteredConfigurationPropertySchema>,
 }
 
-impl Global for ConfigurationRegistry {}
+// impl Global for ConfigurationRegistry {}
 
 impl<'a> ConfigurationRegistry {
     pub fn new() -> Self {

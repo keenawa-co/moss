@@ -281,13 +281,6 @@ impl Context {
         )
     }
 
-    pub(crate) fn new_observer(&mut self, key: EntityId, value: Handler) -> Subscription {
-        let (subscription, activate) = self.observers.insert(key, value);
-        self.defer(move |_| activate());
-
-        subscription
-    }
-
     pub fn observe<W, E>(
         &mut self,
         entity: &E,
@@ -324,6 +317,13 @@ impl Context {
                 }
             }),
         )
+    }
+
+    pub(crate) fn new_observer(&mut self, key: EntityId, value: Handler) -> Subscription {
+        let (subscription, activate) = self.observers.insert(key, value);
+        self.defer(move |_| activate());
+
+        subscription
     }
 
     pub(crate) fn update<R>(&mut self, update: impl FnOnce(&mut Context) -> R) -> R {
