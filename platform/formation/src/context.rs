@@ -129,7 +129,7 @@ pub trait AnyContext {
 
     fn update_atom<T, R>(
         &mut self,
-        handle: &Atom<T>,
+        atom: &Atom<T>,
         callback: impl FnOnce(&mut T, &mut AtomContext<'_, T>) -> R,
     ) -> Self::Result<R>
     where
@@ -183,7 +183,11 @@ impl AnyContext for Context {
     where
         T: 'static,
     {
-        todo!()
+        self.commit(|ctx| {
+            // let value = ctx.store.tree();
+
+            todo!()
+        })
     }
 
     fn new_selector<T: 'static>(
@@ -242,7 +246,32 @@ impl<'a> AnyContext for TransactionContext<'a> {
     where
         T: 'static,
     {
+        // let mut next_tree = self.store.next_tree.as_mut();
+        // if next_tree.is_none() {
+        //     next_tree = Some(&mut TreeState {
+        //         version: self.store.current_tree.version + 1,
+        //         atom_values: self.store.current_tree.atom_values.clone(),
+        //         dirty_atoms: FxHashSet::default(),
+        //     });
+        // }
+
+        // let mut value = next_tree.unwrap().atom_values.begin_lease(atom);
+        // let result = callback(&mut value, &mut AtomContext::new(self, atom.downgrade()));
+        // next_tree.unwrap().atom_values.end_lease(value);
+
+        // result
+        // let next_tree = if let Some(tree) = &self.store.next_tree {
+        //     tree
+        // } else {
+        //     TreeState {
+        //         version: self.store.current_tree.version + 1,
+        //         atom_values: self.store.current_tree.atom_values.clone(),
+        //         dirty_atoms: FxHashSet::default(),
+        //     }
+        // };
+
         todo!()
+
         // self.dirty_atoms.insert(atom.key());
 
         // let mut lease = self.ctx.store.known_atoms.begin_lease(atom);
@@ -320,13 +349,13 @@ impl<'a> TransactionContext<'a> {
 
 impl Context {
     pub fn commit<'a, R>(&mut self, callback: impl FnOnce(&mut TransactionContext) -> R + 'a) -> R {
-        // Transaction {
-        //     callback: Box::new(callback),
-        //     commit_depth: 0,
-        //     // pending_updates: VecDeque::new(),
-        //     not_send: PhantomData,
-        // }
         let ctx = &mut TransactionContext::new(self);
+        ctx.store.next_tree = Some(TreeState {
+            version: ctx.store.current_tree.version + 1,
+            atom_values: ctx.store.current_tree.atom_values.clone(),
+            dirty_atoms: FxHashSet::default(),
+        });
+
         let result = callback(ctx);
 
         self.swap_tree();
@@ -379,6 +408,10 @@ mod tests {
         fn as_any(&self) -> &dyn Any {
             self
         }
+
+        fn as_any_mut(&mut self) -> &mut dyn Any {
+            self
+        }
     }
 
     #[test]
@@ -388,6 +421,10 @@ mod tests {
         let atom_a = ctx.new_atom(|_| Value { a: 0 });
 
         dbg!(atom_a.read(&mut ctx));
+
+        ctx.update_atom(&atom_a, |this, _| {
+            this.a = 1;
+        });
 
         // ctx.begin()
         //     .exec(|tx_ctx| {

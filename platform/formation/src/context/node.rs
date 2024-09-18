@@ -278,8 +278,8 @@ impl<T: 'static> Atom<T> {
 }
 
 pub(super) struct Lease<'a, T> {
-    entity: Option<Box<dyn Any>>,
     node: &'a Atom<T>,
+    value: Option<Box<dyn AnyNodeValue>>,
     typ: PhantomData<T>,
 }
 
@@ -287,19 +287,29 @@ impl<'a, T: 'static> core::ops::Deref for Lease<'a, T> {
     type Target = T;
 
     fn deref(&self) -> &Self::Target {
-        self.entity.as_ref().unwrap().downcast_ref().unwrap()
+        self.value
+            .as_ref()
+            .unwrap()
+            .as_any()
+            .downcast_ref::<T>()
+            .unwrap()
     }
 }
 
 impl<'a, T: 'static> core::ops::DerefMut for Lease<'a, T> {
     fn deref_mut(&mut self) -> &mut Self::Target {
-        self.entity.as_mut().unwrap().downcast_mut().unwrap()
+        self.value
+            .as_mut()
+            .unwrap()
+            .as_any_mut()
+            .downcast_mut()
+            .unwrap()
     }
 }
 
 impl<'a, T> Drop for Lease<'a, T> {
     fn drop(&mut self) {
-        if self.entity.is_some() && !std::thread::panicking() {
+        if self.value.is_some() && !std::thread::panicking() {
             panic!("Drop node which is in leasing")
         }
     }
@@ -307,6 +317,7 @@ impl<'a, T> Drop for Lease<'a, T> {
 
 pub trait AnyNodeValue: Any + DynClone {
     fn as_any(&self) -> &dyn Any;
+    fn as_any_mut(&mut self) -> &mut dyn Any;
 }
 
 dyn_clone::clone_trait_object!(AnyNodeValue);
@@ -358,27 +369,34 @@ impl AtomMap {
             })
     }
 
-    // pub fn begin_lease<'a, T>(&mut self, node: &'a Atom<T>) -> Lease<'a, T> {
-    //     // TODO: add check for valid context
+    pub fn begin_lease<'a, T: 'static>(&mut self, node: &'a Atom<T>) -> Lease<'a, T> {
+        // TODO: add check for valid context
 
-    //     let entity = Some(self.nodes.remove(node.key).unwrap_or_else(|| {
-    //         panic!(
-    //             "cannot update {} node that is already being updated",
-    //             std::any::type_name::<T>()
-    //         )
-    //     }));
+        // let entity = Some(self.nodes.remove(node.key).unwrap_or_else(|| {
+        // panic!(
+        //     "cannot update {} node that is already being updated",
+        //     std::any::type_name::<T>()
+        // )
+        // }));
 
-    //     Lease {
-    //         entity,
-    //         node,
-    //         typ: PhantomData,
-    //     }
-    // }
+        let value = Some(self.values.remove(&node.key()).unwrap_or_else(|| {
+            panic!(
+                "cannot update {} node that is already being updated",
+                std::any::type_name::<T>()
+            )
+        }));
 
-    // pub fn end_lease<T>(&mut self, mut lease: Lease<T>) {
-    //     self.nodes
-    //         .insert(lease.node.key, lease.entity.take().unwrap());
-    // }
+        Lease {
+            value,
+            node,
+            typ: PhantomData,
+        }
+    }
+
+    pub fn end_lease<T>(&mut self, mut lease: Lease<T>) {
+        self.values
+            .insert(lease.node.key, lease.value.take().unwrap());
+    }
 }
 
 // ---------------
