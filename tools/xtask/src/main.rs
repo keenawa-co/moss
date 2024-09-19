@@ -1,19 +1,20 @@
+mod config;
 mod metadata;
 mod tasks;
 
-use std::ptr::metadata;
-
-use anyhow::Result;
+use anyhow::{Context as _, Result};
 use clap::{Parser, Subcommand};
-use tasks::rwa::{check_dependencies_job, RustWorkspaceAuditProvider};
-
-use crate::metadata::load_cargo_metadata;
-
+use tasks::TaskRunner;
 use tracing::Level;
 use tracing_subscriber::FmtSubscriber;
 
+use crate::metadata::load_cargo_metadata;
+
 #[macro_use]
 extern crate anyhow;
+
+#[macro_use]
+extern crate tracing;
 
 #[derive(Parser)]
 #[command(name = "cargo xtask")]
@@ -24,26 +25,33 @@ struct Args {
 
 #[derive(Subcommand)]
 enum CliCommand {
-    License(tasks::license::LicenseArgs),
-    Rwa(tasks::rwa::WorkspaceAuditCommandArgs),
+    License(tasks::license::LicenseCommandArgs),
+    Rwa(tasks::rust_workspace_audit::RustWorkspaceAuditCommandArgs),
 }
 
 #[tokio::main]
 async fn main() -> Result<()> {
     let args = Args::parse();
 
-    let rws_provider =
-        RustWorkspaceAuditProvider::new(vec![Box::new(check_dependencies_job(args, metadata))]);
-
     let subscriber = FmtSubscriber::builder()
         .with_max_level(Level::TRACE)
         .finish();
-    tracing::subscriber::set_global_default(subscriber).expect("setting default subscriber failed");
+    tracing::subscriber::set_global_default(subscriber)
+        .context("setting default subscriber failed")?;
 
     let metadata = load_cargo_metadata()?;
+    let mut runner = TaskRunner::new();
 
     match args.command {
-        CliCommand::License(args) => tasks::license::run_license(args, metadata).await,
-        CliCommand::Rwa(args) => tasks::rwa::check_dependencies_job(args, metadata).await,
+        CliCommand::License(args) => {
+            runner.spawn_job(tasks::license::run_license(args, metadata));
+            runner.run().await
+        }
+        CliCommand::Rwa(args) => {
+            runner.spawn_job(tasks::rust_workspace_audit::check_dependencies_job(
+                args, metadata,
+            ));
+            runner.run().await
+        }
     }
 }

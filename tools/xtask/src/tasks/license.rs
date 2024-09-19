@@ -1,5 +1,8 @@
 use smol::fs;
-use std::path::{Path, PathBuf};
+use std::{
+    path::{Path, PathBuf},
+    sync::Arc,
+};
 
 use anyhow::{anyhow, Result};
 use clap::Parser;
@@ -9,18 +12,24 @@ use tracing::info;
 
 use cargo_metadata::{Metadata, Package};
 
-#[derive(Parser)]
-pub struct LicenseArgs {}
+use crate::config::ConfigFile;
 
-pub async fn run_license(_args: LicenseArgs, metadata: Metadata) -> Result<()> {
-    const LICENSE_FILES: &[&str] = &["LICENSE-MIT"];
-    let default_license = metadata.workspace_root.join(LICENSE_FILES[0]);
+#[derive(Parser)]
+pub struct LicenseCommandArgs {
+    #[clap(long, default_value = "config.toml")]
+    config_file_path: String,
+}
+
+pub async fn run_license(args: LicenseCommandArgs, metadata: Metadata) -> Result<()> {
+    let config_file = Arc::new(ConfigFile::load(&args.config_file_path).await?);
+    let default_license = metadata.workspace_root.join(&config_file.licenses[0]);
 
     let tasks = metadata
         .packages
         .into_iter()
         .filter(|p| metadata.workspace_members.contains(&p.id))
         .map(|package| {
+            let config_file_clone = Arc::clone(&config_file);
             let workspace_root_clone = metadata.workspace_root.clone();
             let default_license_clone = default_license.clone();
             tokio::task::spawn(async move {
@@ -28,7 +37,7 @@ pub async fn run_license(_args: LicenseArgs, metadata: Metadata) -> Result<()> {
                     package,
                     default_license_clone.into(),
                     workspace_root_clone.into(),
-                    LICENSE_FILES,
+                    &config_file_clone.licenses,
                 )
                 .await
             })
@@ -45,7 +54,7 @@ async fn handle_package_license(
     package: Package,
     default_license: PathBuf,
     workspace_root: PathBuf,
-    license_files: &[&str],
+    license_files: &Vec<String>,
 ) -> Result<()> {
     let crate_path = package
         .manifest_path
@@ -56,7 +65,7 @@ async fn handle_package_license(
         get_first_license_symlink_path(crate_path, license_files).await
     {
         let root_license_path = pathdiff::diff_paths(
-            workspace_root.join(license_files[license_index]),
+            workspace_root.join(&license_files[license_index]),
             crate_path,
         )
         .ok_or_else(|| anyhow!("Failed to create relative path for root license"))?;
@@ -73,7 +82,7 @@ async fn handle_package_license(
         }
     } else {
         info!("creating license symlink for '{}'", package.name);
-        let new_symlink_path = crate_path.join(license_files[0]);
+        let new_symlink_path = crate_path.join(&license_files[0]);
         let default_license_path = pathdiff::diff_paths(default_license, crate_path)
             .ok_or_else(|| anyhow!("failed to create relative path for default license"))?;
         create_symlink(&default_license_path, &new_symlink_path.as_std_path()).await?;
@@ -92,10 +101,10 @@ async fn handle_update_symlink(
 
 async fn get_first_license_symlink_path(
     crate_path: impl AsRef<Path>,
-    license_files: &[&str],
+    license_files: &Vec<String>,
 ) -> Option<(PathBuf, usize)> {
     let crate_path = crate_path.as_ref();
-    for (index, &license_file) in license_files.iter().enumerate() {
+    for (index, license_file) in license_files.iter().enumerate() {
         let path_to_license = crate_path.join(license_file);
         info!("analyzing '{}'...", path_to_license.display());
         match fs::symlink_metadata(&path_to_license).await {

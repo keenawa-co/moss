@@ -1,80 +1,32 @@
-use smol::fs;
-use std::{collections::HashMap, future::Future, io, sync::Arc};
-
 use anyhow::Result;
+use cargo_metadata::{Metadata, Package};
 use clap::Parser;
 use futures::future::join_all;
-use serde::Deserialize;
+use smol::fs;
+use std::{io, sync::Arc};
 use toml::Value;
-
 use tracing::{error, info, warn};
 
-use cargo_metadata::{Metadata, Package};
+use crate::config::ConfigFile;
 
 #[derive(Parser)]
-pub struct WorkspaceAuditCommandArgs {
+pub struct RustWorkspaceAuditCommandArgs {
     #[clap(long, default_value = "config.toml")]
-    config_file: String,
-}
-
-#[derive(Deserialize, Default)]
-struct ConfigFile {
-    #[serde(default)]
-    rust_workspace_audit: RustWorkspaceAuditBlock,
-}
-
-#[derive(Deserialize, Default)]
-struct RustWorkspaceAuditBlock {
-    #[serde(default)]
-    ignore: HashMap<String, Vec<String>>,
-}
-
-// pub type ProviderJobCallback = dyn FnOnce() -> (dyn Future<Output = Result<()>> Send + 'static);
-
-pub(crate) struct RustWorkspaceAuditProvider {
-    metadata: Metadata,
-    jobs: Vec<Box<dyn Future<Output = Result<()>> + Send + 'static>>,
-}
-
-impl RustWorkspaceAuditProvider {
-    pub fn new(metadata: Metadata) -> Self {
-        Self {
-            metadata,
-            jobs: vec![],
-        }
-    }
-
-    pub async fn run(&self) -> Result<()> {
-        // 1. vec of tasks
-
-        let tasks = self.jobs.into_iter().map(|job| {
-            tokio::task::spawn(job)
-        }).collect::Vec<_>();
-
-        // 2. wait for all tasks and handle result
-
-        for result in join_all(tasks).await {
-             result.map_err(|err| anyhow!(err))??;
-        }
-    }
-
-    pub fn insert_job(&mut self, job: impl Future<Output = Result<()>> + Send + 'static) {
-        self.jobs.push(Box::new(job))
-    }
+    config_file_path: String,
 }
 
 pub async fn check_dependencies_job(
-    _args: WorkspaceAuditCommandArgs,
+    args: RustWorkspaceAuditCommandArgs,
     metadata: Metadata,
 ) -> Result<()> {
-    let ignored_deps = Arc::new(load_ignored_dependencies(&_args.config_file).await?);
-
+    let config_file = Arc::new(ConfigFile::load(&args.config_file_path).await?);
     let tasks = metadata
         .packages
         .into_iter()
         .filter(|p| metadata.workspace_members.contains(&p.id))
         .map(|package| {
-            let ignored_deps = ignored_deps.clone();
+            let config_file_clone = Arc::clone(&config_file);
+
             tokio::task::spawn(async move {
                 info!("analyzing '{}'...", package.name);
 
@@ -100,7 +52,7 @@ pub async fn check_dependencies_job(
                     }
                 };
 
-                handle_package_dependencies(cargo_toml, &ignored_deps, package).await;
+                handle_package_dependencies(cargo_toml, &config_file_clone, package).await;
 
                 Ok(())
             })
@@ -147,17 +99,4 @@ async fn handle_package_dependencies(
             }
         }
     }
-}
-
-async fn load_ignored_dependencies(config_path: &str) -> Result<ConfigFile> {
-    let content_str = match smol::fs::read_to_string(config_path).await {
-        Ok(content) => content,
-        Err(e) if e.kind() == io::ErrorKind::NotFound => {
-            warn!("Config file not found, continuing without ignored dependencies.");
-            return Err(anyhow!("File {config_path} is not found"));
-        }
-        Err(e) => return Err(anyhow!(e)),
-    };
-
-    Ok(toml::from_str(&content_str)?)
 }
