@@ -1,21 +1,23 @@
 mod command;
+mod config;
 mod mem;
 mod menu;
 mod service;
 
-use crate::command::{cmd_base, cmd_dummy};
-use anyhow::{Context as ResultContext, Result};
-use platform_core::common::context::{
-    async_context::AsyncContext, entity::Model, AnyContext, Context,
-};
+use anyhow::{Context as _, Result};
+use platform_core::context::async_context::AsyncContext;
+use platform_core::context::Context;
+use platform_core::platform::cross::client::CrossPlatformClient;
 use platform_formation::service_registry::ServiceRegistry;
 use platform_fs::disk::file_system_service::DiskFileSystemService;
 use platform_workspace::WorkspaceId;
 use service::project_service::ProjectService;
 use service::session_service::SessionService;
+use std::cell::RefCell;
 use std::rc::Rc;
 use std::sync::Arc;
 use std::{env, process::ExitCode};
+use surrealdb::engine::remote::ws::Client;
 use surrealdb::{engine::remote::ws::Ws, Surreal};
 use tauri::{App, Emitter, Manager, State};
 use tauri_specta::{collect_commands, collect_events};
@@ -24,6 +26,8 @@ use tracing_subscriber::util::SubscriberInitExt;
 use workbench_service_environment_tgui::environment_service::NativeEnvironmentService;
 use workbench_tgui::window::{NativePlatformInfo, NativeWindowConfiguration};
 use workbench_tgui::Workbench;
+
+use crate::command::{cmd_base, cmd_dummy};
 
 #[macro_use]
 extern crate serde;
@@ -49,97 +53,70 @@ impl MockStorageService {
     }
 }
 
-pub struct AppState<'a> {
-    pub workbench: Model<Workbench<'a>>,
+pub struct AppState {
+    pub workbench: Arc<Workbench>,
     pub platform_info: NativePlatformInfo,
     pub project_service: ProjectService,
     pub session_service: SessionService,
 }
 
 pub struct AppMain {
+    platform_client: Rc<CrossPlatformClient>,
     native_window_configuration: NativeWindowConfiguration,
 }
 
 impl AppMain {
     pub fn new(configuration: NativeWindowConfiguration) -> Self {
         Self {
+            platform_client: Rc::new(CrossPlatformClient::new()),
             native_window_configuration: configuration,
         }
     }
 
-    pub fn run<F>(&self, f: F) -> ExitCode
-    where
-        F: 'static + FnOnce(&Self, Context) -> Result<()>,
-    {
-        let ctx = Context::new();
+    pub fn run(&self) -> ExitCode {
+        let platform_client_clone = self.platform_client.clone();
 
-        if let Err(e) = f(self, ctx) {
-            error!("{}", e);
-            ExitCode::FAILURE
-        } else {
-            ExitCode::SUCCESS
-        }
+        self.platform_client.run(async {
+            let ctx = Context::new(platform_client_clone);
+
+            if let Err(e) = self.open_main_window(ctx).await {
+                error!("{}", e);
+                ExitCode::FAILURE
+            } else {
+                ExitCode::SUCCESS
+            }
+        })
     }
 
-    pub fn open_main_window(&self, ctx: Context) -> Result<()> {
-        // ------ Example stream
-        // TODO:
-        // Used only as an example implementation. Remove this disgrace as soon as possible.
-        let (tx, rx) = tokio::sync::broadcast::channel(16);
-
-        ctx.detach(async move {
-            let mut interval = tokio::time::interval(tokio::time::Duration::from_secs(1));
-            let mut count = 0;
-            loop {
-                interval.tick().await;
-                count += 1;
-                if tx.send(count).is_err() {
-                    break;
-                }
-            }
-        });
-        // ------
-
+    pub async fn open_main_window(&self, ctx: Rc<RefCell<Context>>) -> Result<()> {
         // TODO: move to StorageService
-        let db = ctx.block_on(async {
-            let db = Surreal::new::<Ws>("127.0.0.1:8000")
-                .await
-                .expect("failed to connect to db");
-            // let db = Surreal::new::<File>("../rocksdb").await.unwrap();
-            db.use_ns("moss").use_db("compass").await.unwrap();
+        let db = Arc::new(
+            ctx.as_ref()
+                .borrow()
+                .background_executor()
+                .block_on(init_db_client())?,
+        );
 
-            // let schema = include_str!("../schema.surql");
-            // db.query(schema).await.unwrap();
+        let service_group = self.create_service_registry()?;
 
-            Arc::new(db)
-        });
+        let window_state = service_group
+            .get_unchecked::<MockStorageService>()
+            .get_last_window_state();
 
-        let async_ctx = ctx.to_async();
+        let async_ctx = {
+            let ctx = ctx.as_ref().borrow();
+            ctx.to_async()
+        };
 
-        let app_state = async_ctx.with_mut::<Result<AppState>>(|ctx| {
-            let service_group = self.create_service_registry()?;
+        let workbench = Workbench::new(&async_ctx, service_group, window_state.workspace_id)?;
+        workbench.initialize(&async_ctx)?;
 
-            let window_state = service_group
-                .get_unchecked::<MockStorageService>()
-                .get_last_window_state();
-
-            let mut workbench =
-                Workbench::new(ctx, service_group, window_state.workspace_id).unwrap();
-
-            ctx.block_on(async {
-                workbench
-                    .initialize()
-                    .await
-                    .expect("Failed to initialize the workbench");
-            });
-
-            Ok(AppState {
-                workbench: ctx.new_model(|_ctx| workbench),
-                platform_info: self.native_window_configuration.platform_info.clone(),
-                project_service: ProjectService::new(db.clone()),
-                session_service: SessionService::new(db.clone()),
-            })
-        })?;
+        let app_state = AppState {
+            workbench: Arc::new(workbench),
+            platform_info: self.native_window_configuration.platform_info.clone(),
+            project_service: ProjectService::new(db.clone()),
+            session_service: SessionService::new(db.clone()),
+        };
 
         let builder = tauri_specta::Builder::<tauri::Wry>::new()
             .events(collect_events![])
@@ -157,21 +134,29 @@ impl AppMain {
         #[cfg(debug_assertions)]
         self.export_typescript_bindings(&builder)?;
 
+        async_ctx
+            .spawn_local(|_| async { println!("Hello from awaited spawn!") })
+            .await;
+
+        async_ctx
+            .spawn_local(|_| async { println!("Hello from detached spawn!") })
+            .detach();
+
+        async_ctx.block_on(async { println!("Hello from blocked!") });
+
         Ok(self
-            .initialize_app(async_ctx, app_state, builder, rx)?
+            .initialize_app(async_ctx, app_state, builder)?
             .run(|_, _| {}))
     }
 
     fn initialize_app(
         &self,
-        async_ctx: AsyncContext,
-        app_state: AppState<'static>,
+        ctx: AsyncContext,
+        app_state: AppState,
         builder: tauri_specta::Builder,
-        mut rx: tokio::sync::broadcast::Receiver<i32>,
     ) -> Result<App> {
         let builder = tauri::Builder::default()
-            // .plugin(tauri_plugin_fs::init())
-            .manage(async_ctx)
+            .manage(ctx)
             .manage(app_state)
             .invoke_handler(builder.invoke_handler())
             .setup(move |app: &mut App| {
@@ -181,28 +166,18 @@ impl AppMain {
                 let app_handle = app.handle().clone();
                 let window = app.get_webview_window("main").unwrap();
 
-                let ctx_lock: &mut Context = &mut async_ctx.lock();
-                app_state.workbench.update(ctx_lock, |this, ctx| {
-                    this.set_configuration_window_size(window).unwrap();
-                    this.set_tao_handle(ctx, Rc::new(app_handle.clone()));
+                async_ctx
+                    .update(|ctx| {
+                        app_state
+                            .workbench
+                            .set_configuration_window_size(window)
+                            .unwrap();
 
-                    ctx.notify();
-                });
+                        app_state.workbench.set_tao_handle(ctx, app_handle.clone());
+                    })
+                    .unwrap();
 
                 // init_custom_logging(app_handle.clone());
-
-                // TODO:
-                // Used only as an example implementation. Remove this disgrace as soon as possible.
-                tokio::task::block_in_place(|| {
-                    tauri::async_runtime::block_on(async move {
-                        // Example stream data emitting
-                        tokio::spawn(async move {
-                            while let Ok(data) = rx.recv().await {
-                                app_handle.emit("data-stream", data).unwrap();
-                            }
-                        });
-                    });
-                });
 
                 Ok(())
             })
@@ -272,3 +247,14 @@ impl AppMain {
 //     event!(tracing::Level::DEBUG, "Logging init");
 //     info!("Logging initialized");
 // }
+
+async fn init_db_client() -> Result<Surreal<Client>> {
+    // let db = Surreal::new::<File>("../rocksdb").await.unwrap();
+
+    let db = Surreal::new::<Ws>("127.0.0.1:8000")
+        .await
+        .expect("failed to connect to db");
+    db.use_ns("moss").use_db("compass").await?;
+
+    Ok(db)
+}

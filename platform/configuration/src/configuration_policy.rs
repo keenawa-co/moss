@@ -2,6 +2,7 @@ use std::sync::Arc;
 
 use arc_swap::ArcSwap;
 use hashbrown::HashMap;
+use platform_core::context::{entity::Model, Context};
 
 use super::{
     configuration_default::DefaultConfiguration,
@@ -10,15 +11,15 @@ use super::{
     policy::{PolicyDefinitionType, PolicyService},
 };
 
-pub struct ConfigurationPolicy<'a> {
+pub struct ConfigurationPolicy {
     model: ArcSwap<ConfigurationModel>,
-    registry: &'a ConfigurationRegistry<'a>,
+    registry: Model<ConfigurationRegistry>,
     policy_service: ConfigurationPolicyService,
 }
 
-impl<'a> ConfigurationPolicy<'a> {
+impl<'a> ConfigurationPolicy {
     pub fn new(
-        registry: &'a ConfigurationRegistry<'a>,
+        registry: Model<ConfigurationRegistry>,
         policy_service: ConfigurationPolicyService,
     ) -> Self {
         Self {
@@ -28,13 +29,13 @@ impl<'a> ConfigurationPolicy<'a> {
         }
     }
 
-    pub fn initialize(&mut self, default_configuration: &DefaultConfiguration) {
+    pub fn initialize(&mut self, ctx: &mut Context, default_configuration: &DefaultConfiguration) {
         let default_configuration_model = default_configuration.get_configuration_model().unwrap(); // TODO: handle panic (should never happen)
 
         let mut configuration_model = ConfigurationModel::empty();
 
         for (property_key, property_policy) in
-            self.find_all_model_policies(default_configuration_model)
+            self.find_all_model_policies(ctx, default_configuration_model)
         {
             if let Some(property_value) = self.policy_service.get_value(&property_policy.name) {
                 configuration_model.set_value(property_key, property_value.clone());
@@ -52,9 +53,10 @@ impl<'a> ConfigurationPolicy<'a> {
 
     fn find_all_model_policies(
         &self,
+        ctx: &mut Context,
         model: Arc<ConfigurationModel>,
-    ) -> HashMap<String, &PropertyPolicy> {
-        let configuration_properties = self.registry.properties();
+    ) -> HashMap<String, PropertyPolicy> {
+        let configuration_properties = self.registry.read(ctx).properties();
         let mut property_policies = HashMap::new();
 
         for key in model.get_attribute_names() {
@@ -67,7 +69,7 @@ impl<'a> ConfigurationPolicy<'a> {
             if let Some(property_policy) = &property.schema.policy {
                 // TODO: check for uniqueness and warning if the key already exists
 
-                property_policies.insert(key.clone(), property_policy);
+                property_policies.insert(key.clone(), property_policy.clone());
             }
         }
 

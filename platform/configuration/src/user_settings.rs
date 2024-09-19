@@ -1,4 +1,5 @@
 use anyhow::Result;
+use platform_core::context::Context;
 use platform_fs::disk::file_system_service::AbstractDiskFileSystemService;
 use std::{io::Read, path::PathBuf, sync::Arc};
 
@@ -7,17 +8,17 @@ use crate::{configuration_model::ConfigurationModel, configuration_parser::Confi
 // TODO:
 // - Use a LogService.
 // - Use a PolicyService
-pub struct UserSettings<'a> {
-    parser: Arc<ConfigurationParser<'a>>,
-    resource: &'a PathBuf,
+pub struct UserSettings {
+    parser: Arc<ConfigurationParser>,
+    resource: PathBuf,
 
     fs_service: Arc<dyn AbstractDiskFileSystemService>,
 }
 
-impl<'a> UserSettings<'a> {
+impl<'a> UserSettings {
     pub fn new(
-        file_path: &'a PathBuf,
-        content_parser: Arc<ConfigurationParser<'a>>,
+        file_path: PathBuf,
+        content_parser: Arc<ConfigurationParser>,
         fs_service: Arc<dyn AbstractDiskFileSystemService>,
     ) -> Self {
         Self {
@@ -27,8 +28,8 @@ impl<'a> UserSettings<'a> {
         }
     }
 
-    pub async fn load_configuration(&self) -> Result<ConfigurationModel> {
-        let mut file = self.fs_service.read_file(&self.resource).await?;
+    pub fn load_configuration(&self, ctx: &mut Context) -> Result<ConfigurationModel> {
+        let mut file = ctx.block_on(self.fs_service.read_file(&self.resource))?;
         let mut content = String::new();
         file.read_to_string(&mut content)?;
 
@@ -36,6 +37,6 @@ impl<'a> UserSettings<'a> {
             content = String::from("{}")
         }
 
-        Ok(self.parser.parse(&content)?)
+        Ok(self.parser.parse(ctx, &content)?)
     }
 }

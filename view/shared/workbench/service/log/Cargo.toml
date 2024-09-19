@@ -5,3 +5,6 @@ edition = "2021"
 
 [dependencies]
 platform_log.workspace = true
+tauri.workspace = true
+tracing.workspace = true
+tracing_subscriber.workspace = true

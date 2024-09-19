@@ -12,6 +12,12 @@ impl std::ops::Deref for ServiceRegistry {
     }
 }
 
+impl std::ops::DerefMut for ServiceRegistry {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.0
+    }
+}
+
 impl std::fmt::Debug for ServiceRegistry {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         f.debug_tuple("ServiceGroup").finish()

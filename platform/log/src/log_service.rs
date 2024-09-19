@@ -120,7 +120,7 @@ struct CliLogger {
 
 impl CliLogger {
     pub fn new() -> Self {
-        CliLogger::default()
+        Self::default()
     }
 
     fn default() -> Self {

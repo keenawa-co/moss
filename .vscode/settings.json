@@ -48,8 +48,10 @@
     "Turborepo",
     "unpark",
     "unparker",
+    "unsync",
     "unwatch",
-    "worktree"
+    "worktree",
+    "xtask"
   ],
   "todohighlight.keywords": [
     {

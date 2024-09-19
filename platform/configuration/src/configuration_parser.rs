@@ -2,6 +2,7 @@ use anyhow::Result;
 use hashbrown::HashMap;
 use lazy_regex::{Lazy, Regex};
 use moss_std::collection::extend::Extend;
+use platform_core::context::{entity::Model, Context};
 use radix_trie::{Trie, TrieCommon};
 use serde_json::Value;
 
@@ -12,8 +13,8 @@ use crate::{
 
 static OVERRIDE_PROPERTY_REGEX: &'static Lazy<Regex> = regex!(r"^(\[.*\])+$");
 
-pub struct ConfigurationParser<'a> {
-    registry: &'a ConfigurationRegistry<'a>,
+pub struct ConfigurationParser {
+    registry: Model<ConfigurationRegistry>,
 }
 
 struct ConfigurationOverride {
@@ -22,18 +23,19 @@ struct ConfigurationOverride {
     content: Trie<String, serde_json::Value>,
 }
 
-impl<'a> ConfigurationParser<'a> {
-    pub fn new(registry: &'a ConfigurationRegistry<'a>) -> Self {
+impl ConfigurationParser {
+    pub fn new(registry: Model<ConfigurationRegistry>) -> Self {
         Self { registry }
     }
 
-    pub fn parse(&self, content: &str) -> Result<ConfigurationModel> {
+    pub fn parse(&self, ctx: &mut Context, content: &str) -> Result<ConfigurationModel> {
         let raw_content: HashMap<String, Value> = serde_json::from_str(content)?;
         let mut model = ConfigurationModel::empty();
 
         for (attribute_name, value) in &raw_content {
             if OVERRIDE_PROPERTY_REGEX.is_match(attribute_name) {
-                if let Some(override_definition) = self.process_override(attribute_name, value) {
+                if let Some(override_definition) = self.process_override(ctx, attribute_name, value)
+                {
                     model.overrides.push(override_definition.ident);
                     model.content.extend(override_definition.content.iter());
                 }
@@ -41,7 +43,7 @@ impl<'a> ConfigurationParser<'a> {
                 continue;
             }
 
-            if self.inspect_attribute(attribute_name) {
+            if self.inspect_attribute(ctx, attribute_name) {
                 model.set_value(AttributeName::format(attribute_name), value.clone());
             }
         }
@@ -51,8 +53,8 @@ impl<'a> ConfigurationParser<'a> {
 
     // TODO: return diags
     // TODO: use logs, not println
-    fn inspect_attribute(&self, attribute_name: &str) -> bool {
-        let configuration_properties = self.registry.properties();
+    fn inspect_attribute(&self, ctx: &mut Context, attribute_name: &str) -> bool {
+        let configuration_properties = self.registry.read(ctx).properties();
 
         match configuration_properties.get(attribute_name) {
             Some(registered_property) => {
@@ -75,6 +77,7 @@ impl<'a> ConfigurationParser<'a> {
 
     fn process_override(
         &self,
+        ctx: &mut Context,
         attribute_name: &str,
         value: &Value,
     ) -> Option<ConfigurationOverride> {
@@ -85,7 +88,7 @@ impl<'a> ConfigurationParser<'a> {
             return None;
         };
 
-        let override_identifiers = self.registry.override_identifiers();
+        let override_identifiers = self.registry.read(ctx).override_identifiers();
         let formatted_identifier = attribute_name.trim_matches(|c| c == '[' || c == ']');
 
         if override_identifiers.get(formatted_identifier).is_none() {
@@ -103,7 +106,7 @@ impl<'a> ConfigurationParser<'a> {
         };
 
         for (attribute_name, value) in content {
-            if self.inspect_attribute(attribute_name) {
+            if self.inspect_attribute(ctx, attribute_name) {
                 // let formatted_key = format!("$.[{}].{}", formatted_identifier, attribute_name);
                 let formatted_key =
                     AttributeName::format_with_override(attribute_name, formatted_identifier);

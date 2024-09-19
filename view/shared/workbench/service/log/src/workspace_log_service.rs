@@ -58,7 +58,48 @@ impl WorkspaceLogService {
 pub struct TaoLogger {
     level: LogLevel,
     formatter: Box<dyn Fn(&str, LogLevel) -> String>,
+    app_handle: tauri::AppHandle,
 } 
+
+
+impl TaoLogger {
+    pub fn new(app_handle: tauri::AppHandle) -> Self {
+        Self::default(app_handle)
+    }
+
+    fn default(app_handle: tauri::AppHandle) -> Self {
+        Self {
+            level: LogLevel::Trace,
+            formatter: Box::new(|message, level| format!("[{:?}] {}", level, message)),
+            app_handle: app_handle
+        }
+    }
+
+    fn init_tracing() {
+        tracing_subscriber::registry()
+        // log to frontend
+            .with(
+                tracing_subscriber::fmt::layer().with_writer(move || TauriLogWriter {
+                    app_handle: app_handle.clone(),
+                }),
+            )
+            .init();
+
+    }
+}
+
+    impl std::io::Write for TauriLogWriter {
+        fn write(&mut self, buf: &[u8]) -> std::io::Result<usize> {
+            let log_message = String::from_utf8_lossy(buf).to_string();
+            let _ = self.app_handle.emit("logs-stream", log_message);
+            Ok(buf.len())
+        }
+
+        fn flush(&mut self) -> std::io::Result<()> {
+            Ok(())
+        }
+    }
+
 
 impl AnyLogger for TaoLogger {
     fn trace(&mut self, message: &str) {

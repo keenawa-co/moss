@@ -1,4 +1,4 @@
-use anyhow::Context;
+use anyhow::Context as ResultContext;
 use anyhow::Result;
 use platform_configuration::configuration_parser::ConfigurationParser;
 use platform_configuration::user_settings::UserSettings;
@@ -9,6 +9,8 @@ use platform_configuration::{
     configuration_registry::ConfigurationRegistry,
     AbstractConfigurationService,
 };
+use platform_core::context::entity::Model;
+use platform_core::context::Context;
 use platform_fs::disk::file_system_service::AbstractDiskFileSystemService;
 use platform_workspace::Workspace;
 use std::{path::PathBuf, sync::Arc};
@@ -20,23 +22,23 @@ pub struct WorkspaceConfigurationService {
 }
 
 impl WorkspaceConfigurationService {
-    pub async fn new<'a>(
+    pub fn new(
+        ctx: &mut Context,
         workspace: Workspace,
-        registry: &'a ConfigurationRegistry<'_>,
+        registry: Model<ConfigurationRegistry>,
         policy_service: ConfigurationPolicyService,
-        user_configuration_resource: &PathBuf,
+        user_configuration_resource: PathBuf,
         fs_service: Arc<dyn AbstractDiskFileSystemService>,
     ) -> Self {
-        let parser = ConfigurationParser::new(&registry); // TODO: platform ConfigurationParser?
+        let parser = ConfigurationParser::new(registry.clone()); // TODO: platform ConfigurationParser?
 
-        let default_configuration = DefaultConfiguration::new(&registry); // TODO: use WorkspaceDefaultConfiguration
-        default_configuration.initialize();
+        let default_configuration = DefaultConfiguration::new(registry.clone()); // TODO: use WorkspaceDefaultConfiguration
+        default_configuration.initialize(ctx);
 
         let user_configuration =
             UserSettings::new(user_configuration_resource, Arc::new(parser), fs_service);
         let user_configuration_model = user_configuration
-            .load_configuration()
-            .await
+            .load_configuration(ctx)
             .context("failed to load user configuration model")
             .unwrap();
         let default_configuration_model = default_configuration
@@ -45,8 +47,8 @@ impl WorkspaceConfigurationService {
             .context("default was not initialized correctly")
             .unwrap();
 
-        let mut configuration_policy = ConfigurationPolicy::new(&registry, policy_service);
-        configuration_policy.initialize(&default_configuration);
+        let mut configuration_policy = ConfigurationPolicy::new(registry.clone(), policy_service);
+        configuration_policy.initialize(ctx, &default_configuration);
 
         let policy_configuration_model = configuration_policy.get_model();
 

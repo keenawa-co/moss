@@ -3,23 +3,25 @@ pub mod entity;
 pub mod model_context;
 pub mod subscription;
 
-mod async_runner;
 mod utl;
 
 use async_context::AsyncContext;
-use async_runner::{AsyncRunner, Task};
 use entity::{AnyEntity, EntityId, EntityMap, Model, Slot};
 use model_context::ModelContext;
 use moss_std::collection::{FxHashSet, VecDeque};
-use parking_lot::Mutex;
-
 use std::{
     any::{Any, TypeId},
-    borrow::BorrowMut,
+    borrow::Borrow,
+    cell::RefCell,
     future::Future,
-    sync::{Arc, Weak},
+    rc::{Rc, Weak},
 };
 use subscription::{SubscriberSet, Subscription};
+
+use crate::{
+    executor::{BackgroundExecutor, MainThreadExecutor, Task},
+    platform::AnyPlatform,
+};
 
 pub struct Reservation<T>(pub(crate) Slot<T>);
 
@@ -69,7 +71,9 @@ type Listener = Box<dyn FnMut(&dyn Any, &mut Context) -> bool + 'static>;
 type ReleaseListener = Box<dyn FnOnce(&mut dyn Any, &mut Context) + 'static>;
 
 pub struct Context {
-    runner: AsyncRunner,
+    this: Weak<RefCell<Self>>,
+    background_executor: BackgroundExecutor,
+    main_thread_executor: MainThreadExecutor,
     observers: SubscriberSet<EntityId, Handler>,
     pending_notifications: FxHashSet<EntityId>,
     pending_effects: VecDeque<Effect>,
@@ -79,9 +83,6 @@ pub struct Context {
     event_listeners: SubscriberSet<EntityId, (TypeId, Listener)>,
     release_listeners: SubscriberSet<EntityId, ReleaseListener>,
 }
-
-unsafe impl Send for Context {}
-unsafe impl Sync for Context {}
 
 impl AnyContext for Context {
     type Result<T> = T;
@@ -118,10 +119,7 @@ impl AnyContext for Context {
         &mut self,
         model: &Model<T>,
         update: impl FnOnce(&mut T, &mut ModelContext<'_, T>) -> R,
-    ) -> R
-    where
-        T: 'static,
-    {
+    ) -> R {
         self.update(|ctx| {
             let mut entity = ctx.entities.lease(model);
             let result = update(&mut entity, &mut ModelContext::new(ctx, model.downgrade()));
@@ -132,37 +130,46 @@ impl AnyContext for Context {
 }
 
 impl Context {
-    pub fn new() -> Self {
-        Context {
-            runner: AsyncRunner::new(),
-            observers: SubscriberSet::new(),
-            pending_notifications: FxHashSet::default(),
-            pending_effects: VecDeque::new(),
-            pending_updates: 0,
-            entities: EntityMap::new(),
-            flushing_effects: false,
-            event_listeners: SubscriberSet::new(),
-            release_listeners: SubscriberSet::new(),
+    pub fn new(platform: Rc<dyn AnyPlatform>) -> Rc<RefCell<Self>> {
+        Rc::new_cyclic(|this| {
+            RefCell::new(Context {
+                this: this.clone(),
+                background_executor: platform.background_executor().clone(),
+                main_thread_executor: platform.main_thread_executor().clone(),
+                observers: SubscriberSet::new(),
+                pending_notifications: FxHashSet::default(),
+                pending_effects: VecDeque::new(),
+                pending_updates: 0,
+                entities: EntityMap::new(),
+                flushing_effects: false,
+                event_listeners: SubscriberSet::new(),
+                release_listeners: SubscriberSet::new(),
+            })
+        })
+    }
+
+    pub fn spawn_local<Fut>(&self, f: impl FnOnce(AsyncContext) -> Fut) -> Task<Fut::Output>
+    where
+        Fut: Future + 'static,
+        Fut::Output: 'static,
+    {
+        self.main_thread_executor.spawn_local(f(self.to_async()))
+    }
+
+    pub fn block_on<R>(&self, fut: impl Future<Output = R>) -> R {
+        self.background_executor.block_on(fut)
+    }
+
+    pub fn background_executor(&self) -> BackgroundExecutor {
+        self.borrow().background_executor.clone()
+    }
+
+    pub fn to_async(&self) -> AsyncContext {
+        AsyncContext {
+            cell: self.this.clone(),
+            background_executor: self.background_executor.clone(),
+            main_thread_executor: self.main_thread_executor.clone(),
         }
-    }
-
-    pub fn to_async(self) -> AsyncContext {
-        AsyncContext::from(self)
-    }
-
-    pub fn detach<F>(&self, future: F) -> Task<F::Output>
-    where
-        F: Future + Send + 'static,
-        F::Output: Send + 'static,
-    {
-        Task::Spawned(self.runner.spawn(future))
-    }
-
-    pub fn block_on<F>(&self, future: F) -> F::Output
-    where
-        F: Future,
-    {
-        self.runner.block_on(future)
     }
 
     pub fn defer(&mut self, f: impl FnOnce(&mut Context) + 'static) {
@@ -210,15 +217,15 @@ impl Context {
         subscription
     }
 
-    pub(crate) fn subscribe_internal<T, E, Evt>(
+    pub(crate) fn subscribe_internal<T, E, Ev>(
         &mut self,
         entity: &E,
-        mut on_event: impl FnMut(E, &Evt, &mut Context) -> bool + 'static,
+        mut on_event: impl FnMut(E, &Ev, &mut Context) -> bool + 'static,
     ) -> Subscription
     where
-        T: 'static + EventEmitter<Evt>,
+        T: 'static + EventEmitter<Ev>,
         E: AnyEntity<T>,
-        Evt: 'static,
+        Ev: 'static,
     {
         let entity_id = entity.entity_id();
         let entity = entity.downgrade();
@@ -226,9 +233,9 @@ impl Context {
         self.new_subscription(
             entity_id,
             (
-                TypeId::of::<Evt>(),
+                TypeId::of::<Ev>(),
                 Box::new(move |event, cx| {
-                    let event: &Evt = event.downcast_ref().expect("invalid event type");
+                    let event: &Ev = event.downcast_ref().expect("invalid event type");
                     if let Some(handle) = E::upgrade_from(&entity) {
                         on_event(handle, event, cx)
                     } else {
