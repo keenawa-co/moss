@@ -177,7 +177,12 @@ impl AppMain {
                     })
                     .unwrap();
 
-                // init_custom_logging(app_handle.clone());
+                let mut workspace_log_service = match workbench_service_log::workspace_log_service::create_service(app_handle.clone()) {
+                    Ok(logger) => logger,
+                    Err(error) => panic!("Error when creating workspace log service: {error:?}"),
+                };
+
+                workspace_log_service.error("Some error text");
 
                 Ok(())
             })

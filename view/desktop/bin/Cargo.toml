@@ -37,6 +37,7 @@ platform_log.workspace = true # TODO: to be removed after the testing is done
 workbench_tgui.workspace = true
 workbench_service_configuration_tgui.workspace = true
 workbench_service_environment_tgui.workspace = true
+workbench_service_log.workspace = true
 
 surrealdb = { workspace = true, features = ["kv-rocksdb"] }
 strum = { workspace = true, features = ["derive"] }

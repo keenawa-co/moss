@@ -1336,6 +1336,7 @@ dependencies = [
  "tracing-subscriber",
  "workbench_service_configuration_tgui",
  "workbench_service_environment_tgui",
+ "workbench_service_log",
  "workbench_tgui",
 ]
 
@@ -7737,6 +7738,8 @@ version = "0.1.0"
 dependencies = [
  "platform_log",
  "tauri",
+ "tracing",
+ "tracing-subscriber",
 ]
 
 [[package]]
