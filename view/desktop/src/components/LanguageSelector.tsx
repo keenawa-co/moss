@@ -14,7 +14,7 @@ export const LanguageSelector: React.FC = () => {
   };
 
   return (
-    <select className="bg-purple-300 text-primary" value={language} onChange={onChangeLang}>
+    <select className="bg-purple-300 text-[rgba(var(--color-primary))]" value={language} onChange={onChangeLang}>
       {LANGUAGES.map(({ code, label }) => (
         <option key={code} value={code}>
           {label}
