@@ -15,7 +15,7 @@ export const Icon = ({
 } & ComponentPropsWithoutRef<"svg">) => {
   const IconTag = icons[icon];
 
-  return <IconTag className={cn("text-primary hover:text-zinc-600", className)} {...props} />;
+  return <IconTag className={cn("text-[rgba(var(--color-primary))] hover:text-zinc-600", className)} {...props} />;
 };
 
 export default Icon;

@@ -5,7 +5,7 @@ const StatusBar = ({ branch, className }: { branch?: string } & ComponentPropsWi
   return (
     <footer
       className={twMerge(
-        "flex justify-end [&>*:first-child]:mr-auto items-center px-5 bg-statusBarBackground text-stone-50 text-xs z-100",
+        "flex justify-end [&>*:first-child]:mr-auto items-center px-5 bg-[rgba(var(--color-statusBar-background))] text-stone-50 text-xs z-100",
         className
       )}
     >

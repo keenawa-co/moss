@@ -70,19 +70,19 @@ const SessionComponent = () => {
         <p>No session</p>
       )}
 
-      <p className="text-primary">
-        Workspace: <span className="bg-red-500 text-primary"> {workbenchState}</span>
+      <p className="text-[rgba(var(--color-primary))]">
+        Workspace: <span className="bg-red-500 text-[rgba(var(--color-primary))]"> {workbenchState}</span>
       </p>
       <br />
 
-      <button className="bg-red-500 text-primary" onClick={handleRestoreSession}>
+      <button className="bg-red-500 text-[rgba(var(--color-primary))]" onClick={handleRestoreSession}>
         Restore Session
       </button>
       <br />
 
-      <span className="text-primary">{t("description.part1")}</span>
+      <span className="text-[rgba(var(--color-primary))]">{t("description.part1")}</span>
       <br />
-      <span className="bg-secondary text-primary">{t("description.part1", { ns: "ns2" })}</span>
+      <span className="bg-secondary text-[rgba(var(--color-primary))]">{t("description.part1", { ns: "ns2" })}</span>
       {data !== null && <p>Received data: {data}</p>}
     </>
   );
@@ -93,17 +93,17 @@ export const Home: React.FC = () => {
 
   return (
     <div>
-      <h1 className="text-primary">{t("title")}</h1>
+      <h1 className="text-[rgba(var(--color-primary))]">{t("title")}</h1>
 
       <div>
-        <Tooltip label="Test" className="text-primary">
+        <Tooltip label="Test" className="text-[rgba(var(--color-primary))]">
           <Icon icon="Code" />
         </Tooltip>
       </div>
       <SessionComponent />
       <div>
         <DropdownMenu>
-          <DropdownMenuTrigger className="text-primary">Click me!</DropdownMenuTrigger>
+          <DropdownMenuTrigger className="text-[rgba(var(--color-primary))]">Click me!</DropdownMenuTrigger>
 
           <DropdownMenuContent>
             <DropdownMenuItem icon="Search">Menu item 1</DropdownMenuItem>

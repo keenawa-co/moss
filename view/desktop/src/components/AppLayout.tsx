@@ -8,7 +8,7 @@ export const RootLayout = ({ children, className, ...props }: ComponentProps<"ma
     <div className="h-full grid grid-rows-[auto_1fr_auto]">
       <TitleBar />
 
-      <main className={twMerge("bg-pageBackground", className)} {...props}>
+      <main className={twMerge("bg-[rgba(var(--color-page-background))]", className)} {...props}>
         {children}
       </main>
 
@@ -20,7 +20,7 @@ export const RootLayout = ({ children, className, ...props }: ComponentProps<"ma
 export const Sidebar = ({ className, children, ...props }: ComponentProps<"aside">) => {
   return (
     <aside
-      className={twMerge("flex flex-col mb-5.5 bg-sideBarBackground", className)}
+      className={twMerge("flex flex-col mb-5.5 bg-[rgba(var(--color-sideBar-background))]", className)}
       //className={twMerge('w-[200px] mt-8 h-[100vh + 10px] overflow-auto bg-bgPrimary', className)}
       {...props}
     >

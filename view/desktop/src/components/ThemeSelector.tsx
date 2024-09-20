@@ -22,7 +22,11 @@ export const ThemeSelector: React.FC<ThemeSelectorProps> = ({ themes }) => {
 
   return (
     <div>
-      <select className="bg-pink-300 text-primary" value={selectedTheme} onChange={handleThemeChange}>
+      <select
+        className="bg-pink-300 text-[rgba(var(--color-primary))]"
+        value={selectedTheme}
+        onChange={handleThemeChange}
+      >
         {themes.map((theme) => (
           <option key={theme} value={theme}>
             {theme.charAt(0).toUpperCase() + theme.slice(1)}
