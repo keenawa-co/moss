@@ -12,6 +12,7 @@
     "interface": "i18next-resources-for-ts interface -i ./public/locales/de -o ./src/@types/resources.d.ts"
   },
   "dependencies": {
+    "@reduxjs/toolkit": "^2.2.7",
     "@tailwindcss/nesting": "0.0.0-insiders.565cd3e",
     "@tauri-apps/api": ">=2.0.0-rc.0",
     "@tauri-apps/plugin-fs": "2.0.0-rc.0",
@@ -20,7 +21,8 @@
     "allotment": "^1.20.2",
     "install": "^0.13.0",
     "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "react-dom": "^18.3.1",
+    "react-redux": "^9.1.2"
   },
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",
