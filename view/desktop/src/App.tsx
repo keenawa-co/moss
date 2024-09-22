@@ -1,14 +1,15 @@
+import { commands } from "@/bindings";
+import { Content, Home, Logs, Menu, RootLayout, Settings, Sidebar } from "@/components";
 import "@/i18n";
+import { Convert, Theme } from "@repo/theme";
+import { Icon, IconTitle, MenuItem, ThemeProvider } from "@repo/ui";
 import "@repo/ui/src/fonts.css";
-import { Settings, Content, Home, Menu, RootLayout, Sidebar, Logs } from "@/components";
 import { Suspense, useEffect, useState } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { twMerge } from "tailwind-merge";
-import { Icon, MenuItem, IconTitle, ThemeProvider } from "@repo/ui";
-import { useTranslation } from "react-i18next";
 import { Resizable, ResizablePanel } from "./components/Resizable";
-import { Convert, Theme } from "@repo/theme";
-import { commands } from "@/bindings";
+import { useAppDispatch } from "./store";
+import { setLanguageFromLocalStorage } from "./store/languages/languagesSlice";
 
 const handleFetchAllThemes = async () => {
   try {
@@ -46,10 +47,15 @@ enum IconState {
 }
 
 function App() {
-  const [sideBarVisible, setSideBarVisibility] = useState(true);
-  const { i18n } = useTranslation();
+  const dispatch = useAppDispatch();
+  const [sideBarVisible] = useState(true);
   const [themes, setThemes] = useState<string[]>([]);
   const [selectedTheme, setSelectedTheme] = useState<Theme | undefined>(undefined);
+
+  // Initialize language
+  useEffect(() => {
+    dispatch(setLanguageFromLocalStorage());
+  }, []);
 
   // Initialize theme
   useEffect(() => {
@@ -80,17 +86,6 @@ function App() {
 
     initializeThemes();
   }, []);
-
-  // Initialize language
-  useEffect(() => {
-    const setLanguageFromLocalStorage = () => {
-      const savedLanguage = localStorage.getItem("language");
-      if (savedLanguage) {
-        i18n.changeLanguage(savedLanguage);
-      }
-    };
-    setLanguageFromLocalStorage();
-  }, [i18n]);
 
   // Handle theme change
   useEffect(() => {
