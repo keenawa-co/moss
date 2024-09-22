@@ -1,4 +1,4 @@
-import { ContentLayout, Home, Logs, Menu, RootLayout, Settings } from "@/components";
+import { ContentLayout, Menu, RootLayout } from "@/components";
 import "@/i18n";
 import "@repo/ui/src/fonts.css";
 import { Suspense, useEffect, useState } from "react";
@@ -9,6 +9,7 @@ import { setLanguageFromLocalStorage } from "./store/languages/languagesSlice";
 import { initializeThemes } from "./store/themes/themesSlice";
 import { useSelector } from "react-redux";
 import Sidebar from "./components/Sidebar";
+import { Home, Settings, Logs } from "./components/pages";
 
 function App() {
   const dispatch = useAppDispatch();

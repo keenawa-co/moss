@@ -53,5 +53,3 @@ export const Settings = () => {
     </main>
   );
 };
-
-export default Settings;

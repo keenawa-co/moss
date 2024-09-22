@@ -33,5 +33,3 @@ export const Logs: React.FC = () => {
     </main>
   );
 };
-
-export default Logs;
