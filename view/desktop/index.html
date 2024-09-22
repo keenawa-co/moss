@@ -1,14 +1,8 @@
 <!doctype html>
 <html lang="en">
   <head>
-    <script>
-      // Load react-devtools script only in development mode
-      if (import.meta.env.MODE === 'development') {
-        const script = document.createElement('script');
-        script.src = 'http://localhost:8097';
-        document.head.appendChild(script);
-      }
-    </script>
+    <!-- localhost:8097 shoudn't be in prod.  It is reserved for react-devtools. -->
+    <script src="http://localhost:8097"></script>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
