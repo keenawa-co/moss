@@ -13,7 +13,9 @@ use platform_fs::disk::file_system_service::DiskFileSystemService;
 use platform_workspace::WorkspaceId;
 use service::project_service::ProjectService;
 use service::session_service::SessionService;
-use workbench_service_log::workspace_log_service;
+use tracing_subscriber::layer::SubscriberExt;
+use tracing_subscriber::util::SubscriberInitExt;
+use workbench_service_log::workspace_log_service::{self, create_service, WorkspaceLogService};
 use std::cell::RefCell;
 use std::rc::Rc;
 use std::sync::Arc;
@@ -22,8 +24,6 @@ use surrealdb::engine::remote::ws::Client;
 use surrealdb::{engine::remote::ws::Ws, Surreal};
 use tauri::{App, Emitter, Manager, State};
 use tauri_specta::{collect_commands, collect_events};
-use tracing_subscriber::layer::SubscriberExt;
-use tracing_subscriber::util::SubscriberInitExt;
 use workbench_service_environment_tgui::environment_service::NativeEnvironmentService;
 use workbench_tgui::window::{NativePlatformInfo, NativeWindowConfiguration};
 use workbench_tgui::Workbench;
@@ -59,6 +59,7 @@ pub struct AppState {
     pub platform_info: NativePlatformInfo,
     pub project_service: ProjectService,
     pub session_service: SessionService,
+    pub log_service: WorkspaceLogService,
 }
 
 pub struct AppMain {
@@ -112,11 +113,19 @@ impl AppMain {
         let workbench = Workbench::new(&async_ctx, service_group, window_state.workspace_id)?;
         workbench.initialize(&async_ctx)?;
 
+        
+        // TODO: Only for testing purposes! Rework after testing is done
+        let mut workspace_log_service = match create_service() {
+            Ok(logger) => logger,
+            Err(error) => panic!("Error when creating workspace log service: {error:?}"),
+        };
+
         let app_state = AppState {
             workbench: Arc::new(workbench),
             platform_info: self.native_window_configuration.platform_info.clone(),
             project_service: ProjectService::new(db.clone()),
             session_service: SessionService::new(db.clone()),
+            log_service: workspace_log_service,
         };
 
         let builder = tauri_specta::Builder::<tauri::Wry>::new()
@@ -179,12 +188,13 @@ impl AppMain {
                     })
                     .unwrap();
 
-                let mut workspace_log_service = match workspace_log_service::create_service(app_handle.clone()) {
-                    Ok(logger) => logger,
-                    Err(error) => panic!("Error when creating workspace log service: {error:?}"),
-                };
+                    init_custom_logging(app_handle.clone());
+                // let mut workspace_log_service = match workspace_log_service::create_service() {
+                //     Ok(logger) => logger,
+                //     Err(error) => panic!("Error when creating workspace log service: {error:?}"),
+                // };
 
-                workspace_log_service.error("Some error text");
+                // workspace_log_service.error("Some error text");
 
                 Ok(())
             })
@@ -222,38 +232,37 @@ impl AppMain {
     }
 }
 
-// An example of how the logging could function
-// fn init_custom_logging(app_handle: tauri::AppHandle) {
-//     struct TauriLogWriter {
-//         app_handle: tauri::AppHandle,
-//     }
+fn init_custom_logging(app_handle: tauri::AppHandle) {
+    struct TauriLogWriter {
+        app_handle: tauri::AppHandle,
+    }
 
-//     impl std::io::Write for TauriLogWriter {
-//         fn write(&mut self, buf: &[u8]) -> std::io::Result<usize> {
-//             let log_message = String::from_utf8_lossy(buf).to_string();
-//             let _ = self.app_handle.emit("logs-stream", log_message);
-//             Ok(buf.len())
-//         }
+    impl std::io::Write for TauriLogWriter {
+        fn write(&mut self, buf: &[u8]) -> std::io::Result<usize> {
+            let log_message = String::from_utf8_lossy(buf).to_string();
+            let _ = self.app_handle.emit("logs-stream", log_message);
+            Ok(buf.len())
+        }
 
-//         fn flush(&mut self) -> std::io::Result<()> {
-//             Ok(())
-//         }
-//     }
+        fn flush(&mut self) -> std::io::Result<()> {
+            Ok(())
+        }
+    }
 
-//     tracing_subscriber::registry()
-//         // log to stdout
-//         .with(tracing_subscriber::fmt::layer().with_writer(std::io::stdout))
-//         // log to frontend
-//         .with(
-//             tracing_subscriber::fmt::layer().with_writer(move || TauriLogWriter {
-//                 app_handle: app_handle.clone(),
-//             }),
-//         )
-//         .init();
+    // filrer to disable log messages from certain crates
+    // let filter = tracing_subscriber::EnvFilter::default()
+    //     .add_directive("tokio_tungstenite=off".parse().unwrap());
 
-//     event!(tracing::Level::DEBUG, "Logging init");
-//     info!("Logging initialized");
-// }
+    tracing_subscriber::registry()
+    // log to frontend
+        .with(
+            tracing_subscriber::fmt::layer().with_writer(move || TauriLogWriter {
+                app_handle: app_handle.clone(),
+            }),
+        )
+        // .with(filter)
+        .init();
+}
 
 async fn init_db_client() -> Result<Surreal<Client>> {
     // let db = Surreal::new::<File>("../rocksdb").await.unwrap();

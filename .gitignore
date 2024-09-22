@@ -39,3 +39,7 @@ dist/
 /*.txt
 /*.db*
 /*.session*
+
+
+# TODO: remove after logs testing is done
+/logs

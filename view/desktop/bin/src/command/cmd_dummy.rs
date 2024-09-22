@@ -96,11 +96,19 @@ pub async fn restore_session(
     }
 }
 
-#[tauri::command]
+#[tauri::command(async)]
 #[specta::specta]
-pub fn generate_log(app_handle: tauri::AppHandle) {
+pub fn generate_log(
+    state: State<'_, AppState>, 
+    app_handle: tauri::AppHandle,
+) {
     // Generate a log message and emit it to the frontend
     let log_message = "Log message from backend".to_string();
     app_handle.emit("logs-stream", log_message).unwrap();
+    state.log_service.trace("Trace from backend");
+    state.log_service.debug("Debug from backend");
+    state.log_service.info("Info from backend");
+    state.log_service.warning("Warning from backend");
+    state.log_service.error("Error from backend");
 }
 

@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { listen } from "@tauri-apps/api/event";
 import { invoke } from '@tauri-apps/api/core';
+import { commands } from "@/bindings";
+
 
 // import { invoke } from '@tauri-apps/api/tauri'
 
@@ -19,14 +21,10 @@ export const Logs: React.FC = () => {
     };
   }, []);
 
-  // Function to invoke the backend command
-  const generateLogMessage = async () => {
-    try {
-      await invoke("generate_log"); // "generate_log" is the command that the backend will listen for
-    } catch (error) {
-      console.error("Failed to generate log:", error);
-    }
+  const handleGenerateLog = async () => {
+    commands.generateLog();
   };
+
 
   return (
     <main className="p-4">
@@ -44,7 +42,7 @@ export const Logs: React.FC = () => {
       </div>
       <button
         className="mt-4 bg-blue-500 text-white p-2 rounded"
-        onClick={generateLogMessage}
+        onClick={handleGenerateLog}
       >
         Generate log message in the backend
       </button>
