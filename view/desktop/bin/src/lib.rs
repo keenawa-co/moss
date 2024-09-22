@@ -13,6 +13,7 @@ use platform_fs::disk::file_system_service::DiskFileSystemService;
 use platform_workspace::WorkspaceId;
 use service::project_service::ProjectService;
 use service::session_service::SessionService;
+use workbench_service_log::workspace_log_service;
 use std::cell::RefCell;
 use std::rc::Rc;
 use std::sync::Arc;
@@ -128,6 +129,7 @@ impl AppMain {
                 cmd_dummy::update_font_size,
                 cmd_dummy::fetch_all_themes,
                 cmd_dummy::read_theme,
+                cmd_dummy::generate_log,
                 cmd_base::native_platform_info,
             ]);
 
@@ -177,7 +179,7 @@ impl AppMain {
                     })
                     .unwrap();
 
-                let mut workspace_log_service = match workbench_service_log::workspace_log_service::create_service(app_handle.clone()) {
+                let mut workspace_log_service = match workspace_log_service::create_service(app_handle.clone()) {
                     Ok(logger) => logger,
                     Err(error) => panic!("Error when creating workspace log service: {error:?}"),
                 };

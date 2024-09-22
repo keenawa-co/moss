@@ -146,6 +146,11 @@ fn init_custom_logging(app_handle: tauri::AppHandle) {
         }
     }
 
+    // filrer to disable log messages from certain crates
+    let filter = tracing_subscriber::EnvFilter::default()
+        .add_directive("tokio_tungstenite=off".parse().unwrap());
+        // .add_directive("tungstenite=off".parse().unwrap());
+
     // TODO: setup of logging level
     tracing_subscriber::registry()
     // log to frontend
@@ -154,5 +159,6 @@ fn init_custom_logging(app_handle: tauri::AppHandle) {
                 app_handle: app_handle.clone(),
             }),
         )
+        .with(filter)
         .init();
 }

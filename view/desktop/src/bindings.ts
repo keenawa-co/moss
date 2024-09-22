@@ -54,6 +54,9 @@ export const commands = {
       else return { status: "error", error: e as any };
     }
   },
+  async generateLog(): Promise<void> {
+    await TAURI_INVOKE("generate_log");
+  },
   async nativePlatformInfo(): Promise<NativePlatformInfo> {
     return await TAURI_INVOKE("native_platform_info");
   },

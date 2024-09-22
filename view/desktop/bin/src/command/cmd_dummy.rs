@@ -1,7 +1,7 @@
 use anyhow::Result;
 use platform_core::context::async_context::AsyncContext;
 use std::path::PathBuf;
-use tauri::{AppHandle, Manager, State};
+use tauri::{AppHandle, Emitter, Manager, State};
 use workbench_tgui::WorkbenchState;
 
 use crate::service::project_service::{CreateProjectInput, ProjectDTO};
@@ -95,3 +95,12 @@ pub async fn restore_session(
         }
     }
 }
+
+#[tauri::command]
+#[specta::specta]
+pub fn generate_log(app_handle: tauri::AppHandle) {
+    // Generate a log message and emit it to the frontend
+    let log_message = "Log message from backend".to_string();
+    app_handle.emit("logs-stream", log_message).unwrap();
+}
+
