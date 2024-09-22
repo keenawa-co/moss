@@ -1,12 +1,12 @@
 import { configureStore } from "@reduxjs/toolkit";
 import languagesReducer from "./languages/languagesSlice";
-// import themesReducer from "./themes/themesSlice";
+import themesReducer from "./themes/themesSlice";
 import { useDispatch } from "react-redux";
 
 export const store = configureStore({
   reducer: {
     languages: languagesReducer,
-    // themes: themesReducer,
+    themes: themesReducer,
   },
 });
 

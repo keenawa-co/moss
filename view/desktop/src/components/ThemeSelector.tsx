@@ -1,23 +1,16 @@
-import React, { useState, useEffect } from "react";
+import { useAppDispatch, RootState } from "@/store";
+import { setTheme } from "@/store/themes/themesSlice";
+import React from "react";
+import { useSelector } from "react-redux";
 
-interface ThemeSelectorProps {
-  themes: string[];
-}
+export const ThemeSelector = () => {
+  const dispatch = useAppDispatch();
 
-export const ThemeSelector: React.FC<ThemeSelectorProps> = ({ themes }) => {
-  const [selectedTheme, setSelectedTheme] = useState<string>(() => {
-    return localStorage.getItem("theme") || "";
-  });
-
-  useEffect(() => {
-    if (selectedTheme) {
-      localStorage.setItem("theme", selectedTheme);
-      dispatchEvent(new Event("storage"));
-    }
-  }, [selectedTheme]);
+  const selectedTheme = useSelector((state: RootState) => state.themes.selected);
+  const themes = useSelector((state: RootState) => state.themes.themes);
 
   const handleThemeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setSelectedTheme(e.target.value);
+    dispatch(setTheme(e.target.value));
   };
 
   return (
