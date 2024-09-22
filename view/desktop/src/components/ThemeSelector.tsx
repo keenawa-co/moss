@@ -1,5 +1,5 @@
 import { useAppDispatch, RootState } from "@/store";
-import { setTheme } from "@/store/themes/themesSlice";
+import { setTheme } from "@/store/themes";
 import React from "react";
 import { useSelector } from "react-redux";
 

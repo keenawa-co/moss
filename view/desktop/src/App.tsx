@@ -2,14 +2,14 @@ import { ContentLayout, Menu, RootLayout } from "@/components";
 import "@/i18n";
 import "@repo/ui/src/fonts.css";
 import { Suspense, useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Resizable, ResizablePanel } from "./components/Resizable";
+import Sidebar from "./components/Sidebar";
+import { Home, Logs, Settings } from "./components/pages";
 import { RootState, useAppDispatch } from "./store";
 import { setLanguageFromLocalStorage } from "./store/languages/languagesSlice";
-import { initializeThemes } from "./store/themes/themesSlice";
-import { useSelector } from "react-redux";
-import Sidebar from "./components/Sidebar";
-import { Home, Settings, Logs } from "./components/pages";
+import { initializeThemes } from "./store/themes";
 
 function App() {
   const dispatch = useAppDispatch();
