@@ -25,6 +25,7 @@
     "otlp",
     "overrider",
     "realfs",
+    "reduxjs",
     "repr",
     "revisioned",
     "rocksdb",
