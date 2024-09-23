@@ -21,6 +21,7 @@
     "mimalloc",
     "mossland",
     "mossql",
+    "nonvalidated",
     "oneshot",
     "otlp",
     "overrider",

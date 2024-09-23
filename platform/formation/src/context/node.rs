@@ -1,27 +1,20 @@
 use derive_more::{Deref, DerefMut};
 use dyn_clone::DynClone;
+use moss_std::collection::ImHashMap;
 use parking_lot::RwLock;
-use platform_core::context::entity::Model;
-use slotmap::{SecondaryMap, SlotMap};
+use slotmap::SlotMap;
 use std::{
     any::{Any, TypeId},
-    cell::OnceCell,
     marker::PhantomData,
-    mem,
-    ops::DerefMut,
-    rc::Rc,
     sync::{
         atomic::{AtomicUsize, Ordering},
         Arc, Weak,
     },
 };
 
-use crate::context::{TransactionContext, TreeState};
+use crate::context::TreeState;
 
-use super::{
-    subscription::{SubscriberSet, Subscription},
-    AnyContext, AnyStateProvider, Context,
-};
+use super::{AnyContext, Context};
 
 slotmap::new_key_type! {
     pub struct NodeKey;
@@ -136,7 +129,7 @@ pub struct Atom<T> {
     typ: PhantomData<T>,
 }
 
-impl<T: 'static> AnyNode<T> for Atom<T> {
+impl<T: NodeValue> AnyNode<T> for Atom<T> {
     type Weak = WeakAtom<T>;
 
     fn key(&self) -> NodeKey {
@@ -158,9 +151,9 @@ impl<T: 'static> AnyNode<T> for Atom<T> {
     }
 }
 
-impl<T: 'static> AnyAtom<T> for Atom<T> {}
+impl<T: NodeValue> AnyAtom<T> for Atom<T> {}
 
-impl<T: 'static> Atom<T> {
+impl<T: NodeValue> Atom<T> {
     pub(super) fn new(key: NodeKey, rc: Weak<RwLock<NodeRefCounter>>) -> Self {
         Self {
             node: ProtoAtom::new(key, TypeId::of::<T>(), rc),
@@ -168,14 +161,8 @@ impl<T: 'static> Atom<T> {
         }
     }
 
-    #[allow(private_bounds)]
-    pub fn read<'a, C: AnyContext + AnyStateProvider>(&self, ctx: &'a mut C) -> &'a T {
-        if ctx.tree().is_some() {
-            ctx.tree().unwrap().atom_values.read(&self.key)
-        } else {
-            let tree = ctx.with_next_tree();
-            tree.atom_values.read(&self.key)
-        }
+    pub fn read<'a, C: AnyContext>(&self, ctx: &'a mut C) -> &'a T {
+        ctx.read_atom(self)
     }
 }
 
@@ -185,7 +172,7 @@ pub(super) struct Lease<'a, T> {
     typ: PhantomData<T>,
 }
 
-impl<'a, T: 'static> core::ops::Deref for Lease<'a, T> {
+impl<'a, T: NodeValue> core::ops::Deref for Lease<'a, T> {
     type Target = T;
 
     fn deref(&self) -> &Self::Target {
@@ -198,7 +185,7 @@ impl<'a, T: 'static> core::ops::Deref for Lease<'a, T> {
     }
 }
 
-impl<'a, T: 'static> core::ops::DerefMut for Lease<'a, T> {
+impl<'a, T: NodeValue> core::ops::DerefMut for Lease<'a, T> {
     fn deref_mut(&mut self) -> &mut Self::Target {
         self.value
             .as_mut()
@@ -223,9 +210,12 @@ pub trait AnyNodeValue: Any + DynClone {
     fn as_any_mut(&mut self) -> &mut dyn Any;
 }
 
+pub trait NodeValue: AnyNodeValue + Clone + 'static {}
+impl<T: AnyNodeValue + Clone + 'static> NodeValue for T {}
+
 #[derive(Clone)]
 pub(super) struct AtomMap {
-    values: im::HashMap<NodeKey, Box<dyn AnyNodeValue>>,
+    values: ImHashMap<NodeKey, Box<dyn AnyNodeValue>>,
     rc: Arc<RwLock<NodeRefCounter>>,
 }
 
@@ -240,15 +230,12 @@ impl AtomMap {
         }
     }
 
-    pub fn reserve<T: 'static>(&self) -> Slot<T> {
+    pub fn reserve<T: NodeValue>(&self) -> Slot<T> {
         let id = self.rc.write().counts.insert(1.into());
         Slot(Atom::new(id, Arc::downgrade(&self.rc)))
     }
 
-    pub fn insert<T: AnyNodeValue>(&mut self, slot: Slot<T>, entity: T) -> Atom<T>
-    where
-        T: 'static + Clone,
-    {
+    pub fn insert<T: NodeValue>(&mut self, slot: Slot<T>, entity: T) -> Atom<T> {
         let atom = slot.0;
         dbg!(std::any::type_name::<T>());
         self.values = self.values.update(atom.key, Box::new(entity));
@@ -256,10 +243,10 @@ impl AtomMap {
         atom
     }
 
-    pub fn read<T: 'static>(&self, key: &NodeKey) -> &T {
+    pub fn read<T: NodeValue>(&self, key: &NodeKey) -> &T {
         // TODO: add check for valid context
-        dbg!(&self.values.len());
-        &self.values[key]
+
+        self.values[key]
             .as_any_ref()
             .downcast_ref::<T>()
             .unwrap_or_else(|| {
@@ -270,7 +257,7 @@ impl AtomMap {
             })
     }
 
-    pub fn begin_lease<'a, T: 'static>(&mut self, node: &'a Atom<T>) -> Lease<'a, T> {
+    pub fn begin_lease<'a, T: NodeValue>(&mut self, node: &'a Atom<T>) -> Lease<'a, T> {
         // TODO: add check for valid context
 
         let value = Some(self.values.remove(&node.key()).unwrap_or_else(|| {
@@ -303,44 +290,33 @@ pub struct SelectorContext<'a, V> {
 impl<'a, V> AnyContext for SelectorContext<'a, V> {
     type Result<T> = T;
 
-    fn new_atom<T>(
+    fn new_atom<T: NodeValue>(
         &mut self,
         build_atom: impl FnOnce(&mut AtomContext<'_, T>) -> T,
-    ) -> Self::Result<Atom<T>>
-    where
-        T: 'static + AnyNodeValue + Clone,
-    {
+    ) -> Self::Result<Atom<T>> {
         todo!()
     }
 
-    fn update_atom<T, R>(
+    fn read_atom<T: NodeValue>(&self, atom: &Atom<T>) -> &T {
+        todo!()
+    }
+
+    fn update_atom<T: NodeValue, R>(
         &mut self,
         atom: &Atom<T>,
         callback: impl FnOnce(&mut T, &mut AtomContext<'_, T>) -> R,
-    ) -> Self::Result<R>
-    where
-        T: 'static,
-    {
+    ) -> Self::Result<R> {
         todo!()
     }
 
-    fn new_selector<T>(
+    fn new_selector<T: NodeValue>(
         &mut self,
         build_selector: impl FnOnce(&mut SelectorContext<'_, T>) -> T,
-    ) -> Self::Result<Selector<T>>
-    where
-        T: 'static + AnyNodeValue + Clone,
-    {
-        todo!()
-    }
-}
-
-impl<'a, V> AnyStateProvider for SelectorContext<'a, V> {
-    fn tree(&self) -> Option<&TreeState> {
+    ) -> Self::Result<Selector<T>> {
         todo!()
     }
 
-    fn with_next_tree(&mut self) -> &TreeState {
+    fn read_selector<T: NodeValue>(&mut self, atom: &Selector<T>) -> &T {
         todo!()
     }
 }
@@ -350,11 +326,28 @@ impl<'a, V> SelectorContext<'a, V> {
         Self { ctx, weak }
     }
 
-    pub fn read<T: 'static>(&mut self, key: &NodeKey) -> &T {
+    fn origin_key(&self) -> &NodeKey {
+        &self.weak.key
+    }
+
+    pub fn read<T: NodeValue>(&self, key: &NodeKey) -> &T {
         // TODO: The fact of reading means the subscription is initialized.
         // Implement saving connections with other entities for further processing
 
-        self.ctx.store.current_tree.atom_values.read::<T>(key)
+        let origin_key = self.origin_key();
+
+        if self
+            .ctx
+            .read_graph(|graph| graph.has_subscription(origin_key, key))
+        {
+            self.ctx.store.current_tree.atom_values.read::<T>(key)
+        } else {
+            self.ctx.advance_graph(|graph| {
+                graph.create_dependency(origin_key.to_owned(), key.clone());
+            });
+
+            self.ctx.store.current_tree.atom_values.read::<T>(key)
+        }
     }
 }
 
@@ -368,7 +361,7 @@ pub struct Selector<T> {
     #[deref_mut]
     node: ProtoAtom,
     typ: PhantomData<T>,
-    func: OnceCell<Box<dyn Fn(&mut SelectorContext<'_, T>) -> T>>,
+    pub(super) compute: Box<dyn Fn(&mut SelectorContext<'_, T>) -> T + 'static>,
     // observed_nodes: SubscriberSet<NodeKey, SelectorCallback>,
 }
 
@@ -394,64 +387,34 @@ impl<T: 'static> AnyNode<T> for Selector<T> {
     }
 }
 
-impl<T: 'static + AnyNodeValue> Selector<T> {
-    pub(super) fn new(key: NodeKey, rc: Weak<RwLock<NodeRefCounter>>) -> Self {
+impl<T: NodeValue> Selector<T> {
+    pub(super) fn new(
+        key: NodeKey,
+        compute: impl Fn(&mut SelectorContext<'_, T>) -> T + 'static,
+        rc: Weak<RwLock<NodeRefCounter>>,
+    ) -> Self {
         Self {
             node: ProtoAtom::new(key, TypeId::of::<T>(), rc),
-            func: OnceCell::new(),
+            compute: Box::new(compute),
             typ: PhantomData,
         }
     }
 
-    fn set(&self, transformer: impl Fn(&mut SelectorContext<'_, T>) -> T + 'static) {
-        self.func
-            .set(Box::new(transformer))
-            .unwrap_or_else(|_| panic!("can only update the transform function once"));
-    }
-
     pub fn read<'a, C: AnyContext + AsMut<Context>>(&self, ctx: &'a mut C) -> &'a T {
-        ctx.as_mut().commit(|cx| {
-            let mut lease = cx
-                .store
-                .next_tree
-                .as_mut()
-                .unwrap()
-                .selector_values
-                .begin_lease(self);
-
-            if lease.value.is_none() {
-                let transformer_fn = self.func.get().unwrap();
-                let result = transformer_fn(&mut SelectorContext::new(cx, self.downgrade()));
-                lease.value = Some(Box::new(result));
-            }
-
-            cx.store
-                .next_tree
-                .as_mut()
-                .unwrap()
-                .selector_values
-                .end_lease(lease);
-        });
-
-        ctx.as_mut()
-            .store
-            .current_tree
-            .selector_values
-            .read(&self.key)
-            .unwrap()
+        ctx.read_selector(self)
     }
 }
 
 #[derive(Clone)]
 pub(super) struct SelectorMap {
-    values: im::HashMap<NodeKey, Option<Box<dyn AnyNodeValue>>>,
-    rc: Arc<RwLock<NodeRefCounter>>,
+    pub(super) computed_values: im::HashMap<NodeKey, Box<dyn AnyNodeValue>>,
+    pub(super) rc: Arc<RwLock<NodeRefCounter>>,
 }
 
 impl SelectorMap {
     pub fn new() -> Self {
         Self {
-            values: im::HashMap::new(),
+            computed_values: im::HashMap::new(),
             rc: Arc::new(RwLock::new(NodeRefCounter {
                 counts: SlotMap::with_key(),
                 dropped: Vec::new(),
@@ -459,62 +422,72 @@ impl SelectorMap {
         }
     }
 
-    pub fn reserve<T: 'static + AnyNodeValue>(&self) -> SlotNode<T, Selector<T>> {
-        let id = self.rc.write().counts.insert(1.into());
-        SlotNode(Selector::new(id, Arc::downgrade(&self.rc)), PhantomData)
+    pub(super) fn lookup(&self, key: &NodeKey) -> bool {
+        self.computed_values.contains_key(key)
     }
 
-    pub fn insert<T>(
-        &mut self,
-        slot: SlotNode<T, Selector<T>>,
-        transformer: impl Fn(&mut SelectorContext<'_, T>) -> T + 'static,
-    ) -> Selector<T>
+    pub(super) fn remove(&mut self, key: &NodeKey) {
+        self.computed_values
+            .remove(key)
+            // Panic at this point most likely signals a bug in the program.
+            // The reason why the key may not be in the map:
+            // - The value has already been deleted
+            // - The value is currently leased and is being updated
+            .unwrap_or_else(|| panic!("cannot delete a node value that does not exist"));
+    }
+
+    pub(super) fn reserve<T: 'static + AnyNodeValue, N: AnyNode<T>>(
+        &self,
+        create_slot: impl FnOnce(&Self, NodeKey) -> N,
+    ) -> SlotNode<T, N> {
+        let key = self.rc.write().counts.insert(1.into());
+        SlotNode(create_slot(self, key), PhantomData)
+    }
+
+    pub(super) fn insert<T>(&mut self, key: NodeKey, value: T)
     where
-        T: 'static + AnyNodeValue + Clone,
+        T: AnyNodeValue + Clone + 'static,
     {
-        let selector = slot.0;
-        selector.set(transformer);
-        self.values = self.values.update(selector.key, None);
-
-        selector
+        self.computed_values = self.computed_values.update(key, Box::new(value));
     }
 
-    pub fn read<T: 'static>(&self, key: &NodeKey) -> Option<&T> {
+    pub(super) fn read<T: 'static>(&self, key: &NodeKey) -> &T {
         // TODO: add check for valid context
 
-        if let Some(value) = &self.values[key] {
-            Some(value.as_any_ref().downcast_ref::<T>().unwrap_or_else(|| {
+        self.computed_values[key]
+            .as_any_ref()
+            .downcast_ref()
+            .unwrap_or_else(|| {
                 panic!(
                     "cannot read {} node that is being updated",
                     std::any::type_name::<T>()
                 )
-            }))
-        } else {
-            None
-        }
+            })
     }
 
-    pub fn begin_lease<'a, T: 'static>(&mut self, node: &'a Selector<T>) -> SelectorLease<'a, T> {
+    pub(super) fn begin_lease<'a, T: 'static>(
+        &mut self,
+        node: &'a Selector<T>,
+    ) -> SelectorLease<'a, T> {
         // TODO: add check for valid context
 
-        let value = Some(self.values.remove(&node.key).unwrap_or_else(|| {
+        let value = Some(self.computed_values.remove(&node.key).unwrap_or_else(|| {
             panic!(
                 "cannot update {} node that is already being updated",
                 std::any::type_name::<T>()
             )
-        }))
-        .unwrap();
+        }));
 
         SelectorLease {
-            value,
             node,
+            value,
             typ: PhantomData,
         }
     }
 
-    pub fn end_lease<T>(&mut self, mut lease: SelectorLease<T>) {
-        self.values
-            .insert(lease.node.key, Some(lease.value.take().unwrap()));
+    pub(super) fn end_lease<T>(&mut self, mut lease: SelectorLease<T>) {
+        self.computed_values
+            .insert(lease.node.key, lease.value.take().unwrap());
     }
 }
 
@@ -522,6 +495,16 @@ pub(super) struct SelectorLease<'a, T> {
     node: &'a Selector<T>,
     value: Option<Box<dyn AnyNodeValue>>,
     typ: PhantomData<T>,
+}
+
+impl<'a, T: AnyNodeValue + 'static> SelectorLease<'a, T> {
+    pub(super) fn set_value(&mut self, value: T) {
+        self.value = Some(Box::new(value));
+    }
+
+    pub(super) fn is_empty(&self) -> bool {
+        self.value.is_none()
+    }
 }
 
 impl<'a, T: 'static> core::ops::Deref for SelectorLease<'a, T> {

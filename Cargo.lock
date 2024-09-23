@@ -4116,9 +4116,11 @@ dependencies = [
  "fnv",
  "im",
  "moss_std",
+ "once_cell",
  "parking_lot",
  "platform_core",
  "slotmap",
+ "smallvec",
 ]
 
 [[package]]
