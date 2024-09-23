@@ -41,6 +41,40 @@ pub struct AtomContext<'a, T> {
     weak: WeakAtom<T>,
 }
 
+impl<V> AnyContext for AtomContext<'_, V> {
+    type Result<T> = T;
+
+    fn new_atom<T: NodeValue>(
+        &mut self,
+        build_atom: impl FnOnce(&mut AtomContext<'_, T>) -> T,
+    ) -> Self::Result<Atom<T>> {
+        self.ctx.new_atom(build_atom)
+    }
+
+    fn read_atom<T: NodeValue>(&self, atom: &Atom<T>) -> &T {
+        todo!()
+    }
+
+    fn update_atom<T: NodeValue, R>(
+        &mut self,
+        atom: &Atom<T>,
+        callback: impl FnOnce(&mut T, &mut AtomContext<'_, T>) -> R,
+    ) -> Self::Result<R> {
+        todo!()
+    }
+
+    fn new_selector<T: NodeValue>(
+        &mut self,
+        build_selector: impl Fn(&mut SelectorContext<'_, T>) -> T + 'static,
+    ) -> Self::Result<Selector<T>> {
+        todo!()
+    }
+
+    fn read_selector<T: NodeValue>(&mut self, atom: &Selector<T>) -> &T {
+        todo!()
+    }
+}
+
 impl<'a, T: 'static> AtomContext<'a, T> {
     pub(super) fn new(ctx: &'a mut Context, weak: WeakAtom<T>) -> Self {
         Self { ctx, weak }
@@ -361,7 +395,7 @@ pub struct Selector<T> {
     #[deref_mut]
     node: ProtoAtom,
     typ: PhantomData<T>,
-    pub(super) compute: Box<dyn Fn(&mut SelectorContext<'_, T>) -> T + 'static>,
+    compute: Box<dyn Fn(&mut SelectorContext<'_, T>) -> T + 'static>,
     // observed_nodes: SubscriberSet<NodeKey, SelectorCallback>,
 }
 
@@ -402,6 +436,10 @@ impl<T: NodeValue> Selector<T> {
 
     pub fn read<'a, C: AnyContext + AsMut<Context>>(&self, ctx: &'a mut C) -> &'a T {
         ctx.read_selector(self)
+    }
+
+    pub fn compute(&self, ctx: &mut SelectorContext<'_, T>) -> T {
+        (&self.compute)(ctx)
     }
 }
 
