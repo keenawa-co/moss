@@ -1,14 +1,10 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { commands } from "@/bindings";
 import { listen } from "@tauri-apps/api/event";
 import { LanguageSelector, ThemeSelector } from "@/components";
 
-interface SettingsProps {
-  themes: string[];
-}
-
-export const Settings: React.FC<SettingsProps> = ({ themes }) => {
+export const Settings = () => {
   const { t } = useTranslation(["ns1", "ns2"]);
 
   const [number, setNumber] = useState<number>(0);
@@ -43,7 +39,7 @@ export const Settings: React.FC<SettingsProps> = ({ themes }) => {
       </div>
       <div>
         <h3>{t("selectTheme")}</h3>
-        <ThemeSelector themes={themes} />
+        <ThemeSelector />
       </div>
       <div>
         <h3>Update Font Size</h3>
@@ -57,5 +53,3 @@ export const Settings: React.FC<SettingsProps> = ({ themes }) => {
     </main>
   );
 };
-
-export default Settings;

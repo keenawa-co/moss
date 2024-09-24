@@ -1,16 +1,16 @@
+import { LANGUAGES } from "@/constants";
+import { RootState } from "@/store";
+import { setLanguage } from "@/store/languages/languagesSlice";
 import React from "react";
-import { useTranslation } from "react-i18next";
-import { LANGUAGES } from "@/constants/index";
+import { useDispatch, useSelector } from "react-redux";
 
-export const LanguageSelector: React.FC = () => {
-  const { i18n } = useTranslation();
-  const [language, setLanguage] = React.useState(() => localStorage.getItem("language") || i18n.language);
+export const LanguageSelector = () => {
+  const dispatch = useDispatch();
+  const language = useSelector((state: RootState) => state.languages.code);
 
   const onChangeLang = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const langCode = e.target.value;
-    setLanguage(langCode);
-    localStorage.setItem("language", langCode);
-    i18n.changeLanguage(langCode);
+    console.log("Language changed", e.target.value);
+    dispatch(setLanguage(e.target.value));
   };
 
   return (
