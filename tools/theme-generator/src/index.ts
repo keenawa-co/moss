@@ -1,4 +1,4 @@
-//import { InputTheme } from "@repo/theme";
+//import { InputTheme } from "@repo/moss_theme";
 import { existsSync, mkdirSync, writeFileSync } from "fs";
 import * as os from "os";
 

@@ -1,5 +1,5 @@
 import { commands } from "@/bindings";
-import { Convert } from "@repo/theme";
+import { Convert } from "@repo/moss_theme";
 
 export const handleReadTheme = async (themeName: string) => {
   try {

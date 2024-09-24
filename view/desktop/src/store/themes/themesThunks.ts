@@ -1,6 +1,6 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { commands } from "@/bindings";
-import { Convert } from "@repo/theme";
+import { Convert } from "@repo/moss_theme";
 import { setSelectedTheme, setThemes } from "./themesSlice";
 import applyTheme from "../../../../shared/ui/src/tailwind/applyTheme";
 import { handleReadTheme } from "./themesHelpers";

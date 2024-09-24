@@ -1,4 +1,4 @@
-import { Theme, ThemeCssVariables, mapThemeToCssVariables } from "@repo/theme";
+import { Theme, ThemeCssVariables, mapThemeToCssVariables } from "@repo/moss_theme";
 
 //Applies the theme to the root element of the app.
 export default function applyTheme(theme: Theme) {
