@@ -80,18 +80,14 @@ function toKebabCase(str: string): string {
 }
 
 // Theme custom Tailwind color variables
-export const customTailwindColorVariables: Colors = {
-  primary: rgbaWithOpacity("--color-primary"),
-  sideBarBackground: rgbaWithOpacity("--color-side-bar-background"),
-  toolBarBackground: rgbaWithOpacity("--color-tool-bar-background"),
-  pageBackground: rgbaWithOpacity("--color-page-background"),
-  statusBarBackground: rgbaWithOpacity("--color-status-bar-background"),
-  windowsCloseButtonBackground: rgbaWithOpacity("--color-windows-close-button-background"),
-  windowControlsLinuxBackground: rgbaWithOpacity("--color-window-controls-linux-background"),
-  windowControlsLinuxText: rgbaWithOpacity("--color-window-controls-linux-text"),
-  windowControlsLinuxHoverBackground: rgbaWithOpacity("--color-window-controls-linux-hover-background"),
-  windowControlsLinuxActiveBackground: rgbaWithOpacity("--color-window-controls-linux-active-background"),
-};
+export const customTailwindColorVariables: Record<keyof Colors, string> = Object.keys(new Colors()).reduce(
+  (acc, key) => {
+    const cssKey = `--color-${toKebabCase(key)}` as keyof ThemeCssVariables;
+    acc[key as keyof Colors] = rgbaWithOpacity(cssKey);
+    return acc;
+  },
+  {} as Record<keyof Colors, string>
+);
 
 // https://tailwindcss.com/docs/customizing-colors#using-css-variables
 function rgbaWithOpacity(variableName: keyof ThemeCssVariables): string {
