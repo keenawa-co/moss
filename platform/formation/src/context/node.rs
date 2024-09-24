@@ -12,8 +12,6 @@ use std::{
     },
 };
 
-use crate::context::TreeState;
-
 use super::{AnyContext, Context};
 
 slotmap::new_key_type! {

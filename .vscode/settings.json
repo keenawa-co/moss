@@ -37,6 +37,7 @@
     "sess",
     "shadcn",
     "slotmap",
+    "smallvec",
     "smol",
     "specta",
     "sqlx",

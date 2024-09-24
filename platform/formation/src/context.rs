@@ -12,10 +12,9 @@ use node::{
 use once_cell::sync::OnceCell;
 use smallvec::SmallVec;
 use std::{
-    cell::{Cell, Ref, RefCell, RefMut},
+    cell::{Cell, RefCell},
     collections::HashSet,
     mem,
-    rc::{Rc, Weak},
     sync::Arc,
 };
 
