@@ -66,18 +66,17 @@ export type ThemeCssVariables = {
 };
 
 export function mapThemeToCssVariables(theme: Theme): ThemeCssVariables {
-  return {
-    "--color-primary": theme.colors.primary || "",
-    "--color-side-bar-background": theme.colors.sideBarBackground || "",
-    "--color-tool-bar-background": theme.colors.toolBarBackground || "",
-    "--color-page-background": theme.colors.pageBackground || "",
-    "--color-status-bar-background": theme.colors.statusBarBackground || "",
-    "--color-windows-close-button-background": theme.colors.windowsCloseButtonBackground || "",
-    "--color-window-controls-linux-background": theme.colors.windowControlsLinuxBackground || "",
-    "--color-window-controls-linux-text": theme.colors.windowControlsLinuxText || "",
-    "--color-window-controls-linux-hover-background": theme.colors.windowControlsLinuxHoverBackground || "",
-    "--color-window-controls-linux-active-background": theme.colors.windowControlsLinuxActiveBackground || "",
-  };
+  const colorKeys = Object.keys(theme.colors) as (keyof Colors)[];
+
+  return colorKeys.reduce((acc, key) => {
+    const cssKey = `--color-${toKebabCase(key)}` as keyof ThemeCssVariables;
+    acc[cssKey] = theme.colors[key] || "";
+    return acc;
+  }, {} as ThemeCssVariables);
+}
+
+function toKebabCase(str: string): string {
+  return str.replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`);
 }
 
 // Theme custom Tailwind color variables
