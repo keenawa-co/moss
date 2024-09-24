@@ -20,8 +20,8 @@ members = [
     "view/shared/workbench/service/configuration/common",
     "view/shared/workbench/service/configuration/tgui",
     "view/shared/workbench/service/user_profile/tgui",
-    "view/shared/workbench/service/environment/tgui", 
-    
+    "view/shared/workbench/service/environment/tgui",
+
     "tools/xtask",
 ]
 
@@ -87,7 +87,9 @@ slotmap = "1.0.7"
 rustc-hash = "2.0.0"
 parking = "2.2.1"
 waker-fn = "1.2.0"
+im = "15.1.0"
+smallvec = "1.13.2"
+dyn-clone = "1.0.17"
 cargo_metadata = "0.18"
-clap = { version = "4.4", features = ["derive"] }
 pathdiff = "0.2"
 toml = "0.8.19"
