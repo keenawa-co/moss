@@ -54,7 +54,7 @@ impl CrossPlatformClient {
     pub fn run<Fut: Future>(&self, fut: Fut) -> Fut::Output {
         let state = self.0.as_ref().borrow();
         let main_rx_clone = state.main_rx.clone();
-        dbg!(12);
+
         state.local_set.spawn_local(async move {
             while let Ok(runnable) = main_rx_clone.recv_async().await {
                 dbg!(111);

@@ -14,7 +14,7 @@
   }
   html,
   body {
-    @apply font-sans text-primary;
+    @apply font-sans text-[rgba(var(--color-primary))];
     overflow: hidden;
     position: fixed;
     width: 100vw;
@@ -25,7 +25,7 @@
   h2,
   h3,
   h4 {
-    @apply text-primary;
+    @apply text-[rgba(var(--color-primary))];
   }
 
   h2,
@@ -51,6 +51,6 @@
   }
 
   p {
-    @apply text-sm text-primary leading-normal;
+    @apply text-sm text-[rgba(var(--color-primary))] leading-normal;
   }
 }

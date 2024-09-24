@@ -11,13 +11,13 @@ export function Gnome({ className, ...props }: HTMLProps<HTMLDivElement>) {
     <div className={cn("mr-[10px] h-auto items-center space-x-[13px]", className)} {...props}>
       <Button
         onClick={minimizeWindow}
-        className="m-0 aspect-square h-6 w-6 cursor-default rounded-full bg-windowControlsLinuxBackground p-0 text-windowControlsLinuxText hover:bg-windowControlsLinuxHoverBackground active:bg-windowControlsLinuxActiveBackground dark:bg-[#373737] dark:text-white dark:hover:bg-[#424242] dark:active:bg-[#565656]"
+        className="m-0 aspect-square h-6 w-6 cursor-default rounded-full bg-[rgba(var(--color-window-controls-linux-background))] p-0 text-[rgba(var(--color-window-controls-linux-text))] hover:bg-[rgba(var(--color-window-controls-linux-hover-background))] active:bg-[rgba(var(--color-window-controls-linux-active-background))] dark:bg-[#373737] dark:text-white dark:hover:bg-[#424242] dark:active:bg-[#565656]"
       >
         <Icons.minimizeWin className="h-[9px] w-[9px]" />
       </Button>
       <Button
         onClick={maximizeWindow}
-        className="m-0 aspect-square h-6 w-6 cursor-default rounded-full bg-windowControlsLinuxBackground p-0 text-windowControlsLinuxText hover:bg-windowControlsLinuxHoverBackground active:bg-windowControlsLinuxActiveBackground dark:bg-[#373737] dark:text-white dark:hover:bg-[#424242] dark:active:bg-[#565656]"
+        className="m-0 aspect-square h-6 w-6 cursor-default rounded-full bg-[rgba(var(--color-window-controls-linux-background))] p-0 text-[rgba(var(--color-window-controls-linux-text))] hover:bg-[rgba(var(--color-window-controls-linux-hover-background))] active:bg-[rgba(var(--color-window-controls-linux-active-background))] dark:bg-[#373737] dark:text-white dark:hover:bg-[#424242] dark:active:bg-[#565656]"
       >
         {!isWindowMaximized ? (
           <Icons.maximizeWin className="h-2 w-2" />
@@ -27,7 +27,7 @@ export function Gnome({ className, ...props }: HTMLProps<HTMLDivElement>) {
       </Button>
       <Button
         onClick={closeWindow}
-        className="m-0 aspect-square h-6 w-6 cursor-default rounded-full bg-windowControlsLinuxBackground p-0 text-windowControlsLinuxText hover:bg-windowControlsLinuxHoverBackground active:bg-windowControlsLinuxActiveBackground dark:bg-[#373737] dark:text-white dark:hover:bg-[#424242] dark:active:bg-[#565656]"
+        className="m-0 aspect-square h-6 w-6 cursor-default rounded-full bg-[rgba(var(--color-window-controls-linux-background))] p-0 text-[rgba(var(--color-window-controls-linux-text))] hover:bg-[rgba(var(--color-window-controls-linux-hover-background))] active:bg-[rgba(var(--color-window-controls-linux-active-background))] dark:bg-[#373737] dark:text-white dark:hover:bg-[#424242] dark:active:bg-[#565656]"
       >
         <Icons.closeWin className="h-2 w-2" />
       </Button>
