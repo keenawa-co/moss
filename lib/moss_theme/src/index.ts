@@ -1,66 +1,61 @@
-// Theme used for JSON parsing
-export interface Theme {
-  name: string;
-  type: string;
-  default: boolean;
-  colors: Colors;
+// FIXME: isDefault
+const keywords = ["background", "hoverBackground", "activeBackground", "text"];
+
+export class Theme {
+  constructor(
+    public name: string,
+    public type: string,
+    public isDefault: boolean,
+    public colors: Colors
+  ) {}
 }
 
-export interface Colors {
-  primary?: string;
-  sideBarBackground?: string;
-  toolBarBackground?: string;
-  pageBackground?: string;
-  statusBarBackground?: string;
-  windowsCloseButtonBackground?: string;
-  windowControlsLinuxBackground?: string;
-  windowControlsLinuxText?: string;
-  windowControlsLinuxHoverBackground?: string;
-  windowControlsLinuxActiveBackground?: string;
+export class Colors {
+  constructor(
+    public primary?: string,
+    public sideBarBackground?: string,
+    public toolBarBackground?: string,
+    public pageBackground?: string,
+    public statusBarBackground?: string,
+    public windowsCloseButtonBackground?: string,
+    public windowControlsLinuxBackground?: string,
+    public windowControlsLinuxText?: string,
+    public windowControlsLinuxHoverBackground?: string,
+    public windowControlsLinuxActiveBackground?: string
+  ) {}
 }
 
 const typeMap: any = {
   Theme: createPropsWithAdditional(
-    [
-      { json: "name", js: "name", typ: "" },
-      { json: "type", js: "type", typ: "" },
-      { json: "default", js: "default", typ: true },
-      { json: "colors", js: "colors", typ: createReference("Colors") },
-    ],
+    Object.keys(new Theme("", "", false, new Colors())).map((key) => ({
+      json: key,
+      js: key,
+      typ: key === "colors" ? createReference("Colors") : key === "isDefault" ? true : "",
+    })),
     false
   ),
   Colors: createPropsWithAdditional(
-    [
-      { json: "primary", js: "primary", typ: createUnionMembers(undefined, "") },
-      { json: "sideBar.background", js: "sideBarBackground", typ: createUnionMembers(undefined, "") },
-      { json: "toolBar.background", js: "toolBarBackground", typ: createUnionMembers(undefined, "") },
-      { json: "page.background", js: "pageBackground", typ: createUnionMembers(undefined, "") },
-      { json: "statusBar.background", js: "statusBarBackground", typ: createUnionMembers(undefined, "") },
-      {
-        json: "windowsCloseButton.background",
-        js: "windowsCloseButtonBackground",
+    Object.keys(new Colors()).map((key) => {
+      return {
+        json: createJsonKey(key),
+        js: key,
         typ: createUnionMembers(undefined, ""),
-      },
-      {
-        json: "windowControlsLinux.background",
-        js: "windowControlsLinuxBackground",
-        typ: createUnionMembers(undefined, ""),
-      },
-      { json: "windowControlsLinux.text", js: "windowControlsLinuxText", typ: createUnionMembers(undefined, "") },
-      {
-        json: "windowControlsLinux.hoverBackground",
-        js: "windowControlsLinuxHoverBackground",
-        typ: createUnionMembers(undefined, ""),
-      },
-      {
-        json: "windowControlsLinux.activeBackground",
-        js: "windowControlsLinuxActiveBackground",
-        typ: createUnionMembers(undefined, ""),
-      },
-    ],
+      };
+    }),
     false
   ),
 };
+
+function createJsonKey(key: string) {
+  const matchedKeywords = keywords.filter((v) => key.toLowerCase().indexOf(v.toLowerCase()) !== -1);
+  if (matchedKeywords.length > 0) {
+    const longestKeyword = matchedKeywords.reduce((a, b) => (a.length > b.length ? a : b));
+    return key.replace(new RegExp(longestKeyword, "i"), "." + longestKeyword);
+  }
+  return key;
+}
+
+console.dir(typeMap);
 
 // Theme custom CSS variables
 export interface ThemeCssVariables {
