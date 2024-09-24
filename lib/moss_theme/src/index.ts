@@ -1,5 +1,5 @@
 // FIXME: isDefault
-const keywords = ["background", "hoverBackground", "activeBackground", "text"];
+const styleKeywords = ["background", "hoverBackground", "activeBackground", "text"];
 
 export class Theme {
   constructor(
@@ -47,7 +47,7 @@ const typeMap: any = {
 };
 
 function createJsonKey(key: string) {
-  const matchedKeywords = keywords.filter((v) => key.toLowerCase().indexOf(v.toLowerCase()) !== -1);
+  const matchedKeywords = styleKeywords.filter((v) => key.toLowerCase().indexOf(v.toLowerCase()) !== -1);
   if (matchedKeywords.length > 0) {
     const longestKeyword = matchedKeywords.reduce((a, b) => (a.length > b.length ? a : b));
     return key.replace(new RegExp(longestKeyword, "i"), "." + longestKeyword);
@@ -55,29 +55,23 @@ function createJsonKey(key: string) {
   return key;
 }
 
-console.dir(typeMap);
+type KebabCase<T extends string> = T extends `${infer F}${infer R}`
+  ? R extends Uncapitalize<R>
+    ? `${Lowercase<F>}${KebabCase<R>}`
+    : `${Lowercase<F>}-${KebabCase<R>}`
+  : T;
 
-// Theme custom CSS variables
-export interface ThemeCssVariables {
-  "--color-primary": string;
-  "--color-sideBar-background": string;
-  "--color-toolBar-background": string;
-  "--color-page-background": string;
-  "--color-statusBar-background": string;
-  "--color-windows-close-button-background": string;
-  "--color-window-controls-linux-background": string;
-  "--color-window-controls-linux-text": string;
-  "--color-window-controls-linux-hover-background": string;
-  "--color-window-controls-linux-active-background": string;
-}
+export type ThemeCssVariables = {
+  [K in keyof Colors as `--color-${KebabCase<K>}`]: string;
+};
 
 export function mapThemeToCssVariables(theme: Theme): ThemeCssVariables {
   return {
     "--color-primary": theme.colors.primary || "",
-    "--color-sideBar-background": theme.colors.sideBarBackground || "",
-    "--color-toolBar-background": theme.colors.toolBarBackground || "",
+    "--color-side-bar-background": theme.colors.sideBarBackground || "",
+    "--color-tool-bar-background": theme.colors.toolBarBackground || "",
     "--color-page-background": theme.colors.pageBackground || "",
-    "--color-statusBar-background": theme.colors.statusBarBackground || "",
+    "--color-status-bar-background": theme.colors.statusBarBackground || "",
     "--color-windows-close-button-background": theme.colors.windowsCloseButtonBackground || "",
     "--color-window-controls-linux-background": theme.colors.windowControlsLinuxBackground || "",
     "--color-window-controls-linux-text": theme.colors.windowControlsLinuxText || "",
@@ -89,10 +83,10 @@ export function mapThemeToCssVariables(theme: Theme): ThemeCssVariables {
 // Theme custom Tailwind color variables
 export const customTailwindColorVariables: Colors = {
   primary: rgbaWithOpacity("--color-primary"),
-  sideBarBackground: rgbaWithOpacity("--color-sideBar-background"),
-  toolBarBackground: rgbaWithOpacity("--color-toolBar-background"),
+  sideBarBackground: rgbaWithOpacity("--color-side-bar-background"),
+  toolBarBackground: rgbaWithOpacity("--color-tool-bar-background"),
   pageBackground: rgbaWithOpacity("--color-page-background"),
-  statusBarBackground: rgbaWithOpacity("--color-statusBar-background"),
+  statusBarBackground: rgbaWithOpacity("--color-status-bar-background"),
   windowsCloseButtonBackground: rgbaWithOpacity("--color-windows-close-button-background"),
   windowControlsLinuxBackground: rgbaWithOpacity("--color-window-controls-linux-background"),
   windowControlsLinuxText: rgbaWithOpacity("--color-window-controls-linux-text"),

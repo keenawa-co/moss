@@ -22,7 +22,7 @@ export const TitleBar = ({}: TitleBarProps) => {
   return (
     <header
       data-tauri-drag-region
-      className={cn("inset-0 bg-[rgba(var(--color-toolBar-background))]", {
+      className={cn("inset-0 bg-[rgba(var(--color-tool-bar-background))]", {
         "rounded-t-lg": osType != "windows",
       })}
     >

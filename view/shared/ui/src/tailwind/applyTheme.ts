@@ -7,6 +7,8 @@ export default function applyTheme(theme: Theme) {
 
   Object.keys(themeObject).forEach((v) => {
     const propertyVal = themeObject[v as keyof ThemeCssVariables];
-    root.style.setProperty(v, propertyVal);
+    if (propertyVal !== undefined) {
+      root.style.setProperty(v, propertyVal);
+    }
   });
 }
