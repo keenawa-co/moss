@@ -35,7 +35,7 @@ export const Badge = ({
   return (
     <div
       style={{ backgroundColor, color: primaryColor }}
-      className={cn("inline-block font-bold text-[10px] py-0.5 px-[5px] rounded-[5px]", className)}
+      className={cn("inline-block rounded-[5px] px-[5px] py-0.5 text-[10px] font-bold", className)}
       {...props}
     >
       {value}

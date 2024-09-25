@@ -5,13 +5,13 @@ const StatusBar = ({ branch, className }: { branch?: string } & ComponentPropsWi
   return (
     <footer
       className={twMerge(
-        "flex justify-end [&>*:first-child]:mr-auto items-center px-5 bg-[rgba(var(--color-statusBar-background))] text-stone-50 text-xs z-100",
+        "flex items-center justify-end bg-[rgba(var(--color-statusBar-background))] px-5 text-xs text-stone-50 z-100 [&>*:first-child]:mr-auto",
         className
       )}
     >
       <StatusBarButton className="group">
         <svg
-          className="opacity-80 group-hover:opacity-100 group-focus:opacity-100 transition"
+          className="opacity-80 transition group-hover:opacity-100 group-focus:opacity-100"
           fill="none"
           height="18"
           viewBox="0 0 18 18"
@@ -30,7 +30,7 @@ const StatusBar = ({ branch, className }: { branch?: string } & ComponentPropsWi
       {branch ? (
         <StatusBarButton className="group">
           <svg
-            className="opacity-80 group-hover:opacity-100 group-focus:opacity-100 transition shrink-0"
+            className="shrink-0 opacity-80 transition group-hover:opacity-100 group-focus:opacity-100"
             fill="none"
             height="18"
             viewBox="0 0 14 15"
@@ -51,7 +51,7 @@ const StatusBar = ({ branch, className }: { branch?: string } & ComponentPropsWi
 
       <StatusBarButton className="group">
         <svg
-          className="opacity-80 group-hover:opacity-100 group-focus:opacity-100 w-4.5 h-4.5 transition"
+          className="h-4.5 w-4.5 opacity-80 transition group-hover:opacity-100 group-focus:opacity-100"
           fill="none"
           height="18"
           viewBox="0 0 14 14"
@@ -71,7 +71,7 @@ const StatusBar = ({ branch, className }: { branch?: string } & ComponentPropsWi
 
       <StatusBarButton className="group">
         <svg
-          className="opacity-80 group-hover:opacity-100 group-focus:opacity-100 w-4.5 h-4.5 transition"
+          className="h-4.5 w-4.5 opacity-80 transition group-hover:opacity-100 group-focus:opacity-100"
           fill="none"
           height="18"
           viewBox="-4 -4 18 18"
@@ -97,7 +97,7 @@ function StatusBarButton({ children, className }: ComponentPropsWithoutRef<"butt
   return (
     <button
       className={twMerge(
-        "flex items-center gap-2 hover:bg-white hover:bg-opacity-10 focus:bg-white focus:bg-opacity-10 transition px-2.5 py-0.5",
+        "flex items-center gap-2 px-2.5 py-0.5 transition hover:bg-white hover:bg-opacity-10 focus:bg-white focus:bg-opacity-10",
         className
       )}
     >

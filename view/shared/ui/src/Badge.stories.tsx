@@ -30,7 +30,7 @@ export const AllVariants: Story = {
   args: {},
   render: (args) => {
     return (
-      <div className="w-full p-16 flex flex-col gap-6">
+      <div className="flex w-full flex-col gap-6 p-16">
         <h2 className="text-3xl font-semibold">All variants</h2>
 
         <table className="w-64">

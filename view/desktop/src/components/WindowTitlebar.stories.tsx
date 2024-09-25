@@ -52,7 +52,7 @@ export const MacControlsOnRightSide: Story = {
   },
   render: (args) => (
     <WindowTitlebar {...args}>
-      <div className="flex items-center justify-center rounded-full bg-sky-200 px-2">
+      <div className="bg-sky-200 flex items-center justify-center rounded-full px-2">
         titlebar content without w-full (macos but on the right side)
       </div>
     </WindowTitlebar>
@@ -89,7 +89,7 @@ export const WithIconAndTitle: Story = {
   },
   render: (args) => (
     <WindowTitlebar {...args}>
-      <div className="flex h-full w-full items-center justify-center mr-96" data-tauri-drag-region>
+      <div className="mr-96 flex h-full w-full items-center justify-center" data-tauri-drag-region>
         <LogoSvg />
         App Title
       </div>
@@ -112,7 +112,7 @@ export const WithIconMenuAndTitle: Story = {
         <Menu />
       </div>
 
-      <div className="flex items-center justify-center mx-20" data-tauri-drag-region>
+      <div className="mx-20 flex items-center justify-center" data-tauri-drag-region>
         App Title
       </div>
     </WindowTitlebar>

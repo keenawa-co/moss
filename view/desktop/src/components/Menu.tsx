@@ -9,13 +9,13 @@ export const Menu = () => {
   return (
     <nav>
       <div>
-        <NavLink className={isActive + " bg-green-300 text-[rgba(var(--color-primary))] px-20"} to="/">
+        <NavLink className={isActive + " bg-green-300 px-20 text-[rgba(var(--color-primary))]"} to="/">
           {t("home")}
         </NavLink>
-        <NavLink className={isActive + " bg-orange-300 text-[rgba(var(--color-primary))] px-20"} to="/settings">
+        <NavLink className={isActive + " bg-orange-300 px-20 text-[rgba(var(--color-primary))]"} to="/settings">
           {t("settings")}
         </NavLink>
-        <NavLink className={isActive + " bg-yellow-300 text-[rgba(var(--color-primary))] px-20"} to="/logs">
+        <NavLink className={isActive + " bg-yellow-300 px-20 text-[rgba(var(--color-primary))]"} to="/logs">
           logs
         </NavLink>
       </div>

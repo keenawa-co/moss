@@ -108,25 +108,25 @@ export const Controls: Story = {
       <>
         <div className="flex gap-2 p-4 ">
           <button
-            className={cn(`border rounded p-2 duration-0`, { "bg-sky-500 border-sky-500 text-white": oneVisible })}
+            className={cn(`rounded border p-2 duration-0`, { "border-sky-500 bg-sky-500 text-white": oneVisible })}
             onClick={() => setOneVisible(!oneVisible)}
           >
             One
           </button>
           <button
-            className={cn(`border rounded p-2 duration-0`, { "bg-sky-500 border-sky-500 text-white": twoVisible })}
+            className={cn(`rounded border p-2 duration-0`, { "border-sky-500 bg-sky-500 text-white": twoVisible })}
             onClick={() => setTwoVisible(!twoVisible)}
           >
             Two
           </button>
           <button
-            className={cn(`border rounded p-2 duration-0`, { "bg-sky-500 border-sky-500 text-white": threeVisible })}
+            className={cn(`rounded border p-2 duration-0`, { "border-sky-500 bg-sky-500 text-white": threeVisible })}
             onClick={() => setThreeVisible(!threeVisible)}
           >
             Three
           </button>
           <button
-            className={cn(`border rounded p-2 duration-0`, { "bg-sky-500 border-sky-500 text-white": fourVisible })}
+            className={cn(`rounded border p-2 duration-0`, { "border-sky-500 bg-sky-500 text-white": fourVisible })}
             onClick={() => setFourVisible(!fourVisible)}
           >
             Four
@@ -166,7 +166,7 @@ export const DotsOnTextOverflow: Story = {
             {Array(10)
               .fill(0)
               .map((_, i) => (
-                <div key={i} className="text-ellipsis whitespace-nowrap overflow-hidden">
+                <div key={i} className="overflow-hidden text-ellipsis whitespace-nowrap">
                   Menu item - {i + 1} with a very long name
                 </div>
               ))}
@@ -198,12 +198,12 @@ export const OverflowXY: Story = {
     return (
       <Resizable>
         <ResizablePanel className="grid place-items-center" preferredSize={200} maxSize={300} snap>
-          <div className="w-full h-full overflow-y-scroll">
-            <div className="text-center h-12 mt-12 mb-4 font-bold">Overflow Y</div>
+          <div className="h-full w-full overflow-y-scroll">
+            <div className="mb-4 mt-12 h-12 text-center font-bold">Overflow Y</div>
             {Array(10)
               .fill(0)
               .map((_, i) => (
-                <div key={i} className="text-ellipsis whitespace-nowrap overflow-hidden h-12">
+                <div key={i} className="h-12 overflow-hidden text-ellipsis whitespace-nowrap">
                   Menu item - {i + 1} with a very long name
                 </div>
               ))}
@@ -211,41 +211,41 @@ export const OverflowXY: Story = {
         </ResizablePanel>
 
         <ResizablePanel maxSize={500}>
-          <div className="w-full h-full overflow-x-scroll flex flex-col justify-center">
+          <div className="flex h-full w-full flex-col justify-center overflow-x-scroll">
             <div>Overflow X</div>
             <div className="flex">
-              <div className="h-44 min-w-80 w-full bg-[#e50000]" />
-              <div className="h-44 min-w-80 w-full bg-[#ff8d00]" />
-              <div className="h-44 min-w-80 w-full bg-[#ffee00]" />
-              <div className="h-44 min-w-80 w-full bg-[#028121]" />
-              <div className="h-44 min-w-80 w-full bg-[#004cff]" />
-              <div className="h-44 min-w-80 w-full bg-[#770088]" />
+              <div className="h-44 w-full min-w-80 bg-[#e50000]" />
+              <div className="h-44 w-full min-w-80 bg-[#ff8d00]" />
+              <div className="h-44 w-full min-w-80 bg-[#ffee00]" />
+              <div className="h-44 w-full min-w-80 bg-[#028121]" />
+              <div className="h-44 w-full min-w-80 bg-[#004cff]" />
+              <div className="h-44 w-full min-w-80 bg-[#770088]" />
             </div>
           </div>
         </ResizablePanel>
 
         <ResizablePanel>
-          <div className="w-full h-full overflow-auto grid grid-cols-[repeat(6,minmax(320px,1fr))]">
-            <div className="min-h-80 h-full min-w-80 w-full bg-[#e50000]">Overflow auto</div>
-            <div className="min-h-80 h-full min-w-80 w-full bg-[#ff8d00]"></div>
-            <div className="min-h-80 h-full min-w-80 w-full bg-[#ffee00]"></div>
-            <div className="min-h-80 h-full min-w-80 w-full bg-[#028121]"></div>
-            <div className="min-h-80 h-full min-w-80 w-full bg-[#004cff]"></div>
-            <div className="min-h-80 h-full min-w-80 w-full bg-[#770088]"></div>
+          <div className="grid h-full w-full grid-cols-[repeat(6,minmax(320px,1fr))] overflow-auto">
+            <div className="h-full min-h-80 w-full min-w-80 bg-[#e50000]">Overflow auto</div>
+            <div className="h-full min-h-80 w-full min-w-80 bg-[#ff8d00]"></div>
+            <div className="h-full min-h-80 w-full min-w-80 bg-[#ffee00]"></div>
+            <div className="h-full min-h-80 w-full min-w-80 bg-[#028121]"></div>
+            <div className="h-full min-h-80 w-full min-w-80 bg-[#004cff]"></div>
+            <div className="h-full min-h-80 w-full min-w-80 bg-[#770088]"></div>
 
-            <div className="min-h-80 h-full min-w-80 w-full bg-[#770088]"></div>
-            <div className="min-h-80 h-full min-w-80 w-full bg-[#004cff]"></div>
-            <div className="min-h-80 h-full min-w-80 w-full bg-[#028121]"></div>
-            <div className="min-h-80 h-full min-w-80 w-full bg-[#ffee00]"></div>
-            <div className="min-h-80 h-full min-w-80 w-full bg-[#ff8d00]"></div>
-            <div className="min-h-80 h-full min-w-80 w-full bg-[#e50000]"></div>
+            <div className="h-full min-h-80 w-full min-w-80 bg-[#770088]"></div>
+            <div className="h-full min-h-80 w-full min-w-80 bg-[#004cff]"></div>
+            <div className="h-full min-h-80 w-full min-w-80 bg-[#028121]"></div>
+            <div className="h-full min-h-80 w-full min-w-80 bg-[#ffee00]"></div>
+            <div className="h-full min-h-80 w-full min-w-80 bg-[#ff8d00]"></div>
+            <div className="h-full min-h-80 w-full min-w-80 bg-[#e50000]"></div>
 
-            <div className="min-h-80 h-full min-w-80 w-full bg-[#e50000]"></div>
-            <div className="min-h-80 h-full min-w-80 w-full bg-[#ff8d00]"></div>
-            <div className="min-h-80 h-full min-w-80 w-full bg-[#ffee00]"></div>
-            <div className="min-h-80 h-full min-w-80 w-full bg-[#028121]"></div>
-            <div className="min-h-80 h-full min-w-80 w-full bg-[#004cff]"></div>
-            <div className="min-h-80 h-full min-w-80 w-full bg-[#770088]"></div>
+            <div className="h-full min-h-80 w-full min-w-80 bg-[#e50000]"></div>
+            <div className="h-full min-h-80 w-full min-w-80 bg-[#ff8d00]"></div>
+            <div className="h-full min-h-80 w-full min-w-80 bg-[#ffee00]"></div>
+            <div className="h-full min-h-80 w-full min-w-80 bg-[#028121]"></div>
+            <div className="h-full min-h-80 w-full min-w-80 bg-[#004cff]"></div>
+            <div className="h-full min-h-80 w-full min-w-80 bg-[#770088]"></div>
           </div>
         </ResizablePanel>
       </Resizable>

@@ -8,7 +8,5 @@
   "bracketSpacing": true,
   "endOfLine": "lf",
   "plugins": ["prettier-plugin-tailwindcss"],
-  "tailwindConfig": "./view/shared/config-tailwind/tailwind.config.ts",
-  "tailwindPreserveWhitespace": true,
-  "tailwindPreserveDuplicates": true
+  "tailwindConfig": "./view/shared/config-tailwind/tailwind.config.ts"
 }
