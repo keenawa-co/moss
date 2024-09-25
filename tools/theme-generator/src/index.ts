@@ -1,4 +1,4 @@
-import { Theme, Colors, styleKeywords } from "@repo/moss-models";
+import { Theme, Colors } from "@repo/moss-models";
 import { existsSync, mkdirSync, writeFileSync } from "fs";
 import * as os from "os";
 
@@ -69,28 +69,16 @@ function ensureDirectoryExists(directory: string): void {
 async function writeThemeFile(theme: Theme): Promise<void> {
   const fileName = `${themesDirectory}/${theme.name}.json`;
 
-  const modifiedTheme = Object.keys(theme).reduce(
-    (acc, key) => {
-      acc[modifyThemePropNames(key)] = theme[key as keyof Theme];
-      return acc;
-    },
-    {} as Record<string, any>
+  const filteredColors = Object.fromEntries(
+    Object.entries(theme.colors).filter(([key]) => key.includes(".") || !/[A-Z]/.test(key))
   );
 
-  if (modifiedTheme.colors) {
-    modifiedTheme.colors = Object.keys(theme.colors).reduce(
-      (acc, key) => {
-        const value = theme.colors[key as keyof Colors];
-        if (value !== undefined) {
-          acc[modifyThemePropNames(key)] = value;
-        }
-        return acc;
-      },
-      {} as Record<string, string>
-    );
-  }
+  const filteredTheme = {
+    ...theme,
+    colors: filteredColors,
+  };
 
-  writeFileSync(fileName, JSON.stringify(modifiedTheme, null, 2), {
+  writeFileSync(fileName, JSON.stringify(filteredTheme, null, 2), {
     flag: "w",
   });
 }
@@ -104,15 +92,6 @@ async function generateThemeFiles(): Promise<void> {
     console.error("Error generating theme files:", error);
     process.exit(1);
   }
-}
-
-function modifyThemePropNames(key: string) {
-  const matchedKeywords = styleKeywords.filter((v) => key.toLowerCase().indexOf(v.toLowerCase()) !== -1);
-  if (matchedKeywords.length > 0) {
-    const longestKeyword = matchedKeywords.reduce((a, b) => (a.length > b.length ? a : b));
-    return key.replace(new RegExp(longestKeyword, "i"), "." + longestKeyword);
-  }
-  return key;
 }
 
 generateThemeFiles();

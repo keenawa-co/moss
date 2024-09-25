@@ -1,4 +1,4 @@
-import { Theme, Colors, styleKeywords } from "@repo/moss-models";
+import { Theme, Colors } from "@repo/moss-models";
 
 // Mapping between Theme JSON and TypeScript types
 const typeMap: any = {
@@ -13,7 +13,7 @@ const typeMap: any = {
   Colors: createPropsWithAdditional(
     Object.keys(new Colors()).map((key) => {
       return {
-        json: createJsonKey(key),
+        json: key,
         js: key,
         typ: createUnionMembers(undefined, ""),
       };
@@ -24,7 +24,7 @@ const typeMap: any = {
 
 // Theme CSS variables
 export type ThemeCssVariables = {
-  [K in keyof Colors as `--color-${KebabCase<K>}`]: string;
+  [K in keyof Colors as `--color-${KebabCase<string & K>}`]: string;
 };
 
 // Map Theme to CSS variables
@@ -32,8 +32,14 @@ export function mapThemeToCssVariables(theme: Theme): ThemeCssVariables {
   const colorKeys = Object.keys(theme.colors) as (keyof Colors)[];
 
   return colorKeys.reduce((acc, key) => {
-    const cssKey = `--color-${toKebabCase(key)}` as keyof ThemeCssVariables;
-    acc[cssKey] = theme.colors[key] || "";
+    const cssKey = `--color-${toKebabCase(String(key))}` as keyof ThemeCssVariables;
+    let value = theme.colors[key] || "";
+
+    if (value === "") {
+      value = findThemeColorValue(key, theme.colors);
+    }
+
+    acc[cssKey] = value;
     return acc;
   }, {} as ThemeCssVariables);
 }
@@ -48,15 +54,6 @@ export const customTailwindColorVariables: Record<keyof Colors, string> = Object
   {} as Record<keyof Colors, string>
 );
 
-function createJsonKey(key: string) {
-  const matchedKeywords = styleKeywords.filter((v) => key.toLowerCase().indexOf(v.toLowerCase()) !== -1);
-  if (matchedKeywords.length > 0) {
-    const longestKeyword = matchedKeywords.reduce((a, b) => (a.length > b.length ? a : b));
-    return key.replace(new RegExp(longestKeyword, "i"), "." + longestKeyword);
-  }
-  return key;
-}
-
 type KebabCase<T extends string> = T extends `${infer F}${infer R}`
   ? R extends Uncapitalize<R>
     ? `${Lowercase<F>}${KebabCase<R>}`
@@ -65,6 +62,21 @@ type KebabCase<T extends string> = T extends `${infer F}${infer R}`
 
 function toKebabCase(str: string): string {
   return str.replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`);
+}
+
+function findThemeColorValue(key: keyof Colors, keys: Colors): string {
+  const parts = String(key).split(/(?=[A-Z])/);
+  const len = parts.length;
+
+  for (let i = len - 1; i > 0; i--) {
+    parts[i] = parts[i].charAt(0).toLowerCase() + parts[i].slice(1);
+    const result = parts.slice(0, i).join("") + "." + parts.slice(i).join("");
+    if (keys[result] !== undefined) {
+      return keys[result];
+    }
+    parts[i] = parts[i].charAt(0).toUpperCase() + parts[i].slice(1);
+  }
+  return "";
 }
 
 // https://tailwindcss.com/docs/customizing-colors#using-css-variables
