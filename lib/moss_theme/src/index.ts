@@ -1,6 +1,4 @@
-import { Theme, Colors } from "@repo/moss-models";
-
-const styleKeywords = ["background", "hoverBackground", "activeBackground", "text"];
+import { Theme, Colors, styleKeywords } from "@repo/moss-models";
 
 // Mapping between Theme JSON and TypeScript types
 const typeMap: any = {

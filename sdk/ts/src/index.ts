@@ -1,3 +1,5 @@
+export const styleKeywords = ["background", "hoverBackground", "activeBackground", "text"];
+
 export class Theme {
   constructor(
     public name: string,
