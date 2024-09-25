@@ -27,7 +27,7 @@
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",
     "@repo/tailwind-config": "workspace:*",
-    "@repo/moss_theme": "workspace:*",
+    "@repo/moss-theme": "workspace:*",
     "@repo/typescript-config": "workspace:*",
     "@repo/ui": "workspace:*",
     "@storybook/react": "^8.2.8",

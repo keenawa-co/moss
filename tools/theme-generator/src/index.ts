@@ -1,4 +1,4 @@
-//import { InputTheme } from "@repo/moss_theme";
+//import { InputTheme } from "@repo/moss-theme";
 import { existsSync, mkdirSync, writeFileSync } from "fs";
 import * as os from "os";
 
@@ -9,7 +9,7 @@ const themesDirectory = `${homeDirectory}/.config/moss/themes`;
 export interface InputTheme {
   name: string;
   type: string;
-  default: boolean;
+  isDefault: boolean;
   colors: InputThemeColors;
 }
 
@@ -30,7 +30,7 @@ const themes: InputTheme[] = [
   {
     name: "moss-light",
     type: "light",
-    default: true,
+    isDefault: true,
     colors: {
       primary: "0, 0, 0, 1",
       "sideBar.background": "244, 244, 245, 1",
@@ -47,7 +47,7 @@ const themes: InputTheme[] = [
   {
     name: "moss-dark",
     type: "dark",
-    default: false,
+    isDefault: false,
     colors: {
       primary: "255, 255, 255, 1",
       "sideBar.background": "39, 39, 42, 1",
@@ -64,7 +64,7 @@ const themes: InputTheme[] = [
   {
     name: "moss-pink",
     type: "pink",
-    default: false,
+    isDefault: false,
     colors: {
       primary: "0, 0, 0, 1",
       "sideBar.background": "234, 157, 242, 1",

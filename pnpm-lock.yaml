@@ -43,7 +43,7 @@ importers:
         specifier: ^5.3.3
         version: 5.5.4
     devDependencies:
-      '@repo/moss_theme':
+      '@repo/moss-theme':
         specifier: workspace:*
         version: link:../../lib/moss_theme
       '@repo/typescript-config':
@@ -95,7 +95,7 @@ importers:
       '@repo/tailwind-config':
         specifier: workspace:*
         version: link:../shared/config-tailwind
-      '@repo/moss_theme':
+      '@repo/moss-theme':
         specifier: workspace:*
         version: link:../../lib/moss_theme
       '@repo/typescript-config':
@@ -325,7 +325,7 @@ importers:
       '@repo/tailwind-config':
         specifier: workspace:*
         version: link:../config-tailwind
-      '@repo/moss_theme':
+      '@repo/moss-theme':
         specifier: workspace:*
         version: link:../../../lib/moss_theme
       '@repo/typescript-config':
@@ -374,7 +374,7 @@ importers:
       '@repo/tailwind-config':
         specifier: workspace:*
         version: link:../shared/config-tailwind
-      '@repo/moss_theme':
+      '@repo/moss-theme':
         specifier: workspace:*
         version: link:../../lib/moss_theme
       '@repo/typescript-config':

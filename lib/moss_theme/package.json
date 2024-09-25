@@ -1,5 +1,5 @@
 {
-  "name": "@repo/moss_theme",
+  "name": "@repo/moss-theme",
   "exports": {
     ".": "./src/index.ts"
   },

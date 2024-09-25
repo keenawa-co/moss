@@ -25,6 +25,7 @@ export class Colors {
   ) {}
 }
 
+// Mapping between Theme JSON and TypeScript types
 const typeMap: any = {
   Theme: createPropsWithAdditional(
     Object.keys(new Theme("", "", false, new Colors())).map((key) => ({
@@ -46,6 +47,32 @@ const typeMap: any = {
   ),
 };
 
+// Theme CSS variables
+export type ThemeCssVariables = {
+  [K in keyof Colors as `--color-${KebabCase<K>}`]: string;
+};
+
+// Map Theme to CSS variables
+export function mapThemeToCssVariables(theme: Theme): ThemeCssVariables {
+  const colorKeys = Object.keys(theme.colors) as (keyof Colors)[];
+
+  return colorKeys.reduce((acc, key) => {
+    const cssKey = `--color-${toKebabCase(key)}` as keyof ThemeCssVariables;
+    acc[cssKey] = theme.colors[key] || "";
+    return acc;
+  }, {} as ThemeCssVariables);
+}
+
+// Theme custom Tailwind color variables
+export const customTailwindColorVariables: Record<keyof Colors, string> = Object.keys(new Colors()).reduce(
+  (acc, key) => {
+    const cssKey = `--color-${toKebabCase(key)}` as keyof ThemeCssVariables;
+    acc[key as keyof Colors] = rgbaWithOpacity(cssKey);
+    return acc;
+  },
+  {} as Record<keyof Colors, string>
+);
+
 function createJsonKey(key: string) {
   const matchedKeywords = styleKeywords.filter((v) => key.toLowerCase().indexOf(v.toLowerCase()) !== -1);
   if (matchedKeywords.length > 0) {
@@ -61,33 +88,9 @@ type KebabCase<T extends string> = T extends `${infer F}${infer R}`
     : `${Lowercase<F>}-${KebabCase<R>}`
   : T;
 
-export type ThemeCssVariables = {
-  [K in keyof Colors as `--color-${KebabCase<K>}`]: string;
-};
-
-export function mapThemeToCssVariables(theme: Theme): ThemeCssVariables {
-  const colorKeys = Object.keys(theme.colors) as (keyof Colors)[];
-
-  return colorKeys.reduce((acc, key) => {
-    const cssKey = `--color-${toKebabCase(key)}` as keyof ThemeCssVariables;
-    acc[cssKey] = theme.colors[key] || "";
-    return acc;
-  }, {} as ThemeCssVariables);
-}
-
 function toKebabCase(str: string): string {
   return str.replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`);
 }
-
-// Theme custom Tailwind color variables
-export const customTailwindColorVariables: Record<keyof Colors, string> = Object.keys(new Colors()).reduce(
-  (acc, key) => {
-    const cssKey = `--color-${toKebabCase(key)}` as keyof ThemeCssVariables;
-    acc[key as keyof Colors] = rgbaWithOpacity(cssKey);
-    return acc;
-  },
-  {} as Record<keyof Colors, string>
-);
 
 // https://tailwindcss.com/docs/customizing-colors#using-css-variables
 function rgbaWithOpacity(variableName: keyof ThemeCssVariables): string {
