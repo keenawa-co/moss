@@ -30,6 +30,7 @@
     "@repo/eslint-config": "workspace:*",
     "@repo/tailwind-config": "workspace:*",
     "@repo/moss-theme": "workspace:*",
+    "@repo/moss-models": "workspace:*",
     "@repo/typescript-config": "workspace:*",
     "@storybook/react": "^8.1.11",
     "@storybook/test": "^8.1.11",

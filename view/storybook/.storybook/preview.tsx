@@ -4,7 +4,8 @@ import React from "react";
 import "@repo/ui/src/styles.css";
 import { ThemeProvider, staticColors } from "@repo/ui";
 import * as themeFiles from "./themes";
-import { Convert, Theme } from "@repo/moss-theme";
+import { Convert } from "@repo/moss-theme";
+import { Theme } from "@repo/moss-models";
 
 const themes: Map<string, Theme> = new Map();
 for (const themeName in themeFiles) {

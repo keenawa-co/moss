@@ -1,5 +1,5 @@
 {
-  "name": "@repo/moss-theme",
+  "name": "@repo/moss-models",
   "exports": {
     ".": "./src/index.ts"
   },
@@ -7,7 +7,6 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "devDependencies": {
-    "@repo/moss-models": "workspace:*",
     "@repo/typescript-config": "workspace:*"
   },
   "dependencies": {

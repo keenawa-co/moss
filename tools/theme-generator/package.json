@@ -4,7 +4,7 @@
     "start": "tsc ./src/index.ts --outDir ./dist && node ./dist/index.js"
   },
   "devDependencies": {
-    "@repo/moss-theme": "workspace:*",
+    "@repo/moss-models": "workspace:*",
     "@repo/typescript-config": "workspace:*",
     "@types/node": "^22.5.3"
   },
