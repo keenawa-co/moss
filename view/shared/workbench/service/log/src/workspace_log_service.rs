@@ -6,6 +6,7 @@ use platform_log::log_service::{AnyLogger, BufferLogger, BufferableLogger, FileL
 use tauri::Emitter;
 use tracing::{debug, error, info, trace, warn};
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
+// use parking_lot::Mutex use instead of Mutex
 
 pub struct WorkspaceLogService {
     file_logger: Arc<Mutex<dyn AnyLogger + Send + Sync + 'static>>,

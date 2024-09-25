@@ -1,6 +1,8 @@
-use std::{cell::RefCell, collections::VecDeque, default, fs::{File, OpenOptions}, io::{BufWriter, Write}, path::PathBuf, rc::{Rc, Weak}, sync::{Arc, Mutex}};
+use std::{borrow::Borrow, cell::RefCell, collections::VecDeque, default, fs::{File, OpenOptions}, io::{BufWriter, Write}, path::PathBuf, rc::{Rc, Weak}, sync::{Arc, Mutex}};
 
 use chrono::Utc;
+use tracing::{level_filters::LevelFilter, Level};
+use tracing_subscriber::{layer::SubscriberExt, EnvFilter, Layer};
 
 pub struct LogService {
     file_logger: Arc<Mutex<dyn AnyLogger + Send + Sync + 'static>>,
@@ -13,11 +15,16 @@ impl LogService {
         file_logger: Arc<Mutex<dyn AnyLogger + Send + Sync + 'static>>, 
         buffer_logger: Arc<Mutex<dyn BufferableLogger + Send + Sync + 'static>>, 
         cli_logger: Arc<Mutex<dyn AnyLogger + Send + Sync + 'static>>) -> Self {
-        Self {
+        
+        let service = Self {
             file_logger,
             buffer_logger,
             cli_logger,
-        }
+        };
+
+        service.init_tracing();
+        
+        return service
     }
 
     // TODO: replace unwrap with match (in all functions)
@@ -61,6 +68,34 @@ impl LogService {
             }
         }
     }
+
+    fn init_tracing(&self) {
+        let cli_layer = self.cli_logger.lock().unwrap().get_tracing_layer();
+        let file_layer = self.file_logger.lock().unwrap().get_tracing_layer();
+        let buffer_layer = self.buffer_logger.lock().unwrap().get_tracing_layer();
+
+        // Create the base registry
+        let mut registry = tracing_subscriber::registry();
+
+        // Initialize a layered subscriber
+        let mut layered_subscriber = registry;
+
+        // Add layers if they are Some
+        if let Some(layer) = cli_layer {
+            layered_subscriber = layered_subscriber.with(layer);
+        }
+
+        if let Some(layer) = file_layer {
+            layered_subscriber = layered_subscriber.with(layer);
+        }
+
+        if let Some(layer) = buffer_layer {
+            layered_subscriber = layered_subscriber.with(layer);
+        }
+
+        // Initialize the subscriber with the combined layers
+        layered_subscriber.init();
+    }
 }
 
 pub fn create_service() -> Result<LogService, std::io::Error> {
@@ -90,10 +125,12 @@ pub trait AnyLogger {
     
     fn set_level(&mut self, level: LogLevel);
 
-    fn set_format(&mut self, formatter: Arc<dyn Fn(&str, LogLevel) -> String + Send + Sync + 'static>);
+    // fn set_format(&mut self, formatter: Arc<dyn Fn(&str, LogLevel) -> String + Send + Sync + 'static>);
 
     // determine if the logger is ready to be used (files are created, memory allocated, etc.)
     fn is_ready(&self) -> bool; 
+
+    fn get_tracing_layer(&self) -> Option<Box<dyn Layer<tracing_subscriber::Registry> + Send + Sync>>; 
 
     // Set target to re-direct logs to some other logger (such, as, from buffer to others...)
     // fn set_target_logger(&mut self, logger: Arc<Mutex<dyn AnyLogger>>);
@@ -114,6 +151,19 @@ pub enum LogLevel {
     Info,
     Warning,
     Error,
+}
+
+impl LogLevel {
+    pub fn to_tracing_level(&self) -> Option<Level> {
+        match self {
+            LogLevel::Off => None, // Disable logging
+            LogLevel::Trace => Some(Level::TRACE),
+            LogLevel::Debug => Some(Level::DEBUG),
+            LogLevel::Info => Some(Level::INFO),
+            LogLevel::Warning => Some(Level::WARN),
+            LogLevel::Error => Some(Level::ERROR),
+        }
+    }
 }
 
 // #[derive(Default)]
@@ -174,9 +224,9 @@ impl AnyLogger for CliLogger {
         self.level = level;
     }
 
-    fn set_format(&mut self, formatter: Arc<dyn Fn(&str, LogLevel) -> String + Send + Sync + 'static>) {
-        self.formatter = formatter;
-    }
+    // fn set_format(&mut self, formatter: Arc<dyn Fn(&str, LogLevel) -> String + Send + Sync + 'static>) {
+    //     self.formatter = formatter;
+    // }
 
     fn is_ready(&self) -> bool {
         return true; // cli logger is always ready
@@ -185,7 +235,19 @@ impl AnyLogger for CliLogger {
     // fn set_target_logger(&mut self, logger: Arc<Mutex<dyn AnyLogger>>) {
         // unimplemented!()
     // }
-
+    fn get_tracing_layer(&self) -> Option<Box<dyn Layer<tracing_subscriber::Registry> + Send + Sync>> {
+        self.level.to_tracing_level().map(|level| {
+            Box::new(
+                tracing_subscriber::fmt::layer()
+                    .with_writer(std::io::stdout)
+                    .with_filter(LevelFilter::from_level(level)), // Convert `Level` to `LevelFilter`
+            ) as Box<dyn Layer<_> + Send + Sync>
+        })
+        
+        // tracing_subscriber::fmt::layer()
+        // .with_writer(std::io::stdout)
+        // .with_filter(tracing::level_filters::LevelFilter::from(self.level.to_tracing_level()))
+    }
 }
 
 pub struct BufferLogger {
@@ -280,10 +342,10 @@ impl AnyLogger for BufferLogger {
         self.level = level;
     }
 
-    fn set_format(&mut self, formatter: Arc<dyn Fn(&str, LogLevel) -> String + Send + Sync + 'static>) {
-        // Do nothing, as the format will be set by more specific loggers
-        unimplemented!()
-    }
+    // fn set_format(&mut self, formatter: Arc<dyn Fn(&str, LogLevel) -> String + Send + Sync + 'static>) {
+    //     // Do nothing, as the format will be set by more specific loggers
+    //     unimplemented!()
+    // }
 
     // fn set_target_logger(&mut self, logger: Arc<Mutex<dyn AnyLogger>>) {
     //     self.target_logger = Some(logger);
@@ -291,6 +353,16 @@ impl AnyLogger for BufferLogger {
 
     fn is_ready(&self) -> bool {
         todo!();
+    }
+
+    fn get_tracing_layer(&self) -> Option<Box<dyn Layer<tracing_subscriber::Registry> + Send + Sync>> {
+        self.level.to_tracing_level().map(|level| {
+            Box::new(
+                tracing_subscriber::fmt::layer()
+                .with_writer(std::io::sink) // Buffer doesn't write directly to a destination
+                .with_filter(LevelFilter::from_level(level)), // Convert `Level` to `LevelFilter`
+            ) as Box<dyn Layer<_> + Send + Sync>
+        })
     }
 }
 
@@ -419,11 +491,21 @@ impl AnyLogger for FileLogger {
         self.level = level;
     }
 
-    fn set_format(&mut self, formatter: Arc<dyn Fn(&str, LogLevel) -> String + Send + Sync + 'static>) {
-        self.formatter = formatter;
-    }
+    // fn set_format(&mut self, formatter: Arc<dyn Fn(&str, LogLevel) -> String + Send + Sync + 'static>) {
+    //     self.formatter = formatter;
+    // }
 
     fn is_ready(&self) -> bool {
         self.file.is_some()
+    }
+
+    fn get_tracing_layer(&self) -> Option<Box<dyn Layer<tracing_subscriber::Registry> + Send + Sync>> {
+        self.level.to_tracing_level().map(|level| {
+            Box::new(
+                tracing_subscriber::fmt::layer()
+                .with_writer(|| std::fs::File::create("logfile.log").unwrap())
+                .with_filter(LevelFilter::from_level(level)), // Convert `Level` to `LevelFilter`
+            ) as Box<dyn Layer<_> + Send + Sync>
+        })
     }
 }
