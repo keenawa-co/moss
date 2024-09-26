@@ -1,16 +1,21 @@
+pub mod atom;
+pub mod atom_context;
 pub mod graph;
 pub mod node;
+pub mod selector;
+pub mod selector_context;
 pub mod subscription;
+pub mod transaction_context;
 
-use derive_more::{Deref, DerefMut};
+use atom::{Atom, AtomMap};
+use atom_context::AtomContext;
 use graph::Graph;
 use moss_std::collection::{FxHashMap, FxHashSet};
-use node::{
-    AnyNode, AnyNodeValue, Atom, AtomContext, AtomMap, NodeKey, NodeValue, Selector,
-    SelectorContext, SelectorMap,
-};
+use node::{AnyNode, NodeKey, NodeValue};
 use once_cell::sync::OnceCell;
 use platform_core::context::EventEmitter;
+use selector::{Selector, SelectorMap};
+use selector_context::SelectorContext;
 use smallvec::SmallVec;
 use std::{
     any::{Any, TypeId},
@@ -20,6 +25,7 @@ use std::{
     sync::Arc,
 };
 use subscription::{SubscriberSet, Subscription};
+use transaction_context::TransactionContext;
 
 pub(crate) mod sealed {
     pub trait Sealed {}
@@ -67,9 +73,13 @@ pub struct StoreState {
 
 impl StoreState {
     fn new() -> Self {
-        let initial_graph = Graph::new();
-        let mut graph_map = FxHashMap::default();
-        graph_map.insert(1, initial_graph);
+        let initial_graph_map = {
+            let initial_graph = Graph::new();
+            let mut graph_map = FxHashMap::default();
+            graph_map.insert(1, initial_graph);
+
+            graph_map
+        };
 
         Self {
             previous_tree: None,
@@ -77,7 +87,7 @@ impl StoreState {
             next_tree: OnceCell::new(),
             node_observers: SubscriberSet::new(),
             event_listeners: SubscriberSet::new(),
-            graph_by_version: RefCell::new(graph_map),
+            graph_by_version: RefCell::new(initial_graph_map),
             known_selectors: FxHashSet::default(),
         }
     }
@@ -137,10 +147,10 @@ impl AnyContext for Context {
         build_atom: impl FnOnce(&mut AtomContext<'_, T>) -> T,
     ) -> Self::Result<Atom<T>> {
         self.commit(|ctx| {
-            let slot = ctx.tree().atom_values.reserve();
+            let slot = ctx.next_tree().atom_values.reserve();
             let value = build_atom(&mut AtomContext::new(ctx, slot.downgrade()));
 
-            ctx.tree_mut().atom_values.insert(slot, value)
+            ctx.next_tree_mut().atom_values.insert(slot, value)
         })
     }
 
@@ -162,7 +172,7 @@ impl AnyContext for Context {
     ) -> Self::Result<Selector<T>> {
         self.commit(|ctx| {
             let slot = ctx
-                .tree()
+                .next_tree()
                 .selector_values
                 .reserve(|map, key| Selector::new(key, callback, Arc::downgrade(&map.rc)));
 
@@ -186,7 +196,7 @@ impl AnyContext for Context {
                 ));
 
                 transaction_context
-                    .tree_mut()
+                    .next_tree_mut()
                     .selector_values
                     .insert(selector.key(), value);
             });
@@ -217,12 +227,74 @@ impl Context {
         result
     }
 
+    pub(super) fn next_tree(&self) -> &TreeState {
+        self.store.next_tree.get_or_init(|| self.advance_tree())
+    }
+
+    pub(super) fn next_tree_mut(&mut self) -> &mut TreeState {
+        self.store.next_tree.get_or_init(|| self.advance_tree());
+        self.store
+            .next_tree
+            .get_mut()
+            .unwrap_or_else(|| unreachable!())
+    }
+
+    fn advance_tree(&self) -> TreeState {
+        let current_tree = &self.store.current_tree;
+
+        TreeState {
+            version: current_tree.version + 1,
+            graph_version: Cell::clone(&current_tree.graph_version),
+            atom_values: current_tree.atom_values.clone(),
+            selector_values: current_tree.selector_values.clone(),
+            dirty_atoms: FxHashSet::default(),
+        }
+    }
+
     fn refresh(&mut self) {
         self.flush_effects();
 
-        if let Some(next_tree) = self.store.next_tree.take() {
-            let previous_tree = mem::replace(&mut self.store.current_tree, next_tree);
-            self.store.previous_tree = Some(previous_tree);
+        let mut next_tree = if let Some(next_tree) = self.store.next_tree.take() {
+            next_tree
+        } else {
+            return;
+        };
+
+        self.invalidate(&mut next_tree);
+
+        let previous_tree = mem::replace(&mut self.store.current_tree, next_tree);
+        self.store.previous_tree = Some(previous_tree);
+    }
+
+    fn invalidate(&mut self, next_tree: &mut TreeState) {
+        // Finds all nodes whose cache should be invalidated starting from the changed nodes.
+        let nodes_to_invalidate = self.read_graph(|current_graph| {
+            let mut nodes_to_invalidate: HashSet<NodeKey> = HashSet::new();
+            let mut stack: SmallVec<[NodeKey; 8]> = SmallVec::new();
+            for atom_key in next_tree.dirty_atoms.iter() {
+                if current_graph.node_to_sub.get(&atom_key).is_some() {
+                    if nodes_to_invalidate.insert(atom_key.clone()) {
+                        stack.push(atom_key.clone());
+                    }
+                }
+            }
+
+            // DFS traversal to find all dependent nodes
+            while let Some(node_key) = stack.pop() {
+                if let Some(subscribers) = current_graph.node_to_sub.get(&node_key) {
+                    for subscriber_key in subscribers {
+                        if nodes_to_invalidate.insert(subscriber_key.clone()) {
+                            stack.push(subscriber_key.clone());
+                        }
+                    }
+                }
+            }
+
+            nodes_to_invalidate
+        });
+
+        for node_key in nodes_to_invalidate {
+            next_tree.selector_values.remove(&node_key);
         }
     }
 
@@ -399,61 +471,6 @@ impl Context {
     }
 }
 
-impl<'a> AnyContext for TransactionContext<'a> {
-    type Result<T> = T;
-
-    fn new_atom<T: NodeValue>(
-        &mut self,
-        build_atom: impl FnOnce(&mut AtomContext<'_, T>) -> T,
-    ) -> Self::Result<Atom<T>> {
-        todo!()
-    }
-
-    fn read_atom<T: NodeValue>(&self, atom: &Atom<T>) -> &T {
-        self.tree().atom_values.read(&atom.key())
-    }
-
-    fn update_atom<T: NodeValue, R>(
-        &mut self,
-        atom: &Atom<T>,
-        callback: impl FnOnce(&mut T, &mut AtomContext<'_, T>) -> R,
-    ) -> Self::Result<R> {
-        let mut value = self.tree_mut().atom_values.begin_lease(atom);
-
-        let result = callback(&mut value, &mut AtomContext::new(self, atom.downgrade()));
-
-        self.tree_mut().atom_values.end_lease(value);
-        self.tree_mut().dirty_atoms.insert(atom.key());
-
-        result
-    }
-
-    fn new_selector<T: NodeValue>(
-        &mut self,
-        build_selector: impl FnOnce(&mut SelectorContext<'_, T>) -> T,
-    ) -> Self::Result<Selector<T>> {
-        todo!()
-    }
-
-    fn read_selector<T: NodeValue>(&mut self, selector: &Selector<T>) -> &T {
-        if !self.tree().selector_values.lookup(&selector.key()) {
-            self.commit(|transaction_context| {
-                let value = selector.compute(&mut SelectorContext::new(
-                    transaction_context,
-                    selector.downgrade(),
-                ));
-
-                transaction_context
-                    .tree_mut()
-                    .selector_values
-                    .insert(selector.key(), value);
-            });
-        }
-
-        self.tree().selector_values.read(&selector.key())
-    }
-}
-
 struct Batcher {
     // Used to detect nested transactions.
     commit_depth: Cell<usize>,
@@ -487,112 +504,6 @@ impl Batcher {
     }
 }
 
-#[derive(Deref, DerefMut)]
-pub struct TransactionContext<'a> {
-    #[deref]
-    #[deref_mut]
-    ctx: &'a mut Context,
-    depth_value: usize,
-}
-
-impl<'a> Drop for TransactionContext<'a> {
-    fn drop(&mut self) {
-        let decremented_commit_depth_value = self.ctx.batcher.dec_commit_depth();
-        self.assert_valid_depth_value(decremented_commit_depth_value + 1);
-
-        if decremented_commit_depth_value > 0 {
-            return;
-        } else {
-            self.invalidate();
-            self.ctx.refresh();
-
-            // if let Some(next_tree) = self.ctx.store.next_tree.take() {
-            //     let previous_tree = mem::replace(&mut self.ctx.store.current_tree, next_tree);
-            //     self.ctx.store.previous_tree = Some(previous_tree);
-            // }
-        }
-    }
-}
-
-impl<'a> From<&'a mut Context> for TransactionContext<'a> {
-    fn from(ctx: &'a mut Context) -> Self {
-        let depth_value = ctx.batcher.inc_commit_depth();
-
-        Self { ctx, depth_value }
-    }
-}
-
-impl<'a> TransactionContext<'a> {
-    fn assert_valid_depth_value(&self, prev_value: usize) {
-        debug_assert!(
-            self.depth_value == prev_value,
-            "inconsistent decrementation of transaction context, context depth {}, expected {}",
-            self.depth_value,
-            prev_value
-        );
-    }
-
-    fn invalidate(&mut self) {
-        // Finds all nodes whose cache should be invalidated starting from the changed nodes.
-        let nodes_to_invalidate = self.read_graph(|current_graph| {
-            let mut nodes_to_invalidate: HashSet<NodeKey> = HashSet::new();
-            let mut stack: SmallVec<[NodeKey; 8]> = SmallVec::new();
-            for atom_key in &self.tree().dirty_atoms {
-                if current_graph.node_to_sub.get(&atom_key).is_some() {
-                    if nodes_to_invalidate.insert(atom_key.clone()) {
-                        stack.push(atom_key.clone());
-                    }
-                }
-            }
-
-            // DFS traversal to find all dependent nodes
-            while let Some(node_key) = stack.pop() {
-                dbg!(&current_graph.node_to_sub.get(&node_key));
-                if let Some(subscribers) = current_graph.node_to_sub.get(&node_key) {
-                    for subscriber_key in subscribers {
-                        if nodes_to_invalidate.insert(subscriber_key.clone()) {
-                            stack.push(subscriber_key.clone());
-                        }
-                    }
-                }
-            }
-
-            nodes_to_invalidate
-        });
-
-        dbg!(&nodes_to_invalidate);
-
-        for node_key in nodes_to_invalidate {
-            self.tree_mut().selector_values.remove(&node_key);
-        }
-    }
-
-    pub(super) fn tree(&self) -> &TreeState {
-        self.ctx.store.next_tree.get_or_init(|| self.advance_tree())
-    }
-
-    pub(super) fn tree_mut(&mut self) -> &mut TreeState {
-        self.ctx.store.next_tree.get_or_init(|| self.advance_tree());
-        self.ctx
-            .store
-            .next_tree
-            .get_mut()
-            .unwrap_or_else(|| unreachable!())
-    }
-
-    fn advance_tree(&self) -> TreeState {
-        let current_tree = &self.ctx.store.current_tree;
-
-        TreeState {
-            version: current_tree.version + 1,
-            graph_version: Cell::clone(&current_tree.graph_version),
-            atom_values: current_tree.atom_values.clone(),
-            selector_values: current_tree.selector_values.clone(),
-            dirty_atoms: FxHashSet::default(),
-        }
-    }
-}
-
 impl AsMut<Context> for Context {
     fn as_mut(&mut self) -> &mut Context {
         self
@@ -602,6 +513,9 @@ impl AsMut<Context> for Context {
 #[cfg(test)]
 mod tests {
     use std::any::Any;
+
+    use atom::OnChangeAtomEvent;
+    use node::AnyNodeValue;
 
     use super::*;
 
@@ -639,6 +553,36 @@ mod tests {
     }
 
     impl EventEmitter<Change> for Value {}
+
+    impl EventEmitter<OnChangeAtomEvent> for Value {}
+
+    #[test]
+    fn subscription_on_atom_change_test() {
+        let ctx = &mut Context::new();
+        let atom_a = ctx.new_atom(|_| Value { a: 0 });
+
+        let atom_b = ctx.new_atom(|ctx| {
+            ctx.subscribe(
+                &atom_a,
+                |atom_b_inner: &mut Value, value_a, event: &OnChangeAtomEvent, _cx| {
+                    println!("Hello, form atom subscription");
+                },
+            )
+            .detach();
+
+            Value { a: 0 }
+        });
+
+        ctx.update_atom(&atom_a, |this, cx| {
+            this.a += 10;
+
+            cx.notify();
+            cx.emit(OnChangeAtomEvent {});
+        });
+
+        dbg!(atom_a.read(ctx));
+        dbg!(atom_b.read(ctx));
+    }
 
     #[test]
     fn subscription_test() {
@@ -692,38 +636,31 @@ mod tests {
 
         let atom_a = ctx.new_atom(|_| Value { a: 0 });
 
-        ctx.update_atom(&atom_a, |this, cx| {
-            let atom_b = cx.new_atom(|_| Value { a: 1000 });
+        ctx.update_atom(&atom_a, |this, atom_context| {
             this.a += 10;
         });
 
-        // dbg!(atom_a.read(ctx));
+        let atom_a_key = atom_a.key();
 
-        // let atom_a_key = atom_a.key();
+        let selector_a = ctx.new_selector(move |selector_context| {
+            let atom_a_value = selector_context.read::<Value>(&atom_a_key);
 
-        let r = ctx.observe(&atom_a, |this, cx| {
-            println!("Hello, form atom this value: {}", this.read(cx).a)
+            let result = format!("Hello, {}!", atom_a_value.a);
+            MyString(result)
         });
 
-        // let selector_a = ctx.new_selector(move |ctx| {
-        //     let atom_a_value = ctx.read::<Value>(&atom_a_key);
+        let v = selector_a.read(ctx);
+        dbg!(v);
 
-        //     let result = format!("Hello, {}!", atom_a_value.a);
-        //     MyString(result)
-        // });
-
-        // let v = selector_a.read(ctx);
-        // dbg!(v);
-
-        ctx.update_atom(&atom_a, |this, cx| {
+        ctx.update_atom(&atom_a, |this, atom_context| {
             this.a += 10;
 
-            cx.notify();
+            atom_context.notify();
         });
 
-        // dbg!(atom_a.read(ctx));
+        dbg!(atom_a.read(ctx));
 
-        // let v = selector_a.read(ctx);
-        // dbg!(v);
+        let v = selector_a.read(ctx);
+        dbg!(v);
     }
 }
