@@ -8,3 +8,4 @@ export * from "./LanguageSelector";
 export * from "./ThemeSelector";
 export * from "./Sidebar";
 export * from "./DraggableAccordion";
+export * from "./SidebarHeader";

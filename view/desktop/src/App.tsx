@@ -14,6 +14,7 @@ import DraggableAccordion from "./components/DraggableAccordion";
 import { setAccordion } from "./store/accordion/accordionSlice";
 import { swapByIndex } from "./store/accordion/accordionHelpers";
 import { monitorForElements } from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
+import SidebarHeader from "./components/SidebarHeader";
 
 function App() {
   const dispatch = useAppDispatch();
@@ -69,7 +70,8 @@ function App() {
       ) : (
         <RootLayout>
           <Resizable proportionalLayout={false}>
-            <ResizablePanel minSize={100} preferredSize={255} snap visible={sideBarVisible}>
+            <ResizablePanel minSize={100} preferredSize={255} snap visible={sideBarVisible} className="select-none">
+              <SidebarHeader title="launchpad" />
               {accordion.map((accordion, index) => (
                 <DraggableAccordion
                   key={index}
