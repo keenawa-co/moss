@@ -5,19 +5,15 @@ import { cn } from "@/utils";
 
 type HoveredState = "idle" | "valid" | "invalid";
 
-const DraggableAccordion = ({
-  title,
-  isOpen = false,
-  location,
-  handleClick,
-  children,
-}: {
+interface DraggableAccordionProps {
   title: string;
   isOpen?: boolean;
   location: number;
   handleClick: () => void;
   children: React.ReactNode[] | React.ReactNode;
-}) => {
+}
+
+const DraggableAccordion = ({ title, isOpen = false, location, handleClick, children }: DraggableAccordionProps) => {
   const ref = useRef(null);
   const dropRef = useRef(null);
 
@@ -71,7 +67,7 @@ const DraggableAccordion = ({
         style={{ opacity: dragging ? 0.4 : 1 }}
         className="flex items-center py-[5px] px-2"
       >
-        <div className={cn(`size-5 flex items-center justify-center`, { "rotate-90": isOpen })}>
+        <div className={cn(`size-5 flex items-center justify-center cursor-pointer`, { "rotate-90": isOpen })}>
           <Icon icon="ArrowRight" className="text-xs" />
         </div>
         <span className="font-bold">{title}</span>

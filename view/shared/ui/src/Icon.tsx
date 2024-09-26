@@ -7,7 +7,6 @@ export type Icons = keyof typeof icons;
 export const Icon = ({
   icon,
   className,
-
   ...props
 }: {
   icon: Icons;

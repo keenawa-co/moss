@@ -35,7 +35,6 @@ export const accordionSlice: Slice<AccordionState> = createSlice({
   initialState,
   reducers: {
     setAccordion: (state, action: PayloadAction<Accordion[]>) => {
-      console.log("setAccordion", action.payload);
       state.accordion = action.payload;
     },
   },
