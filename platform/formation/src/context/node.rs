@@ -1,7 +1,9 @@
+use anyhow::Result;
 use derive_more::{Deref, DerefMut};
 use dyn_clone::DynClone;
 use moss_std::collection::ImHashMap;
 use parking_lot::RwLock;
+use platform_core::context::EventEmitter;
 use slotmap::SlotMap;
 use std::{
     any::{Any, TypeId},
@@ -12,7 +14,9 @@ use std::{
     },
 };
 
-use super::{AnyContext, Context};
+use crate::FlattenAnyhowResult;
+
+use super::{subscription::Subscription, AnyContext, Context};
 
 slotmap::new_key_type! {
     pub struct NodeKey;
@@ -50,7 +54,7 @@ impl<V> AnyContext for AtomContext<'_, V> {
     }
 
     fn read_atom<T: NodeValue>(&self, atom: &Atom<T>) -> &T {
-        todo!()
+        self.ctx.read_atom(atom)
     }
 
     fn update_atom<T: NodeValue, R>(
@@ -73,9 +77,59 @@ impl<V> AnyContext for AtomContext<'_, V> {
     }
 }
 
-impl<'a, T: 'static> AtomContext<'a, T> {
-    pub(super) fn new(ctx: &'a mut Context, weak: WeakAtom<T>) -> Self {
+impl<'a, V: NodeValue> AtomContext<'a, V> {
+    pub(super) fn new(ctx: &'a mut Context, weak: WeakAtom<V>) -> Self {
         Self { ctx, weak }
+    }
+
+    pub fn weak_atom(&self) -> WeakAtom<V> {
+        self.weak.clone()
+    }
+}
+
+impl<'a, V: NodeValue> AtomContext<'a, V> {
+    pub fn emit<E>(&mut self, event: E)
+    where
+        V: EventEmitter<E>,
+        E: 'static,
+    {
+        self.ctx.push_effect(super::Effect::Event {
+            emitter: self.weak.key,
+            typ: TypeId::of::<E>(),
+            payload: Box::new(event),
+        });
+    }
+
+    pub fn notify(&mut self) {
+        if self.ctx.batcher.pending_notifications.insert(self.weak.key) {
+            self.ctx.push_effect(super::Effect::Notify {
+                emitter: self.weak.key,
+            });
+        }
+    }
+
+    pub fn subscribe<T, N, P>(
+        &mut self,
+        node: &N,
+        mut on_event: impl FnMut(&mut V, N, &P, &mut AtomContext<'_, V>) + 'static,
+    ) -> Subscription
+    where
+        T: EventEmitter<P> + 'static,
+        N: AnyNode<T>,
+        P: 'static,
+    {
+        let this = self.weak_atom();
+        self.ctx.subscribe_internal(node, move |n, payload, ctx| {
+            if let Some(atom) = this.upgrade() {
+                atom.update(ctx, |this, atom_context| {
+                    on_event(this, n, payload, atom_context)
+                });
+
+                true
+            } else {
+                false
+            }
+        })
     }
 }
 
@@ -153,6 +207,40 @@ pub struct WeakAtom<T> {
     typ: PhantomData<T>,
 }
 
+unsafe impl<T> Send for WeakAtom<T> {}
+unsafe impl<T> Sync for WeakAtom<T> {}
+
+impl<T> Clone for WeakAtom<T> {
+    fn clone(&self) -> Self {
+        Self {
+            weak_proto_atom: self.weak_proto_atom.clone(),
+            typ: self.typ,
+        }
+    }
+}
+
+impl<T: NodeValue> WeakAtom<T> {
+    pub fn upgrade(&self) -> Option<Atom<T>> {
+        Atom::upgrade_from(self)
+    }
+
+    pub fn update<C, R>(
+        &self,
+        ctx: &mut C,
+        update: impl FnOnce(&mut T, &mut AtomContext<'_, T>) -> R,
+    ) -> Result<R>
+    where
+        C: AnyContext,
+        Result<C::Result<R>>: FlattenAnyhowResult<R>,
+    {
+        FlattenAnyhowResult::flatten(
+            self.upgrade()
+                .ok_or_else(|| anyhow!("node release"))
+                .map(|this| ctx.update_atom(&this, update)),
+        )
+    }
+}
+
 #[derive(Deref, DerefMut)]
 pub struct Atom<T> {
     #[deref]
@@ -179,7 +267,10 @@ impl<T: NodeValue> AnyNode<T> for Atom<T> {
     where
         Self: Sized,
     {
-        todo!()
+        Some(Atom {
+            node: weak.weak_proto_atom.upgrade()?,
+            typ: weak.typ,
+        })
     }
 }
 
@@ -191,6 +282,17 @@ impl<T: NodeValue> Atom<T> {
             node: ProtoAtom::new(key, TypeId::of::<T>(), rc),
             typ: PhantomData,
         }
+    }
+
+    pub fn update<C, R>(
+        &self,
+        ctx: &mut C,
+        update: impl FnOnce(&mut T, &mut AtomContext<'_, T>) -> R,
+    ) -> C::Result<R>
+    where
+        C: AnyContext,
+    {
+        ctx.update_atom(self, update)
     }
 
     pub fn read<'a, C: AnyContext>(&self, ctx: &'a mut C) -> &'a T {

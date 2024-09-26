@@ -10,13 +10,16 @@ use node::{
     SelectorContext, SelectorMap,
 };
 use once_cell::sync::OnceCell;
+use platform_core::context::EventEmitter;
 use smallvec::SmallVec;
 use std::{
+    any::{Any, TypeId},
     cell::{Cell, RefCell},
-    collections::HashSet,
+    collections::{HashSet, VecDeque},
     mem,
     sync::Arc,
 };
+use subscription::{SubscriberSet, Subscription};
 
 pub(crate) mod sealed {
     pub trait Sealed {}
@@ -53,8 +56,10 @@ pub struct StoreState {
     current_tree: TreeState,
     // The state being built during a transaction.
     next_tree: OnceCell<TreeState>,
-    // Used to detect nested transactions.
-    // commit_depth: usize,
+
+    node_observers: SubscriberSet<NodeKey, Handler>,
+    event_listeners: SubscriberSet<NodeKey, (TypeId, Listener)>,
+
     // Dependency graphs for each version of the state.
     graph_by_version: RefCell<FxHashMap<usize, Graph>>,
     known_selectors: FxHashSet<NodeKey>,
@@ -70,6 +75,8 @@ impl StoreState {
             previous_tree: None,
             current_tree: TreeState::default(),
             next_tree: OnceCell::new(),
+            node_observers: SubscriberSet::new(),
+            event_listeners: SubscriberSet::new(),
             graph_by_version: RefCell::new(graph_map),
             known_selectors: FxHashSet::default(),
         }
@@ -99,6 +106,23 @@ pub trait AnyContext {
 
     fn read_selector<T: NodeValue>(&mut self, atom: &Selector<T>) -> &T;
 }
+
+pub enum Effect {
+    Notify {
+        emitter: NodeKey,
+    },
+    Event {
+        emitter: NodeKey,
+        typ: TypeId,
+        payload: Box<dyn Any>,
+    },
+    Defer {
+        callback: Box<dyn FnOnce(&mut Context) + 'static>,
+    },
+}
+
+type Handler = Box<dyn FnMut(&mut Context) -> bool + 'static>;
+type Listener = Box<dyn FnMut(&dyn Any, &mut Context) -> bool + 'static>;
 
 pub struct Context {
     store: StoreState,
@@ -187,13 +211,156 @@ impl Context {
         &'a mut self,
         transaction_callback: impl FnOnce(&mut TransactionContext) -> R + 'a,
     ) -> R {
-        println!("---------------- TRANSACTION ----------------");
-        self.batcher.commit_depth += 1;
-
         let transaction_context = &mut TransactionContext::from(self);
         let result = transaction_callback(transaction_context);
 
         result
+    }
+
+    fn refresh(&mut self) {
+        self.flush_effects();
+
+        if let Some(next_tree) = self.store.next_tree.take() {
+            let previous_tree = mem::replace(&mut self.store.current_tree, next_tree);
+            self.store.previous_tree = Some(previous_tree);
+        }
+    }
+
+    fn flush_effects(&mut self) {
+        loop {
+            if let Some(effect) = self.batcher.pending_effects.pop_front() {
+                //  dbg!(457);
+                match effect {
+                    Effect::Notify { emitter } => self.apply_notify_effect(emitter),
+                    Effect::Event {
+                        emitter,
+                        typ: payload_typ,
+                        payload,
+                    } => self.apply_event_effect(emitter, payload_typ, payload),
+                    Effect::Defer { callback } => self.apply_defer_effect(callback),
+                }
+            } else {
+                if self.batcher.pending_effects.is_empty() {
+                    break;
+                }
+            }
+        }
+    }
+
+    fn apply_notify_effect(&mut self, emitter: NodeKey) {
+        self.batcher.pending_notifications.remove(&emitter);
+
+        self.store
+            .node_observers
+            .clone()
+            .retain(&emitter, |handler| handler(self));
+    }
+
+    fn apply_event_effect(&mut self, emitter: NodeKey, payload_typ: TypeId, payload: Box<dyn Any>) {
+        self.store
+            .event_listeners
+            .clone()
+            .retain(&emitter, |(stored_typ, handler)| {
+                if *stored_typ == payload_typ {
+                    handler(payload.as_ref(), self)
+                } else {
+                    true
+                }
+            });
+    }
+
+    fn apply_defer_effect(&mut self, callback: Box<dyn FnOnce(&mut Context) + 'static>) {
+        callback(self);
+    }
+
+    pub(crate) fn subscribe_internal<V, N, T>(
+        &mut self,
+        node: &N,
+        mut on_event: impl FnMut(N, &T, &mut Context) -> bool + 'static,
+    ) -> Subscription
+    where
+        V: EventEmitter<T>,
+        N: AnyNode<V>,
+        T: 'static,
+    {
+        let node_key = node.key();
+        let weak_node = node.downgrade();
+
+        self.new_subscription(
+            node_key,
+            (
+                TypeId::of::<T>(),
+                Box::new(move |payload, ctx| {
+                    let payload: &T = payload.downcast_ref().expect("invalid event payload type");
+                    if let Some(handle) = N::upgrade_from(&weak_node) {
+                        on_event(handle, payload, ctx)
+                    } else {
+                        false
+                    }
+                }),
+            ),
+        )
+    }
+
+    fn new_subscription(&mut self, key: NodeKey, value: (TypeId, Listener)) -> Subscription {
+        let (subscription, activate) = self.store.event_listeners.insert(key, value);
+        self.defer(move |_| activate());
+
+        subscription
+    }
+
+    pub fn observe<V, N>(
+        &mut self,
+        node: &N,
+        mut on_notify: impl FnMut(N, &mut Context) + 'static,
+    ) -> Subscription
+    where
+        V: 'static,
+        N: AnyNode<V>,
+    {
+        self.observe_internal(node, move |n, ctx| {
+            on_notify(n, ctx);
+            true
+        })
+    }
+
+    fn observe_internal<V, N>(
+        &mut self,
+        node: &N,
+        mut on_notify: impl FnMut(N, &mut Context) -> bool + 'static,
+    ) -> Subscription
+    where
+        V: 'static,
+        N: AnyNode<V>,
+    {
+        let handle = node.downgrade();
+        self.new_observer(
+            node.key(),
+            Box::new(move |ctx| {
+                if let Some(n) = N::upgrade_from(&handle) {
+                    on_notify(n, ctx)
+                } else {
+                    false
+                }
+            }),
+        )
+    }
+
+    fn new_observer(&mut self, key: NodeKey, handler: Handler) -> Subscription {
+        let (subscription, activate) = self.store.node_observers.insert(key, handler);
+        self.defer(move |_| activate());
+
+        subscription
+    }
+
+    pub fn defer(&mut self, f: impl FnOnce(&mut Context) + 'static) {
+        self.push_effect(Effect::Defer {
+            callback: Box::new(f),
+        });
+    }
+
+    pub fn push_effect(&mut self, effect: Effect) {
+        self.batcher.pending_effects.push_back(effect);
     }
 
     pub(super) fn advance_graph<R>(&self, callback: impl FnOnce(&mut Graph) -> R) -> R {
@@ -288,14 +455,35 @@ impl<'a> AnyContext for TransactionContext<'a> {
 }
 
 struct Batcher {
-    commit_depth: usize,
-    // dirty_atoms: FxHashSet<NodeKey>,
-    // next_tree: OnceCell<TreeState>,
+    // Used to detect nested transactions.
+    commit_depth: Cell<usize>,
+    pending_effects: VecDeque<Effect>,
+    pending_notifications: FxHashSet<NodeKey>,
 }
 
 impl Batcher {
     fn new() -> Self {
-        Self { commit_depth: 0 }
+        Self {
+            commit_depth: Cell::new(0),
+            pending_effects: VecDeque::new(),
+            pending_notifications: FxHashSet::default(),
+        }
+    }
+
+    fn inc_commit_depth(&self) -> usize {
+        let current_version = self.commit_depth.get();
+        let new_version = current_version + 1;
+        self.commit_depth.set(new_version);
+
+        new_version
+    }
+
+    fn dec_commit_depth(&self) -> usize {
+        let current_version = self.commit_depth.get();
+        let new_version = current_version - 1;
+        self.commit_depth.set(new_version);
+
+        new_version
     }
 }
 
@@ -304,49 +492,46 @@ pub struct TransactionContext<'a> {
     #[deref]
     #[deref_mut]
     ctx: &'a mut Context,
-    // next_tree: OnceCell<TreeState>,
-    // dirty_atoms: FxHashSet<NodeKey>,
+    depth_value: usize,
 }
 
 impl<'a> Drop for TransactionContext<'a> {
-    // fn drop(&mut self) {
-    //     self.invalidate();
-
-    //     if let Some(next_tree) = self.next_tree.take() {
-    //         let previous_tree = mem::replace(&mut self.ctx.store.current_tree, next_tree);
-    //         self.ctx.store.previous_tree = Some(previous_tree);
-    //     }
-    // }
-
     fn drop(&mut self) {
-        self.ctx.batcher.commit_depth -= 1;
+        let decremented_commit_depth_value = self.ctx.batcher.dec_commit_depth();
+        self.assert_valid_depth_value(decremented_commit_depth_value + 1);
 
-        // for atom_key in &self.dirty_atoms {}
-        dbg!(self.ctx.batcher.commit_depth);
-        if self.ctx.batcher.commit_depth > 0 {
+        if decremented_commit_depth_value > 0 {
             return;
         } else {
             self.invalidate();
-            dbg!(1234);
-            if let Some(next_tree) = self.ctx.store.next_tree.take() {
-                let previous_tree = mem::replace(&mut self.ctx.store.current_tree, next_tree);
-                self.ctx.store.previous_tree = Some(previous_tree);
-            }
+            self.ctx.refresh();
+
+            // if let Some(next_tree) = self.ctx.store.next_tree.take() {
+            //     let previous_tree = mem::replace(&mut self.ctx.store.current_tree, next_tree);
+            //     self.ctx.store.previous_tree = Some(previous_tree);
+            // }
         }
     }
 }
 
 impl<'a> From<&'a mut Context> for TransactionContext<'a> {
     fn from(ctx: &'a mut Context) -> Self {
-        Self {
-            ctx,
-            // next_tree: OnceCell::new(),
-            // dirty_atoms: FxHashSet::default(),
-        }
+        let depth_value = ctx.batcher.inc_commit_depth();
+
+        Self { ctx, depth_value }
     }
 }
 
 impl<'a> TransactionContext<'a> {
+    fn assert_valid_depth_value(&self, prev_value: usize) {
+        debug_assert!(
+            self.depth_value == prev_value,
+            "inconsistent decrementation of transaction context, context depth {}, expected {}",
+            self.depth_value,
+            prev_value
+        );
+    }
+
     fn invalidate(&mut self) {
         // Finds all nodes whose cache should be invalidated starting from the changed nodes.
         let nodes_to_invalidate = self.read_graph(|current_graph| {
@@ -396,8 +581,6 @@ impl<'a> TransactionContext<'a> {
     }
 
     fn advance_tree(&self) -> TreeState {
-        println!("------------- ADVANCE TREE -------------");
-
         let current_tree = &self.ctx.store.current_tree;
 
         TreeState {
@@ -450,40 +633,97 @@ mod tests {
         }
     }
 
+    #[derive(Debug)]
+    struct Change {
+        b: usize,
+    }
+
+    impl EventEmitter<Change> for Value {}
+
+    #[test]
+    fn subscription_test() {
+        let ctx = &mut Context::new();
+        let atom_a = ctx.new_atom(|_| Value { a: 0 });
+
+        let atom_b = ctx.new_atom(|ctx| {
+            ctx.subscribe(
+                &atom_a,
+                |atom_b_inner: &mut Value, value_a, event: &Change, _cx| {
+                    println!("Hello, form atom subscription");
+
+                    atom_b_inner.a = event.b;
+                },
+            )
+            .detach();
+
+            Value { a: 0 }
+        });
+
+        ctx.update_atom(&atom_a, |this, cx| {
+            this.a += 10;
+
+            cx.notify();
+            cx.emit(Change { b: this.a });
+        });
+
+        dbg!(atom_a.read(ctx));
+        dbg!(atom_b.read(ctx));
+    }
+
+    #[test]
+    fn observe_test() {
+        let ctx = &mut Context::new();
+        let atom_a = ctx.new_atom(|_| Value { a: 0 });
+
+        let _subscription = ctx.observe(&atom_a, move |this, cx| {
+            println!("Hello, form atom observe, this value: {}", this.read(cx).a);
+        });
+
+        ctx.update_atom(&atom_a, |this, cx| {
+            this.a += 10;
+
+            cx.notify();
+        });
+    }
+
     #[test]
     fn simple_test() {
         let ctx = &mut Context::new();
 
         let atom_a = ctx.new_atom(|_| Value { a: 0 });
 
-        // ctx.update_atom(&atom_a, |this, cx| {
-        //     let atom_b = cx.new_atom(|_| Value { a: 1000 });
-        //     this.a += 10;
-
-        //     // atom_b
-        // });
-
-        dbg!(atom_a.read(ctx));
-
-        let atom_a_key = atom_a.key();
-
-        let selector_a = ctx.new_selector(move |ctx| {
-            let atom_a_value = ctx.read::<Value>(&atom_a_key);
-
-            let result = format!("Hello, {}!", atom_a_value.a);
-            MyString(result)
-        });
-
-        let v = selector_a.read(ctx);
-        dbg!(v);
-
         ctx.update_atom(&atom_a, |this, cx| {
+            let atom_b = cx.new_atom(|_| Value { a: 1000 });
             this.a += 10;
         });
 
-        dbg!(atom_a.read(ctx));
+        // dbg!(atom_a.read(ctx));
 
-        let v = selector_a.read(ctx);
-        dbg!(v);
+        // let atom_a_key = atom_a.key();
+
+        let r = ctx.observe(&atom_a, |this, cx| {
+            println!("Hello, form atom this value: {}", this.read(cx).a)
+        });
+
+        // let selector_a = ctx.new_selector(move |ctx| {
+        //     let atom_a_value = ctx.read::<Value>(&atom_a_key);
+
+        //     let result = format!("Hello, {}!", atom_a_value.a);
+        //     MyString(result)
+        // });
+
+        // let v = selector_a.read(ctx);
+        // dbg!(v);
+
+        ctx.update_atom(&atom_a, |this, cx| {
+            this.a += 10;
+
+            cx.notify();
+        });
+
+        // dbg!(atom_a.read(ctx));
+
+        // let v = selector_a.read(ctx);
+        // dbg!(v);
     }
 }
