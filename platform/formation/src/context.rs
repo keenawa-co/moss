@@ -147,7 +147,10 @@ impl AnyContext for Context {
         build_atom: impl FnOnce(&mut AtomContext<'_, T>) -> T,
     ) -> Self::Result<Atom<T>> {
         self.commit(|ctx| {
-            let slot = ctx.next_tree().atom_values.reserve();
+            let slot = ctx
+                .next_tree()
+                .atom_values
+                .reserve(|map, key| Atom::new(key, Arc::downgrade(&map.rc)));
             let value = build_atom(&mut AtomContext::new(ctx, slot.downgrade()));
 
             ctx.next_tree_mut().atom_values.insert(slot, value)
@@ -524,7 +527,7 @@ mod tests {
         a: usize,
     }
 
-    #[derive(Debug, Clone)]
+    #[derive(Debug, Clone, PartialEq)]
     struct MyString(String);
 
     impl AnyNodeValue for MyString {
@@ -649,8 +652,9 @@ mod tests {
             MyString(result)
         });
 
-        let v = selector_a.read(ctx);
-        dbg!(v);
+        let selector_a_result = selector_a.read(ctx);
+        debug_assert_eq!(selector_a_result, &MyString("Hello, 10!".to_string()));
+        dbg!(selector_a_result);
 
         ctx.update_atom(&atom_a, |this, atom_context| {
             this.a += 10;
@@ -660,7 +664,8 @@ mod tests {
 
         dbg!(atom_a.read(ctx));
 
-        let v = selector_a.read(ctx);
-        dbg!(v);
+        let selector_a_result = selector_a.read(ctx);
+        debug_assert_eq!(selector_a_result, &MyString("Hello, 20!".to_string()));
+        dbg!(selector_a_result);
     }
 }

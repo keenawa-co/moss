@@ -3,17 +3,12 @@ use dyn_clone::DynClone;
 use slotmap::SlotMap;
 use std::{any::Any, marker::PhantomData, sync::atomic::AtomicUsize};
 
-use super::atom::Atom;
-
 slotmap::new_key_type! {
     pub struct NodeKey;
 }
 
 #[derive(Deref, DerefMut)]
-pub struct Slot<T>(pub(super) Atom<T>);
-
-#[derive(Deref, DerefMut)]
-pub struct SlotNode<T, N: AnyNode<T>>(
+pub struct Slot<T, N: AnyNode<T>>(
     #[deref]
     #[deref_mut]
     pub(super) N,
@@ -43,3 +38,41 @@ pub trait AnyNodeValue: Any + DynClone {
 
 pub trait NodeValue: AnyNodeValue + Clone + 'static {}
 impl<T: AnyNodeValue + Clone + 'static> NodeValue for T {}
+
+pub(super) struct Lease<'a, T, N: AnyNode<T>> {
+    pub node: &'a N,
+    pub value: Option<Box<dyn AnyNodeValue>>,
+    pub typ: PhantomData<T>,
+}
+
+impl<'a, T: 'static, N: AnyNode<T>> core::ops::Deref for Lease<'a, T, N> {
+    type Target = T;
+
+    fn deref(&self) -> &Self::Target {
+        self.value
+            .as_ref()
+            .unwrap()
+            .as_any_ref()
+            .downcast_ref::<T>()
+            .unwrap()
+    }
+}
+
+impl<'a, T: 'static, N: AnyNode<T>> core::ops::DerefMut for Lease<'a, T, N> {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        self.value
+            .as_mut()
+            .unwrap()
+            .as_any_mut()
+            .downcast_mut()
+            .unwrap()
+    }
+}
+
+impl<'a, T, N: AnyNode<T>> Drop for Lease<'a, T, N> {
+    fn drop(&mut self) {
+        if self.value.is_some() && !std::thread::panicking() {
+            panic!("Drop node which is in leasing")
+        }
+    }
+}

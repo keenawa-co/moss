@@ -11,11 +11,11 @@ use std::{
 
 use crate::FlattenAnyhowResult;
 
-use super::AnyContext;
 use super::{
     atom_context::AtomContext,
-    node::{AnyNode, AnyNodeValue, NodeKey, NodeRefCounter, NodeValue, Slot},
+    node::{AnyNode, AnyNodeValue, NodeKey, NodeRefCounter, NodeValue},
 };
+use super::{node::Slot, AnyContext};
 
 pub trait AnyAtom<T>: AnyNode<T> {}
 
@@ -178,48 +178,12 @@ impl<T: NodeValue> Atom<T> {
     }
 }
 
-pub(super) struct Lease<'a, T> {
-    node: &'a Atom<T>,
-    value: Option<Box<dyn AnyNodeValue>>,
-    typ: PhantomData<T>,
-}
-
-impl<'a, T: NodeValue> core::ops::Deref for Lease<'a, T> {
-    type Target = T;
-
-    fn deref(&self) -> &Self::Target {
-        self.value
-            .as_ref()
-            .unwrap()
-            .as_any_ref()
-            .downcast_ref::<T>()
-            .unwrap()
-    }
-}
-
-impl<'a, T: NodeValue> core::ops::DerefMut for Lease<'a, T> {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        self.value
-            .as_mut()
-            .unwrap()
-            .as_any_mut()
-            .downcast_mut()
-            .unwrap()
-    }
-}
-
-impl<'a, T> Drop for Lease<'a, T> {
-    fn drop(&mut self) {
-        if self.value.is_some() && !std::thread::panicking() {
-            panic!("Drop node which is in leasing")
-        }
-    }
-}
+type AtomLease<'a, T> = super::node::Lease<'a, T, Atom<T>>;
 
 #[derive(Clone)]
 pub(super) struct AtomMap {
-    values: ImHashMap<NodeKey, Box<dyn AnyNodeValue>>,
-    rc: Arc<RwLock<NodeRefCounter>>,
+    pub values: ImHashMap<NodeKey, Box<dyn AnyNodeValue>>,
+    pub rc: Arc<RwLock<NodeRefCounter>>,
 }
 
 impl AtomMap {
@@ -233,20 +197,30 @@ impl AtomMap {
         }
     }
 
-    pub fn reserve<T: NodeValue>(&self) -> Slot<T> {
-        let id = self.rc.write().counts.insert(1.into());
-        Slot(Atom::new(id, Arc::downgrade(&self.rc)))
+    pub fn reserve<T, N>(&self, create_slot: impl FnOnce(&Self, NodeKey) -> N) -> Slot<T, N>
+    where
+        T: NodeValue,
+        N: AnyNode<T>,
+    {
+        let key = self.rc.write().counts.insert(1.into());
+        Slot(create_slot(self, key), PhantomData)
     }
 
-    pub fn insert<T: NodeValue>(&mut self, slot: Slot<T>, entity: T) -> Atom<T> {
+    pub fn insert<T, N>(&mut self, slot: Slot<T, N>, entity: T) -> N
+    where
+        T: NodeValue,
+        N: AnyNode<T>,
+    {
         let atom = slot.0;
-        dbg!(std::any::type_name::<T>());
-        self.values = self.values.update(atom.key, Box::new(entity));
+        self.values = self.values.update(atom.key(), Box::new(entity));
 
         atom
     }
 
-    pub fn read<T: NodeValue>(&self, key: &NodeKey) -> &T {
+    pub fn read<T>(&self, key: &NodeKey) -> &T
+    where
+        T: NodeValue,
+    {
         // TODO: add check for valid context
 
         self.values[key]
@@ -260,7 +234,10 @@ impl AtomMap {
             })
     }
 
-    pub fn begin_lease<'a, T: NodeValue>(&mut self, node: &'a Atom<T>) -> Lease<'a, T> {
+    pub fn begin_lease<'a, T>(&mut self, node: &'a Atom<T>) -> AtomLease<'a, T>
+    where
+        T: NodeValue,
+    {
         // TODO: add check for valid context
 
         let value = Some(self.values.remove(&node.key()).unwrap_or_else(|| {
@@ -270,14 +247,17 @@ impl AtomMap {
             )
         }));
 
-        Lease {
+        AtomLease {
             value,
             node,
             typ: PhantomData,
         }
     }
 
-    pub fn end_lease<T>(&mut self, mut lease: Lease<T>) {
+    pub fn end_lease<T>(&mut self, mut lease: AtomLease<T>)
+    where
+        T: NodeValue,
+    {
         self.values
             .insert(lease.node.key, lease.value.take().unwrap());
     }

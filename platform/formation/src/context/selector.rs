@@ -9,7 +9,7 @@ use std::{
 
 use super::{
     atom::{ProtoAtom, WeakAtom},
-    node::{AnyNode, AnyNodeValue, NodeKey, NodeRefCounter, NodeValue, SlotNode},
+    node::{AnyNode, AnyNodeValue, NodeKey, NodeRefCounter, NodeValue, Slot},
     selector_context::SelectorContext,
     AnyContext, Context,
 };
@@ -21,7 +21,6 @@ pub struct Selector<T> {
     node: ProtoAtom,
     typ: PhantomData<T>,
     compute: Box<dyn Fn(&mut SelectorContext<'_, T>) -> T + 'static>,
-    // observed_nodes: SubscriberSet<NodeKey, SelectorCallback>,
 }
 
 impl<T: 'static> AnyNode<T> for Selector<T> {
@@ -59,7 +58,10 @@ impl<T: NodeValue> Selector<T> {
         }
     }
 
-    pub fn read<'a, C: AnyContext + AsMut<Context>>(&self, ctx: &'a mut C) -> &'a T {
+    pub fn read<'a, C>(&self, ctx: &'a mut C) -> &'a T
+    where
+        C: AnyContext + AsMut<Context>,
+    {
         ctx.read_selector(self)
     }
 
@@ -67,6 +69,8 @@ impl<T: NodeValue> Selector<T> {
         (&self.compute)(ctx)
     }
 }
+
+type SelectorLease<'a, T> = super::node::Lease<'a, T, Selector<T>>;
 
 #[derive(Clone)]
 pub(super) struct SelectorMap {
@@ -99,19 +103,26 @@ impl SelectorMap {
             .unwrap_or_else(|| panic!("cannot delete a node value that does not exist"));
     }
 
-    pub(super) fn reserve<T: NodeValue, N: AnyNode<T>>(
-        &self,
-        create_slot: impl FnOnce(&Self, NodeKey) -> N,
-    ) -> SlotNode<T, N> {
+    pub(super) fn reserve<T, N>(&self, create_slot: impl FnOnce(&Self, NodeKey) -> N) -> Slot<T, N>
+    where
+        T: NodeValue,
+        N: AnyNode<T>,
+    {
         let key = self.rc.write().counts.insert(1.into());
-        SlotNode(create_slot(self, key), PhantomData)
+        Slot(create_slot(self, key), PhantomData)
     }
 
-    pub(super) fn insert<T: NodeValue>(&mut self, key: NodeKey, value: T) {
+    pub(super) fn insert<T>(&mut self, key: NodeKey, value: T)
+    where
+        T: NodeValue,
+    {
         self.computed_values = self.computed_values.update(key, Box::new(value));
     }
 
-    pub(super) fn read<T: 'static>(&self, key: &NodeKey) -> &T {
+    pub(super) fn read<T>(&self, key: &NodeKey) -> &T
+    where
+        T: NodeValue,
+    {
         // TODO: add check for valid context
 
         self.computed_values[key]
@@ -125,10 +136,10 @@ impl SelectorMap {
             })
     }
 
-    pub(super) fn begin_lease<'a, T: 'static>(
-        &mut self,
-        node: &'a Selector<T>,
-    ) -> SelectorLease<'a, T> {
+    pub(super) fn begin_lease<'a, T>(&mut self, node: &'a Selector<T>) -> SelectorLease<'a, T>
+    where
+        T: NodeValue,
+    {
         // TODO: add check for valid context
 
         let value = Some(self.computed_values.remove(&node.key).unwrap_or_else(|| {
@@ -145,56 +156,11 @@ impl SelectorMap {
         }
     }
 
-    pub(super) fn end_lease<T>(&mut self, mut lease: SelectorLease<T>) {
+    pub(super) fn end_lease<T>(&mut self, mut lease: SelectorLease<T>)
+    where
+        T: NodeValue,
+    {
         self.computed_values
             .insert(lease.node.key, lease.value.take().unwrap());
-    }
-}
-
-pub(super) struct SelectorLease<'a, T> {
-    node: &'a Selector<T>,
-    value: Option<Box<dyn AnyNodeValue>>,
-    typ: PhantomData<T>,
-}
-
-impl<'a, T: NodeValue> SelectorLease<'a, T> {
-    pub(super) fn set_value(&mut self, value: T) {
-        self.value = Some(Box::new(value));
-    }
-
-    pub(super) fn is_empty(&self) -> bool {
-        self.value.is_none()
-    }
-}
-
-impl<'a, T: 'static> core::ops::Deref for SelectorLease<'a, T> {
-    type Target = T;
-
-    fn deref(&self) -> &Self::Target {
-        self.value
-            .as_ref()
-            .unwrap()
-            .as_any_ref()
-            .downcast_ref::<T>()
-            .unwrap()
-    }
-}
-
-impl<'a, T: 'static> core::ops::DerefMut for SelectorLease<'a, T> {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        self.value
-            .as_mut()
-            .unwrap()
-            .as_any_mut()
-            .downcast_mut()
-            .unwrap()
-    }
-}
-
-impl<'a, T> Drop for SelectorLease<'a, T> {
-    fn drop(&mut self) {
-        if self.value.is_some() && !std::thread::panicking() {
-            panic!("Drop node which is in leasing")
-        }
     }
 }

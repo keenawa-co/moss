@@ -18,33 +18,48 @@ pub struct AtomContext<'a, T> {
 impl<V> AnyContext for AtomContext<'_, V> {
     type Result<T> = T;
 
-    fn new_atom<T: NodeValue>(
+    fn new_atom<T>(
         &mut self,
         build_atom: impl FnOnce(&mut AtomContext<'_, T>) -> T,
-    ) -> Self::Result<Atom<T>> {
+    ) -> Self::Result<Atom<T>>
+    where
+        T: NodeValue,
+    {
         self.ctx.new_atom(build_atom)
     }
 
-    fn read_atom<T: NodeValue>(&self, atom: &Atom<T>) -> &T {
+    fn read_atom<T>(&self, atom: &Atom<T>) -> &T
+    where
+        T: NodeValue,
+    {
         self.ctx.read_atom(atom)
     }
 
-    fn update_atom<T: NodeValue, R>(
+    fn update_atom<T, R>(
         &mut self,
         atom: &Atom<T>,
         callback: impl FnOnce(&mut T, &mut AtomContext<'_, T>) -> R,
-    ) -> Self::Result<R> {
+    ) -> Self::Result<R>
+    where
+        T: NodeValue,
+    {
         todo!()
     }
 
-    fn new_selector<T: NodeValue>(
+    fn new_selector<T>(
         &mut self,
         build_selector: impl Fn(&mut SelectorContext<'_, T>) -> T + 'static,
-    ) -> Self::Result<Selector<T>> {
+    ) -> Self::Result<Selector<T>>
+    where
+        T: NodeValue,
+    {
         todo!()
     }
 
-    fn read_selector<T: NodeValue>(&mut self, atom: &Selector<T>) -> &T {
+    fn read_selector<T>(&mut self, atom: &Selector<T>) -> &T
+    where
+        T: NodeValue,
+    {
         todo!()
     }
 }
