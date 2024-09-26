@@ -2,11 +2,13 @@ import { configureStore } from "@reduxjs/toolkit";
 import languagesReducer from "./languages/languagesSlice";
 import themesReducer from "./themes/themesSlice";
 import { useDispatch } from "react-redux";
+import { accordionReducer } from "./accordion";
 
 export const store = configureStore({
   reducer: {
     languages: languagesReducer,
     themes: themesReducer,
+    accordion: accordionReducer,
   },
 });
 
