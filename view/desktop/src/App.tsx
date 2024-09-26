@@ -22,7 +22,6 @@ function App() {
   const accordion = useSelector((state: RootState) => state.accordion.accordion);
 
   useEffect(() => {
-    //@ts-ignore
     dispatch(setLanguageFromLocalStorage());
     dispatch(initializeThemes());
   }, []);
@@ -35,11 +34,6 @@ function App() {
 
         const destinationLocation = destination.data.location as number;
         const sourceLocation = source.data.location as number;
-
-        console.log({
-          destinationLocation,
-          sourceLocation,
-        });
 
         if (
           destinationLocation === undefined ||
@@ -57,11 +51,11 @@ function App() {
   }, [accordion]);
 
   const handleAccordionClick = (index: number) => {
-    const test = accordion.map((accordion, i) =>
+    const updatedAccordion = accordion.map((accordion, i) =>
       i === index ? { ...accordion, isOpen: !accordion.isOpen } : accordion
     );
 
-    dispatch(setAccordion(test));
+    dispatch(setAccordion(updatedAccordion));
   };
 
   return (
@@ -82,7 +76,7 @@ function App() {
                   title={accordion.title}
                   location={index}
                   isOpen={accordion?.isOpen}
-                  handleClick={() => handleAccordionClick(index)} // handle state update
+                  handleClick={() => handleAccordionClick(index)}
                 >
                   {accordion.content === "Sidebar" ? <Sidebar /> : <div>{accordion.content}</div>}
                 </DraggableAccordion>

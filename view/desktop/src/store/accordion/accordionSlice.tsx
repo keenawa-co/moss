@@ -1,6 +1,4 @@
-import { Sidebar } from "@/components";
 import { PayloadAction, Slice, createSlice } from "@reduxjs/toolkit";
-import { ReactElement } from "react";
 
 export interface Accordion {
   title: string;
@@ -15,8 +13,8 @@ export interface AccordionState {
 const initialState: AccordionState = {
   accordion: [
     {
-      title: "Accordion 1",
-      content: "Sidebar", // i want to render this, but error occurs: [Error] ReferenceError: Cannot access uninitialized variable. Module Code (accordionSlice.tsx:8)
+      title: "Sidebar",
+      content: "Sidebar",
       isOpen: false,
     },
     {
