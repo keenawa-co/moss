@@ -6,7 +6,7 @@ const typeMap: any = {
     Object.keys(new Theme("", "", false, new Colors())).map((key) => ({
       json: key,
       js: key,
-      typ: key === "colors" ? createReference("Colors") : key === "isDefault" ? true : "",
+      typ: getkeyTypeForTheme(key),
     })),
     false
   ),
@@ -15,12 +15,20 @@ const typeMap: any = {
       return {
         json: key,
         js: key,
-        typ: createUnionMembers(undefined, ""),
+        typ: getKeyTypeForColors(),
       };
     }),
     false
   ),
 };
+
+function getkeyTypeForTheme(key: string): any {
+  return key === "colors" ? createReference("Colors") : key === "isDefault" ? true : "";
+}
+
+function getKeyTypeForColors(): any {
+  return createUnionMembers(undefined, "");
+}
 
 // Theme CSS variables
 export type ThemeCssVariables = {
