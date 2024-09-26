@@ -255,8 +255,6 @@ impl Context {
     }
 
     fn refresh(&mut self) {
-        self.flush_effects();
-
         let mut next_tree = if let Some(next_tree) = self.store.next_tree.take() {
             next_tree
         } else {
@@ -267,6 +265,8 @@ impl Context {
 
         let previous_tree = mem::replace(&mut self.store.current_tree, next_tree);
         self.store.previous_tree = Some(previous_tree);
+
+        self.flush_effects();
     }
 
     fn invalidate(&mut self, next_tree: &mut TreeState) {
@@ -302,9 +302,10 @@ impl Context {
     }
 
     fn flush_effects(&mut self) {
+        // TODO: release dropped nodes
+
         loop {
             if let Some(effect) = self.batcher.pending_effects.pop_front() {
-                //  dbg!(457);
                 match effect {
                     Effect::Notify { emitter } => self.apply_notify_effect(emitter),
                     Effect::Event {
@@ -631,6 +632,8 @@ mod tests {
 
             cx.notify();
         });
+
+        dbg!(atom_a.read(ctx));
     }
 
     #[test]
