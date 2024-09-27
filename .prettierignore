@@ -4,7 +4,7 @@ obsolete/
 .vscode/
 
 view/desktop/public
-
+view/desktop/bin/lib/macos/.build
 
 *.rs
 
