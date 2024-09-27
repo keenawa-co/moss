@@ -3,6 +3,7 @@ STORYBOOK_DIR = view/storybook
 DOCS_DIR = view/docs
 WEB_DIR = view/web
 THEME_GENERATOR_DIR = tools/theme-generator
+ICONS_DIR = view/shared/icons
 
 PNPM = pnpm
 SURREAL = surreal
@@ -17,6 +18,8 @@ SURREAL = surreal
 	stop-database \
 	run-docs \
 	run-web \
+	gen-themes \
+	gen-icons \
 	check-db \
 	count \
 	cleanup \
@@ -45,6 +48,9 @@ run-web:
 
 gen-themes:
 	@cd $(THEME_GENERATOR_DIR) && $(PNPM) start
+
+gen-icons:
+	@cd $(ICONS_DIR) && $(PNPM) run build
 
 # Check if the database is running, if not, start it in the background
 check-db:
