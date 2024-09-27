@@ -117,7 +117,6 @@ function formatStack(stack: string[]): string {
   return stack.length ? stack.join(".") : "root";
 }
 
-// Validation functions for each type
 function validateString(val: any, stack: string[]): string {
   if (typeof val !== "string") {
     throw new Error(`Expected string but got ${typeof val} at ${formatStack(stack)}`);
@@ -144,7 +143,6 @@ function validateObject(val: any, typ: Type, stack: string[]): any {
     throw new Error(`Expected object but got ${getType(val)} at ${formatStack(stack)}`);
   }
 
-  // Ensure the 'typ' is actually an object type before accessing object-specific properties
   if (typ.type !== "object") {
     throw new Error(`Expected type 'object' but got '${typ.type}' at ${formatStack(stack)}`);
   }
@@ -186,29 +184,24 @@ function validateObject(val: any, typ: Type, stack: string[]): any {
 }
 
 function validateArray(val: any, typ: Type, stack: string[]): any[] {
-  // Ensure that the 'typ' is an array type before accessing 'items'
   if (typ.type !== "array") {
     throw new Error(`Expected type 'array' but got '${typ.type}' at ${formatStack(stack)}`);
   }
 
-  // Check if the value is an array
   if (!Array.isArray(val)) {
     throw new Error(`Expected array but got ${getType(val)} at ${formatStack(stack)}`);
   }
 
-  // Map each item in the array using the defined 'items' type
   return val.map((item, index) => transform(item, typ.items, [...stack, String(index)]));
 }
 
 function validateUnion(val: any, typ: Type, stack: string[]): any {
-  // Ensure that the 'typ' is a union type before accessing 'types'
   if (typ.type !== "union") {
     throw new Error(`Expected type 'union' but got '${typ.type}' at ${formatStack(stack)}`);
   }
 
   const errors: string[] = [];
 
-  // Iterate over each subtype in the union
   for (const subtype of typ.types) {
     try {
       return transform(val, subtype, stack);
@@ -219,11 +212,9 @@ function validateUnion(val: any, typ: Type, stack: string[]): any {
     }
   }
 
-  // If none of the types in the union match, throw an error
   throw new Error(`Value does not match any type in union: ${errors.join(" | ")} at ${formatStack(stack)}`);
 }
 
-// Utility function to get the type of a value
 function getType(val: any): string {
   if (val === null) return "null";
   if (Array.isArray(val)) return "array";
