@@ -1,269 +1,231 @@
 import { Theme, Colors } from "@repo/moss-models";
 
-// Mapping between Theme JSON and TypeScript types
-const typeMap: any = {
-  Theme: createPropsWithAdditional(
-    Object.keys(new Theme("", "", false, new Colors())).map((key) => ({
-      json: key,
-      js: key,
-      typ: getkeyTypeForTheme(key),
-    })),
-    false
-  ),
-  Colors: createPropsWithAdditional(
-    Object.keys(new Colors()).map((key) => {
-      return {
-        json: key,
-        js: key,
-        typ: getKeyTypeForColors(),
-      };
-    }),
-    false
-  ),
-};
-
-function getkeyTypeForTheme(key: string): any {
-  return key === "colors" ? createReference("Colors") : key === "isDefault" ? true : "";
+// Utility function to convert camelCase to kebab-case
+function toKebabCase(str: string): string {
+  return str
+    .replace(/([a-z0-9])([A-Z])/g, "$1-$2")
+    .toLowerCase()
+    .replace(/\./g, "-");
 }
 
-function getKeyTypeForColors(): any {
-  return createUnionMembers(undefined, "");
-}
-
-// Theme CSS variables
-export type ThemeCssVariables = {
-  [K in keyof Colors as `--color-${KebabCase<string & K>}`]: string;
+// Type to convert string keys to CSS variable format
+type ThemeCssVariables = {
+  [K in keyof Colors as `--color-${KebabCase<K>}`]: string;
 };
 
-// Map Theme to CSS variables
+// Mapped type to convert string to kebab-case using Template Literal Types
+type KebabCase<S extends string> = S extends `${infer T}${infer U}`
+  ? U extends Uncapitalize<U>
+    ? `${Lowercase<T>}${KebabCase<U>}`
+    : `${Lowercase<T>}-${KebabCase<U>}`
+  : S;
+
+// Function to map Theme colors to CSS variables
 export function mapThemeToCssVariables(theme: Theme): ThemeCssVariables {
-  const colorKeys = Object.keys(theme.colors) as (keyof Colors)[];
+  const cssVariables = {} as ThemeCssVariables;
 
-  return colorKeys.reduce((acc, key) => {
-    const cssKey = `--color-${toKebabCase(String(key))}` as keyof ThemeCssVariables;
-    let value = theme.colors[key] || "";
+  // Dynamically iterate over the keys of the colors object
+  Object.entries(theme.colors).forEach(([key, value]) => {
+    const cssKey = `--color-${toKebabCase(key)}` as keyof ThemeCssVariables;
+    cssVariables[cssKey] = value;
+  });
 
-    if (value === "") {
-      value = findThemeColorValue(key, theme.colors);
-    }
-
-    acc[cssKey] = value;
-    return acc;
-  }, {} as ThemeCssVariables);
+  return cssVariables;
 }
 
-// Theme custom Tailwind color variables
-export const customTailwindColorVariables: Record<keyof Colors, string> = Object.keys(new Colors()).reduce(
+// Function to generate Tailwind CSS color variables with opacity
+export const customTailwindColorVariables: Record<keyof Colors, string> = Object.keys({} as Colors).reduce(
   (acc, key) => {
     const cssKey = `--color-${toKebabCase(key)}` as keyof ThemeCssVariables;
-    acc[key as keyof Colors] = rgbaWithOpacity(cssKey);
+    acc[key as keyof Colors] = `rgba(var(${cssKey}), var(--tw-bg-opacity, 1))`;
     return acc;
   },
   {} as Record<keyof Colors, string>
 );
 
-type KebabCase<T extends string> = T extends `${infer F}${infer R}`
-  ? R extends Uncapitalize<R>
-    ? `${Lowercase<F>}${KebabCase<R>}`
-    : `${Lowercase<F>}-${KebabCase<R>}`
-  : T;
-
-function toKebabCase(str: string): string {
-  return str.replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`);
-}
-
-function findThemeColorValue(key: keyof Colors, keys: Colors): string {
-  const parts = String(key).split(/(?=[A-Z])/);
-  const len = parts.length;
-
-  for (let i = len - 1; i > 0; i--) {
-    parts[i] = parts[i].charAt(0).toLowerCase() + parts[i].slice(1);
-    const result = parts.slice(0, i).join("") + "." + parts.slice(i).join("");
-    if (keys[result] !== undefined) {
-      return keys[result];
-    }
-    parts[i] = parts[i].charAt(0).toUpperCase() + parts[i].slice(1);
-  }
-  return "";
-}
-
-// https://tailwindcss.com/docs/customizing-colors#using-css-variables
+// Utility function to handle RGBA with opacity
 function rgbaWithOpacity(variableName: keyof ThemeCssVariables): string {
-  return `rgba(var(${variableName}))`;
+  return `rgba(var(${variableName}), var(--tw-bg-opacity, 1))`;
 }
 
+// Conversion class using JSON parsing with type safety
 export class Convert {
   public static toTheme(json: string): Theme {
-    return cast(JSON.parse(json), createReference("Theme"));
+    return cast(JSON.parse(json), themeType);
   }
 
   public static themeToJson(value: Theme): string {
-    return JSON.stringify(uncast(value, createReference("Theme")), null, 2);
+    return JSON.stringify(uncast(value, themeType), null, 2);
   }
 }
 
-function invalidValue(typ: any, val: any, key: any, parent: any = ""): never {
-  const prettyTyp = prettyTypeName(typ);
-  const parentText = parent ? ` on ${parent}` : "";
-  const keyText = key ? ` for key "${key}"` : "";
-  throw Error(`Invalid value${keyText}${parentText}. Expected ${prettyTyp} but got ${JSON.stringify(val)}`);
+// Define the type schema for Theme and Colors
+const themeType: Type = {
+  type: "object",
+  properties: {
+    name: { type: "string" },
+    slug: { type: "string" },
+    type: { type: "string" },
+    isDefault: { type: "boolean" },
+    colors: {
+      type: "object",
+      additionalProperties: { type: "string" },
+    },
+  },
+  required: ["name", "slug", "type", "isDefault", "colors"],
+};
+
+type Type =
+  | { type: "string" }
+  | { type: "number" }
+  | { type: "boolean" }
+  | { type: "object"; properties?: Record<string, Type>; additionalProperties?: Type; required?: string[] }
+  | { type: "array"; items: Type }
+  | { type: "union"; types: Type[] };
+
+// Function to cast JSON to TypeScript types with validation
+function cast<T>(val: any, typ: Type): T {
+  return transform(val, typ, []);
 }
 
-function prettyTypeName(typ: any): string {
-  if (Array.isArray(typ)) {
-    if (typ.length === 2 && typ[0] === undefined) {
-      return `an optional ${prettyTypeName(typ[1])}`;
-    } else {
-      return `one of [${typ
-        .map((a) => {
-          return prettyTypeName(a);
-        })
-        .join(", ")}]`;
-    }
-  } else if (typeof typ === "object" && typ.literal !== undefined) {
-    return typ.literal;
-  } else {
-    return typeof typ;
+// Function to uncast TypeScript types to JSON with validation
+function uncast<T>(val: T, typ: Type): any {
+  return transform(val, typ, []);
+}
+
+function transform(val: any, typ: Type, stack: string[] = []): any {
+  switch (typ.type) {
+    case "string":
+      return validateString(val, stack);
+    case "number":
+      return validateNumber(val, stack);
+    case "boolean":
+      return validateBoolean(val, stack);
+    case "object":
+      return validateObject(val, typ, stack);
+    case "array":
+      return validateArray(val, typ, stack);
+    case "union":
+      return validateUnion(val, typ, stack);
+    default:
+      throw new Error(`Unknown type '${(typ as any).type}' at ${formatStack(stack)}`);
   }
 }
 
-function jsonToJSProps(typ: any): any {
-  if (typ.jsonToJS === undefined) {
-    const map: any = {};
-    typ.props.forEach((p: any) => (map[p.json] = { key: p.js, typ: p.typ }));
-    typ.jsonToJS = map;
-  }
-  return typ.jsonToJS;
+// Helper function to format the stack for error messages
+function formatStack(stack: string[]): string {
+  return stack.length ? stack.join(".") : "root";
 }
 
-function jsToJSONProps(typ: any): any {
-  if (typ.jsToJSON === undefined) {
-    const map: any = {};
-    typ.props.forEach((p: any) => (map[p.js] = { key: p.json, typ: p.typ }));
-    typ.jsToJSON = map;
+// Validation functions for each type
+function validateString(val: any, stack: string[]): string {
+  if (typeof val !== "string") {
+    throw new Error(`Expected string but got ${typeof val} at ${formatStack(stack)}`);
   }
-  return typ.jsToJSON;
+  return val;
 }
 
-function transform(val: any, typ: any, getProps: any, key: any = "", parent: any = ""): any {
-  function transformPrimitive(typ: string, val: any): any {
-    if (typeof typ === typeof val) return val;
-    return invalidValue(typ, val, key, parent);
+function validateNumber(val: any, stack: string[]): number {
+  if (typeof val !== "number") {
+    throw new Error(`Expected number but got ${typeof val} at ${formatStack(stack)}`);
+  }
+  return val;
+}
+
+function validateBoolean(val: any, stack: string[]): boolean {
+  if (typeof val !== "boolean") {
+    throw new Error(`Expected boolean but got ${typeof val} at ${formatStack(stack)}`);
+  }
+  return val;
+}
+
+function validateObject(val: any, typ: Type, stack: string[]): any {
+  if (typeof val !== "object" || val === null || Array.isArray(val)) {
+    throw new Error(`Expected object but got ${getType(val)} at ${formatStack(stack)}`);
   }
 
-  function transformUnion(typs: any[], val: any): any {
-    // val must validate against one typ in typs
-    const l = typs.length;
-    for (let i = 0; i < l; i++) {
-      const typ = typs[i];
-      try {
-        return transform(val, typ, getProps);
-      } catch (_) {}
-    }
-    return invalidValue(typs, val, key, parent);
+  // Ensure the 'typ' is actually an object type before accessing object-specific properties
+  if (typ.type !== "object") {
+    throw new Error(`Expected type 'object' but got '${typ.type}' at ${formatStack(stack)}`);
   }
 
-  function transformEnum(cases: string[], val: any): any {
-    if (cases.indexOf(val) !== -1) return val;
-    return invalidValue(
-      cases.map((a) => {
-        return createLiteral(a);
-      }),
-      val,
-      key,
-      parent
-    );
-  }
+  const result: any = {};
 
-  function transformArray(typ: any, val: any): any {
-    // val must be an array with no invalid elements
-    if (!Array.isArray(val)) return invalidValue(createLiteral("array"), val, key, parent);
-    return val.map((el) => transform(el, typ, getProps));
-  }
-
-  function transformDate(val: any): any {
-    if (val === null) {
-      return null;
-    }
-    const d = new Date(val);
-    if (isNaN(d.valueOf())) {
-      return invalidValue(createLiteral("Date"), val, key, parent);
-    }
-    return d;
-  }
-
-  function transformObject(props: { [k: string]: any }, additional: any, val: any): any {
-    if (val === null || typeof val !== "object" || Array.isArray(val)) {
-      return invalidValue(createLiteral(ref || "object"), val, key, parent);
-    }
-    const result: any = {};
-    Object.getOwnPropertyNames(props).forEach((key) => {
-      const prop = props[key];
-      const v = Object.prototype.hasOwnProperty.call(val, key) ? val[key] : undefined;
-      result[prop.key] = transform(v, prop.typ, getProps, key, ref);
-    });
-    Object.getOwnPropertyNames(val).forEach((key) => {
-      if (!Object.prototype.hasOwnProperty.call(props, key)) {
-        result[key] = transform(val[key], additional, getProps, key, ref);
+  // Validate required properties
+  if (typ.required) {
+    for (const reqKey of typ.required) {
+      if (!(reqKey in val)) {
+        throw new Error(`Missing required property '${reqKey}' at ${formatStack([...stack, reqKey])}`);
       }
-    });
-    return result;
+    }
   }
 
-  if (typ === "any") return val;
-  if (typ === null) {
-    if (val === null) return val;
-    return invalidValue(typ, val, key, parent);
+  // Validate defined properties
+  if (typ.properties) {
+    for (const key in typ.properties) {
+      if (Object.prototype.hasOwnProperty.call(typ.properties, key)) {
+        stack.push(key);
+        result[key] = transform(val[key], typ.properties[key], stack);
+        stack.pop();
+      }
+    }
   }
-  if (typ === false) return invalidValue(typ, val, key, parent);
-  let ref: any = undefined;
-  while (typeof typ === "object" && typ.ref !== undefined) {
-    ref = typ.ref;
-    typ = typeMap[typ.ref];
+
+  // Validate additional properties
+  if (typ.additionalProperties) {
+    for (const key in val) {
+      if (!typ.properties || !Object.prototype.hasOwnProperty.call(typ.properties, key)) {
+        stack.push(key);
+        result[key] = transform(val[key], typ.additionalProperties, stack);
+        stack.pop();
+      }
+    }
   }
-  if (Array.isArray(typ)) return transformEnum(typ, val);
-  if (typeof typ === "object") {
-    return typ.hasOwnProperty("unionMembers")
-      ? transformUnion(typ.unionMembers, val)
-      : typ.hasOwnProperty("arrayItems")
-        ? transformArray(typ.arrayItems, val)
-        : typ.hasOwnProperty("props")
-          ? transformObject(getProps(typ), typ.additional, val)
-          : invalidValue(typ, val, key, parent);
+
+  return result;
+}
+
+function validateArray(val: any, typ: Type, stack: string[]): any[] {
+  // Ensure that the 'typ' is an array type before accessing 'items'
+  if (typ.type !== "array") {
+    throw new Error(`Expected type 'array' but got '${typ.type}' at ${formatStack(stack)}`);
   }
-  // Numbers can be parsed by Date but shouldn't be.
-  if (typ === Date && typeof val !== "number") return transformDate(val);
-  return transformPrimitive(typ, val);
+
+  // Check if the value is an array
+  if (!Array.isArray(val)) {
+    throw new Error(`Expected array but got ${getType(val)} at ${formatStack(stack)}`);
+  }
+
+  // Map each item in the array using the defined 'items' type
+  return val.map((item, index) => transform(item, typ.items, [...stack, String(index)]));
 }
 
-function cast<T>(val: any, typ: any): T {
-  return transform(val, typ, jsonToJSProps);
+function validateUnion(val: any, typ: Type, stack: string[]): any {
+  // Ensure that the 'typ' is a union type before accessing 'types'
+  if (typ.type !== "union") {
+    throw new Error(`Expected type 'union' but got '${typ.type}' at ${formatStack(stack)}`);
+  }
+
+  const errors: string[] = [];
+
+  // Iterate over each subtype in the union
+  for (const subtype of typ.types) {
+    try {
+      return transform(val, subtype, stack);
+    } catch (e) {
+      if (e instanceof Error) {
+        errors.push(e.message);
+      }
+    }
+  }
+
+  // If none of the types in the union match, throw an error
+  throw new Error(`Value does not match any type in union: ${errors.join(" | ")} at ${formatStack(stack)}`);
 }
 
-function uncast<T>(val: T, typ: any): any {
-  return transform(val, typ, jsToJSONProps);
-}
-
-function createLiteral(typ: any) {
-  return { literal: typ };
-}
-
-function createArrayItems(typ: any) {
-  return { arrayItems: typ };
-}
-
-function createUnionMembers(...typs: any[]) {
-  return { unionMembers: typs };
-}
-
-function createPropsWithAdditional(props: any[], additional: any) {
-  return { props, additional };
-}
-
-function createPropsArrayWithAdditional(additional: any) {
-  return { props: [], additional };
-}
-
-function createReference(name: string) {
-  return { ref: name };
+// Utility function to get the type of a value
+function getType(val: any): string {
+  if (val === null) return "null";
+  if (Array.isArray(val)) return "array";
+  return typeof val;
 }

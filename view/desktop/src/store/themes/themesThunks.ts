@@ -42,7 +42,7 @@ export const setThemeFromLocalStorage = createAsyncThunk(
         dispatch(setSelectedTheme("moss-light"));
       } else {
         applyTheme(themeToUse);
-        dispatch(setSelectedTheme(themeToUse.name || "moss-light"));
+        dispatch(setSelectedTheme(themeToUse.slug || "moss-light"));
       }
     } catch (error) {
       if (error instanceof Error) return rejectWithValue(error);

@@ -18,7 +18,7 @@ const preview: Preview = {
     theme: {
       name: "Theme",
       description: "Global theme for components",
-      defaultValue: Array.from(themes.entries()).find(([_, theme]) => theme.default === true)?.[0] || "moss-light",
+      defaultValue: Array.from(themes.entries()).find(([_, theme]) => theme.isDefault === true)?.[0] || "moss-light",
       toolbar: {
         icon: "circlehollow",
         items: Array.from(themes.keys()).map((themeName) => ({
