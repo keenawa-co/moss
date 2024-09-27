@@ -77,8 +77,8 @@ function App() {
   return (
     <>
       {!selectedTheme ? (
-        <div className="relative min-h-screen flex bg-storm-800">
-          <div className="container max-w-screen-xl mx-auto flex justify-center items-center text-4xl text-white">
+        <div className="relative flex min-h-screen bg-storm-800">
+          <div className="container mx-auto flex max-w-screen-xl items-center justify-center text-4xl text-white">
             Loading...
           </div>
         </div>
@@ -109,7 +109,7 @@ function App() {
               </Resizable>
             </ResizablePanel>
             <ResizablePanel>
-              <ContentLayout className="content relative flex flex-col overflow-auto h-full">
+              <ContentLayout className="content relative flex h-full flex-col overflow-auto">
                 <Suspense fallback="loading">
                   <BrowserRouter>
                     <Menu />

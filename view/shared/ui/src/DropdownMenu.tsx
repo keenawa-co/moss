@@ -49,12 +49,12 @@ const DropdownMenuLabel = ({ children, className, ...props }: DropdownMenuLabelP
 );
 
 const DropdownMenuSeparator = ({ className }: DropdownMenuSeparatorProps) => (
-  <DropdownMenuPrimitive.Separator className={cn("h-px mx-0.5 my-2 bg-[#383838]", className)} />
+  <DropdownMenuPrimitive.Separator className={cn("mx-0.5 my-2 h-px bg-[#383838]", className)} />
 );
 
 // TODO add functionality for DropdownMenuShortcut
 const DropdownMenuShortcut = ({ className, ...props }: React.HTMLAttributes<HTMLSpanElement>) => {
-  return <span className={cn("ml-auto opacity-60 font-[Inter] font-normal", className)} {...props} />;
+  return <span className={cn("ml-auto font-[Inter] font-normal opacity-60", className)} {...props} />;
 };
 
 // CONTENT
@@ -91,7 +91,7 @@ const DropdownMenuItem = ({ icon, className, children, ...props }: DropdownMenuI
 const DropdownMenuSub: React.FC<DropdownMenuSubProps> = DropdownMenuPrimitive.Sub;
 
 const DropdownMenuSubTrigger = ({ icon, className, children, ...props }: DropdownMenuSubTriggerProps) => (
-  <DropdownMenuPrimitive.SubTrigger className={cn(ItemStyles, "pr-1 cursor-default", className)} {...props}>
+  <DropdownMenuPrimitive.SubTrigger className={cn(ItemStyles, "cursor-default pr-1", className)} {...props}>
     {icon ? <Icon icon={icon} className={IconStyles} /> : <div className="size-4" />}
 
     <div className="flex w-full justify-between">
@@ -104,7 +104,7 @@ const DropdownMenuSubTrigger = ({ icon, className, children, ...props }: Dropdow
 const DropdownMenuSubContent = ({ className, children, ...props }: DropdownMenuSubContentProps) => (
   <DropdownMenuPrimitive.SubContent
     sideOffset={16 || props.sideOffset}
-    className={cn(ContentStyles, TextStyles, "min-w-48 -mt-1.5", className)}
+    className={cn(ContentStyles, TextStyles, "-mt-1.5 min-w-48", className)}
     {...props}
   >
     {children}

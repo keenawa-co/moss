@@ -37,20 +37,20 @@ export function MacOS({ className, ...props }: HTMLProps<HTMLDivElement>) {
 
   return (
     <div
-      className={cn("space-x-2 px-3 text-black active:text-black dark:text-black", className)}
+      className={cn("text-black active:text-black dark:text-black space-x-2 px-3", className)}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       {...props}
     >
       <Button
         onClick={closeWindow}
-        className="aspect-square h-3 w-3 cursor-default content-center items-center justify-center self-center rounded-full border border-black/[.12] bg-[#ff544d] text-center text-black/60 hover:bg-[#ff544d] active:bg-[#bf403a] active:text-black/60 dark:border-none"
+        className="border-black/[.12] text-black/60 active:text-black/60 aspect-square h-3 w-3 cursor-default content-center items-center justify-center self-center rounded-full border bg-[#ff544d] text-center hover:bg-[#ff544d] active:bg-[#bf403a] dark:border-none"
       >
         {isHovering && <Icons.closeMac />}
       </Button>
       <Button
         onClick={minimizeWindow}
-        className="aspect-square h-3 w-3 cursor-default content-center items-center justify-center self-center rounded-full border border-black/[.12]  bg-[#ffbd2e] text-center text-black/60 hover:bg-[#ffbd2e] active:bg-[#bf9122] active:text-black/60 dark:border-none"
+        className="border-black/[.12] text-black/60 active:text-black/60 aspect-square h-3 w-3 cursor-default content-center items-center justify-center self-center  rounded-full border bg-[#ffbd2e] text-center hover:bg-[#ffbd2e] active:bg-[#bf9122] dark:border-none"
       >
         {isHovering && <Icons.minMac />}
       </Button>
@@ -58,7 +58,7 @@ export function MacOS({ className, ...props }: HTMLProps<HTMLDivElement>) {
         // onKeyDown={handleAltKeyDown}
         // onKeyUp={handleAltKeyUp}
         onClick={isAltKeyPressed ? maximizeWindow : fullscreenWindow}
-        className="aspect-square h-3 w-3 cursor-default content-center items-center justify-center self-center rounded-full border border-black/[.12] bg-[#28c93f] text-center text-black/60 hover:bg-[#28c93f] active:bg-[#1e9930] active:text-black/60 dark:border-none"
+        className="border-black/[.12] text-black/60 active:text-black/60 aspect-square h-3 w-3 cursor-default content-center items-center justify-center self-center rounded-full border bg-[#28c93f] text-center hover:bg-[#28c93f] active:bg-[#1e9930] dark:border-none"
       >
         {isHovering && last}
       </Button>
