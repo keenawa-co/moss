@@ -49,6 +49,7 @@
     "tgui",
     "thiserror",
     "Turborepo",
+    "Uncapitalize",
     "unpark",
     "unparker",
     "unsync",

@@ -21,7 +21,6 @@ const SessionComponent = () => {
   let getWorkbenchState = async () => {
     try {
       const response = await commands.workbenchGetState();
-      console.log(response);
       if (response.status === "ok") {
         setWorkbenchState(response.data);
       }

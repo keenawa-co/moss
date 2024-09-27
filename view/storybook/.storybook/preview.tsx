@@ -4,7 +4,8 @@ import React from "react";
 import "@repo/ui/src/styles.css";
 import { ThemeProvider, staticColors } from "@repo/ui";
 import * as themeFiles from "./themes";
-import { Convert, Theme } from "@repo/theme";
+import { Convert } from "@repo/moss-theme";
+import { Theme } from "@repo/moss-models";
 
 const themes: Map<string, Theme> = new Map();
 for (const themeName in themeFiles) {
@@ -17,7 +18,7 @@ const preview: Preview = {
     theme: {
       name: "Theme",
       description: "Global theme for components",
-      defaultValue: Array.from(themes.entries()).find(([_, theme]) => theme.default === true)?.[0] || "moss-light",
+      defaultValue: Array.from(themes.entries()).find(([_, theme]) => theme.isDefault === true)?.[0] || "moss-light",
       toolbar: {
         icon: "circlehollow",
         items: Array.from(themes.keys()).map((themeName) => ({
