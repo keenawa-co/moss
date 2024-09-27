@@ -2,7 +2,9 @@ import { useRef, useEffect, useState } from "react";
 import { draggable, dropTargetForElements } from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
 import { Icon } from "@repo/ui";
 import { cn } from "@/utils";
-
+import { DropIndicator } from "@atlaskit/pragmatic-drag-and-drop-react-drop-indicator/box";
+import { combine } from "@atlaskit/pragmatic-drag-and-drop/combine";
+import { attachClosestEdge, extractClosestEdge, Edge } from "@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge";
 type HoveredState = "idle" | "valid" | "invalid";
 
 interface DraggableAccordionProps {
@@ -19,10 +21,10 @@ const DraggableAccordion = ({ title, isOpen = false, location, handleClick, chil
 
   const [dragging, setDragging] = useState<boolean>(false);
   const [state, setState] = useState<HoveredState>("idle");
+  const [closestEdge, setClosestEdge] = useState<Edge | null>(null);
 
   useEffect(() => {
     const el = ref.current;
-
     if (!el) return;
 
     return draggable({
@@ -37,29 +39,64 @@ const DraggableAccordion = ({ title, isOpen = false, location, handleClick, chil
     const el = dropRef.current;
     if (!el) return;
 
-    return dropTargetForElements({
-      element: el,
-      getData: () => ({ location }),
-      onDragEnter: ({ source }) => {
-        const targetIndex = location;
-        const draggedIndex = source.data.location;
+    return combine(
+      dropTargetForElements({
+        element: el,
+        getData: () => ({ location }),
+        onDragStart: () => setClosestEdge("bottom"),
+        onDragEnter: ({ source }) => {
+          console.log({ source });
+          setClosestEdge("bottom");
 
-        if (targetIndex == draggedIndex) setState("invalid");
-        else setState("valid");
-      },
-      onDragLeave: () => setState("idle"),
-      onDrop: () => setState("idle"),
-    });
+          const targetIndex = location;
+          const draggedIndex = source.data.location;
+
+          if (targetIndex == draggedIndex) setState("invalid");
+          else setState("valid");
+        },
+        onDragLeave: () => {
+          setState("idle");
+          setClosestEdge(null);
+        },
+        onDrop: () => {
+          setState("idle");
+          setClosestEdge(null);
+        },
+      }),
+      dropTargetForElements({
+        element: el,
+        getData({ input, element }) {
+          return attachClosestEdge(
+            { location },
+            {
+              element,
+              input,
+              allowedEdges: ["top", "bottom"],
+            }
+          );
+        },
+        onDrag({ self }) {
+          const closestEdge = extractClosestEdge(self.data);
+          setClosestEdge(closestEdge);
+        },
+        onDragLeave() {
+          setClosestEdge(null);
+        },
+        onDrop() {
+          setClosestEdge(null);
+        },
+      })
+    );
   }, [location]);
 
   return (
     <div
+      ref={dropRef}
       key={location}
-      className={cn({
+      className={cn("relative", {
         "bg-stone-300": state == "valid",
         "bg-red-300": state == "invalid",
       })}
-      ref={dropRef}
     >
       <div
         ref={ref}
@@ -72,7 +109,9 @@ const DraggableAccordion = ({ title, isOpen = false, location, handleClick, chil
         </div>
         <span className="font-bold">{title}</span>
       </div>
+
       <div className={isOpen ? "text-gray-500 text-xs pl-6" : "visually-hidden"}>{children}</div>
+      {closestEdge && <DropIndicator edge={closestEdge} />}
     </div>
   );
 };
