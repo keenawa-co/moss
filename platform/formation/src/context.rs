@@ -614,8 +614,8 @@ mod tests {
             cx.emit(Change { b: this.a });
         });
 
-        dbg!(atom_a.read(ctx));
-        dbg!(atom_b.read(ctx));
+        debug_assert_eq!(atom_a.read(ctx).a, 10);
+        debug_assert_eq!(atom_b.read(ctx).a, 10);
     }
 
     #[test]

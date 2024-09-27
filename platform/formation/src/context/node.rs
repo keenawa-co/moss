@@ -1,10 +1,9 @@
-use anyhow::Result;
 use derive_more::{Deref, DerefMut};
 use dyn_clone::DynClone;
 use parking_lot::RwLock;
 use slotmap::SlotMap;
 use std::{
-    any::{Any, TypeId},
+    any::Any,
     marker::PhantomData,
     sync::{
         atomic::{AtomicUsize, Ordering},
@@ -50,15 +49,14 @@ impl<T: AnyNodeValue + Clone + 'static> NodeValue for T {}
 
 pub struct ProtoNode {
     pub(super) key: NodeKey,
-    typ: TypeId,
+    // typ: TypeId,
     rc: Weak<RwLock<NodeRefCounter>>,
 }
 
 impl ProtoNode {
-    pub(super) fn new(key: NodeKey, typ: TypeId, rc: Weak<RwLock<NodeRefCounter>>) -> Self {
+    pub(super) fn new(key: NodeKey, rc: Weak<RwLock<NodeRefCounter>>) -> Self {
         Self {
             key,
-            typ,
             rc: rc.clone(),
         }
     }
@@ -66,7 +64,6 @@ impl ProtoNode {
     pub(super) fn downgrade(&self) -> WeakProtoNode {
         WeakProtoNode {
             key: self.key,
-            typ: self.typ,
             rc: self.rc.clone(),
         }
     }
@@ -76,7 +73,6 @@ impl ProtoNode {
 // AnyWeakModel
 pub struct WeakProtoNode {
     pub(super) key: NodeKey,
-    pub(super) typ: TypeId,
     pub(super) rc: Weak<RwLock<NodeRefCounter>>,
 }
 
@@ -95,7 +91,6 @@ impl WeakProtoNode {
 
         Some(ProtoNode {
             key: self.key,
-            typ: self.typ,
             rc: self.rc.clone(),
         })
     }
@@ -105,8 +100,8 @@ impl WeakProtoNode {
 pub struct WeakNode<T, N: AnyNode<T>> {
     #[deref]
     #[deref_mut]
-    pub(super) weak_proto_atom: WeakProtoNode,
-    pub(super) typ: PhantomData<T>,
+    pub(super) wp_node: WeakProtoNode,
+    pub(super) value_typ: PhantomData<T>,
     pub(super) node_typ: PhantomData<N>,
 }
 
@@ -116,8 +111,8 @@ unsafe impl<T, N: AnyNode<T>> Sync for WeakNode<T, N> {}
 impl<T, N: AnyNode<T>> Clone for WeakNode<T, N> {
     fn clone(&self) -> Self {
         Self {
-            weak_proto_atom: self.weak_proto_atom.clone(),
-            typ: self.typ,
+            wp_node: self.wp_node.clone(),
+            value_typ: self.value_typ,
             node_typ: self.node_typ,
         }
     }

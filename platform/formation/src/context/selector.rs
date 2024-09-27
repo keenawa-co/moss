@@ -2,7 +2,6 @@ use derive_more::{Deref, DerefMut};
 use parking_lot::RwLock;
 use slotmap::SlotMap;
 use std::{
-    any::TypeId,
     marker::PhantomData,
     sync::{Arc, Weak},
 };
@@ -16,26 +15,26 @@ use super::{
 };
 
 #[derive(Deref, DerefMut)]
-pub struct Selector<T: NodeValue> {
+pub struct Selector<V: NodeValue> {
     #[deref]
     #[deref_mut]
-    node: ProtoNode,
-    typ: PhantomData<T>,
-    compute: Box<dyn Fn(&mut SelectorContext<'_, T>) -> T + 'static>,
+    p_node: ProtoNode,
+    result_typ: PhantomData<V>,
+    compute: Box<dyn Fn(&mut SelectorContext<'_, V>) -> V + 'static>,
 }
 
-impl<T: NodeValue> AnyNode<T> for Selector<T> {
-    type Weak = WeakNode<T, Selector<T>>;
+impl<V: NodeValue> AnyNode<V> for Selector<V> {
+    type Weak = WeakNode<V, Selector<V>>;
 
     fn key(&self) -> NodeKey {
-        self.node.key
+        self.p_node.key
     }
 
     fn downgrade(&self) -> Self::Weak {
         WeakNode {
-            weak_proto_atom: self.node.downgrade(),
-            typ: self.typ,
-            node_typ: PhantomData::<Selector<T>>,
+            wp_node: self.p_node.downgrade(),
+            value_typ: self.result_typ,
+            node_typ: PhantomData::<Selector<V>>,
         }
     }
 
@@ -47,27 +46,27 @@ impl<T: NodeValue> AnyNode<T> for Selector<T> {
     }
 }
 
-impl<T: NodeValue> Selector<T> {
+impl<V: NodeValue> Selector<V> {
     pub(super) fn new(
         key: NodeKey,
-        compute: impl Fn(&mut SelectorContext<'_, T>) -> T + 'static,
+        compute: impl Fn(&mut SelectorContext<'_, V>) -> V + 'static,
         rc: Weak<RwLock<NodeRefCounter>>,
     ) -> Self {
         Self {
-            node: ProtoNode::new(key, TypeId::of::<T>(), rc),
+            p_node: ProtoNode::new(key, rc),
             compute: Box::new(compute),
-            typ: PhantomData,
+            result_typ: PhantomData,
         }
     }
 
-    pub fn read<'a, C>(&self, ctx: &'a mut C) -> &'a T
+    pub fn read<'a, C>(&self, ctx: &'a mut C) -> &'a V
     where
         C: AnyContext + AsMut<Context>,
     {
         ctx.read_selector(self)
     }
 
-    pub fn compute(&self, ctx: &mut SelectorContext<'_, T>) -> T {
+    pub fn compute(&self, ctx: &mut SelectorContext<'_, V>) -> V {
         (&self.compute)(ctx)
     }
 }
@@ -103,25 +102,27 @@ impl SelectorMap {
             .unwrap_or_else(|| panic!("cannot delete a node value that does not exist"));
     }
 
-    pub(super) fn reserve<T, N>(&self, create_slot: impl FnOnce(&Self, NodeKey) -> N) -> Slot<T, N>
+    pub(super) fn reserve<V>(
+        &self,
+        create_slot: impl FnOnce(&Self, NodeKey) -> Selector<V>,
+    ) -> Slot<V, Selector<V>>
     where
-        T: NodeValue,
-        N: AnyNode<T>,
+        V: NodeValue,
     {
         let key = self.rc.write().counts.insert(1.into());
         Slot(create_slot(self, key), PhantomData)
     }
 
-    pub(super) fn insert<T>(&mut self, key: NodeKey, value: T)
+    pub(super) fn insert<V>(&mut self, key: NodeKey, value: V)
     where
-        T: NodeValue,
+        V: NodeValue,
     {
         self.computed_values = self.computed_values.update(key, Box::new(value));
     }
 
-    pub(super) fn read<T>(&self, key: &NodeKey) -> &T
+    pub(super) fn read<V>(&self, key: &NodeKey) -> &V
     where
-        T: NodeValue,
+        V: NodeValue,
     {
         // TODO: add check for valid context
 
@@ -131,21 +132,21 @@ impl SelectorMap {
             .unwrap_or_else(|| {
                 panic!(
                     "cannot read {} node that is being updated",
-                    std::any::type_name::<T>()
+                    std::any::type_name::<V>()
                 )
             })
     }
 
-    pub(super) fn begin_lease<'a, T>(&mut self, node: &'a Selector<T>) -> Lease<'a, T, Selector<T>>
+    pub(super) fn begin_lease<'a, V>(&mut self, node: &'a Selector<V>) -> Lease<'a, V, Selector<V>>
     where
-        T: NodeValue,
+        V: NodeValue,
     {
         // TODO: add check for valid context
 
         let value = Some(self.computed_values.remove(&node.key).unwrap_or_else(|| {
             panic!(
                 "cannot update {} node that is already being updated",
-                std::any::type_name::<T>()
+                std::any::type_name::<V>()
             )
         }));
 
@@ -156,9 +157,9 @@ impl SelectorMap {
         }
     }
 
-    pub(super) fn end_lease<T>(&mut self, mut lease: Lease<T, Selector<T>>)
+    pub(super) fn end_lease<V>(&mut self, mut lease: Lease<V, Selector<V>>)
     where
-        T: NodeValue,
+        V: NodeValue,
     {
         self.computed_values
             .insert(lease.node.key, lease.value.take().unwrap());

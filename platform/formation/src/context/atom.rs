@@ -4,7 +4,6 @@ use moss_std::collection::ImHashMap;
 use parking_lot::RwLock;
 use slotmap::SlotMap;
 use std::{
-    any::TypeId,
     marker::PhantomData,
     sync::{Arc, Weak},
 };
@@ -47,8 +46,8 @@ pub struct OnChangeAtomEvent {}
 pub struct Atom<T> {
     #[deref]
     #[deref_mut]
-    node: ProtoNode,
-    typ: PhantomData<T>,
+    p_node: ProtoNode,
+    value_typ: PhantomData<T>,
 }
 
 impl<T: NodeValue> AnyAtom<T> for Atom<T> {}
@@ -57,13 +56,13 @@ impl<T: NodeValue> AnyNode<T> for Atom<T> {
     type Weak = WeakNode<T, Atom<T>>;
 
     fn key(&self) -> NodeKey {
-        self.node.key
+        self.p_node.key
     }
 
     fn downgrade(&self) -> Self::Weak {
         WeakNode {
-            weak_proto_atom: self.node.downgrade(),
-            typ: self.typ,
+            wp_node: self.p_node.downgrade(),
+            value_typ: self.value_typ,
             node_typ: PhantomData::<Atom<T>>,
         }
     }
@@ -73,8 +72,8 @@ impl<T: NodeValue> AnyNode<T> for Atom<T> {
         Self: Sized,
     {
         Some(Atom {
-            node: weak.weak_proto_atom.upgrade()?,
-            typ: weak.typ,
+            p_node: weak.wp_node.upgrade()?,
+            value_typ: weak.value_typ,
         })
     }
 }
@@ -82,8 +81,8 @@ impl<T: NodeValue> AnyNode<T> for Atom<T> {
 impl<T: NodeValue> Atom<T> {
     pub(super) fn new(key: NodeKey, rc: Weak<RwLock<NodeRefCounter>>) -> Self {
         Self {
-            node: ProtoNode::new(key, TypeId::of::<T>(), rc),
-            typ: PhantomData,
+            p_node: ProtoNode::new(key, rc),
+            value_typ: PhantomData,
         }
     }
 
@@ -120,10 +119,12 @@ impl AtomMap {
         }
     }
 
-    pub fn reserve<T, N>(&self, create_slot: impl FnOnce(&Self, NodeKey) -> N) -> Slot<T, N>
+    pub fn reserve<T>(
+        &self,
+        create_slot: impl FnOnce(&Self, NodeKey) -> Atom<T>,
+    ) -> Slot<T, Atom<T>>
     where
         T: NodeValue,
-        N: AnyNode<T>,
     {
         let key = self.rc.write().counts.insert(1.into());
         Slot(create_slot(self, key), PhantomData)
@@ -157,13 +158,13 @@ impl AtomMap {
             })
     }
 
-    pub fn begin_lease<'a, T>(&mut self, node: &'a Atom<T>) -> Lease<'a, T, Atom<T>>
+    pub fn begin_lease<'a, T>(&mut self, atom: &'a Atom<T>) -> Lease<'a, T, Atom<T>>
     where
         T: NodeValue,
     {
         // TODO: add check for valid context
 
-        let value = Some(self.values.remove(&node.key()).unwrap_or_else(|| {
+        let value = Some(self.values.remove(&atom.key()).unwrap_or_else(|| {
             panic!(
                 "cannot update {} node that is already being updated",
                 std::any::type_name::<T>()
@@ -172,7 +173,7 @@ impl AtomMap {
 
         Lease {
             value,
-            node,
+            node: atom,
             typ: PhantomData,
         }
     }
