@@ -9,10 +9,8 @@ import { Home, Logs, Settings } from "./components/pages";
 import { RootState, useAppDispatch } from "./store";
 import { setLanguageFromLocalStorage } from "./store/languages/languagesSlice";
 import { initializeThemes } from "./store/themes";
-import DraggableAccordion from "./components/DraggableAccordion";
+import Accordion from "./components/DraggableAccordion";
 import { setAccordion, setDefaultSizes } from "./store/accordion/accordionSlice";
-import { swapByIndex } from "./store/accordion/accordionHelpers";
-import { monitorForElements } from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
 import SidebarHeader from "./components/SidebarHeader";
 import * as DesktopComponents from "./components";
 
@@ -42,31 +40,7 @@ function App() {
     dispatch(initializeThemes());
   }, []);
 
-  useEffect(() => {
-    return monitorForElements({
-      onDrop({ source, location }) {
-        const destination = location.current.dropTargets[0];
-        if (!destination) return;
-
-        const destinationLocation = destination.data.location as number;
-        const sourceLocation = source.data.location as number;
-
-        if (
-          destinationLocation === undefined ||
-          sourceLocation === undefined ||
-          destinationLocation === sourceLocation
-        ) {
-          return;
-        }
-
-        const updatedArray = swapByIndex(accordion, sourceLocation, destinationLocation);
-
-        dispatch(setAccordion(updatedArray));
-      },
-    });
-  }, [accordion]);
-
-  const handleAccordionClick = (index: number) => {
+  const toggleAccordion = (index: number) => {
     const updatedAccordion = accordion.map((accordion, i) =>
       i === index ? { ...accordion, isOpen: !accordion.isOpen } : accordion
     );
@@ -96,14 +70,9 @@ function App() {
               >
                 {accordion.map((accordion, index) => (
                   <ResizablePanel key={index} minSize={accordion.isOpen ? 100 : 35}>
-                    <DraggableAccordion
-                      key={accordion.title}
-                      {...accordion}
-                      location={index}
-                      handleClick={() => handleAccordionClick(index)}
-                    >
+                    <Accordion key={accordion.title} {...accordion} handleClick={() => toggleAccordion(index)}>
                       {getDesktopComponentByName(accordion.content as DesktopComponentsOmitted)}
-                    </DraggableAccordion>
+                    </Accordion>
                   </ResizablePanel>
                 ))}
               </Resizable>
