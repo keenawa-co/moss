@@ -2,17 +2,17 @@ import { Icon } from "@repo/ui";
 
 export const SidebarLinks = () => {
   return (
-    <ul className="text-stone-500 text-[14px] flex flex-col gap-[14px] mt-[10px]">
-      <li className="flex gap-[5px] items-center">
+    <ul className="mt-[10px] flex flex-col gap-[14px] text-[14px] text-stone-500">
+      <li className="flex items-center gap-[5px]">
         <span>Moss Docs</span> <Icon icon="ArrowTopRight" className="size-[7px]" />
       </li>
-      <li className="flex gap-[5px] items-center">
+      <li className="flex items-center gap-[5px]">
         <span>Moss Releases</span> <Icon icon="ArrowTopRight" className="size-[7px]" />
       </li>
-      <li className="flex gap-[5px] items-center">
+      <li className="flex items-center gap-[5px]">
         <span>Moss GitHub</span> <Icon icon="ArrowTopRight" className="size-[7px]" />
       </li>
-      <li className="flex gap-[5px] items-center">
+      <li className="flex items-center gap-[5px]">
         <span>Moss Support</span> <Icon icon="ArrowTopRight" className="size-[7px]" />
       </li>
     </ul>

@@ -2,9 +2,9 @@ import { Icon } from "@repo/ui";
 
 export const SidebarHeader = ({ title }: { title: string }) => {
   return (
-    <div className="uppercase text-stone-500 font-semibold text-[14px] py-[10px] px-[15px] flex items-center justify-between">
+    <div className="flex items-center justify-between px-[15px] py-[10px] text-[14px] font-semibold uppercase text-stone-500">
       <span>{title}</span>
-      <button className="hover:bg-stone-100 rounded p-1">
+      <button className="rounded p-1 hover:bg-stone-100">
         <Icon icon="ThreeHorizontalDots" />
       </button>
     </div>
