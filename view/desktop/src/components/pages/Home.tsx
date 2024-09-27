@@ -116,7 +116,7 @@ export const Home: React.FC = () => {
 
       <div className="flex">
         <Icon icon="Accessibility" className="text-6xl hover:*:fill-green-500" />
-        <Icon icon="NewProject" className="text-6xl text-red-700 hover:fill-green-500" />
+        <Icon icon="NewProject" className="text-red-700 text-6xl hover:fill-green-500" />
       </div>
 
       <div className="w-96 bg-red-600">

@@ -29,17 +29,17 @@ export const AllVariants: Story = {
   },
   render: (args) => {
     return (
-      <div className="w-full p-16 flex flex-col gap-6">
+      <div className="flex w-full flex-col gap-6 p-16">
         <h2 className="text-3xl font-semibold">All variants</h2>
 
-        <div className="grid grid-cols-4 gap-4 justify-items-center">
+        <div className="grid grid-cols-4 justify-items-center gap-4">
           <div>Default</div>
           <div>Fill</div>
           <div>Stroke</div>
           <div>Without default color</div>
           <Icon icon={args.icon} className="text-6xl" />
           <Icon icon={args.icon} className="text-6xl text-green-400" />
-          <Icon icon={args.icon} className="text-6xl stroke-1 stroke-green-400" viewBox="-1 -1 18 17" />
+          <Icon icon={args.icon} className="stroke-green-400 stroke-1 text-6xl" viewBox="-1 -1 18 17" />
           <Icon icon="NewProject" className="text-6xl" />
         </div>
       </div>

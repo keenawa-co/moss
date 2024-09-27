@@ -5,7 +5,7 @@ export const MenuItem = ({ children, title, className }: { title?: string } & Co
   return (
     <div
       className={twMerge(
-        "flex items-center gap-2.5 hover:bg-zinc-500 hover:bg-opacity-10 focus:bg-zinc-500 focus:bg-opacity-10 rounded-lg ml-3.5  h-8 pl-2.5",
+        "hover:bg-zinc-500 focus:bg-zinc-500 ml-3.5 flex h-8 items-center gap-2.5 rounded-lg pl-2.5  hover:bg-opacity-10 focus:bg-opacity-10",
         className
       )}
     >

@@ -57,14 +57,14 @@ export const Tooltip = ({
         <TooltipPrimitive.Trigger asChild={asChild}>{children}</TooltipPrimitive.Trigger>
         <TooltipPrimitive.Content
           className={cn(
-            `z-50 overflow-hidden flex gap-2.5 bg-[#1E1E1E] text-white py-1 px-2 -mb-px rounded-md shadow-md text-xs max-w-44
-              data-[state=closed]:animate-out
-              data-[state=closed]:fade-out-0
-              data-[state=closed]:zoom-out-95
-              data-[side=bottom]:slide-in-from-top-2
-              data-[side=left]:slide-in-from-right-2
-              data-[side=right]:slide-in-from-left-2
-              data-[side=top]:slide-in-from-bottom-2`,
+            `data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50 -mb-px flex max-w-44 gap-2.5 overflow-hidden
+              rounded-md
+              bg-[#1E1E1E]
+              px-2
+              py-1
+              text-xs
+              text-white
+              shadow-md`,
             className
           )}
           {...options?.content}
@@ -75,7 +75,7 @@ export const Tooltip = ({
           <div>{label}</div>
 
           {shortcut && (
-            <div className="text-neutral-400 uppercase self-center">
+            <div className="text-neutral-400 self-center uppercase">
               {shortcut.map((s) => (
                 <span key={s}>{s}</span>
               ))}
