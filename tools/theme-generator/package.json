@@ -1,12 +1,13 @@
 {
   "name": "@repo/theme-generator",
   "scripts": {
-    "start": "tsc ./src/index.ts --outDir ./dist && node ./dist/index.js"
+    "start": "npx vite-node ./src/index.ts"
   },
   "devDependencies": {
-    "@repo/theme": "workspace:*",
+    "@repo/moss-models": "workspace:*",
     "@repo/typescript-config": "workspace:*",
-    "@types/node": "^22.5.3"
+    "@types/node": "^22.5.3",
+    "vite-node": "^2.1.1"
   },
   "dependencies": {
     "typescript": "^5.3.3"

@@ -1,5 +1,6 @@
 packages:
   - "view/*"
   - "view/shared/*"
-  - "sdk-ts/*"
+  - "lib/*"
   - "tools/*"
+  - "sdk/*"

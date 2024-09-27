@@ -1,6 +1,6 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { commands } from "@/bindings";
-import { Convert } from "@repo/theme";
+import { Convert } from "@repo/moss-theme";
 import { setSelectedTheme, setThemes } from "./themesSlice";
 import applyTheme from "../../../../shared/ui/src/tailwind/applyTheme";
 import { handleReadTheme } from "./themesHelpers";
@@ -42,7 +42,7 @@ export const setThemeFromLocalStorage = createAsyncThunk(
         dispatch(setSelectedTheme("moss-light"));
       } else {
         applyTheme(themeToUse);
-        dispatch(setSelectedTheme(themeToUse.name || "moss-light"));
+        dispatch(setSelectedTheme(themeToUse.slug || "moss-light"));
       }
     } catch (error) {
       if (error instanceof Error) return rejectWithValue(error);

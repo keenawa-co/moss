@@ -17,10 +17,13 @@
       "path": "view/shared/ui"
     },
     {
-      "path": "sdk-ts/theme"
+      "path": "lib/moss_theme"
     },
     {
       "path": "tools/theme-generator"
+    },
+    {
+      "path": "sdk/ts"
     }
   ]
 }
