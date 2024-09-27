@@ -12,6 +12,7 @@
     "interface": "i18next-resources-for-ts interface -i ./public/locales/de -o ./src/@types/resources.d.ts"
   },
   "dependencies": {
+    "@dnd-kit/core": "^6.1.0",
     "@reduxjs/toolkit": "^2.2.7",
     "@tailwindcss/nesting": "0.0.0-insiders.565cd3e",
     "@tauri-apps/api": ">=2.0.0-rc.0",
