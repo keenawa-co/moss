@@ -6,101 +6,25 @@ use slotmap::SlotMap;
 use std::{
     any::TypeId,
     marker::PhantomData,
-    sync::{atomic::Ordering, Arc, Weak},
+    sync::{Arc, Weak},
 };
 
 use crate::FlattenAnyhowResult;
 
 use super::{
     atom_context::AtomContext,
-    node::{AnyNode, AnyNodeValue, NodeKey, NodeRefCounter, NodeValue},
+    node::{AnyNode, AnyNodeValue, Lease, NodeKey, NodeRefCounter, NodeValue, ProtoNode, WeakNode},
 };
 use super::{node::Slot, AnyContext};
 
 pub trait AnyAtom<T>: AnyNode<T> {}
 
-// AnyModel
-pub struct ProtoAtom {
-    pub(super) key: NodeKey,                     // TODO: remove pub(super)
-    pub(super) typ: TypeId,                      // TODO: remove pub(super)
-    pub(super) rc: Weak<RwLock<NodeRefCounter>>, // TODO: remove pub(super)
-}
-
-impl ProtoAtom {
-    // TODO: remove pub(super)
-    pub(super) fn new(key: NodeKey, typ: TypeId, rc: Weak<RwLock<NodeRefCounter>>) -> Self {
-        Self {
-            key,
-            typ,
-            rc: rc.clone(),
-        }
-    }
-
-    // TODO: remove pub(super)
-    pub(super) fn downgrade(&self) -> WeakProtoAtom {
-        WeakProtoAtom {
-            key: self.key,
-            typ: self.typ,
-            rc: self.rc.clone(),
-        }
-    }
-}
-
-#[derive(Clone)]
-// AnyWeakModel
-pub struct WeakProtoAtom {
-    pub(super) key: NodeKey,
-    pub(super) typ: TypeId,
-    pub(super) rc: Weak<RwLock<NodeRefCounter>>,
-}
-
-impl WeakProtoAtom {
-    fn upgrade(&self) -> Option<ProtoAtom> {
-        let ref_counts = &self.rc.upgrade()?;
-        let ref_counts_lock = ref_counts.read();
-        let ref_count = ref_counts_lock.counts.get(self.key)?;
-
-        if ref_count.load(Ordering::SeqCst) == 0 {
-            return None;
-        }
-
-        ref_count.fetch_add(1, Ordering::SeqCst);
-        drop(ref_counts_lock);
-
-        Some(ProtoAtom {
-            key: self.key,
-            typ: self.typ,
-            rc: self.rc.clone(),
-        })
-    }
-}
-
-#[derive(Deref, DerefMut)]
-pub struct WeakAtom<T> {
-    #[deref]
-    #[deref_mut]
-    pub(super) weak_proto_atom: WeakProtoAtom,
-    pub(super) typ: PhantomData<T>,
-}
-
-unsafe impl<T> Send for WeakAtom<T> {}
-unsafe impl<T> Sync for WeakAtom<T> {}
-
-impl<T> Clone for WeakAtom<T> {
-    fn clone(&self) -> Self {
-        Self {
-            weak_proto_atom: self.weak_proto_atom.clone(),
-            typ: self.typ,
-        }
-    }
-}
-
-impl<T: NodeValue> WeakAtom<T> {
+impl<T: NodeValue> WeakNode<T, Atom<T>> {
     pub fn upgrade(&self) -> Option<Atom<T>> {
         Atom::upgrade_from(self)
     }
 
-    pub fn update<C, R>(
+    pub fn update<'a, C, R>(
         &self,
         ctx: &mut C,
         update: impl FnOnce(&mut T, &mut AtomContext<'_, T>) -> R,
@@ -123,23 +47,24 @@ pub struct OnChangeAtomEvent {}
 pub struct Atom<T> {
     #[deref]
     #[deref_mut]
-    node: ProtoAtom,
+    node: ProtoNode,
     typ: PhantomData<T>,
 }
 
 impl<T: NodeValue> AnyAtom<T> for Atom<T> {}
 
 impl<T: NodeValue> AnyNode<T> for Atom<T> {
-    type Weak = WeakAtom<T>;
+    type Weak = WeakNode<T, Atom<T>>;
 
     fn key(&self) -> NodeKey {
         self.node.key
     }
 
     fn downgrade(&self) -> Self::Weak {
-        WeakAtom {
+        WeakNode {
             weak_proto_atom: self.node.downgrade(),
             typ: self.typ,
+            node_typ: PhantomData::<Atom<T>>,
         }
     }
 
@@ -157,7 +82,7 @@ impl<T: NodeValue> AnyNode<T> for Atom<T> {
 impl<T: NodeValue> Atom<T> {
     pub(super) fn new(key: NodeKey, rc: Weak<RwLock<NodeRefCounter>>) -> Self {
         Self {
-            node: ProtoAtom::new(key, TypeId::of::<T>(), rc),
+            node: ProtoNode::new(key, TypeId::of::<T>(), rc),
             typ: PhantomData,
         }
     }
@@ -177,8 +102,6 @@ impl<T: NodeValue> Atom<T> {
         ctx.read_atom(self)
     }
 }
-
-type AtomLease<'a, T> = super::node::Lease<'a, T, Atom<T>>;
 
 #[derive(Clone)]
 pub(super) struct AtomMap {
@@ -234,7 +157,7 @@ impl AtomMap {
             })
     }
 
-    pub fn begin_lease<'a, T>(&mut self, node: &'a Atom<T>) -> AtomLease<'a, T>
+    pub fn begin_lease<'a, T>(&mut self, node: &'a Atom<T>) -> Lease<'a, T, Atom<T>>
     where
         T: NodeValue,
     {
@@ -247,14 +170,14 @@ impl AtomMap {
             )
         }));
 
-        AtomLease {
+        Lease {
             value,
             node,
             typ: PhantomData,
         }
     }
 
-    pub fn end_lease<T>(&mut self, mut lease: AtomLease<T>)
+    pub fn end_lease<T>(&mut self, mut lease: Lease<T, Atom<T>>)
     where
         T: NodeValue,
     {

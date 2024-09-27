@@ -8,32 +8,34 @@ use std::{
 };
 
 use super::{
-    atom::{ProtoAtom, WeakAtom},
-    node::{AnyNode, AnyNodeValue, NodeKey, NodeRefCounter, NodeValue, Slot},
+    node::{
+        AnyNode, AnyNodeValue, Lease, NodeKey, NodeRefCounter, NodeValue, ProtoNode, Slot, WeakNode,
+    },
     selector_context::SelectorContext,
     AnyContext, Context,
 };
 
 #[derive(Deref, DerefMut)]
-pub struct Selector<T> {
+pub struct Selector<T: NodeValue> {
     #[deref]
     #[deref_mut]
-    node: ProtoAtom,
+    node: ProtoNode,
     typ: PhantomData<T>,
     compute: Box<dyn Fn(&mut SelectorContext<'_, T>) -> T + 'static>,
 }
 
-impl<T: 'static> AnyNode<T> for Selector<T> {
-    type Weak = WeakAtom<T>;
+impl<T: NodeValue> AnyNode<T> for Selector<T> {
+    type Weak = WeakNode<T, Selector<T>>;
 
     fn key(&self) -> NodeKey {
         self.node.key
     }
 
     fn downgrade(&self) -> Self::Weak {
-        WeakAtom {
+        WeakNode {
             weak_proto_atom: self.node.downgrade(),
             typ: self.typ,
+            node_typ: PhantomData::<Selector<T>>,
         }
     }
 
@@ -52,7 +54,7 @@ impl<T: NodeValue> Selector<T> {
         rc: Weak<RwLock<NodeRefCounter>>,
     ) -> Self {
         Self {
-            node: ProtoAtom::new(key, TypeId::of::<T>(), rc),
+            node: ProtoNode::new(key, TypeId::of::<T>(), rc),
             compute: Box::new(compute),
             typ: PhantomData,
         }
@@ -69,8 +71,6 @@ impl<T: NodeValue> Selector<T> {
         (&self.compute)(ctx)
     }
 }
-
-type SelectorLease<'a, T> = super::node::Lease<'a, T, Selector<T>>;
 
 #[derive(Clone)]
 pub(super) struct SelectorMap {
@@ -136,7 +136,7 @@ impl SelectorMap {
             })
     }
 
-    pub(super) fn begin_lease<'a, T>(&mut self, node: &'a Selector<T>) -> SelectorLease<'a, T>
+    pub(super) fn begin_lease<'a, T>(&mut self, node: &'a Selector<T>) -> Lease<'a, T, Selector<T>>
     where
         T: NodeValue,
     {
@@ -149,14 +149,14 @@ impl SelectorMap {
             )
         }));
 
-        SelectorLease {
+        Lease {
             node,
             value,
             typ: PhantomData,
         }
     }
 
-    pub(super) fn end_lease<T>(&mut self, mut lease: SelectorLease<T>)
+    pub(super) fn end_lease<T>(&mut self, mut lease: Lease<T, Selector<T>>)
     where
         T: NodeValue,
     {

@@ -584,8 +584,8 @@ mod tests {
             cx.emit(OnChangeAtomEvent {});
         });
 
-        dbg!(atom_a.read(ctx));
-        dbg!(atom_b.read(ctx));
+        debug_assert_eq!(atom_a.read(ctx).a, 10);
+        debug_assert_eq!(atom_b.read(ctx).a, 0);
     }
 
     #[test]
@@ -623,8 +623,11 @@ mod tests {
         let ctx = &mut Context::new();
         let atom_a = ctx.new_atom(|_| Value { a: 0 });
 
-        let _subscription = ctx.observe(&atom_a, move |this, cx| {
-            println!("Hello, form atom observe, this value: {}", this.read(cx).a);
+        let _subscription = ctx.observe(&atom_a, move |this, atom_context| {
+            let this_a_read_result = this.read(atom_context).a;
+            debug_assert_eq!(this_a_read_result, 10);
+
+            println!("Hello, form atom observe, this value: {this_a_read_result}",);
         });
 
         ctx.update_atom(&atom_a, |this, cx| {

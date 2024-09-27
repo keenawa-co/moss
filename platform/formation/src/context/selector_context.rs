@@ -1,17 +1,17 @@
 use super::{
-    atom::{Atom, WeakAtom},
+    atom::Atom,
     atom_context::AtomContext,
-    node::{NodeKey, NodeValue},
+    node::{NodeKey, NodeValue, WeakNode},
     selector::Selector,
     AnyContext, Context,
 };
 
-pub struct SelectorContext<'a, V> {
+pub struct SelectorContext<'a, V: NodeValue> {
     ctx: &'a mut Context,
-    weak: WeakAtom<V>,
+    weak: WeakNode<V, Selector<V>>,
 }
 
-impl<'a, V> AnyContext for SelectorContext<'a, V> {
+impl<'a, V: NodeValue> AnyContext for SelectorContext<'a, V> {
     type Result<T> = T;
 
     fn new_atom<T: NodeValue>(
@@ -45,8 +45,8 @@ impl<'a, V> AnyContext for SelectorContext<'a, V> {
     }
 }
 
-impl<'a, V> SelectorContext<'a, V> {
-    pub(super) fn new(ctx: &'a mut Context, weak: WeakAtom<V>) -> Self {
+impl<'a, V: NodeValue> SelectorContext<'a, V> {
+    pub(super) fn new(ctx: &'a mut Context, weak: WeakNode<V, Selector<V>>) -> Self {
         Self { ctx, weak }
     }
 

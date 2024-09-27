@@ -2,20 +2,20 @@ use platform_core::context::EventEmitter;
 use std::any::TypeId;
 
 use super::{
-    atom::{Atom, WeakAtom},
-    node::{AnyNode, NodeValue},
+    atom::Atom,
+    node::{AnyNode, NodeValue, WeakNode},
     selector::Selector,
     selector_context::SelectorContext,
     subscription::Subscription,
     AnyContext, Context,
 };
 
-pub struct AtomContext<'a, T> {
+pub struct AtomContext<'a, V: NodeValue> {
     ctx: &'a mut Context,
-    weak: WeakAtom<T>,
+    weak: WeakNode<V, Atom<V>>,
 }
 
-impl<V> AnyContext for AtomContext<'_, V> {
+impl<V: NodeValue> AnyContext for AtomContext<'_, V> {
     type Result<T> = T;
 
     fn new_atom<T>(
@@ -65,11 +65,11 @@ impl<V> AnyContext for AtomContext<'_, V> {
 }
 
 impl<'a, V: NodeValue> AtomContext<'a, V> {
-    pub(super) fn new(ctx: &'a mut Context, weak: WeakAtom<V>) -> Self {
+    pub(super) fn new(ctx: &'a mut Context, weak: WeakNode<V, Atom<V>>) -> Self {
         Self { ctx, weak }
     }
 
-    pub fn weak_atom(&self) -> WeakAtom<V> {
+    pub fn weak_atom(&self) -> WeakNode<V, Atom<V>> {
         self.weak.clone()
     }
 }
