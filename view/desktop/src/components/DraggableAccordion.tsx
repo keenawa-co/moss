@@ -39,54 +39,41 @@ const DraggableAccordion = ({ title, isOpen = false, location, handleClick, chil
     const el = dropRef.current;
     if (!el) return;
 
-    return combine(
-      dropTargetForElements({
-        element: el,
-        getData: () => ({ location }),
-        onDragStart: () => setClosestEdge("bottom"),
-        onDragEnter: ({ source }) => {
-          console.log({ source });
-          setClosestEdge("bottom");
+    return dropTargetForElements({
+      element: el,
+      getData({ input, element }) {
+        return attachClosestEdge(
+          { location },
+          {
+            element,
+            input,
+            allowedEdges: ["top", "bottom"],
+          }
+        );
+      },
+      onDragStart: () => setClosestEdge("bottom"),
+      onDragEnter: ({ source }) => {
+        setClosestEdge("bottom");
 
-          const targetIndex = location;
-          const draggedIndex = source.data.location;
+        const targetIndex = location;
+        const draggedIndex = source.data.location;
 
-          if (targetIndex == draggedIndex) setState("invalid");
-          else setState("valid");
-        },
-        onDragLeave: () => {
-          setState("idle");
-          setClosestEdge(null);
-        },
-        onDrop: () => {
-          setState("idle");
-          setClosestEdge(null);
-        },
-      }),
-      dropTargetForElements({
-        element: el,
-        getData({ input, element }) {
-          return attachClosestEdge(
-            { location },
-            {
-              element,
-              input,
-              allowedEdges: ["top", "bottom"],
-            }
-          );
-        },
-        onDrag({ self }) {
-          const closestEdge = extractClosestEdge(self.data);
-          setClosestEdge(closestEdge);
-        },
-        onDragLeave() {
-          setClosestEdge(null);
-        },
-        onDrop() {
-          setClosestEdge(null);
-        },
-      })
-    );
+        if (targetIndex == draggedIndex) setState("invalid");
+        else setState("valid");
+      },
+      onDrag({ self }) {
+        const closestEdge = extractClosestEdge(self.data);
+        setClosestEdge(closestEdge);
+      },
+      onDragLeave: () => {
+        setState("idle");
+        setClosestEdge(null);
+      },
+      onDrop: () => {
+        setState("idle");
+        setClosestEdge(null);
+      },
+    });
   }, [location]);
 
   return (
@@ -102,15 +89,15 @@ const DraggableAccordion = ({ title, isOpen = false, location, handleClick, chil
         ref={ref}
         onClick={handleClick}
         style={{ opacity: dragging ? 0.4 : 1 }}
-        className="flex items-center py-[5px] px-2"
+        className="flex items-center px-2 py-[5px]"
       >
-        <div className={cn(`size-5 flex items-center justify-center cursor-pointer`, { "rotate-90": isOpen })}>
+        <div className={cn(`flex size-5 cursor-pointer items-center justify-center`, { "rotate-90": isOpen })}>
           <Icon icon="ArrowRight" className="text-xs" />
         </div>
         <span className="font-bold">{title}</span>
       </div>
 
-      <div className={isOpen ? "text-gray-500 text-xs pl-6" : "visually-hidden"}>{children}</div>
+      <div className={isOpen ? "text-gray-500 pl-6 text-xs" : "visually-hidden"}>{children}</div>
       {closestEdge && <DropIndicator edge={closestEdge} />}
     </div>
   );
