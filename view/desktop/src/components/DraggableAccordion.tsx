@@ -72,7 +72,7 @@ const DraggableAccordion = ({ title, isOpen = false, location, handleClick, chil
         </div>
         <span className="font-bold">{title}</span>
       </div>
-      <div className={isOpen ? "text-gray-500 text-xs" : "visually-hidden"}>{children}</div>
+      <div className={isOpen ? "text-gray-500 text-xs pl-6" : "visually-hidden"}>{children}</div>
     </div>
   );
 };

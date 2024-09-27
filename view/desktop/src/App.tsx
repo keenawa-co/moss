@@ -1,26 +1,41 @@
 import { ContentLayout, Menu, RootLayout } from "@/components";
 import "@/i18n";
 import "@repo/ui/src/fonts.css";
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Resizable, ResizablePanel } from "./components/Resizable";
-import Sidebar from "./components/Sidebar";
 import { Home, Logs, Settings } from "./components/pages";
 import { RootState, useAppDispatch } from "./store";
 import { setLanguageFromLocalStorage } from "./store/languages/languagesSlice";
 import { initializeThemes } from "./store/themes";
 import DraggableAccordion from "./components/DraggableAccordion";
-import { setAccordion } from "./store/accordion/accordionSlice";
+import { setAccordion, setDefaultSizes } from "./store/accordion/accordionSlice";
 import { swapByIndex } from "./store/accordion/accordionHelpers";
 import { monitorForElements } from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
 import SidebarHeader from "./components/SidebarHeader";
+import * as DesktopComponents from "./components";
+
+type DesktopComponentKeys = keyof typeof DesktopComponents;
+type OmittedComponents = Omit<
+  Record<DesktopComponentKeys, any>,
+  "RootLayout" | "SidebarLayout" | "ContentLayout" | "PropertiesLayout"
+>;
+type DesktopComponentsOmitted = keyof OmittedComponents;
+
+const getDesktopComponentByName = (name: DesktopComponentsOmitted) => {
+  if (!DesktopComponents[name]) return <div>{name}</div>;
+
+  const Tag = DesktopComponents[name];
+  return <Tag />;
+};
 
 function App() {
   const dispatch = useAppDispatch();
   const [sideBarVisible] = useState(true);
   const selectedTheme = useSelector((state: RootState) => state.themes.selected);
   const accordion = useSelector((state: RootState) => state.accordion.accordion);
+  const defaultSizes = useRef(useSelector((state: RootState) => state.accordion.defaultSizes));
 
   useEffect(() => {
     dispatch(setLanguageFromLocalStorage());
@@ -72,17 +87,26 @@ function App() {
           <Resizable proportionalLayout={false}>
             <ResizablePanel minSize={100} preferredSize={255} snap visible={sideBarVisible} className="select-none">
               <SidebarHeader title="launchpad" />
-              {accordion.map((accordion, index) => (
-                <DraggableAccordion
-                  key={index}
-                  title={accordion.title}
-                  location={index}
-                  isOpen={accordion?.isOpen}
-                  handleClick={() => handleAccordionClick(index)}
-                >
-                  {accordion.content === "Sidebar" ? <Sidebar /> : <div>{accordion.content}</div>}
-                </DraggableAccordion>
-              ))}
+              <Resizable
+                proportionalLayout={false}
+                vertical
+                defaultSizes={defaultSizes.current}
+                onDragEnd={(e) => dispatch(setDefaultSizes(e))}
+                className="pb-[35px]"
+              >
+                {accordion.map((accordion, index) => (
+                  <ResizablePanel key={index} minSize={accordion.isOpen ? 100 : 35}>
+                    <DraggableAccordion
+                      key={accordion.title}
+                      {...accordion}
+                      location={index}
+                      handleClick={() => handleAccordionClick(index)}
+                    >
+                      {getDesktopComponentByName(accordion.content as DesktopComponentsOmitted)}
+                    </DraggableAccordion>
+                  </ResizablePanel>
+                ))}
+              </Resizable>
             </ResizablePanel>
             <ResizablePanel>
               <ContentLayout className="content relative flex flex-col overflow-auto h-full">
