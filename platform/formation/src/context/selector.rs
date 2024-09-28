@@ -18,7 +18,7 @@ use super::{
 
 struct Abstract(());
 
-pub struct Computer {
+pub(super) struct Computer {
     data: NonNull<Abstract>,
     call: unsafe fn(NonNull<Abstract>, NonNull<Abstract>, NonNull<Abstract>),
     drop_fn: unsafe fn(NonNull<Abstract>),
@@ -34,7 +34,7 @@ impl Drop for Computer {
 }
 
 impl Computer {
-    pub fn new<V, F>(hook: F) -> Self
+    pub(super) fn new<V, F>(hook: F) -> Self
     where
         V: NodeValue,
         F: Fn(&mut SelectorContext<'_, V>) -> V + 'static,
@@ -73,7 +73,7 @@ impl Computer {
         }
     }
 
-    pub unsafe fn compute<V: NodeValue>(&self, ctx: &mut SelectorContext<'_, V>) -> V {
+    pub(super) unsafe fn compute<V: NodeValue>(&self, ctx: &mut SelectorContext<'_, V>) -> V {
         let mut result: V = std::mem::MaybeUninit::uninit().assume_init();
 
         let ctx_ptr = NonNull::from(ctx).cast::<Abstract>();
