@@ -13,6 +13,16 @@ import Accordion from "./components/DraggableAccordion";
 import { setAccordion, setDefaultSizes } from "./store/accordion/accordionSlice";
 import SidebarHeader from "./components/SidebarHeader";
 import * as DesktopComponents from "./components";
+import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+import { swapByIndex } from "./store/accordion/accordionHelpers";
 
 type DesktopComponentKeys = keyof typeof DesktopComponents;
 type OmittedComponents = Omit<
@@ -34,6 +44,31 @@ function App() {
   const selectedTheme = useSelector((state: RootState) => state.themes.selected);
   const accordion = useSelector((state: RootState) => state.accordion.accordion);
   const defaultSizes = useRef(useSelector((state: RootState) => state.accordion.defaultSizes));
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  const handleDragEnd = (event) => {
+    const { active, over } = event;
+
+    if (active.id !== over.id) {
+      const oldIndex = accordion.findIndex((a) => a.id === active.id);
+      const newIndex = accordion.findIndex((a) => a.id === over.id);
+
+      // console.log({
+      //   "active.id":  active.id,
+      //   "over.id":  over.id,
+      //   "oldIndex":  oldIndex,
+      //   "newIndex": newIndex
+      // })
+
+      const updated = swapByIndex(accordion, oldIndex, newIndex);
+      dispatch(setAccordion(updated));
+    }
+  };
 
   useEffect(() => {
     dispatch(setLanguageFromLocalStorage());
@@ -68,13 +103,17 @@ function App() {
                 onDragEnd={(e) => dispatch(setDefaultSizes(e))}
                 className="pb-[35px]"
               >
-                {accordion.map((accordion, index) => (
-                  <ResizablePanel key={index} minSize={accordion.isOpen ? 100 : 35}>
-                    <Accordion key={accordion.title} {...accordion} handleClick={() => toggleAccordion(index)}>
-                      {getDesktopComponentByName(accordion.content as DesktopComponentsOmitted)}
-                    </Accordion>
-                  </ResizablePanel>
-                ))}
+                <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+                  <SortableContext items={accordion} strategy={verticalListSortingStrategy}>
+                    {accordion.map((accordion, index) => (
+                      <ResizablePanel key={accordion.id} minSize={accordion.isOpen ? 100 : 35}>
+                        <Accordion key={accordion.id} {...accordion} handleClick={() => toggleAccordion(index)}>
+                          {getDesktopComponentByName(accordion.content as DesktopComponentsOmitted)}
+                        </Accordion>
+                      </ResizablePanel>
+                    ))}
+                  </SortableContext>
+                </DndContext>
               </Resizable>
             </ResizablePanel>
             <ResizablePanel>

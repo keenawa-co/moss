@@ -7,6 +7,7 @@ type OmittedComponents = Omit<
 >;
 type DesktopComponentsOmitted = keyof OmittedComponents;
 export interface Accordion {
+  id: number;
   title: string;
   content: DesktopComponentsOmitted;
   isOpen?: boolean;
@@ -20,16 +21,19 @@ export interface AccordionState {
 const initialState: AccordionState = {
   accordion: [
     {
+      id: 1,
       title: "Sidebar",
       content: "Sidebar",
       isOpen: false,
     },
     {
+      id: 2,
       title: "General",
       content: "SidebarGeneral",
       isOpen: false,
     },
     {
+      id: 3,
       title: "Links",
       content: "SidebarLinks",
       isOpen: false,
