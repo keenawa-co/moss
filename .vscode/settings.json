@@ -50,6 +50,7 @@
     "tauri",
     "tgui",
     "thiserror",
+    "Transactable",
     "Turborepo",
     "Uncapitalize",
     "unpark",

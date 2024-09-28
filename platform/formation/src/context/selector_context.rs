@@ -1,20 +1,35 @@
+use derive_more::{Deref, DerefMut};
+
 use super::{
     atom::Atom,
     atom_context::AtomContext,
     node::{NodeKey, NodeValue, WeakNode},
     selector::Selector,
-    AnyContext, Context,
+    AnyContext, Context, NonTransactableContext,
 };
 
+#[derive(Deref, DerefMut)]
 pub struct SelectorContext<'a, V: NodeValue> {
+    #[deref]
+    #[deref_mut]
     ctx: &'a mut Context,
     weak: WeakNode<V, Selector<V>>,
+}
+
+impl<V: NodeValue> NonTransactableContext for SelectorContext<'_, V> {
+    fn as_mut(&mut self) -> &mut Context {
+        self
+    }
+
+    fn as_ref(&self) -> &Context {
+        self
+    }
 }
 
 impl<'a, V: NodeValue> AnyContext for SelectorContext<'a, V> {
     type Result<T> = T;
 
-    fn new_atom<T: NodeValue>(
+    fn create_atom<T: NodeValue>(
         &mut self,
         build_atom: impl FnOnce(&mut AtomContext<'_, T>) -> T,
     ) -> Self::Result<Atom<T>> {

@@ -18,7 +18,7 @@ use super::{
 pub struct Selector<V: NodeValue> {
     #[deref]
     #[deref_mut]
-    p_node: ProtoNode,
+    pub(super) p_node: ProtoNode,
     result_typ: PhantomData<V>,
     compute: Box<dyn Fn(&mut SelectorContext<'_, V>) -> V + 'static>,
 }
@@ -59,10 +59,7 @@ impl<V: NodeValue> Selector<V> {
         }
     }
 
-    pub fn read<'a, C>(&self, ctx: &'a mut C) -> &'a V
-    where
-        C: AnyContext + AsMut<Context>,
-    {
+    pub fn read<'a>(&self, ctx: &'a mut Context) -> &'a V {
         ctx.read_selector(self)
     }
 

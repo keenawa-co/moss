@@ -49,8 +49,7 @@ impl<T: AnyNodeValue + Clone + 'static> NodeValue for T {}
 
 pub struct ProtoNode {
     pub(super) key: NodeKey,
-    // typ: TypeId,
-    rc: Weak<RwLock<NodeRefCounter>>,
+    pub(super) rc: Weak<RwLock<NodeRefCounter>>,
 }
 
 impl ProtoNode {

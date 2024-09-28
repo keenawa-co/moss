@@ -1,11 +1,13 @@
 pub mod atom;
 pub mod atom_context;
-pub mod graph;
 pub mod node;
 pub mod selector;
 pub mod selector_context;
 pub mod subscription;
 pub mod transaction_context;
+
+mod common;
+mod graph;
 
 use atom::{Atom, AtomMap};
 use atom_context::AtomContext;
@@ -96,9 +98,9 @@ impl StoreState {
 pub trait AnyContext {
     type Result<T>;
 
-    fn new_atom<T: NodeValue>(
+    fn create_atom<T: NodeValue>(
         &mut self,
-        build_atom: impl FnOnce(&mut AtomContext<'_, T>) -> T,
+        callback: impl FnOnce(&mut AtomContext<'_, T>) -> T,
     ) -> Self::Result<Atom<T>>;
 
     fn read_atom<T: NodeValue>(&self, atom: &Atom<T>) -> &T;
@@ -111,10 +113,15 @@ pub trait AnyContext {
 
     fn new_selector<T: NodeValue>(
         &mut self,
-        build_selector: impl Fn(&mut SelectorContext<'_, T>) -> T + 'static,
+        callback: impl Fn(&mut SelectorContext<'_, T>) -> T + 'static,
     ) -> Self::Result<Selector<T>>;
 
     fn read_selector<T: NodeValue>(&mut self, atom: &Selector<T>) -> &T;
+}
+
+pub(super) trait NonTransactableContext {
+    fn as_mut(&mut self) -> &mut Context;
+    fn as_ref(&self) -> &Context;
 }
 
 pub enum Effect {
@@ -139,26 +146,28 @@ pub struct Context {
     batcher: Batcher,
 }
 
+impl NonTransactableContext for Context {
+    fn as_mut(&mut self) -> &mut Context {
+        self
+    }
+
+    fn as_ref(&self) -> &Context {
+        self
+    }
+}
+
 impl AnyContext for Context {
     type Result<T> = T;
 
-    fn new_atom<T: NodeValue>(
+    fn create_atom<T: NodeValue>(
         &mut self,
-        build_atom: impl FnOnce(&mut AtomContext<'_, T>) -> T,
+        callback: impl FnOnce(&mut AtomContext<'_, T>) -> T,
     ) -> Self::Result<Atom<T>> {
-        self.commit(|ctx| {
-            let slot = ctx
-                .next_tree()
-                .atom_values
-                .reserve(|map, key| Atom::new(key, Arc::downgrade(&map.rc)));
-            let value = build_atom(&mut AtomContext::new(ctx, slot.downgrade()));
-
-            ctx.next_tree_mut().atom_values.insert(slot, value)
-        })
+        common::stage_create_atom(self, callback)
     }
 
     fn read_atom<T: NodeValue>(&self, atom: &Atom<T>) -> &T {
-        self.store.current_tree.atom_values.read(&atom.key())
+        common::read_atom::<Self, _>(self, atom)
     }
 
     fn update_atom<T: NodeValue, R>(
@@ -166,49 +175,18 @@ impl AnyContext for Context {
         atom: &Atom<T>,
         callback: impl FnOnce(&mut T, &mut AtomContext<'_, T>) -> R,
     ) -> Self::Result<R> {
-        self.commit(|ctx| ctx.update_atom(atom, callback))
+        common::stage_update_atom(self, atom, callback)
     }
 
     fn new_selector<T: NodeValue>(
         &mut self,
         callback: impl Fn(&mut SelectorContext<'_, T>) -> T + 'static,
     ) -> Self::Result<Selector<T>> {
-        self.commit(|ctx| {
-            let slot = ctx
-                .next_tree()
-                .selector_values
-                .reserve(|map, key| Selector::new(key, callback, Arc::downgrade(&map.rc)));
-
-            ctx.store.known_selectors.insert(slot.key());
-
-            slot.0
-        })
+        common::stage_create_selector(self, callback)
     }
 
     fn read_selector<T: NodeValue>(&mut self, selector: &Selector<T>) -> &T {
-        if !self
-            .store
-            .current_tree
-            .selector_values
-            .lookup(&selector.key())
-        {
-            self.commit(|transaction_context| {
-                let value = selector.compute(&mut SelectorContext::new(
-                    transaction_context,
-                    selector.downgrade(),
-                ));
-
-                transaction_context
-                    .next_tree_mut()
-                    .selector_values
-                    .insert(selector.key(), value);
-            });
-        }
-
-        self.store
-            .current_tree
-            .selector_values
-            .read(&selector.key())
+        common::resolve_selector::<Self, _>(self, selector)
     }
 }
 
@@ -220,7 +198,7 @@ impl Context {
         }
     }
 
-    pub fn commit<'a, R>(
+    pub fn stage<'a, R>(
         &'a mut self,
         transaction_callback: impl FnOnce(&mut TransactionContext) -> R + 'a,
     ) -> R {
@@ -254,7 +232,7 @@ impl Context {
         }
     }
 
-    fn refresh(&mut self) {
+    fn commit(&mut self) {
         let mut next_tree = if let Some(next_tree) = self.store.next_tree.take() {
             next_tree
         } else {
@@ -508,12 +486,6 @@ impl Batcher {
     }
 }
 
-impl AsMut<Context> for Context {
-    fn as_mut(&mut self) -> &mut Context {
-        self
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use std::any::Any;
@@ -563,9 +535,9 @@ mod tests {
     #[test]
     fn subscription_on_atom_change_test() {
         let ctx = &mut Context::new();
-        let atom_a = ctx.new_atom(|_| Value { a: 0 });
+        let atom_a = ctx.create_atom(|_| Value { a: 0 });
 
-        let atom_b = ctx.new_atom(|ctx| {
+        let atom_b = ctx.create_atom(|ctx| {
             ctx.subscribe(
                 &atom_a,
                 |atom_b_inner: &mut Value, value_a, event: &OnChangeAtomEvent, _cx| {
@@ -591,9 +563,9 @@ mod tests {
     #[test]
     fn subscription_test() {
         let ctx = &mut Context::new();
-        let atom_a = ctx.new_atom(|_| Value { a: 0 });
+        let atom_a = ctx.create_atom(|_| Value { a: 0 });
 
-        let atom_b = ctx.new_atom(|ctx| {
+        let atom_b = ctx.create_atom(|ctx| {
             ctx.subscribe(
                 &atom_a,
                 |atom_b_inner: &mut Value, value_a, event: &Change, _cx| {
@@ -621,7 +593,7 @@ mod tests {
     #[test]
     fn observe_test() {
         let ctx = &mut Context::new();
-        let atom_a = ctx.new_atom(|_| Value { a: 0 });
+        let atom_a = ctx.create_atom(|_| Value { a: 0 });
 
         let _subscription = ctx.observe(&atom_a, move |this, atom_context| {
             let this_a_read_result = this.read(atom_context).a;
@@ -643,7 +615,7 @@ mod tests {
     fn simple_test() {
         let ctx = &mut Context::new();
 
-        let atom_a = ctx.new_atom(|_| Value { a: 0 });
+        let atom_a = ctx.create_atom(|_| Value { a: 0 });
 
         ctx.update_atom(&atom_a, |this, atom_context| {
             this.a += 10;

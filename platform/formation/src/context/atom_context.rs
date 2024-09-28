@@ -1,38 +1,53 @@
+use derive_more::{Deref, DerefMut};
 use platform_core::context::EventEmitter;
 use std::any::TypeId;
 
 use super::{
     atom::Atom,
+    common,
     node::{AnyNode, NodeValue, WeakNode},
     selector::Selector,
     selector_context::SelectorContext,
     subscription::Subscription,
-    AnyContext, Context,
+    AnyContext, Context, NonTransactableContext,
 };
 
+#[derive(Deref, DerefMut)]
 pub struct AtomContext<'a, V: NodeValue> {
+    #[deref]
+    #[deref_mut]
     ctx: &'a mut Context,
     weak: WeakNode<V, Atom<V>>,
+}
+
+impl<V: NodeValue> NonTransactableContext for AtomContext<'_, V> {
+    fn as_mut(&mut self) -> &mut Context {
+        self
+    }
+
+    fn as_ref(&self) -> &Context {
+        self
+    }
 }
 
 impl<V: NodeValue> AnyContext for AtomContext<'_, V> {
     type Result<T> = T;
 
-    fn new_atom<T>(
+    fn create_atom<T>(
         &mut self,
-        build_atom: impl FnOnce(&mut AtomContext<'_, T>) -> T,
+        callback: impl FnOnce(&mut AtomContext<'_, T>) -> T,
     ) -> Self::Result<Atom<T>>
     where
         T: NodeValue,
     {
-        self.ctx.new_atom(build_atom)
+        common::stage_create_atom(self, callback)
     }
 
     fn read_atom<T>(&self, atom: &Atom<T>) -> &T
     where
         T: NodeValue,
     {
-        self.ctx.read_atom(atom)
+        common::read_atom(self, atom)
     }
 
     fn update_atom<T, R>(
@@ -43,24 +58,24 @@ impl<V: NodeValue> AnyContext for AtomContext<'_, V> {
     where
         T: NodeValue,
     {
-        todo!()
+        common::stage_update_atom(self, atom, callback)
     }
 
     fn new_selector<T>(
         &mut self,
-        build_selector: impl Fn(&mut SelectorContext<'_, T>) -> T + 'static,
+        callback: impl Fn(&mut SelectorContext<'_, T>) -> T + 'static,
     ) -> Self::Result<Selector<T>>
     where
         T: NodeValue,
     {
-        todo!()
+        common::stage_create_selector(self, callback)
     }
 
-    fn read_selector<T>(&mut self, atom: &Selector<T>) -> &T
+    fn read_selector<T>(&mut self, selector: &Selector<T>) -> &T
     where
         T: NodeValue,
     {
-        todo!()
+        common::resolve_selector::<Self, _>(self, selector)
     }
 }
 

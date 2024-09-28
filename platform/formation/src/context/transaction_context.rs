@@ -1,7 +1,10 @@
+#![feature(negative_impls)]
+
 use derive_more::{Deref, DerefMut};
 
 use super::atom::Atom;
 use super::atom_context::AtomContext;
+use super::common;
 use super::node::{AnyNode, NodeValue};
 use super::selector::Selector;
 use super::selector_context::SelectorContext;
@@ -23,7 +26,7 @@ impl<'a> Drop for TransactionContext<'a> {
         if self.ctx.batcher.dec_commit_depth() > 0 {
             return;
         } else {
-            self.refresh();
+            self.commit();
         }
     }
 }
@@ -39,11 +42,11 @@ impl<'a> From<&'a mut Context> for TransactionContext<'a> {
 impl<'a> AnyContext for TransactionContext<'a> {
     type Result<T> = T;
 
-    fn new_atom<T: NodeValue>(
+    fn create_atom<T: NodeValue>(
         &mut self,
-        build_atom: impl FnOnce(&mut AtomContext<'_, T>) -> T,
+        callback: impl FnOnce(&mut AtomContext<'_, T>) -> T,
     ) -> Self::Result<Atom<T>> {
-        unimplemented!()
+        common::stage_create_atom(self, callback)
     }
 
     fn read_atom<T: NodeValue>(&self, atom: &Atom<T>) -> &T {
@@ -55,26 +58,19 @@ impl<'a> AnyContext for TransactionContext<'a> {
         atom: &Atom<T>,
         callback: impl FnOnce(&mut T, &mut AtomContext<'_, T>) -> R,
     ) -> Self::Result<R> {
-        let mut value = self.next_tree_mut().atom_values.begin_lease(atom);
-
-        let result = callback(&mut value, &mut AtomContext::new(self, atom.downgrade()));
-
-        self.next_tree_mut().atom_values.end_lease(value);
-        self.next_tree_mut().dirty_atoms.insert(atom.key());
-
-        result
+        common::stage_update_atom(self, atom, callback)
     }
 
     fn new_selector<T: NodeValue>(
         &mut self,
-        build_selector: impl FnOnce(&mut SelectorContext<'_, T>) -> T,
+        callback: impl Fn(&mut SelectorContext<'_, T>) -> T + 'static,
     ) -> Self::Result<Selector<T>> {
-        unimplemented!()
+        common::stage_create_selector(self, callback)
     }
 
     fn read_selector<T: NodeValue>(&mut self, selector: &Selector<T>) -> &T {
         if !self.next_tree().selector_values.lookup(&selector.key()) {
-            self.commit(|transaction_context| {
+            self.stage(|transaction_context| {
                 let value = selector.compute(&mut SelectorContext::new(
                     transaction_context,
                     selector.downgrade(),
