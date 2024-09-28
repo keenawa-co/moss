@@ -69,21 +69,22 @@ impl<'a> AnyContext for TransactionContext<'a> {
     }
 
     fn read_selector<T: NodeValue>(&mut self, selector: &Selector<T>) -> &T {
-        if !self.next_tree().selector_values.lookup(&selector.key()) {
-            self.stage(|transaction_context| {
-                let value = selector.compute(&mut SelectorContext::new(
-                    transaction_context,
-                    selector.downgrade(),
-                ));
+        todo!()
+        // if !self.next_tree().selector_values.lookup(&selector.key()) {
+        //     self.stage(|transaction_context| {
+        //         let value = selector.compute(&mut SelectorContext::new(
+        //             transaction_context,
+        //             selector.downgrade(),
+        //         ));
 
-                transaction_context
-                    .next_tree_mut()
-                    .selector_values
-                    .insert(selector.key(), value);
-            });
-        }
+        //         transaction_context
+        //             .next_tree_mut()
+        //             .selector_values
+        //             .insert(selector.key(), value);
+        //     });
+        // }
 
-        self.next_tree().selector_values.read(&selector.key())
+        // self.next_tree().selector_values.read(&selector.key())
     }
 }
 

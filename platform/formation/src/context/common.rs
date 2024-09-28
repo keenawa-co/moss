@@ -1,4 +1,4 @@
-use std::sync::Arc;
+use std::{rc::Rc, sync::Arc};
 
 use crate::context::SelectorContext;
 
@@ -7,7 +7,7 @@ use super::{
     atom_context::AtomContext,
     node::{AnyNode, NodeValue},
     selector::Selector,
-    AnyContext, Context, NonTransactableContext,
+    AnyContext, Computer, Context, NonTransactableContext,
 };
 
 // ----------------------------------------------------------------------------
@@ -67,9 +67,13 @@ pub(super) fn stage_create_selector<T: NodeValue>(
         let slot = ctx
             .next_tree()
             .selector_values
-            .reserve(|map, key| Selector::new(key, callback, Arc::downgrade(&map.rc)));
+            .reserve(|map, key| Selector::new(key, Arc::downgrade(&map.rc)));
 
-        ctx.store.known_selectors.insert(slot.key());
+        let computer = Computer::new(callback);
+
+        ctx.store
+            .known_selectors
+            .insert(slot.key(), Rc::new(computer));
 
         slot.0
     })
@@ -87,12 +91,22 @@ where
         .selector_values
         .lookup(&selector.key())
     {
-        ctx.as_mut().stage(|transaction_context| {
-            let value = selector.compute(&mut SelectorContext::new(
-                transaction_context,
-                selector.downgrade(),
-            ));
+        let computer = ctx
+            .as_mut()
+            .store
+            .known_selectors
+            .get(&selector.key)
+            .unwrap()
+            .clone();
 
+        let value = unsafe {
+            computer.compute(&mut SelectorContext::new(
+                ctx.as_mut(),
+                selector.downgrade(),
+            ))
+        };
+
+        ctx.as_mut().stage(|transaction_context| {
             transaction_context
                 .next_tree_mut()
                 .selector_values

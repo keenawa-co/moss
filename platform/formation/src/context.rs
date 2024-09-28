@@ -16,7 +16,7 @@ use moss_std::collection::{FxHashMap, FxHashSet};
 use node::{AnyNode, NodeKey, NodeValue};
 use once_cell::sync::OnceCell;
 use platform_core::context::EventEmitter;
-use selector::{Selector, SelectorMap};
+use selector::{Computer, Selector, SelectorMap};
 use selector_context::SelectorContext;
 use smallvec::SmallVec;
 use std::{
@@ -24,7 +24,7 @@ use std::{
     cell::{Cell, RefCell},
     collections::{HashSet, VecDeque},
     mem,
-    sync::Arc,
+    rc::Rc,
 };
 use subscription::{SubscriberSet, Subscription};
 use transaction_context::TransactionContext;
@@ -57,6 +57,9 @@ impl Default for TreeState {
     }
 }
 
+type Handler = Box<dyn FnMut(&mut Context) -> bool + 'static>;
+type Listener = Box<dyn FnMut(&dyn Any, &mut Context) -> bool + 'static>;
+
 pub struct StoreState {
     // The previous state, used during transitions.
     previous_tree: Option<TreeState>,
@@ -70,7 +73,7 @@ pub struct StoreState {
 
     // Dependency graphs for each version of the state.
     graph_by_version: RefCell<FxHashMap<usize, Graph>>,
-    known_selectors: FxHashSet<NodeKey>,
+    known_selectors: FxHashMap<NodeKey, Rc<Computer>>,
 }
 
 impl StoreState {
@@ -90,7 +93,7 @@ impl StoreState {
             node_observers: SubscriberSet::new(),
             event_listeners: SubscriberSet::new(),
             graph_by_version: RefCell::new(initial_graph_map),
-            known_selectors: FxHashSet::default(),
+            known_selectors: FxHashMap::default(),
         }
     }
 }
@@ -137,9 +140,6 @@ pub enum Effect {
         callback: Box<dyn FnOnce(&mut Context) + 'static>,
     },
 }
-
-type Handler = Box<dyn FnMut(&mut Context) -> bool + 'static>;
-type Listener = Box<dyn FnMut(&dyn Any, &mut Context) -> bool + 'static>;
 
 pub struct Context {
     store: StoreState,

@@ -3,6 +3,8 @@ use parking_lot::RwLock;
 use slotmap::SlotMap;
 use std::{
     marker::PhantomData,
+    ptr::NonNull,
+    rc::Rc,
     sync::{Arc, Weak},
 };
 
@@ -14,13 +16,80 @@ use super::{
     AnyContext, Context,
 };
 
+struct Abstract(());
+
+pub struct Computer {
+    data: NonNull<Abstract>,
+    call: unsafe fn(NonNull<Abstract>, NonNull<Abstract>, NonNull<Abstract>),
+    drop_fn: unsafe fn(NonNull<Abstract>),
+    not_send: PhantomData<Rc<()>>,
+}
+
+impl Drop for Computer {
+    fn drop(&mut self) {
+        unsafe {
+            (self.drop_fn)(self.data);
+        }
+    }
+}
+
+impl Computer {
+    pub fn new<V, F>(hook: F) -> Self
+    where
+        V: NodeValue,
+        F: Fn(&mut SelectorContext<'_, V>) -> V + 'static,
+    {
+        unsafe fn call<V, F>(
+            data: NonNull<Abstract>,
+            ctx: NonNull<Abstract>,
+            result: NonNull<Abstract>,
+        ) where
+            V: NodeValue,
+            F: Fn(&mut SelectorContext<'_, V>) -> V + 'static,
+        {
+            let f = &*(data.cast::<F>().as_ref());
+            let ctx = &mut *(ctx.cast::<SelectorContext<'_, V>>().as_ptr());
+            let v = f(ctx);
+            std::ptr::write(result.cast::<V>().as_ptr(), v)
+        }
+
+        unsafe fn drop<V, F>(data: NonNull<Abstract>)
+        where
+            V: NodeValue,
+            F: Fn(&mut SelectorContext<'_, V>) -> V + 'static,
+        {
+            let _ = Box::from_raw(data.cast::<F>().as_ptr());
+        }
+
+        let boxed_f = Box::new(hook) as Box<F>;
+        let raw_f = Box::into_raw(boxed_f);
+        let data = unsafe { NonNull::new_unchecked(raw_f as *mut Abstract) };
+
+        Computer {
+            data,
+            call: call::<V, F>,
+            drop_fn: drop::<V, F>,
+            not_send: PhantomData::default(),
+        }
+    }
+
+    pub unsafe fn compute<V: NodeValue>(&self, ctx: &mut SelectorContext<'_, V>) -> V {
+        let mut result: V = std::mem::MaybeUninit::uninit().assume_init();
+
+        let ctx_ptr = NonNull::from(ctx).cast::<Abstract>();
+        let result_ptr = NonNull::new(&mut result as *mut _ as *mut Abstract).unwrap();
+
+        (self.call)(self.data, ctx_ptr, result_ptr);
+        result
+    }
+}
+
 #[derive(Deref, DerefMut)]
 pub struct Selector<V: NodeValue> {
     #[deref]
     #[deref_mut]
     pub(super) p_node: ProtoNode,
     result_typ: PhantomData<V>,
-    compute: Box<dyn Fn(&mut SelectorContext<'_, V>) -> V + 'static>,
 }
 
 impl<V: NodeValue> AnyNode<V> for Selector<V> {
@@ -42,29 +111,24 @@ impl<V: NodeValue> AnyNode<V> for Selector<V> {
     where
         Self: Sized,
     {
-        todo!()
+        Some(Selector {
+            p_node: weak.wp_node.upgrade()?,
+            result_typ: weak.value_typ,
+        })
     }
 }
 
 impl<V: NodeValue> Selector<V> {
-    pub(super) fn new(
-        key: NodeKey,
-        compute: impl Fn(&mut SelectorContext<'_, V>) -> V + 'static,
-        rc: Weak<RwLock<NodeRefCounter>>,
-    ) -> Self {
+    pub(super) fn new(key: NodeKey, rc: Weak<RwLock<NodeRefCounter>>) -> Self {
         Self {
             p_node: ProtoNode::new(key, rc),
-            compute: Box::new(compute),
+            // compute: Box::new(compute),
             result_typ: PhantomData,
         }
     }
 
     pub fn read<'a>(&self, ctx: &'a mut Context) -> &'a V {
         ctx.read_selector(self)
-    }
-
-    pub fn compute(&self, ctx: &mut SelectorContext<'_, V>) -> V {
-        (&self.compute)(ctx)
     }
 }
 
