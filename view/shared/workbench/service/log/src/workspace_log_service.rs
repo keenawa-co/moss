@@ -9,16 +9,16 @@ use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 // use parking_lot::Mutex use instead of Mutex
 
 pub struct WorkspaceLogService {
-    file_logger: Arc<Mutex<dyn AnyLogger + Send + Sync + 'static>>,
-    buffer_logger: Arc<Mutex<dyn BufferableLogger + Send + Sync + 'static>>,
-    tao_logger: Arc<Mutex<dyn AnyLogger + Send + Sync + 'static>>,
+    file_logger: Arc<parking_lot::Mutex<dyn AnyLogger + Send + Sync + 'static>>,
+    buffer_logger: Arc<parking_lot::Mutex<dyn BufferableLogger + Send + Sync + 'static>>,
+    tao_logger: Arc<parking_lot::Mutex<dyn AnyLogger + Send + Sync + 'static>>,
 }
 
 impl WorkspaceLogService {
     pub fn new(
-        file_logger: Arc<Mutex<dyn AnyLogger + Send + Sync + 'static>>, 
-        buffer_logger: Arc<Mutex<dyn BufferableLogger + Send + Sync + 'static>>, 
-        tao_logger: Arc<Mutex<dyn AnyLogger + Send + Sync + 'static>>
+        file_logger: Arc<parking_lot::Mutex<dyn AnyLogger + Send + Sync + 'static>>, 
+        buffer_logger: Arc<parking_lot::Mutex<dyn BufferableLogger + Send + Sync + 'static>>, 
+        tao_logger: Arc<parking_lot::Mutex<dyn AnyLogger + Send + Sync + 'static>>
     ) -> Self {
         Self {
             file_logger,
@@ -30,42 +30,42 @@ impl WorkspaceLogService {
     // TODO: replace unwrap with match (in all functions)
     pub fn trace(&self, message: &str) {
         println!("trace!");
-        if self.tao_logger.lock().unwrap().is_ready() {
-            self.tao_logger.lock().unwrap().trace(message);
+        if self.tao_logger.lock().is_ready() {
+            self.tao_logger.lock().trace(message);
         } else {
-            self.file_logger.lock().unwrap().trace(message);
+            self.file_logger.lock().trace(message);
         }
     }
 
     pub fn debug(&self, message: &str) {
-        if self.tao_logger.lock().unwrap().is_ready() {
-            self.tao_logger.lock().unwrap().debug(message);
+        if self.tao_logger.lock().is_ready() {
+            self.tao_logger.lock().debug(message);
         } else {
-            self.file_logger.lock().unwrap().debug(message);
+            self.file_logger.lock().debug(message);
         }
     }
 
     pub fn info(&self, message: &str) {
-        if self.tao_logger.lock().unwrap().is_ready() {
-            self.tao_logger.lock().unwrap().info(message);
+        if self.tao_logger.lock().is_ready() {
+            self.tao_logger.lock().info(message);
         } else {
-            self.file_logger.lock().unwrap().info(message);
+            self.file_logger.lock().info(message);
         }
     }
     
     pub fn warning(&self, message: &str) {
-        if self.tao_logger.lock().unwrap().is_ready() {
-            self.tao_logger.lock().unwrap().warning(message);
+        if self.tao_logger.lock().is_ready() {
+            self.tao_logger.lock().warning(message);
         } else {
-            self.file_logger.lock().unwrap().warning(message);
+            self.file_logger.lock().warning(message);
         }
     }
     
     pub fn error(&self, message: &str) {
-        if self.tao_logger.lock().unwrap().is_ready() {
-            self.tao_logger.lock().unwrap().error(message);
+        if self.tao_logger.lock().is_ready() {
+            self.tao_logger.lock().error(message);
         } else {
-            self.file_logger.lock().unwrap().error(message);
+            self.file_logger.lock().error(message);
         }
     }
 }
@@ -76,16 +76,15 @@ pub fn create_service() -> Result<WorkspaceLogService, std::io::Error> {
         8*1024*1024, // Max file size in bytes
     )?;
 
-    let file_logger: Arc<Mutex<dyn AnyLogger + Send + Sync + 'static>> = Arc::new(Mutex::new(file_logger));
-    let buffer_logger: Arc<Mutex<dyn BufferableLogger + Send + Sync + 'static>> = Arc::new(Mutex::new(BufferLogger::new(5000))); // TODO: move this value to config/constant
-    let tao_logger: Arc<Mutex<dyn AnyLogger + Send + Sync + 'static>> = Arc::new(Mutex::new(TaoLogger::new()));
+    let file_logger: Arc<parking_lot::Mutex<dyn AnyLogger + Send + Sync + 'static>> = Arc::new(parking_lot::Mutex::new(file_logger));
+    let buffer_logger: Arc<parking_lot::Mutex<dyn BufferableLogger + Send + Sync + 'static>> = Arc::new(parking_lot::Mutex::new(BufferLogger::new(5000))); // TODO: move this value to config/constant
+    let tao_logger: Arc<parking_lot::Mutex<dyn AnyLogger + Send + Sync + 'static>> = Arc::new(parking_lot::Mutex::new(TaoLogger::new()));
     
     Ok(WorkspaceLogService::new(file_logger, buffer_logger, tao_logger))
 }
 
 pub struct TaoLogger {
     level: LogLevel,
-    formatter: Arc<dyn Fn(&str, LogLevel) -> String + Send + Sync + 'static>,
 } 
 
 impl TaoLogger {
@@ -96,40 +95,34 @@ impl TaoLogger {
     fn default() -> Self {
         Self {
             level: LogLevel::Trace,
-            formatter: Arc::new(|message, level| format!("[{:?}] {}", level, message)),
         }
     }
 }
 
 impl AnyLogger for TaoLogger {
     fn trace(&mut self, message: &str) {
-        println!("trace in TaoLogger!");
-        if matches!(self.level, LogLevel::Trace) {
-            trace!("{}", (self.formatter)(message, LogLevel::Trace));
+        if self.level >= LogLevel::Trace {
+            trace!("{}", message);
         }
     }
-
     fn debug(&mut self, message: &str) {
-        if matches!(self.level, LogLevel::Debug | LogLevel::Trace) {
-            debug!("{}", (self.formatter)(message, LogLevel::Debug));
+        if self.level >= LogLevel::Debug {
+            debug!("{}", message);
         }
     }
-
     fn info(&mut self, message: &str) {
-        if matches!(self.level, LogLevel::Info | LogLevel::Debug | LogLevel::Trace) {
-            info!("{}", (self.formatter)(message, LogLevel::Info));
+        if self.level >= LogLevel::Info {
+            info!("{}", message);
         }
     }
-
     fn warning(&mut self, message: &str) {
-        if matches!(self.level, LogLevel::Info | LogLevel::Debug | LogLevel::Trace | LogLevel::Warning ) {
-            warn!("{}", (self.formatter)(message, LogLevel::Warning));
+        if self.level >= LogLevel::Warning {
+            warn!("{}", message);
         }
     }
-
     fn error(&mut self, message: &str) {
-        if matches!(self.level, LogLevel::Info | LogLevel::Debug | LogLevel::Trace | LogLevel::Warning | LogLevel::Error ) {
-            error!("{}", (self.formatter)(message, LogLevel::Error));
+        if self.level >= LogLevel::Error {
+            error!("{}", message);
         }
     }
 
@@ -139,10 +132,6 @@ impl AnyLogger for TaoLogger {
 
     fn set_level(&mut self, level: LogLevel) {
         self.level = level;
-    }
-
-    fn set_format(&mut self, formatter: Arc<dyn Fn(&str, LogLevel) -> String + Send + Sync + 'static>) {
-        self.formatter = formatter;
     }
 
     fn is_ready(&self) -> bool {

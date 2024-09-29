@@ -1,20 +1,20 @@
-use std::{borrow::Borrow, cell::RefCell, collections::VecDeque, default, fs::{File, OpenOptions}, io::{BufWriter, Write}, path::PathBuf, rc::{Rc, Weak}, sync::{Arc, Mutex}};
+use std::{borrow::Borrow, cell::RefCell, collections::{binary_heap, VecDeque}, default, fs::{File, OpenOptions}, io::{BufWriter, Write}, path::PathBuf, rc::{Rc, Weak}, sync::{Arc, Mutex}};
 
 use chrono::Utc;
-use tracing::{level_filters::LevelFilter, Level};
-use tracing_subscriber::{layer::SubscriberExt, EnvFilter, Layer};
+use tracing::{debug, error, info, level_filters::LevelFilter, trace, warn, Level};
+use tracing_subscriber::{fmt, layer::{Layered, SubscriberExt}, util::SubscriberInitExt, EnvFilter, Layer, Registry};
 
 pub struct LogService {
-    file_logger: Arc<Mutex<dyn AnyLogger + Send + Sync + 'static>>,
-    buffer_logger: Arc<Mutex<dyn BufferableLogger + Send + Sync + 'static>>,
-    cli_logger: Arc<Mutex<dyn AnyLogger + Send + Sync + 'static>>,
+    file_logger: Arc<parking_lot::Mutex<dyn AnyLogger + Send + Sync + 'static>>,
+    buffer_logger: Arc<parking_lot::Mutex<dyn BufferableLogger + Send + Sync + 'static>>,
+    cli_logger: Arc<parking_lot::Mutex<dyn AnyLogger + Send + Sync + 'static>>,
 }
 
 impl LogService {
     pub fn new(
-        file_logger: Arc<Mutex<dyn AnyLogger + Send + Sync + 'static>>, 
-        buffer_logger: Arc<Mutex<dyn BufferableLogger + Send + Sync + 'static>>, 
-        cli_logger: Arc<Mutex<dyn AnyLogger + Send + Sync + 'static>>) -> Self {
+        file_logger: Arc<parking_lot::Mutex<dyn AnyLogger + Send + Sync + 'static>>, 
+        buffer_logger: Arc<parking_lot::Mutex<dyn BufferableLogger + Send + Sync + 'static>>, 
+        cli_logger: Arc<parking_lot::Mutex<dyn AnyLogger + Send + Sync + 'static>>) -> Self {
         
         let service = Self {
             file_logger,
@@ -29,72 +29,96 @@ impl LogService {
 
     // TODO: replace unwrap with match (in all functions)
     pub fn trace(&self, message: &str) {
-        self.buffer_logger.lock().unwrap().trace(message);
-        self.file_logger.lock().unwrap().trace(message);
+        self.cli_logger.lock().trace(message);
     }
 
     pub fn debug(&self, message: &str) {
-        self.buffer_logger.lock().unwrap().debug(message);
-        self.file_logger.lock().unwrap().debug(message);
+        self.cli_logger.lock().debug(message);
     }
 
     pub fn info(&self, message: &str) {
-        self.buffer_logger.lock().unwrap().info(message);
-        self.file_logger.lock().unwrap().info(message);
+        self.cli_logger.lock().info(message);
     }
     
     pub fn warning(&self, message: &str) {
-        self.buffer_logger.lock().unwrap().warning(message);
-        self.file_logger.lock().unwrap().warning(message);
+        self.cli_logger.lock().warning(message);
     }
     
     pub fn error(&self, message: &str) {
-        self.buffer_logger.lock().unwrap().error(message);
-        self.file_logger.lock().unwrap().error(message);
+        self.cli_logger.lock().error(message);
     }
 
     // method used only for testing
     pub fn flush_buffer_logger_to_cli(&mut self) {
-        let mut buffered_logs = self.buffer_logger.lock().unwrap().drain_logs();
+        let mut buffered_logs = self.buffer_logger.lock().drain_logs();
         
         while let Some(log_entry) = buffered_logs.pop_front() {
             match log_entry.level {
-                LogLevel::Trace => self.cli_logger.lock().unwrap().trace(&log_entry.message),
-                LogLevel::Debug => self.cli_logger.lock().unwrap().debug(&log_entry.message),
-                LogLevel::Info => self.cli_logger.lock().unwrap().info(&log_entry.message),
-                LogLevel::Warning => self.cli_logger.lock().unwrap().warning(&log_entry.message),
-                LogLevel::Error => self.cli_logger.lock().unwrap().error(&log_entry.message),
+                LogLevel::Trace => self.cli_logger.lock().trace(&log_entry.message),
+                LogLevel::Debug => self.cli_logger.lock().debug(&log_entry.message),
+                LogLevel::Info => self.cli_logger.lock().info(&log_entry.message),
+                LogLevel::Warning => self.cli_logger.lock().warning(&log_entry.message),
+                LogLevel::Error => self.cli_logger.lock().error(&log_entry.message),
                 LogLevel::Off => ()
             }
         }
     }
 
     fn init_tracing(&self) {
-        let cli_layer = self.cli_logger.lock().unwrap().get_tracing_layer();
-        let file_layer = self.file_logger.lock().unwrap().get_tracing_layer();
-        let buffer_layer = self.buffer_logger.lock().unwrap().get_tracing_layer();
+        let cli_layer = fmt::layer::<CliLogger>()
+        .with_writer(|| {
+            let cli_logger = CliLogger { level: LogLevel::Trace };
+            Box::new(cli_logger)
+        });
+
+        // Create a subscriber that includes the cli_layer
+        // let subscriber = Registry::default().with(cli_layer);
+
+        // Create a subscriber that includes the cli_layer
+        // let subscriber = Registry::default().with(cli_layer);
+
+        // Set the subscriber as the global default
+        tracing::subscriber::set_global_default(subscriber).expect("Failed to set global subscriber");
+    
+        // Set the subscriber as the global default
+        // .filter(tracing_subscriber::filter::LevelFilter::INFO); // Adjust the log level here
+
+        // let cli_layer = tracing_subscriber::fmt::layer()
+        // .with_writer(std::io::stdout)
+        // .with_filter(LevelFilter::from_level(Level::TRACE))
+        // .with_filter(tracing_subscriber::filter::FilterFn::new(|metadata| {
+        //     metadata.target() == "cli_target" // Only log this target for CLI
+        // }));
+    
+        // let file_layer = tracing_subscriber::fmt::layer()
+        //     .with_writer(|| std::fs::File::create("logfile.log"))
+        //     .with_filter(LevelFilter::from_level(Level::TRACE))
+        //     .with_filter(tracing_subscriber::filter::FilterFn::new(|metadata| {
+        //         metadata.target() == "file_target" // Only log this target for file
+        //     }));
+        
+        // let buffer_layer = tracing_subscriber::fmt::layer()
+        //     .with_writer(std::io::sink)
+        //     .with_filter(LevelFilter::from_level(Level::TRACE))
+        //     .with_filter(tracing_subscriber::filter::FilterFn::new(|metadata| {
+        //         metadata.target() == "buffer_target" // Only log this target for buffer
+        //     }));
 
         // Create the base registry
-        let mut registry = tracing_subscriber::registry();
+        let mut registry = tracing_subscriber::registry()
+            .with(cli_layer)
+            .init();
+        //     .with(buffer_layer)
+        //     .init();
 
-        // Initialize a layered subscriber
-        let mut layered_subscriber = registry;
 
-        // Add layers if they are Some
-        if let Some(layer) = cli_layer {
-            layered_subscriber = layered_subscriber.with(layer);
-        }
 
-        if let Some(layer) = file_layer {
-            layered_subscriber = layered_subscriber.with(layer);
-        }
-
-        if let Some(layer) = buffer_layer {
-            layered_subscriber = layered_subscriber.with(layer);
-        }
-
-        // Initialize the subscriber with the combined layers
-        layered_subscriber.init();
+         // Log examples with specific targets
+        // info!(target: "cli_target", "This is a log message for the CLI layer");
+        // warn!(target: "file_target", "This is a warning message for the file layer");
+        // debug!(target: "buffer_target", "This is a debug message for the buffer layer");
+        // info!("This is a log message for all layers"); // This goes to all layers with trace level
+    
     }
 }
 
@@ -104,9 +128,9 @@ pub fn create_service() -> Result<LogService, std::io::Error> {
         50, // Max file size in bytes
     )?;
 
-    let file_logger: Arc<Mutex<dyn AnyLogger + Send + Sync + 'static>> = Arc::new(Mutex::new(file_logger));
-    let buffer_logger: Arc<Mutex<dyn BufferableLogger + Send + Sync + 'static>> = Arc::new(Mutex::new(BufferLogger::new(5000))); // TODO: move this value to config/constant
-    let cli_logger: Arc<Mutex<dyn AnyLogger + Send + Sync + 'static>> = Arc::new(Mutex::new(CliLogger::new()));
+    let file_logger: Arc<parking_lot::Mutex<dyn AnyLogger + Send + Sync + 'static>> = Arc::new(parking_lot::Mutex::new(file_logger));
+    let buffer_logger: Arc<parking_lot::Mutex<dyn BufferableLogger + Send + Sync + 'static>> = Arc::new(parking_lot::Mutex::new(BufferLogger::new(5000))); // TODO: move this value to config/constant
+    let cli_logger: Arc<parking_lot::Mutex<dyn AnyLogger + Send + Sync + 'static>> = Arc::new(parking_lot::Mutex::new(CliLogger::new()));
     
     Ok(LogService::new(file_logger, buffer_logger, cli_logger))
 }
@@ -130,8 +154,7 @@ pub trait AnyLogger {
     // determine if the logger is ready to be used (files are created, memory allocated, etc.)
     fn is_ready(&self) -> bool; 
 
-    fn get_tracing_layer(&self) -> Option<Box<dyn Layer<tracing_subscriber::Registry> + Send + Sync>>; 
-
+    // fn get_tracing_layer(&self) -> tracing_subscriber::fmt::Layer<tracing_subscriber::Registry>;
     // Set target to re-direct logs to some other logger (such, as, from buffer to others...)
     // fn set_target_logger(&mut self, logger: Arc<Mutex<dyn AnyLogger>>);
 }
@@ -143,7 +166,7 @@ pub trait Bufferable {
 pub trait BufferableLogger: AnyLogger + Bufferable {}
 impl<T: AnyLogger + Bufferable> BufferableLogger for T {}
 
-#[derive(Debug,Clone)]
+#[derive(Debug,Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub enum LogLevel {
     Off,
     Trace,
@@ -154,14 +177,14 @@ pub enum LogLevel {
 }
 
 impl LogLevel {
-    pub fn to_tracing_level(&self) -> Option<Level> {
+    pub fn to_tracing_level(&self) -> Level {
         match self {
-            LogLevel::Off => None, // Disable logging
-            LogLevel::Trace => Some(Level::TRACE),
-            LogLevel::Debug => Some(Level::DEBUG),
-            LogLevel::Info => Some(Level::INFO),
-            LogLevel::Warning => Some(Level::WARN),
-            LogLevel::Error => Some(Level::ERROR),
+            LogLevel::Off => Level::TRACE, // TODO: Disable logging
+            LogLevel::Trace => Level::TRACE,
+            LogLevel::Debug => Level::DEBUG,
+            LogLevel::Info => Level::INFO,
+            LogLevel::Warning => Level::WARN,
+            LogLevel::Error => Level::ERROR,
         }
     }
 }
@@ -169,7 +192,7 @@ impl LogLevel {
 // #[derive(Default)]
 struct CliLogger {
     level: LogLevel,
-    formatter: Arc<dyn Fn(&str, LogLevel) -> String + Send + Sync + 'static>,
+    // formatter: Arc<dyn Fn(&str, LogLevel) -> String + Send + Sync + 'static>,
 }
 
 impl CliLogger {
@@ -180,39 +203,35 @@ impl CliLogger {
     fn default() -> Self {
         Self {
             level: LogLevel::Trace,
-            formatter: Arc::new(|message, level| format!("[{:?}] {}", level, message)),
+            // formatter: Arc::new(|message, level| format!("[{:?}] {}", level, message)),
         }
     }
 }
 
 impl AnyLogger for CliLogger {
     fn trace(&mut self, message: &str) {
-        if matches!(self.level, LogLevel::Trace) {
-            println!("{}", (self.formatter)(message, LogLevel::Trace));
+        if self.level >= LogLevel::Trace {
+            trace!("{}", message);
         }
     }
-
     fn debug(&mut self, message: &str) {
-        if matches!(self.level, LogLevel::Debug | LogLevel::Trace) {
-            println!("{}", (self.formatter)(message, LogLevel::Debug));
+        if self.level >= LogLevel::Debug {
+            debug!("{}", message);
         }
     }
-
     fn info(&mut self, message: &str) {
-        if matches!(self.level, LogLevel::Info | LogLevel::Debug | LogLevel::Trace) {
-            println!("{}", (self.formatter)(message, LogLevel::Info));
+        if self.level >= LogLevel::Info {
+            info!("{}", message);
         }
     }
-
     fn warning(&mut self, message: &str) {
-        if matches!(self.level, LogLevel::Info | LogLevel::Debug | LogLevel::Trace | LogLevel::Warning ) {
-            println!("{}", (self.formatter)(message, LogLevel::Warning));
+        if self.level >= LogLevel::Warning {
+            warn!("{}", message);
         }
     }
-
     fn error(&mut self, message: &str) {
-        if matches!(self.level, LogLevel::Info | LogLevel::Debug | LogLevel::Trace | LogLevel::Warning | LogLevel::Error ) {
-            println!("{}", (self.formatter)(message, LogLevel::Error));
+        if self.level >= LogLevel::Error {
+            error!("{}", message);
         }
     }
 
@@ -235,18 +254,33 @@ impl AnyLogger for CliLogger {
     // fn set_target_logger(&mut self, logger: Arc<Mutex<dyn AnyLogger>>) {
         // unimplemented!()
     // }
-    fn get_tracing_layer(&self) -> Option<Box<dyn Layer<tracing_subscriber::Registry> + Send + Sync>> {
-        self.level.to_tracing_level().map(|level| {
-            Box::new(
-                tracing_subscriber::fmt::layer()
-                    .with_writer(std::io::stdout)
-                    .with_filter(LevelFilter::from_level(level)), // Convert `Level` to `LevelFilter`
-            ) as Box<dyn Layer<_> + Send + Sync>
-        })
+    // fn get_tracing_layer(&self) -> Filtered<tracing_subscriber::fmt::Layer<_, _, _, fn() -> Stdout {stdout}>, LevelFilter, _> {
+    //     let level = self.level.to_tracing_level();
+
+    //     tracing_subscriber::fmt::layer()
+    //         .with_writer(std::io::stdout)
+    //         .with_filter(LevelFilter::from_level(level)) 
+    
+    // }
+}
+
+impl Write for CliLogger {
+    fn write(&mut self, buf: &[u8]) -> std::io::Result<usize> {
+        // Convert bytes to a string
+        let message = String::from_utf8_lossy(buf);
         
-        // tracing_subscriber::fmt::layer()
-        // .with_writer(std::io::stdout)
-        // .with_filter(tracing::level_filters::LevelFilter::from(self.level.to_tracing_level()))
+        // Log the message according to the log level
+        if self.level >= LogLevel::Trace {
+            println!("TRACE: {}", message); // Directly write to stdout or handle as desired
+        }
+        
+        // Log other levels similarly
+        Ok(buf.len()) // Return the number of bytes written
+    }
+
+    fn flush(&mut self) -> std::io::Result<()> {
+        // Implement flush if necessary
+        Ok(())
     }
 }
 
@@ -322,7 +356,7 @@ impl AnyLogger for BufferLogger {
 
     fn flush(&mut self) {
         // if let Some(target_logger) = &self.target_logger {
-        //     let mut logger = target_logger.lock().unwrap(); 
+        //     let mut logger = target_logger.lock(); 
         //     while let Some(log_entry) = self.buffer.pop_front() {
         //         match log_entry.level {
         //             LogLevel::Trace => logger.trace(&log_entry.message),
@@ -355,15 +389,15 @@ impl AnyLogger for BufferLogger {
         todo!();
     }
 
-    fn get_tracing_layer(&self) -> Option<Box<dyn Layer<tracing_subscriber::Registry> + Send + Sync>> {
-        self.level.to_tracing_level().map(|level| {
-            Box::new(
-                tracing_subscriber::fmt::layer()
-                .with_writer(std::io::sink) // Buffer doesn't write directly to a destination
-                .with_filter(LevelFilter::from_level(level)), // Convert `Level` to `LevelFilter`
-            ) as Box<dyn Layer<_> + Send + Sync>
-        })
-    }
+    // fn get_tracing_layer(&self) -> Box<dyn Layer<tracing_subscriber::Registry> + Send + Sync> {
+    //     let level = self.level.to_tracing_level();
+
+    //     Box::new(
+    //         tracing_subscriber::fmt::layer()
+    //         .with_writer(std::io::sink) // Buffer doesn't write directly to a destination
+    //         .with_filter(LevelFilter::from_level(level)), // Convert `Level` to `LevelFilter`
+    //     ) as Box<dyn Layer<_> + Send + Sync>
+    // }
 }
 
 impl Bufferable for BufferLogger {
@@ -387,7 +421,7 @@ pub struct FileLogger {
     max_file_size: u64,
     current_file_size: u64,
     level: LogLevel,
-    formatter: Arc<dyn Fn(&str, LogLevel) -> String + Send + Sync + 'static>,
+    // formatter: Arc<dyn Fn(&str, LogLevel) -> String + Send + Sync + 'static>,
 }
 
 impl FileLogger {
@@ -405,15 +439,18 @@ impl FileLogger {
             max_file_size,
             current_file_size,
             level: LogLevel::Trace,
-            formatter: Arc::new(|message, level| format!("[{:?}] {}", level, message)),
+            // formatter: Arc::new(|message, level| format!("[{:?}] {}", level, message)),
         })
     }
 
     fn rotate_log(&mut self) -> Result<(), std::io::Error> {
         let timestamp = Utc::now().format("%Y%m%d%H%M%S").to_string();
         let rotated_file_name = format!(
-            "{}_{}.log",
-            self.file_path.file_stem().unwrap().to_str().unwrap(),
+            "{:?}_{}.log",
+            match self.file_path.file_stem() {
+                Some(s) => s.to_str(),
+                None => unimplemented!()
+            },
             timestamp
         );
 
@@ -440,8 +477,8 @@ impl FileLogger {
         }
 
         if let Some(file) = self.file.as_mut() {
-            let formatted_message = (self.formatter)(message, level);
-            let bytes_written = file.write(formatted_message.as_bytes())?;
+            // let formatted_message = (self.formatter)(message, level);
+            let bytes_written = file.write(message.as_bytes())?;
             file.write(b"\n")?; // write a newline after the log message
             self.current_file_size += bytes_written as u64 + 1;
         }
@@ -491,21 +528,7 @@ impl AnyLogger for FileLogger {
         self.level = level;
     }
 
-    // fn set_format(&mut self, formatter: Arc<dyn Fn(&str, LogLevel) -> String + Send + Sync + 'static>) {
-    //     self.formatter = formatter;
-    // }
-
     fn is_ready(&self) -> bool {
         self.file.is_some()
-    }
-
-    fn get_tracing_layer(&self) -> Option<Box<dyn Layer<tracing_subscriber::Registry> + Send + Sync>> {
-        self.level.to_tracing_level().map(|level| {
-            Box::new(
-                tracing_subscriber::fmt::layer()
-                .with_writer(|| std::fs::File::create("logfile.log").unwrap())
-                .with_filter(LevelFilter::from_level(level)), // Convert `Level` to `LevelFilter`
-            ) as Box<dyn Layer<_> + Send + Sync>
-        })
     }
 }

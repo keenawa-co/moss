@@ -4214,6 +4214,7 @@ name = "platform_log"
 version = "0.1.0"
 dependencies = [
  "chrono",
+ "parking_lot",
  "tracing",
  "tracing-subscriber",
 ]
@@ -7736,6 +7737,7 @@ dependencies = [
 name = "workbench_service_log"
 version = "0.1.0"
 dependencies = [
+ "parking_lot",
  "platform_log",
  "tauri",
  "tracing",

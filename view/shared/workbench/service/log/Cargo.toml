@@ -8,3 +8,4 @@ platform_log.workspace = true
 tauri.workspace = true
 tracing.workspace = true
 tracing-subscriber.workspace = true
+parking_lot.workspace = true
