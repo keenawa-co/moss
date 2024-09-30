@@ -53,6 +53,7 @@ pub trait AnyContext {
 
 // TODO: rename Emmiteble
 pub trait EventEmitter<E: Any>: 'static {}
+impl<T: 'static, E: Any> EventEmitter<E> for T {}
 
 pub enum Effect {
     Notify {

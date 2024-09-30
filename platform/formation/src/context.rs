@@ -543,10 +543,6 @@ mod tests {
         b: usize,
     }
 
-    impl EventEmitter<Change> for Value {}
-
-    impl EventEmitter<OnChangeAtomEvent> for Value {}
-
     #[test]
     fn subscription_on_atom_change_test() {
         let ctx = &mut Context::new();
