@@ -11,6 +11,7 @@ use std::{
     },
 };
 
+// Represents the key for a node.
 slotmap::new_key_type! {
     pub struct NodeKey;
 }
@@ -23,6 +24,8 @@ pub struct Slot<T, N: AnyNode<T>>(
     pub(super) PhantomData<T>,
 );
 
+/// Represents the reference counter for nodes.
+/// Manages counts of references to nodes.
 pub(super) struct NodeRefCounter {
     pub counts: SlotMap<NodeKey, AtomicUsize>,
     pub dropped: Vec<NodeKey>,
@@ -31,6 +34,7 @@ pub(super) struct NodeRefCounter {
 pub trait AnyNode<T> {
     type Weak: 'static;
 
+    /// Returns the key associated with the atom.
     fn key(&self) -> NodeKey;
     fn downgrade(&self) -> Self::Weak;
     fn upgrade_from(weak: &Self::Weak) -> Option<Self>
@@ -39,11 +43,14 @@ pub trait AnyNode<T> {
 }
 
 dyn_clone::clone_trait_object!(AnyNodeValue);
+/// Trait representing a node value.
+/// Combines `Any` for type erasure and `Clone` for duplicating values.
 pub trait AnyNodeValue: Any + DynClone {
     fn as_any_ref(&self) -> &dyn Any;
     fn as_any_mut(&mut self) -> &mut dyn Any;
 }
 
+/// Trait representing a node value that can be used in the system.
 pub trait NodeValue: AnyNodeValue + Clone + 'static {}
 impl<T: AnyNodeValue + Clone + 'static> NodeValue for T {}
 
@@ -95,6 +102,7 @@ impl WeakProtoNode {
     }
 }
 
+/// Represents a weak reference to a node.
 #[derive(Deref, DerefMut)]
 pub struct WeakNode<T, N: AnyNode<T>> {
     #[deref]

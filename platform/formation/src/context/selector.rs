@@ -16,66 +16,83 @@ use super::{
     AnyContext, Context,
 };
 
+/// Marker structure for type erasure.
+/// Used to cast different types to a common abstract type.
 struct Abstract(());
 
+/// Represents a computer that can store and invoke selector
+/// computers with different types.
 pub(super) struct Computer {
+    /// Pointer to the stored callback.
     data: NonNull<Abstract>,
+    /// Function pointer to call the stored callback.
     call: unsafe fn(NonNull<Abstract>, NonNull<Abstract>, NonNull<Abstract>),
-    drop_fn: unsafe fn(NonNull<Abstract>),
+    /// Function pointer to drop the stored callback.
+    drop: unsafe fn(NonNull<Abstract>),
+    /// PhantomData to prevent `Send` and `Sync` implementations.
     not_send: PhantomData<Rc<()>>,
 }
 
 impl Drop for Computer {
     fn drop(&mut self) {
         unsafe {
-            (self.drop_fn)(self.data);
+            (self.drop)(self.data);
         }
     }
 }
 
 impl Computer {
-    pub(super) fn new<V, F>(hook: F) -> Self
+    /// Creates a new `Computer` with the provided callback.
+    /// This function uses `unsafe` code to perform type erasure and manage memory manually.
+    pub(super) fn new<R, F>(f: F) -> Self
     where
-        V: NodeValue,
-        F: Fn(&mut SelectorContext<'_, V>) -> V + 'static,
+        R: NodeValue,
+        F: Fn(&mut SelectorContext<'_, R>) -> R + 'static,
     {
-        unsafe fn call<V, F>(
+        // The function that calls the stored callback.
+        unsafe fn call<R, F>(
             data: NonNull<Abstract>,
             ctx: NonNull<Abstract>,
             result: NonNull<Abstract>,
         ) where
-            V: NodeValue,
-            F: Fn(&mut SelectorContext<'_, V>) -> V + 'static,
+            R: NodeValue,
+            F: Fn(&mut SelectorContext<'_, R>) -> R + 'static,
         {
             let f = &*(data.cast::<F>().as_ref());
-            let ctx = &mut *(ctx.cast::<SelectorContext<'_, V>>().as_ptr());
+            let ctx = &mut *(ctx.cast::<SelectorContext<'_, R>>().as_ptr());
+
             let v = f(ctx);
-            std::ptr::write(result.cast::<V>().as_ptr(), v)
+            std::ptr::write(result.cast::<R>().as_ptr(), v)
         }
 
-        unsafe fn drop<V, F>(data: NonNull<Abstract>)
+        // The function that drops the stored callback.
+        unsafe fn drop<R, F>(data: NonNull<Abstract>)
         where
-            V: NodeValue,
-            F: Fn(&mut SelectorContext<'_, V>) -> V + 'static,
+            R: NodeValue,
+            F: Fn(&mut SelectorContext<'_, R>) -> R + 'static,
         {
+            // Reconstruct and drop to free memory.
             let _ = Box::from_raw(data.cast::<F>().as_ptr());
         }
 
-        let boxed_f = Box::new(hook) as Box<F>;
+        // Box the callback and convert it to a raw pointer.
+        let boxed_f = Box::new(f) as Box<F>;
         let raw_f = Box::into_raw(boxed_f);
         let data = unsafe { NonNull::new_unchecked(raw_f as *mut Abstract) };
 
         Computer {
             data,
-            call: call::<V, F>,
-            drop_fn: drop::<V, F>,
+            call: call::<R, F>,
+            drop: drop::<R, F>,
             not_send: PhantomData::default(),
         }
     }
 
-    pub(super) unsafe fn compute<V: NodeValue>(&self, ctx: &mut SelectorContext<'_, V>) -> V {
-        let mut result: V = std::mem::MaybeUninit::uninit().assume_init();
-
+    /// Calls the stored callback with the provided context and returns the result  of type `V`.
+    /// This function is `unsafe` because it assumes that `ctx` is of the correct type `V` and that
+    /// the stored callback corresponds to this type.
+    pub(super) unsafe fn compute<R: NodeValue>(&self, ctx: &mut SelectorContext<'_, R>) -> R {
+        let mut result: R = std::mem::MaybeUninit::uninit().assume_init();
         let ctx_ptr = NonNull::from(ctx).cast::<Abstract>();
         let result_ptr = NonNull::new(&mut result as *mut _ as *mut Abstract).unwrap();
 
@@ -84,6 +101,8 @@ impl Computer {
     }
 }
 
+/// Represents the context in which a selector operates.
+/// Holds a mutable reference to the main `Context` and a weak reference to the selector.
 #[derive(Deref, DerefMut)]
 pub struct Selector<V: NodeValue> {
     #[deref]
@@ -122,7 +141,6 @@ impl<V: NodeValue> Selector<V> {
     pub(super) fn new(key: NodeKey, rc: Weak<RwLock<NodeRefCounter>>) -> Self {
         Self {
             p_node: ProtoNode::new(key, rc),
-            // compute: Box::new(compute),
             result_typ: PhantomData,
         }
     }
@@ -224,5 +242,107 @@ impl SelectorMap {
     {
         self.computed_values
             .insert(lease.node.key, lease.value.take().unwrap());
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::{
+        any::Any,
+        sync::atomic::{AtomicUsize, Ordering},
+    };
+
+    #[derive(Debug, Clone, PartialEq)]
+    struct TestString(String);
+
+    impl AnyNodeValue for TestValue {
+        fn as_any_ref(&self) -> &dyn Any {
+            self
+        }
+
+        fn as_any_mut(&mut self) -> &mut dyn Any {
+            self
+        }
+    }
+
+    #[derive(Debug, Clone)]
+    struct TestValue {
+        a: usize,
+    }
+
+    impl AnyNodeValue for TestString {
+        fn as_any_ref(&self) -> &dyn Any {
+            self
+        }
+
+        fn as_any_mut(&mut self) -> &mut dyn Any {
+            self
+        }
+    }
+
+    #[test]
+    fn test_computer_creation_and_compute() {
+        let ctx = &mut Context::new();
+        let atom_a = ctx.create_atom(|_| TestValue { a: 0 });
+
+        ctx.update_atom(&atom_a, |this, _| {
+            this.a += 10;
+        });
+
+        let atom_a_key = atom_a.key();
+        let selector_a = ctx.new_selector(move |selector_context| {
+            let atom_a_value = selector_context.read::<TestValue>(&atom_a_key);
+
+            let result = format!("Hello, {}!", atom_a_value.a);
+            TestString(result)
+        });
+
+        let selector_a_result = selector_a.read(ctx);
+        assert_eq!(selector_a_result, &TestString("Hello, 10!".to_string()));
+
+        ctx.update_atom(&atom_a, |this, atom_context| {
+            this.a += 10;
+
+            atom_context.notify();
+        });
+
+        let selector_a_result = selector_a.read(ctx);
+        assert_eq!(selector_a_result, &TestString("Hello, 20!".to_string()));
+    }
+
+    #[test]
+    fn test_computer_drop() {
+        // A counter to track drop calls.
+        struct DropCounter {
+            count: Rc<AtomicUsize>,
+        }
+
+        impl Drop for DropCounter {
+            fn drop(&mut self) {
+                self.count.fetch_add(1, Ordering::SeqCst);
+            }
+        }
+
+        let counter = Rc::new(AtomicUsize::new(0));
+        let counter_clone = Rc::clone(&counter);
+
+        let computer = {
+            let drop_counter = DropCounter {
+                count: counter_clone,
+            };
+
+            // Create a `Computer` that takes a DropCounter in its closure.
+            Computer::new(move |_: &mut SelectorContext<'_, TestValue>| -> TestValue {
+                // Closure uses drop_counter, which will be dropped when the Computer is dropped.
+                let _ = &drop_counter;
+
+                TestValue { a: 0 }
+            })
+        };
+
+        assert_eq!(counter.load(Ordering::SeqCst), 0);
+        drop(computer); //  must drop the DropCounter inside the closure
+        assert_eq!(counter.load(Ordering::SeqCst), 1);
     }
 }
