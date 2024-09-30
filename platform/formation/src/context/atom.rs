@@ -1,18 +1,13 @@
 use anyhow::Result;
 use derive_more::{Deref, DerefMut};
-use moss_std::collection::ImHashMap;
 use parking_lot::RwLock;
-use slotmap::SlotMap;
-use std::{
-    marker::PhantomData,
-    sync::{Arc, Weak},
-};
+use std::{marker::PhantomData, sync::Weak};
 
 use crate::FlattenAnyhowResult;
 
 use super::{
     atom_context::AtomContext,
-    node::{AnyNode, AnyNodeValue, Lease, NodeKey, NodeRefCounter, NodeValue, ProtoNode, WeakNode},
+    node::{AnyNode, NodeImMap, NodeKey, NodeRefCounter, NodeValue, ProtoNode, WeakNode},
 };
 use super::{node::Slot, AnyContext};
 
@@ -102,21 +97,12 @@ impl<T: NodeValue> Atom<T> {
     }
 }
 
-#[derive(Clone)]
-pub(super) struct AtomMap {
-    pub values: ImHashMap<NodeKey, Box<dyn AnyNodeValue>>,
-    pub rc: Arc<RwLock<NodeRefCounter>>,
-}
+#[derive(Deref, DerefMut, Clone)]
+pub(super) struct AtomImMap(NodeImMap);
 
-impl AtomMap {
+impl AtomImMap {
     pub fn new() -> Self {
-        Self {
-            values: im::HashMap::new(),
-            rc: Arc::new(RwLock::new(NodeRefCounter {
-                counts: SlotMap::with_key(),
-                dropped: Vec::new(),
-            })),
-        }
+        Self(NodeImMap::new())
     }
 
     pub fn reserve<T>(
@@ -130,13 +116,13 @@ impl AtomMap {
         Slot(create_slot(self, key), PhantomData)
     }
 
-    pub fn insert<T, N>(&mut self, slot: Slot<T, N>, entity: T) -> N
+    pub fn insert<T, N>(&mut self, slot: Slot<T, N>, value: T) -> N
     where
         T: NodeValue,
         N: AnyNode<T>,
     {
         let atom = slot.0;
-        self.values = self.values.update(atom.key(), Box::new(entity));
+        self.values.insert(atom.key(), Box::new(value));
 
         atom
     }
@@ -156,33 +142,5 @@ impl AtomMap {
                     std::any::type_name::<T>()
                 )
             })
-    }
-
-    pub fn begin_lease<'a, T>(&mut self, atom: &'a Atom<T>) -> Lease<'a, T, Atom<T>>
-    where
-        T: NodeValue,
-    {
-        // TODO: add check for valid context
-
-        let value = Some(self.values.remove(&atom.key()).unwrap_or_else(|| {
-            panic!(
-                "cannot update {} node that is already being updated",
-                std::any::type_name::<T>()
-            )
-        }));
-
-        Lease {
-            value,
-            node: atom,
-            typ: PhantomData,
-        }
-    }
-
-    pub fn end_lease<T>(&mut self, mut lease: Lease<T, Atom<T>>)
-    where
-        T: NodeValue,
-    {
-        self.values
-            .insert(lease.node.key, lease.value.take().unwrap());
     }
 }

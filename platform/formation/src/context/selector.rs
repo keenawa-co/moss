@@ -10,7 +10,8 @@ use std::{
 
 use super::{
     node::{
-        AnyNode, AnyNodeValue, Lease, NodeKey, NodeRefCounter, NodeValue, ProtoNode, Slot, WeakNode,
+        AnyNode, AnyNodeValue, Lease, NodeImMap, NodeKey, NodeRefCounter, NodeValue, ProtoNode,
+        Slot, WeakNode,
     },
     selector_context::SelectorContext,
     AnyContext, Context,
@@ -150,29 +151,26 @@ impl<V: NodeValue> Selector<V> {
     }
 }
 
-#[derive(Clone)]
-pub(super) struct SelectorMap {
-    pub(super) computed_values: im::HashMap<NodeKey, Box<dyn AnyNodeValue>>,
-    pub(super) rc: Arc<RwLock<NodeRefCounter>>,
-}
+#[derive(Deref, DerefMut, Clone)]
+pub(super) struct SelectorImMap(NodeImMap);
 
-impl SelectorMap {
+// #[derive(Clone)]
+// pub(super) struct SelectorMap {
+//     pub(super) computed_values: im::HashMap<NodeKey, Box<dyn AnyNodeValue>>,
+//     pub(super) rc: Arc<RwLock<NodeRefCounter>>,
+// }
+
+impl SelectorImMap {
     pub fn new() -> Self {
-        Self {
-            computed_values: im::HashMap::new(),
-            rc: Arc::new(RwLock::new(NodeRefCounter {
-                counts: SlotMap::with_key(),
-                dropped: Vec::new(),
-            })),
-        }
+        Self(NodeImMap::new())
     }
 
     pub(super) fn lookup(&self, key: &NodeKey) -> bool {
-        self.computed_values.contains_key(key)
+        self.values.contains_key(key)
     }
 
     pub(super) fn remove(&mut self, key: &NodeKey) {
-        self.computed_values
+        self.values
             .remove(key)
             // Panic at this point most likely signals a bug in the program.
             // The reason why the key may not be in the map:
@@ -196,7 +194,7 @@ impl SelectorMap {
     where
         V: NodeValue,
     {
-        self.computed_values = self.computed_values.update(key, Box::new(value));
+        self.values.insert(key, Box::new(value));
     }
 
     pub(super) fn read<V>(&self, key: &NodeKey) -> &V
@@ -205,7 +203,7 @@ impl SelectorMap {
     {
         // TODO: add check for valid context
 
-        self.computed_values[key]
+        self.values[key]
             .as_any_ref()
             .downcast_ref()
             .unwrap_or_else(|| {
@@ -214,34 +212,6 @@ impl SelectorMap {
                     std::any::type_name::<V>()
                 )
             })
-    }
-
-    pub(super) fn begin_lease<'a, V>(&mut self, node: &'a Selector<V>) -> Lease<'a, V, Selector<V>>
-    where
-        V: NodeValue,
-    {
-        // TODO: add check for valid context
-
-        let value = Some(self.computed_values.remove(&node.key).unwrap_or_else(|| {
-            panic!(
-                "cannot update {} node that is already being updated",
-                std::any::type_name::<V>()
-            )
-        }));
-
-        Lease {
-            node,
-            value,
-            typ: PhantomData,
-        }
-    }
-
-    pub(super) fn end_lease<V>(&mut self, mut lease: Lease<V, Selector<V>>)
-    where
-        V: NodeValue,
-    {
-        self.computed_values
-            .insert(lease.node.key, lease.value.take().unwrap());
     }
 }
 

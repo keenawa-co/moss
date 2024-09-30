@@ -1,6 +1,5 @@
 pub mod atom;
 pub mod atom_context;
-pub mod node;
 pub mod selector;
 pub mod selector_context;
 pub mod subscription;
@@ -8,15 +7,16 @@ pub mod transaction_context;
 
 mod common;
 mod graph;
+mod node;
 
-use atom::{Atom, AtomMap};
+use atom::{Atom, AtomImMap};
 use atom_context::AtomContext;
 use graph::Graph;
 use moss_std::collection::{FxHashMap, FxHashSet};
 use node::{AnyNode, NodeKey, NodeValue};
 use once_cell::sync::OnceCell;
 use platform_core::context::EventEmitter;
-use selector::{Computer, Selector, SelectorMap};
+use selector::{Computer, Selector, SelectorImMap};
 use selector_context::SelectorContext;
 use smallvec::SmallVec;
 use std::{
@@ -38,8 +38,8 @@ pub struct TreeState {
     // A unique identifier for the state version.
     version: usize,
     graph_version: Cell<usize>,
-    atom_values: AtomMap,
-    selector_values: SelectorMap,
+    atom_values: AtomImMap,
+    selector_values: SelectorImMap,
 
     // Set of atoms that have changed.
     dirty_atoms: FxHashSet<NodeKey>,
@@ -50,8 +50,8 @@ impl Default for TreeState {
         Self {
             version: 1,
             graph_version: Cell::new(1),
-            atom_values: AtomMap::new(),
-            selector_values: SelectorMap::new(),
+            atom_values: AtomImMap::new(),
+            selector_values: SelectorImMap::new(),
             dirty_atoms: FxHashSet::default(),
         }
     }
@@ -240,11 +240,26 @@ impl Context {
         };
 
         self.invalidate(&mut next_tree);
+        self.release_dropped(&mut next_tree);
 
         let previous_tree = mem::replace(&mut self.store.current_tree, next_tree);
         self.store.previous_tree = Some(previous_tree);
 
         self.flush_effects();
+    }
+
+    fn release_dropped(&mut self, next_tree: &mut TreeState) {
+        loop {
+            let dropped = next_tree.atom_values.take_dropped();
+            if dropped.is_empty() {
+                break;
+            }
+
+            for (node_key, mut _node_value) in dropped {
+                self.store.node_observers.remove(&node_key);
+                self.store.event_listeners.remove(&node_key);
+            }
+        }
     }
 
     fn invalidate(&mut self, next_tree: &mut TreeState) {

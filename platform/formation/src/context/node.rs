@@ -1,13 +1,15 @@
 use derive_more::{Deref, DerefMut};
 use dyn_clone::DynClone;
+use moss_std::collection::ImHashMap;
 use parking_lot::RwLock;
 use slotmap::SlotMap;
 use std::{
     any::Any,
     marker::PhantomData,
+    mem,
     sync::{
         atomic::{AtomicUsize, Ordering},
-        Weak,
+        Arc, Weak,
     },
 };
 
@@ -160,5 +162,77 @@ impl<'a, T, N: AnyNode<T>> Drop for Lease<'a, T, N> {
         if self.value.is_some() && !std::thread::panicking() {
             panic!("Drop node which is in leasing")
         }
+    }
+}
+
+#[derive(Clone)]
+pub(super) struct NodeImMap {
+    pub values: ImHashMap<NodeKey, Box<dyn AnyNodeValue>>,
+    pub rc: Arc<RwLock<NodeRefCounter>>,
+}
+
+impl NodeImMap {
+    pub(super) fn new() -> Self {
+        Self {
+            values: ImHashMap::new(),
+            rc: Arc::new(RwLock::new(NodeRefCounter {
+                counts: SlotMap::with_key(),
+                dropped: Vec::new(),
+            })),
+        }
+    }
+
+    pub(super) fn begin_lease<'a, V, N>(&mut self, node: &'a N) -> Lease<'a, V, N>
+    where
+        V: NodeValue,
+        N: AnyNode<V>,
+    {
+        // TODO: add check for valid context
+
+        let value = Some(self.values.remove(&node.key()).unwrap_or_else(|| {
+            panic!(
+                "cannot update {} node that is already being updated",
+                std::any::type_name::<V>()
+            )
+        }));
+
+        Lease {
+            node,
+            value,
+            typ: PhantomData,
+        }
+    }
+
+    pub fn end_lease<V, N>(&mut self, mut lease: Lease<V, N>)
+    where
+        V: NodeValue,
+        N: AnyNode<V>,
+    {
+        self.values
+            .insert(lease.node.key(), lease.value.take().unwrap());
+    }
+
+    pub(super) fn take_dropped(&mut self) -> Vec<(NodeKey, Box<dyn AnyNodeValue>)> {
+        let mut ref_counts_lock = self.rc.write();
+        let dropped_nodes = mem::take(&mut ref_counts_lock.dropped);
+        dropped_nodes
+            .into_iter()
+            .filter_map(|node_key| {
+                let count = ref_counts_lock.counts.remove(node_key).unwrap();
+                NodeImMap::assert_referenced(count);
+
+                Some((node_key, self.values.remove(&node_key)?))
+            })
+            .collect()
+    }
+}
+
+impl NodeImMap {
+    fn assert_referenced(count: AtomicUsize) {
+        debug_assert_eq!(
+            count.load(std::sync::atomic::Ordering::SeqCst),
+            0,
+            "dropped a node that was referenced"
+        );
     }
 }
