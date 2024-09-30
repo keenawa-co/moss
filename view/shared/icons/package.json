@@ -1,9 +1,8 @@
 {
   "name": "@repo/icons",
-  "exports": {
-  },
+  "exports": {},
   "scripts": {
-    "build": "rimraf build && svgr -d build assets"
+    "build": "rimraf build && svgr --no-prettier -d build assets"
   },
   "devDependencies": {
     "@svgr/cli": "^8.1.0",
