@@ -20,19 +20,19 @@ const Accordion = ({ id, title, isOpen = false, handleClick, children }: Draggab
 
   return (
     <div>
-      <div
+      <button
         ref={setNodeRef}
         style={style}
         {...attributes}
-        {...listeners}
         onClick={handleClick}
+        {...listeners}
         className="flex items-center px-2 py-[5px]"
       >
         <div className={cn(`flex size-5 cursor-pointer items-center justify-center`, { "rotate-90": isOpen })}>
           <Icon icon="ArrowRight" className="text-xs" />
         </div>
         <span className="font-bold">{title}</span>
-      </div>
+      </button>
 
       <div className={isOpen ? "text-gray-500 pl-6 text-xs" : "visually-hidden"}>{children}</div>
     </div>

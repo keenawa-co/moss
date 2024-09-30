@@ -45,7 +45,11 @@ function App() {
   const accordion = useSelector((state: RootState) => state.accordion.accordion);
   const defaultSizes = useRef(useSelector((state: RootState) => state.accordion.defaultSizes));
   const sensors = useSensors(
-    useSensor(PointerSensor),
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
     })
@@ -96,14 +100,14 @@ function App() {
           <Resizable proportionalLayout={false}>
             <ResizablePanel minSize={100} preferredSize={255} snap visible={sideBarVisible} className="select-none">
               <SidebarHeader title="launchpad" />
-              <Resizable
-                proportionalLayout={false}
-                vertical
-                defaultSizes={defaultSizes.current}
-                onDragEnd={(e) => dispatch(setDefaultSizes(e))}
-                className="pb-[35px]"
-              >
-                <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+              <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+                <Resizable
+                  proportionalLayout={false}
+                  vertical
+                  defaultSizes={defaultSizes.current}
+                  onDragEnd={(e) => dispatch(setDefaultSizes(e))}
+                  className="pb-[35px]"
+                >
                   <SortableContext items={accordion} strategy={verticalListSortingStrategy}>
                     {accordion.map((accordion, index) => (
                       <ResizablePanel key={accordion.id} minSize={accordion.isOpen ? 100 : 35}>
@@ -113,8 +117,8 @@ function App() {
                       </ResizablePanel>
                     ))}
                   </SortableContext>
-                </DndContext>
-              </Resizable>
+                </Resizable>
+              </DndContext>
             </ResizablePanel>
             <ResizablePanel>
               <ContentLayout className="content relative flex h-full flex-col overflow-auto">
