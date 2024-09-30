@@ -2,13 +2,14 @@
 
 use std::{cell::RefCell, path::PathBuf, rc::Rc, sync::{Arc, Mutex}};
 
-use platform_log::log_service::{AnyLogger, BufferLogger, BufferableLogger, FileLogger, LogLevel};
+use platform_log::log_service::{AnyLogger, BufferLogger, BufferableLogger, FileLogger, LogLevel, LogService};
 use tauri::Emitter;
-use tracing::{debug, error, info, trace, warn};
+use tracing::{debug, error, event, info, trace, warn, Level};
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 // use parking_lot::Mutex use instead of Mutex
 
 pub struct WorkspaceLogService {
+    // platformService: LogService,
     file_logger: Arc<parking_lot::Mutex<dyn AnyLogger + Send + Sync + 'static>>,
     buffer_logger: Arc<parking_lot::Mutex<dyn BufferableLogger + Send + Sync + 'static>>,
     tao_logger: Arc<parking_lot::Mutex<dyn AnyLogger + Send + Sync + 'static>>,
@@ -31,41 +32,41 @@ impl WorkspaceLogService {
     pub fn trace(&self, message: &str) {
         println!("trace!");
         if self.tao_logger.lock().is_ready() {
-            self.tao_logger.lock().trace(message);
+            self.tao_logger.lock().log(LogLevel::Trace, message);
         } else {
-            self.file_logger.lock().trace(message);
+            self.file_logger.lock().log(LogLevel::Trace, message);
         }
     }
 
     pub fn debug(&self, message: &str) {
         if self.tao_logger.lock().is_ready() {
-            self.tao_logger.lock().debug(message);
+            self.tao_logger.lock().log(LogLevel::Debug, message);;
         } else {
-            self.file_logger.lock().debug(message);
+            self.file_logger.lock().log(LogLevel::Debug, message);
         }
     }
 
     pub fn info(&self, message: &str) {
         if self.tao_logger.lock().is_ready() {
-            self.tao_logger.lock().info(message);
+            self.tao_logger.lock().log(LogLevel::Info, message);
         } else {
-            self.file_logger.lock().info(message);
+            self.file_logger.lock().log(LogLevel::Info, message);
         }
     }
     
     pub fn warning(&self, message: &str) {
         if self.tao_logger.lock().is_ready() {
-            self.tao_logger.lock().warning(message);
+            self.tao_logger.lock().log(LogLevel::Warning, message);
         } else {
-            self.file_logger.lock().warning(message);
+            self.file_logger.lock().log(LogLevel::Warning, message);
         }
     }
     
     pub fn error(&self, message: &str) {
         if self.tao_logger.lock().is_ready() {
-            self.tao_logger.lock().error(message);
+            self.tao_logger.lock().log(LogLevel::Error, message);
         } else {
-            self.file_logger.lock().error(message);
+            self.file_logger.lock().log(LogLevel::Error, message);
         }
     }
 }
@@ -100,31 +101,46 @@ impl TaoLogger {
 }
 
 impl AnyLogger for TaoLogger {
-    fn trace(&mut self, message: &str) {
-        if self.level >= LogLevel::Trace {
-            trace!("{}", message);
+    fn log(&mut self, level: LogLevel, message: &str) {
+        if self.level < level {
+            // do not log
+            return
+        }
+
+        match level {
+            LogLevel::Off => return, // ignore input
+            LogLevel::Trace => event!(Level::TRACE, tao=true, message),
+            LogLevel::Debug => event!(Level::DEBUG, tao=true, message),
+            LogLevel::Info => event!(Level::INFO, tao=true, message),
+            LogLevel::Warning => event!(Level::WARN, tao=true, message),
+            LogLevel::Error => event!(Level::ERROR, tao=true, message),
         }
     }
-    fn debug(&mut self, message: &str) {
-        if self.level >= LogLevel::Debug {
-            debug!("{}", message);
-        }
-    }
-    fn info(&mut self, message: &str) {
-        if self.level >= LogLevel::Info {
-            info!("{}", message);
-        }
-    }
-    fn warning(&mut self, message: &str) {
-        if self.level >= LogLevel::Warning {
-            warn!("{}", message);
-        }
-    }
-    fn error(&mut self, message: &str) {
-        if self.level >= LogLevel::Error {
-            error!("{}", message);
-        }
-    }
+    // fn trace(&mut self, message: &str) {
+    //     if self.level >= LogLevel::Trace {
+    //         trace!("{}", message);
+    //     }
+    // }
+    // fn debug(&mut self, message: &str) {
+    //     if self.level >= LogLevel::Debug {
+    //         debug!("{}", message);
+    //     }
+    // }
+    // fn info(&mut self, message: &str) {
+    //     if self.level >= LogLevel::Info {
+    //         info!("{}", message);
+    //     }
+    // }
+    // fn warning(&mut self, message: &str) {
+    //     if self.level >= LogLevel::Warning {
+    //         warn!("{}", message);
+    //     }
+    // }
+    // fn error(&mut self, message: &str) {
+    //     if self.level >= LogLevel::Error {
+    //         error!("{}", message);
+    //     }
+    // }
 
     fn flush(&mut self) {
         unimplemented!()

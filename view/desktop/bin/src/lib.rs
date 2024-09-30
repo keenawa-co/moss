@@ -188,7 +188,7 @@ impl AppMain {
                     })
                     .unwrap();
 
-                    init_custom_logging(app_handle.clone());
+                    // init_custom_logging(app_handle.clone());
                 // let mut workspace_log_service = match workspace_log_service::create_service() {
                 //     Ok(logger) => logger,
                 //     Err(error) => panic!("Error when creating workspace log service: {error:?}"),
