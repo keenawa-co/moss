@@ -5,9 +5,11 @@ mod menu;
 mod service;
 
 use anyhow::{Context as _, Result};
-use platform_core::context::async_context::AsyncContext;
-use platform_core::context::Context;
+use platform_core::context_v2::async_context::AsyncContext;
+use platform_core::context_v2::{Context, ContextCell};
+use platform_core::executor::BackgroundExecutor;
 use platform_core::platform::cross::client::CrossPlatformClient;
+use platform_core::platform::AnyPlatform;
 use platform_formation::service_registry::ServiceRegistry;
 use platform_fs::disk::file_system_service::DiskFileSystemService;
 use platform_workspace::WorkspaceId;
@@ -75,9 +77,9 @@ impl AppMain {
 
     pub fn run(&self) -> ExitCode {
         let platform_client_clone = self.platform_client.clone();
-
+        let r = self.platform_client.background_executor();
         self.platform_client.run(async {
-            let ctx = Context::new(platform_client_clone);
+            let ctx = ContextCell::new(platform_client_clone);
 
             if let Err(e) = self.open_main_window(ctx).await {
                 error!("{}", e);
@@ -88,11 +90,10 @@ impl AppMain {
         })
     }
 
-    pub async fn open_main_window(&self, ctx: Rc<RefCell<Context>>) -> Result<()> {
+    pub async fn open_main_window(&self, ctx_cell: Rc<ContextCell>) -> Result<()> {
         // TODO: move to StorageService
         let db = Arc::new(
-            ctx.as_ref()
-                .borrow()
+            self.platform_client
                 .background_executor()
                 .block_on(init_db_client())?,
         );
@@ -104,7 +105,7 @@ impl AppMain {
             .get_last_window_state();
 
         let async_ctx = {
-            let ctx = ctx.as_ref().borrow();
+            let ctx = ctx_cell.as_ref().borrow();
             ctx.to_async()
         };
 
@@ -167,7 +168,7 @@ impl AppMain {
                 let window = app.get_webview_window("main").unwrap();
 
                 async_ctx
-                    .update(|ctx| {
+                    .apply(|ctx| {
                         app_state
                             .workbench
                             .set_configuration_window_size(window)

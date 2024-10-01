@@ -9,8 +9,8 @@ use platform_configuration::{
     configuration_registry::ConfigurationRegistry,
     AbstractConfigurationService,
 };
-use platform_core::context::entity::Model;
-use platform_core::context::Context;
+use platform_core::context_v2::atom::Atom;
+use platform_core::context_v2::Context;
 use platform_fs::disk::file_system_service::AbstractDiskFileSystemService;
 use platform_workspace::Workspace;
 use std::{path::PathBuf, sync::Arc};
@@ -25,7 +25,7 @@ impl WorkspaceConfigurationService {
     pub fn new(
         ctx: &mut Context,
         workspace: Workspace,
-        registry: Model<ConfigurationRegistry>,
+        registry: Atom<ConfigurationRegistry>,
         policy_service: ConfigurationPolicyService,
         user_configuration_resource: PathBuf,
         fs_service: Arc<dyn AbstractDiskFileSystemService>,

@@ -7,6 +7,7 @@ use std::time::Duration;
 use crate::executor::{BackgroundExecutor, MainThreadExecutor};
 
 pub trait AnyPlatform: 'static {
+    // TODO: run
     fn main_thread_executor(&self) -> MainThreadExecutor;
     fn background_executor(&self) -> BackgroundExecutor;
 }
