@@ -1319,7 +1319,6 @@ dependencies = [
  "hashbrown 0.14.5",
  "macos-trampoline",
  "mimalloc",
- "moss_std",
  "once_cell",
  "parking_lot",
  "platform_configuration",
@@ -3222,18 +3221,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "moss_std"
-version = "0.1.0"
-dependencies = [
- "async-trait",
- "dunce",
- "hashbrown 0.14.5",
- "im",
- "radix_trie",
- "rustc-hash 2.0.0",
-]
-
-[[package]]
 name = "muda"
 version = "0.13.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4063,7 +4050,6 @@ dependencies = [
  "async-trait",
  "hashbrown 0.14.5",
  "lazy-regex",
- "moss_std",
  "parking_lot",
  "platform_core",
  "platform_fs",
@@ -4081,16 +4067,21 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "async-task",
+ "async-trait",
  "derive_more",
+ "dunce",
  "dyn-clone",
  "flume",
  "fnv",
  "futures",
+ "hashbrown 0.14.5",
+ "im",
  "lazy_static",
- "moss_std",
  "once_cell",
  "parking",
  "parking_lot",
+ "radix_trie",
+ "rustc-hash 2.0.0",
  "slotmap",
  "smallvec",
  "smol",
@@ -4108,7 +4099,6 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "fnv",
- "moss_std",
  "parking_lot",
  "platform_core",
  "slotmap",

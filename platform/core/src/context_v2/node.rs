@@ -1,6 +1,5 @@
 use derive_more::{Deref, DerefMut};
 use dyn_clone::DynClone;
-use moss_std::collection::ImHashMap;
 use parking_lot::RwLock;
 use slotmap::SlotMap;
 use std::{
@@ -12,6 +11,8 @@ use std::{
         Arc, Weak,
     },
 };
+
+use crate::base::collection::ImHashMap;
 
 // Represents the key for a node.
 slotmap::new_key_type! {

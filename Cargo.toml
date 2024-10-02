@@ -1,8 +1,6 @@
 [workspace]
 resolver = "2"
 members = [
-    "lib/moss_std",
-
     "platform/core",
     "platform/fs",
     "platform/formation",
@@ -36,7 +34,6 @@ codegen-units = 1
 
 [workspace.dependencies]
 
-moss_std = { path = "lib/moss_std" }
 
 platform_core = { path = "platform/core" }
 platform_utl = { path = "platform/utl" }
