@@ -13,12 +13,4 @@ platform_core.workspace = true
 fnv.workspace = true
 slotmap.workspace = true
 parking_lot.workspace = true
-derive_more.workspace = true
 anyhow.workspace = true
-
-flume.workspace = true
-async-task.workspace = true
-im.workspace = true
-dyn-clone.workspace = true
-once_cell.workspace = true
-smallvec.workspace = true
