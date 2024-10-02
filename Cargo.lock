@@ -1342,9 +1342,9 @@ dependencies = [
  "tokio",
  "tracing",
  "tracing-subscriber",
- "workbench_service_configuration_tgui",
- "workbench_service_environment_tgui",
- "workbench_tgui",
+ "workbench_service_configuration_tao",
+ "workbench_service_environment_tao",
+ "workbench_tao",
 ]
 
 [[package]]
@@ -7627,7 +7627,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "workbench_service_configuration_tgui"
+name = "workbench_service_configuration_tao"
 version = "0.1.0"
 dependencies = [
  "anyhow",
@@ -7639,18 +7639,18 @@ dependencies = [
  "platform_workspace",
  "serde_json",
  "workbench_service_configuration_common",
- "workbench_service_user_profile_tgui",
+ "workbench_service_user_profile_tao",
 ]
 
 [[package]]
-name = "workbench_service_environment_tgui"
+name = "workbench_service_environment_tao"
 version = "0.1.0"
 dependencies = [
  "platform_environment",
 ]
 
 [[package]]
-name = "workbench_service_user_profile_tgui"
+name = "workbench_service_user_profile_tao"
 version = "0.1.0"
 dependencies = [
  "anyhow",
@@ -7661,7 +7661,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "workbench_tgui"
+name = "workbench_tao"
 version = "0.1.0"
 dependencies = [
  "anyhow",
@@ -7679,9 +7679,9 @@ dependencies = [
  "specta",
  "sysinfo",
  "tauri",
- "workbench_service_configuration_tgui",
- "workbench_service_environment_tgui",
- "workbench_service_user_profile_tgui",
+ "workbench_service_configuration_tao",
+ "workbench_service_environment_tao",
+ "workbench_service_user_profile_tao",
 ]
 
 [[package]]

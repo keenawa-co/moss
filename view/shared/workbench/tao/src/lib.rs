@@ -10,7 +10,7 @@ use std::{
 };
 
 use anyhow::Result;
-use contribution::WORKBENCH_TGUI_WINDOW;
+use contribution::WORKBENCH_TAO_WINDOW;
 use once_cell::unsync::OnceCell;
 use platform_configuration::{
     attribute_name, configuration_policy::ConfigurationPolicyService,
@@ -28,9 +28,9 @@ use platform_user_profile::user_profile_service::UserProfileService as PlatformU
 use platform_workspace::{Workspace, WorkspaceId};
 use specta::Type;
 use tauri::{AppHandle, Emitter, WebviewWindow};
-use workbench_service_configuration_tgui::configuration_service::WorkspaceConfigurationService;
-use workbench_service_environment_tgui::environment_service::NativeEnvironmentService;
-use workbench_service_user_profile_tgui::user_profile_service::UserProfileService;
+use workbench_service_configuration_tao::configuration_service::WorkspaceConfigurationService;
+use workbench_service_environment_tao::environment_service::NativeEnvironmentService;
+use workbench_service_user_profile_tao::user_profile_service::UserProfileService;
 
 #[macro_use]
 extern crate serde;
@@ -92,7 +92,7 @@ impl Workbench {
             let configuration_registry = tx_ctx.create_atom(|_| ConfigurationRegistry::new());
 
             tx_ctx.update_atom(&configuration_registry, |this, ctx| {
-                this.register_configuration(&WORKBENCH_TGUI_WINDOW);
+                this.register_configuration(&WORKBENCH_TAO_WINDOW);
 
                 ctx.notify();
             });

@@ -1,5 +1,5 @@
 use tauri::State;
-use workbench_tgui::window::NativePlatformInfo;
+use workbench_tao::window::NativePlatformInfo;
 
 use crate::AppState;
 

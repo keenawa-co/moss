@@ -1,5 +1,5 @@
 [package]
-name = "workbench_service_user_profile_tgui"
+name = "workbench_service_user_profile_tao"
 version = "0.1.0"
 edition = "2021"
 
