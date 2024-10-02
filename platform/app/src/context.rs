@@ -38,7 +38,6 @@ impl AppCell {
     }
 
     pub fn borrow_mut(&self) -> AppRefMut {
-        println!("borrowed mut");
         AppRefMut(self.app.borrow_mut())
     }
 }

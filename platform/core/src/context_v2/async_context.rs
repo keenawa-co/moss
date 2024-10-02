@@ -85,7 +85,7 @@ impl AsyncContext {
             .ok_or_else(|| anyhow!("context was released"))?;
         let ctx = &mut ctx_cell.borrow_mut();
 
-        Ok(ctx.stage(tx_callback))
+        Ok(ctx.apply(tx_callback))
     }
 
     pub fn block_on_with<Fut>(&self, f: impl FnOnce(AsyncContext) -> Fut) -> Fut::Output

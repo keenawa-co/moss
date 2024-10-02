@@ -16,7 +16,7 @@ pub(super) fn stage_create_atom<T: NodeValue>(
     ctx: &mut Context,
     callback: impl FnOnce(&mut AtomContext<'_, T>) -> T,
 ) -> Atom<T> {
-    ctx.stage(|ctx| {
+    ctx.apply(|ctx| {
         let slot = ctx
             .next_tree()
             .atom_values
@@ -32,7 +32,7 @@ pub(super) fn stage_update_atom<T: NodeValue, R>(
     atom: &Atom<T>,
     callback: impl FnOnce(&mut T, &mut AtomContext<'_, T>) -> R,
 ) -> R {
-    ctx.stage(|tx_ctx| {
+    ctx.apply(|tx_ctx| {
         let mut value = tx_ctx.next_tree_mut().atom_values.begin_lease(atom);
         let result = callback(&mut value, &mut AtomContext::new(tx_ctx, atom.downgrade()));
 
@@ -62,7 +62,7 @@ pub(super) fn stage_create_selector<T: NodeValue>(
     ctx: &mut Context,
     callback: impl Fn(&mut SelectorContext<'_, T>) -> T + 'static,
 ) -> Selector<T> {
-    ctx.stage(|ctx| {
+    ctx.apply(|ctx| {
         let slot = ctx
             .next_tree()
             .selector_values
@@ -105,7 +105,7 @@ where
             ))
         };
 
-        ctx.as_mut().stage(|transaction_context| {
+        ctx.as_mut().apply(|transaction_context| {
             transaction_context
                 .next_tree_mut()
                 .selector_values

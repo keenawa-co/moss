@@ -84,7 +84,7 @@ unsafe impl<'a> Send for Workbench {}
 
 impl Workbench {
     pub fn new(
-        ctx: &AsyncContext,
+        ctx: &mut AsyncContext,
         service_registry: ServiceRegistry,
         workspace_id: WorkspaceId,
     ) -> Result<Self> {
@@ -101,11 +101,11 @@ impl Workbench {
         })?;
 
         let font_service_atom = ctx.apply(|tx_ctx| {
-            let font_service_model = tx_ctx.create_atom(|_ctx| MockFontSizeService {
+            let font_service_atom = tx_ctx.create_atom(|_ctx| MockFontSizeService {
                 size: Cell::new(10),
             });
 
-            font_service_model
+            font_service_atom
         })?;
 
         Ok(Self {
@@ -118,7 +118,7 @@ impl Workbench {
         })
     }
 
-    pub fn initialize<'a>(&'a self, ctx: &'a AsyncContext) -> Result<()> {
+    pub fn initialize<'a>(&'a self, ctx: &mut AsyncContext) -> Result<()> {
         // let cell = async_ctx
         //     .upgrade()
         //     .ok_or_else(|| anyhow!("context was released"))?;

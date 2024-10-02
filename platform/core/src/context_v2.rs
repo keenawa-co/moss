@@ -255,7 +255,7 @@ impl Context {
         }
     }
 
-    pub fn stage<'a, R>(
+    pub fn apply<'a, R>(
         &'a mut self,
         tx_callback: impl FnOnce(&mut TransactionContext) -> R + 'a,
     ) -> R {

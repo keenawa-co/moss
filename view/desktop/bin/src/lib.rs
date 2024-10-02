@@ -6,8 +6,7 @@ mod service;
 
 use anyhow::{Context as _, Result};
 use platform_core::context_v2::async_context::AsyncContext;
-use platform_core::context_v2::{Context, ContextCell};
-use platform_core::executor::BackgroundExecutor;
+use platform_core::context_v2::ContextCell;
 use platform_core::platform::cross::client::CrossPlatformClient;
 use platform_core::platform::AnyPlatform;
 use platform_formation::service_registry::ServiceRegistry;
@@ -15,16 +14,13 @@ use platform_fs::disk::file_system_service::DiskFileSystemService;
 use platform_workspace::WorkspaceId;
 use service::project_service::ProjectService;
 use service::session_service::SessionService;
-use std::cell::RefCell;
+use std::env;
 use std::rc::Rc;
 use std::sync::Arc;
-use std::{env, process::ExitCode};
 use surrealdb::engine::remote::ws::Client;
 use surrealdb::{engine::remote::ws::Ws, Surreal};
-use tauri::{App, Emitter, Manager, State};
-use tauri_specta::{collect_commands, collect_events};
-use tracing_subscriber::layer::SubscriberExt;
-use tracing_subscriber::util::SubscriberInitExt;
+use tauri::{App, Manager};
+use tauri_specta::{collect_commands, collect_events, Builder};
 use workbench_service_environment_tgui::environment_service::NativeEnvironmentService;
 use workbench_tgui::window::{NativePlatformInfo, NativeWindowConfiguration};
 use workbench_tgui::Workbench;
@@ -62,191 +58,134 @@ pub struct AppState {
     pub session_service: SessionService,
 }
 
-pub struct AppMain {
+pub fn run(native_window_configuration: NativeWindowConfiguration) -> Result<()> {
+    let platform_client = Rc::new(CrossPlatformClient::new());
+    platform_client.run(async {
+        let ctx_cell = ContextCell::new(platform_client.clone());
+        let async_ctx = ctx_cell.borrow().to_async();
+        let tao_app = initialize_app(
+            async_ctx,
+            platform_client.clone(),
+            native_window_configuration,
+        )
+        .expect("Failed to build tauri app");
+
+        Ok(tao_app.run(|_, _| {}))
+    })
+}
+
+fn initialize_app(
+    ctx: AsyncContext,
     platform_client: Rc<CrossPlatformClient>,
     native_window_configuration: NativeWindowConfiguration,
+) -> Result<App> {
+    let builder = create_specta_builder();
+
+    #[cfg(debug_assertions)]
+    export_typescript_bindings(&builder)?;
+
+    //  TODO: move to StorageService
+    let db = Arc::new(
+        platform_client
+            .background_executor()
+            .block_on(init_db_client())?,
+    );
+
+    let platform_info_clone = native_window_configuration.platform_info.clone();
+    let service_group = create_service_registry(native_window_configuration)?;
+    let tao_app = tauri::Builder::default()
+        .invoke_handler(builder.invoke_handler())
+        .setup(move |app: &mut App| setup_app(app, ctx, service_group, db, platform_info_clone))
+        .menu(menu::setup_window_menu)
+        .plugin(tauri_plugin_os::init())
+        .build(tauri::generate_context!())?;
+
+    Ok(tao_app)
 }
 
-impl AppMain {
-    pub fn new(configuration: NativeWindowConfiguration) -> Self {
-        Self {
-            platform_client: Rc::new(CrossPlatformClient::new()),
-            native_window_configuration: configuration,
-        }
+fn setup_app(
+    app: &mut App,
+    mut ctx: AsyncContext,
+    service_group: ServiceRegistry,
+    db: Arc<Surreal<Client>>,
+    platform_info: NativePlatformInfo,
+) -> std::result::Result<(), Box<dyn std::error::Error>> {
+    let window_state = service_group
+        .get_unchecked::<MockStorageService>()
+        .get_last_window_state();
+
+    let workbench = Workbench::new(&mut ctx, service_group, window_state.workspace_id)?;
+    workbench.initialize(&mut ctx)?;
+
+    let window = app.get_webview_window("main").unwrap();
+    let app_state = AppState {
+        workbench: Arc::new(workbench),
+        platform_info,
+        project_service: ProjectService::new(db.clone()),
+        session_service: SessionService::new(db.clone()),
+    };
+
+    ctx.apply(|tx_ctx| {
+        app_state
+            .workbench
+            .set_configuration_window_size(window)
+            .unwrap();
+
+        app_state
+            .workbench
+            .set_tao_handle(tx_ctx, app.handle().clone());
+    })?;
+
+    {
+        app.handle().manage(ctx);
+        app.handle().manage(app_state);
     }
 
-    pub fn run(&self) -> ExitCode {
-        let platform_client_clone = self.platform_client.clone();
-        let r = self.platform_client.background_executor();
-        self.platform_client.run(async {
-            let ctx = ContextCell::new(platform_client_clone);
-
-            if let Err(e) = self.open_main_window(ctx).await {
-                error!("{}", e);
-                ExitCode::FAILURE
-            } else {
-                ExitCode::SUCCESS
-            }
-        })
-    }
-
-    pub async fn open_main_window(&self, ctx_cell: Rc<ContextCell>) -> Result<()> {
-        // TODO: move to StorageService
-        let db = Arc::new(
-            self.platform_client
-                .background_executor()
-                .block_on(init_db_client())?,
-        );
-
-        let service_group = self.create_service_registry()?;
-
-        let window_state = service_group
-            .get_unchecked::<MockStorageService>()
-            .get_last_window_state();
-
-        let async_ctx = {
-            let ctx = ctx_cell.as_ref().borrow();
-            ctx.to_async()
-        };
-
-        let workbench = Workbench::new(&async_ctx, service_group, window_state.workspace_id)?;
-        workbench.initialize(&async_ctx)?;
-
-        let app_state = AppState {
-            workbench: Arc::new(workbench),
-            platform_info: self.native_window_configuration.platform_info.clone(),
-            project_service: ProjectService::new(db.clone()),
-            session_service: SessionService::new(db.clone()),
-        };
-
-        let builder = tauri_specta::Builder::<tauri::Wry>::new()
-            .events(collect_events![])
-            .commands(collect_commands![
-                cmd_dummy::workbench_get_state,
-                cmd_dummy::create_project,
-                cmd_dummy::restore_session,
-                cmd_dummy::app_ready,
-                cmd_dummy::update_font_size,
-                cmd_dummy::fetch_all_themes,
-                cmd_dummy::read_theme,
-                cmd_base::native_platform_info,
-            ]);
-
-        #[cfg(debug_assertions)]
-        self.export_typescript_bindings(&builder)?;
-
-        async_ctx
-            .spawn_local(|_| async { println!("Hello from awaited spawn!") })
-            .await;
-
-        async_ctx
-            .spawn_local(|_| async { println!("Hello from detached spawn!") })
-            .detach();
-
-        async_ctx.block_on(async { println!("Hello from blocked!") });
-
-        Ok(self
-            .initialize_app(async_ctx, app_state, builder)?
-            .run(|_, _| {}))
-    }
-
-    fn initialize_app(
-        &self,
-        ctx: AsyncContext,
-        app_state: AppState,
-        builder: tauri_specta::Builder,
-    ) -> Result<App> {
-        let builder = tauri::Builder::default()
-            .manage(ctx)
-            .manage(app_state)
-            .invoke_handler(builder.invoke_handler())
-            .setup(move |app: &mut App| {
-                let app_state: State<AppState> = app.state();
-                let async_ctx: State<AsyncContext> = app.state();
-
-                let app_handle = app.handle().clone();
-                let window = app.get_webview_window("main").unwrap();
-
-                async_ctx
-                    .apply(|ctx| {
-                        app_state
-                            .workbench
-                            .set_configuration_window_size(window)
-                            .unwrap();
-
-                        app_state.workbench.set_tao_handle(ctx, app_handle.clone());
-                    })
-                    .unwrap();
-
-                // init_custom_logging(app_handle.clone());
-
-                Ok(())
-            })
-            .menu(menu::setup_window_menu)
-            .plugin(tauri_plugin_os::init())
-            .build(tauri::generate_context!())?;
-
-        Ok(builder)
-    }
-
-    fn create_service_registry(&self) -> Result<ServiceRegistry> {
-        let mut service_registry = ServiceRegistry::new();
-
-        let mock_storage_service = MockStorageService::new();
-
-        let fs_service = DiskFileSystemService::new();
-        let environment_service =
-            NativeEnvironmentService::new(self.native_window_configuration.home_dir.clone());
-
-        service_registry.insert(mock_storage_service);
-        service_registry.insert(environment_service);
-        service_registry.insert(Arc::new(fs_service));
-
-        Ok(service_registry)
-    }
-
-    fn export_typescript_bindings(&self, builder: &tauri_specta::Builder) -> Result<()> {
-        Ok(builder
-            .export(
-                specta_typescript::Typescript::default()
-                    .formatter(specta_typescript::formatter::prettier),
-                "../src/bindings.ts",
-            )
-            .context("Failed to export typescript bindings")?)
-    }
+    Ok(())
 }
 
-// An example of how the logging could function
-fn init_custom_logging(app_handle: tauri::AppHandle) {
-    struct TauriLogWriter {
-        app_handle: tauri::AppHandle,
-    }
+fn create_specta_builder() -> Builder {
+    tauri_specta::Builder::<tauri::Wry>::new()
+        .events(collect_events![])
+        .commands(collect_commands![
+            cmd_dummy::workbench_get_state,
+            cmd_dummy::create_project,
+            cmd_dummy::restore_session,
+            cmd_dummy::app_ready,
+            cmd_dummy::update_font_size,
+            cmd_dummy::fetch_all_themes,
+            cmd_dummy::read_theme,
+            cmd_base::native_platform_info,
+        ])
+}
 
-    impl std::io::Write for TauriLogWriter {
-        fn write(&mut self, buf: &[u8]) -> std::io::Result<usize> {
-            let log_message = String::from_utf8_lossy(buf).to_string();
-            let _ = self.app_handle.emit("logs-stream", log_message);
-            Ok(buf.len())
-        }
+fn create_service_registry(
+    native_window_configuration: NativeWindowConfiguration,
+) -> Result<ServiceRegistry> {
+    let mut service_registry = ServiceRegistry::new();
 
-        fn flush(&mut self) -> std::io::Result<()> {
-            Ok(())
-        }
-    }
+    let mock_storage_service = MockStorageService::new();
 
-    tracing_subscriber::registry()
-        // log to stdout
-        .with(tracing_subscriber::fmt::layer().with_writer(std::io::stdout))
-        // log to frontend
-        .with(
-            tracing_subscriber::fmt::layer().with_writer(move || TauriLogWriter {
-                app_handle: app_handle.clone(),
-            }),
+    let fs_service = DiskFileSystemService::new();
+    let environment_service =
+        NativeEnvironmentService::new(native_window_configuration.home_dir.clone());
+
+    service_registry.insert(mock_storage_service);
+    service_registry.insert(environment_service);
+    service_registry.insert(Arc::new(fs_service));
+
+    Ok(service_registry)
+}
+
+fn export_typescript_bindings(builder: &tauri_specta::Builder) -> Result<()> {
+    Ok(builder
+        .export(
+            specta_typescript::Typescript::default()
+                .formatter(specta_typescript::formatter::prettier)
+                .header("/* eslint-disable */"),
+            "../src/bindings.ts",
         )
-        .init();
-
-    event!(tracing::Level::DEBUG, "Logging init");
-    info!("Logging initialized");
+        .context("Failed to export typescript bindings")?)
 }
 
 async fn init_db_client() -> Result<Surreal<Client>> {
@@ -259,3 +198,36 @@ async fn init_db_client() -> Result<Surreal<Client>> {
 
     Ok(db)
 }
+
+// An example of how the logging could function
+// fn init_custom_logging(app_handle: tauri::AppHandle) {
+//     struct TauriLogWriter {
+//         app_handle: tauri::AppHandle,
+//     }
+
+//     impl std::io::Write for TauriLogWriter {
+//         fn write(&mut self, buf: &[u8]) -> std::io::Result<usize> {
+//             let log_message = String::from_utf8_lossy(buf).to_string();
+//             let _ = self.app_handle.emit("logs-stream", log_message);
+//             Ok(buf.len())
+//         }
+
+//         fn flush(&mut self) -> std::io::Result<()> {
+//             Ok(())
+//         }
+//     }
+
+//     tracing_subscriber::registry()
+//         // log to stdout
+//         .with(tracing_subscriber::fmt::layer().with_writer(std::io::stdout))
+//         // log to frontend
+//         .with(
+//             tracing_subscriber::fmt::layer().with_writer(move || TauriLogWriter {
+//                 app_handle: app_handle.clone(),
+//             }),
+//         )
+//         .init();
+
+//     event!(tracing::Level::DEBUG, "Logging init");
+//     info!("Logging initialized");
+// }

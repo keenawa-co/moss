@@ -84,7 +84,7 @@ impl<'a> AnyContext for TransactionContext<'a> {
             let value =
                 unsafe { computer.compute(&mut SelectorContext::new(self, selector.downgrade())) };
 
-            self.stage(|transaction_context| {
+            self.apply(|transaction_context| {
                 transaction_context
                     .next_tree_mut()
                     .selector_values
