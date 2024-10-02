@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 use arc_swap::ArcSwap;
 use hashbrown::HashMap;
-use platform_core::context::{entity::Model, Context};
+use platform_core::context_v2::{atom::Atom, Context};
 
 use super::{
     configuration_default::DefaultConfiguration,
@@ -13,13 +13,13 @@ use super::{
 
 pub struct ConfigurationPolicy {
     model: ArcSwap<ConfigurationModel>,
-    registry: Model<ConfigurationRegistry>,
+    registry: Atom<ConfigurationRegistry>,
     policy_service: ConfigurationPolicyService,
 }
 
 impl<'a> ConfigurationPolicy {
     pub fn new(
-        registry: Model<ConfigurationRegistry>,
+        registry: Atom<ConfigurationRegistry>,
         policy_service: ConfigurationPolicyService,
     ) -> Self {
         Self {

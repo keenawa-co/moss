@@ -22,6 +22,8 @@ parking.workspace = true
 waker-fn.workspace = true
 lazy_static.workspace = true
 once_cell.workspace = true
+smallvec.workspace = true
+dyn-clone.workspace = true
 
 [features]
 default = []

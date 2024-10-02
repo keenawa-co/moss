@@ -1,5 +1,5 @@
 use arc_swap::ArcSwapOption;
-use platform_core::context::{entity::Model, Context};
+use platform_core::context_v2::{atom::Atom, Context};
 use radix_trie::Trie;
 use std::sync::Arc;
 
@@ -10,11 +10,11 @@ use super::{
 
 pub struct DefaultConfiguration {
     configuration_model: ArcSwapOption<ConfigurationModel>,
-    configuration_registry: Model<ConfigurationRegistry>,
+    configuration_registry: Atom<ConfigurationRegistry>,
 }
 
 impl DefaultConfiguration {
-    pub fn new(registry: Model<ConfigurationRegistry>) -> Self {
+    pub fn new(registry: Atom<ConfigurationRegistry>) -> Self {
         Self {
             configuration_model: ArcSwapOption::from(None),
             configuration_registry: registry,
