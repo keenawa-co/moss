@@ -7,7 +7,7 @@ use platform_configuration::{
 };
 
 lazy_static! {
-    pub static ref WORKBENCH_TGUI_WINDOW: ConfigurationNode = ConfigurationNode {
+    pub static ref WORKBENCH_TAO_WINDOW: ConfigurationNode = ConfigurationNode {
         id: "window".to_string(),
         title: Some("Window".to_string()),
         description: None,

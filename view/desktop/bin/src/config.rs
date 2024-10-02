@@ -1,5 +1,5 @@
-use moss_std::{lazy_env_parse, lazy_env_parse_or_else};
 use once_cell::sync::Lazy;
+use platform_core::{lazy_env_parse, lazy_env_parse_or_else};
 
 pub static RUNTIME_MAX_BLOCKING_THREADS: Lazy<usize> =
     lazy_env_parse!("MOSS_RUNTIME_MAX_BLOCKING_THREADS", usize, 512);

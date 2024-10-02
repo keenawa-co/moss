@@ -15,7 +15,6 @@ use atom::{Atom, AtomImMap};
 use atom_context::AtomContext;
 use derive_more::{Deref, DerefMut};
 use graph::Graph;
-use moss_std::collection::{FxHashMap, FxHashSet};
 use node::{AnyNode, NodeKey, NodeValue};
 use once_cell::sync::OnceCell;
 use selector::{Computer, Selector, SelectorImMap};
@@ -33,6 +32,7 @@ use subscription::{SubscriberSet, Subscription};
 use transaction_context::TransactionContext;
 
 use crate::{
+    base::collection::{FxHashMap, FxHashSet},
     executor::{BackgroundExecutor, MainThreadExecutor, Task},
     platform::AnyPlatform,
 };

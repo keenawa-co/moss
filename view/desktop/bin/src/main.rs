@@ -3,7 +3,7 @@
 
 use app_lib::run;
 use std::process::ExitCode;
-use workbench_tgui::window::{NativePlatformInfo, NativeWindowConfiguration};
+use workbench_tao::window::{NativePlatformInfo, NativeWindowConfiguration};
 
 fn main() -> ExitCode {
     let home_dir = std::env::var("HOME")

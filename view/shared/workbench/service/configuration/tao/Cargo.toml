@@ -1,5 +1,5 @@
 [package]
-name = "workbench_service_configuration_tgui"
+name = "workbench_service_configuration_tao"
 version = "0.1.0"
 edition = "2021"
 
@@ -17,4 +17,4 @@ platform_configuration.workspace = true
 platform_fs.workspace = true
 
 workbench_service_configuration_common.workspace = true
-workbench_service_user_profile_tgui.workspace = true
+workbench_service_user_profile_tao.workspace = true

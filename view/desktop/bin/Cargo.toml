@@ -25,17 +25,15 @@ tracing-subscriber.workspace = true
 flume.workspace = true
 async-task.workspace = true
 
-moss_std.workspace = true
-
 platform_core.workspace = true
 platform_workspace.workspace = true
 platform_configuration.workspace = true
 platform_formation.workspace = true
 platform_fs.workspace = true
 
-workbench_tgui.workspace = true
-workbench_service_configuration_tgui.workspace = true
-workbench_service_environment_tgui.workspace = true
+workbench_tao.workspace = true
+workbench_service_configuration_tao.workspace = true
+workbench_service_environment_tao.workspace = true
 
 surrealdb = { workspace = true, features = ["kv-rocksdb"] }
 strum = { workspace = true, features = ["derive"] }

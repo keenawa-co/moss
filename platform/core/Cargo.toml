@@ -6,8 +6,6 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-moss_std.workspace = true
-
 fnv.workspace = true
 slotmap.workspace = true
 parking_lot.workspace = true
@@ -24,6 +22,13 @@ lazy_static.workspace = true
 once_cell.workspace = true
 smallvec.workspace = true
 dyn-clone.workspace = true
+async-trait.workspace = true
+hashbrown = { workspace = true, features = [] }
+radix_trie.workspace = true
+dunce.workspace = true
+rustc-hash.workspace = true
+im.workspace = true
+
 
 [features]
 default = []

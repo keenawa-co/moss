@@ -2,7 +2,7 @@ use anyhow::Result;
 use platform_core::context_v2::async_context::AsyncContext;
 use std::path::PathBuf;
 use tauri::{AppHandle, Manager, State};
-use workbench_tgui::WorkbenchState;
+use workbench_tao::WorkbenchState;
 
 use crate::service::project_service::{CreateProjectInput, ProjectDTO};
 use crate::service::session_service::SessionInfoDTO;
