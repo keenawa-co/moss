@@ -1,41 +1,47 @@
 import { Icon } from "@repo/ui";
 import { cn } from "@/utils";
-import { useSortable } from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
+import { Draggable, DraggableProvided, DraggableStateSnapshot } from "@hello-pangea/dnd";
+import { ResizablePanel } from "./Resizable";
 interface DraggableAccordionProps {
   id: number;
   title: string;
   isOpen?: boolean;
+  index: number;
   handleClick: () => void;
   children: React.ReactNode[] | React.ReactNode;
 }
 
-const Accordion = ({ id, title, isOpen = false, handleClick, children }: DraggableAccordionProps) => {
-  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id });
-
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-  };
-
+const Accordion = ({ id, title, isOpen = false, index, handleClick, children }: DraggableAccordionProps) => {
   return (
-    <div>
-      <button
-        ref={setNodeRef}
-        style={style}
-        {...attributes}
-        onClick={handleClick}
-        {...listeners}
-        className="flex items-center px-2 py-[5px]"
-      >
-        <div className={cn(`flex size-5 cursor-pointer items-center justify-center`, { "rotate-90": isOpen })}>
-          <Icon icon="ArrowRight" className="text-xs" />
-        </div>
-        <span className="font-bold">{title}</span>
-      </button>
+    <Draggable draggableId={id.toString()} index={index}>
+      {(provided: DraggableProvided, snapshot: DraggableStateSnapshot) => (
+        <ResizablePanel className="h-full overflow-hidden" key={index} ref={provided.innerRef}>
+          <div className="DraggableAccordion h-full">
+            <div
+              onClick={handleClick}
+              {...provided.dragHandleProps}
+              {...provided.draggableProps}
+              className="flex items-center px-2 py-[5px]"
+            >
+              <div className={cn(`flex size-5 cursor-pointer items-center justify-center`, { "rotate-90": isOpen })}>
+                <Icon icon="ArrowRight" className="text-xs" />
+              </div>
+              <span className="font-bold">
+                {title} id: {id} - i: {index} - isOpen: {isOpen.toString()}
+              </span>
+            </div>
 
-      <div className={isOpen ? "text-gray-500 pl-6 text-xs" : "visually-hidden"}>{children}</div>
-    </div>
+            <div
+              className={
+                isOpen && !snapshot.isDragging ? "text-gray-500 h-full overflow-auto pl-6 text-xs" : "visually-hidden"
+              }
+            >
+              {children}
+            </div>
+          </div>
+        </ResizablePanel>
+      )}
+    </Draggable>
   );
 };
 
