@@ -33,7 +33,7 @@ const AccordionResizableBox = forwardRef(
         <Resizable
           className="overflow-hidden"
           minHeight={isOpen ? 100 : 35}
-          maxHeight={400}
+          maxHeight={isOpen ? 400 : 35}
           size={{
             width: "100%",
             height: height,

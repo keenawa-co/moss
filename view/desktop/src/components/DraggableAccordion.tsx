@@ -29,7 +29,11 @@ const Accordion = ({ id, title, isOpen = false, index, handleClick, children, ..
               <span className="font-bold">{title}</span>
             </div>
 
-            <div className={isOpen ? "text-gray-500 h-full overflow-auto pl-6 text-xs" : "visually-hidden"}>
+            <div
+              className={
+                isOpen && !snapshot.isDragging ? "text-gray-500 h-full overflow-auto pl-6 text-xs" : "visually-hidden"
+              }
+            >
               {children}
             </div>
           </div>
