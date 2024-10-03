@@ -1,7 +1,8 @@
 import { Icon } from "@repo/ui";
 import { cn } from "@/utils";
 import { Draggable, DraggableProvided, DraggableStateSnapshot } from "@hello-pangea/dnd";
-import { ResizablePanel } from "./Resizable";
+import RcResizable from "./RcResizable";
+
 interface DraggableAccordionProps {
   id: number;
   title: string;
@@ -11,35 +12,24 @@ interface DraggableAccordionProps {
   children: React.ReactNode[] | React.ReactNode;
 }
 
-const Accordion = ({ id, title, isOpen = false, index, handleClick, children }: DraggableAccordionProps) => {
+const Accordion = ({ id, title, isOpen = false, index, handleClick, children, ...props }: DraggableAccordionProps) => {
   return (
     <Draggable draggableId={id.toString()} index={index}>
       {(provided: DraggableProvided, snapshot: DraggableStateSnapshot) => (
-        <ResizablePanel className="h-full overflow-hidden" key={index} ref={provided.innerRef}>
+        <RcResizable accordionId={id} ref={provided.innerRef} {...provided.draggableProps} isOpen={isOpen}>
           <div className="DraggableAccordion h-full">
-            <div
-              onClick={handleClick}
-              {...provided.dragHandleProps}
-              {...provided.draggableProps}
-              className="flex items-center px-2 py-[5px]"
-            >
+            <div onClick={handleClick} {...provided.dragHandleProps} className="flex items-center px-2 py-[5px]">
               <div className={cn(`flex size-5 cursor-pointer items-center justify-center`, { "rotate-90": isOpen })}>
                 <Icon icon="ArrowRight" className="text-xs" />
               </div>
-              <span className="font-bold">
-                {title} id: {id} - i: {index} - isOpen: {isOpen.toString()}
-              </span>
+              <span className="font-bold">{title}</span>
             </div>
 
-            <div
-              className={
-                isOpen && !snapshot.isDragging ? "text-gray-500 h-full overflow-auto pl-6 text-xs" : "visually-hidden"
-              }
-            >
+            <div className={isOpen ? "text-gray-500 h-full overflow-auto pl-6 text-xs" : "visually-hidden"}>
               {children}
             </div>
           </div>
-        </ResizablePanel>
+        </RcResizable>
       )}
     </Draggable>
   );

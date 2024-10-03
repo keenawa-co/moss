@@ -1,5 +1,6 @@
-import { PayloadAction, Slice, createSlice } from "@reduxjs/toolkit";
+import { PayloadAction, Slice, createSelector, createSlice } from "@reduxjs/toolkit";
 import * as DesktopComponents from "../../components";
+import { RootState } from "..";
 type DesktopComponentKeys = keyof typeof DesktopComponents;
 type OmittedComponents = Omit<
   Record<DesktopComponentKeys, any>,
@@ -11,6 +12,7 @@ export interface Accordion {
   title: string;
   content: DesktopComponentsOmitted;
   isOpen?: boolean;
+  preferredHeight?: number;
 }
 
 export interface AccordionState {
@@ -46,14 +48,24 @@ export const accordionSlice: Slice<AccordionState> = createSlice({
   name: "accordion",
   initialState,
   reducers: {
-    setAccordion: (state, action: PayloadAction<Accordion[]>) => {
+    setAccordions: (state, action: PayloadAction<Accordion[]>) => {
       state.accordion = action.payload;
     },
     setDefaultSizes: (state, action: PayloadAction<number[]>) => {
       state.defaultSizes = action.payload;
     },
+    updateAccordionById: (state, action: PayloadAction<{ id: number; changes: Partial<Accordion> }>) => {
+      const { id, changes } = action.payload;
+      const accordionIndex = state.accordion.findIndex((item) => item.id === id);
+      if (accordionIndex !== -1) {
+        state.accordion[accordionIndex] = {
+          ...state.accordion[accordionIndex],
+          ...changes,
+        };
+      }
+    },
   },
 });
 
-export const { setAccordion, setDefaultSizes } = accordionSlice.actions;
+export const { setAccordions, setDefaultSizes, updateAccordionById } = accordionSlice.actions;
 export default accordionSlice.reducer;

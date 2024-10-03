@@ -1,13 +1,10 @@
 import { DragDropContext, Droppable, DroppableProvided, DropResult } from "@hello-pangea/dnd";
 import Accordion from "./DraggableAccordion";
-import { Resizable, ResizablePanel } from "./Resizable";
 import SidebarHeader from "./SidebarHeader";
 import { useAppDispatch, RootState } from "@/store";
-import { setAccordion } from "@/store/accordion/accordionSlice";
+import { setAccordions } from "@/store/accordion/accordionSlice";
 import { useSelector } from "react-redux";
 import * as DesktopComponents from ".";
-import { swapByIndex } from "@/store/accordion/accordionHelpers";
-import { useRef } from "react";
 type DesktopComponentKeys = keyof typeof DesktopComponents;
 type OmittedComponents = Omit<
   Record<DesktopComponentKeys, any>,
@@ -19,12 +16,12 @@ const getDesktopComponentByName = (name: DesktopComponentsOmitted) => {
   if (!DesktopComponents[name]) return <div>{name}</div>;
 
   const Tag = DesktopComponents[name];
+  // FIXME: Type 'typeof Tag' is not assignable to type 'ElementType<any>'.
+  //@ts-ignore
   return <Tag />;
 };
 
 const LaunchPad = () => {
-  const ResizableRef = useRef(null);
-
   return (
     <>
       <SidebarHeader title="launchpad" />
@@ -44,19 +41,24 @@ const DroppableContainer = () => {
       i === index ? { ...accordion, isOpen: !accordion.isOpen } : accordion
     );
 
-    dispatch(setAccordion(updatedAccordion));
+    dispatch(setAccordions(updatedAccordion));
   };
 
   const handleDragEnd = (result: DropResult) => {
-    console.log(result);
-    const oldIndex = result.source.index;
-    const newIndex = result.destination?.index;
+    const { destination, source, draggableId } = result;
 
-    if (newIndex == undefined || oldIndex === newIndex) return;
+    if (!destination) return;
+    if (destination.droppableId === source.droppableId && destination.index === source.index) return;
 
-    const updated = swapByIndex(accordion, oldIndex, newIndex);
-    console.log(updated);
-    dispatch(setAccordion(updated));
+    const updatedAccordion = Array.from(accordion);
+    const draggedAccordion = updatedAccordion.find((accordion) => accordion.id === Number(draggableId));
+
+    if (!draggedAccordion) return;
+
+    updatedAccordion.splice(source.index, 1);
+    updatedAccordion.splice(destination.index, 0, draggedAccordion);
+
+    dispatch(setAccordions(updatedAccordion));
   };
 
   return (
@@ -64,14 +66,14 @@ const DroppableContainer = () => {
       <Droppable droppableId="list">
         {(provided: DroppableProvided) => (
           <div ref={provided.innerRef} {...provided.droppableProps} className="h-full">
-            <Resizable proportionalLayout={false} vertical minSize={100}>
+            <div className="h-[calc(100%_-_42px)] overflow-auto">
               {accordion.map((accordion, index) => (
                 <Accordion key={accordion.id} {...accordion} index={index} handleClick={() => toggleAccordion(index)}>
                   {getDesktopComponentByName(accordion.content as DesktopComponentsOmitted)}
                 </Accordion>
               ))}
-            </Resizable>
-            {provided.placeholder}
+              {provided.placeholder}
+            </div>
           </div>
         )}
       </Droppable>
