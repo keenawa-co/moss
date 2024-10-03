@@ -17,7 +17,11 @@ const Accordion = ({ id, title, isOpen = false, index, handleClick, children, ..
     <Draggable draggableId={id.toString()} index={index}>
       {(provided: DraggableProvided, snapshot: DraggableStateSnapshot) => (
         <AccordionResizableBox accordionId={id} ref={provided.innerRef} {...provided.draggableProps} isOpen={isOpen}>
-          <div className="DraggableAccordion h-full">
+          <div
+            className={cn(`h-full`, {
+              "border-b": !snapshot.isDragging,
+            })}
+          >
             <div onClick={handleClick} {...provided.dragHandleProps} className="flex items-center px-2 py-[5px]">
               <div className={cn(`flex size-5 cursor-pointer items-center justify-center`, { "rotate-90": isOpen })}>
                 <Icon icon="ArrowRight" className="text-xs" />
