@@ -1,6 +1,8 @@
 pub mod contribution;
 pub mod window;
 
+mod component;
+
 use std::{
     any::Any,
     cell::{Cell, RefCell},
@@ -10,6 +12,7 @@ use std::{
 };
 
 use anyhow::Result;
+use component::{ActivityBar, Part, View, ViewKey};
 use contribution::WORKBENCH_TAO_WINDOW;
 use once_cell::unsync::OnceCell;
 use platform_configuration::{
@@ -26,6 +29,7 @@ use platform_fs::disk::file_system_service::{
 };
 use platform_user_profile::user_profile_service::UserProfileService as PlatformUserProfileService;
 use platform_workspace::{Workspace, WorkspaceId};
+use slotmap::{SecondaryMap, SlotMap};
 use specta::Type;
 use tauri::{AppHandle, Emitter, WebviewWindow};
 use workbench_service_configuration_tao::configuration_service::WorkspaceConfigurationService;
@@ -77,6 +81,10 @@ pub struct Workbench {
     font_size_service: Atom<MockFontSizeService>,
     _observe_font_size_service: OnceCell<Subscription>,
     tao_handle: OnceCell<Rc<AppHandle>>,
+    // sizes: SecondaryMap<ViewKey, S>
+    // known_views: SlotMap<ViewKey, View>,
+    // activity_bar_part: Part<ActivityBar>,
+    // known_activities:
 }
 
 unsafe impl<'a> Sync for Workbench {}

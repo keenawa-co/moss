@@ -7666,6 +7666,7 @@ dependencies = [
  "platform_workspace",
  "serde",
  "serde_json",
+ "slotmap",
  "specta",
  "sysinfo",
  "tauri",
