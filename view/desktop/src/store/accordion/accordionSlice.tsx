@@ -16,9 +16,7 @@ export interface IAccordion {
 
 export interface AccordionState {
   accordion: IAccordion[];
-  preferredSizes: {
-    [key: number]: number;
-  };
+  preferredSizes: number[];
 }
 
 const initialState: AccordionState = {
@@ -42,7 +40,7 @@ const initialState: AccordionState = {
       isOpen: false,
     },
   ],
-  preferredSizes: {},
+  preferredSizes: [],
 };
 
 export const accordionSlice: Slice<AccordionState> = createSlice({
@@ -52,10 +50,9 @@ export const accordionSlice: Slice<AccordionState> = createSlice({
     setAccordions: (state, action: PayloadAction<IAccordion[]>) => {
       state.accordion = action.payload;
     },
-    setPreferredSize: (state, action: PayloadAction<{ id: number; size: number }>) => {
-      const { id, size } = action.payload;
-      const updatedPreferredSizes = { ...state.preferredSizes, [id]: size };
-      state.preferredSizes = updatedPreferredSizes;
+    setPreferredSizes: (state, action: PayloadAction<number[]>) => {
+      if (!action.payload) return;
+      state.preferredSizes = action.payload;
     },
     updateAccordionById: (state, action: PayloadAction<{ id: number; changes: Partial<IAccordion> }>) => {
       const { id, changes } = action.payload;
@@ -70,5 +67,5 @@ export const accordionSlice: Slice<AccordionState> = createSlice({
   },
 });
 
-export const { setAccordions, setPreferredSize, updateAccordionById } = accordionSlice.actions;
+export const { setAccordions, setPreferredSizes, updateAccordionById } = accordionSlice.actions;
 export default accordionSlice.reducer;

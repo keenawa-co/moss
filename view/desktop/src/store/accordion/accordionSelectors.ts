@@ -7,9 +7,3 @@ export const selectAccordionById = (id: number) =>
     (state: RootState) => state.accordion.accordion,
     (accordion) => accordion.find((a: IAccordion) => a.id === id)
   );
-
-export const getPreferredSizeById = (id: number) =>
-  createSelector(
-    (state: RootState) => state.accordion.preferredSizes,
-    (preferredSizes) => preferredSizes[id]
-  );

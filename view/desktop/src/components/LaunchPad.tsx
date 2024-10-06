@@ -1,12 +1,14 @@
 import Accordion from "./DraggableAccordion";
 import SidebarHeader from "./SidebarHeader";
 import { useAppDispatch, RootState } from "@/store";
-import { IAccordion, setAccordions, setPreferredSize } from "@/store/accordion/accordionSlice";
+import { IAccordion, setAccordions, setPreferredSize, setPreferredSizes } from "@/store/accordion/accordionSlice";
 import { useSelector } from "react-redux";
 import * as DesktopComponents from ".";
 import { useRef, useEffect } from "react";
 import { ImperativePanelGroupHandle, Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import { getPreferredSizeById } from "@/store/accordion/accordionSelectors";
+import { Resizable, ResizablePanel } from "./Resizable";
+import { AllotmentHandle } from "allotment";
 type DesktopComponentKeys = keyof typeof DesktopComponents;
 type OmittedComponents = Omit<
   Record<DesktopComponentKeys, any>,
@@ -23,32 +25,6 @@ const getDesktopComponentByName = (name: DesktopComponentsOmitted) => {
   return <Tag />;
 };
 
-// 1. Сколько составляет % от числа
-const calculatePercentageOfNumber = (percentage: number, number: number): number => {
-  const coefficient = number / 100;
-  return coefficient * percentage;
-};
-
-// 2. Сколько процентов составляет число 1 от числа 2
-const calculatePercentageOfPart = (part: number, total: number): number => {
-  const coefficient = total / part;
-  return 100 / coefficient;
-};
-
-// 3. Прибавить процент к числу
-const addPercentageToNumber = (percentage: number, number: number): number => {
-  const coefficient = number / 100;
-  const percentageValue = coefficient * percentage;
-  return number + percentageValue;
-};
-
-// 4. Вычесть процент из числа
-const subtractPercentageFromNumber = (percentage: number, number: number): number => {
-  const coefficient = number / 100;
-  const percentageValue = coefficient * percentage;
-  return number - percentageValue;
-};
-
 const LaunchPad = () => {
   return (
     <>
@@ -61,28 +37,11 @@ const LaunchPad = () => {
 export default LaunchPad;
 
 const DroppableContainer = () => {
+  const ref = useRef<AllotmentHandle>(null);
   const dispatch = useAppDispatch();
   const accordions = useSelector((state: RootState) => state.accordion.accordion);
-  // const preferredSizes = useSelector((state: RootState) => state.accordion.preferredSizes);
-
-  const panelsRef = useRef<ImperativePanelGroupHandle>(null);
-
-  const minCollapsedSize = useRef<number | undefined>(5.18);
-  const maxCollapsedSize = useRef<number | undefined>(5.18);
-  const minPanelSize = useRef<number | undefined>(14.8);
-  const maxPanelSize = useRef<number | undefined>(44.44);
-
-  useEffect(() => {
-    if (!panelsRef.current) return;
-
-    const htmlDiv = document.querySelector(`[data-panel-group-id='${panelsRef.current.getId()}']`);
-    if (!htmlDiv) return;
-
-    minCollapsedSize.current = calculatePercentageOfPart(35, htmlDiv.clientHeight);
-    maxCollapsedSize.current = calculatePercentageOfPart(35, htmlDiv.clientHeight);
-    minPanelSize.current = calculatePercentageOfPart(100, htmlDiv.clientHeight);
-    maxPanelSize.current = calculatePercentageOfPart(300, htmlDiv.clientHeight);
-  }, [panelsRef]);
+  const preferredSizes = useSelector((state: RootState) => state.accordion.preferredSizes);
+  // const preferredSizes = useRef<number[] | undefined>(undefined);
 
   const toggleAccordion = (index: number) => {
     const updatedAccordions = accordions.map((accordion, i) =>
@@ -92,34 +51,34 @@ const DroppableContainer = () => {
     dispatch(setAccordions(updatedAccordions));
   };
 
-  const handlePanelResize = (id: IAccordion["id"], size: number) => {
-    dispatch(setPreferredSize({ id, size }));
+  const handleOnDragEnd = (sizes: number[]) => {
+    // preferredSizes.current = sizes;
+    dispatch(setPreferredSizes(sizes));
   };
+
+  useEffect(() => {
+    if (!ref.current || preferredSizes.length === 0) return;
+    ref.current.resize(preferredSizes);
+  }, [accordions]);
 
   return (
     <div className="h-[calc(100%_-_42px)] overflow-auto">
-      <PanelGroup ref={panelsRef} direction="vertical" id={"sidebar"}>
+      <Resizable ref={ref} vertical className="h-full" proportionalLayout={false} onDragEnd={handleOnDragEnd}>
         {accordions.map((accordion, index) => (
-          <>
-            <Panel
-              key={accordion.id}
-              id={String(accordion.id)}
-              order={index}
-              minSize={accordion.isOpen ? minPanelSize.current : minCollapsedSize.current}
-              maxSize={accordion.isOpen ? maxPanelSize.current : maxCollapsedSize.current}
-              onResize={(newSize) => {
-                if (accordion.isOpen) handlePanelResize(accordion.id, newSize);
-              }}
-            >
-              <Accordion {...accordion} index={index} handleClick={() => toggleAccordion(index)}>
-                {getDesktopComponentByName(accordion.content as DesktopComponentsOmitted)}
-              </Accordion>
-            </Panel>
-            <PanelResizeHandle className="h-px w-full bg-stone-100" key={`handle-${accordion.id}`} />
-            {index === accordions.length - 1 && <Panel key={accordion.id + 1} order={index + 1}></Panel>}
-          </>
+          <ResizablePanel
+            key={accordion.id}
+            minSize={accordion.isOpen ? 100 : 35}
+            maxSize={accordion.isOpen ? 300 : 35}
+          >
+            <Accordion {...accordion} index={index} handleClick={() => toggleAccordion(index)}>
+              {getDesktopComponentByName(accordion.content as DesktopComponentsOmitted)}
+            </Accordion>
+          </ResizablePanel>
         ))}
-      </PanelGroup>
+        <ResizablePanel>
+          <span />
+        </ResizablePanel>
+      </Resizable>
     </div>
   );
 };
