@@ -1,13 +1,13 @@
-use crate::context::Context;
+// use crate::context::Context;
 
-pub trait Global: 'static {}
+// pub trait Global: 'static {}
 
-pub trait ReadGlobal {
-    fn global(ctx: &Context) -> &Self;
-}
+// pub trait ReadGlobal {
+//     fn global(ctx: &Context) -> &Self;
+// }
 
-impl<T: Global> ReadGlobal for T {
-    fn global(ctx: &Context) -> &Self {
-        ctx.global::<T>()
-    }
-}
+// impl<T: Global> ReadGlobal for T {
+//     fn global(ctx: &Context) -> &Self {
+//         ctx.global::<T>()
+//     }
+// }

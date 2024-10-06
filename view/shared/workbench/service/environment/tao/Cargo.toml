@@ -1,14 +1,9 @@
 [package]
-name = "platform_formation"
+name = "workbench_service_environment_tao"
 version = "0.1.0"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-platform_core.workspace = true
-
-fnv.workspace = true
-slotmap.workspace = true
-parking_lot.workspace = true
-anyhow.workspace = true
+platform_environment.workspace = true

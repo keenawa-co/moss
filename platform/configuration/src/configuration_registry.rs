@@ -1,8 +1,9 @@
-use std::sync::Arc;
+use std::{any::Any, sync::Arc};
 
 use hashbrown::{HashMap, HashSet};
 use lazy_regex::Regex as LazyRegex;
-use moss_std::collection::extend::MaybeExtend;
+use platform_core::base::collection::extend::MaybeExtend;
+use platform_core::context_v2::node::AnyNodeValue;
 // use platform_core::global::Global;
 use serde_json::Value;
 
@@ -445,7 +446,7 @@ pub struct ConfigurationDefaultOverrideValue {
 }
 
 /// Struct to store schema information for configuration settings.
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct ConfigurationSchemaStorage {
     /// Schema for all settings.
     all_settings_schema: HashMap<String, ConfigurationPropertySchema>,
@@ -500,7 +501,7 @@ impl ConfigurationSchemaStorage {
 }
 
 /// Registry to manage configurations and their schemas.
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct ConfigurationRegistry {
     /// Map of configuration properties.
     /// This hashmap stores the properties of configurations, indexed by their keys.
@@ -528,7 +529,15 @@ pub struct ConfigurationRegistry {
     excluded_properties: HashMap<String, RegisteredConfigurationPropertySchema>,
 }
 
-// impl Global for ConfigurationRegistry {}
+impl AnyNodeValue for ConfigurationRegistry {
+    fn as_any_ref(&self) -> &dyn Any {
+        self
+    }
+
+    fn as_any_mut(&mut self) -> &mut dyn Any {
+        self
+    }
+}
 
 impl<'a> ConfigurationRegistry {
     pub fn new() -> Self {

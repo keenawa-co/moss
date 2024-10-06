@@ -1,0 +1,20 @@
+[package]
+name = "workbench_service_configuration_tao"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+anyhow.workspace = true
+async-trait.workspace = true
+serde_json.workspace = true
+
+platform_core.workspace = true
+platform_workspace.workspace = true
+platform_user_profile.workspace = true
+platform_configuration.workspace = true
+platform_fs.workspace = true
+
+workbench_service_configuration_common.workspace = true
+workbench_service_user_profile_tao.workspace = true
