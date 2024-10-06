@@ -11,4 +11,4 @@ export * from "./DraggableAccordion";
 export * from "./SidebarHeader";
 export * from "./SidebarGeneral";
 export * from "./SidebarLinks";
-export * from "./AccordionResizableBox";
+export * from "./LaunchPad";
