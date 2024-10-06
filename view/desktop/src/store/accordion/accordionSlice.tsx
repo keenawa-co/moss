@@ -7,17 +7,18 @@ type OmittedComponents = Omit<
   "RootLayout" | "SidebarLayout" | "ContentLayout" | "PropertiesLayout"
 >;
 type DesktopComponentsOmitted = keyof OmittedComponents;
-export interface Accordion {
+export interface IAccordion {
   id: number;
   title: string;
   content: DesktopComponentsOmitted;
   isOpen?: boolean;
-  preferredHeight?: number;
 }
 
 export interface AccordionState {
-  accordion: Accordion[];
-  defaultSizes: number[];
+  accordion: IAccordion[];
+  preferredSizes: {
+    [key: number]: number;
+  };
 }
 
 const initialState: AccordionState = {
@@ -41,20 +42,22 @@ const initialState: AccordionState = {
       isOpen: false,
     },
   ],
-  defaultSizes: [35, 35, 35],
+  preferredSizes: {},
 };
 
 export const accordionSlice: Slice<AccordionState> = createSlice({
   name: "accordion",
   initialState,
   reducers: {
-    setAccordions: (state, action: PayloadAction<Accordion[]>) => {
+    setAccordions: (state, action: PayloadAction<IAccordion[]>) => {
       state.accordion = action.payload;
     },
-    setDefaultSizes: (state, action: PayloadAction<number[]>) => {
-      state.defaultSizes = action.payload;
+    setPreferredSize: (state, action: PayloadAction<{ id: number; size: number }>) => {
+      const { id, size } = action.payload;
+      const updatedPreferredSizes = { ...state.preferredSizes, [id]: size };
+      state.preferredSizes = updatedPreferredSizes;
     },
-    updateAccordionById: (state, action: PayloadAction<{ id: number; changes: Partial<Accordion> }>) => {
+    updateAccordionById: (state, action: PayloadAction<{ id: number; changes: Partial<IAccordion> }>) => {
       const { id, changes } = action.payload;
       const accordionIndex = state.accordion.findIndex((item) => item.id === id);
       if (accordionIndex !== -1) {
@@ -67,5 +70,5 @@ export const accordionSlice: Slice<AccordionState> = createSlice({
   },
 });
 
-export const { setAccordions, setDefaultSizes, updateAccordionById } = accordionSlice.actions;
+export const { setAccordions, setPreferredSize, updateAccordionById } = accordionSlice.actions;
 export default accordionSlice.reducer;
