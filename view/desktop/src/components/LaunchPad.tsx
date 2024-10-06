@@ -21,17 +21,6 @@ const getDesktopComponentByName = (name: DesktopComponentsOmitted) => {
   return <Tag />;
 };
 
-const LaunchPad = () => {
-  return (
-    <>
-      <SidebarHeader title="launchpad" />
-      <AccordionsList />
-    </>
-  );
-};
-
-export default LaunchPad;
-
 const AccordionsList = () => {
   const ref = useRef<AllotmentHandle>(null);
   const dispatch = useAppDispatch();
@@ -74,5 +63,14 @@ const AccordionsList = () => {
         </ResizablePanel>
       </Resizable>
     </div>
+  );
+};
+
+export const LaunchPad = () => {
+  return (
+    <>
+      <SidebarHeader title="launchpad" />
+      <AccordionsList />
+    </>
   );
 };

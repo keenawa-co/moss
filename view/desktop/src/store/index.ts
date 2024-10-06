@@ -1,6 +1,6 @@
 import { configureStore } from "@reduxjs/toolkit";
-import languagesReducer from "./languages/languagesSlice";
-import themesReducer from "./themes/themesSlice";
+import { languagesReducer } from "./languages";
+import { themesReducer } from "./themes";
 import { useDispatch } from "react-redux";
 import { accordionReducer } from "./accordion";
 

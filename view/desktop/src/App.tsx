@@ -1,4 +1,4 @@
-import { ContentLayout, Menu, RootLayout } from "@/components";
+import { ContentLayout, LaunchPad, Menu, RootLayout } from "@/components";
 import "@/i18n";
 import "@repo/ui/src/fonts.css";
 import { Suspense, useEffect, useState } from "react";
@@ -9,10 +9,10 @@ import { Home, Logs, Settings } from "./components/pages";
 import { RootState, useAppDispatch } from "./store";
 import { setLanguageFromLocalStorage } from "./store/languages/languagesSlice";
 import { initializeThemes } from "./store/themes";
-import LaunchPad from "./components/LaunchPad";
 
 function App() {
   const dispatch = useAppDispatch();
+
   const [sideBarVisible] = useState(true);
   const selectedTheme = useSelector((state: RootState) => state.themes.selected);
 
