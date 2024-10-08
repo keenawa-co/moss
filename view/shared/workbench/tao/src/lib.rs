@@ -3,8 +3,6 @@ pub mod window;
 
 pub mod command;
 pub mod component;
-pub mod entity;
-pub mod frame;
 
 use std::{
     any::Any,
