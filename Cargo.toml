@@ -18,6 +18,9 @@ members = [
     "view/shared/workbench/service/user_profile/tao",
     "view/shared/workbench/service/environment/tao",
 
+    "view/shared/workbench/tao/lib/crater",
+    "view/shared/workbench/tao/lib/crater/macros",
+
     "tools/xtask",
 ]
 
@@ -33,8 +36,6 @@ codegen-units = 1
 
 
 [workspace.dependencies]
-
-
 platform_core = { path = "platform/core" }
 platform_utl = { path = "platform/utl" }
 platform_configuration = { path = "platform/configuration" }
@@ -49,6 +50,9 @@ workbench_service_configuration_common = { path = "view/shared/workbench/service
 workbench_service_configuration_tao = { path = "view/shared/workbench/service/configuration/tao" }
 workbench_service_user_profile_tao = { path = "view/shared/workbench/service/user_profile/tao" }
 workbench_service_environment_tao = { path = "view/shared/workbench/service/environment/tao" }
+
+crater = { path = "view/shared/workbench/tao/lib/crater" }
+crater-macros = { path = "view/shared/workbench/tao/lib/crater/macros" }
 
 tauri = "2.0.0-rc"
 specta = "2.0.0-rc.20"
@@ -88,3 +92,9 @@ dyn-clone = "1.0.17"
 cargo_metadata = "0.18"
 pathdiff = "0.2"
 toml = "0.8.19"
+spin = "0.9.8"
+bencher = "0.1.5"
+rand = "0.8.3"
+trybuild = "1.0.23"
+serde_test = "1.0.117"
+ts-rs = "10.0"

@@ -1,0 +1,40 @@
+[package]
+name = "crater"
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+
+[features]
+default = ["std"]
+std = []
+# Enables derive(Bundle) and derive(Query)
+macros = ["crater-macros"]
+# Enables the serialize::column module
+column-serialize = ["serde"]
+# Enables the serialize::row module
+row-serialize = ["serde"]
+
+[dependencies]
+crater-macros = { path = "macros", optional = true }
+hashbrown = { workspace = true, default-features = false, features = [
+    "ahash",
+    "inline-more",
+] }
+serde = { workspace = true, default-features = false, optional = true }
+spin = { workspace = true, default-features = false, features = [
+    "mutex",
+    "spin_mutex",
+    "lazy",
+] }
+
+[dev-dependencies]
+bencher.workspace = true
+rand.workspace = true
+trybuild.workspace = true
+serde = { workspace = true, features = ["derive"] }
+serde_test.workspace = true
+
+[[bench]]
+name = "bench"
+harness = false
+required-features = ["macros"]

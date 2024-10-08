@@ -1,0 +1,25 @@
+[package]
+name = "crater-macros"
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+
+[lib]
+proc-macro = true
+
+[dependencies]
+syn = { version = "2.0", default-features = false, features = [
+    "proc-macro",
+    "parsing",
+    "printing",
+    "derive",
+    "clone-impls",
+    "visit-mut",
+] }
+quote = "1.0.3"
+proc-macro2 = "1.0.1"
+
+[dev-dependencies]
+# Remarkably, this isn't a circular dependency. Test crates coexist
+# with regular crates, even in unit tests!
+crater = { features = ["macros"], path = ".." }
