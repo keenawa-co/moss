@@ -1,80 +1,101 @@
-use std::any::TypeId;
-use std::borrow::Cow;
-use std::marker::PhantomData;
+use derive_more::{Deref, DerefMut};
 
-use hashbrown::{HashMap, HashSet};
+// new_key_type! {
+//     pub struct ViewKey;
+// }
 
-use slotmap::new_key_type;
-use slotmap::{SecondaryMap, SlotMap};
+// pub trait AnyView {}
 
-new_key_type! {
-    pub struct ViewKey;
-}
+// pub struct PropertyStore {}
 
-pub trait AnyView {}
+// pub enum ActivitySpot {
+//     Left,
+//     Right,
+// }
 
-pub struct PropertyStore {}
+// pub struct Activity {
+//     pub title: String,
+//     pub icon: String,
+//     pub spot: ActivitySpot,
+//     pub order: Option<usize>,
+// }
 
-pub enum ActivitySpot {
-    Left,
-    Right,
-}
+// pub struct ActivityView<T> {
+//     pub title: String,
+//     pub tools: Vec<String>,
+//     pub content: T,
+// }
 
-pub struct Activity {
-    name: Cow<'static, str>,
-    spot: ActivitySpot,
-    order: usize,
-}
+// pub struct Column {
+//     data: String,
+// }
 
-pub struct Part {
-    name: Cow<'static, str>,
-    typ: TypeId,
-}
+// pub struct PropertyId(Cow<'static, str>);
 
-impl Part {
-    pub fn new<T: 'static>(name: impl Into<Cow<'static, str>>) -> Self {
-        Self {
-            name: name.into(),
-            typ: TypeId::of::<T>(),
-        }
-    }
-}
+// pub struct Table {
+//     columns: HashMap<PropertyId, Column>,
+//     components: Vec<String>,
+// }
 
-pub type PartId = usize;
+// pub struct CompositeComponentSet {
+//     table: Table,
+// }
 
-pub struct PartSet {
-    parts: HashMap<PartId, Part>,
-}
+// pub struct Part {
+//     name: Cow<'static, str>,
+//     typ: TypeId,
+// }
 
-pub struct View {}
+// impl Part {
+//     pub fn new<T: 'static>(name: impl Into<Cow<'static, str>>) -> Self {
+//         Self {
+//             name: name.into(),
+//             typ: TypeId::of::<T>(),
+//         }
+//     }
+// }
 
-pub struct Component {}
+// pub type PartId = usize;
 
-pub enum Orientation {
-    Vertical,
-    Horizontal,
-}
+// pub struct PartSet {
+//     parts: HashMap<PartId, Part>,
+// }
 
-pub struct ActivityBar {
-    orientation: Orientation,
-    icon_size: f32,
-    content: HashSet<SideBarViewSet>,
-}
+// pub struct View {}
 
-pub struct SideBarViewSet {
-    icon: String,
-    title: String,
-    tool_list: Vec<String>,
-    content: HashSet<SideBarView>,
-}
+// pub struct Component {}
 
-pub struct SideBarView {
-    toolbar: Vec<String>,
-}
+// pub enum Orientation {
+//     Vertical,
+//     Horizontal,
+// }
 
-pub struct ActivityBarItem {
-    // id
-    // title
-    // order
-    // container: View
-}
+// pub struct ActivityBar {
+//     orientation: Orientation,
+//     icon_size: f32,
+//     content: HashSet<SideBarViewSet>,
+// }
+
+// pub struct SideBarViewSet {
+//     icon: String,
+//     title: String,
+//     tool_list: Vec<String>,
+//     content: HashSet<SideBarView>,
+// }
+
+// pub struct SideBarView {
+//     toolbar: Vec<String>,
+// }
+
+// pub struct ActivityBarItem {
+//     // id
+//     // title
+//     // order
+//     // container: View
+// }
+
+#[derive(Deref, DerefMut, Debug, Copy, Clone, Default, Eq, PartialEq)]
+pub struct Tooltip(pub &'static str);
+
+#[derive(Deref, DerefMut, Debug, Copy, Clone, Default, Eq, PartialEq)]
+pub struct Order(pub usize);

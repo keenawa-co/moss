@@ -58,23 +58,46 @@ impl ComponentMetadata {
             drop_fn: drop_ptr::<T>,
         }
     }
+
+    pub fn id(&self) -> ComponentId {
+        self.id
+    }
 }
 
 pub struct ComponentSet {
-    infos: HashMap<ComponentId, ComponentMetadata>,
+    metadata: HashMap<ComponentId, ComponentMetadata>,
     type_to_id: HashMap<TypeId, ComponentId>,
 }
 
 impl ComponentSet {
     pub fn new() -> Self {
         Self {
-            infos: HashMap::new(),
+            metadata: HashMap::new(),
             type_to_id: HashMap::new(),
         }
     }
 
+    pub fn register<T: 'static>(&mut self) -> ComponentId {
+        let type_id = TypeId::of::<T>();
+        if let Some(&id) = self.type_to_id.get(&type_id) {
+            return id;
+        }
+
+        let metadata = ComponentMetadata::new::<T>();
+        let id = metadata.id();
+
+        self.metadata.insert(id, metadata);
+        self.type_to_id.insert(type_id, id);
+
+        id
+    }
+
     pub fn get_metadata(&self, id: &ComponentId) -> Option<&ComponentMetadata> {
-        self.infos.get(id)
+        self.metadata.get(id)
+    }
+
+    pub fn get_id<T: 'static>(&self) -> Option<ComponentId> {
+        self.type_to_id.get(&TypeId::of::<T>()).cloned()
     }
 }
 
@@ -140,6 +163,29 @@ impl Column {
             self.cap * 2 // TODO: use this value as a const
         };
 
+        let new_size = self.layout.size() * new_capacity;
+        let new_layout = Layout::from_size_align(new_size, self.layout.align()).unwrap();
+
+        let new_ptr = if self.cap == 0 {
+            alloc(new_layout)
+        } else {
+            realloc(
+                self.data.as_ptr(),
+                Layout::from_size_align(self.layout.size() * self.cap, self.layout.align())
+                    .unwrap(),
+                new_size,
+            )
+        };
+
+        if new_ptr.is_null() {
+            handle_alloc_error(new_layout);
+        }
+
+        self.data = NonNull::new_unchecked(new_ptr);
+        self.cap = new_capacity;
+    }
+
+    unsafe fn resize(&mut self, new_capacity: usize) {
         let new_size = self.layout.size() * new_capacity;
         let new_layout = Layout::from_size_align(new_size, self.layout.align()).unwrap();
 
@@ -231,5 +277,145 @@ impl Table {
         self.view_indices.insert(view.ident.clone(), index);
 
         TableRow::new(index as u32)
+    }
+
+    fn get_row(&self, ident: &str) -> Option<TableRow> {
+        self.view_indices
+            .get(ident)
+            .map(|&index| TableRow::new(index as u32))
+    }
+}
+
+// --------------
+
+pub struct Storage {
+    components: ComponentSet,
+    tables: HashMap<TableId, Table>,
+
+    next_table_id: u32,
+    next_view_id: u32,
+}
+
+impl Storage {
+    pub fn new() -> Self {
+        Self {
+            components: ComponentSet::new(),
+            tables: HashMap::new(),
+            next_table_id: 0,
+            next_view_id: 0,
+        }
+    }
+
+    pub fn register_component<T: 'static>(&mut self) -> ComponentId {
+        self.components.register::<T>()
+    }
+
+    pub fn create_table(&mut self, components_ids: &[ComponentId], capacity: usize) -> TableId {
+        let table_id = TableId::new(self.next_table_id);
+        self.next_table_id += 1;
+
+        let table = Table::new(components_ids, &self.components, capacity);
+        self.tables.insert(table_id, table);
+
+        table_id
+    }
+
+    pub fn create_view(&mut self, table_id: TableId, ident: String) -> Option<(View, TableRow)> {
+        let table = self.tables.get_mut(&table_id)?;
+        let view = View::new(self.next_view_id, ident);
+
+        self.next_view_id += 1;
+
+        let row = table.add_view(view.clone());
+
+        Some((view, row))
+    }
+
+    pub fn set_component<T: 'static>(
+        &mut self,
+        table_id: TableId,
+        row: TableRow,
+        value: T,
+    ) -> Result<(), String> {
+        let component_id = self
+            .components
+            .get_id::<T>()
+            .ok_or("Component not registered")?;
+        let table = self.tables.get_mut(&table_id).ok_or("Table not found")?;
+        let column = table
+            .columns
+            .get_mut(&component_id)
+            .ok_or("Component not found in table")?;
+
+        let index = row.0 as usize;
+
+        unsafe {
+            if index >= column.cap {
+                column.resize(index + 1);
+            }
+
+            let dst = column.get_ptr(index) as *mut T;
+            ptr::write(dst, value);
+            if index >= column.len {
+                column.len = index + 1;
+            }
+        }
+
+        Ok(())
+    }
+
+    fn get_component<T: 'static>(&self, table_id: TableId, row: TableRow) -> Option<&T> {
+        let component_id = self.components.get_id::<T>()?;
+        let table = self.tables.get(&table_id)?;
+        let column = table.columns.get(&component_id)?;
+
+        let index = row.0 as usize;
+        if index >= column.len {
+            return None;
+        }
+
+        unsafe {
+            let ptr = column.get_ptr(index) as *const T;
+            Some(&*ptr)
+        }
+    }
+
+    fn get_row(&self, table_id: TableId, ident: &str) -> Option<TableRow> {
+        self.tables.get(&table_id)?.get_row(ident)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    struct TestTooltipComponent(String);
+    struct TestOrderComponent(u32);
+
+    #[test]
+    fn simple_test() {
+        let mut storages = Storage::new();
+
+        let tooltip_id = storages.register_component::<TestTooltipComponent>();
+        let order_id = storages.register_component::<TestOrderComponent>();
+
+        let component_ids = vec![tooltip_id, order_id];
+        let table_id = storages.create_table(&component_ids, 10);
+
+        let identifier = "activityBar.launchpad".to_string();
+        let (entity, row) = storages.create_view(table_id, identifier.clone()).unwrap();
+
+        storages
+            .set_component(table_id, row, TestTooltipComponent("Launchpad".to_string()))
+            .unwrap();
+        storages
+            .set_component(table_id, row, TestOrderComponent(1))
+            .unwrap();
+
+        let row = storages.get_row(table_id, &identifier).unwrap();
+
+        if let Some(tooltip) = storages.get_component::<TestTooltipComponent>(table_id, row) {
+            println!("Tooltip: {}", tooltip.0);
+        }
     }
 }

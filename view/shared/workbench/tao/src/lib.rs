@@ -1,10 +1,14 @@
 pub mod contribution;
 pub mod window;
 
-mod component;
+pub mod command;
+pub mod component;
+pub mod entity;
+pub mod frame;
 
 use std::{
     any::Any,
+    borrow::Cow,
     cell::{Cell, RefCell},
     path::PathBuf,
     rc::Rc,
@@ -12,8 +16,10 @@ use std::{
 };
 
 use anyhow::Result;
-use component::{ActivityBar, Part, View, ViewKey};
+use component::{Order, Tooltip};
 use contribution::WORKBENCH_TAO_WINDOW;
+use crater::{Entity, EntityBuilder, EntityBuilderClone, Frame};
+use hashbrown::{HashMap, HashSet};
 use once_cell::unsync::OnceCell;
 use platform_configuration::{
     attribute_name, configuration_policy::ConfigurationPolicyService,
@@ -67,13 +73,14 @@ impl MockFontSizeService {
     }
 }
 
-#[derive(Debug, Type, Serialize)]
+#[derive(Debug, Serialize)]
 pub enum WorkbenchState {
     Empty,
     Workspace,
 }
 
 pub struct Workbench {
+    frame: Frame,
     workspace_id: WorkspaceId,
     service_registry: Rc<RefCell<ServiceRegistry>>,
     configuration_registry: Atom<ConfigurationRegistry>,
@@ -84,7 +91,7 @@ pub struct Workbench {
     // sizes: SecondaryMap<ViewKey, S>
     // known_views: SlotMap<ViewKey, View>,
     // activity_bar_part: Part<ActivityBar>,
-    // known_activities:
+    known_activities: HashSet<Entity>,
 }
 
 unsafe impl<'a> Sync for Workbench {}
@@ -117,16 +124,35 @@ impl Workbench {
         })?;
 
         Ok(Self {
+            frame: Frame::new(),
             workspace_id,
             service_registry: Rc::new(RefCell::new(service_registry)),
             configuration_registry,
             font_size_service: font_service_atom,
             _observe_font_size_service: OnceCell::new(),
             tao_handle: OnceCell::new(),
+            known_activities: HashSet::new(),
         })
     }
 
-    pub fn initialize<'a>(&'a self, ctx: &mut AsyncContext) -> Result<()> {
+    pub fn initialize<'a>(&'a mut self, ctx: &mut AsyncContext) -> Result<()> {
+        let activity_launchpad_entity = {
+            let mut entity = EntityBuilder::new();
+            entity.add(Tooltip("Launchpad")).add(Order(1));
+
+            self.frame.spawn(entity.build())
+        };
+
+        let activity_essentials_entity = {
+            let mut entity = EntityBuilder::new();
+            entity.add(Tooltip("Essentials")).add(Order(1));
+
+            self.frame.spawn(entity.build())
+        };
+
+        self.known_activities.insert(activity_launchpad_entity);
+        self.known_activities.insert(activity_essentials_entity);
+
         // let cell = async_ctx
         //     .upgrade()
         //     .ok_or_else(|| anyhow!("context was released"))?;
