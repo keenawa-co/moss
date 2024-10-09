@@ -1,6 +1,9 @@
 [workspace]
 resolver = "2"
 members = [
+    "lib-rs/moss_uikit",
+    "lib-rs/moss_ui",
+
     "platform/core",
     "platform/fs",
     "platform/formation",
@@ -18,9 +21,6 @@ members = [
     "view/shared/workbench/service/user_profile/tao",
     "view/shared/workbench/service/environment/tao",
 
-    # "view/shared/workbench/tao/lib/moss_hecs",
-    # "view/shared/workbench/tao/lib/moss_hecs/macros",
-
     "tools/xtask",
 ]
 
@@ -36,6 +36,12 @@ codegen-units = 1
 
 
 [workspace.dependencies]
+moss_hecs = { git = "https://github.com/keenawa-co/moss_hecs.git", branch = "master" }
+moss_hecs_hierarchy = { git = "https://github.com/keenawa-co/moss_hecs_hierarchy.git", branch = "main" }
+
+moss_uikit = { path = "lib-rs/moss_uikit" }
+moss_ui = { path = "lib-rs/moss_ui" }
+
 platform_core = { path = "platform/core" }
 platform_utl = { path = "platform/utl" }
 platform_configuration = { path = "platform/configuration" }
@@ -50,8 +56,6 @@ workbench_service_configuration_common = { path = "view/shared/workbench/service
 workbench_service_configuration_tao = { path = "view/shared/workbench/service/configuration/tao" }
 workbench_service_user_profile_tao = { path = "view/shared/workbench/service/user_profile/tao" }
 workbench_service_environment_tao = { path = "view/shared/workbench/service/environment/tao" }
-
-moss_hecs = { git = "https://github.com/keenawa-co/moss_hecs.git", branch = "master" }
 
 tauri = "2.0.0-rc"
 specta = "2.0.0-rc.20"

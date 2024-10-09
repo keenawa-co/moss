@@ -5,6 +5,7 @@ edition = "2021"
 
 
 [dependencies]
+moss_hecs = { workspace = true, features = ["macros", "hierarchy"] }
 serde = { workspace = true, features = ["derive"] }
 serde_json.workspace = true
 sysinfo.workspace = true
@@ -17,8 +18,6 @@ slotmap.workspace = true
 specta.workspace = true
 derive_more.workspace = true
 ts-rs.workspace = true
-
-moss_hecs.workspace = true
 
 platform_core.workspace = true
 platform_fs.workspace = true

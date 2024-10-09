@@ -422,6 +422,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1505bd5d3d116872e7271a6d4e16d81d0c8570876c8de68093a09ac269d8aac0"
 
 [[package]]
+name = "atomic_refcell"
+version = "0.1.13"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "41e67cd8309bbd06cd603a9e693a784ac2e5d1e955f11286e355089fcab3047c"
+
+[[package]]
 name = "autocfg"
 version = "1.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3231,7 +3237,53 @@ version = "0.10.5"
 source = "git+https://github.com/keenawa-co/moss_hecs.git?branch=master#d81cfd62b2a510468218cf1e30d293764cc7c140"
 dependencies = [
  "hashbrown 0.14.5",
+ "moss_hecs_macros",
  "spin 0.9.8",
+]
+
+[[package]]
+name = "moss_hecs_hierarchy"
+version = "0.12.1"
+source = "git+https://github.com/keenawa-co/moss_hecs_hierarchy.git?branch=main#8d6ec67b0dbfe44769bb3063ecacc6097fa92941"
+dependencies = [
+ "moss_hecs",
+ "moss_hecs_schedule",
+ "once_cell",
+ "smallvec",
+]
+
+[[package]]
+name = "moss_hecs_macros"
+version = "0.10.0"
+source = "git+https://github.com/keenawa-co/moss_hecs.git?branch=master#d81cfd62b2a510468218cf1e30d293764cc7c140"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 2.0.79",
+]
+
+[[package]]
+name = "moss_hecs_schedule"
+version = "0.7.0"
+source = "git+https://github.com/keenawa-co/moss_hecs_schedule.git?branch=main#22ff4e884b1f7e97ec4d10f685b4839e0214b34f"
+dependencies = [
+ "anyhow",
+ "atomic_refcell",
+ "moss_hecs",
+ "smallvec",
+ "thiserror",
+]
+
+[[package]]
+name = "moss_ui"
+version = "0.1.0"
+
+[[package]]
+name = "moss_uikit"
+version = "0.1.0"
+dependencies = [
+ "derive_more",
+ "ts-rs",
 ]
 
 [[package]]
@@ -7716,6 +7768,9 @@ dependencies = [
  "hashbrown 0.14.5",
  "lazy_static",
  "moss_hecs",
+ "moss_hecs_hierarchy",
+ "moss_ui",
+ "moss_uikit",
  "once_cell",
  "platform_configuration",
  "platform_core",
