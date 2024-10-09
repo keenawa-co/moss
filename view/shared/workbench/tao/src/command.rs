@@ -2,10 +2,9 @@ use anyhow::Result;
 use moss_hecs::MissingComponent;
 use ts_rs::TS;
 
-use crate::{
-    component::{Order, Tooltip},
-    Workbench,
-};
+use moss_uikit::{primitive::Tooltip, state::Order};
+
+use crate::Workbench;
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize, TS)]
 #[serde(rename_all = "camelCase")]
@@ -22,17 +21,17 @@ impl Workbench {
         for entity in &self.known_activities {
             let entity_ref = self.frame.entity(*entity)?;
 
-            let r = entity_ref
+            let tooltip = entity_ref
                 .get::<&Tooltip>()
                 .ok_or_else(|| MissingComponent::new::<Tooltip>())?;
 
-            let r2 = entity_ref
+            let order = entity_ref
                 .get::<&Order>()
                 .ok_or_else(|| MissingComponent::new::<Order>())?;
 
             result.push(DescribeActivityOutput {
-                tooltip: r.0.to_string(),
-                order: r2.0.clone(),
+                tooltip: tooltip.text.to_string(),
+                order: order.value.clone(),
             });
         }
 

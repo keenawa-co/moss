@@ -2,11 +2,9 @@ pub mod contribution;
 pub mod window;
 
 pub mod command;
-pub mod component;
 
 use std::{
     any::Any,
-    borrow::Cow,
     cell::{Cell, RefCell},
     path::PathBuf,
     rc::Rc,
@@ -14,10 +12,11 @@ use std::{
 };
 
 use anyhow::Result;
-use component::{Order, Tooltip};
 use contribution::WORKBENCH_TAO_WINDOW;
 use hashbrown::HashSet;
 use moss_hecs::{Entity, EntityBuilder, Frame};
+use moss_hecs_hierarchy::*;
+use moss_uikit::{primitive::Tooltip, state::Order};
 use once_cell::unsync::OnceCell;
 use platform_configuration::{
     attribute_name, configuration_policy::ConfigurationPolicyService,
@@ -134,14 +133,18 @@ impl Workbench {
     pub fn initialize<'a>(&'a mut self, ctx: &mut AsyncContext) -> Result<()> {
         let activity_launchpad_entity = {
             let mut entity = EntityBuilder::new();
-            entity.add(Tooltip("Launchpad")).add(Order(1));
+            entity
+                .add(Tooltip { text: "Launchpad" })
+                .add(Order { value: 1 });
 
             self.frame.spawn(entity.build())
         };
 
         let activity_essentials_entity = {
             let mut entity = EntityBuilder::new();
-            entity.add(Tooltip("Essentials")).add(Order(1));
+            entity
+                .add(Tooltip { text: "Essentials" })
+                .add(Order { value: 2 });
 
             self.frame.spawn(entity.build())
         };
