@@ -1,5 +1,5 @@
 use anyhow::Result;
-use crater::MissingComponent;
+use moss_hecs::MissingComponent;
 use ts_rs::TS;
 
 use crate::{

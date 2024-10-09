@@ -16,8 +16,8 @@ use std::{
 use anyhow::Result;
 use component::{Order, Tooltip};
 use contribution::WORKBENCH_TAO_WINDOW;
-use crater::{Entity, EntityBuilder, EntityBuilderClone, Frame};
-use hashbrown::{HashMap, HashSet};
+use hashbrown::HashSet;
+use moss_hecs::{Entity, EntityBuilder, Frame};
 use once_cell::unsync::OnceCell;
 use platform_configuration::{
     attribute_name, configuration_policy::ConfigurationPolicyService,
@@ -33,8 +33,6 @@ use platform_fs::disk::file_system_service::{
 };
 use platform_user_profile::user_profile_service::UserProfileService as PlatformUserProfileService;
 use platform_workspace::{Workspace, WorkspaceId};
-use slotmap::{SecondaryMap, SlotMap};
-use specta::Type;
 use tauri::{AppHandle, Emitter, WebviewWindow};
 use workbench_service_configuration_tao::configuration_service::WorkspaceConfigurationService;
 use workbench_service_environment_tao::environment_service::NativeEnvironmentService;

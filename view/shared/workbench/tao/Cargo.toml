@@ -18,7 +18,7 @@ specta.workspace = true
 derive_more.workspace = true
 ts-rs.workspace = true
 
-crater.workspace = true
+moss_hecs.workspace = true
 
 platform_core.workspace = true
 platform_fs.workspace = true
