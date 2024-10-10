@@ -1,4 +1,4 @@
-import { PayloadAction, Slice, createSlice } from "@reduxjs/toolkit";
+import { PayloadAction, Slice, createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import i18n from "@/i18n";
 import { LANGUAGES } from "@/constants";
 
@@ -11,6 +11,22 @@ export interface LanguagesState {
 const initialState: LanguagesState = {
   code: "en",
 };
+
+export const setLanguageFromLocalStorage = createAsyncThunk(
+  "languages/setLanguageFromLocalStorage",
+  async (_, { dispatch }) => {
+    let savedLanguage = localStorage.getItem("language") as LanguageCodes | null;
+
+    if (!savedLanguage || !LANGUAGES.some(({ code }) => code === savedLanguage)) {
+      savedLanguage = "en";
+      localStorage.setItem("language", savedLanguage);
+    }
+
+    i18n.changeLanguage(savedLanguage);
+    dispatch(setLanguage(savedLanguage));
+  }
+);
+
 export const languagesSlice: Slice<LanguagesState> = createSlice({
   name: "languages",
   initialState,
@@ -22,19 +38,8 @@ export const languagesSlice: Slice<LanguagesState> = createSlice({
       i18n.changeLanguage(newLanguage);
       state.code = newLanguage;
     },
-    setLanguageFromLocalStorage: (state) => {
-      let savedLanguage = localStorage.getItem("language") as LanguageCodes | null;
-
-      if (!savedLanguage || !LANGUAGES.some(({ code }) => code === savedLanguage)) {
-        savedLanguage = "en";
-        localStorage.setItem("language", savedLanguage);
-      }
-
-      i18n.changeLanguage(savedLanguage);
-      state.code = savedLanguage;
-    },
   },
 });
 
-export const { setLanguage, setLanguageFromLocalStorage } = languagesSlice.actions;
+export const { setLanguage } = languagesSlice.actions;
 export default languagesSlice.reducer;

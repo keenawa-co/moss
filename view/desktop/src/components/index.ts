@@ -7,3 +7,8 @@ export * from "./TitleBar";
 export * from "./LanguageSelector";
 export * from "./ThemeSelector";
 export * from "./Sidebar";
+export * from "./DraggableAccordion";
+export * from "./SidebarHeader";
+export * from "./SidebarGeneral";
+export * from "./SidebarLinks";
+export * from "./LaunchPad";
