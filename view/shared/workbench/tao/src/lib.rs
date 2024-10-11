@@ -16,7 +16,10 @@ use contribution::WORKBENCH_TAO_WINDOW;
 use hashbrown::HashSet;
 use moss_hecs::{Entity, EntityBuilder, Frame};
 use moss_hecs_hierarchy::*;
-use moss_uikit::{primitive::Tooltip, state::Order};
+use moss_uikit::{
+    layout::Order,
+    primitive::{Link, Tooltip},
+};
 use once_cell::unsync::OnceCell;
 use platform_configuration::{
     attribute_name, configuration_policy::ConfigurationPolicyService,
@@ -134,7 +137,18 @@ impl Workbench {
         let activity_launchpad_entity = {
             let mut entity = EntityBuilder::new();
             entity
-                .add(Tooltip { text: "Launchpad" })
+                .add(Tooltip {
+                    header: "Launchpad",
+                    text: Some(
+                        "Explain behavior that is not clear from the setting or action name.",
+                    ),
+                    shortcut: Some("⌘⌥A"),
+                    link: Some(Link {
+                        title: Some("External"),
+                        href: "google.com",
+                        description: None,
+                    }),
+                })
                 .add(Order { value: 1 });
 
             self.frame.spawn(entity.build())
@@ -143,11 +157,16 @@ impl Workbench {
         let activity_essentials_entity = {
             let mut entity = EntityBuilder::new();
             entity
-                .add(Tooltip { text: "Essentials" })
+                .add(Tooltip {
+                    header: "Essentials",
+                    ..Default::default()
+                })
                 .add(Order { value: 2 });
 
             self.frame.spawn(entity.build())
         };
+
+        // self.frame.attach(child, parent)
 
         self.known_activities.insert(activity_launchpad_entity);
         self.known_activities.insert(activity_essentials_entity);

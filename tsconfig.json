@@ -24,6 +24,9 @@
     },
     {
       "path": "sdk/ts"
+    },
+    {
+      "path": "lib-rs/moss_uikit"
     }
   ]
 }

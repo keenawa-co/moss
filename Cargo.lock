@@ -3277,12 +3277,19 @@ dependencies = [
 [[package]]
 name = "moss_ui"
 version = "0.1.0"
+dependencies = [
+ "moss_hecs",
+ "moss_uikit",
+ "serde",
+ "specta",
+ "ts-rs",
+]
 
 [[package]]
 name = "moss_uikit"
 version = "0.1.0"
 dependencies = [
- "derive_more",
+ "serde",
  "ts-rs",
 ]
 
