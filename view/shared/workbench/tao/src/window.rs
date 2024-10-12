@@ -1,9 +1,8 @@
 use specta::Type;
 use std::path::PathBuf;
 use sysinfo::System;
-use ts_rs::TS;
 
-#[derive(Debug, Clone, Serialize, TS)]
+#[derive(Debug, Clone, Serialize)]
 pub struct NativePlatformInfo {
     pub os: String,
     pub version: String,

@@ -7,11 +7,12 @@ edition = "2021"
 
 [build-dependencies]
 specta.workspace = true
+specta-typescript = "0.0.7"
 
 [dependencies]
 moss_uikit.workspace = true
 moss_hecs.workspace = true
 
-ts-rs.workspace = true
+specta-typescript = "0.0.7"
 serde = { workspace = true, features = ["derive"] }
 specta.workspace = true

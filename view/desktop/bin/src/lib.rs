@@ -21,7 +21,6 @@ use std::sync::Arc;
 use surrealdb::engine::remote::ws::Client;
 use surrealdb::{engine::remote::ws::Ws, Surreal};
 use tauri::{App, Manager};
-use tauri_specta::{collect_commands, collect_events, Builder};
 use workbench_service_environment_tao::environment_service::NativeEnvironmentService;
 use workbench_tao::window::{NativePlatformInfo, NativeWindowConfiguration};
 use workbench_tao::Workbench;

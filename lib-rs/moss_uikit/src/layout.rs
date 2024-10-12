@@ -1,16 +1,14 @@
 use serde::Serialize;
-use ts_rs::TS;
+use specta::Type;
 
-#[derive(Serialize, Debug, Clone, Default, Eq, PartialEq, TS)]
+#[derive(Serialize, Debug, Clone, Default, Eq, PartialEq, Type)]
 #[serde(rename_all = "camelCase")]
-#[ts(export, export_to = "components/layout.ts")]
 pub struct Order {
     pub value: usize,
 }
 
-#[derive(Serialize, Debug, Clone, Eq, PartialEq, TS)]
-#[serde(tag = "type", rename_all = "snake_case")]
-#[ts(export, export_to = "components/layout.ts")]
+#[derive(Serialize, Debug, Clone, Eq, PartialEq, Type)]
+#[serde(rename_all = "camelCase")]
 pub enum Alignment {
     Top,
     Right,
@@ -18,11 +16,10 @@ pub enum Alignment {
     Left,
 }
 
-#[derive(Serialize, Debug, Clone, Eq, PartialEq, TS)]
-#[serde(tag = "type", rename_all = "snake_case")]
-#[ts(export, export_to = "components/layout.ts")]
+#[derive(Serialize, Debug, Clone, Eq, PartialEq, Type)]
+#[serde(rename_all = "camelCase")]
 pub enum Visibility {
     Visible,
-    Hidden,
+    Invisible,
     Collapse,
 }

@@ -22,12 +22,16 @@ members = [
     "view/shared/workbench/service/environment/tao",
 
     "tools/xtask",
+    "tools/bindexp",
 ]
 
 # [profile.dev]
 # split-debuginfo = "unpacked"
 # debug = "limited"
 # codegen-units = 16
+
+[profile.dev]
+incremental = true
 
 [profile.release]
 debug = "limited"
@@ -60,6 +64,7 @@ workbench_service_environment_tao = { path = "view/shared/workbench/service/envi
 
 tauri = "2.0.0-rc"
 specta = "2.0.0-rc.20"
+specta-typescript = "0.0.7"
 libc = "0.2.155"
 fnv = "1.0.7"
 anyhow = "1.0"
@@ -93,12 +98,3 @@ waker-fn = "1.2.0"
 im = "15.1.0"
 smallvec = "1.13.2"
 dyn-clone = "1.0.17"
-cargo_metadata = "0.18"
-pathdiff = "0.2"
-toml = "0.8.19"
-spin = "0.9.8"
-bencher = "0.1.5"
-rand = "0.8.3"
-trybuild = "1.0.23"
-serde_test = "1.0.117"
-ts-rs = "10.0"

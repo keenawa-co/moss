@@ -1,14 +1,12 @@
 use anyhow::Result;
 use moss_hecs::MissingComponent;
-use ts_rs::TS;
 
 use moss_uikit::{layout::Order, primitive::Tooltip};
 
 use crate::Workbench;
 
-#[derive(Debug, Clone, Default, Serialize, TS)]
+#[derive(Debug, Clone, Default, Serialize)]
 #[serde(rename_all = "camelCase")]
-#[ts(export, export_to = "dummy.ts")]
 pub struct DescribeActivityOutput {
     pub tooltip: Tooltip,
     pub order: usize,
