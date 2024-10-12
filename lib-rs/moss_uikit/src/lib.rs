@@ -1,9 +1,8 @@
-pub mod layout;
-pub mod primitive;
+pub mod component;
 
 use anyhow::Result;
-use layout::*;
-use primitive::*;
+use component::{layout::*, primitive::*};
+
 use specta::Language;
 use specta_typescript::{export, Typescript};
 use std::{

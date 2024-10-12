@@ -1,7 +1,7 @@
 use anyhow::Result;
 use moss_hecs::MissingComponent;
 
-use moss_uikit::{layout::Order, primitive::Tooltip};
+use moss_uikit::component::{layout::Order, primitive::Tooltip};
 
 use crate::Workbench;
 

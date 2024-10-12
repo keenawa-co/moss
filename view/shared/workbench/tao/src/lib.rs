@@ -15,8 +15,7 @@ use anyhow::Result;
 use contribution::WORKBENCH_TAO_WINDOW;
 use hashbrown::HashSet;
 use moss_hecs::{Entity, EntityBuilder, Frame};
-use moss_hecs_hierarchy::*;
-use moss_uikit::{
+use moss_uikit::component::{
     layout::Order,
     primitive::{Link, Tooltip},
 };
