@@ -3,6 +3,7 @@ resolver = "2"
 members = [
     "lib-rs/moss_uikit",
     "lib-rs/moss_ui",
+    "lib-rs/moss_specta_export",
 
     "platform/core",
     "platform/fs",
@@ -46,6 +47,7 @@ moss_hecs_hierarchy = { git = "https://github.com/keenawa-co/moss_hecs_hierarchy
 
 moss_uikit = { path = "lib-rs/moss_uikit" }
 moss_ui = { path = "lib-rs/moss_ui" }
+moss_specta_export = { path = "lib-rs/moss_specta_export" }
 
 platform_core = { path = "platform/core" }
 platform_utl = { path = "platform/utl" }
