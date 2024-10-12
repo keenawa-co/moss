@@ -3287,7 +3287,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "moss_specta_export"
+name = "moss_specta"
 version = "0.1.0"
 dependencies = [
  "anyhow",
@@ -3311,7 +3311,7 @@ name = "moss_uikit"
 version = "0.1.0"
 dependencies = [
  "anyhow",
- "moss_specta_export",
+ "moss_specta",
  "serde",
  "specta",
  "specta-typescript",

@@ -3,7 +3,7 @@ pub mod component;
 use anyhow::Result;
 use component::{layout::*, primitive::*};
 
-use moss_specta_export::ExportGroup;
+use moss_specta::ExportGroup;
 use specta_typescript::{export, Typescript};
 use std::path::PathBuf;
 
@@ -27,7 +27,7 @@ pub fn export_ts_bindings(conf: &Typescript) -> Result<()> {
     );
     primitive_group.export(&dir, conf)?;
 
-    Ok(moss_specta_export::create_index_file(
+    Ok(moss_specta::create_index_file(
         &dir,
         &[layout_group.path(), primitive_group.path()],
     )?)
