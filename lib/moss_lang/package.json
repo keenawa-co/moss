@@ -1,0 +1,17 @@
+{
+  "name": "@repo/moss-lang",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "interface": "i18next-resources-for-ts interface -i ../../view/desktop/public/locales/en -o ./types/resources.d.ts"
+  },
+  "devDependencies": {
+    "@repo/typescript-config": "workspace:*"
+  },
+  "dependencies": {
+    "i18next-resources-for-ts": "^1.5.0",
+    "typescript": "^5.5.4"
+  }
+}
