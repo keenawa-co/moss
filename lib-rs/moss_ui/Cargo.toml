@@ -7,9 +7,7 @@ edition = "2021"
 
 [dependencies]
 moss_uikit.workspace = true
-moss_specta.workspace = true
 
-typeshare = "1.0.0"
 anyhow.workspace = true
 serde = { workspace = true, features = ["derive"] }
 specta.workspace = true

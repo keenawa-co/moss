@@ -4,7 +4,6 @@ use moss_uikit::component::{
 };
 use serde::Serialize;
 use specta::Type;
-use typeshare::typeshare;
 
 use super::common::ContextMenu;
 

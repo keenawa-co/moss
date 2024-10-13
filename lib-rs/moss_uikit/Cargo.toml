@@ -7,10 +7,7 @@ edition = "2021"
 
 
 [dependencies]
-typeshare = "1.0.0"
-
 anyhow.workspace = true
 specta.workspace = true
 specta-typescript.workspace = true
 serde = { workspace = true, features = ["derive"] }
-moss_specta.workspace = true

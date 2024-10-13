@@ -5,7 +5,6 @@ mod menu;
 mod service;
 
 use anyhow::{Context as _, Result};
-use command::cmd_sidebar_part;
 use platform_core::context_v2::async_context::AsyncContext;
 use platform_core::context_v2::ContextCell;
 use platform_core::platform::cross::client::CrossPlatformClient;
@@ -103,7 +102,6 @@ fn initialize_app(
             cmd_dummy::fetch_all_themes,
             cmd_dummy::read_theme,
             cmd_base::native_platform_info,
-            cmd_sidebar_part::sidebar_get_all_activities,
             cmd_base::describe_toolbar_part,
         ])
         .setup(move |app: &mut App| setup_app(app, ctx, service_group, db, platform_info_clone))
