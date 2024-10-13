@@ -2,7 +2,7 @@ use specta::Type;
 use std::path::PathBuf;
 use sysinfo::System;
 
-#[derive(Debug, Clone, Type, Serialize)]
+#[derive(Debug, Clone, Serialize)]
 pub struct NativePlatformInfo {
     pub os: String,
     pub version: String,
@@ -27,4 +27,10 @@ pub struct NativeWindowConfiguration {
     pub home_dir: PathBuf,
     pub full_screen: bool,
     pub platform_info: NativePlatformInfo,
+}
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn simple_test() {}
 }
