@@ -1,6 +1,9 @@
 pub mod contribution;
 pub mod window;
 
+pub mod command;
+pub mod parts;
+
 use std::{
     any::Any,
     cell::{Cell, RefCell},
@@ -11,6 +14,14 @@ use std::{
 
 use anyhow::Result;
 use contribution::WORKBENCH_TAO_WINDOW;
+use hashbrown::HashSet;
+use moss_hecs::{Entity, EntityBuilder, Frame};
+use moss_hecs_hierarchy::HierarchyMut;
+use moss_uikit::component::{
+    accessibility::Action,
+    layout::Order,
+    primitive::{Link, Text, Tooltip},
+};
 use once_cell::unsync::OnceCell;
 use platform_configuration::{
     attribute_name, configuration_policy::ConfigurationPolicyService,
@@ -26,7 +37,6 @@ use platform_fs::disk::file_system_service::{
 };
 use platform_user_profile::user_profile_service::UserProfileService as PlatformUserProfileService;
 use platform_workspace::{Workspace, WorkspaceId};
-use specta::Type;
 use tauri::{AppHandle, Emitter, WebviewWindow};
 use workbench_service_configuration_tao::configuration_service::WorkspaceConfigurationService;
 use workbench_service_environment_tao::environment_service::NativeEnvironmentService;
@@ -63,13 +73,16 @@ impl MockFontSizeService {
     }
 }
 
-#[derive(Debug, Type, Serialize)]
+#[derive(Debug, Serialize)]
 pub enum WorkbenchState {
     Empty,
     Workspace,
 }
 
+pub struct ToolBarProjectContextMenuMarker;
+
 pub struct Workbench {
+    pub frame: Frame,
     workspace_id: WorkspaceId,
     service_registry: Rc<RefCell<ServiceRegistry>>,
     configuration_registry: Atom<ConfigurationRegistry>,
@@ -77,6 +90,11 @@ pub struct Workbench {
     font_size_service: Atom<MockFontSizeService>,
     _observe_font_size_service: OnceCell<Subscription>,
     tao_handle: OnceCell<Rc<AppHandle>>,
+    // sizes: SecondaryMap<ViewKey, S>
+    // known_views: SlotMap<ViewKey, View>,
+    // activity_bar_part: Part<ActivityBar>,
+    known_activities: HashSet<Entity>,
+    pub project_context_menu: OnceCell<Entity>,
 }
 
 unsafe impl<'a> Sync for Workbench {}
@@ -109,16 +127,93 @@ impl Workbench {
         })?;
 
         Ok(Self {
+            frame: Frame::new(),
             workspace_id,
             service_registry: Rc::new(RefCell::new(service_registry)),
             configuration_registry,
             font_size_service: font_service_atom,
             _observe_font_size_service: OnceCell::new(),
             tao_handle: OnceCell::new(),
+            known_activities: HashSet::new(),
+            project_context_menu: OnceCell::new(),
         })
     }
 
-    pub fn initialize<'a>(&'a self, ctx: &mut AsyncContext) -> Result<()> {
+    pub fn initialize<'a>(&'a mut self, ctx: &mut AsyncContext) -> Result<()> {
+        let activity_launchpad_entity = {
+            let mut entity = EntityBuilder::new();
+            entity
+                .add(Tooltip {
+                    header: "Launchpad",
+                    text: Some(
+                        "Explain behavior that is not clear from the setting or action name.",
+                    ),
+                    shortcut: Some("⌘⌥A"),
+                    link: Some(Link {
+                        title: Some("External"),
+                        href: "google.com",
+                        description: None,
+                    }),
+                })
+                .add(Order { value: 1 });
+
+            self.frame.spawn(entity.build())
+        };
+
+        let activity_essentials_entity = {
+            let mut entity = EntityBuilder::new();
+            entity
+                .add(Tooltip {
+                    header: "Essentials",
+                    ..Default::default()
+                })
+                .add(Order { value: 2 });
+
+            self.frame.spawn(entity.build())
+        };
+
+        // Toolbar
+        {
+            let project_menu_entity = {
+                let mut entity = EntityBuilder::new();
+                entity.add(Action("toolBar.project.contextMenu"));
+
+                self.frame.spawn(entity.build())
+            };
+
+            let new_project_menu_item_entity = {
+                let mut entity = EntityBuilder::new();
+                entity.add(Text("New Project"));
+                entity.add(Action("toolBar.project.contextMenu:createNewProject"));
+
+                self.frame.spawn(entity.build())
+            };
+
+            let new_window_menu_item_entity = {
+                let mut entity = EntityBuilder::new();
+                entity.add(Text("New Window"));
+                entity.add(Action("toolBar.project.contextMenu:openNewWindow"));
+
+                self.frame.spawn(entity.build())
+            };
+
+            self.frame.attach::<ToolBarProjectContextMenuMarker>(
+                new_project_menu_item_entity,
+                project_menu_entity,
+            )?;
+            self.frame.attach::<ToolBarProjectContextMenuMarker>(
+                new_window_menu_item_entity,
+                project_menu_entity,
+            )?;
+
+            self.project_context_menu.set(project_menu_entity).unwrap();
+        }
+
+        // self.frame.attach(child, parent)
+
+        self.known_activities.insert(activity_launchpad_entity);
+        self.known_activities.insert(activity_essentials_entity);
+
         // let cell = async_ctx
         //     .upgrade()
         //     .ok_or_else(|| anyhow!("context was released"))?;

@@ -4,9 +4,11 @@ DOCS_DIR = view/docs
 WEB_DIR = view/web
 THEME_GENERATOR_DIR = tools/theme-generator
 ICONS_DIR = view/shared/icons
+BINDEXP_DIR = tools/bindexp
 
 PNPM = pnpm
 SURREAL = surreal
+CARGO = cargo
 
 .DEFAULT_GOAL := run-desktop
 
@@ -20,12 +22,13 @@ SURREAL = surreal
 	run-web \
 	gen-themes \
 	gen-icons \
+	gen-bindings \
 	check-db \
-	count \
+	loc \
 	cleanup \
 
 
-run-desktop: check-db
+run-desktop: gen-bindings
 	@cd $(DESKTOP_DIR) && $(PNPM) tauri dev
 
 run-desktop-web:
@@ -52,15 +55,23 @@ gen-themes:
 gen-icons:
 	@cd $(ICONS_DIR) && $(PNPM) run build
 
+gen-bindings:
+	@cd $(BINDEXP_DIR) && $(CARGO) run
+
 # Check if the database is running, if not, start it in the background
 check-db:
 	@if ! pgrep -x "surreal" > /dev/null; then \
 		$(MAKE) run-database; \
 	fi	
-	
-# Count lines of Rust code, excluding the 'target' directory
-count-rust:
-	@find . -type f -name '*.rs' | grep -v '/target/' | xargs wc -l
+
+# Comma separated list of file extensions to count
+SRC_EXT := rs,ts
+# Comma separated list of directories to exclude
+EXCLUDE_DIRS := target,node_modules
+
+# Count lines of code
+loc:
+	@cloc --exclude-dir=$(EXCLUDE_DIRS) --include-ext=$(SRC_EXT) .
 
 # Clean up merged branches except master, main, and dev
 cleanup-git:

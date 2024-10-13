@@ -1,6 +1,9 @@
 [workspace]
 resolver = "2"
 members = [
+    "lib-rs/moss_uikit",
+    "lib-rs/moss_ui",
+
     "platform/core",
     "platform/fs",
     "platform/formation",
@@ -21,19 +24,30 @@ members = [
     "tools/xtask",
 ]
 
-# [profile.dev]
-# split-debuginfo = "unpacked"
-# debug = "limited"
-# codegen-units = 16
+[profile.dev]
+split-debuginfo = "unpacked"
+debug = "limited"
+codegen-units = 16
+
 
 [profile.release]
-debug = "limited"
-lto = "thin"
-codegen-units = 1
+codegen-units = 1 # Compile crates one after another so the compiler can optimize better
+lto = true        # Enables link to optimizations
+opt-level = "s"   # Optimize for binary size
+debug = true      # Enable debug symbols, for profiling
+
+[profile.bench]
+codegen-units = 256
+lto = false
+opt-level = 3
 
 
 [workspace.dependencies]
+moss_hecs = { git = "https://github.com/keenawa-co/moss_hecs.git", branch = "master" }
+moss_hecs_hierarchy = { git = "https://github.com/keenawa-co/moss_hecs_hierarchy.git", branch = "main" }
 
+moss_uikit = { path = "lib-rs/moss_uikit" }
+moss_ui = { path = "lib-rs/moss_ui" }
 
 platform_core = { path = "platform/core" }
 platform_utl = { path = "platform/utl" }
@@ -52,6 +66,7 @@ workbench_service_environment_tao = { path = "view/shared/workbench/service/envi
 
 tauri = "2.0.0-rc"
 specta = "2.0.0-rc.20"
+specta-typescript = "0.0.7"
 libc = "0.2.155"
 fnv = "1.0.7"
 anyhow = "1.0"
@@ -85,6 +100,3 @@ waker-fn = "1.2.0"
 im = "15.1.0"
 smallvec = "1.13.2"
 dyn-clone = "1.0.17"
-cargo_metadata = "0.18"
-pathdiff = "0.2"
-toml = "0.8.19"
