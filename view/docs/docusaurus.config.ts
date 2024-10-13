@@ -3,7 +3,7 @@ import type { Config } from "@docusaurus/types";
 import type * as Preset from "@docusaurus/preset-classic";
 
 const config: Config = {
-  title: "My Site",
+  title: "Moss Studio",
   tagline: "Dinosaurs are cool",
   favicon: "img/favicon.ico",
   url: "https://4rchr4y.github.io",
@@ -43,9 +43,9 @@ const config: Config = {
     [
       "@docusaurus/plugin-content-docs",
       {
-        id: "community",
-        path: "./community",
-        routeBasePath: "community",
+        id: "design-system",
+        path: "./design-system",
+        routeBasePath: "design-system",
         sidebarPath: "./sidebars.ts",
       },
     ],
@@ -84,7 +84,7 @@ const config: Config = {
         //   position: "left",
         //   label: "Tutorial",
         // },
-        { to: "/community", label: "Community", position: "left" },
+        { to: "/design-system", label: "Design System", position: "left" },
         {
           href: "https://github.com/4rchr4y/moss",
           label: "Moss",
@@ -99,8 +99,8 @@ const config: Config = {
           title: "Docs",
           items: [
             {
-              label: "Community",
-              to: "/community",
+              label: "Design System",
+              to: "/design-system",
             },
           ],
         },
