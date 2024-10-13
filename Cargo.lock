@@ -493,6 +493,7 @@ name = "bindexp"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "moss_ui",
  "moss_uikit",
  "specta",
  "specta-typescript",
@@ -3299,11 +3300,13 @@ dependencies = [
 name = "moss_ui"
 version = "0.1.0"
 dependencies = [
- "moss_hecs",
+ "anyhow",
+ "moss_specta",
  "moss_uikit",
  "serde",
  "specta",
  "specta-typescript",
+ "typeshare",
 ]
 
 [[package]]
@@ -3315,6 +3318,7 @@ dependencies = [
  "serde",
  "specta",
  "specta-typescript",
+ "typeshare",
 ]
 
 [[package]]
@@ -6810,6 +6814,28 @@ name = "typenum"
 version = "1.17.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "42ff0bf0c66b8238c6f3b578df37d0b7848e55df8577b3f74f92a69acceeb825"
+
+[[package]]
+name = "typeshare"
+version = "1.0.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "04f17399b76c2e743d58eac0635d7686e9c00f48cd4776f00695d9882a7d3187"
+dependencies = [
+ "chrono",
+ "serde",
+ "serde_json",
+ "typeshare-annotation",
+]
+
+[[package]]
+name = "typeshare-annotation"
+version = "1.0.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a615d6c2764852a2e88a4f16e9ce1ea49bb776b5872956309e170d63a042a34f"
+dependencies = [
+ "quote",
+ "syn 2.0.79",
+]
 
 [[package]]
 name = "ulid"

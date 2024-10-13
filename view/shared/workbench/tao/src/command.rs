@@ -1,6 +1,5 @@
 use anyhow::Result;
 use moss_hecs::MissingComponent;
-
 use moss_uikit::component::{layout::Order, primitive::Tooltip};
 
 use crate::Workbench;
@@ -11,8 +10,6 @@ pub struct DescribeActivityOutput {
     pub tooltip: Tooltip,
     pub order: usize,
 }
-
-pub struct DescribeMenuBarOutput {}
 
 impl Workbench {
     // OPTIMIZE: consider to use a SmallVec type, as we don't expect tons of such elements

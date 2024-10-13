@@ -9,5 +9,12 @@ fn main() -> Result<()> {
             .bigint(BigIntExportBehavior::Number),
     )?;
 
+    moss_ui::export_ts_bindings(
+        &specta_typescript::Typescript::default()
+            .formatter(specta_typescript::formatter::prettier)
+            .header("/* eslint-disable */")
+            .bigint(BigIntExportBehavior::Number),
+    )?;
+
     Ok(())
 }

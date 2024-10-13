@@ -26,6 +26,10 @@ pub struct Icon {
 
 #[derive(Serialize, Debug, Clone, Default, Eq, PartialEq, Type)]
 #[serde(rename_all = "camelCase")]
+pub struct Text(pub &'static str);
+
+#[derive(Serialize, Debug, Clone, Default, Eq, PartialEq, Type)]
+#[serde(rename_all = "camelCase")]
 pub struct Button {
     pub text: &'static str,
 }

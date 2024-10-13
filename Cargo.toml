@@ -26,22 +26,25 @@ members = [
     "tools/bindexp",
 ]
 
-# [profile.dev]
-# split-debuginfo = "unpacked"
-# debug = "limited"
-# codegen-units = 16
-
 [profile.dev]
-incremental = true
+split-debuginfo = "unpacked"
+debug = "limited"
+codegen-units = 16
+
 
 [profile.release]
-debug = "limited"
-lto = "thin"
-codegen-units = 1
+codegen-units = 1 # Compile crates one after another so the compiler can optimize better
+lto = true        # Enables link to optimizations
+opt-level = "s"   # Optimize for binary size
+debug = true      # Enable debug symbols, for profiling
+
+[profile.bench]
+codegen-units = 256
+lto = false
+opt-level = 3
 
 
 [workspace.dependencies]
-
 moss_hecs = { git = "https://github.com/keenawa-co/moss_hecs.git", branch = "master" }
 moss_hecs_hierarchy = { git = "https://github.com/keenawa-co/moss_hecs_hierarchy.git", branch = "main" }
 

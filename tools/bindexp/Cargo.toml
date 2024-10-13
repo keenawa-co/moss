@@ -8,6 +8,7 @@ edition = "2021"
 
 [dependencies]
 moss_uikit.workspace = true
+moss_ui.workspace = true
 
 anyhow.workspace = true
 specta.workspace = true

@@ -2,6 +2,7 @@ pub mod contribution;
 pub mod window;
 
 pub mod command;
+pub mod parts;
 
 use std::{
     any::Any,
@@ -15,9 +16,11 @@ use anyhow::Result;
 use contribution::WORKBENCH_TAO_WINDOW;
 use hashbrown::HashSet;
 use moss_hecs::{Entity, EntityBuilder, Frame};
+use moss_hecs_hierarchy::HierarchyMut;
 use moss_uikit::component::{
+    accessibility::Action,
     layout::Order,
-    primitive::{Link, Tooltip},
+    primitive::{Link, Text, Tooltip},
 };
 use once_cell::unsync::OnceCell;
 use platform_configuration::{
@@ -76,8 +79,10 @@ pub enum WorkbenchState {
     Workspace,
 }
 
+pub struct ToolBarProjectContextMenuMarker;
+
 pub struct Workbench {
-    frame: Frame,
+    pub frame: Frame,
     workspace_id: WorkspaceId,
     service_registry: Rc<RefCell<ServiceRegistry>>,
     configuration_registry: Atom<ConfigurationRegistry>,
@@ -89,6 +94,7 @@ pub struct Workbench {
     // known_views: SlotMap<ViewKey, View>,
     // activity_bar_part: Part<ActivityBar>,
     known_activities: HashSet<Entity>,
+    pub project_context_menu: OnceCell<Entity>,
 }
 
 unsafe impl<'a> Sync for Workbench {}
@@ -129,6 +135,7 @@ impl Workbench {
             _observe_font_size_service: OnceCell::new(),
             tao_handle: OnceCell::new(),
             known_activities: HashSet::new(),
+            project_context_menu: OnceCell::new(),
         })
     }
 
@@ -164,6 +171,43 @@ impl Workbench {
 
             self.frame.spawn(entity.build())
         };
+
+        // Toolbar
+        {
+            let project_menu_entity = {
+                let mut entity = EntityBuilder::new();
+                entity.add(Action("toolBar.project.contextMenu"));
+
+                self.frame.spawn(entity.build())
+            };
+
+            let new_project_menu_item_entity = {
+                let mut entity = EntityBuilder::new();
+                entity.add(Text("New Project"));
+                entity.add(Action("toolBar.project.contextMenu:createNewProject"));
+
+                self.frame.spawn(entity.build())
+            };
+
+            let new_window_menu_item_entity = {
+                let mut entity = EntityBuilder::new();
+                entity.add(Text("New Window"));
+                entity.add(Action("toolBar.project.contextMenu:openNewWindow"));
+
+                self.frame.spawn(entity.build())
+            };
+
+            self.frame.attach::<ToolBarProjectContextMenuMarker>(
+                new_project_menu_item_entity,
+                project_menu_entity,
+            )?;
+            self.frame.attach::<ToolBarProjectContextMenuMarker>(
+                new_window_menu_item_entity,
+                project_menu_entity,
+            )?;
+
+            self.project_context_menu.set(project_menu_entity).unwrap();
+        }
 
         // self.frame.attach(child, parent)
 
