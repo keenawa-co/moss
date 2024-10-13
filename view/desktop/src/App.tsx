@@ -1,11 +1,10 @@
-import { ContentLayout, Menu, RootLayout } from "@/components";
+import { ContentLayout, LaunchPad, Menu, RootLayout } from "@/components";
 import "@/i18n";
 import "@repo/ui/src/fonts.css";
 import { Suspense, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Resizable, ResizablePanel } from "./components/Resizable";
-import Sidebar from "./components/Sidebar";
 import { Home, Logs, Settings } from "./components/pages";
 import { RootState, useAppDispatch } from "./store";
 import { setLanguageFromLocalStorage } from "./store/languages/languagesSlice";
@@ -13,6 +12,7 @@ import { initializeThemes } from "./store/themes";
 
 function App() {
   const dispatch = useAppDispatch();
+
   const [sideBarVisible] = useState(true);
   const selectedTheme = useSelector((state: RootState) => state.themes.selected);
 
@@ -32,8 +32,8 @@ function App() {
       ) : (
         <RootLayout>
           <Resizable proportionalLayout={false}>
-            <ResizablePanel minSize={100} preferredSize={255} snap visible={sideBarVisible}>
-              <Sidebar />
+            <ResizablePanel minSize={100} preferredSize={255} snap visible={sideBarVisible} className="select-none">
+              <LaunchPad />
             </ResizablePanel>
             <ResizablePanel>
               <ContentLayout className="content relative flex h-full flex-col overflow-auto">

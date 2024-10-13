@@ -7,7 +7,6 @@ export type Icons = keyof typeof icons;
 export const Icon = ({
   icon,
   className,
-
   ...props
 }: {
   icon: Icons;
@@ -15,7 +14,7 @@ export const Icon = ({
 } & ComponentPropsWithoutRef<"svg">) => {
   const IconTag = icons[icon];
 
-  return <IconTag className={cn("hover:text-zinc-600 text-[rgba(var(--color-primary))]", className)} {...props} />;
+  return <IconTag className={cn("text-[rgba(var(--colorPrimary))]", className)} {...props} />;
 };
 
 export default Icon;

@@ -13,10 +13,13 @@ enum IconState {
 
 export const Sidebar = () => {
   return (
-    <SidebarLayout className="h-full w-full overflow-auto p-0">
+    <SidebarLayout className=" w-full overflow-auto p-0">
       <MenuItem className="bg-zinc-200 group mb-3.5 mt-13">
         <Icon icon="Search" className={twMerge("h-4.5 w-4.5 min-w-4", IconState.Default, IconState.Hover)} />
-        <IconTitle className="text-xs text-[rgba(var(--color-primary))]" title="Search..." />
+        <IconTitle
+          className="text-xs text-[rgba(var(--color-primary))]"
+          title={`"Search... ${Math.random().toFixed(3)}"`}
+        />
 
         <Icon icon="SearchShortcut" className="fill-zinc-500  group-hover:fill-zinc-600 ml-auto w-4.5  min-w-4 pr-2" />
       </MenuItem>
