@@ -4,7 +4,6 @@ DOCS_DIR = view/docs
 WEB_DIR = view/web
 THEME_GENERATOR_DIR = tools/theme-generator
 ICONS_DIR = view/shared/icons
-BINDEXP_DIR = tools/bindexp
 
 PNPM = pnpm
 SURREAL = surreal
@@ -22,13 +21,12 @@ CARGO = cargo
 	run-web \
 	gen-themes \
 	gen-icons \
-	gen-bindings \
 	check-db \
 	loc \
 	cleanup \
 
 
-run-desktop: gen-bindings
+run-desktop:
 	@cd $(DESKTOP_DIR) && $(PNPM) tauri dev
 
 run-desktop-web:
@@ -55,8 +53,6 @@ gen-themes:
 gen-icons:
 	@cd $(ICONS_DIR) && $(PNPM) run build
 
-gen-bindings:
-	@cd $(BINDEXP_DIR) && $(CARGO) run
 
 # Check if the database is running, if not, start it in the background
 check-db:
