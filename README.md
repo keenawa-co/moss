@@ -12,25 +12,27 @@ We would for you to get involved with Moss development! If you wish to help, you
 
 # Requirements
 
-Before starting the project, ensure you have the following installed:
+Before starting the project, ensure you have [NIX](https://nixos.org/download/) installed and enable the [flakes](https://nixos.wiki/wiki/Flakes) experimental feature.
 
-- [SurrealDB](https://surrealdb.com/)
-- [Tauri](https://tauri.app/)
-- [pnpm](https://pnpm.io/)
-- [Rust](https://www.rust-lang.org/)
+To do this, add the following line to your Nix configuration file:
 
-On the first app start, Tauri may prompt you to install additional dependencies. These dependencies are described in the [Tauri Getting Started Guide](https://tauri.app/v1/guides/getting-started/prerequisites).
+- For user-specific settings, edit `~/.config/nix/nix.conf`:
 
-**Note for Ubuntu Linux users:**
+- For system-wide settings, edit `/etc/nix/nix.conf`:
 
-Based on personal experience, some additional libraries may be required:
-
-```sh
-sudo apt install libwebkit2gtk-4.1-dev
-sudo apt install libjavascriptcoregtk-4.1-dev
-sudo apt install libsoup-3.0-dev
-sudo apt install clang
 ```
+experimental-features = nix-command flakes
+```
+
+## Installing Dependencies
+
+To install the necessary dependencies for the project, run the following command:
+
+```bash
+nix develop
+```
+
+This command will set up a development environment with all the required tools and libraries specified in the `flake.nix` file.
 
 # Usage
 
