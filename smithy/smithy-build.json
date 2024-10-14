@@ -1,0 +1,13 @@
+{
+  "version": "1.0",
+  "sources": ["models"],
+  "maven": {
+    "dependencies": ["software.amazon.smithy.typescript:smithy-typescript-codegen:0.24.0"]
+  },
+  "plugins": {
+    "typescript-client-codegen": {
+      "package": "@moss/models",
+      "packageVersion": "0.0.1"
+    }
+  }
+}
