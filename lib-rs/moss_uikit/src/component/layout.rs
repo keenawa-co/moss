@@ -23,3 +23,8 @@ pub enum Visibility {
     Invisible,
     Collapse,
 }
+
+pub struct Group {
+    pub id: String,
+    pub order: usize,
+}
