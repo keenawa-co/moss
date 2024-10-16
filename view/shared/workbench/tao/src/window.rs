@@ -1,4 +1,3 @@
-use specta::Type;
 use std::path::PathBuf;
 use sysinfo::System;
 

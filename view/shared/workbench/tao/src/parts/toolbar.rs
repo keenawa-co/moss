@@ -1,4 +1,5 @@
 use anyhow::Result;
+use hashbrown::HashMap;
 use moss_hecs::{Entity, Frame};
 use moss_hecs_hierarchy::Hierarchy;
 use moss_ui::parts::{
@@ -9,7 +10,46 @@ use moss_uikit::component::{accessibility::*, layout::*, primitive::*};
 
 use crate::ToolBarProjectContextMenuMarker;
 
+pub mod contribe;
 pub mod describe;
+
+pub trait AnyActionsContainer {
+    const GROUP: &'static str;
+
+    type ArchetypeMarker<Marker>;
+    type DescribeOutput<Output>;
+
+    fn describe<Output>(&self) -> Result<Self::DescribeOutput<Output>>;
+}
+
+type ActionGroupId = String;
+type ActionGroup = HashMap<String, Entity>;
+
+pub struct AccountActions(ActionGroup);
+
+pub struct AccountActionsMarker;
+
+pub struct DescribeAccountActionsOutput;
+
+impl AnyActionsContainer for AccountActions {
+    const GROUP: &'static str = "workbench/account";
+
+    type ArchetypeMarker<Marker> = AccountActionsMarker;
+    type DescribeOutput<Output> = DescribeAccountActionsOutput;
+
+    fn describe<Output>(&self) -> Result<Self::DescribeOutput<Output>> {
+        todo!()
+    }
+}
+
+pub struct LayoutActions(ActionGroup);
+
+type WidgetId = String;
+
+pub struct ToolBarPart {
+    widgets: HashMap<WidgetId, Entity>,
+    actions: HashMap<ActionGroupId, ActionGroup>,
+}
 
 pub fn describe_toolbar(frame: &Frame, project_menu: &Entity) -> Result<DescribeToolBarOutput> {
     let result = DescribeToolBarOutput {
@@ -18,7 +58,7 @@ pub fn describe_toolbar(frame: &Frame, project_menu: &Entity) -> Result<Describe
             activities: vec![ActivityCell {
                 title: Some("Discovery"),
                 tooltip: None,
-                order: Some(Order { value: 1 }),
+                order: Some(Order(1)),
                 icon: None,
                 visibility: Visibility::Visible,
                 nested: None,
