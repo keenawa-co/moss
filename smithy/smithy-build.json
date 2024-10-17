@@ -2,10 +2,7 @@
   "version": "1.0",
   "sources": ["models"],
   "maven": {
-    "dependencies": [
-      "software.amazon.smithy.typescript:smithy-typescript-codegen:0.24.0",
-      "software.amazon.smithy.typescript:smithy-rust-codegen:latest"
-    ]
+    "dependencies": ["software.amazon.smithy.typescript:smithy-typescript-codegen:0.24.0"]
   },
   "projections": {
     "typescript": {
@@ -19,11 +16,6 @@
           "unreferencedTypes": true,
           "disableDefaultValidation": true
         }
-      }
-    },
-    "rust": {
-      "plugins": {
-        "rust-client-codegen": {}
       }
     }
   }
