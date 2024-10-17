@@ -44,9 +44,9 @@
                     curl
                     wget
                     pkg-config
-                    surrealdb
+                    surrealdbVersion
                     cloc           
-                    pnpm             
+                    pnpmVersion             
                     rustToolchain    
                     libsoup
                 ];

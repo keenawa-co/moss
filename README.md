@@ -34,6 +34,8 @@ nix develop
 
 This command will set up a development environment with all the required tools and libraries specified in the `flake.nix` file.
 
+**Note**: You will need to run `nix develop` in every new terminal session before starting development to make the tools available in that shell. This is because the environment is only active within the current shell session and does not persist across multiple terminal sessions.
+
 # Usage
 
 - Before running any applications, ensure that SurrealDB is started:
