@@ -2381,6 +2381,53 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2304e00983f87ffb38b55b444b5e3b60a884b5d30c0fca7d82fe33449bbe55ea"
 
 [[package]]
+name = "hecs"
+version = "0.10.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e1cbc675ee8d97b4d206a985137f8ad59666538f56f906474f554467a63c776d"
+dependencies = [
+ "hashbrown 0.14.5",
+ "hecs-macros",
+ "spin 0.9.8",
+]
+
+[[package]]
+name = "hecs-hierarchy"
+version = "0.12.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "addd824b77e8f43b25e630fe5a97ae51e4f16f411607310b034f609e0e4293cd"
+dependencies = [
+ "hecs",
+ "hecs-schedule",
+ "once_cell",
+ "smallvec",
+]
+
+[[package]]
+name = "hecs-macros"
+version = "0.10.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "052fc25b12dc326082605cd2098eb76050a72fa0c0e9ea7faaa3f58b565fc970"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 2.0.79",
+]
+
+[[package]]
+name = "hecs-schedule"
+version = "0.7.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8efdd727f5665b12f6d92ee2fc0184420a07bd7044e602cff1ea8ea063c397ce"
+dependencies = [
+ "anyhow",
+ "atomic_refcell",
+ "hecs",
+ "smallvec",
+ "thiserror",
+]
+
+[[package]]
 name = "hermit-abi"
 version = "0.3.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2979,7 +3026,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4979f22fdb869068da03c9f7528f8297c6fd2606bc3a4affe42e6a823fdb8da4"
 dependencies = [
  "cfg-if",
- "windows-targets 0.48.5",
+ "windows-targets 0.52.6",
 ]
 
 [[package]]
@@ -3230,49 +3277,6 @@ dependencies = [
  "libc",
  "wasi 0.11.0+wasi-snapshot-preview1",
  "windows-sys 0.52.0",
-]
-
-[[package]]
-name = "moss_hecs"
-version = "0.10.5"
-source = "git+https://github.com/keenawa-co/moss_hecs.git?branch=master#d81cfd62b2a510468218cf1e30d293764cc7c140"
-dependencies = [
- "hashbrown 0.14.5",
- "moss_hecs_macros",
- "spin 0.9.8",
-]
-
-[[package]]
-name = "moss_hecs_hierarchy"
-version = "0.12.1"
-source = "git+https://github.com/keenawa-co/moss_hecs_hierarchy.git?branch=main#8d6ec67b0dbfe44769bb3063ecacc6097fa92941"
-dependencies = [
- "moss_hecs",
- "moss_hecs_schedule",
- "once_cell",
- "smallvec",
-]
-
-[[package]]
-name = "moss_hecs_macros"
-version = "0.10.0"
-source = "git+https://github.com/keenawa-co/moss_hecs.git?branch=master#d81cfd62b2a510468218cf1e30d293764cc7c140"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn 2.0.79",
-]
-
-[[package]]
-name = "moss_hecs_schedule"
-version = "0.7.0"
-source = "git+https://github.com/keenawa-co/moss_hecs_schedule.git?branch=main#22ff4e884b1f7e97ec4d10f685b4839e0214b34f"
-dependencies = [
- "anyhow",
- "atomic_refcell",
- "moss_hecs",
- "smallvec",
- "thiserror",
 ]
 
 [[package]]
@@ -7744,9 +7748,9 @@ dependencies = [
  "anyhow",
  "derive_more",
  "hashbrown 0.14.5",
+ "hecs",
+ "hecs-hierarchy",
  "lazy_static",
- "moss_hecs",
- "moss_hecs_hierarchy",
  "moss_ui",
  "moss_uikit",
  "once_cell",

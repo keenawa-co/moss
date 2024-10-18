@@ -1,6 +1,6 @@
 use anyhow::Result;
 use hashbrown::HashMap;
-use moss_hecs::{BuiltEntity, DynamicBundle, EntityBuilder};
+use hecs::{BuiltEntity, DynamicBundle, EntityBuilder};
 
 use crate::layout::Layout;
 
@@ -18,6 +18,7 @@ pub trait AnyPart {
     fn id(&self) -> PartId {
         Self::ID
     }
+
     fn contribute(&self, layout: &mut Layout);
     fn describe(&self, layout: &Layout) -> Result<Self::DescribeOutput>;
 }

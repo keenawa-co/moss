@@ -1,6 +1,6 @@
 use anyhow::Result;
 use hashbrown::HashMap;
-use moss_hecs::{DynamicBundle, Entity, EntityBuilder, Frame as Registry};
+use hecs::{DynamicBundle, Entity, EntityBuilder, World as Registry};
 use std::any::{Any, TypeId};
 
 use crate::{

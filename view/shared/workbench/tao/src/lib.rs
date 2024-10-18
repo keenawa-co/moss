@@ -1,8 +1,6 @@
 pub mod contribution;
-pub mod window;
-
-pub mod command;
 pub mod parts;
+pub mod window;
 
 mod action;
 mod layout;
@@ -17,20 +15,11 @@ use std::{
 
 use anyhow::Result;
 use contribution::WORKBENCH_TAO_WINDOW;
-use hashbrown::{HashMap, HashSet};
+use hashbrown::HashMap;
+use hecs::Entity;
 use layout::Layout;
-use moss_hecs::{DynamicBundle, Entity, EntityBuilder, Frame};
-use moss_hecs_hierarchy::HierarchyMut;
-use moss_uikit::component::{
-    accessibility::Action,
-    layout::Order,
-    primitive::{Link, Text, Tooltip},
-};
 use once_cell::unsync::OnceCell;
-use parts::{
-    activitybar::{ActivityBarPart, DescribeActivityBarOutput},
-    AnyPart, PartId,
-};
+use parts::{activitybar::ActivityBarPart, AnyPart, PartId};
 use platform_configuration::{
     attribute_name, configuration_policy::ConfigurationPolicyService,
     configuration_registry::ConfigurationRegistry, AbstractConfigurationService,
@@ -85,65 +74,6 @@ impl MockFontSizeService {
 pub enum WorkbenchState {
     Empty,
     Workspace,
-}
-
-pub struct ToolBarProjectContextMenuMarker;
-
-pub type MenuAccessId = &'static str;
-pub type MenuEntityId = usize;
-
-pub struct EntityRegister {
-    frame: Frame,
-    tree_view_container_groups: HashMap<String, Vec<Entity>>,
-    tree_views: HashMap<String, Vec<Entity>>,
-}
-
-impl EntityRegister {
-    pub fn new() -> Self {
-        Self {
-            frame: Frame::new(),
-            tree_view_container_groups: HashMap::new(),
-            tree_views: HashMap::new(),
-        }
-    }
-
-    pub fn add_tree_view_container(
-        &mut self,
-        group_id: &str,
-        view_container_id: &'static str,
-        bundle: impl DynamicBundle,
-    ) {
-        let mut entity_builder = EntityBuilder::new();
-        entity_builder.add(view_container_id).add_bundle(bundle);
-        let entity = self.frame.spawn(entity_builder.build());
-
-        if let Some(group) = self.tree_view_container_groups.get_mut(group_id) {
-            group.push(entity);
-        } else {
-            self.tree_view_container_groups
-                .insert(group_id.to_string(), vec![entity]);
-        }
-
-        self.tree_views
-            .insert(view_container_id.to_string(), Vec::new());
-    }
-
-    pub fn add_tree_view(
-        &mut self,
-        view_container_id: &str,
-        bundle: impl DynamicBundle,
-    ) -> Result<()> {
-        if let Some(container) = self.tree_views.get_mut(view_container_id) {
-            let mut entity_builder = EntityBuilder::new();
-            entity_builder.add_bundle(bundle);
-
-            container.push(self.frame.spawn(entity_builder.build()));
-
-            Ok(())
-        } else {
-            Err(anyhow!("{view_container_id} view container is undefined"))
-        }
-    }
 }
 
 pub struct Workbench {

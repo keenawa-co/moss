@@ -20,8 +20,6 @@ pub fn describe_activity_bar_part(
         .get_part::<ActivityBarPart>(ACTIVITY_BAR_PART)
         .unwrap();
 
-    dbg!(&part.id());
-
     part.describe(state.workbench.layout())
         .map_err(|err| format!("failed to describe toolbar: {err}"))
 }

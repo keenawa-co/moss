@@ -126,25 +126,6 @@ fn setup_app(
     let mut workbench = Workbench::new(&mut ctx, service_group, window_state.workspace_id)?;
     workbench.initialize(&mut ctx)?;
 
-    // workbench.add_activity(
-    //     "activityBar.launchpad",
-    //     Activity {
-    //         title: "Launchpad".to_string(),
-    //         icon: "icon_name.svg".to_string(),
-    //         order: Some(1),
-    //         spot: ActivitySpot::Left,
-    //     },
-    // );
-    // workbench.add_activity(
-    //     "activityBar.essentials",
-    //     Activity {
-    //         title: "Essentials".to_string(),
-    //         icon: "icon_name.svg".to_string(),
-    //         order: Some(2),
-    //         spot: ActivitySpot::Left,
-    //     },
-    // );
-
     let window = app.get_webview_window("main").unwrap();
     let app_state = AppState {
         workbench: Arc::new(workbench),
@@ -171,21 +152,6 @@ fn setup_app(
 
     Ok(())
 }
-
-// fn create_specta_builder() -> Builder {
-//     tauri_specta::Builder::<tauri::Wry>::new()
-//         .events(collect_events![])
-//         .commands(collect_commands![
-//             cmd_dummy::workbench_get_state,
-//             cmd_dummy::create_project,
-//             cmd_dummy::restore_session,
-//             cmd_dummy::app_ready,
-//             cmd_dummy::update_font_size,
-//             cmd_dummy::fetch_all_themes,
-//             cmd_dummy::read_theme,
-//             cmd_base::native_platform_info,
-//         ])
-// }
 
 fn create_service_registry(
     native_window_configuration: NativeWindowConfiguration,
