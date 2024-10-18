@@ -10,9 +10,6 @@ use moss_uikit::component::{accessibility::*, layout::*, primitive::*};
 
 use crate::ToolBarProjectContextMenuMarker;
 
-pub mod contribe;
-pub mod describe;
-
 pub trait AnyActionsContainer {
     const GROUP: &'static str;
 

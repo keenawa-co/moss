@@ -2,16 +2,14 @@ use anyhow::Result;
 use hashbrown::HashMap;
 use moss_uikit::component::{layout::Order, primitive::Tooltip};
 
-use crate::EntityRegister;
+use super::{AnyPart, PartId};
 
 pub type ActivityContainerId = &'static str;
 
 pub type DescribeActivityContainerInput = (ActivityContainerId, Tooltip, Order);
 pub type DescribeActivityContainerOutput<'a> = (&'a ActivityContainerId, &'a Tooltip, &'a Order);
 
-pub struct ActivityBarPart {
-    group_id: &'static str,
-}
+pub struct ActivityBarPart {}
 
 #[derive(Serialize, Debug, Clone, Default, Eq, PartialEq)]
 pub struct ActivityBarItem {
@@ -23,17 +21,42 @@ pub struct ActivityBarItem {
 pub struct DescribeActivityBarOutput(HashMap<ActivityContainerId, ActivityBarItem>);
 
 impl ActivityBarPart {
-    pub fn new(side_view_container_group_id: &'static str) -> Self {
-        Self {
-            group_id: side_view_container_group_id,
-        }
+    pub fn new() -> Self {
+        Self {}
     }
-    pub fn describe(&self, from: &EntityRegister) -> Result<DescribeActivityBarOutput> {
+}
+
+impl AnyPart for ActivityBarPart {
+    const ID: PartId = crate::parts::ACTIVITY_BAR_PART;
+    type DescribeOutput = DescribeActivityBarOutput;
+
+    fn contribute(&self, layout: &mut crate::layout::Layout) {
+        layout.add_tree_view_container(
+            "leftActivityBar",
+            "launchpad",
+            (
+                Tooltip {
+                    header: "Launchpad",
+                    text: Some(
+                        "Explain behavior that is not clear from the setting or action name.",
+                    ),
+                    shortcut: Some("⌘⌥A"),
+                    ..Default::default()
+                },
+                Order(1),
+            ),
+        );
+
+        // self.entity_register
+        //     .add_side_view("launchpad", ("Recently Viewed", Order))?;
+    }
+
+    fn describe(&self, layout: &crate::layout::Layout) -> Result<DescribeActivityBarOutput> {
         let mut result = DescribeActivityBarOutput(HashMap::new());
 
-        if let Some(group) = from.side_view_container_groups.get(self.group_id) {
+        if let Some(group) = layout.tree_view_container_groups.get("leftActivityBar") {
             for entity in group {
-                let entity_ref = from.frame.entity(*entity)?;
+                let entity_ref = layout.registry.entity(*entity)?;
                 let mut query = entity_ref.query::<DescribeActivityContainerOutput>();
                 let (id, tooltip, order) = query.get().unwrap();
 

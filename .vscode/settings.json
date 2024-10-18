@@ -12,6 +12,7 @@
     "filetree",
     "hashbrown",
     "Hasher",
+    "headbar",
     "inmem",
     "jsonwebtoken",
     "Keyable",

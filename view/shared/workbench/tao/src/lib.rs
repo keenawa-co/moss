@@ -5,6 +5,7 @@ pub mod command;
 pub mod parts;
 
 mod action;
+mod layout;
 
 use std::{
     any::Any,
@@ -17,6 +18,7 @@ use std::{
 use anyhow::Result;
 use contribution::WORKBENCH_TAO_WINDOW;
 use hashbrown::{HashMap, HashSet};
+use layout::Layout;
 use moss_hecs::{DynamicBundle, Entity, EntityBuilder, Frame};
 use moss_hecs_hierarchy::HierarchyMut;
 use moss_uikit::component::{
@@ -25,7 +27,10 @@ use moss_uikit::component::{
     primitive::{Link, Text, Tooltip},
 };
 use once_cell::unsync::OnceCell;
-use parts::activitybar::{ActivityBarPart, DescribeActivityBarOutput};
+use parts::{
+    activitybar::{ActivityBarPart, DescribeActivityBarOutput},
+    AnyPart, PartId,
+};
 use platform_configuration::{
     attribute_name, configuration_policy::ConfigurationPolicyService,
     configuration_registry::ConfigurationRegistry, AbstractConfigurationService,
@@ -86,31 +91,23 @@ pub struct ToolBarProjectContextMenuMarker;
 
 pub type MenuAccessId = &'static str;
 pub type MenuEntityId = usize;
-pub struct MenuRegistry(HashMap<MenuAccessId, Entity>);
-
-pub struct SideViewContainer {
-    id: String,
-    title: String,
-}
-
-pub struct SideViewContainerRegister(HashMap<String, Entity>);
 
 pub struct EntityRegister {
     frame: Frame,
-    side_view_container_groups: HashMap<String, Vec<Entity>>,
-    side_views: HashMap<String, Vec<Entity>>,
+    tree_view_container_groups: HashMap<String, Vec<Entity>>,
+    tree_views: HashMap<String, Vec<Entity>>,
 }
 
 impl EntityRegister {
     pub fn new() -> Self {
         Self {
             frame: Frame::new(),
-            side_view_container_groups: HashMap::new(),
-            side_views: HashMap::new(),
+            tree_view_container_groups: HashMap::new(),
+            tree_views: HashMap::new(),
         }
     }
 
-    pub fn add_side_view_container(
+    pub fn add_tree_view_container(
         &mut self,
         group_id: &str,
         view_container_id: &'static str,
@@ -120,23 +117,23 @@ impl EntityRegister {
         entity_builder.add(view_container_id).add_bundle(bundle);
         let entity = self.frame.spawn(entity_builder.build());
 
-        if let Some(group) = self.side_view_container_groups.get_mut(group_id) {
+        if let Some(group) = self.tree_view_container_groups.get_mut(group_id) {
             group.push(entity);
         } else {
-            self.side_view_container_groups
+            self.tree_view_container_groups
                 .insert(group_id.to_string(), vec![entity]);
         }
 
-        self.side_views
+        self.tree_views
             .insert(view_container_id.to_string(), Vec::new());
     }
 
-    pub fn add_side_view(
+    pub fn add_tree_view(
         &mut self,
         view_container_id: &str,
         bundle: impl DynamicBundle,
     ) -> Result<()> {
-        if let Some(container) = self.side_views.get_mut(view_container_id) {
+        if let Some(container) = self.tree_views.get_mut(view_container_id) {
             let mut entity_builder = EntityBuilder::new();
             entity_builder.add_bundle(bundle);
 
@@ -150,7 +147,6 @@ impl EntityRegister {
 }
 
 pub struct Workbench {
-    entity_register: EntityRegister,
     workspace_id: WorkspaceId,
     service_registry: Rc<RefCell<ServiceRegistry>>,
     configuration_registry: Atom<ConfigurationRegistry>,
@@ -163,21 +159,12 @@ pub struct Workbench {
     // activity_bar_part: Part<ActivityBar>,
     pub project_context_menu: OnceCell<Entity>,
 
-    pub activity_bar: ActivityBarPart,
+    layout: Layout,
+    parts: HashMap<PartId, Box<dyn Any>>,
 }
 
 unsafe impl<'a> Sync for Workbench {}
 unsafe impl<'a> Send for Workbench {}
-
-impl Workbench {
-    // pub fn describe_part_from<T>(&self, f: impl Fn(&EntityRegister) -> T) -> T {
-    //     f(&self.entity_register)
-    // }
-
-    pub fn describe_part(&self) -> Result<DescribeActivityBarOutput> {
-        self.activity_bar.describe(&self.entity_register)
-    }
-}
 
 impl Workbench {
     pub fn new(
@@ -206,7 +193,6 @@ impl Workbench {
         })?;
 
         Ok(Self {
-            entity_register: EntityRegister::new(),
             workspace_id,
             service_registry: Rc::new(RefCell::new(service_registry)),
             configuration_registry,
@@ -214,29 +200,42 @@ impl Workbench {
             _observe_font_size_service: OnceCell::new(),
             tao_handle: OnceCell::new(),
             project_context_menu: OnceCell::new(),
-            activity_bar: ActivityBarPart::new("leftActivityBar"),
+            layout: Layout::new(),
+            parts: HashMap::new(),
         })
     }
 
-    pub fn initialize<'a>(&'a mut self, ctx: &mut AsyncContext) -> Result<()> {
-        self.entity_register.add_side_view_container(
-            "leftActivityBar",
-            "launchpad",
-            (
-                Tooltip {
-                    header: "Launchpad",
-                    text: Some(
-                        "Explain behavior that is not clear from the setting or action name.",
-                    ),
-                    shortcut: Some("⌘⌥A"),
-                    ..Default::default()
-                },
-                Order(1),
-            ),
-        );
+    fn register_part(&mut self, part: impl AnyPart + 'static) {
+        part.contribute(&mut self.layout);
+        self.parts.insert(part.id(), Box::new(part));
+    }
 
-        // self.entity_register
-        //     .add_side_view("launchpad", ("Recently Viewed", Order))?;
+    pub fn layout(&self) -> &Layout {
+        &self.layout
+    }
+
+    pub fn get_part<T: AnyPart + 'static>(&self, id: PartId) -> Option<&T> {
+        self.parts.get(id)?.downcast_ref::<T>()
+    }
+
+    pub fn initialize<'a>(&'a mut self, ctx: &mut AsyncContext) -> Result<()> {
+        self.register_part(ActivityBarPart::new());
+
+        // self.entity_register.add_tree_view_container(
+        //     "leftActivityBar",
+        //     "launchpad",
+        //     (
+        //         Tooltip {
+        //             header: "Launchpad",
+        //             text: Some(
+        //                 "Explain behavior that is not clear from the setting or action name.",
+        //             ),
+        //             shortcut: Some("⌘⌥A"),
+        //             ..Default::default()
+        //         },
+        //         Order(1),
+        //     ),
+        // );
 
         // self.layout.add_side_view_container(, bundle);
         // let activity_launchpad_entity = {
