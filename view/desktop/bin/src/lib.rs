@@ -2,7 +2,7 @@ mod command;
 mod config;
 mod mem;
 mod menu;
-mod service;
+// mod service;
 
 use anyhow::{Context as _, Result};
 use platform_core::context_v2::async_context::AsyncContext;
@@ -12,13 +12,9 @@ use platform_core::platform::AnyPlatform;
 use platform_formation::service_registry::ServiceRegistry;
 use platform_fs::disk::file_system_service::DiskFileSystemService;
 use platform_workspace::WorkspaceId;
-use service::project_service::ProjectService;
-use service::session_service::SessionService;
 use std::env;
 use std::rc::Rc;
 use std::sync::Arc;
-use surrealdb::engine::remote::ws::Client;
-use surrealdb::{engine::remote::ws::Ws, Surreal};
 use tauri::{App, Manager};
 use workbench_service_environment_tao::environment_service::NativeEnvironmentService;
 use workbench_tao::window::{NativePlatformInfo, NativeWindowConfiguration};
@@ -53,8 +49,8 @@ impl MockStorageService {
 pub struct AppState {
     pub workbench: Arc<Workbench>,
     pub platform_info: NativePlatformInfo,
-    pub project_service: ProjectService,
-    pub session_service: SessionService,
+    // pub project_service: ProjectService,
+    // pub session_service: SessionService,
 }
 
 pub fn run(native_window_configuration: NativeWindowConfiguration) -> Result<()> {
@@ -84,19 +80,19 @@ fn initialize_app(
     // export_typescript_bindings(&builder)?;
 
     //  TODO: move to StorageService
-    let db = Arc::new(
-        platform_client
-            .background_executor()
-            .block_on(init_db_client())?,
-    );
+    // let db = Arc::new(
+    //     platform_client
+    //         .background_executor()
+    //         .block_on(init_db_client())?,
+    // );
 
     let platform_info_clone = native_window_configuration.platform_info.clone();
     let service_group = create_service_registry(native_window_configuration)?;
     let tao_app = tauri::Builder::default()
         .invoke_handler(tauri::generate_handler![
             cmd_dummy::workbench_get_state,
-            cmd_dummy::create_project,
-            cmd_dummy::restore_session,
+            // cmd_dummy::create_project,
+            // cmd_dummy::restore_session,
             cmd_dummy::app_ready,
             cmd_dummy::update_font_size,
             cmd_dummy::fetch_all_themes,
@@ -104,7 +100,7 @@ fn initialize_app(
             cmd_base::native_platform_info,
             cmd_base::describe_activity_bar_part,
         ])
-        .setup(move |app: &mut App| setup_app(app, ctx, service_group, db, platform_info_clone))
+        .setup(move |app: &mut App| setup_app(app, ctx, service_group, platform_info_clone))
         .menu(menu::setup_window_menu)
         .plugin(tauri_plugin_os::init())
         .build(tauri::generate_context!())?;
@@ -116,7 +112,7 @@ fn setup_app(
     app: &mut App,
     mut ctx: AsyncContext,
     service_group: ServiceRegistry,
-    db: Arc<Surreal<Client>>,
+    // db: Arc<Surreal<Client>>,
     platform_info: NativePlatformInfo,
 ) -> std::result::Result<(), Box<dyn std::error::Error>> {
     let window_state = service_group
@@ -130,8 +126,8 @@ fn setup_app(
     let app_state = AppState {
         workbench: Arc::new(workbench),
         platform_info,
-        project_service: ProjectService::new(db.clone()),
-        session_service: SessionService::new(db.clone()),
+        // project_service: ProjectService::new(db.clone()),
+        // session_service: SessionService::new(db.clone()),
     };
 
     ctx.apply(|tx_ctx| {
@@ -182,16 +178,16 @@ fn export_typescript_bindings(builder: &tauri_specta::Builder) -> Result<()> {
         .context("Failed to export typescript bindings")?)
 }
 
-async fn init_db_client() -> Result<Surreal<Client>> {
-    // let db = Surreal::new::<File>("../rocksdb").await.unwrap();
+// async fn init_db_client() -> Result<Surreal<Client>> {
+//     // let db = Surreal::new::<File>("../rocksdb").await.unwrap();
 
-    let db = Surreal::new::<Ws>("127.0.0.1:8000")
-        .await
-        .expect("failed to connect to db");
-    db.use_ns("moss").use_db("compass").await?;
+//     let db = Surreal::new::<Ws>("127.0.0.1:8000")
+//         .await
+//         .expect("failed to connect to db");
+//     db.use_ns("moss").use_db("compass").await?;
 
-    Ok(db)
-}
+//     Ok(db)
+// }
 
 // An example of how the logging could function
 // fn init_custom_logging(app_handle: tauri::AppHandle) {
