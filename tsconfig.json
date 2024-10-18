@@ -20,6 +20,9 @@
       "path": "lib/moss_theme"
     },
     {
+      "path": "lib/moss_lang"
+    },
+    {
       "path": "tools/theme-generator"
     },
     {
