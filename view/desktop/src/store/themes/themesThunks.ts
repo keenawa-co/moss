@@ -2,6 +2,7 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import { commands } from "@/bindings";
 import { Convert } from "@repo/moss-theme";
 import { setSelectedTheme, setThemes } from "./themesSlice";
+//FIXME TS Import error
 import applyTheme from "../../../../shared/ui/src/tailwind/applyTheme";
 import { handleReadTheme } from "./themesHelpers";
 
