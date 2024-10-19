@@ -14,7 +14,7 @@ function App() {
   const dispatch = useAppDispatch();
 
   const [sideBarVisible] = useState(true);
-  const selectedTheme = useSelector((state: RootState) => state.themes.selected);
+  const isThemeSelected = useSelector((state: RootState) => state.themes.isThemeSelected);
 
   useEffect(() => {
     dispatch(setLanguageFromLocalStorage());
@@ -23,7 +23,7 @@ function App() {
 
   return (
     <>
-      {!selectedTheme ? (
+      {!isThemeSelected ? (
         <div className="relative flex min-h-screen bg-storm-800">
           <div className="container mx-auto flex max-w-screen-xl items-center justify-center text-4xl text-white">
             Loading...
