@@ -69,13 +69,6 @@
                     libcanberra
                     libcanberra-gtk2
                     libcanberra-gtk3
-                    gtk3
-                    gtk3-x11
-                    mesa
-                    libglvnd
-                    vulkan-loader
-                    vulkan-tools
-                    vulkan-validation-layers
                 ];
 
                 # Required tools and packages
