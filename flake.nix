@@ -58,17 +58,28 @@
                     librsvg
                     libsoup_3
                     pango
+                    # webkitgtk
                     webkitgtk_4_1
                     webkitgtk_4_1.dev
-                ];
-
-                # Required tools and packages
-                packages = with pkgs; [
                     dbus
                     openssl_3
                     curl
                     wget
                     pkg-config
+                    libcanberra
+                    libcanberra-gtk2
+                    libcanberra-gtk3
+                    gtk3
+                    gtk3-x11
+                    mesa
+                    libglvnd
+                    vulkan-loader
+                    vulkan-tools
+                    vulkan-validation-layers
+                ];
+
+                # Required tools and packages
+                packages = with pkgs; [
                     surrealdbVersion
                     cloc           
                     pnpmVersion             
@@ -80,6 +91,11 @@
                 devShells = {
                     default = pkgs.mkShell {
                         buildInputs = packages;
+
+                        # Ensure the GTK module path is correctly set
+                        shellHook = ''
+                            export GTK_MODULES="gail:atk-bridge"
+                        '';
                     };
                 };
 
