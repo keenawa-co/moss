@@ -24,12 +24,6 @@ members = [
     "tools/xtask",
 ]
 
-[profile.dev]
-split-debuginfo = "unpacked"
-debug = "limited"
-codegen-units = 16
-
-
 [profile.release]
 codegen-units = 1 # Compile crates one after another so the compiler can optimize better
 lto = true        # Enables link to optimizations
@@ -43,9 +37,6 @@ opt-level = 3
 
 
 [workspace.dependencies]
-# moss_hecs = { git = "https://github.com/keenawa-co/moss_hecs.git", branch = "master" }
-# moss_hecs_hierarchy = { git = "https://github.com/keenawa-co/moss_hecs_hierarchy.git", branch = "main" }
-
 moss_uikit = { path = "lib-rs/moss_uikit" }
 moss_ui = { path = "lib-rs/moss_ui" }
 
