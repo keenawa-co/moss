@@ -27,10 +27,6 @@ impl Layout {
 }
 
 impl Layout {
-    pub(crate) fn contribute(&mut self, f: impl FnOnce(&mut Self) -> Result<()>) -> Result<()> {
-        f(self)
-    }
-
     pub(crate) fn add_tree_view_container(
         &mut self,
         group_id: &str,

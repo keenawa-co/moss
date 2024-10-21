@@ -5,6 +5,9 @@ edition = "2021"
 
 
 [dependencies]
+thiserror.workspace = true
+strum.workspace = true
+strum_macros.workspace = true
 hecs = { workspace = true, features = ["macros"] }
 hecs-hierarchy = { workspace = true }
 moss_uikit = { workspace = true }

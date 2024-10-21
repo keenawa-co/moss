@@ -1,74 +1,44 @@
-use anyhow::Result;
-use hashbrown::HashMap;
-use moss_uikit::component::{layout::Order, primitive::Tooltip};
+use moss_uikit::component::layout::{Alignment, Orientation};
 
-use super::{AnyPart, PartId};
+use crate::{contribution::ViewContainerGroupKey, RegistryManager};
 
-pub type ActivityContainerId = &'static str;
+use super::{sidebar::TreeViewContainer, AnyPart, PartId, Parts};
 
-pub type DescribeActivityContainerInput = (ActivityContainerId, Tooltip, Order);
-pub type DescribeActivityContainerOutput<'a> = (&'a ActivityContainerId, &'a Tooltip, &'a Order);
-
-pub struct ActivityBarPart {}
-
-#[derive(Serialize, Debug, Clone, Default, Eq, PartialEq)]
-pub struct ActivityBarItem {
-    tooltip: Tooltip,
-    order: Order,
+#[derive(Debug, Serialize)]
+pub struct DescribeActivityBarPartOutput {
+    pub align: Alignment,
+    pub orientation: Orientation,
+    pub containers: Option<Vec<TreeViewContainer>>,
 }
 
-#[derive(Serialize, Debug, Clone, Default, Eq, PartialEq)]
-pub struct DescribeActivityBarOutput(HashMap<ActivityContainerId, ActivityBarItem>);
+pub struct ActivityBarPart {
+    align: Alignment,
+    orientation: Orientation,
+    view_container_group_type: ViewContainerGroupKey,
+}
 
 impl ActivityBarPart {
-    pub fn new() -> Self {
-        Self {}
+    pub fn new(view_container_group_key: ViewContainerGroupKey) -> Self {
+        Self {
+            align: Alignment::Start,
+            orientation: Orientation::Horizontal,
+            view_container_group_type: view_container_group_key,
+        }
     }
 }
 
 impl AnyPart for ActivityBarPart {
-    const ID: PartId = crate::parts::ACTIVITY_BAR_PART;
-    type DescribeOutput = DescribeActivityBarOutput;
+    const ID: PartId = Parts::ACTIVITY_BAR;
+    type DescribeOutput = DescribeActivityBarPartOutput;
 
-    fn contribute(&self, layout: &mut crate::layout::Layout) {
-        layout.add_tree_view_container(
-            "leftActivityBar",
-            "launchpad",
-            (
-                Tooltip {
-                    header: "Launchpad",
-                    text: Some(
-                        "Explain behavior that is not clear from the setting or action name.",
-                    ),
-                    shortcut: Some("⌘⌥A"),
-                    ..Default::default()
-                },
-                Order(1),
-            ),
-        );
-
-        // self.entity_register
-        //     .add_side_view("launchpad", ("Recently Viewed", Order))?;
-    }
-
-    fn describe(&self, layout: &crate::layout::Layout) -> Result<DescribeActivityBarOutput> {
-        let mut result = DescribeActivityBarOutput(HashMap::new());
-
-        if let Some(group) = layout.tree_view_container_groups.get("leftActivityBar") {
-            for entity in group {
-                let entity_ref = layout.registry.entity(*entity)?;
-                let mut query = entity_ref.query::<DescribeActivityContainerOutput>();
-                let (id, tooltip, order) = query.get().unwrap();
-
-                result.0.insert(
-                    id,
-                    ActivityBarItem {
-                        tooltip: tooltip.clone(),
-                        order: order.clone(),
-                    },
-                );
-            }
-        }
+    fn describe(&self, registry: &RegistryManager) -> anyhow::Result<Self::DescribeOutput> {
+        let result = DescribeActivityBarPartOutput {
+            align: self.align.clone(),
+            orientation: self.orientation.clone(),
+            containers: registry
+                .views
+                .get_containers_by_group_id(&self.view_container_group_type.as_group_key()),
+        };
 
         Ok(result)
     }

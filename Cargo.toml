@@ -55,6 +55,7 @@ workbench_service_configuration_tao = { path = "view/shared/workbench/service/co
 workbench_service_user_profile_tao = { path = "view/shared/workbench/service/user_profile/tao" }
 workbench_service_environment_tao = { path = "view/shared/workbench/service/environment/tao" }
 
+thiserror = "1.0"
 tauri = "2.0.0-rc"
 specta = "2.0.0-rc.20"
 specta-typescript = "0.0.7"
@@ -68,6 +69,7 @@ radix_trie = "0.2.1"
 parking_lot = "0.12.3"
 derive_more = "0.99.17"
 strum = "0.26"
+strum_macros = "0.26"
 lazy-regex = "3.3.0"
 dunce = "1.0.5"
 sysinfo = "0.31.2"

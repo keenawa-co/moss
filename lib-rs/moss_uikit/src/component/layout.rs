@@ -7,22 +7,23 @@ pub struct Order(pub usize);
 
 #[derive(Serialize, Debug, Clone, Eq, PartialEq, Type)]
 #[serde(rename_all = "camelCase")]
-pub enum Alignment {
-    Top,
-    Right,
-    Bottom,
-    Left,
-}
-
-#[derive(Serialize, Debug, Clone, Eq, PartialEq, Type)]
-#[serde(rename_all = "camelCase")]
 pub enum Visibility {
     Visible,
     Invisible,
     Collapse,
 }
 
-pub struct Group {
-    pub id: String,
-    pub order: usize,
+#[derive(Serialize, Debug, Clone, Eq, PartialEq, Type)]
+#[serde(rename_all = "camelCase")]
+pub enum Alignment {
+    Start,
+    Center,
+    End,
+}
+
+#[derive(Serialize, Debug, Clone, Eq, PartialEq, Type)]
+#[serde(rename_all = "camelCase")]
+pub enum Orientation {
+    Vertical,
+    Horizontal,
 }

@@ -14,12 +14,15 @@ use std::{
 };
 
 use anyhow::Result;
-use contribution::WORKBENCH_TAO_WINDOW;
+use contribution::{
+    LaunchpadContribution, ViewContainerContribution, ViewContainerGroupKey, WORKBENCH_TAO_WINDOW,
+};
 use hashbrown::HashMap;
-use hecs::Entity;
+use hecs::{Entity, EntityBuilder};
 use layout::Layout;
+use moss_uikit::component::primitive::*;
 use once_cell::unsync::OnceCell;
-use parts::{activitybar::ActivityBarPart, AnyPart, PartId};
+use parts::{activitybar::ActivityBarPart, sidebar::ViewsRegistry, AnyPart, PartId, Parts};
 use platform_configuration::{
     attribute_name, configuration_policy::ConfigurationPolicyService,
     configuration_registry::ConfigurationRegistry, AbstractConfigurationService,
@@ -76,8 +79,26 @@ pub enum WorkbenchState {
     Workspace,
 }
 
+pub(crate) trait Contribution {
+    fn contribute(registry: &mut RegistryManager) -> Result<()>;
+}
+
+#[derive(Debug)]
+pub struct RegistryManager {
+    pub views: ViewsRegistry,
+}
+
+impl RegistryManager {
+    pub fn new() -> Self {
+        Self {
+            views: ViewsRegistry::new(),
+        }
+    }
+}
+
 pub struct Workbench {
     workspace_id: WorkspaceId,
+    registry: RegistryManager,
     service_registry: Rc<RefCell<ServiceRegistry>>,
     configuration_registry: Atom<ConfigurationRegistry>,
     // TODO: this will be removed after testing is complete
@@ -124,6 +145,7 @@ impl Workbench {
 
         Ok(Self {
             workspace_id,
+            registry: RegistryManager::new(),
             service_registry: Rc::new(RefCell::new(service_registry)),
             configuration_registry,
             font_size_service: font_service_atom,
@@ -135,117 +157,24 @@ impl Workbench {
         })
     }
 
-    fn register_part(&mut self, part: impl AnyPart + 'static) {
-        part.contribute(&mut self.layout);
+    pub fn registry(&self) -> &RegistryManager {
+        &self.registry
+    }
+
+    pub fn add_part<T: AnyPart + 'static>(&mut self, part: T) {
         self.parts.insert(part.id(), Box::new(part));
     }
 
-    pub fn layout(&self) -> &Layout {
-        &self.layout
-    }
-
-    pub fn get_part<T: AnyPart + 'static>(&self, id: PartId) -> Option<&T> {
-        self.parts.get(id)?.downcast_ref::<T>()
+    pub fn get_part<T: AnyPart + 'static>(&self, part_id: PartId) -> Option<&T> {
+        self.parts.get(part_id)?.downcast_ref::<T>()
     }
 
     pub fn initialize<'a>(&'a mut self, ctx: &mut AsyncContext) -> Result<()> {
-        self.register_part(ActivityBarPart::new());
+        ViewContainerContribution::contribute(&mut self.registry)?;
 
-        // self.entity_register.add_tree_view_container(
-        //     "leftActivityBar",
-        //     "launchpad",
-        //     (
-        //         Tooltip {
-        //             header: "Launchpad",
-        //             text: Some(
-        //                 "Explain behavior that is not clear from the setting or action name.",
-        //             ),
-        //             shortcut: Some("⌘⌥A"),
-        //             ..Default::default()
-        //         },
-        //         Order(1),
-        //     ),
-        // );
+        LaunchpadContribution::contribute(&mut self.registry)?;
 
-        // self.layout.add_side_view_container(, bundle);
-        // let activity_launchpad_entity = {
-        //     let mut entity = EntityBuilder::new();
-        //     entity
-        //         .add(Tooltip {
-        //             header: "Launchpad",
-        //             text: Some(
-        //                 "Explain behavior that is not clear from the setting or action name.",
-        //             ),
-        //             shortcut: Some("⌘⌥A"),
-        //             link: Some(Link {
-        //                 title: Some("External"),
-        //                 href: "google.com",
-        //                 description: None,
-        //             }),
-        //         })
-        //         .add(Order { value: 1 });
-
-        //     self.frame.spawn(entity.build())
-        // };
-
-        // let activity_essentials_entity = {
-        //     let mut entity = EntityBuilder::new();
-        //     entity
-        //         .add(Tooltip {
-        //             header: "Essentials",
-        //             ..Default::default()
-        //         })
-        //         .add(Order { value: 2 });
-
-        //     self.frame.spawn(entity.build())
-        // };
-
-        // Toolbar
-        // {
-        //     let project_menu_entity = {
-        //         let mut entity = EntityBuilder::new();
-        //         // entity.add(Action("workbench.project.contextMenu"));
-
-        //         self.frame.spawn(entity.build())
-        //     };
-
-        //     let new_project_menu_item_entity = {
-        //         let mut entity = EntityBuilder::new();
-        //         entity.add(Text("New Project"));
-        //         entity.add(Action("workbench.action.project.new"));
-
-        //         self.frame.spawn(entity.build())
-        //     };
-
-        //     let new_window_menu_item_entity = {
-        //         let mut entity = EntityBuilder::new();
-        //         entity.add(Text("New Window"));
-        //         entity.add(Action("workbench.action.newWindow"));
-
-        //         self.frame.spawn(entity.build())
-        //     };
-
-        //     self.frame.attach::<ToolBarProjectContextMenuMarker>(
-        //         new_project_menu_item_entity,
-        //         project_menu_entity,
-        //     )?;
-        //     self.frame.attach::<ToolBarProjectContextMenuMarker>(
-        //         new_window_menu_item_entity,
-        //         project_menu_entity,
-        //     )?;
-
-        //     self.project_context_menu.set(project_menu_entity).unwrap();
-        // }
-
-        // self.frame.attach(child, parent)
-
-        // self.known_activities.insert(activity_launchpad_entity);
-        // self.known_activities.insert(activity_essentials_entity);
-
-        // let cell = async_ctx
-        //     .upgrade()
-        //     .ok_or_else(|| anyhow!("context was released"))?;
-        // let ctx: &mut Context = &mut cell.as_ref().borrow_mut();
+        self.add_part(ActivityBarPart::new(ViewContainerGroupKey::ActivityBar));
 
         ctx.apply(|cx| self.initialize_services(cx))??;
 

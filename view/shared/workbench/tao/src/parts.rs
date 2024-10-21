@@ -1,15 +1,28 @@
-use anyhow::Result;
-use hashbrown::HashMap;
-use hecs::{BuiltEntity, DynamicBundle, EntityBuilder};
-
-use crate::layout::Layout;
-
 pub mod activitybar;
-pub mod headbar;
+pub mod sidebar;
+
+use anyhow::Result;
+
+use crate::RegistryManager;
 
 pub type PartId = &'static str;
 
-pub const ACTIVITY_BAR_PART: PartId = "activityBar";
+pub enum Parts {
+    ActivityBar,
+    AuxiliaryBar,
+}
+
+impl Parts {
+    const ACTIVITY_BAR: PartId = "workbench.part.activityBar";
+    const AUXILIARY_BAR: PartId = "workbench.part.auxiliaryBar";
+
+    pub fn as_part_id(&self) -> PartId {
+        match &self {
+            Parts::ActivityBar => Self::ACTIVITY_BAR,
+            Parts::AuxiliaryBar => Self::AUXILIARY_BAR,
+        }
+    }
+}
 
 pub trait AnyPart {
     const ID: PartId;
@@ -19,6 +32,5 @@ pub trait AnyPart {
         Self::ID
     }
 
-    fn contribute(&self, layout: &mut Layout);
-    fn describe(&self, layout: &Layout) -> Result<Self::DescribeOutput>;
+    fn describe(&self, registry: &RegistryManager) -> Result<Self::DescribeOutput>;
 }
