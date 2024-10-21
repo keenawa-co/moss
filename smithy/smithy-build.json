@@ -17,6 +17,18 @@
           "disableDefaultValidation": true
         }
       }
+    },
+    "rust-codegen": {
+      "imports": ["/home/krail/projects/smithy-rs/aws/sdk/aws-models/bedrock-runtime.json"],
+      "plugins": {
+        "rust-client-codegen": {
+          "service": "com.example#MyA",
+          "module": "com.example.generated",
+          "runtimeConfig": {
+            "default": "crate"
+          }
+        }
+      }
     }
   }
 }
