@@ -8,7 +8,6 @@ const config: Pick<Config, "presets" | "content" | "extend" | "plugins" | "darkM
   content: ["./src/**/*.{js,ts,jsx,tsx,mdx}"],
   presets: [sharedConfig],
   darkMode: "selector",
-
   extend: {
     fontSize,
     keyframes: {
