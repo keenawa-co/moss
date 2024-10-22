@@ -1,6 +1,7 @@
 import * as React from "react";
 import * as TooltipPrimitive from "@radix-ui/react-tooltip";
 import { cn } from "./utils/utils";
+import { Link } from "./Link";
 
 // api-reference https://www.radix-ui.com/primitives/docs/components/tooltip#api-reference
 
@@ -34,16 +35,34 @@ export interface TooltipOptions {
   portal?: Pick<TooltipPrimitive.TooltipPortalProps, "forceMount" | "container">;
 }
 
+const TooltipShortcut = ({ shortcut }: { shortcut: string[] }) => {
+  return (
+    <div className="uppercase text-[#818594]">
+      {shortcut.map((s) => (
+        <span key={s}>{s}</span>
+      ))}
+    </div>
+  );
+};
+
 export const Tooltip = ({
-  label,
+  header,
+  text,
   shortcut, //TODO shortcut doesn't have any functionality
+  link,
   options,
   noArrow = false,
   asChild = false,
   children,
   className,
 }: {
+  header?: string;
+  text?: string;
   label?: string;
+  link?: {
+    label: string;
+    url: string;
+  };
   shortcut?: string[];
   options?: TooltipOptions;
   noArrow?: boolean;
@@ -57,14 +76,7 @@ export const Tooltip = ({
         <TooltipPrimitive.Trigger asChild={asChild}>{children}</TooltipPrimitive.Trigger>
         <TooltipPrimitive.Content
           className={cn(
-            `data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50 -mb-px flex max-w-44 gap-2.5 overflow-hidden
-              rounded-md
-              bg-[#1E1E1E]
-              px-2
-              py-1
-              text-xs
-              text-white
-              shadow-md`,
+            "z-50 -mb-px flex max-w-80 overflow-hidden rounded-md bg-[#27282E] leading-5 text-white shadow-md",
             className
           )}
           {...options?.content}
@@ -72,13 +84,21 @@ export const Tooltip = ({
           {options?.portal && <TooltipPrimitive.Portal {...options?.portal} />}
           {noArrow === false && <TooltipPrimitive.Arrow className="bg-inherit " {...options?.arrow} />}
 
-          <div>{label}</div>
+          {text || link ? (
+            <div className="flex flex-col items-start gap-1.5 px-4 py-3">
+              {header && <div className="font-semibold">{header}</div>}
 
-          {shortcut && (
-            <div className="text-neutral-400 self-center uppercase">
-              {shortcut.map((s) => (
-                <span key={s}>{s}</span>
-              ))}
+              {text && <div className="font-medium text-[#C9CCD6]">{text}</div>}
+
+              {shortcut && <TooltipShortcut shortcut={shortcut} />}
+
+              {link && <Link {...link} type="secondary" withIcon />}
+            </div>
+          ) : (
+            <div className="flex gap-1.5 p-2">
+              {header && <div className="font-semibold">{header}</div>}
+
+              {shortcut && <TooltipShortcut shortcut={shortcut} />}
             </div>
           )}
         </TooltipPrimitive.Content>

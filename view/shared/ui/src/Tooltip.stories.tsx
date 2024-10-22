@@ -15,42 +15,88 @@ type Story = StoryObj<typeof meta>;
 
 const TooltipTemplate = (args: any) => <Tooltip {...args}>Hover me!</Tooltip>;
 
-export const WithShortcut: Story = {
+export const Full: Story = {
   args: {
-    shortcut: ["⌘", "s"],
-    label: "Settings",
+    header: "Header",
+    text: "Explain behavior that is not clear from the setting or action name.",
+    shortcut: ["⌘", "⌥", "s"],
+    link: {
+      label: "External",
+      url: "https://github.com/keenawa-co/moss",
+    },
   },
   render: (args) => <TooltipTemplate {...args} />,
 };
 
-export const NoShortcut: Story = {
+export const Header: Story = {
   args: {
-    label: "Settings",
+    header: "Header",
+  },
+  render: (args) => <TooltipTemplate {...args} />,
+};
+export const Text: Story = {
+  args: {
+    text: "Explain behavior that is not clear from the setting or action name.",
+  },
+  render: (args) => <TooltipTemplate {...args} />,
+};
+export const Shortcut: Story = {
+  args: {
+    shortcut: ["⌘", "⌥", "s"],
+  },
+  render: (args) => <TooltipTemplate {...args} />,
+};
+export const Link: Story = {
+  args: {
+    link: {
+      label: "External",
+      url: "https://github.com/keenawa-co/moss",
+    },
+  },
+  render: (args) => <TooltipTemplate {...args} />,
+};
+
+export const HeaderWithShortcut: Story = {
+  args: {
+    header: "Header",
+    shortcut: ["⌘", "⌥", "s"],
+  },
+  render: (args) => <TooltipTemplate {...args} />,
+};
+
+export const WithShortcutAndLink: Story = {
+  args: {
+    shortcut: ["⌘", "⌥", "s"],
+    header: "Settings",
+    link: {
+      label: "moss",
+      url: "https://github.com/keenawa-co/moss",
+    },
   },
   render: (args) => <TooltipTemplate {...args} />,
 };
 
 export const ALotOfText: Story = {
   args: {
-    shortcut: ["⌘", "s"],
-    label: 'Not a lorem ipsum text, because spell checker marks words from lorem ipsum text as "problems"',
+    shortcut: ["⌘", "⌥", "s"],
+    text: 'Not a lorem ipsum text, because spell checker marks words from lorem ipsum text as "problems"',
   },
   render: (args) => <TooltipTemplate {...args} />,
 };
 
 export const NoArrow: Story = {
   args: {
-    shortcut: ["⌘", "s"],
-    label: "Settings",
+    shortcut: ["⌘", "⌥", "s"],
+    header: "Settings",
     noArrow: true,
   },
   render: (args) => <TooltipTemplate {...args} />,
 };
 
-export const SideBottom: Story = {
+export const AlignTooltipBottom: Story = {
   args: {
-    shortcut: ["⌘", "s"],
-    label: "Settings",
+    shortcut: ["⌘", "⌥", "s"],
+    header: "Settings",
     options: {
       content: {
         side: "bottom",
@@ -60,10 +106,10 @@ export const SideBottom: Story = {
   render: (args) => <TooltipTemplate {...args} />,
 };
 
-export const AlignStart: Story = {
+export const AlignTooltipStart: Story = {
   args: {
-    shortcut: ["⌘", "s"],
-    label: "Settings and some other stuff",
+    shortcut: ["⌘", "⌥", "s"],
+    header: "Settings and some other stuff",
     options: {
       content: {
         align: "start",
@@ -75,8 +121,8 @@ export const AlignStart: Story = {
 
 export const InstantOpen: Story = {
   args: {
-    shortcut: ["⌘", "s"],
-    label: "Settings",
+    shortcut: ["⌘", "⌥", "s"],
+    header: "Settings",
     options: {
       provider: {
         delayDuration: 0,
@@ -88,8 +134,13 @@ export const InstantOpen: Story = {
 
 export const AlwaysOpen: Story = {
   args: {
-    shortcut: ["⌘", "s"],
-    label: "Settings",
+    header: "Header",
+    text: "Explain behavior that is not clear from the setting or action name.",
+    shortcut: ["⌘", "⌥", "s"],
+    link: {
+      label: "External",
+      url: "https://github.com/keenawa-co/moss",
+    },
     options: {
       root: {
         open: true,
@@ -99,19 +150,10 @@ export const AlwaysOpen: Story = {
   render: (args) => <TooltipTemplate {...args} />,
 };
 
-export const CustomClassName: Story = {
-  args: {
-    shortcut: ["⌘", "s"],
-    label: 'Not a lorem ipsum text, because spell checker marks words from lorem ipsum text as "problems"',
-    className: "bg-red-500 text-blue-600 p-6 max-w-full text-2xl font-bold italic",
-  },
-  render: (args) => <TooltipTemplate {...args} />,
-};
-
 export const IconTrigger: Story = {
   args: {
-    shortcut: ["⌘", "s"],
-    label: "Settings",
+    shortcut: ["⌘", "⌥", "s"],
+    header: "Settings",
     options: {
       root: {},
     },
@@ -143,13 +185,12 @@ export const IconTrigger: Story = {
 
 export const TriggerAsChild: Story = {
   args: {
-    shortcut: ["⌘", "s"],
-    label: "Settings",
+    text: "Generally when you pass text to inside tooltip tag it will wrap it in button. If you don't need this wrapper you set asChild prop to true",
     asChild: true,
   },
   render: (args) => (
     <Tooltip {...args}>
-      <button>Hover me!</button>
+      <span>Hover me!</span>
     </Tooltip>
   ),
 };
