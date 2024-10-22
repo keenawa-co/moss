@@ -1,7 +1,8 @@
 {
+  "slug": "moss-dark",
   "name": "moss-dark",
   "type": "dark",
-  "default": false,
+  "isDefault": false,
   "colors": {
     "primary": "255, 255, 255, 1",
     "sideBar.background": "39, 39, 42, 1",

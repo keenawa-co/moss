@@ -1,7 +1,8 @@
 {
+  "slug": "moss-pink",
   "name": "moss-pink",
   "type": "pink",
-  "default": false,
+  "isDefault": false,
   "colors": {
     "primary": "0, 0, 0, 1",
     "sideBar.background": "234, 157, 242, 1",
