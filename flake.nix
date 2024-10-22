@@ -50,7 +50,6 @@
                     atkmm
                     cairo
                     gdk-pixbuf
-                    glib
                     gobject-introspection
                     gobject-introspection.dev
                     gtk3
@@ -58,21 +57,28 @@
                     librsvg
                     libsoup_3
                     pango
-                    # webkitgtk
                     webkitgtk_4_1
                     webkitgtk_4_1.dev
                     dbus
+                ];
+
+                # runtime Deps
+                libraries = with pkgs;[
+                    cairo
+                    pango
+                    harfbuzz
+                    gdk-pixbuf
+                    glib
                     openssl_3
-                    curl
-                    wget
-                    pkg-config
                     libcanberra
                     libcanberra-gtk2
                     libcanberra-gtk3
-                ];
+                ] ++ tauriDeps;
 
                 # Required tools and packages
                 packages = with pkgs; [
+                    curl
+                    wget
                     surrealdbVersion
                     cloc           
                     pnpmVersion             
@@ -85,10 +91,11 @@
                     default = pkgs.mkShell {
                         buildInputs = packages;
 
-                        # Ensure the GTK module path is correctly set
                         shellHook = ''
-                            export GTK_MODULES="gail:atk-bridge"
-                        '';
+                            export LD_LIBRARY_PATH=${pkgs.lib.makeLibraryPath libraries}:$LD_LIBRARY_PATH
+                            export XDG_DATA_DIRS=${pkgs.gsettings-desktop-schemas}/share/gsettings-schemas/${pkgs.gsettings-desktop-schemas.name}:${pkgs.gtk3}/share/gsettings-schemas/${pkgs.gtk3.name}:$XDG_DATA_DIRS
+                            export GIO_MODULE_DIR="${pkgs.glib-networking}/lib/gio/modules/"
+                            '';
                     };
                 };
 
