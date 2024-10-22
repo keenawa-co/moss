@@ -7,24 +7,24 @@ use platform_configuration::{
 };
 
 use crate::{
-    parts::sidebar::{GroupKey, TreeViewContainer, TreeViewDescriptor},
+    views::{GroupKey, TreeViewContainer, TreeViewDescriptor},
     Contribution,
 };
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub enum ViewContainerGroupKey {
-    ActivityBar,
-    AuxiliaryBar,
+pub enum ViewContainerLocation {
+    PrimaryActivityBar,
+    SecondaryActivityBar,
 }
 
-impl ViewContainerGroupKey {
-    const ACTIVITY_BAR: GroupKey = "activityBar";
-    const AUXILIARY_BAR: GroupKey = "auxiliaryBar";
+impl ViewContainerLocation {
+    const PRIMARY_ACTIVITY_BAR: GroupKey = "primaryActivityBar";
+    const SECONDARY_ACTIVITY_BAR: GroupKey = "secondaryActivityBar";
 
     pub fn as_group_key(&self) -> GroupKey {
         match &self {
-            ViewContainerGroupKey::ActivityBar => Self::ACTIVITY_BAR,
-            ViewContainerGroupKey::AuxiliaryBar => Self::AUXILIARY_BAR,
+            ViewContainerLocation::PrimaryActivityBar => Self::PRIMARY_ACTIVITY_BAR,
+            ViewContainerLocation::SecondaryActivityBar => Self::SECONDARY_ACTIVITY_BAR,
         }
     }
 }
@@ -34,11 +34,11 @@ impl Contribution for ViewContainerContribution {
     fn contribute(registry: &mut crate::RegistryManager) -> anyhow::Result<()> {
         registry
             .views
-            .register_container_group(ViewContainerGroupKey::ActivityBar.as_group_key())?;
+            .register_container_group(ViewContainerLocation::PrimaryActivityBar.as_group_key())?;
 
         registry
             .views
-            .register_container_group(ViewContainerGroupKey::AuxiliaryBar.as_group_key())?;
+            .register_container_group(ViewContainerLocation::SecondaryActivityBar.as_group_key())?;
 
         Ok(())
     }
@@ -55,7 +55,7 @@ impl Contribution for LaunchpadContribution {
             order: 1,
         })?;
         registry.views.add_container_to_group(
-            &ViewContainerGroupKey::ActivityBar.as_group_key(),
+            &ViewContainerLocation::PrimaryActivityBar.as_group_key(),
             &CONTAINER_ID,
         )?;
 

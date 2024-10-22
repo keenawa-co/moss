@@ -1,8 +1,8 @@
 use moss_uikit::component::layout::{Alignment, Orientation};
 
-use crate::{contribution::ViewContainerGroupKey, RegistryManager};
+use crate::{contribution::ViewContainerLocation, views::TreeViewContainer, RegistryManager};
 
-use super::{sidebar::TreeViewContainer, AnyPart, PartId, Parts};
+use super::{AnyPart, PartId, Parts};
 
 #[derive(Debug, Serialize)]
 pub struct DescribeActivityBarPartOutput {
@@ -11,24 +11,24 @@ pub struct DescribeActivityBarPartOutput {
     pub containers: Option<Vec<TreeViewContainer>>,
 }
 
-pub struct ActivityBarPart {
+pub struct PrimaryActivityBarPart {
     align: Alignment,
     orientation: Orientation,
-    view_container_group_type: ViewContainerGroupKey,
+    view_container_group_key: ViewContainerLocation,
 }
 
-impl ActivityBarPart {
-    pub fn new(view_container_group_key: ViewContainerGroupKey) -> Self {
+impl PrimaryActivityBarPart {
+    pub fn new(view_container_group_key: ViewContainerLocation) -> Self {
         Self {
             align: Alignment::Start,
             orientation: Orientation::Horizontal,
-            view_container_group_type: view_container_group_key,
+            view_container_group_key,
         }
     }
 }
 
-impl AnyPart for ActivityBarPart {
-    const ID: PartId = Parts::ACTIVITY_BAR;
+impl AnyPart for PrimaryActivityBarPart {
+    const ID: PartId = Parts::PRIMARY_ACTIVITY_BAR;
     type DescribeOutput = DescribeActivityBarPartOutput;
 
     fn describe(&self, registry: &RegistryManager) -> anyhow::Result<Self::DescribeOutput> {
@@ -37,7 +37,7 @@ impl AnyPart for ActivityBarPart {
             orientation: self.orientation.clone(),
             containers: registry
                 .views
-                .get_containers_by_group_id(&self.view_container_group_type.as_group_key()),
+                .get_containers_by_group_id(&self.view_container_group_key.as_group_key()),
         };
 
         Ok(result)

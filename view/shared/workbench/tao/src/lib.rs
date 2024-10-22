@@ -1,9 +1,7 @@
 pub mod contribution;
 pub mod parts;
+pub mod views;
 pub mod window;
-
-mod action;
-mod layout;
 
 use std::{
     any::Any,
@@ -15,14 +13,14 @@ use std::{
 
 use anyhow::Result;
 use contribution::{
-    LaunchpadContribution, ViewContainerContribution, ViewContainerGroupKey, WORKBENCH_TAO_WINDOW,
+    LaunchpadContribution, ViewContainerContribution, ViewContainerLocation, WORKBENCH_TAO_WINDOW,
 };
 use hashbrown::HashMap;
-use hecs::{Entity, EntityBuilder};
-use layout::Layout;
-use moss_uikit::component::primitive::*;
+use hecs::Entity;
 use once_cell::unsync::OnceCell;
-use parts::{activitybar::ActivityBarPart, sidebar::ViewsRegistry, AnyPart, PartId, Parts};
+use parts::{
+    primary_activitybar::PrimaryActivityBarPart, primary_sidebar::SideBarPart, AnyPart, PartId,
+};
 use platform_configuration::{
     attribute_name, configuration_policy::ConfigurationPolicyService,
     configuration_registry::ConfigurationRegistry, AbstractConfigurationService,
@@ -38,6 +36,7 @@ use platform_fs::disk::file_system_service::{
 use platform_user_profile::user_profile_service::UserProfileService as PlatformUserProfileService;
 use platform_workspace::{Workspace, WorkspaceId};
 use tauri::{AppHandle, Emitter, WebviewWindow};
+use views::ViewsRegistry;
 use workbench_service_configuration_tao::configuration_service::WorkspaceConfigurationService;
 use workbench_service_environment_tao::environment_service::NativeEnvironmentService;
 use workbench_service_user_profile_tao::user_profile_service::UserProfileService;
@@ -79,7 +78,7 @@ pub enum WorkbenchState {
     Workspace,
 }
 
-pub(crate) trait Contribution {
+pub trait Contribution {
     fn contribute(registry: &mut RegistryManager) -> Result<()>;
 }
 
@@ -110,7 +109,6 @@ pub struct Workbench {
     // activity_bar_part: Part<ActivityBar>,
     pub project_context_menu: OnceCell<Entity>,
 
-    layout: Layout,
     parts: HashMap<PartId, Box<dyn Any>>,
 }
 
@@ -152,7 +150,6 @@ impl Workbench {
             _observe_font_size_service: OnceCell::new(),
             tao_handle: OnceCell::new(),
             project_context_menu: OnceCell::new(),
-            layout: Layout::new(),
             parts: HashMap::new(),
         })
     }
@@ -165,16 +162,25 @@ impl Workbench {
         self.parts.insert(part.id(), Box::new(part));
     }
 
+    pub fn add_contribution(
+        &mut self,
+        f: impl FnOnce(&mut crate::RegistryManager) -> anyhow::Result<()>,
+    ) -> Result<()> {
+        f(&mut self.registry)
+    }
+
     pub fn get_part<T: AnyPart + 'static>(&self, part_id: PartId) -> Option<&T> {
         self.parts.get(part_id)?.downcast_ref::<T>()
     }
 
     pub fn initialize<'a>(&'a mut self, ctx: &mut AsyncContext) -> Result<()> {
-        ViewContainerContribution::contribute(&mut self.registry)?;
+        self.add_contribution(ViewContainerContribution::contribute)?;
+        self.add_contribution(LaunchpadContribution::contribute)?;
 
-        LaunchpadContribution::contribute(&mut self.registry)?;
-
-        self.add_part(ActivityBarPart::new(ViewContainerGroupKey::ActivityBar));
+        self.add_part(PrimaryActivityBarPart::new(
+            ViewContainerLocation::PrimaryActivityBar,
+        ));
+        self.add_part(SideBarPart::new(ViewContainerLocation::PrimaryActivityBar));
 
         ctx.apply(|cx| self.initialize_services(cx))??;
 

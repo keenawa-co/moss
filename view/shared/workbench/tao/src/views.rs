@@ -11,8 +11,8 @@ pub struct TreeViewContainer {
 }
 
 /// Describes a single view.
-#[derive(Debug, Clone)]
-pub(crate) struct TreeViewDescriptor {
+#[derive(Serialize, Debug, Clone)]
+pub struct TreeViewDescriptor {
     pub id: String,
     pub title: String,
     pub order: usize,
@@ -106,11 +106,11 @@ impl ViewsRegistry {
         let group = self
             .view_container_groups
             .get_mut(group_id)
-            .ok_or_else(|| ViewsRegistryError::GroupNotFound(group_id.clone()))?;
+            .ok_or_else(|| ViewsRegistryError::GroupNotFound(group_id))?;
         if !self.view_containers.contains_key(container_id) {
-            return Err(ViewsRegistryError::ContainerNotFound(container_id.clone()));
+            return Err(ViewsRegistryError::ContainerNotFound(container_id));
         }
-        group.insert(container_id.clone());
+        group.insert(container_id);
 
         Ok(())
     }
@@ -126,7 +126,7 @@ impl ViewsRegistry {
         let container_views = self
             .views
             .get_mut(id)
-            .ok_or_else(|| ViewsRegistryError::ContainerNotFound(id.clone()))?;
+            .ok_or_else(|| ViewsRegistryError::ContainerNotFound(id))?;
         container_views.extend(batch);
 
         Ok(())
