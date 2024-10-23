@@ -108,5 +108,5 @@
       "mode": "auto"
     }
   ],
-  "tailwindCSS.rootFontSize": 13,
+  "tailwindCSS.rootFontSize": 16,
 }

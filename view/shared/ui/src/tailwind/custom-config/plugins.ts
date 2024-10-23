@@ -18,6 +18,9 @@ const widgetPlugin = plugin(({ addUtilities }) => {
       "box-shadow": "3px 3px 4px 0 rgba(149, 163, 167, 0.5)",
     },
     html: {
+      fontSize: "16px",
+    },
+    body: {
       fontSize: "13px",
     },
   });
