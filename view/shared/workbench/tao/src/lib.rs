@@ -1,7 +1,9 @@
 pub mod contribution;
 pub mod parts;
-pub mod views;
+pub mod view;
 pub mod window;
+
+pub mod contributions;
 
 use std::{
     any::Any,
@@ -12,7 +14,8 @@ use std::{
 };
 
 use anyhow::Result;
-use contribution::{LaunchpadContribution, WORKBENCH_TAO_WINDOW};
+use contribution::WORKBENCH_TAO_WINDOW;
+use contributions::launchpad::contribution::LaunchpadContribution;
 use hashbrown::HashMap;
 use hecs::Entity;
 use once_cell::unsync::OnceCell;
@@ -35,7 +38,7 @@ use platform_fs::disk::file_system_service::{
 use platform_user_profile::user_profile_service::UserProfileService as PlatformUserProfileService;
 use platform_workspace::{Workspace, WorkspaceId};
 use tauri::{AppHandle, Emitter, WebviewWindow};
-use views::ViewsRegistry;
+use view::ViewsRegistry;
 use workbench_service_configuration_tao::configuration_service::WorkspaceConfigurationService;
 use workbench_service_environment_tao::environment_service::NativeEnvironmentService;
 use workbench_service_user_profile_tao::user_profile_service::UserProfileService;

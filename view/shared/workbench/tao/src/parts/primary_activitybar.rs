@@ -1,7 +1,7 @@
 use moss_uikit::component::layout::{Alignment, Orientation};
 
 use crate::{
-    views::{TreeViewContainer, TreeViewContainerLocation},
+    view::{TreeViewContainer, TreeViewContainerLocation},
     RegistryManager,
 };
 

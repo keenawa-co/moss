@@ -6,47 +6,6 @@ use platform_configuration::{
     property_key,
 };
 
-use crate::{
-    views::{TreeView, TreeViewContainer, TreeViewContainerLocation},
-    Contribution,
-};
-
-pub(crate) struct LaunchpadContribution;
-impl Contribution for LaunchpadContribution {
-    fn contribute(registry: &mut crate::RegistryManager) -> anyhow::Result<()> {
-        let container_id = registry.views.register_container(
-            TreeViewContainerLocation::PrimaryBar,
-            TreeViewContainer {
-                id: "launchpad",
-                name: "Launchpad".to_string(),
-                order: 1,
-            },
-        )?;
-
-        registry.views.register_views(
-            &container_id,
-            vec![
-                TreeView {
-                    id: "launchpad.recentlyViewed".to_string(),
-                    name: "Recently Viewed".to_string(),
-                    order: 1,
-                    hide_by_default: false,
-                    can_toggle_visibility: false,
-                },
-                TreeView {
-                    id: "launchpad.links".to_string(),
-                    name: "Links".to_string(),
-                    order: 2,
-                    hide_by_default: false,
-                    can_toggle_visibility: true,
-                },
-            ],
-        )?;
-
-        Ok(())
-    }
-}
-
 lazy_static! {
     pub static ref WORKBENCH_TAO_WINDOW: ConfigurationNode = ConfigurationNode {
         id: "window".to_string(),

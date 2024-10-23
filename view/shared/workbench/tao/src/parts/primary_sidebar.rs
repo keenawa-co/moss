@@ -1,4 +1,4 @@
-use crate::views::{TreeView, TreeViewContainer, TreeViewContainerLocation};
+use crate::view::{TreeView, TreeViewContainer, TreeViewContainerLocation};
 
 use super::{AnyPart, PartId, Parts};
 use anyhow::Result;
