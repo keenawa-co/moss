@@ -7,70 +7,38 @@ use platform_configuration::{
 };
 
 use crate::{
-    views::{GroupKey, TreeViewContainer, TreeViewDescriptor},
+    views::{TreeView, TreeViewContainer, TreeViewContainerLocation},
     Contribution,
 };
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub enum ViewContainerLocation {
-    PrimaryActivityBar,
-    SecondaryActivityBar,
-}
-
-impl ViewContainerLocation {
-    const PRIMARY_ACTIVITY_BAR: GroupKey = "primaryActivityBar";
-    const SECONDARY_ACTIVITY_BAR: GroupKey = "secondaryActivityBar";
-
-    pub fn as_group_key(&self) -> GroupKey {
-        match &self {
-            ViewContainerLocation::PrimaryActivityBar => Self::PRIMARY_ACTIVITY_BAR,
-            ViewContainerLocation::SecondaryActivityBar => Self::SECONDARY_ACTIVITY_BAR,
-        }
-    }
-}
-
-pub(crate) struct ViewContainerContribution;
-impl Contribution for ViewContainerContribution {
-    fn contribute(registry: &mut crate::RegistryManager) -> anyhow::Result<()> {
-        registry
-            .views
-            .register_container_group(ViewContainerLocation::PrimaryActivityBar.as_group_key())?;
-
-        registry
-            .views
-            .register_container_group(ViewContainerLocation::SecondaryActivityBar.as_group_key())?;
-
-        Ok(())
-    }
-}
 
 pub(crate) struct LaunchpadContribution;
 impl Contribution for LaunchpadContribution {
     fn contribute(registry: &mut crate::RegistryManager) -> anyhow::Result<()> {
-        const CONTAINER_ID: &str = "launchpad";
-
-        registry.views.register_container(TreeViewContainer {
-            id: CONTAINER_ID,
-            name: "Launchpad".to_string(),
-            order: 1,
-        })?;
-        registry.views.add_container_to_group(
-            &ViewContainerLocation::PrimaryActivityBar.as_group_key(),
-            &CONTAINER_ID,
+        let container_id = registry.views.register_container(
+            TreeViewContainerLocation::PrimaryBar,
+            TreeViewContainer {
+                id: "launchpad",
+                name: "Launchpad".to_string(),
+                order: 1,
+            },
         )?;
 
-        registry.views.register_batch_view(
-            &CONTAINER_ID,
+        registry.views.register_views(
+            &container_id,
             vec![
-                TreeViewDescriptor {
+                TreeView {
                     id: "launchpad.recentlyViewed".to_string(),
-                    title: "Recently Viewed".to_string(),
+                    name: "Recently Viewed".to_string(),
                     order: 1,
+                    hide_by_default: false,
+                    can_toggle_visibility: false,
                 },
-                TreeViewDescriptor {
+                TreeView {
                     id: "launchpad.links".to_string(),
-                    title: "Links".to_string(),
+                    name: "Links".to_string(),
                     order: 2,
+                    hide_by_default: false,
+                    can_toggle_visibility: true,
                 },
             ],
         )?;

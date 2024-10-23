@@ -1,7 +1,4 @@
-use crate::{
-    contribution::ViewContainerLocation,
-    views::{TreeViewContainer, TreeViewDescriptor},
-};
+use crate::views::{TreeView, TreeViewContainer, TreeViewContainerLocation};
 
 use super::{AnyPart, PartId, Parts};
 use anyhow::Result;
@@ -9,35 +6,28 @@ use hashbrown::HashMap;
 
 #[derive(Debug, Serialize)]
 pub struct DescribeSideBarPartOutput {
-    pub views: HashMap<String, Vec<TreeViewDescriptor>>,
+    pub views: HashMap<String, Vec<TreeView>>,
 }
 
-pub struct SideBarPart {
-    view_container_group_key: ViewContainerLocation,
-}
+pub struct PrimarySideBarPart {}
 
-impl SideBarPart {
-    pub fn new(view_container_group_key: ViewContainerLocation) -> Self {
-        Self {
-            view_container_group_key,
-        }
-    }
-
-    fn get_containers(&self, registry: &crate::RegistryManager) -> Option<Vec<TreeViewContainer>> {
-        registry
-            .views
-            .get_containers_by_group_id(&self.view_container_group_key.as_group_key())
+impl PrimarySideBarPart {
+    pub fn new() -> Self {
+        Self {}
     }
 }
 
-impl AnyPart for SideBarPart {
+impl AnyPart for PrimarySideBarPart {
     const ID: PartId = Parts::PRIMARY_SIDE_BAR;
     type DescribeOutput = DescribeSideBarPartOutput;
 
     fn describe(&self, registry: &crate::RegistryManager) -> Result<Self::DescribeOutput> {
         let mut views = HashMap::new();
 
-        if let Some(containers) = self.get_containers(registry) {
+        if let Some(containers) = registry
+            .views
+            .get_containers_by_location(&TreeViewContainerLocation::PrimaryBar)
+        {
             for container in containers {
                 if let Some(view_descriptors) =
                     registry.views.get_views_by_container_id(&container.id)

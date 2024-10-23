@@ -12,14 +12,13 @@ use std::{
 };
 
 use anyhow::Result;
-use contribution::{
-    LaunchpadContribution, ViewContainerContribution, ViewContainerLocation, WORKBENCH_TAO_WINDOW,
-};
+use contribution::{LaunchpadContribution, WORKBENCH_TAO_WINDOW};
 use hashbrown::HashMap;
 use hecs::Entity;
 use once_cell::unsync::OnceCell;
 use parts::{
-    primary_activitybar::PrimaryActivityBarPart, primary_sidebar::SideBarPart, AnyPart, PartId,
+    primary_activitybar::PrimaryActivityBarPart, primary_sidebar::PrimarySideBarPart, AnyPart,
+    PartId,
 };
 use platform_configuration::{
     attribute_name, configuration_policy::ConfigurationPolicyService,
@@ -174,13 +173,10 @@ impl Workbench {
     }
 
     pub fn initialize<'a>(&'a mut self, ctx: &mut AsyncContext) -> Result<()> {
-        self.add_contribution(ViewContainerContribution::contribute)?;
         self.add_contribution(LaunchpadContribution::contribute)?;
 
-        self.add_part(PrimaryActivityBarPart::new(
-            ViewContainerLocation::PrimaryActivityBar,
-        ));
-        self.add_part(SideBarPart::new(ViewContainerLocation::PrimaryActivityBar));
+        self.add_part(PrimaryActivityBarPart::new());
+        self.add_part(PrimarySideBarPart::new());
 
         ctx.apply(|cx| self.initialize_services(cx))??;
 

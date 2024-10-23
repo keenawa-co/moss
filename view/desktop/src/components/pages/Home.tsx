@@ -34,7 +34,7 @@ const SessionComponent = () => {
 
   let getAllActivities = async () => {
     try {
-      const responses = (await invokeCmd("describe_activity_bar_part")) as object;
+      const responses = (await invokeCmd("describe_primary_activitybar_part")) as object;
       console.log(responses);
     } catch (err) {
       console.error("Failed to get workbench state:", err);

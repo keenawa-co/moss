@@ -98,7 +98,8 @@ fn initialize_app(
             cmd_dummy::fetch_all_themes,
             cmd_dummy::read_theme,
             cmd_base::native_platform_info,
-            cmd_base::describe_activity_bar_part,
+            cmd_base::describe_primary_activitybar_part,
+            cmd_base::describe_primary_sidebar_part,
         ])
         .setup(move |app: &mut App| setup_app(app, ctx, service_group, platform_info_clone))
         .menu(menu::setup_window_menu)
