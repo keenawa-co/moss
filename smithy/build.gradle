@@ -1,0 +1,46 @@
+plugins {
+    id 'java'
+    id 'software.amazon.smithy' version '0.7.0' // Use the latest version available
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'software.amazon.smithy:smithy-model:1.0.0' // Adjust version as necessary
+}
+
+// Configure Smithy properties for building models
+smithy {
+    // Set the source directory for Smithy models
+    // srcDir = file('src/main/smithy') // Specify where your Smithy models are located
+
+    // Specify output directory for artifacts
+    // outputDirectory = file("${buildDir}/smithy-output")
+
+    // Set tags for the JAR output
+    // tags = ['example-tag', 'another-tag'] // Replace with your desired tags
+}
+
+
+// Configure Smithy code generation
+task generateSmithy {
+    doLast {
+        // Code generation for TypeScript
+        exec {
+            commandLine 'java', '-jar', 
+            configurations.smithyClasspath.singleFile, // Ensure the Smithy CLI is in the classpath
+            'codegen', 'typescript',
+            '--output', "${buildDir}/generated-typescript"
+        }
+
+        // Code generation for Rust
+        exec {
+            commandLine 'java', '-jar', 
+            configurations.smithyClasspath.singleFile, // Ensure the Smithy CLI is in the classpath
+            'codegen', 'rust',
+            '--output', "${buildDir}/generated-rust"
+        }
+    }
+}
