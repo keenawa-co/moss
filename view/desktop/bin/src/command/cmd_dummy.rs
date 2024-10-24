@@ -4,8 +4,6 @@ use std::path::PathBuf;
 use tauri::{AppHandle, Manager, State};
 use workbench_tao::WorkbenchState;
 
-use crate::service::project_service::{CreateProjectInput, ProjectDTO};
-use crate::service::session_service::SessionInfoDTO;
 use crate::AppState;
 
 #[tauri::command(async)]
@@ -56,22 +54,22 @@ pub async fn app_ready(app_handle: AppHandle) {
     window.show().unwrap();
 }
 
-#[tauri::command(async)]
-#[specta::specta]
-pub async fn create_project(
-    state: State<'_, AppState>,
-    input: CreateProjectInput,
-) -> Result<Option<ProjectDTO>, String> {
-    match state.project_service.create_project(&input).await {
-        Ok(Some(project)) => return Ok(Some(project.into())),
-        Ok(None) => return Ok(None),
-        Err(e) => {
-            let err = format!("An error occurred while creating the project: {e}");
-            error!(err);
-            return Err(err);
-        }
-    }
-}
+// #[tauri::command(async)]
+// #[specta::specta]
+// pub async fn create_project(
+//     state: State<'_, AppState>,
+//     input: CreateProjectInput,
+// ) -> Result<Option<ProjectDTO>, String> {
+//     match state.project_service.create_project(&input).await {
+//         Ok(Some(project)) => return Ok(Some(project.into())),
+//         Ok(None) => return Ok(None),
+//         Err(e) => {
+//             let err = format!("An error occurred while creating the project: {e}");
+//             error!(err);
+//             return Err(err);
+//         }
+//     }
+// }
 
 #[tauri::command(async)]
 #[specta::specta]
@@ -79,19 +77,19 @@ pub async fn workbench_get_state(state: State<'_, AppState>) -> Result<Workbench
     Ok(WorkbenchState::Empty)
 }
 
-#[tauri::command(async)]
-#[specta::specta]
-pub async fn restore_session(
-    state: State<'_, AppState>,
-    project_source: Option<String>,
-) -> Result<Option<SessionInfoDTO>, String> {
-    match state.session_service.restore_session(project_source).await {
-        Ok(Some(session_info)) => return Ok(Some(session_info.into())),
-        Ok(None) => return Ok(None),
-        Err(e) => {
-            let err = format!("An error occurred while restoring the session: {e}");
-            error!(err);
-            return Err(err);
-        }
-    }
-}
+// #[tauri::command(async)]
+// #[specta::specta]
+// pub async fn restore_session(
+//     state: State<'_, AppState>,
+//     project_source: Option<String>,
+// ) -> Result<Option<SessionInfoDTO>, String> {
+//     match state.session_service.restore_session(project_source).await {
+//         Ok(Some(session_info)) => return Ok(Some(session_info.into())),
+//         Ok(None) => return Ok(None),
+//         Err(e) => {
+//             let err = format!("An error occurred while restoring the session: {e}");
+//             error!(err);
+//             return Err(err);
+//         }
+//     }
+// }

@@ -37,7 +37,7 @@ workbench_tao.workspace = true
 workbench_service_configuration_tao.workspace = true
 workbench_service_environment_tao.workspace = true
 
-surrealdb = { workspace = true, features = ["kv-rocksdb"] }
+# surrealdb = { workspace = true, features = ["kv-rocksdb"] }
 strum = { workspace = true, features = ["derive"] }
 tokio = { workspace = true, features = ["full", "macros", "signal"] }
 serde_json.workspace = true

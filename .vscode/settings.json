@@ -1,9 +1,11 @@
 {
   "rust-analyzer.showUnlinkedFileNotification": false,
   "cSpell.words": [
+    "actionbar",
     "activites",
     "ahash",
     "autodocs",
+    "auxiliarybar",
     "bindgen",
     "canonicalize",
     "chrono",
@@ -12,6 +14,7 @@
     "filetree",
     "hashbrown",
     "Hasher",
+    "headbar",
     "inmem",
     "jsonwebtoken",
     "Keyable",
@@ -29,6 +32,7 @@
     "pangea",
     "Proto",
     "realfs",
+    "Recents",
     "reduxjs",
     "repr",
     "revisioned",
