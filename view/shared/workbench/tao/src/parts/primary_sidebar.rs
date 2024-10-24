@@ -1,4 +1,4 @@
-use crate::view::{TreeView, TreeViewContainer, TreeViewContainerLocation};
+use crate::view::{TreeView, TreeViewGroup, TreeViewGroupLocation};
 
 use super::{AnyPart, PartId, Parts};
 use anyhow::Result;
@@ -26,11 +26,10 @@ impl AnyPart for PrimarySideBarPart {
 
         if let Some(containers) = registry
             .views
-            .get_containers_by_location(&TreeViewContainerLocation::PrimaryBar)
+            .get_groups_by_location(&TreeViewGroupLocation::PrimaryBar)
         {
             for container in containers {
-                if let Some(view_descriptors) =
-                    registry.views.get_views_by_container_id(&container.id)
+                if let Some(view_descriptors) = registry.views.get_views_by_group_id(&container.id)
                 {
                     views
                         .entry(container.id.to_string())

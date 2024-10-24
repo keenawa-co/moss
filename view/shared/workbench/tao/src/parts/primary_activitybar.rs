@@ -1,7 +1,7 @@
 use moss_uikit::component::layout::{Alignment, Orientation};
 
 use crate::{
-    view::{TreeViewContainer, TreeViewContainerLocation},
+    view::{TreeViewGroup, TreeViewGroupLocation},
     RegistryManager,
 };
 
@@ -11,7 +11,7 @@ use super::{AnyPart, PartId, Parts};
 pub struct DescribeActivityBarPartOutput {
     pub align: Alignment,
     pub orientation: Orientation,
-    pub containers: Option<Vec<TreeViewContainer>>,
+    pub containers: Option<Vec<TreeViewGroup>>,
 }
 
 pub struct PrimaryActivityBarPart {
@@ -38,7 +38,7 @@ impl AnyPart for PrimaryActivityBarPart {
             orientation: self.orientation.clone(),
             containers: registry
                 .views
-                .get_containers_by_location(&TreeViewContainerLocation::PrimaryBar)
+                .get_groups_by_location(&TreeViewGroupLocation::PrimaryBar)
                 .cloned(),
         };
 

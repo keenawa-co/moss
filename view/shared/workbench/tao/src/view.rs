@@ -2,10 +2,10 @@ use hashbrown::HashMap;
 use std::fmt::Debug;
 use thiserror::Error;
 
-/// Represents a container that holds views.
+/// Represents a group that holds views.
 #[derive(Serialize, Debug, Clone)]
-pub struct TreeViewContainer {
-    pub id: ContainerId,
+pub struct TreeViewGroup {
+    pub id: GroupId,
     pub name: String,
     pub order: usize,
 }
@@ -29,86 +29,77 @@ pub trait Registry<K, V> {
 // Type aliases for better readability.
 
 pub type GroupKey = &'static str;
-pub type ContainerId = &'static str;
+pub type GroupId = &'static str;
 
 /// Custom errors for ViewsRegistry operations.
 
 #[derive(Debug, Error)]
 pub enum ViewsRegistryError {
-    #[error("Container group '{0}' already exists.")]
-    GroupAlreadyExists(GroupKey),
+    #[error("Group '{0}' already exists.")]
+    GroupAlreadyExists(GroupId),
 
-    #[error("Container group '{0}' does not exist.")]
-    GroupNotFound(GroupKey),
-
-    #[error("Container '{0}' already exists.")]
-    ContainerAlreadyExists(ContainerId),
-
-    #[error("Container '{0}' does not exist.")]
-    ContainerNotFound(ContainerId),
+    #[error("Group '{0}' does not exist.")]
+    GroupNotFound(GroupId),
 }
 
 #[derive(Debug, PartialEq, Eq, Hash)]
-pub enum TreeViewContainerLocation {
+pub enum TreeViewGroupLocation {
     PrimaryBar,
     SecondaryBar,
 }
 
 #[derive(Debug)]
 pub struct ViewsRegistry {
-    view_containers: HashMap<TreeViewContainerLocation, Vec<TreeViewContainer>>,
-    views: HashMap<ContainerId, Vec<TreeView>>,
+    view_groups: HashMap<TreeViewGroupLocation, Vec<TreeViewGroup>>,
+    views: HashMap<GroupId, Vec<TreeView>>,
 }
 
 impl ViewsRegistry {
     pub fn new() -> Self {
         ViewsRegistry {
-            view_containers: HashMap::new(),
+            view_groups: HashMap::new(),
             views: HashMap::new(),
         }
     }
 
-    pub(crate) fn register_container(
+    pub(crate) fn register_group(
         &mut self,
-        location: TreeViewContainerLocation,
-        container: TreeViewContainer,
+        location: TreeViewGroupLocation,
+        group: TreeViewGroup,
     ) -> Result<(), ViewsRegistryError> {
-        let container_id = container.id;
+        let group_id = group.id;
 
-        self.view_containers
+        self.view_groups
             .entry(location)
             .or_insert_with(Vec::new)
-            .push(container);
-        self.views.entry(container_id).or_insert_with(Vec::new);
+            .push(group);
+        self.views.entry(group_id).or_insert_with(Vec::new);
 
         Ok(())
     }
 
     pub(crate) fn register_views(
         &mut self,
-        id: &ContainerId,
+        id: &GroupId,
         batch: impl IntoIterator<Item = TreeView>,
     ) -> Result<(), ViewsRegistryError> {
-        let container_views = self
+        let group_views = self
             .views
             .get_mut(id)
-            .ok_or_else(|| ViewsRegistryError::ContainerNotFound(id))?;
-        container_views.extend(batch);
+            .ok_or_else(|| ViewsRegistryError::GroupNotFound(id))?;
+        group_views.extend(batch);
 
         Ok(())
     }
 
-    pub(crate) fn get_views_by_container_id(
-        &self,
-        container_id: &ContainerId,
-    ) -> Option<&Vec<TreeView>> {
-        self.views.get(container_id)
+    pub(crate) fn get_views_by_group_id(&self, id: &GroupId) -> Option<&Vec<TreeView>> {
+        self.views.get(id)
     }
 
-    pub(crate) fn get_containers_by_location(
+    pub(crate) fn get_groups_by_location(
         &self,
-        location: &TreeViewContainerLocation,
-    ) -> Option<&Vec<TreeViewContainer>> {
-        self.view_containers.get(location)
+        location: &TreeViewGroupLocation,
+    ) -> Option<&Vec<TreeViewGroup>> {
+        self.view_groups.get(location)
     }
 }
