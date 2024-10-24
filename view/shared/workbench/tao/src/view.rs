@@ -72,7 +72,7 @@ impl ViewsRegistry {
         &mut self,
         location: TreeViewContainerLocation,
         container: TreeViewContainer,
-    ) -> Result<ContainerId, ViewsRegistryError> {
+    ) -> Result<(), ViewsRegistryError> {
         let container_id = container.id;
 
         self.view_containers
@@ -81,7 +81,7 @@ impl ViewsRegistry {
             .push(container);
         self.views.entry(container_id).or_insert_with(Vec::new);
 
-        Ok(container_id)
+        Ok(())
     }
 
     pub(crate) fn register_views(

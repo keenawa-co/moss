@@ -1,5 +1,7 @@
+use crate::{view::TreeView, Contribution};
 use anyhow::Result;
 use quote::quote;
+
 pub trait AnyContentProvider {
     type ContentOutput;
 
@@ -38,5 +40,23 @@ impl AnyContentProvider for RecentsViewContentProvider {
                 },
             ],
         })
+    }
+}
+
+pub(crate) struct RecentsContribution;
+impl Contribution for RecentsContribution {
+    fn contribute(registry: &mut crate::RegistryManager) -> anyhow::Result<()> {
+        registry.views.register_views(
+            &super::tree_view_groups::launchpad::GROUP_ID,
+            vec![TreeView {
+                id: "workbench.view.recents".to_string(),
+                name: "Recents".to_string(),
+                order: 1,
+                hide_by_default: false,
+                can_toggle_visibility: false,
+            }],
+        )?;
+
+        Ok(())
     }
 }

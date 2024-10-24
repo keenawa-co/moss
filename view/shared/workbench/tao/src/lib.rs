@@ -15,7 +15,10 @@ use std::{
 
 use anyhow::Result;
 use contribution::WORKBENCH_TAO_WINDOW;
-use contributions::launchpad::contribution::LaunchpadContribution;
+use contributions::{
+    links::LinksContribution, resents::RecentsContribution,
+    tree_view_groups::launchpad::LaunchpadGroupContribution,
+};
 use hashbrown::HashMap;
 use hecs::Entity;
 use once_cell::unsync::OnceCell;
@@ -176,7 +179,10 @@ impl Workbench {
     }
 
     pub fn initialize<'a>(&'a mut self, ctx: &mut AsyncContext) -> Result<()> {
-        self.add_contribution(LaunchpadContribution::contribute)?;
+        self.add_contribution(LaunchpadGroupContribution::contribute)?;
+
+        self.add_contribution(RecentsContribution::contribute)?;
+        self.add_contribution(LinksContribution::contribute)?;
 
         self.add_part(PrimaryActivityBarPart::new());
         self.add_part(PrimarySideBarPart::new());
