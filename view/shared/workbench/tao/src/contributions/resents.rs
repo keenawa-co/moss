@@ -1,14 +1,12 @@
-use crate::{view::TreeView, Contribution};
+use crate::{
+    view::{AnyContentProvider, TreeViewDescriptor},
+    Contribution,
+};
 use anyhow::Result;
+use once_cell::sync::Lazy;
 use quote::quote;
 
-pub trait AnyContentProvider {
-    type ContentOutput;
-
-    fn content(&self) -> Self::ContentOutput;
-}
-
-pub struct RecentsViewContentProvider {}
+pub struct RecentsContentProvider {}
 
 #[derive(Debug, Serialize)]
 pub struct RecentsViewTreeItem {
@@ -21,7 +19,7 @@ pub struct RecentsViewContentProviderOutput {
     pub html: String,
 }
 
-impl AnyContentProvider for RecentsViewContentProvider {
+impl AnyContentProvider for RecentsContentProvider {
     type ContentOutput = Result<RecentsViewContentProviderOutput>;
 
     fn content(&self) -> Self::ContentOutput {
@@ -43,17 +41,21 @@ impl AnyContentProvider for RecentsViewContentProvider {
     }
 }
 
+pub struct RecentsViewModel {}
+
 pub(crate) struct RecentsContribution;
 impl Contribution for RecentsContribution {
     fn contribute(registry: &mut crate::RegistryManager) -> anyhow::Result<()> {
         registry.views.register_views(
             &super::tree_view_groups::launchpad::GROUP_ID,
-            vec![TreeView {
-                id: "workbench.view.recents".to_string(),
+            vec![TreeViewDescriptor {
+                id: "workbench.view.recentsView".to_string(),
                 name: "Recents".to_string(),
                 order: 1,
                 hide_by_default: false,
                 can_toggle_visibility: false,
+                collapsed: false,
+                model: Lazy::new(|| Box::new(RecentsViewModel {})),
             }],
         )?;
 

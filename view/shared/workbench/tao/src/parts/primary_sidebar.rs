@@ -1,4 +1,4 @@
-use crate::view::{TreeView, TreeViewGroup, TreeViewGroupLocation};
+use crate::view::{TreeViewGroupLocation, TreeViewOutput};
 
 use super::{AnyPart, PartId, Parts};
 use anyhow::Result;
@@ -6,7 +6,7 @@ use hashbrown::HashMap;
 
 #[derive(Debug, Serialize)]
 pub struct DescribeSideBarPartOutput {
-    pub views: HashMap<String, Vec<TreeView>>,
+    pub views: HashMap<String, Vec<TreeViewOutput>>,
 }
 
 pub struct PrimarySideBarPart {}
@@ -29,12 +29,14 @@ impl AnyPart for PrimarySideBarPart {
             .get_groups_by_location(&TreeViewGroupLocation::PrimaryBar)
         {
             for container in containers {
-                if let Some(view_descriptors) = registry.views.get_views_by_group_id(&container.id)
+                if let Some(view_descriptors) = registry
+                    .views
+                    .get_view_descriptors_by_group_id(&container.id)
                 {
                     views
                         .entry(container.id.to_string())
                         .or_insert_with(Vec::new)
-                        .extend(view_descriptors.clone())
+                        .extend(view_descriptors.iter().map(|descriptor| descriptor.into()))
                 }
             }
         }

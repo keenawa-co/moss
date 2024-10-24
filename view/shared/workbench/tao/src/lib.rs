@@ -87,7 +87,6 @@ pub trait Contribution {
     fn contribute(registry: &mut RegistryManager) -> Result<()>;
 }
 
-#[derive(Debug)]
 pub struct RegistryManager {
     pub views: ViewsRegistry,
 }
