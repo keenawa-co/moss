@@ -16,8 +16,7 @@ crate-type = ["lib", "cdylib", "staticlib"]
 tauri-build = { version = "2.0.0-rc", features = [] }
 
 [dependencies]
-moss_ui.workspace = true
-moss_uikit.workspace = true
+moss_uikit_models.workspace = true
 futures.workspace = true
 anyhow.workspace = true
 once_cell.workspace = true

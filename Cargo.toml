@@ -1,8 +1,7 @@
 [workspace]
 resolver = "2"
 members = [
-    "lib-rs/moss_uikit",
-    "lib-rs/moss_ui",
+    "view/shared/models/uikit",
 
     "platform/core",
     "platform/fs",
@@ -37,8 +36,7 @@ opt-level = 3
 
 
 [workspace.dependencies]
-moss_uikit = { path = "lib-rs/moss_uikit" }
-moss_ui = { path = "lib-rs/moss_ui" }
+moss_uikit_models = { path = "view/shared/models/uikit" }
 
 platform_core = { path = "platform/core" }
 platform_utl = { path = "platform/utl" }

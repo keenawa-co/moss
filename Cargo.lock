@@ -897,8 +897,7 @@ dependencies = [
  "hashbrown 0.14.5",
  "macos-trampoline",
  "mimalloc",
- "moss_ui",
- "moss_uikit",
+ "moss_uikit_models",
  "once_cell",
  "parking_lot",
  "platform_configuration",
@@ -2270,18 +2269,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "moss_ui"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "moss_uikit",
- "serde",
- "specta",
- "specta-typescript",
-]
-
-[[package]]
-name = "moss_uikit"
+name = "moss_uikit_models"
 version = "0.1.0"
 dependencies = [
  "anyhow",
@@ -5569,8 +5557,7 @@ dependencies = [
  "hecs",
  "hecs-hierarchy",
  "lazy_static",
- "moss_ui",
- "moss_uikit",
+ "moss_uikit_models",
  "once_cell",
  "platform_configuration",
  "platform_core",
