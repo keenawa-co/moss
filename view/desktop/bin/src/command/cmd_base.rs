@@ -1,4 +1,5 @@
 use tauri::State;
+use workbench_tao::contributions::resents::{RecentsViewContentProviderOutput, RecentsViewModel};
 use workbench_tao::parts::primary_activitybar::{
     DescribeActivityBarPartOutput, PrimaryActivityBarPart,
 };
@@ -37,4 +38,21 @@ pub fn describe_primary_sidebar_part(
 
     part.describe(state.workbench.registry())
         .map_err(|err| format!("failed to describe primary sidebar: {err}"))
+}
+
+#[tauri::command]
+pub fn get_view_content(
+    state: State<'_, AppState>,
+) -> Result<RecentsViewContentProviderOutput, String> {
+    let model = state
+        .workbench
+        .get_view::<RecentsViewModel>(
+            "workbench.group.launchpad",
+            "workbench.view.recentsView".to_string(),
+        )
+        .unwrap();
+
+    model
+        .content()
+        .map_err(|err| format!("failed to get view content: {err}"))
 }

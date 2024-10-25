@@ -41,7 +41,7 @@ use platform_fs::disk::file_system_service::{
 use platform_user_profile::user_profile_service::UserProfileService as PlatformUserProfileService;
 use platform_workspace::{Workspace, WorkspaceId};
 use tauri::{AppHandle, Emitter, WebviewWindow};
-use view::ViewsRegistry;
+use view::{GroupId, ViewsRegistry};
 use workbench_service_configuration_tao::configuration_service::WorkspaceConfigurationService;
 use workbench_service_environment_tao::environment_service::NativeEnvironmentService;
 use workbench_service_user_profile_tao::user_profile_service::UserProfileService;
@@ -175,6 +175,10 @@ impl Workbench {
 
     pub fn get_part<T: AnyPart + 'static>(&self, part_id: PartId) -> Option<&T> {
         self.parts.get(part_id)?.downcast_ref::<T>()
+    }
+
+    pub fn get_view<T: 'static>(&self, group_id: GroupId, view_id: String) -> Option<&T> {
+        self.registry.views.get_view_model(group_id, view_id)
     }
 
     pub fn initialize<'a>(&'a mut self, ctx: &mut AsyncContext) -> Result<()> {

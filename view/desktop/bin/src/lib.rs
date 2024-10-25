@@ -100,6 +100,7 @@ fn initialize_app(
             cmd_base::native_platform_info,
             cmd_base::describe_primary_activitybar_part,
             cmd_base::describe_primary_sidebar_part,
+            cmd_base::get_view_content
         ])
         .setup(move |app: &mut App| setup_app(app, ctx, service_group, platform_info_clone))
         .menu(menu::setup_window_menu)
