@@ -6,8 +6,6 @@ use anyhow::Result;
 use once_cell::sync::Lazy;
 use quote::quote;
 
-pub struct RecentsContentProvider {}
-
 #[derive(Debug, Serialize)]
 pub struct RecentsViewTreeItem {
     pub path: String,
@@ -18,28 +16,6 @@ pub struct RecentsViewTreeItem {
 pub struct RecentsViewContentProviderOutput {
     pub data: Vec<RecentsViewTreeItem>,
     pub html: String,
-}
-
-impl AnyContentProvider for RecentsContentProvider {
-    type ContentOutput = Result<RecentsViewContentProviderOutput>;
-
-    fn content(&self) -> Self::ContentOutput {
-        let tokens = quote! { <p className="text-sm">"Hello, World!"</p> };
-
-        Ok(RecentsViewContentProviderOutput {
-            html: tokens.to_string(),
-            data: vec![
-                RecentsViewTreeItem {
-                    path: "~/keenawa/moss".to_string(),
-                    last_modification: "14 min ago".to_string(),
-                },
-                RecentsViewTreeItem {
-                    path: "~/zigland/zig".to_string(),
-                    last_modification: "18 hours ago".to_string(),
-                },
-            ],
-        })
-    }
 }
 
 pub struct RecentsViewModel {}
