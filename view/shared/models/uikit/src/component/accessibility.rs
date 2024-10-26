@@ -1,6 +1,6 @@
 use serde::Serialize;
-use specta::Type;
 
-#[derive(Serialize, Debug, Clone, Default, Eq, PartialEq, Type)]
-#[serde(rename_all = "camelCase")]
-pub struct Action(pub &'static str);
+// #[derive(Serialize, Debug, Clone, Default, Eq, PartialEq, TS)]
+// #[serde(rename_all = "camelCase")]
+// #[ts(export)]
+// pub struct Action(pub &'static str);

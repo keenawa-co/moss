@@ -25,11 +25,11 @@
     {
       "path": "sdk/ts"
     },
-    {
-      "path": "view/desktop/models/mossui"
-    }
     // {
-    //   "path": "lib-rs/moss_ui"
+    //   "path": "view/desktop/models/mossui"
     // }
+    {
+      "path": "view/shared/models/uikit"
+    }
   ]
 }

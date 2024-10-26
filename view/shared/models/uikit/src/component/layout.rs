@@ -1,28 +1,27 @@
 use serde::Serialize;
-use specta::Type;
+use ts_rs::TS;
 
-#[derive(Serialize, Debug, Clone, Copy, Default, Eq, PartialEq, Type)]
+#[derive(Serialize, Debug, Clone, Eq, PartialEq, TS)]
 #[serde(rename_all = "camelCase")]
-pub struct Order(pub usize);
-
-#[derive(Serialize, Debug, Clone, Eq, PartialEq, Type)]
-#[serde(rename_all = "camelCase")]
+#[ts(export, export_to = "models.ts")]
 pub enum Visibility {
     Visible,
     Invisible,
     Collapse,
 }
 
-#[derive(Serialize, Debug, Clone, Eq, PartialEq, Type)]
+#[derive(Serialize, Debug, Clone, Eq, PartialEq, TS)]
 #[serde(rename_all = "camelCase")]
+#[ts(export, export_to = "models.ts")]
 pub enum Alignment {
     Start,
     Center,
     End,
 }
 
-#[derive(Serialize, Debug, Clone, Eq, PartialEq, Type)]
+#[derive(Serialize, Debug, Clone, Eq, PartialEq, TS)]
 #[serde(rename_all = "camelCase")]
+#[ts(export, export_to = "models.ts")]
 pub enum Orientation {
     Vertical,
     Horizontal,
