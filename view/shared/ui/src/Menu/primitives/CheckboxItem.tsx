@@ -25,7 +25,7 @@ export const CheckboxItem = forwardRef<CheckboxItemElement, CheckboxItemProps>(
       >
         {props.checked ? <Icon icon="CheckIconGreen" /> : <Icon icon="CheckIconGreen" className="opacity-0" />}
 
-        <span className="font-medium">{props.label}</span>
+        <span>{props.label}</span>
 
         {props.shortcut && <div className="ml-auto text-[#8D8D8D]">{props.shortcut.join("")}</div>}
       </MenuPrimitive.CheckboxItem>
