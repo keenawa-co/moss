@@ -51,7 +51,7 @@ export const Tooltip = ({
   shortcut, //TODO shortcut doesn't have any functionality
   link,
   options,
-  noArrow = false,
+  arrow = false,
   asChild = false,
   children,
   className,
@@ -65,7 +65,7 @@ export const Tooltip = ({
   };
   shortcut?: string[];
   options?: TooltipOptions;
-  noArrow?: boolean;
+  arrow?: boolean;
   asChild?: boolean;
   className?: string;
   children?: React.ReactNode;
@@ -76,13 +76,13 @@ export const Tooltip = ({
         <TooltipPrimitive.Trigger asChild={asChild}>{children}</TooltipPrimitive.Trigger>
         <TooltipPrimitive.Content
           className={cn(
-            "z-50 -mb-px flex max-w-80 overflow-hidden rounded-md bg-[#27282E] leading-5 text-white shadow-md",
+            "z-50 -mb-px flex max-w-80 overflow-hidden rounded-md bg-[#1E1E1E] leading-5 text-white shadow-md",
             className
           )}
           {...options?.content}
         >
           {options?.portal && <TooltipPrimitive.Portal {...options?.portal} />}
-          {noArrow === false && <TooltipPrimitive.Arrow className="bg-inherit " {...options?.arrow} />}
+          {arrow && <TooltipPrimitive.Arrow {...options?.arrow} className="fill-[#1E1E1E]" />}
 
           {text || link ? (
             <div className="flex flex-col items-start gap-1.5 px-4 py-3">

@@ -10,12 +10,11 @@ interface Link {
   className?: string;
 }
 
-// TODO change colors to variables
-const linkVariants = cva("inline-flex items-center !duration-0", {
+const linkVariants = cva("inline-flex items-center duration-300 transition-colors  ", {
   variants: {
     type: {
-      primary: "text-[#0f62fe] hover:text-[#054ada] hover:underline ",
-      secondary: "text-[#88ADF7] hover:text-[#054ada] hover:underline",
+      primary: "text-[#0f62fe] hover:text-[#054ada]",
+      secondary: "text-[#88ADF7] hover:text-[#054ada]",
       disabled: "text-[#c4c4c4] cursor-not-allowed",
     },
   },
