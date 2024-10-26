@@ -3,22 +3,22 @@ resolver = "2"
 members = [
     "view/shared/models/uikit",
 
-    "platform/core",
-    "platform/fs",
-    "platform/formation",
-    "platform/configuration",
-    "platform/user_profile",
-    "platform/environment",
-    "platform/utl",
-    "platform/workspace",
+    "internal/platform/core",
+    "internal/platform/fs",
+    "internal/platform/formation",
+    "internal/platform/configuration",
+    "internal/platform/user_profile",
+    "internal/platform/environment",
+    "internal/platform/utl",
+    "internal/platform/workspace",
 
     "view/desktop/bin",
 
-    "view/shared/workbench/tao",
-    "view/shared/workbench/service/configuration/common",
-    "view/shared/workbench/service/configuration/tao",
-    "view/shared/workbench/service/user_profile/tao",
-    "view/shared/workbench/service/environment/tao",
+    "internal/workbench/tao",
+    "internal/workbench/service/configuration/common",
+    "internal/workbench/service/configuration/tao",
+    "internal/workbench/service/user_profile/tao",
+    "internal/workbench/service/environment/tao",
 
     "tools/xtask",
 ]
@@ -38,20 +38,20 @@ opt-level = 3
 [workspace.dependencies]
 moss_uikit_models = { path = "view/shared/models/uikit" }
 
-platform_core = { path = "platform/core" }
-platform_utl = { path = "platform/utl" }
-platform_configuration = { path = "platform/configuration" }
-platform_formation = { path = "platform/formation" }
-platform_user_profile = { path = "platform/user_profile" }
-platform_environment = { path = "platform/environment" }
-platform_workspace = { path = "platform/workspace" }
-platform_fs = { path = "platform/fs" }
+platform_core = { path = "internal/platform/core" }
+platform_utl = { path = "internal/platform/utl" }
+platform_configuration = { path = "internal/platform/configuration" }
+platform_formation = { path = "internal/platform/formation" }
+platform_user_profile = { path = "internal/platform/user_profile" }
+platform_environment = { path = "internal/platform/environment" }
+platform_workspace = { path = "internal/platform/workspace" }
+platform_fs = { path = "internal/platform/fs" }
 
-workbench_tao = { path = "view/shared/workbench/tao" }
-workbench_service_configuration_common = { path = "view/shared/workbench/service/configuration/common" }
-workbench_service_configuration_tao = { path = "view/shared/workbench/service/configuration/tao" }
-workbench_service_user_profile_tao = { path = "view/shared/workbench/service/user_profile/tao" }
-workbench_service_environment_tao = { path = "view/shared/workbench/service/environment/tao" }
+workbench_tao = { path = "internal/workbench/tao" }
+workbench_service_configuration_common = { path = "internal/workbench/service/configuration/common" }
+workbench_service_configuration_tao = { path = "internal/workbench/service/configuration/tao" }
+workbench_service_user_profile_tao = { path = "internal/workbench/service/user_profile/tao" }
+workbench_service_environment_tao = { path = "internal/workbench/service/environment/tao" }
 
 ts-rs = "10.0"
 thiserror = "1.0"
