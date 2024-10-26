@@ -5,6 +5,9 @@ WEB_DIR = view/web
 THEME_GENERATOR_DIR = tools/theme-generator
 ICONS_DIR = view/shared/icons
 
+WORKBENCH_MODELS = internal/workbench/models
+SHARED_MODELS = view/shared/models
+
 PNPM = pnpm
 SURREAL = surreal
 CARGO = cargo
@@ -52,6 +55,15 @@ gen-themes:
 
 gen-icons:
 	@cd $(ICONS_DIR) && $(PNPM) run build
+
+gen-shared-models:
+	cargo test --manifest-path $(SHARED_MODELS)/uikit/Cargo.toml
+
+gen-workbench-models:
+	cargo test --manifest-path $(WORKBENCH_MODELS)/Cargo.toml
+	cargo build --manifest-path $(WORKBENCH_MODELS)/Cargo.toml
+
+gen-models: gen-shared-models gen-workbench-models
 
 
 # Check if the database is running, if not, start it in the background
