@@ -103,7 +103,7 @@ const DropdownMenuSubTrigger = ({ icon, className, children, ...props }: Dropdow
 
 const DropdownMenuSubContent = ({ className, children, ...props }: DropdownMenuSubContentProps) => (
   <DropdownMenuPrimitive.SubContent
-    sideOffset={16 || props.sideOffset}
+    sideOffset={props.sideOffset || 16}
     className={cn(ContentStyles, TextStyles, "-mt-1.5 min-w-48", className)}
     {...props}
   >
