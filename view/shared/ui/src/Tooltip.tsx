@@ -37,7 +37,7 @@ export interface TooltipOptions {
 
 const TooltipShortcut = ({ shortcut }: { shortcut: string[] }) => {
   return (
-    <div className="uppercase text-[#818594]">
+    <div className="font-medium uppercase text-[#818594]">
       {shortcut.map((s) => (
         <span key={s}>{s}</span>
       ))}
@@ -86,9 +86,9 @@ export const Tooltip = ({
 
           {text || link ? (
             <div className="flex flex-col items-start gap-1.5 px-4 py-3">
-              {header && <div className="font-semibold">{header}</div>}
+              {header && <div className="font-medium">{header}</div>}
 
-              {text && <div className="font-medium text-[#C9CCD6]">{text}</div>}
+              {text && <div className="text-[#C9CCD6]">{text}</div>}
 
               {shortcut && <TooltipShortcut shortcut={shortcut} />}
 
@@ -96,7 +96,7 @@ export const Tooltip = ({
             </div>
           ) : (
             <div className="flex gap-1.5 p-2">
-              {header && <div className="font-semibold">{header}</div>}
+              {header && <div className="font-medium">{header}</div>}
 
               {shortcut && <TooltipShortcut shortcut={shortcut} />}
             </div>
