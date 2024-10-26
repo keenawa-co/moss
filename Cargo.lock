@@ -897,7 +897,6 @@ dependencies = [
  "hashbrown 0.14.5",
  "macos-trampoline",
  "mimalloc",
- "moss_uikit_models",
  "once_cell",
  "parking_lot",
  "platform_configuration",
@@ -919,6 +918,7 @@ dependencies = [
  "tokio",
  "tracing",
  "tracing-subscriber",
+ "uikit_models",
  "workbench_service_configuration_tao",
  "workbench_service_environment_tao",
  "workbench_tao",
@@ -2266,15 +2266,6 @@ dependencies = [
  "libc",
  "wasi 0.11.0+wasi-snapshot-preview1",
  "windows-sys 0.52.0",
-]
-
-[[package]]
-name = "moss_uikit_models"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "serde",
- "ts-rs",
 ]
 
 [[package]]
@@ -4745,6 +4736,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "42ff0bf0c66b8238c6f3b578df37d0b7848e55df8577b3f74f92a69acceeb825"
 
 [[package]]
+name = "uikit_models"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "serde",
+ "ts-rs",
+]
+
+[[package]]
 name = "unic-char-property"
 version = "0.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -5537,6 +5537,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "workbench_models"
+version = "0.1.0"
+
+[[package]]
 name = "workbench_service_configuration_common"
 version = "0.1.0"
 dependencies = [
@@ -5588,7 +5592,6 @@ dependencies = [
  "hecs",
  "hecs-hierarchy",
  "lazy_static",
- "moss_uikit_models",
  "once_cell",
  "platform_configuration",
  "platform_core",
@@ -5607,6 +5610,7 @@ dependencies = [
  "sysinfo",
  "tauri",
  "thiserror",
+ "uikit_models",
  "workbench_service_configuration_tao",
  "workbench_service_environment_tao",
  "workbench_service_user_profile_tao",

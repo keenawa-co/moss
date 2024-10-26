@@ -25,11 +25,11 @@
     {
       "path": "sdk/ts"
     },
-    // {
-    //   "path": "view/desktop/models/mossui"
-    // }
     {
       "path": "view/shared/models/uikit"
+    },
+    {
+      "path": "internal/workbench/models"
     }
   ]
 }
