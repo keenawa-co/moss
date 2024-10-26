@@ -18,16 +18,16 @@ export const CheckboxItem = forwardRef<CheckboxItemElement, CheckboxItemProps>(
       <MenuPrimitive.CheckboxItem
         {...props}
         ref={forwardedRef}
-        className={cn("flex items-center gap-1.5 rounded  px-2 py-1", {
+        className={cn("flex items-center gap-1.5 rounded px-2 py-1", {
           "cursor-not-allowed opacity-50": props.disabled,
           "cursor-pointer hover:bg-[#D4E2FF] hover:outline-none": !props.disabled,
         })}
       >
         {props.checked ? <Icon icon="CheckIconGreen" /> : <Icon icon="CheckIconGreen" className="opacity-0" />}
 
-        <span>{props.label}</span>
+        <span className="font-medium">{props.label}</span>
 
-        {props.shortcut && <div className="ml-auto">{props.shortcut.join("")}</div>}
+        {props.shortcut && <div className="ml-auto text-[#8D8D8D]">{props.shortcut.join("")}</div>}
       </MenuPrimitive.CheckboxItem>
     );
   }

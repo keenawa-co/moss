@@ -27,11 +27,16 @@ export const SubTrigger = forwardRef<SubTriggerElement, SubTriggerProps>(
           "cursor-pointer hover:bg-[#D4E2FF] hover:outline-none": !props.disabled,
         })}
       >
-        {!hideIcon && (props.icon ? <Icon icon={props.icon} /> : <Icon icon="Documentation" className="opacity-0" />)}
+        {!hideIcon &&
+          (props.icon ? (
+            <Icon icon={props.icon} className="text-[#8D8D8D]" />
+          ) : (
+            <Icon icon="Documentation" className="opacity-0" />
+          ))}
 
-        <span className="font-medium">{props.label}</span>
+        <span>{props.label}</span>
 
-        <Icon icon="ArrowheadRight" className="ml-auto" />
+        <Icon icon="ArrowheadRight" className="ml-auto text-[#8D8D8D]" />
       </MenuPrimitive.SubTrigger>
     );
   }

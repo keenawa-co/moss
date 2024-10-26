@@ -11,7 +11,7 @@ export const Content = forwardRef<ContentElement, ContentProps>((props, forwarde
   return (
     <MenuPrimitive.Content
       {...props}
-      className={cn("rounded-lg bg-white px-3 py-2", props.className)}
+      className={cn("rounded-lg bg-white px-3 py-2 shadow-lg", props.className)}
       ref={forwardedRef}
     />
   );

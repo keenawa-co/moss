@@ -24,11 +24,16 @@ export const Item = forwardRef<ItemElement, ItemProps>(({ hideIcon = false, ...p
         "cursor-pointer hover:bg-[#D4E2FF] hover:outline-none": !props.disabled,
       })}
     >
-      {!hideIcon && (props.icon ? <Icon icon={props.icon} /> : <Icon icon="Documentation" className="opacity-0" />)}
+      {!hideIcon &&
+        (props.icon ? (
+          <Icon icon={props.icon} className="text-[#8D8D8D]" />
+        ) : (
+          <Icon icon="Documentation" className="opacity-0" />
+        ))}
 
-      <span className="font-medium">{props.label}</span>
+      <span>{props.label}</span>
 
-      {props.shortcut && <div className="ml-auto">{props.shortcut.join("")}</div>}
+      {props.shortcut && <div className="ml-auto text-[#8D8D8D]">{props.shortcut.join("")}</div>}
     </MenuPrimitive.Item>
   );
 });
