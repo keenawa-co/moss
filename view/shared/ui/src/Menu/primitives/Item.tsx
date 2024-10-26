@@ -30,10 +30,11 @@ export const Item = forwardRef<ItemElement, ItemProps>(({ hideIcon = false, ...p
         ) : (
           <Icon icon="Documentation" className="opacity-0" />
         ))}
+      <div className="flex w-full items-center gap-2.5">
+        <span>{props.label}</span>
 
-      <span>{props.label}</span>
-
-      {props.shortcut && <div className="ml-auto text-[#8D8D8D]">{props.shortcut.join("")}</div>}
+        {props.shortcut && <div className="ml-auto text-[#8D8D8D]">{props.shortcut.join("")}</div>}
+      </div>
     </MenuPrimitive.Item>
   );
 });

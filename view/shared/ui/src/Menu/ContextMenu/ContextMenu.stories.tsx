@@ -22,6 +22,8 @@ export const Default: Story = {
   render: () => {
     const [checked1, setChecked1] = useState(true);
     const [checked2, setChecked2] = useState(false);
+    const [checked3, setChecked3] = useState(true);
+    const [checked4, setChecked4] = useState(false);
 
     return (
       <CM.Root>
@@ -50,6 +52,18 @@ export const Default: Story = {
 
             <CM.CheckboxItem label="Checkbox item" checked={checked1} onCheckedChange={setChecked1} />
             <CM.CheckboxItem label="Checkbox item" checked={checked2} onCheckedChange={setChecked2} />
+            <CM.CheckboxItem
+              label="Checkbox item shortcut"
+              shortcut={["⇧", "⌘", "L"]}
+              checked={checked3}
+              onCheckedChange={setChecked3}
+            />
+            <CM.CheckboxItem
+              label="Checkbox item shortcut"
+              shortcut={["⇧", "⌘", "L"]}
+              checked={checked4}
+              onCheckedChange={setChecked4}
+            />
             <CM.CheckboxItem label="Checked disabled" checked disabled />
             <CM.CheckboxItem label="Disabled" disabled />
 
@@ -59,7 +73,7 @@ export const Default: Story = {
               <CM.SubTrigger className="ContextMenuSubTrigger" label="More Tools" />
 
               <CM.SubContent className="ContextMenuSubContent" sideOffset={2} alignOffset={-5}>
-                <CM.Item hideIcon label="Save Page As…" shortcut={["⌘", "S"]} />
+                <CM.Item hideIcon label="Save Page As…" />
                 <CM.Item hideIcon label="Create Shortcut…" />
                 <CM.Item hideIcon label="Name Window…" />
 
