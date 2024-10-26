@@ -65,7 +65,6 @@ gen-workbench-models:
 
 gen-models: gen-shared-models gen-workbench-models
 
-
 # Check if the database is running, if not, start it in the background
 check-db:
 	@if ! pgrep -x "surreal" > /dev/null; then \
