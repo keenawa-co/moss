@@ -17,8 +17,8 @@ import React, {
   useRef,
   useState,
 } from "react";
-import * as CustomPrimitive from "../primitives/index";
-import { ScopedProps } from "../primitives/types";
+import * as CustomPrimitive from "../index";
+import { ScopedProps } from "../types";
 
 function whenTouchOrPen<E>(handler: PointerEventHandler<E>): PointerEventHandler<E> {
   return (event) => (event.pointerType !== "mouse" ? handler(event) : undefined);
