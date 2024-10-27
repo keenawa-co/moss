@@ -1,7 +1,13 @@
-use moss_ui::parts::toolbar::DescribeToolBarOutput;
 use tauri::State;
-use workbench_tao::parts::toolbar::describe_toolbar;
-use workbench_tao::window::NativePlatformInfo;
+use workbench_desktop::contributions::resents::{
+    RecentsViewContentProviderOutput, RecentsViewModel,
+};
+use workbench_desktop::parts::primary_activitybar::{
+    DescribeActivityBarPartOutput, PrimaryActivityBarPart,
+};
+use workbench_desktop::parts::primary_sidebar::{DescribeSideBarPartOutput, PrimarySideBarPart};
+use workbench_desktop::parts::{AnyPart, Parts};
+use workbench_desktop::window::NativePlatformInfo;
 
 use crate::AppState;
 
@@ -11,11 +17,44 @@ pub fn native_platform_info(state: State<'_, AppState>) -> NativePlatformInfo {
 }
 
 #[tauri::command]
-pub fn describe_toolbar_part(state: State<'_, AppState>) -> Result<DescribeToolBarOutput, String> {
-    // TODO: consider to use full import parts::toolbar::describe()
-    describe_toolbar(
-        &state.workbench.frame,
-        state.workbench.project_context_menu.get().unwrap(), // TODO: handle error
-    )
-    .map_err(|err| format!("failed to describe toolbar: {err}"))
+pub fn describe_primary_activitybar_part(
+    state: State<'_, AppState>,
+) -> Result<DescribeActivityBarPartOutput, String> {
+    let part = state
+        .workbench
+        .get_part::<PrimaryActivityBarPart>(Parts::PrimaryActivityBar.as_part_id())
+        .unwrap();
+
+    part.describe(state.workbench.registry())
+        .map_err(|err| format!("failed to describe primary activity bar: {err}"))
+}
+
+#[tauri::command]
+pub fn describe_primary_sidebar_part(
+    state: State<'_, AppState>,
+) -> Result<DescribeSideBarPartOutput, String> {
+    let part = state
+        .workbench
+        .get_part::<PrimarySideBarPart>(Parts::PrimarySideBar.as_part_id())
+        .unwrap();
+
+    part.describe(state.workbench.registry())
+        .map_err(|err| format!("failed to describe primary sidebar: {err}"))
+}
+
+#[tauri::command]
+pub fn get_view_content(
+    state: State<'_, AppState>,
+) -> Result<RecentsViewContentProviderOutput, String> {
+    let model = state
+        .workbench
+        .get_view::<RecentsViewModel>(
+            "workbench.group.launchpad",
+            "workbench.view.recentsView".to_string(),
+        )
+        .unwrap();
+
+    model
+        .content()
+        .map_err(|err| format!("failed to get view content: {err}"))
 }
