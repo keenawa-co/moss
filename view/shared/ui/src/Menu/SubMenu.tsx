@@ -57,7 +57,7 @@ export const SubContent = forwardRef<SubContentElement, SubContentProps>(
         ref={forwardedRef}
         sideOffset={16}
         style={{ ...props.style }}
-        className={cn("rounded-lg bg-white px-3 py-2", props.className)}
+        className={cn("rounded-lg bg-white px-3 py-2 shadow-lg", props.className)}
       />
     );
   }
