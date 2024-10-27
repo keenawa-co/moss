@@ -13,7 +13,7 @@ members = [
     "internal/platform/utl",
     "internal/platform/workspace",
 
-    "internal/workbench/tao",
+    "internal/workbench/desktop",
     "internal/workbench/models",
     "internal/workbench/service/configuration/common",
     "internal/workbench/service/configuration/tao",
@@ -47,7 +47,7 @@ platform_environment = { path = "internal/platform/environment" }
 platform_workspace = { path = "internal/platform/workspace" }
 platform_fs = { path = "internal/platform/fs" }
 
-workbench_tao = { path = "internal/workbench/tao" }
+workbench_desktop = { path = "internal/workbench/desktop" }
 workbench_models = { path = "internal/workbench/models" }
 workbench_service_configuration_common = { path = "internal/workbench/service/configuration/common" }
 workbench_service_configuration_tao = { path = "internal/workbench/service/configuration/tao" }

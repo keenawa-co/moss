@@ -1,5 +1,5 @@
 [package]
-name = "workbench_tao"
+name = "workbench_desktop"
 version = "0.1.0"
 edition = "2021"
 

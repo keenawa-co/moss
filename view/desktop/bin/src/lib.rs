@@ -16,9 +16,9 @@ use std::env;
 use std::rc::Rc;
 use std::sync::Arc;
 use tauri::{App, Manager};
+use workbench_desktop::window::{NativePlatformInfo, NativeWindowConfiguration};
+use workbench_desktop::Workbench;
 use workbench_service_environment_tao::environment_service::NativeEnvironmentService;
-use workbench_tao::window::{NativePlatformInfo, NativeWindowConfiguration};
-use workbench_tao::Workbench;
 
 use crate::command::{cmd_base, cmd_dummy};
 

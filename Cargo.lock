@@ -919,9 +919,9 @@ dependencies = [
  "tracing",
  "tracing-subscriber",
  "uikit_models",
+ "workbench_desktop",
  "workbench_service_configuration_tao",
  "workbench_service_environment_tao",
- "workbench_tao",
 ]
 
 [[package]]
@@ -5586,6 +5586,41 @@ dependencies = [
 ]
 
 [[package]]
+name = "workbench_desktop"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "derive_more",
+ "hashbrown 0.14.5",
+ "hecs",
+ "hecs-hierarchy",
+ "lazy_static",
+ "once_cell",
+ "platform_configuration",
+ "platform_core",
+ "platform_formation",
+ "platform_fs",
+ "platform_user_profile",
+ "platform_workspace",
+ "quote",
+ "rstml",
+ "serde",
+ "serde_json",
+ "slotmap",
+ "specta",
+ "strum",
+ "strum_macros",
+ "sysinfo",
+ "tauri",
+ "thiserror",
+ "uikit_models",
+ "workbench_models",
+ "workbench_service_configuration_tao",
+ "workbench_service_environment_tao",
+ "workbench_service_user_profile_tao",
+]
+
+[[package]]
 name = "workbench_models"
 version = "0.1.0"
 dependencies = [
@@ -5636,41 +5671,6 @@ dependencies = [
  "async-trait",
  "platform_fs",
  "platform_user_profile",
-]
-
-[[package]]
-name = "workbench_tao"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "derive_more",
- "hashbrown 0.14.5",
- "hecs",
- "hecs-hierarchy",
- "lazy_static",
- "once_cell",
- "platform_configuration",
- "platform_core",
- "platform_formation",
- "platform_fs",
- "platform_user_profile",
- "platform_workspace",
- "quote",
- "rstml",
- "serde",
- "serde_json",
- "slotmap",
- "specta",
- "strum",
- "strum_macros",
- "sysinfo",
- "tauri",
- "thiserror",
- "uikit_models",
- "workbench_models",
- "workbench_service_configuration_tao",
- "workbench_service_environment_tao",
- "workbench_service_user_profile_tao",
 ]
 
 [[package]]
