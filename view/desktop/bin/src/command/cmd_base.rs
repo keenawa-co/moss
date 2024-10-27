@@ -2,6 +2,7 @@ use tauri::State;
 use workbench_desktop::contributions::resents::{
     RecentsViewContentProviderOutput, RecentsViewModel,
 };
+use workbench_desktop::menu::{MenuItem, Menus};
 use workbench_desktop::parts::primary_activitybar::{
     DescribeActivityBarPartOutput, PrimaryActivityBarPart,
 };
@@ -57,4 +58,16 @@ pub fn get_view_content(
     model
         .content()
         .map_err(|err| format!("failed to get view content: {err}"))
+}
+
+#[tauri::command]
+pub fn get_menu_items(state: State<'_, AppState>) -> Option<Vec<MenuItem>> {
+    if let Some(items) = state
+        .workbench
+        .get_menu_items(&Menus::ViewItemContext.into())
+    {
+        Some(items.clone())
+    } else {
+        None
+    }
 }

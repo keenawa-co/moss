@@ -1,92 +1,96 @@
-use hashbrown::{HashMap, HashSet};
-use std::collections::LinkedList;
+use hashbrown::HashMap;
 use strum::Display;
 
 #[derive(Debug, Display)]
 pub enum Menus {
-    #[strum(to_string = "RecentsContext")]
-    RecentsContext,
-    #[strum(to_string = "LinksContext")]
-    LinksContext,
+    #[strum(to_string = "ViewItemContext")]
+    ViewItemContext,
 }
 
-pub trait MenuItem {
-    fn id(&self) -> &str;
-    fn group(&self) -> &str;
-}
-
-pub struct CommandAction {
-    id: String,
-    title: String,
-    tooltip: Option<String>,
-    description: Option<String>,
-}
-
-pub struct ActionMenuItem {
-    command: CommandAction,
-    group: Option<String>,
-    order: Option<i64>,
-}
-
-// impl MenuItem for ActionMenuItem {
-//     fn id(&self) -> &str {
-//         &self.command.id
-//     }
-
-//     fn group(&self) -> &Option<String> {
-//       let r =  &self.group;
-//     }
-// }
-
-pub struct SubmenuMenuItem {
-    title: String,
-    submenu_id: String,
-    group: Option<String>,
-    order: Option<i64>,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Serialize, Clone, PartialEq, Eq, Hash)]
 pub struct MenuId(String);
 
+impl MenuId {
+    pub fn new(value: impl Into<String>) -> Self {
+        Self(value.into())
+    }
+}
+
+impl From<&str> for MenuId {
+    fn from(s: &str) -> Self {
+        MenuId(s.to_owned())
+    }
+}
+
+impl From<String> for MenuId {
+    fn from(s: String) -> Self {
+        MenuId(s)
+    }
+}
+
+impl Into<MenuId> for Menus {
+    fn into(self) -> MenuId {
+        MenuId::from(self.to_string())
+    }
+}
+
+#[derive(Debug, Clone, Serialize)]
+pub enum MenuItem {
+    Action(ActionMenuItem),
+    Submenu(SubmenuMenuItem),
+}
+
+#[derive(Debug, Serialize, Clone)]
+pub struct CommandAction {
+    pub id: String,
+    pub title: String,
+    pub tooltip: Option<String>,
+    pub description: Option<String>,
+}
+
+#[derive(Debug, Serialize, Clone)]
+pub struct ActionMenuItem {
+    pub command: CommandAction,
+    pub group: Option<String>,
+    pub order: Option<i64>,
+}
+
+#[derive(Debug, Serialize, Clone)]
+pub struct SubmenuMenuItem {
+    pub submenu_id: MenuId,
+    pub title: String,
+    pub group: Option<String>,
+    pub order: Option<i64>,
+}
+
 pub struct MenuRegistry {
-    menus: HashMap<MenuId, LinkedList<Box<dyn MenuItem>>>,
-    groups: HashMap<String, HashSet<String>>,
+    menus: HashMap<MenuId, Vec<MenuItem>>,
 }
 
 impl MenuRegistry {
     pub fn new() -> Self {
         Self {
             menus: HashMap::new(),
-            groups: HashMap::new(),
         }
     }
 
-    pub fn append_menu_item<T>(&mut self, menu_id: MenuId, item: T)
-    where
-        T: MenuItem + 'static,
-    {
-        self.groups
-            .entry(item.group().to_string())
-            .or_insert_with(HashSet::new)
-            .insert(item.id().to_string());
-
+    pub fn append_menu_item(&mut self, menu_id: MenuId, item: MenuItem) {
         self.menus
-            .entry(menu_id)
-            .or_insert_with(LinkedList::new)
-            .push_back(Box::new(item));
+            .entry(menu_id.into())
+            .or_insert_with(Vec::new)
+            .push(item);
     }
 
-    pub fn append_menu_items<I, T>(&mut self, items: I)
+    pub fn append_menu_items<I>(&mut self, items: I)
     where
-        I: IntoIterator<Item = (MenuId, T)>,
-        T: MenuItem + 'static,
+        I: IntoIterator<Item = (MenuId, MenuItem)>,
     {
         for (menu_id, item) in items {
             self.append_menu_item(menu_id, item);
         }
     }
 
-    pub fn get_menu(&self, menu_id: &MenuId) -> Option<&LinkedList<Box<dyn MenuItem>>> {
+    pub fn get_menu_items(&self, menu_id: &MenuId) -> Option<&Vec<MenuItem>> {
         self.menus.get(menu_id)
     }
 }

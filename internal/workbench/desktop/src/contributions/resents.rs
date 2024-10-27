@@ -1,4 +1,5 @@
 use crate::{
+    menu::{ActionMenuItem, CommandAction, MenuId, MenuItem, Menus, SubmenuMenuItem},
     view::{AnyContentProvider, TreeViewDescriptor},
     Contribution,
 };
@@ -55,6 +56,104 @@ impl Contribution for RecentsContribution {
                 model: Lazy::new(|| Box::new(RecentsViewModel {})),
             }],
         )?;
+
+        let open_with_profile_menu_id = MenuId::new("recents.openWithProfileSubmenu");
+        registry.menus.append_menu_items(vec![
+            (
+                open_with_profile_menu_id.clone(),
+                MenuItem::Action(ActionMenuItem {
+                    command: CommandAction {
+                        id: "someId_1".to_string(),
+                        title: "Default".to_string(),
+                        tooltip: None,
+                        description: None,
+                    },
+                    group: Some("0_profiles".to_string()),
+                    order: None,
+                }),
+            ),
+            (
+                open_with_profile_menu_id.clone(),
+                MenuItem::Action(ActionMenuItem {
+                    command: CommandAction {
+                        id: "someId_2".to_string(),
+                        title: "Custom".to_string(),
+                        tooltip: None,
+                        description: None,
+                    },
+                    group: Some("0_profiles".to_string()),
+                    order: None,
+                }),
+            ),
+        ]);
+
+        registry.menus.append_menu_items(vec![
+            (
+                Menus::ViewItemContext.into(),
+                MenuItem::Action(ActionMenuItem {
+                    command: CommandAction {
+                        id: "someId_1".to_string(),
+                        title: "Open".to_string(),
+                        tooltip: None,
+                        description: None,
+                    },
+                    group: Some("1_open".to_string()),
+                    order: None,
+                }),
+            ),
+            (
+                Menus::ViewItemContext.into(),
+                MenuItem::Action(ActionMenuItem {
+                    command: CommandAction {
+                        id: "someId_2".to_string(),
+                        title: "Open in New Window".to_string(),
+                        tooltip: None,
+                        description: None,
+                    },
+                    group: Some("1_open".to_string()),
+                    order: None,
+                }),
+            ),
+        ]);
+
+        registry.menus.append_menu_items(vec![(
+            Menus::ViewItemContext.into(),
+            MenuItem::Submenu(SubmenuMenuItem {
+                submenu_id: open_with_profile_menu_id,
+                title: "Open with Profile".to_string(),
+                group: Some("1_open".to_string()),
+                order: None,
+            }),
+        )]);
+
+        registry.menus.append_menu_items(vec![
+            (
+                Menus::ViewItemContext.into(),
+                MenuItem::Action(ActionMenuItem {
+                    command: CommandAction {
+                        id: "someId_4".to_string(),
+                        title: "Preview".to_string(),
+                        tooltip: None,
+                        description: None,
+                    },
+                    group: None,
+                    order: None,
+                }),
+            ),
+            (
+                Menus::ViewItemContext.into(),
+                MenuItem::Action(ActionMenuItem {
+                    command: CommandAction {
+                        id: "someId_5".to_string(),
+                        title: "Remove from Recents".to_string(),
+                        tooltip: None,
+                        description: None,
+                    },
+                    group: None,
+                    order: None,
+                }),
+            ),
+        ]);
 
         Ok(())
     }

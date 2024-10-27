@@ -22,6 +22,7 @@ use contributions::{
 };
 use hashbrown::HashMap;
 use hecs::Entity;
+use menu::{MenuId, MenuItem, MenuRegistry};
 use once_cell::unsync::OnceCell;
 use parts::{
     primary_activitybar::PrimaryActivityBarPart, primary_sidebar::PrimarySideBarPart, AnyPart,
@@ -90,12 +91,14 @@ pub trait Contribution {
 
 pub struct RegistryManager {
     pub views: ViewsRegistry,
+    pub menus: MenuRegistry,
 }
 
 impl RegistryManager {
     pub fn new() -> Self {
         Self {
             views: ViewsRegistry::new(),
+            menus: MenuRegistry::new(),
         }
     }
 }
@@ -109,10 +112,6 @@ pub struct Workbench {
     font_size_service: Atom<MockFontSizeService>,
     _observe_font_size_service: OnceCell<Subscription>,
     tao_handle: OnceCell<Rc<AppHandle>>,
-    // sizes: SecondaryMap<ViewKey, S>
-    // known_views: SlotMap<ViewKey, View>,
-    // activity_bar_part: Part<ActivityBar>,
-    pub project_context_menu: OnceCell<Entity>,
 
     parts: HashMap<PartId, Box<dyn Any>>,
 }
@@ -154,7 +153,6 @@ impl Workbench {
             font_size_service: font_service_atom,
             _observe_font_size_service: OnceCell::new(),
             tao_handle: OnceCell::new(),
-            project_context_menu: OnceCell::new(),
             parts: HashMap::new(),
         })
     }
@@ -180,6 +178,10 @@ impl Workbench {
 
     pub fn get_view<T: 'static>(&self, group_id: GroupId, view_id: String) -> Option<&T> {
         self.registry.views.get_view_model(group_id, view_id)
+    }
+
+    pub fn get_menu_items(&self, menu_id: &MenuId) -> Option<&Vec<MenuItem>> {
+        self.registry.menus.get_menu_items(menu_id)
     }
 
     pub fn initialize<'a>(&'a mut self, ctx: &mut AsyncContext) -> Result<()> {
