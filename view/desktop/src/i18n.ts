@@ -7,7 +7,6 @@ export const defaultNS = "ns1";
 i18next
   .use(
     resourcesToBackend((language: string, namespace: string) => {
-      console.log({ language, namespace });
       return import(`../../../lib/moss_lang/locales/${language}/${namespace}.json`);
     })
   )
