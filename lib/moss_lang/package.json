@@ -4,8 +4,7 @@
     ".": "./src/index.ts"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "interface": "i18next-resources-for-ts interface -i ../../view/desktop/public/locales/en -o ./types/resources.d.ts"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "devDependencies": {
     "@repo/typescript-config": "workspace:*"
