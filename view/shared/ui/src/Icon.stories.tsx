@@ -122,10 +122,7 @@ export const Gallery: Story = {
             <div className="grid w-full grid-cols-1 justify-items-center gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 xl:grid-cols-5 2xl:grid-cols-6">
               {filteredIcons().map(([name, Icon]) => (
                 <div
-                  className={cn(
-                    "flex size-40 cursor-pointer flex-col rounded-lg bg-white",
-                    theme === "light" ? "" : "bg-[#1E2021]"
-                  )}
+                  className={cn("flex size-40 flex-col rounded-lg bg-white", theme === "light" ? "" : "bg-[#1E2021]")}
                 >
                   <div className={cn(`grid grow place-items-center`)}>
                     <Icon
