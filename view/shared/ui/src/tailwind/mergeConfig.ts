@@ -4,6 +4,7 @@ import breakpoints from "./custom-config/breakpoints";
 import colors from "./custom-config/colors";
 import plugins from "./custom-config/plugins";
 import typography from "./custom-config/typography";
+import fontSize from "./custom-config/fontSize";
 
 const reactComponentsTailwindConfig: Config = {
   content: ["@repo/ui/**/*.{js,ts,jsx,tsx}"],
@@ -12,6 +13,7 @@ const reactComponentsTailwindConfig: Config = {
     gradientColorStops: colors,
     colors,
     extend: {
+      fontSize: fontSize,
       fontFamily: typography,
       screens: breakpoints,
       borderColor: {

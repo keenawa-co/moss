@@ -112,4 +112,5 @@
       "mode": "auto"
     }
   ],
+  "tailwindCSS.rootFontSize": 16,
 }

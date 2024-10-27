@@ -1,7 +1,8 @@
 {
+  "slug": "moss-light",
   "name": "moss-light",
   "type": "light",
-  "default": true,
+  "isDefault": true,
   "colors": {
     "primary": "0, 0, 0, 1",
     "sideBar.background": "244, 244, 245, 1",

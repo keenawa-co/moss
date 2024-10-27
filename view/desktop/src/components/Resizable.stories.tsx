@@ -1,11 +1,10 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { render } from "react-dom";
 import { Resizable, ResizablePanel } from "./Resizable";
 import "allotment/dist/style.css";
 import { useState } from "react";
-import { cn } from "@/shared/utils/utils";
+import { cn } from "@repo/ui";
 
-const meta = {
+const meta: Meta = {
   title: "desktop/Resizable",
   component: Resizable,
   tags: ["autodocs"],
