@@ -27,12 +27,12 @@
     },
     {
       "path": "sdk/ts"
+    },
+    {
+      "path": "view/shared/models/uikit"
+    },
+    {
+      "path": "internal/workbench/models"
     }
-    // {
-    //   "path": "lib-rs/moss_uikit"
-    // }
-    // {
-    //   "path": "lib-rs/moss_ui"
-    // }
   ]
 }

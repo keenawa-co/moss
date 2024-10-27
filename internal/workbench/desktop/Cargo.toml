@@ -1,0 +1,38 @@
+[package]
+name = "workbench_desktop"
+version = "0.1.0"
+edition = "2021"
+
+
+[dependencies]
+quote = "1.0"
+rstml = "0.12.0"
+workbench_models.workspace = true
+thiserror.workspace = true
+strum.workspace = true
+strum_macros.workspace = true
+hecs = { workspace = true, features = ["macros"] }
+hecs-hierarchy = { workspace = true }
+uikit_models.workspace = true
+serde = { workspace = true, features = ["derive"] }
+serde_json.workspace = true
+sysinfo.workspace = true
+anyhow.workspace = true
+hashbrown.workspace = true
+lazy_static.workspace = true
+tauri.workspace = true
+once_cell.workspace = true
+slotmap.workspace = true
+specta.workspace = true
+derive_more.workspace = true
+
+platform_core.workspace = true
+platform_fs.workspace = true
+platform_workspace.workspace = true
+platform_formation.workspace = true
+platform_configuration.workspace = true
+platform_user_profile.workspace = true
+
+workbench_service_configuration_tao.workspace = true
+workbench_service_user_profile_tao.workspace = true
+workbench_service_environment_tao.workspace = true

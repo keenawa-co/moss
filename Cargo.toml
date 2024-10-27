@@ -1,34 +1,27 @@
 [workspace]
 resolver = "2"
 members = [
-    "lib-rs/moss_uikit",
-    "lib-rs/moss_ui",
-
-    "platform/core",
-    "platform/fs",
-    "platform/formation",
-    "platform/configuration",
-    "platform/user_profile",
-    "platform/environment",
-    "platform/utl",
-    "platform/workspace",
-
     "view/desktop/bin",
+    "view/shared/models/uikit",
 
-    "view/shared/workbench/tao",
-    "view/shared/workbench/service/configuration/common",
-    "view/shared/workbench/service/configuration/tao",
-    "view/shared/workbench/service/user_profile/tao",
-    "view/shared/workbench/service/environment/tao",
+    "internal/platform/core",
+    "internal/platform/fs",
+    "internal/platform/formation",
+    "internal/platform/configuration",
+    "internal/platform/user_profile",
+    "internal/platform/environment",
+    "internal/platform/utl",
+    "internal/platform/workspace",
+
+    "internal/workbench/desktop",
+    "internal/workbench/models",
+    "internal/workbench/service/configuration/common",
+    "internal/workbench/service/configuration/tao",
+    "internal/workbench/service/user_profile/tao",
+    "internal/workbench/service/environment/tao",
 
     "tools/xtask",
 ]
-
-[profile.dev]
-split-debuginfo = "unpacked"
-debug = "limited"
-codegen-units = 16
-
 
 [profile.release]
 codegen-units = 1 # Compile crates one after another so the compiler can optimize better
@@ -43,27 +36,26 @@ opt-level = 3
 
 
 [workspace.dependencies]
-moss_hecs = { git = "https://github.com/keenawa-co/moss_hecs.git", branch = "master" }
-moss_hecs_hierarchy = { git = "https://github.com/keenawa-co/moss_hecs_hierarchy.git", branch = "main" }
+uikit_models = { path = "view/shared/models/uikit" }
 
-moss_uikit = { path = "lib-rs/moss_uikit" }
-moss_ui = { path = "lib-rs/moss_ui" }
+platform_core = { path = "internal/platform/core" }
+platform_utl = { path = "internal/platform/utl" }
+platform_configuration = { path = "internal/platform/configuration" }
+platform_formation = { path = "internal/platform/formation" }
+platform_user_profile = { path = "internal/platform/user_profile" }
+platform_environment = { path = "internal/platform/environment" }
+platform_workspace = { path = "internal/platform/workspace" }
+platform_fs = { path = "internal/platform/fs" }
 
-platform_core = { path = "platform/core" }
-platform_utl = { path = "platform/utl" }
-platform_configuration = { path = "platform/configuration" }
-platform_formation = { path = "platform/formation" }
-platform_user_profile = { path = "platform/user_profile" }
-platform_environment = { path = "platform/environment" }
-platform_workspace = { path = "platform/workspace" }
-platform_fs = { path = "platform/fs" }
+workbench_desktop = { path = "internal/workbench/desktop" }
+workbench_models = { path = "internal/workbench/models" }
+workbench_service_configuration_common = { path = "internal/workbench/service/configuration/common" }
+workbench_service_configuration_tao = { path = "internal/workbench/service/configuration/tao" }
+workbench_service_user_profile_tao = { path = "internal/workbench/service/user_profile/tao" }
+workbench_service_environment_tao = { path = "internal/workbench/service/environment/tao" }
 
-workbench_tao = { path = "view/shared/workbench/tao" }
-workbench_service_configuration_common = { path = "view/shared/workbench/service/configuration/common" }
-workbench_service_configuration_tao = { path = "view/shared/workbench/service/configuration/tao" }
-workbench_service_user_profile_tao = { path = "view/shared/workbench/service/user_profile/tao" }
-workbench_service_environment_tao = { path = "view/shared/workbench/service/environment/tao" }
-
+ts-rs = "10.0"
+thiserror = "1.0"
 tauri = "2.0.0-rc"
 specta = "2.0.0-rc.20"
 specta-typescript = "0.0.7"
@@ -77,6 +69,7 @@ radix_trie = "0.2.1"
 parking_lot = "0.12.3"
 derive_more = "0.99.17"
 strum = "0.26"
+strum_macros = "0.26"
 lazy-regex = "3.3.0"
 dunce = "1.0.5"
 sysinfo = "0.31.2"
@@ -100,3 +93,6 @@ waker-fn = "1.2.0"
 im = "15.1.0"
 smallvec = "1.13.2"
 dyn-clone = "1.0.17"
+
+hecs = "0.10.5"
+hecs-hierarchy = "0.12.1"

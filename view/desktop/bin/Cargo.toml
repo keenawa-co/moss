@@ -16,8 +16,7 @@ crate-type = ["lib", "cdylib", "staticlib"]
 tauri-build = { version = "2.0.0-rc", features = [] }
 
 [dependencies]
-moss_ui.workspace = true
-moss_uikit.workspace = true
+uikit_models.workspace = true
 futures.workspace = true
 anyhow.workspace = true
 once_cell.workspace = true
@@ -33,11 +32,11 @@ platform_configuration.workspace = true
 platform_formation.workspace = true
 platform_fs.workspace = true
 
-workbench_tao.workspace = true
+workbench_desktop.workspace = true
 workbench_service_configuration_tao.workspace = true
 workbench_service_environment_tao.workspace = true
 
-surrealdb = { workspace = true, features = ["kv-rocksdb"] }
+# surrealdb = { workspace = true, features = ["kv-rocksdb"] }
 strum = { workspace = true, features = ["derive"] }
 tokio = { workspace = true, features = ["full", "macros", "signal"] }
 serde_json.workspace = true
