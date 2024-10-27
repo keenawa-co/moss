@@ -1,4 +1,5 @@
 pub mod contribution;
+pub mod menu;
 pub mod parts;
 pub mod view;
 pub mod window;

@@ -22,7 +22,7 @@ pub fn describe_primary_activitybar_part(
 ) -> Result<DescribeActivityBarPartOutput, String> {
     let part = state
         .workbench
-        .get_part::<PrimaryActivityBarPart>(Parts::PrimaryActivityBar.as_part_id())
+        .get_part::<PrimaryActivityBarPart>(Parts::PrimaryActivityBar.as_str())
         .unwrap();
 
     part.describe(state.workbench.registry())
@@ -35,7 +35,7 @@ pub fn describe_primary_sidebar_part(
 ) -> Result<DescribeSideBarPartOutput, String> {
     let part = state
         .workbench
-        .get_part::<PrimarySideBarPart>(Parts::PrimarySideBar.as_part_id())
+        .get_part::<PrimarySideBarPart>(Parts::PrimarySideBar.as_str())
         .unwrap();
 
     part.describe(state.workbench.registry())

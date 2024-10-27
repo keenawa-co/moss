@@ -20,7 +20,7 @@ impl Parts {
 
     const PRIMARY_SIDE_BAR: PartId = "workbench.part.primarySideBar";
 
-    pub fn as_part_id(&self) -> PartId {
+    pub fn as_str(&self) -> &'static str {
         match &self {
             Parts::PrimaryActivityBar => Self::PRIMARY_ACTIVITY_BAR,
             Parts::SecondaryActivityBar => Self::SECONDARY_ACTIVITY_BAR,
