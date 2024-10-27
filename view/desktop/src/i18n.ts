@@ -1,13 +1,21 @@
 import i18next from "i18next";
 import { initReactI18next } from "react-i18next";
-import HttpApi from "i18next-http-backend";
+import resourcesToBackend from "i18next-resources-to-backend";
 
 export const defaultNS = "ns1";
 
-i18next.use(initReactI18next).use(HttpApi).init({
-  debug: false,
-  fallbackLng: "en",
-  defaultNS,
-});
+i18next
+  .use(
+    resourcesToBackend((language: string, namespace: string) => {
+      return import(`../../../lib/moss_lang/locales/${language}/${namespace}.json`);
+    })
+  )
+  .use(initReactI18next)
+  .init({
+    debug: true,
+    fallbackLng: "en",
+    defaultNS,
+    ns: "ns1",
+  });
 
 export default i18next;

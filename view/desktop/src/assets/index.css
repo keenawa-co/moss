@@ -21,10 +21,8 @@
   clip: rect(0 0 0 0);
   overflow: hidden;
 }
+
 @layer base {
-  * {
-    @apply transition-colors duration-500 ease-in-out;
-  }
   html,
   body {
     @apply font-sans text-[rgba(var(--color-primary))];
@@ -32,6 +30,7 @@
     position: fixed;
     width: 100vw;
     height: 100vh;
+    @apply transition-colors duration-75 ease-linear;
   }
 
   h1,
@@ -48,7 +47,7 @@
   }
 
   h1 {
-    @apply font-bold text-3xl;
+    @apply text-3xl font-bold;
   }
 
   h2 {
@@ -64,6 +63,19 @@
   }
 
   p {
-    @apply text-sm text-[rgba(var(--color-primary))] leading-normal;
+    @apply text-sm leading-normal text-[rgba(var(--color-primary))];
   }
+}
+
+[class*="bg-["],
+[class*="group-bg-["] {
+  transition-property: background-color, border-color;
+  transition-timing-function: ease-out;
+  transition-duration: 0.2s;
+}
+[class*="text-["],
+[class*="group-text-["] {
+  transition-property: color, text-decoration-color, fill, stroke;
+  transition-timing-function: ease-out;
+  transition-duration: 0.2s;
 }

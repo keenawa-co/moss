@@ -3,11 +3,13 @@ import { PayloadAction, Slice, createSlice } from "@reduxjs/toolkit";
 export interface ThemesState {
   themes: string[];
   selected: string | undefined;
+  isThemeSelected: boolean;
 }
 
 const initialState: ThemesState = {
   themes: [],
   selected: undefined,
+  isThemeSelected: false,
 };
 
 export const themesSlice: Slice<ThemesState> = createSlice({
@@ -15,10 +17,17 @@ export const themesSlice: Slice<ThemesState> = createSlice({
   initialState,
   reducers: {
     setSelectedTheme: (state, action: PayloadAction<string>) => {
-      if (action.payload === state.selected) return;
+      const newTheme = action.payload;
+      if (newTheme === state.selected) return;
 
-      state.selected = action.payload;
-      localStorage.setItem("theme", action.payload);
+      if (!newTheme) {
+        state.isThemeSelected = false;
+      } else {
+        state.isThemeSelected = true;
+      }
+
+      state.selected = newTheme;
+      localStorage.setItem("theme", newTheme);
     },
     setThemes: (state, action: PayloadAction<string[]>) => {
       state.themes = action.payload;

@@ -1,6 +1,7 @@
 import clsx, { ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { BaseDirectory, exists, readTextFile, readDir } from "@tauri-apps/plugin-fs";
+//FIXME TS Import error
 import { Convert, Theme } from "@repo/moss-theme";
 
 export const cn = (...args: ClassValue[]) => {

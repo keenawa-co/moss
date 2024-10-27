@@ -1,5 +1,5 @@
 const typography = {
-  sans: ["Lato", "Inter"],
+  sans: ["Inter", "Lato"],
   shortcut: ["Inter"],
 };
 
