@@ -1,11 +1,14 @@
 use crate::{
-    menu::{ActionMenuItem, CommandAction, MenuId, MenuItem, Menus, SubmenuMenuItem},
+    menu::{
+        ActionMenuItem, CommandAction, MenuId, MenuItem, Menus, SubmenuMenuItem, ToggledMenuItem,
+    },
     view::{AnyContentProvider, TreeViewDescriptor},
     Contribution,
 };
 use anyhow::Result;
 use once_cell::sync::Lazy;
 use quote::quote;
+use static_str_ops::static_format;
 
 #[derive(Debug, Serialize)]
 pub struct RecentsViewTreeItem {
@@ -44,10 +47,11 @@ impl RecentsViewModel {
 pub(crate) struct RecentsContribution;
 impl Contribution for RecentsContribution {
     fn contribute(registry: &mut crate::RegistryManager) -> anyhow::Result<()> {
+        let recents_view_id = "workbench.view.recentsView";
         registry.views.register_views(
             &super::tree_view_groups::launchpad::GROUP_ID,
             vec![TreeViewDescriptor {
-                id: "workbench.view.recentsView".to_string(),
+                id: recents_view_id.to_string(),
                 name: "Recents".to_string(),
                 order: 1,
                 hide_by_default: false,
@@ -56,6 +60,44 @@ impl Contribution for RecentsContribution {
                 model: Lazy::new(|| Box::new(RecentsViewModel {})),
             }],
         )?;
+
+        // Menus contributions
+
+        let recents_context = static_format!("view == '{recents_view_id}'");
+
+        registry.menus.append_menu_item(
+            Menus::ViewTitleContext.into(),
+            MenuItem::Action(ActionMenuItem {
+                command: CommandAction {
+                    id: "someId_1".to_string(),
+                    title: "Hide 'Recents'".to_string(),
+                    tooltip: None,
+                    description: None,
+                },
+                group: Some("0_self".to_string()),
+                order: Some(1),
+                when: recents_context,
+            }),
+        );
+
+        registry.menus.append_menu_item(
+            Menus::ViewTitleContext.into(),
+            MenuItem::Toggled(ToggledMenuItem {
+                command: CommandAction {
+                    id: "someId_1".to_string(),
+                    title: "Recents".to_string(),
+                    tooltip: None,
+                    description: None,
+                },
+                group: Some("1_views".to_string()),
+                order: Some(1),
+                when: recents_context,
+                toggled: static_format!("viewState == 'mockState'"),
+            }),
+        );
+
+        let recents_item_context =
+            static_format!("view == '{recents_view_id}' && viewItem == 'recents.item'");
 
         let open_with_profile_menu_id = MenuId::new("recents.openWithProfileSubmenu");
         registry.menus.append_menu_items(vec![
@@ -69,7 +111,8 @@ impl Contribution for RecentsContribution {
                         description: None,
                     },
                     group: Some("0_profiles".to_string()),
-                    order: None,
+                    order: Some(1),
+                    when: recents_item_context,
                 }),
             ),
             (
@@ -83,6 +126,7 @@ impl Contribution for RecentsContribution {
                     },
                     group: Some("0_profiles".to_string()),
                     order: None,
+                    when: recents_item_context,
                 }),
             ),
         ]);
@@ -98,7 +142,8 @@ impl Contribution for RecentsContribution {
                         description: None,
                     },
                     group: Some("1_open".to_string()),
-                    order: None,
+                    order: Some(1),
+                    when: recents_item_context,
                 }),
             ),
             (
@@ -111,7 +156,8 @@ impl Contribution for RecentsContribution {
                         description: None,
                     },
                     group: Some("1_open".to_string()),
-                    order: None,
+                    order: Some(2),
+                    when: recents_item_context,
                 }),
             ),
         ]);
@@ -122,7 +168,8 @@ impl Contribution for RecentsContribution {
                 submenu_id: open_with_profile_menu_id,
                 title: "Open with Profile".to_string(),
                 group: Some("1_open".to_string()),
-                order: None,
+                order: Some(3),
+                when: recents_item_context,
             }),
         )]);
 
@@ -137,7 +184,8 @@ impl Contribution for RecentsContribution {
                         description: None,
                     },
                     group: Some("2_preview".to_string()),
-                    order: None,
+                    order: Some(1),
+                    when: recents_item_context,
                 }),
             ),
             (
@@ -150,7 +198,8 @@ impl Contribution for RecentsContribution {
                         description: None,
                     },
                     group: Some("3_remove".to_string()),
-                    order: None,
+                    order: Some(1),
+                    when: recents_item_context,
                 }),
             ),
         ]);

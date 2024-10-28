@@ -1,10 +1,17 @@
 use hashbrown::HashMap;
+use static_str_ops::destaticize;
 use strum::Display;
 
 #[derive(Debug, Display)]
 pub enum Menus {
+    #[strum(to_string = "ViewTitleContext")]
+    ViewTitleContext,
+    #[strum(to_string = "ViewTitle")]
+    ViewTitle,
     #[strum(to_string = "ViewItemContext")]
     ViewItemContext,
+    #[strum(to_string = "ViewItem")]
+    ViewItem,
 }
 
 #[derive(Debug, Serialize, Clone, PartialEq, Eq, Hash)]
@@ -37,6 +44,7 @@ impl Into<MenuId> for Menus {
 #[derive(Debug, Clone, Serialize)]
 pub enum MenuItem {
     Action(ActionMenuItem),
+    Toggled(ToggledMenuItem),
     Submenu(SubmenuMenuItem),
 }
 
@@ -53,6 +61,22 @@ pub struct ActionMenuItem {
     pub command: CommandAction,
     pub group: Option<String>,
     pub order: Option<i64>,
+    pub when: &'static str,
+}
+
+#[derive(Debug, Serialize, Clone)]
+pub struct ToggledMenuItem {
+    pub command: CommandAction,
+    pub group: Option<String>,
+    pub order: Option<i64>,
+    pub toggled: &'static str,
+    pub when: &'static str,
+}
+
+impl Drop for ActionMenuItem {
+    fn drop(&mut self) {
+        destaticize(self.when);
+    }
 }
 
 #[derive(Debug, Serialize, Clone)]
@@ -61,6 +85,13 @@ pub struct SubmenuMenuItem {
     pub title: String,
     pub group: Option<String>,
     pub order: Option<i64>,
+    pub when: &'static str,
+}
+
+impl Drop for SubmenuMenuItem {
+    fn drop(&mut self) {
+        destaticize(self.when);
+    }
 }
 
 pub struct MenuRegistry {
@@ -93,4 +124,8 @@ impl MenuRegistry {
     pub fn get_menu_items(&self, menu_id: &MenuId) -> Option<&Vec<MenuItem>> {
         self.menus.get(menu_id)
     }
+}
+
+pub struct MenuService {
+    // registry:
 }

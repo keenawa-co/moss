@@ -6,6 +6,8 @@ edition = "2021"
 
 [dependencies]
 quote = "1.0"
+static_str_ops = "0.1.2"
+readonly.workspace = true
 workbench_models.workspace = true
 thiserror.workspace = true
 strum = { worksoace = true, features = ["derive"] }
