@@ -22,8 +22,9 @@ use contributions::{
 };
 use hashbrown::HashMap;
 use hecs::Entity;
-use menu::{MenuId, MenuItem, MenuRegistry};
+use menu::{MenuId, MenuItem, MenuRegistry, MenuService};
 use once_cell::unsync::OnceCell;
+use parking_lot::RwLock;
 use parts::{
     primary_activitybar::PrimaryActivityBarPart, primary_sidebar::PrimarySideBarPart, AnyPart,
     PartId,
@@ -90,16 +91,16 @@ pub trait Contribution {
 }
 
 pub struct RegistryManager {
-    pub views: ViewsRegistry,
-    pub menus: MenuRegistry,
+    pub views: Arc<RwLock<ViewsRegistry>>,
+    pub menus: Arc<RwLock<MenuRegistry>>,
 }
 
 impl RegistryManager {
     pub fn new() -> Self {
-        Self {
-            views: ViewsRegistry::new(),
-            menus: MenuRegistry::new(),
-        }
+        let views = Arc::new(RwLock::new(ViewsRegistry::new()));
+        let menus = Arc::new(RwLock::new(MenuRegistry::new()));
+
+        Self { views, menus }
     }
 }
 
@@ -177,21 +178,29 @@ impl Workbench {
     }
 
     pub fn get_view<T: 'static>(&self, group_id: GroupId, view_id: String) -> Option<&T> {
-        self.registry.views.get_view_model(group_id, view_id)
+        let views_registry_lock = self.registry.views.read();
+        views_registry_lock
+            .get_view_model(group_id, view_id)
+            .cloned()
     }
 
     pub fn get_menu_items(&self, menu_id: &MenuId) -> Option<&Vec<MenuItem>> {
-        self.registry.menus.get_menu_items(menu_id)
+        // let menu_registry_lock = self.registry.menus.read();
+        // menu_registry_lock.get_menu_items(menu_id).cloned()
+
+        todo!()
     }
 
     pub fn initialize<'a>(&'a mut self, ctx: &mut AsyncContext) -> Result<()> {
+        let menu_service = Arc::new(MenuService::new(Arc::clone(&self.registry.menus)));
+
         self.add_contribution(LaunchpadGroupContribution::contribute)?;
 
         self.add_contribution(RecentsContribution::contribute)?;
         self.add_contribution(LinksContribution::contribute)?;
 
         self.add_part(PrimaryActivityBarPart::new());
-        self.add_part(PrimarySideBarPart::new());
+        self.add_part(PrimarySideBarPart::new(Arc::clone(&menu_service)));
 
         ctx.apply(|cx| self.initialize_services(cx))??;
 

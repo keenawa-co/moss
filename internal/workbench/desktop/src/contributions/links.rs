@@ -10,7 +10,8 @@ pub struct LinksViewModel;
 pub(crate) struct LinksContribution;
 impl Contribution for LinksContribution {
     fn contribute(registry: &mut crate::RegistryManager) -> anyhow::Result<()> {
-        registry.views.register_views(
+        let mut views_registry_lock = registry.views.write();
+        views_registry_lock.register_views(
             &super::tree_view_groups::launchpad::GROUP_ID,
             vec![TreeViewDescriptor {
                 id: "workbench.view.linksView".to_string(),
@@ -22,6 +23,8 @@ impl Contribution for LinksContribution {
                 model: Lazy::new(|| Box::new(LinksViewModel {})),
             }],
         )?;
+
+        drop(views_registry_lock);
 
         Ok(())
     }

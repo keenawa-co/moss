@@ -1,7 +1,5 @@
 use crate::{
-    menu::{
-        ActionMenuItem, CommandAction, MenuId, MenuItem, Menus, SubmenuMenuItem, ToggledMenuItem,
-    },
+    menu::{ActionMenuItem, CommandAction, MenuId, MenuItem, Menus, SubmenuMenuItem},
     view::{AnyContentProvider, TreeViewDescriptor},
     Contribution,
 };
@@ -47,8 +45,10 @@ impl RecentsViewModel {
 pub(crate) struct RecentsContribution;
 impl Contribution for RecentsContribution {
     fn contribute(registry: &mut crate::RegistryManager) -> anyhow::Result<()> {
+        let mut views_registry_lock = registry.views.write();
+
         let recents_view_id = "workbench.view.recentsView";
-        registry.views.register_views(
+        views_registry_lock.register_views(
             &super::tree_view_groups::launchpad::GROUP_ID,
             vec![TreeViewDescriptor {
                 id: recents_view_id.to_string(),
@@ -61,46 +61,91 @@ impl Contribution for RecentsContribution {
             }],
         )?;
 
-        // Menus contributions
+        drop(views_registry_lock);
+
+        /* ---------- Menus contributions ---------- */
+
+        let mut menus_registry_lock = registry.menus.write();
+
+        // View Title Context
 
         let recents_context = static_format!("view == '{recents_view_id}'");
 
-        registry.menus.append_menu_item(
-            Menus::ViewTitleContext.into(),
-            MenuItem::Action(ActionMenuItem {
-                command: CommandAction {
-                    id: "someId_1".to_string(),
-                    title: "Hide 'Recents'".to_string(),
-                    tooltip: None,
-                    description: None,
-                },
-                group: Some("0_self".to_string()),
-                order: Some(1),
-                when: recents_context,
-            }),
-        );
-
-        registry.menus.append_menu_item(
-            Menus::ViewTitleContext.into(),
-            MenuItem::Toggled(ToggledMenuItem {
-                command: CommandAction {
-                    id: "someId_1".to_string(),
-                    title: "Recents".to_string(),
-                    tooltip: None,
-                    description: None,
-                },
-                group: Some("1_views".to_string()),
-                order: Some(1),
-                when: recents_context,
-                toggled: static_format!("viewState == 'mockState'"),
-            }),
-        );
+        menus_registry_lock.append_menu_items(vec![
+            (
+                Menus::ViewTitleContext.into(),
+                MenuItem::Action(ActionMenuItem {
+                    command: CommandAction {
+                        id: "someId_1".to_string(),
+                        title: "Hide 'Recents'".to_string(),
+                        tooltip: None,
+                        description: None,
+                    },
+                    group: Some("0_self".to_string()),
+                    order: Some(1),
+                    when: recents_context,
+                    toggled: None,
+                }),
+            ),
+            (
+                Menus::ViewTitleContext.into(),
+                MenuItem::Action(ActionMenuItem {
+                    command: CommandAction {
+                        id: "someId_1".to_string(),
+                        title: "Recents".to_string(),
+                        tooltip: None,
+                        description: None,
+                    },
+                    group: Some("1_views".to_string()),
+                    order: Some(1),
+                    when: recents_context,
+                    toggled: Some(static_format!("viewState == 'mockState'")),
+                }),
+            ),
+        ]);
 
         let recents_item_context =
             static_format!("view == '{recents_view_id}' && viewItem == 'recents.item'");
 
+        // View Item
+
+        menus_registry_lock.append_menu_items(vec![
+            (
+                Menus::ViewItem.into(),
+                MenuItem::Action(ActionMenuItem {
+                    command: CommandAction {
+                        id: "someId_1".to_string(),
+                        title: "Remove".to_string(),
+                        tooltip: None,
+                        description: None,
+                    },
+                    group: Some("inline".to_string()),
+                    order: Some(1),
+                    when: recents_item_context,
+                    toggled: None,
+                }),
+            ),
+            (
+                Menus::ViewItem.into(),
+                MenuItem::Action(ActionMenuItem {
+                    command: CommandAction {
+                        id: "someId_1".to_string(),
+                        title: "Preview".to_string(),
+                        tooltip: None,
+                        description: None,
+                    },
+                    group: Some("inline".to_string()),
+                    order: Some(2),
+                    when: recents_item_context,
+                    toggled: None,
+                }),
+            ),
+        ]);
+
+        // View Item Context
+
         let open_with_profile_menu_id = MenuId::new("recents.openWithProfileSubmenu");
-        registry.menus.append_menu_items(vec![
+        menus_registry_lock.append_menu_items(vec![
             (
                 open_with_profile_menu_id.clone(),
                 MenuItem::Action(ActionMenuItem {
@@ -113,6 +158,7 @@ impl Contribution for RecentsContribution {
                     group: Some("0_profiles".to_string()),
                     order: Some(1),
                     when: recents_item_context,
+                    toggled: None,
                 }),
             ),
             (
@@ -127,11 +173,12 @@ impl Contribution for RecentsContribution {
                     group: Some("0_profiles".to_string()),
                     order: None,
                     when: recents_item_context,
+                    toggled: None,
                 }),
             ),
         ]);
 
-        registry.menus.append_menu_items(vec![
+        menus_registry_lock.append_menu_items(vec![
             (
                 Menus::ViewItemContext.into(),
                 MenuItem::Action(ActionMenuItem {
@@ -144,6 +191,7 @@ impl Contribution for RecentsContribution {
                     group: Some("1_open".to_string()),
                     order: Some(1),
                     when: recents_item_context,
+                    toggled: None,
                 }),
             ),
             (
@@ -158,11 +206,12 @@ impl Contribution for RecentsContribution {
                     group: Some("1_open".to_string()),
                     order: Some(2),
                     when: recents_item_context,
+                    toggled: None,
                 }),
             ),
         ]);
 
-        registry.menus.append_menu_items(vec![(
+        menus_registry_lock.append_menu_items(vec![(
             Menus::ViewItemContext.into(),
             MenuItem::Submenu(SubmenuMenuItem {
                 submenu_id: open_with_profile_menu_id,
@@ -173,7 +222,7 @@ impl Contribution for RecentsContribution {
             }),
         )]);
 
-        registry.menus.append_menu_items(vec![
+        menus_registry_lock.append_menu_items(vec![
             (
                 Menus::ViewItemContext.into(),
                 MenuItem::Action(ActionMenuItem {
@@ -186,6 +235,7 @@ impl Contribution for RecentsContribution {
                     group: Some("2_preview".to_string()),
                     order: Some(1),
                     when: recents_item_context,
+                    toggled: None,
                 }),
             ),
             (
@@ -200,6 +250,7 @@ impl Contribution for RecentsContribution {
                     group: Some("3_remove".to_string()),
                     order: Some(1),
                     when: recents_item_context,
+                    toggled: None,
                 }),
             ),
         ]);

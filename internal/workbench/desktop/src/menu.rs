@@ -1,6 +1,29 @@
 use hashbrown::HashMap;
+use parking_lot::RwLock;
 use static_str_ops::destaticize;
+use std::{cell::RefCell, rc::Rc, sync::Arc};
 use strum::Display;
+
+#[derive(Debug, Serialize, Clone, PartialEq, Eq, Hash)]
+pub struct MenuId(Arc<str>);
+
+impl MenuId {
+    pub fn new(value: &str) -> Self {
+        Self(value.into())
+    }
+}
+
+impl From<&str> for MenuId {
+    fn from(s: &str) -> Self {
+        MenuId(s.into())
+    }
+}
+
+impl From<String> for MenuId {
+    fn from(s: String) -> Self {
+        MenuId(s.into())
+    }
+}
 
 #[derive(Debug, Display)]
 pub enum Menus {
@@ -14,27 +37,6 @@ pub enum Menus {
     ViewItem,
 }
 
-#[derive(Debug, Serialize, Clone, PartialEq, Eq, Hash)]
-pub struct MenuId(String);
-
-impl MenuId {
-    pub fn new(value: impl Into<String>) -> Self {
-        Self(value.into())
-    }
-}
-
-impl From<&str> for MenuId {
-    fn from(s: &str) -> Self {
-        MenuId(s.to_owned())
-    }
-}
-
-impl From<String> for MenuId {
-    fn from(s: String) -> Self {
-        MenuId(s)
-    }
-}
-
 impl Into<MenuId> for Menus {
     fn into(self) -> MenuId {
         MenuId::from(self.to_string())
@@ -44,7 +46,6 @@ impl Into<MenuId> for Menus {
 #[derive(Debug, Clone, Serialize)]
 pub enum MenuItem {
     Action(ActionMenuItem),
-    Toggled(ToggledMenuItem),
     Submenu(SubmenuMenuItem),
 }
 
@@ -62,15 +63,7 @@ pub struct ActionMenuItem {
     pub group: Option<String>,
     pub order: Option<i64>,
     pub when: &'static str,
-}
-
-#[derive(Debug, Serialize, Clone)]
-pub struct ToggledMenuItem {
-    pub command: CommandAction,
-    pub group: Option<String>,
-    pub order: Option<i64>,
-    pub toggled: &'static str,
-    pub when: &'static str,
+    pub toggled: Option<&'static str>,
 }
 
 impl Drop for ActionMenuItem {
@@ -126,6 +119,38 @@ impl MenuRegistry {
     }
 }
 
+#[derive(Debug, Serialize, Clone)]
+pub struct MenuGroup {
+    order: Option<i64>,
+    content: Vec<MenuItem>,
+}
+
+#[derive(Debug, Serialize, Clone)]
+pub struct Menu(HashMap<MenuId, Vec<MenuGroup>>);
+
+impl Menu {
+    pub fn new() -> Self {
+        Self(HashMap::new())
+    }
+}
+
 pub struct MenuService {
-    // registry:
+    registry: Arc<RwLock<MenuRegistry>>,
+}
+
+impl MenuService {
+    pub fn new(registry: Arc<RwLock<MenuRegistry>>) -> Self {
+        Self { registry }
+    }
+
+    pub fn create_menu_by_menu_id(
+        &self,
+        id: &MenuId,
+        f: impl FnOnce(&Vec<MenuItem>) -> Menu,
+    ) -> Option<Menu> {
+        let registry_lock = self.registry.read();
+        let items = registry_lock.menus.get(id)?;
+
+        Some(f(items))
+    }
 }

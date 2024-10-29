@@ -1,4 +1,9 @@
-use crate::view::{TreeViewGroupLocation, TreeViewOutput};
+use std::sync::Arc;
+
+use crate::{
+    menu::{Menu, MenuId, MenuService, Menus},
+    view::{TreeViewGroupLocation, TreeViewOutput},
+};
 
 use super::{AnyPart, PartId, Parts};
 use anyhow::Result;
@@ -7,13 +12,16 @@ use hashbrown::HashMap;
 #[derive(Debug, Serialize)]
 pub struct DescribeSideBarPartOutput {
     pub views: HashMap<String, Vec<TreeViewOutput>>,
+    pub menus: HashMap<MenuId, Menu>,
 }
 
-pub struct PrimarySideBarPart {}
+pub struct PrimarySideBarPart {
+    menu_service: Arc<MenuService>,
+}
 
 impl PrimarySideBarPart {
-    pub fn new() -> Self {
-        Self {}
+    pub fn new(menu_service: Arc<MenuService>) -> Self {
+        Self { menu_service }
     }
 }
 
@@ -23,15 +31,14 @@ impl AnyPart for PrimarySideBarPart {
 
     fn describe(&self, registry: &crate::RegistryManager) -> Result<Self::DescribeOutput> {
         let mut views = HashMap::new();
+        let views_registry_lock = registry.views.read();
 
-        if let Some(containers) = registry
-            .views
-            .get_groups_by_location(&TreeViewGroupLocation::PrimaryBar)
+        if let Some(containers) =
+            views_registry_lock.get_groups_by_location(&TreeViewGroupLocation::PrimaryBar)
         {
             for container in containers {
-                if let Some(view_descriptors) = registry
-                    .views
-                    .get_view_descriptors_by_group_id(&container.id)
+                if let Some(view_descriptors) =
+                    views_registry_lock.get_view_descriptors_by_group_id(&container.id)
                 {
                     views
                         .entry(container.id.to_string())
@@ -41,6 +48,9 @@ impl AnyPart for PrimarySideBarPart {
             }
         }
 
-        Ok(DescribeSideBarPartOutput { views })
+        let menus = HashMap::new();
+        // self.menu_service.create_menu_by_menu_id(Menus::ViewItemContext, f)
+
+        Ok(DescribeSideBarPartOutput { views, menus })
     }
 }

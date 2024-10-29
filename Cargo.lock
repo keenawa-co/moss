@@ -5578,6 +5578,7 @@ dependencies = [
  "hecs-hierarchy",
  "lazy_static",
  "once_cell",
+ "parking_lot",
  "platform_configuration",
  "platform_core",
  "platform_formation",
