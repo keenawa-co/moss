@@ -13,9 +13,7 @@ export const HeadBar = () => {
   return (
     <header
       data-tauri-drag-region
-      className={cn("flex h-full max-h-[46px] items-center border-b border-solid border-[#C6C6C6] bg-[#E0E0E0]", {
-        "rounded-t-lg": os !== "windows",
-      })}
+      className={cn("flex h-full max-h-[46px] items-center border-b border-solid border-[#C6C6C6] bg-[#E0E0E0]")}
     >
       {os === "macos" && <WindowControls platform={os} />}
 
