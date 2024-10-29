@@ -14,15 +14,16 @@ export const HeadBarButton = ({ icon, label, sortableId = -1, ...props }: HeadBa
   const style = {
     transform: CSS.Translate.toString(transform),
     transition,
+    zIndex: 50,
   };
 
   return (
     <button
       ref={setNodeRef}
-      style={style}
       {...attributes}
       {...listeners}
-      className="group flex items-center gap-1.5 transition-colors "
+      className="group flex items-center gap-1.5 font-normal transition-colors"
+      style={style}
       {...props}
     >
       <Icon icon={icon} className="text-[#525252] group-hover:text-[#0065FF] group-active:text-[#0747A6]" />
