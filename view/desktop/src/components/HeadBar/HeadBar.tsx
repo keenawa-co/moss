@@ -3,6 +3,17 @@ import { HeadBarButton } from "./HeadBarButton";
 import { type } from "@tauri-apps/plugin-os";
 import { HeadBarDropdown } from "./HeadBarDropdown";
 import { cn } from "@repo/ui";
+import {
+  closestCenter,
+  DndContext,
+  DragEndEvent,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
+import { arrayMove, SortableContext, sortableKeyboardCoordinates } from "@dnd-kit/sortable";
+import { useState } from "react";
 
 export const HeadBar = () => {
   let os = type();
@@ -10,6 +21,45 @@ export const HeadBar = () => {
   // os = "macos";
   // os = "linux";
 
+  const [items, setItems] = useState([
+    {
+      id: 1,
+      label: "Alerts",
+      icon: "HeadBarAlerts" as const,
+    },
+    {
+      id: 2,
+      label: "Discovery",
+      icon: "HeadBarDiscovery" as const,
+    },
+    {
+      id: 3,
+      label: "Community",
+      icon: "HeadBarCommunity" as const,
+    },
+  ]);
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (!over) return;
+
+    if (active.id !== over.id) {
+      setItems((items) => {
+        const oldIndex = items.findIndex((a) => a.id === active.id);
+        const newIndex = items.findIndex((a) => a.id === over.id);
+
+        return arrayMove(items, oldIndex, newIndex);
+      });
+    }
+  };
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
   return (
     <header
       data-tauri-drag-region
@@ -29,13 +79,16 @@ export const HeadBar = () => {
 
         <div className="flex w-full justify-between" data-tauri-drag-region>
           <div className="flex items-center gap-4">
-            <HeadBarButton icon="HeadBarAlerts" label="Alerts" />
-            <HeadBarButton icon="HeadBarDiscovery" label="Discovery" />
-            <HeadBarButton icon="HeadBarCommunity" label="Community" />
+            <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+              <SortableContext items={items}>
+                {items.map((item) => (
+                  <HeadBarButton key={item.id} sortableId={item.id} icon={item.icon} label={item.label} />
+                ))}
+              </SortableContext>
+            </DndContext>
           </div>
 
           <div className="flex items-center gap-4">
-            {/* <HeadBarButton icon="HeadBarBranch" label="moss" /> */}
             <HeadBarDropdown icon="HeadBarBranch" label="moss" />
             <HeadBarButton icon="HeadBarTogglePrimarySideBar" />
             <HeadBarButton icon="HeadBarTogglePanel" />
