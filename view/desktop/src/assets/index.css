@@ -25,7 +25,7 @@
 @layer base {
   html,
   body {
-    @apply font-sans text-[rgba(var(--color-primary))];
+    @apply rounded-t-lg font-sans text-[rgba(var(--color-primary))];
     overflow: hidden;
     position: fixed;
     width: 100vw;
