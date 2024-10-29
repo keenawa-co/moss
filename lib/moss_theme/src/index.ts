@@ -64,21 +64,15 @@ const themeType: Type = {
   type: "object",
   properties: {
     name: { type: "string" },
-    // slug: { type: "string" },
+    slug: { type: "string" },
     type: { type: "string" },
-    // isDefault: { type: "boolean" },
+    isDefault: { type: "boolean" },
     colors: {
       type: "object",
       additionalProperties: { type: "string" },
     },
   },
-  required: [
-    "name",
-    // "slug",
-    "type",
-    // "isDefault",
-    "colors",
-  ],
+  required: ["name", "slug", "type", "isDefault", "colors"],
 };
 
 type Type =
