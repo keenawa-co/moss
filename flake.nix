@@ -42,9 +42,9 @@
 
           common = with unstable; [
             gtk3
+            dbus
             glib
             glib-networking
-            dbus
             openssl_3
             librsvg
             gettext
@@ -64,8 +64,8 @@
             harfbuzz
             gdk-pixbuf
             surrealdbVersion
-            libcanberra
-            libcanberra-gtk2
+            # libcanberra
+            # libcanberra-gtk2
             libcanberra-gtk3
           ] ++ common;
 
@@ -86,6 +86,7 @@
               export LD_LIBRARY_PATH=${unstable.lib.makeLibraryPath libraries}:$LD_LIBRARY_PATH
               export XDG_DATA_DIRS=${unstable.gsettings-desktop-schemas}/share/gsettings-schemas/${unstable.gsettings-desktop-schemas.name}:${unstable.gtk3}/share/gsettings-schemas/${unstable.gtk3.name}:$XDG_DATA_DIRS
               export GIO_MODULE_DIR="${unstable.glib-networking}/lib/gio/modules/"
+              export GTK_PATH="${unstable.libcanberra-gtk3}/lib/gtk-3.0"
             '';
           };
         }
