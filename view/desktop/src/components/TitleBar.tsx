@@ -1,4 +1,3 @@
-import { twMerge } from "tailwind-merge";
 import { WindowTitlebar } from "@/components";
 import { getOsType } from "@/components/window-controls/libs/plugin-os";
 import { OsType } from "@tauri-apps/plugin-os";

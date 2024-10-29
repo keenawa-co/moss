@@ -2,11 +2,12 @@ import { ComponentProps, forwardRef } from "react";
 import { twMerge } from "tailwind-merge";
 import { TitleBar } from "./TitleBar";
 import StatusBar from "./StatusBar";
+import { HeadBar } from "./HeadBar/HeadBar";
 
 export const RootLayout = ({ children, className, ...props }: ComponentProps<"main">) => {
   return (
-    <div className="grid h-full grid-rows-[auto_1fr_auto]">
-      <TitleBar />
+    <div className="grid h-full grid-rows-[minmax(0px,46px)_1fr_auto]">
+      <HeadBar />
 
       <main className={twMerge("bg-[rgba(var(--color-page-background))]", className)} {...props}>
         {children}

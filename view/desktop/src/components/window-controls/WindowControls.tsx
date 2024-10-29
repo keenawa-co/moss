@@ -4,6 +4,7 @@ import { TauriAppWindowProvider } from "@/components/window-controls/contexts";
 import { Gnome, MacOS, Windows } from "@/components/window-controls/controls";
 import { getOsType } from "@/components/window-controls/libs/plugin-os";
 import type { WindowControlsProps } from "@/components/window-controls/types";
+import { OsType } from "@tauri-apps/plugin-os";
 
 export function WindowControls({
   platform,
@@ -31,7 +32,7 @@ export function WindowControls({
         platform = "macos";
         break;
       case "linux":
-        platform = "gnome";
+        platform = "linux";
         break;
       default:
         platform = "windows";
@@ -41,13 +42,13 @@ export function WindowControls({
   const ControlsComponent = () => {
     switch (platform) {
       case "windows":
-        return <Windows className={cn(customClass, justify && "ml-auto")} {...props} />;
+        return <Windows className={cn(customClass)} {...props} />;
       case "macos":
-        return <MacOS className={cn(customClass, justify && "ml-0")} {...props} />;
-      case "gnome":
-        return <Gnome className={cn(customClass, justify && "ml-auto", "py-2.5")} {...props} />;
+        return <MacOS className={cn(customClass)} {...props} />;
+      case "linux":
+        return <Gnome className={cn(customClass, "py-2.5")} {...props} />;
       default:
-        return <Windows className={cn(customClass, justify && "ml-auto")} {...props} />;
+        return <Windows className={cn(customClass)} {...props} />;
     }
   };
 

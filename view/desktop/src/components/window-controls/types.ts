@@ -1,7 +1,7 @@
 import type { HTMLProps } from "react";
 
 export interface WindowControlsProps extends HTMLProps<HTMLDivElement> {
-  platform?: "windows" | "macos" | "gnome";
+  platform?: "windows" | "macos" | "linux";
 
   hide?: boolean;
 

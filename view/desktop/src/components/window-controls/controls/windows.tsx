@@ -11,17 +11,17 @@ export function Windows({ className, ...props }: HTMLProps<HTMLDivElement>) {
   const { isWindowMaximized, minimizeWindow, maximizeWindow, closeWindow } = useContext(TauriAppWindowContext);
 
   return (
-    <div className={cn("h-8", className)} {...props}>
+    <div className={cn("h-full", className)} {...props}>
       <Button
         onClick={minimizeWindow}
-        className="max-h-8 w-[46px] cursor-default rounded-none bg-transparent text-[rgba(var(--color-primary))]/90 hover:bg-[rgba(var(--color-primary))]/[.05] active:bg-[rgba(var(--color-primary))]/[.03]  dark:text-white dark:hover:bg-white/[.06] dark:active:bg-white/[.04]"
+        className="h-full w-[46px] cursor-default rounded-none bg-transparent text-[rgba(var(--color-primary))]/90 hover:bg-[rgba(var(--color-primary))]/[.05] active:bg-[rgba(var(--color-primary))]/[.03]  dark:text-white dark:hover:bg-white/[.06] dark:active:bg-white/[.04]"
       >
         <Icons.minimizeWin />
       </Button>
       <Button
         onClick={maximizeWindow}
         className={cn(
-          "max-h-8 w-[46px] cursor-default rounded-none bg-transparent",
+          "h-full w-[46px] cursor-default rounded-none bg-transparent",
           "text-[rgba(var(--color-primary))]/90 hover:bg-[rgba(var(--color-primary))]/[.05] active:bg-[rgba(var(--color-primary))]/[.03] dark:text-white dark:hover:bg-white/[.06] dark:active:bg-white/[.04]"
           // !isMaximizable && "text-white/[.36]",
         )}
@@ -30,7 +30,7 @@ export function Windows({ className, ...props }: HTMLProps<HTMLDivElement>) {
       </Button>
       <Button
         onClick={closeWindow}
-        className="max-h-8 w-[46px] cursor-default rounded-none bg-transparent text-[rgba(var(--color-primary))]/90 hover:bg-[rgba(var(--color-windows-close-button-background))] hover:text-white active:bg-[rgba(var(--color-windows-close-button-background))]/90 dark:text-white"
+        className="h-full w-[46px] cursor-default rounded-none bg-transparent text-[rgba(var(--color-primary))]/90 hover:bg-[rgba(var(--color-windows-close-button-background))] hover:text-white active:bg-[rgba(var(--color-windows-close-button-background))]/90 dark:text-white"
       >
         <Icons.closeWin />
       </Button>
