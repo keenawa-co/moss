@@ -22,11 +22,11 @@ export const HeadBarButton = ({ icon, label, sortableId = -1, ...props }: HeadBa
       ref={setNodeRef}
       {...attributes}
       {...listeners}
-      className="group flex items-center gap-1.5 font-normal transition-colors"
+      className="group flex  items-center gap-1.5 font-normal transition-colors"
       style={style}
       {...props}
     >
-      <Icon icon={icon} className="text-[#525252] group-hover:text-[#0065FF] group-active:text-[#0747A6]" />
+      <Icon icon={icon} className="size-[18px] text-[#525252] group-hover:text-[#0065FF] group-active:text-[#0747A6]" />
       {label && <span className="text-[#161616] group-hover:text-[#0065FF] group-active:text-[#0747A6]">{label}</span>}
     </button>
   );
