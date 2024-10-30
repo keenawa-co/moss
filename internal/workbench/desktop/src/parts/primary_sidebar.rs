@@ -1,7 +1,7 @@
 use std::sync::Arc;
 
 use crate::{
-    menu::{MenuItem, MenuService, Menus},
+    menu::{BuiltInMenus, MenuItem, MenuService},
     view::{TreeViewGroupLocation, TreeViewOutput},
 };
 
@@ -33,6 +33,8 @@ impl AnyPart for PrimarySideBarPart {
         let mut views = HashMap::new();
         let views_registry_lock = registry.views.read();
 
+        dbg!(&views_registry_lock);
+
         if let Some(containers) =
             views_registry_lock.get_groups_by_location(&TreeViewGroupLocation::PrimaryBar)
         {
@@ -52,31 +54,28 @@ impl AnyPart for PrimarySideBarPart {
 
         let menus_lock = registry.menus.read();
         menus.insert(
-            Menus::ViewItemContext.to_string(),
+            BuiltInMenus::ViewItemContext.to_string(),
             menus_lock
-                .get_menu_items(&Menus::ViewItemContext.into())
+                .get_menu_items(&BuiltInMenus::ViewItemContext.into())
                 .cloned()
                 .unwrap(),
         );
 
         menus.insert(
-            Menus::ViewItem.to_string(),
+            BuiltInMenus::ViewItem.to_string(),
             menus_lock
-                .get_menu_items(&Menus::ViewItem.into())
+                .get_menu_items(&BuiltInMenus::ViewItem.into())
                 .cloned()
                 .unwrap(),
         );
 
         menus.insert(
-            Menus::ViewTitleContext.to_string(),
+            BuiltInMenus::ViewTitleContext.to_string(),
             menus_lock
-                .get_menu_items(&Menus::ViewTitleContext.into())
+                .get_menu_items(&BuiltInMenus::ViewTitleContext.into())
                 .cloned()
                 .unwrap(),
         );
-        // let r = self
-        //     .menu_service
-        //     .create_menu_by_menu_id(&Menus::ViewItemContext.into(), |items| Menu::new());
 
         Ok(DescribeSideBarPartOutput { views, menus })
     }

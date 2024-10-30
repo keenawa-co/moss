@@ -18,11 +18,8 @@ use std::{
 };
 
 use anyhow::Result;
-use contribution::WORKBENCH_TAO_WINDOW;
-use contributions::{
-    links::LinksContribution, resents::RecentsContribution,
-    tree_view_groups::launchpad::LaunchpadGroupContribution,
-};
+use contribution::{WorkbenchContribution, WORKBENCH_TAO_WINDOW};
+use contributions::{links::LinksContribution, resents::RecentsContribution};
 use hashbrown::HashMap;
 use menu::{MenuItem, MenuRegistry, MenuService};
 use once_cell::unsync::OnceCell;
@@ -199,8 +196,7 @@ impl Workbench {
     pub fn initialize<'a>(&'a mut self, ctx: &mut AsyncContext) -> Result<()> {
         let menu_service = Arc::new(MenuService::new(Arc::clone(&self.registry.menus)));
 
-        self.add_contribution(LaunchpadGroupContribution::contribute)?;
-
+        self.add_contribution(WorkbenchContribution::contribute)?;
         self.add_contribution(RecentsContribution::contribute)?;
         self.add_contribution(LinksContribution::contribute)?;
 

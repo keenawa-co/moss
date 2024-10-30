@@ -1,7 +1,7 @@
 use crate::{
-    menu::{ActionMenuItem, CommandAction, MenuItem, Menus, SubmenuMenuItem},
+    menu::{ActionMenuItem, BuiltInMenus, CommandAction, MenuItem, SubmenuMenuItem},
     util::ReadOnlyId,
-    view::TreeViewDescriptor,
+    view::{BuiltInGroups, TreeViewDescriptor},
     Contribution,
 };
 use anyhow::Result;
@@ -24,9 +24,6 @@ pub struct RecentsViewContentProviderOutput {
 
 #[derive(Debug, Serialize)]
 pub struct RecentsViewModel {}
-
-unsafe impl Send for RecentsViewModel {}
-unsafe impl Sync for RecentsViewModel {}
 
 impl RecentsViewModel {
     pub fn content(&self) -> Result<RecentsViewContentProviderOutput> {
@@ -55,7 +52,7 @@ impl Contribution for RecentsContribution {
 
         let recents_view_id = "workbench.view.recentsView";
         views_registry_lock.register_views(
-            ReadOnlyId::new(super::tree_view_groups::launchpad::GROUP_ID),
+            BuiltInGroups::Launchpad.into(),
             vec![TreeViewDescriptor {
                 id: recents_view_id.to_string(),
                 name: "Recents".to_string(),
@@ -79,7 +76,7 @@ impl Contribution for RecentsContribution {
 
         menus_registry_lock.append_menu_items(vec![
             (
-                Menus::ViewTitleContext.into(),
+                BuiltInMenus::ViewTitleContext.into(),
                 MenuItem::Action(ActionMenuItem {
                     command: CommandAction {
                         id: "someId_1".to_string(),
@@ -87,14 +84,14 @@ impl Contribution for RecentsContribution {
                         tooltip: None,
                         description: None,
                     },
-                    group: Some("0_self".to_string()),
+                    group: Some("0_self".into()),
                     order: Some(1),
                     when: recents_context,
                     toggled: None,
                 }),
             ),
             (
-                Menus::ViewTitleContext.into(),
+                BuiltInMenus::ViewTitleContext.into(),
                 MenuItem::Action(ActionMenuItem {
                     command: CommandAction {
                         id: "someId_1".to_string(),
@@ -102,7 +99,7 @@ impl Contribution for RecentsContribution {
                         tooltip: None,
                         description: None,
                     },
-                    group: Some("1_views".to_string()),
+                    group: Some("1_views".into()),
                     order: Some(1),
                     when: recents_context,
                     toggled: Some(static_format!("viewState == 'mockState'")),
@@ -117,7 +114,7 @@ impl Contribution for RecentsContribution {
 
         menus_registry_lock.append_menu_items(vec![
             (
-                Menus::ViewItem.into(),
+                BuiltInMenus::ViewItem.into(),
                 MenuItem::Action(ActionMenuItem {
                     command: CommandAction {
                         id: "someId_1".to_string(),
@@ -125,14 +122,14 @@ impl Contribution for RecentsContribution {
                         tooltip: None,
                         description: None,
                     },
-                    group: Some("inline".to_string()),
+                    group: Some("inline".into()),
                     order: Some(1),
                     when: recents_item_context,
                     toggled: None,
                 }),
             ),
             (
-                Menus::ViewItem.into(),
+                BuiltInMenus::ViewItem.into(),
                 MenuItem::Action(ActionMenuItem {
                     command: CommandAction {
                         id: "someId_1".to_string(),
@@ -140,7 +137,7 @@ impl Contribution for RecentsContribution {
                         tooltip: None,
                         description: None,
                     },
-                    group: Some("inline".to_string()),
+                    group: Some("inline".into()),
                     order: Some(2),
                     when: recents_item_context,
                     toggled: None,
@@ -161,7 +158,7 @@ impl Contribution for RecentsContribution {
                         tooltip: None,
                         description: None,
                     },
-                    group: Some("0_profiles".to_string()),
+                    group: None,
                     order: Some(1),
                     when: recents_item_context,
                     toggled: None,
@@ -176,7 +173,7 @@ impl Contribution for RecentsContribution {
                         tooltip: None,
                         description: None,
                     },
-                    group: Some("0_profiles".to_string()),
+                    group: None,
                     order: None,
                     when: recents_item_context,
                     toggled: None,
@@ -186,7 +183,7 @@ impl Contribution for RecentsContribution {
 
         menus_registry_lock.append_menu_items(vec![
             (
-                Menus::ViewItemContext.into(),
+                BuiltInMenus::ViewItemContext.into(),
                 MenuItem::Action(ActionMenuItem {
                     command: CommandAction {
                         id: "someId_1".to_string(),
@@ -194,14 +191,14 @@ impl Contribution for RecentsContribution {
                         tooltip: None,
                         description: None,
                     },
-                    group: Some("1_open".to_string()),
+                    group: Some("1_open".into()),
                     order: Some(1),
                     when: recents_item_context,
                     toggled: None,
                 }),
             ),
             (
-                Menus::ViewItemContext.into(),
+                BuiltInMenus::ViewItemContext.into(),
                 MenuItem::Action(ActionMenuItem {
                     command: CommandAction {
                         id: "someId_2".to_string(),
@@ -209,7 +206,7 @@ impl Contribution for RecentsContribution {
                         tooltip: None,
                         description: None,
                     },
-                    group: Some("1_open".to_string()),
+                    group: Some("1_open".into()),
                     order: Some(2),
                     when: recents_item_context,
                     toggled: None,
@@ -218,11 +215,11 @@ impl Contribution for RecentsContribution {
         ]);
 
         menus_registry_lock.append_menu_items(vec![(
-            Menus::ViewItemContext.into(),
+            BuiltInMenus::ViewItemContext.into(),
             MenuItem::Submenu(SubmenuMenuItem {
                 submenu_id: open_with_profile_menu_id,
                 title: "Open with Profile".to_string(),
-                group: Some("1_open".to_string()),
+                group: Some("1_open".into()),
                 order: Some(3),
                 when: recents_item_context,
             }),
@@ -230,7 +227,7 @@ impl Contribution for RecentsContribution {
 
         menus_registry_lock.append_menu_items(vec![
             (
-                Menus::ViewItemContext.into(),
+                BuiltInMenus::ViewItemContext.into(),
                 MenuItem::Action(ActionMenuItem {
                     command: CommandAction {
                         id: "someId_4".to_string(),
@@ -238,14 +235,14 @@ impl Contribution for RecentsContribution {
                         tooltip: None,
                         description: None,
                     },
-                    group: Some("2_preview".to_string()),
+                    group: Some("2_preview".into()),
                     order: Some(1),
                     when: recents_item_context,
                     toggled: None,
                 }),
             ),
             (
-                Menus::ViewItemContext.into(),
+                BuiltInMenus::ViewItemContext.into(),
                 MenuItem::Action(ActionMenuItem {
                     command: CommandAction {
                         id: "someId_5".to_string(),
@@ -253,13 +250,15 @@ impl Contribution for RecentsContribution {
                         tooltip: None,
                         description: None,
                     },
-                    group: Some("3_remove".to_string()),
+                    group: Some("3_remove".into()),
                     order: Some(1),
                     when: recents_item_context,
                     toggled: None,
                 }),
             ),
         ]);
+
+        drop(menus_registry_lock);
 
         Ok(())
     }

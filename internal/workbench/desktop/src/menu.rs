@@ -2,25 +2,43 @@ use hashbrown::HashMap;
 use parking_lot::RwLock;
 use static_str_ops::destaticize;
 use std::sync::Arc;
-use strum::Display;
 
 use crate::util::ReadOnlyId;
 
-#[derive(Debug, Display)]
-pub enum Menus {
-    #[strum(to_string = "ViewTitleContext")]
-    ViewTitleContext,
-    #[strum(to_string = "ViewTitle")]
-    ViewTitle,
-    #[strum(to_string = "ViewItemContext")]
-    ViewItemContext,
-    #[strum(to_string = "ViewItem")]
-    ViewItem,
+lazy_static! {
+    static ref READ_ONLY_ID_VIEW_TITLE: ReadOnlyId = ReadOnlyId::new("viewTitle");
+    static ref READ_ONLY_ID_VIEW_TITLE_CONTEXT: ReadOnlyId = ReadOnlyId::new("viewTitleContext");
+    static ref READ_ONLY_ID_VIEW_ITEM: ReadOnlyId = ReadOnlyId::new("viewItem");
+    static ref READ_ONLY_ID_VIEW_ITEM_CONTEXT: ReadOnlyId = ReadOnlyId::new("viewItemContext");
 }
 
-impl From<Menus> for ReadOnlyId {
-    fn from(value: Menus) -> Self {
-        ReadOnlyId::from(value.to_string())
+#[derive(Debug)]
+pub enum BuiltInMenus {
+    ViewTitle,
+    ViewTitleContext,
+    ViewItem,
+    ViewItemContext,
+}
+
+impl From<BuiltInMenus> for ReadOnlyId {
+    fn from(value: BuiltInMenus) -> Self {
+        match value {
+            BuiltInMenus::ViewTitle => READ_ONLY_ID_VIEW_TITLE.clone(),
+            BuiltInMenus::ViewTitleContext => READ_ONLY_ID_VIEW_TITLE_CONTEXT.clone(),
+            BuiltInMenus::ViewItem => READ_ONLY_ID_VIEW_ITEM.clone(),
+            BuiltInMenus::ViewItemContext => READ_ONLY_ID_VIEW_ITEM_CONTEXT.clone(),
+        }
+    }
+}
+
+impl ToString for BuiltInMenus {
+    fn to_string(&self) -> String {
+        match &self {
+            BuiltInMenus::ViewTitle => READ_ONLY_ID_VIEW_TITLE.to_string(),
+            BuiltInMenus::ViewTitleContext => READ_ONLY_ID_VIEW_TITLE_CONTEXT.to_string(),
+            BuiltInMenus::ViewItem => READ_ONLY_ID_VIEW_ITEM.to_string(),
+            BuiltInMenus::ViewItemContext => READ_ONLY_ID_VIEW_ITEM_CONTEXT.to_string(),
+        }
     }
 }
 
@@ -41,7 +59,7 @@ pub struct CommandAction {
 #[derive(Debug, Serialize, Clone)]
 pub struct ActionMenuItem {
     pub command: CommandAction,
-    pub group: Option<String>,
+    pub group: Option<ReadOnlyId>,
     pub order: Option<i64>,
     pub when: &'static str,
     pub toggled: Option<&'static str>,
@@ -57,7 +75,7 @@ impl Drop for ActionMenuItem {
 pub struct SubmenuMenuItem {
     pub submenu_id: ReadOnlyId,
     pub title: String,
-    pub group: Option<String>,
+    pub group: Option<ReadOnlyId>,
     pub order: Option<i64>,
     pub when: &'static str,
 }
