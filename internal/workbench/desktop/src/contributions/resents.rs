@@ -1,12 +1,14 @@
 use crate::{
-    menu::{ActionMenuItem, CommandAction, MenuId, MenuItem, Menus, SubmenuMenuItem},
-    view::{AnyContentProvider, TreeViewDescriptor},
+    menu::{ActionMenuItem, CommandAction, MenuItem, Menus, SubmenuMenuItem},
+    util::ReadOnlyId,
+    view::TreeViewDescriptor,
     Contribution,
 };
 use anyhow::Result;
 use once_cell::sync::Lazy;
 use quote::quote;
 use static_str_ops::static_format;
+use std::sync::Arc;
 
 #[derive(Debug, Serialize)]
 pub struct RecentsViewTreeItem {
@@ -20,7 +22,11 @@ pub struct RecentsViewContentProviderOutput {
     pub html: String,
 }
 
+#[derive(Debug, Serialize)]
 pub struct RecentsViewModel {}
+
+unsafe impl Send for RecentsViewModel {}
+unsafe impl Sync for RecentsViewModel {}
 
 impl RecentsViewModel {
     pub fn content(&self) -> Result<RecentsViewContentProviderOutput> {
@@ -49,7 +55,7 @@ impl Contribution for RecentsContribution {
 
         let recents_view_id = "workbench.view.recentsView";
         views_registry_lock.register_views(
-            &super::tree_view_groups::launchpad::GROUP_ID,
+            ReadOnlyId::new(super::tree_view_groups::launchpad::GROUP_ID),
             vec![TreeViewDescriptor {
                 id: recents_view_id.to_string(),
                 name: "Recents".to_string(),
@@ -57,9 +63,9 @@ impl Contribution for RecentsContribution {
                 hide_by_default: false,
                 can_toggle_visibility: false,
                 collapsed: false,
-                model: Lazy::new(|| Box::new(RecentsViewModel {})),
+                model: Lazy::new(|| Arc::new(RecentsViewModel {})),
             }],
-        )?;
+        );
 
         drop(views_registry_lock);
 
@@ -144,7 +150,7 @@ impl Contribution for RecentsContribution {
 
         // View Item Context
 
-        let open_with_profile_menu_id = MenuId::new("recents.openWithProfileSubmenu");
+        let open_with_profile_menu_id = ReadOnlyId::new("recents.openWithProfileSubmenu");
         menus_registry_lock.append_menu_items(vec![
             (
                 open_with_profile_menu_id.clone(),

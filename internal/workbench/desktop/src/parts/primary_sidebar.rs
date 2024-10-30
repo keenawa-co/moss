@@ -1,7 +1,7 @@
 use std::sync::Arc;
 
 use crate::{
-    menu::{Menu, MenuId, MenuService, Menus},
+    menu::{MenuItem, MenuService, Menus},
     view::{TreeViewGroupLocation, TreeViewOutput},
 };
 
@@ -12,7 +12,7 @@ use hashbrown::HashMap;
 #[derive(Debug, Serialize)]
 pub struct DescribeSideBarPartOutput {
     pub views: HashMap<String, Vec<TreeViewOutput>>,
-    pub menus: HashMap<MenuId, Menu>,
+    pub menus: HashMap<String, Vec<MenuItem>>,
 }
 
 pub struct PrimarySideBarPart {
@@ -48,8 +48,35 @@ impl AnyPart for PrimarySideBarPart {
             }
         }
 
-        let menus = HashMap::new();
-        // self.menu_service.create_menu_by_menu_id(Menus::ViewItemContext, f)
+        let mut menus = HashMap::new();
+
+        let menus_lock = registry.menus.read();
+        menus.insert(
+            Menus::ViewItemContext.to_string(),
+            menus_lock
+                .get_menu_items(&Menus::ViewItemContext.into())
+                .cloned()
+                .unwrap(),
+        );
+
+        menus.insert(
+            Menus::ViewItem.to_string(),
+            menus_lock
+                .get_menu_items(&Menus::ViewItem.into())
+                .cloned()
+                .unwrap(),
+        );
+
+        menus.insert(
+            Menus::ViewTitleContext.to_string(),
+            menus_lock
+                .get_menu_items(&Menus::ViewTitleContext.into())
+                .cloned()
+                .unwrap(),
+        );
+        // let r = self
+        //     .menu_service
+        //     .create_menu_by_menu_id(&Menus::ViewItemContext.into(), |items| Menu::new());
 
         Ok(DescribeSideBarPartOutput { views, menus })
     }

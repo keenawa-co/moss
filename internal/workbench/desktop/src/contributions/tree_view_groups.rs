@@ -13,14 +13,14 @@ pub(crate) mod launchpad {
         fn contribute(registry: &mut crate::RegistryManager) -> anyhow::Result<()> {
             let mut views_registry_lock = registry.views.write();
 
-            views_registry_lock.register_group(
-                TreeViewGroupLocation::PrimaryBar,
-                TreeViewGroup {
-                    id: GROUP_ID,
-                    name: "Launchpad".to_string(),
-                    order: 1,
-                },
-            )?;
+            // views_registry_lock.register_group(
+            //     TreeViewGroupLocation::PrimaryBar,
+            //     TreeViewGroup {
+            //         id: GROUP_ID,
+            //         name: "Launchpad".to_string(),
+            //         order: 1,
+            //     },
+            // )?;
 
             Ok(())
         }

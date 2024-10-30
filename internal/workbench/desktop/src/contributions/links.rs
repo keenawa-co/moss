@@ -1,9 +1,8 @@
+use std::sync::Arc;
+
 use once_cell::sync::Lazy;
 
-use crate::{
-    view::{AnyContentProvider, TreeViewDescriptor},
-    Contribution,
-};
+use crate::{util::ReadOnlyId, view::TreeViewDescriptor, Contribution};
 
 pub struct LinksViewModel;
 
@@ -12,7 +11,7 @@ impl Contribution for LinksContribution {
     fn contribute(registry: &mut crate::RegistryManager) -> anyhow::Result<()> {
         let mut views_registry_lock = registry.views.write();
         views_registry_lock.register_views(
-            &super::tree_view_groups::launchpad::GROUP_ID,
+            ReadOnlyId::new(super::tree_view_groups::launchpad::GROUP_ID),
             vec![TreeViewDescriptor {
                 id: "workbench.view.linksView".to_string(),
                 name: "Links".to_string(),
@@ -20,9 +19,9 @@ impl Contribution for LinksContribution {
                 hide_by_default: false,
                 can_toggle_visibility: true,
                 collapsed: false,
-                model: Lazy::new(|| Box::new(LinksViewModel {})),
+                model: Lazy::new(|| Arc::new(LinksViewModel {})),
             }],
-        )?;
+        );
 
         drop(views_registry_lock);
 

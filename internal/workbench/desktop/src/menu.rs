@@ -1,29 +1,10 @@
 use hashbrown::HashMap;
 use parking_lot::RwLock;
 use static_str_ops::destaticize;
-use std::{cell::RefCell, rc::Rc, sync::Arc};
+use std::sync::Arc;
 use strum::Display;
 
-#[derive(Debug, Serialize, Clone, PartialEq, Eq, Hash)]
-pub struct MenuId(Arc<str>);
-
-impl MenuId {
-    pub fn new(value: &str) -> Self {
-        Self(value.into())
-    }
-}
-
-impl From<&str> for MenuId {
-    fn from(s: &str) -> Self {
-        MenuId(s.into())
-    }
-}
-
-impl From<String> for MenuId {
-    fn from(s: String) -> Self {
-        MenuId(s.into())
-    }
-}
+use crate::util::ReadOnlyId;
 
 #[derive(Debug, Display)]
 pub enum Menus {
@@ -37,9 +18,9 @@ pub enum Menus {
     ViewItem,
 }
 
-impl Into<MenuId> for Menus {
-    fn into(self) -> MenuId {
-        MenuId::from(self.to_string())
+impl From<Menus> for ReadOnlyId {
+    fn from(value: Menus) -> Self {
+        ReadOnlyId::from(value.to_string())
     }
 }
 
@@ -74,7 +55,7 @@ impl Drop for ActionMenuItem {
 
 #[derive(Debug, Serialize, Clone)]
 pub struct SubmenuMenuItem {
-    pub submenu_id: MenuId,
+    pub submenu_id: ReadOnlyId,
     pub title: String,
     pub group: Option<String>,
     pub order: Option<i64>,
@@ -88,7 +69,7 @@ impl Drop for SubmenuMenuItem {
 }
 
 pub struct MenuRegistry {
-    menus: HashMap<MenuId, Vec<MenuItem>>,
+    menus: HashMap<ReadOnlyId, Vec<MenuItem>>,
 }
 
 impl MenuRegistry {
@@ -98,7 +79,7 @@ impl MenuRegistry {
         }
     }
 
-    pub fn append_menu_item(&mut self, menu_id: MenuId, item: MenuItem) {
+    pub fn append_menu_item(&mut self, menu_id: ReadOnlyId, item: MenuItem) {
         self.menus
             .entry(menu_id.into())
             .or_insert_with(Vec::new)
@@ -107,14 +88,14 @@ impl MenuRegistry {
 
     pub fn append_menu_items<I>(&mut self, items: I)
     where
-        I: IntoIterator<Item = (MenuId, MenuItem)>,
+        I: IntoIterator<Item = (ReadOnlyId, MenuItem)>,
     {
         for (menu_id, item) in items {
             self.append_menu_item(menu_id, item);
         }
     }
 
-    pub fn get_menu_items(&self, menu_id: &MenuId) -> Option<&Vec<MenuItem>> {
+    pub fn get_menu_items(&self, menu_id: &ReadOnlyId) -> Option<&Vec<MenuItem>> {
         self.menus.get(menu_id)
     }
 }
@@ -126,7 +107,7 @@ pub struct MenuGroup {
 }
 
 #[derive(Debug, Serialize, Clone)]
-pub struct Menu(HashMap<MenuId, Vec<MenuGroup>>);
+pub struct Menu(HashMap<ReadOnlyId, Vec<MenuGroup>>);
 
 impl Menu {
     pub fn new() -> Self {
@@ -145,11 +126,11 @@ impl MenuService {
 
     pub fn create_menu_by_menu_id(
         &self,
-        id: &MenuId,
+        id: impl AsRef<ReadOnlyId>,
         f: impl FnOnce(&Vec<MenuItem>) -> Menu,
     ) -> Option<Menu> {
         let registry_lock = self.registry.read();
-        let items = registry_lock.menus.get(id)?;
+        let items = registry_lock.menus.get(id.as_ref())?;
 
         Some(f(items))
     }

@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use tauri::State;
 use workbench_desktop::contributions::resents::{
     RecentsViewContentProviderOutput, RecentsViewModel,

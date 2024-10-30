@@ -37,7 +37,7 @@ const SessionComponent = () => {
       console.log((await invokeCmd("describe_primary_activitybar_part")) as object);
       console.log((await invokeCmd("describe_primary_sidebar_part")) as object);
       console.log((await invokeCmd("get_view_content")) as object);
-      console.log((await invokeCmd("get_menu_items")) as object);
+      // console.log((await invokeCmd("get_menu_items")) as object);
     } catch (err) {
       console.error("Failed to get workbench state:", err);
     }

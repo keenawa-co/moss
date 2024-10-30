@@ -6,9 +6,12 @@ pub mod window;
 
 pub mod contributions;
 
+mod util;
+
 use std::{
     any::Any,
     cell::{Cell, RefCell},
+    fmt::Debug,
     path::PathBuf,
     rc::Rc,
     sync::Arc,
@@ -21,8 +24,7 @@ use contributions::{
     tree_view_groups::launchpad::LaunchpadGroupContribution,
 };
 use hashbrown::HashMap;
-use hecs::Entity;
-use menu::{MenuId, MenuItem, MenuRegistry, MenuService};
+use menu::{MenuItem, MenuRegistry, MenuService};
 use once_cell::unsync::OnceCell;
 use parking_lot::RwLock;
 use parts::{
@@ -44,7 +46,8 @@ use platform_fs::disk::file_system_service::{
 use platform_user_profile::user_profile_service::UserProfileService as PlatformUserProfileService;
 use platform_workspace::{Workspace, WorkspaceId};
 use tauri::{AppHandle, Emitter, WebviewWindow};
-use view::{GroupId, ViewsRegistry};
+use util::ReadOnlyId;
+use view::ViewsRegistry;
 use workbench_service_configuration_tao::configuration_service::WorkspaceConfigurationService;
 use workbench_service_environment_tao::environment_service::NativeEnvironmentService;
 use workbench_service_user_profile_tao::user_profile_service::UserProfileService;
@@ -177,14 +180,16 @@ impl Workbench {
         self.parts.get(part_id)?.downcast_ref::<T>()
     }
 
-    pub fn get_view<T: 'static>(&self, group_id: GroupId, view_id: String) -> Option<&T> {
+    pub fn get_view<T: Send + Sync + Debug + 'static>(
+        &self,
+        group_id: impl Into<ReadOnlyId>,
+        view_id: String,
+    ) -> Option<Arc<T>> {
         let views_registry_lock = self.registry.views.read();
-        views_registry_lock
-            .get_view_model(group_id, view_id)
-            .cloned()
+        views_registry_lock.get_view_model::<T>(group_id, view_id)
     }
 
-    pub fn get_menu_items(&self, menu_id: &MenuId) -> Option<&Vec<MenuItem>> {
+    pub fn get_menu_items<'a>(&self, menu_id: impl Into<&'a ReadOnlyId>) -> Option<&Vec<MenuItem>> {
         // let menu_registry_lock = self.registry.menus.read();
         // menu_registry_lock.get_menu_items(menu_id).cloned()
 
