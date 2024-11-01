@@ -94,7 +94,7 @@ export const HeadBar = () => {
           data-tauri-drag-region
         >
           <div className="flex items-center">
-            <button className="flex w-max items-center rounded-[3px] px-[10px] py-[7px] transition-colors hover:bg-[#EBECF0]">
+            <button className="flex w-max items-center rounded-[3px] px-[10px] py-[7px] transition-colors hover:bg-[#C6C6C6]">
               <Icon icon="HeadBarMossStudio" className="mr-1.5 size-[22px] text-[#525252]" />
               <span className="mr-[2px] w-max font-medium text-[#161616]">moss-studio</span>
               <Icon icon="ArrowheadDown" className="text-[#525252]" />
@@ -126,7 +126,7 @@ export const HeadBar = () => {
                     ? createPortal(
                         <DragOverlay>
                           <HeadBarButton
-                            className="cursor-grabbing !bg-stone-300  px-[10px] py-[7px]"
+                            className="cursor-grabbing !bg-[#C6C6C6]  px-[10px] py-[7px]"
                             icon={items.find((item) => item.id === activeId)?.icon!}
                             label={items.find((item) => item.id === activeId)?.label}
                           />
@@ -141,7 +141,7 @@ export const HeadBar = () => {
           <div className="flex items-center gap-4">
             <div className="flex items-center">
               <button className="flex items-center gap-[1px] transition-colors">
-                <div className="flex h-full items-center gap-[6px] rounded-[3px] py-[9px] pl-[10px] pr-[8px] hover:bg-[#EBECF0] ">
+                <div className="flex h-full items-center gap-[6px] rounded-[3px] py-[9px] pl-[10px] pr-[8px] hover:bg-[#C6C6C6] ">
                   <Icon icon="HeadBarBranch" className="size-[18px] text-[#525252]" />
                   <div className="flex items-center gap-[2px]">
                     <span className=" font-semibold leading-4 text-[#161616]">main</span>
@@ -153,9 +153,9 @@ export const HeadBar = () => {
                   <Icon icon="HeadBarBranchSuccess" className="size-[16px] rounded-[3px]" />
                   <Icon
                     icon="HeadBarBranchRefresh"
-                    className="size-[16px] rounded-[3px] text-[#525252] hover:bg-[#EBECF0]"
+                    className="size-[16px] rounded-[3px] text-[#525252] hover:bg-[#C6C6C6]"
                   />
-                  <Icon icon="ArrowheadDown" className="size-[16px] rounded-[3px] text-[#525252] hover:bg-[#EBECF0]" />
+                  <Icon icon="ArrowheadDown" className="size-[16px] rounded-[3px] text-[#525252] hover:bg-[#C6C6C6]" />
                 </div>
               </button>
             </div>
