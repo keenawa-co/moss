@@ -883,7 +883,7 @@ dependencies = [
  "async-task",
  "flume",
  "futures",
- "hashbrown 0.14.5",
+ "hashbrown 0.15.0",
  "macos-trampoline",
  "mimalloc",
  "once_cell",
@@ -1158,6 +1158,12 @@ name = "fnv"
 version = "1.0.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3f9eec918d3f24069decb9af1554cad7c880e2da24a9afd88aca000531ab82c1"
+
+[[package]]
+name = "foldhash"
+version = "0.1.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f81ec6369c545a7d40e4589b5597581fa1c441fe1cce96dd1de43159910a36a2"
 
 [[package]]
 name = "foreign-types"
@@ -1651,8 +1657,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e5274423e17b7c9fc20b6e7e208532f9b19825d82dfd615708b70edd83df41f1"
 dependencies = [
  "ahash",
- "allocator-api2",
- "serde",
 ]
 
 [[package]]
@@ -1660,6 +1664,12 @@ name = "hashbrown"
 version = "0.15.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1e087f84d4f86bf4b218b927129862374b72199ae7d8657835f1e89000eea4fb"
+dependencies = [
+ "allocator-api2",
+ "equivalent",
+ "foldhash",
+ "serde",
+]
 
 [[package]]
 name = "heck"
@@ -2945,7 +2955,7 @@ dependencies = [
  "anyhow",
  "arc-swap",
  "async-trait",
- "hashbrown 0.14.5",
+ "hashbrown 0.15.0",
  "lazy-regex",
  "parking_lot",
  "platform_core",
@@ -2971,7 +2981,7 @@ dependencies = [
  "flume",
  "fnv",
  "futures",
- "hashbrown 0.14.5",
+ "hashbrown 0.15.0",
  "im",
  "lazy_static",
  "once_cell",
@@ -5573,7 +5583,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "derive_more",
- "hashbrown 0.14.5",
+ "hashbrown 0.15.0",
  "hecs",
  "hecs-hierarchy",
  "lazy_static",
