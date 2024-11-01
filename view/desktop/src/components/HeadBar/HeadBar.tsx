@@ -36,6 +36,7 @@ export const HeadBar = () => {
   // os = "linux";
 
   const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null);
+  const [isSorting, setSorting] = useState(false);
 
   const [items, setItems] = useState([
     {
@@ -58,9 +59,11 @@ export const HeadBar = () => {
   function handleDragStart(event: DragStartEvent) {
     console.log(event);
     setActiveId(event.active.id);
+    setSorting(true);
   }
 
   const handleDragEnd = (event: DragEndEvent) => {
+    setSorting(false);
     const { active, over } = event;
     setActiveId(null);
 
@@ -117,7 +120,9 @@ export const HeadBar = () => {
                         sortableId={item.id}
                         icon={item.icon}
                         label={item.label}
-                        className="text-ellipsis px-[10px] py-[5px]"
+                        className={cn("text-ellipsis px-[10px] py-[5px]", {
+                          "bg-[#c6c6c6]": isSorting && item.id !== activeId,
+                        })}
                       />
                     ))}
                   </SortableContext>
