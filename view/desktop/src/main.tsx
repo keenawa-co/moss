@@ -8,7 +8,7 @@ import { type } from "@tauri-apps/plugin-os";
 
 if (type() !== "windows") {
   document.querySelectorAll("html, body").forEach((el) => {
-    el.classList.add("rounded-2xl");
+    el.classList.add("rounded-xl");
   });
 }
 
