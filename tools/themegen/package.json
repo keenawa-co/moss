@@ -1,5 +1,5 @@
 {
-  "name": "@repo/theme-generator",
+  "name": "@repo/themegen",
   "scripts": {
     "start": "npx vite-node ./src/index.ts"
   },

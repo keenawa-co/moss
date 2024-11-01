@@ -2,8 +2,8 @@ DESKTOP_DIR = view/desktop
 STORYBOOK_DIR = view/storybook
 DOCS_DIR = view/docs
 WEB_DIR = view/web
-THEME_GENERATOR_DIR = tools/theme-generator
-ICONS_DIR = view/shared/icons
+THEME_GENERATOR_DIR = tools/themegen
+ICONS_DIR = tools/icongen
 
 WORKBENCH_MODELS = internal/workbench/models
 SHARED_MODELS = view/shared/models

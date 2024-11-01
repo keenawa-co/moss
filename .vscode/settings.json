@@ -15,6 +15,7 @@
     "hashbrown",
     "Hasher",
     "headbar",
+    "icongen",
     "inmem",
     "jsonwebtoken",
     "Keyable",

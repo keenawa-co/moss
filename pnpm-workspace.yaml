@@ -4,3 +4,5 @@ packages:
   - "lib/*"
   - "tools/*"
   - "sdk/*"
+  - "internal/workbench/*"
+  - "view/shared/models/*"

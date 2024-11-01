@@ -23,7 +23,10 @@
       "path": "lib/moss_lang"
     },
     {
-      "path": "tools/theme-generator"
+      "path": "tools/themegen"
+    },
+    {
+      "path": "tools/icongen"
     },
     {
       "path": "sdk/ts"
