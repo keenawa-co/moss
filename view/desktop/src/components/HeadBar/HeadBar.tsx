@@ -124,9 +124,7 @@ export const HeadBar = () => {
                         sortableId={item.id}
                         icon={item.icon}
                         label={item.label}
-                        className={cn("text-ellipsis px-[10px] py-[5px]", {
-                          "bg-[#c6c6c6]": isSorting && item.id !== activeId,
-                        })}
+                        className={cn("text-ellipsis px-[10px] py-[5px]")}
                       />
                     ))}
                   </SortableContext>
