@@ -106,11 +106,7 @@ export const HeadBar = () => {
             <Separator />
 
             <div className="flex w-full justify-between">
-              <div
-                className={cn("flex items-center gap-2 overflow-hidden", {
-                  "rounded bg-[#c8c8c8]": isSorting,
-                })}
-              >
+              <div className={cn("flex items-center gap-2 overflow-hidden")}>
                 <DndContext
                   sensors={sensors}
                   collisionDetection={closestCenter}
@@ -133,7 +129,7 @@ export const HeadBar = () => {
                     ? createPortal(
                         <DragOverlay>
                           <HeadBarButton
-                            className="cursor-grabbing !bg-[#C6C6C6]  px-[10px] py-[5px] shadow-lg"
+                            className="cursor-grabbing !bg-[#e0e0e0]  px-[10px] py-[5px] shadow-lg"
                             icon={items.find((item) => item.id === activeId)?.icon!}
                             label={items.find((item) => item.id === activeId)?.label}
                           />
