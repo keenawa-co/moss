@@ -1,4 +1,7 @@
-use crate::view::{TreeViewGroupLocation, TreeViewOutput};
+use crate::{
+    menu::{BuiltInMenuNamespaces, MenuItem},
+    view::{TreeViewGroupLocation, TreeViewOutput},
+};
 
 use super::{AnyPart, PartId, Parts};
 use anyhow::Result;
@@ -7,6 +10,7 @@ use hashbrown::HashMap;
 #[derive(Debug, Serialize)]
 pub struct DescribeSideBarPartOutput {
     pub views: HashMap<String, Vec<TreeViewOutput>>,
+    pub menus: HashMap<String, Vec<MenuItem>>,
 }
 
 pub struct PrimarySideBarPart {}
@@ -23,15 +27,16 @@ impl AnyPart for PrimarySideBarPart {
 
     fn describe(&self, registry: &crate::RegistryManager) -> Result<Self::DescribeOutput> {
         let mut views = HashMap::new();
+        let views_registry_lock = registry.views.read();
 
-        if let Some(containers) = registry
-            .views
-            .get_groups_by_location(&TreeViewGroupLocation::PrimaryBar)
+        dbg!(&views_registry_lock);
+
+        if let Some(containers) =
+            views_registry_lock.get_groups_by_location(&TreeViewGroupLocation::PrimaryBar)
         {
             for container in containers {
-                if let Some(view_descriptors) = registry
-                    .views
-                    .get_view_descriptors_by_group_id(&container.id)
+                if let Some(view_descriptors) =
+                    views_registry_lock.get_view_descriptors_by_group_id(&container.id)
                 {
                     views
                         .entry(container.id.to_string())
@@ -41,6 +46,33 @@ impl AnyPart for PrimarySideBarPart {
             }
         }
 
-        Ok(DescribeSideBarPartOutput { views })
+        let mut menus = HashMap::new();
+
+        let menus_lock = registry.menus.read();
+        menus.insert(
+            BuiltInMenuNamespaces::ViewItemContext.to_string(),
+            menus_lock
+                .get_menu_items(&BuiltInMenuNamespaces::ViewItemContext.into())
+                .cloned()
+                .unwrap(),
+        );
+
+        menus.insert(
+            BuiltInMenuNamespaces::ViewItem.to_string(),
+            menus_lock
+                .get_menu_items(&BuiltInMenuNamespaces::ViewItem.into())
+                .cloned()
+                .unwrap(),
+        );
+
+        menus.insert(
+            BuiltInMenuNamespaces::ViewTitleContext.to_string(),
+            menus_lock
+                .get_menu_items(&BuiltInMenuNamespaces::ViewTitleContext.into())
+                .cloned()
+                .unwrap(),
+        );
+
+        Ok(DescribeSideBarPartOutput { views, menus })
     }
 }

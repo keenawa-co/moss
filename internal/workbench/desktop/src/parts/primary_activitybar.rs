@@ -33,13 +33,15 @@ impl AnyPart for PrimaryActivityBarPart {
     type DescribeOutput = DescribeActivityBarPartOutput;
 
     fn describe(&self, registry: &RegistryManager) -> anyhow::Result<Self::DescribeOutput> {
+        let views_registry_lock = registry.views.read();
+        let containers = views_registry_lock
+            .get_groups_by_location(&TreeViewGroupLocation::PrimaryBar)
+            .cloned();
+
         let result = DescribeActivityBarPartOutput {
             align: self.align.clone(),
             orientation: self.orientation.clone(),
-            containers: registry
-                .views
-                .get_groups_by_location(&TreeViewGroupLocation::PrimaryBar)
-                .cloned(),
+            containers,
         };
 
         Ok(result)

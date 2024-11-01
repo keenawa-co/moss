@@ -1,28 +1,44 @@
 use hashbrown::HashMap;
-use once_cell::sync::{Lazy, OnceCell};
-use std::{
-    any::{Any, TypeId},
-    cell::RefCell,
-    fmt::Debug,
-};
-use thiserror::Error;
+use once_cell::sync::Lazy;
+use std::{any::Any, fmt::Debug, sync::Arc};
 
-pub type GroupId = &'static str;
-pub type ViewId = &'static str;
+use crate::util::ReadOnlyStr;
 
-pub trait AnyContentProvider {
-    type ContentOutput;
+pub type GroupId = ReadOnlyStr;
 
-    fn content(&self) -> Self::ContentOutput;
+lazy_static! {
+    static ref READ_ONLY_ID_LAUNCHPAD: ReadOnlyStr = ReadOnlyStr::new("workbench.group.launchpad");
+}
+
+#[derive(Debug)]
+pub enum BuiltInGroups {
+    Launchpad,
+}
+
+impl From<BuiltInGroups> for ReadOnlyStr {
+    fn from(value: BuiltInGroups) -> Self {
+        match value {
+            BuiltInGroups::Launchpad => READ_ONLY_ID_LAUNCHPAD.clone(),
+        }
+    }
+}
+
+impl ToString for BuiltInGroups {
+    fn to_string(&self) -> String {
+        match &self {
+            BuiltInGroups::Launchpad => READ_ONLY_ID_LAUNCHPAD.to_string(),
+        }
+    }
 }
 
 #[derive(Serialize, Debug, Clone)]
 pub struct TreeViewGroup {
-    pub id: GroupId,
+    pub id: ReadOnlyStr,
     pub name: String,
     pub order: usize,
 }
 
+#[derive(Debug)]
 pub struct TreeViewDescriptor {
     pub id: String,
     pub name: String,
@@ -30,7 +46,7 @@ pub struct TreeViewDescriptor {
     pub hide_by_default: bool,
     pub can_toggle_visibility: bool,
     pub collapsed: bool,
-    pub model: Lazy<Box<dyn Any>>,
+    pub model: Lazy<Arc<dyn Any + Send + Sync>>,
 }
 
 #[derive(Serialize, Debug, Clone)]
@@ -56,87 +72,69 @@ impl From<&TreeViewDescriptor> for TreeViewOutput {
     }
 }
 
-#[derive(Debug, Error)]
-pub enum ViewsRegistryError {
-    #[error("Group '{0}' already exists.")]
-    GroupAlreadyExists(GroupId),
-
-    #[error("Group '{0}' does not exist.")]
-    GroupNotFound(GroupId),
-}
-
-#[derive(Debug, PartialEq, Eq, Hash)]
+#[derive(Serialize, Debug, PartialEq, Eq, Hash)]
+#[serde(rename_all = "camelCase")]
 pub enum TreeViewGroupLocation {
     PrimaryBar,
     SecondaryBar,
 }
 
+#[derive(Debug)]
 pub struct ViewsRegistry {
-    view_groups: HashMap<TreeViewGroupLocation, Vec<TreeViewGroup>>,
+    groups: HashMap<TreeViewGroupLocation, Vec<TreeViewGroup>>,
     views: HashMap<GroupId, Vec<TreeViewDescriptor>>,
 }
 
 impl ViewsRegistry {
     pub fn new() -> Self {
         ViewsRegistry {
-            view_groups: HashMap::new(),
+            groups: HashMap::new(),
             views: HashMap::new(),
         }
     }
 
-    pub(crate) fn register_group(
+    pub(crate) fn append_view_group(
         &mut self,
         location: TreeViewGroupLocation,
         group: TreeViewGroup,
-    ) -> Result<(), ViewsRegistryError> {
-        let group_id = group.id;
-
-        self.view_groups
+    ) {
+        self.groups
             .entry(location)
             .or_insert_with(Vec::new)
             .push(group);
-        self.views.entry(group_id).or_insert_with(Vec::new);
-
-        Ok(())
     }
 
     pub(crate) fn register_views(
         &mut self,
-        id: &GroupId,
+        id: ReadOnlyStr,
         batch: impl IntoIterator<Item = TreeViewDescriptor>,
-    ) -> Result<(), ViewsRegistryError> {
-        let group_views = self
-            .views
-            .get_mut(id)
-            .ok_or_else(|| ViewsRegistryError::GroupNotFound(id))?;
-        group_views.extend(batch);
-
-        Ok(())
+    ) {
+        self.views.entry(id).or_insert_with(Vec::new).extend(batch);
     }
 
     pub(crate) fn get_view_descriptors_by_group_id(
         &self,
-        id: &GroupId,
+        id: &ReadOnlyStr,
     ) -> Option<&Vec<TreeViewDescriptor>> {
         self.views.get(id)
     }
 
-    pub(crate) fn get_view_model<T: 'static>(
+    pub(crate) fn get_view_model<T: Send + Sync + Debug + 'static>(
         &self,
-        group_id: GroupId,
+        group_id: impl Into<ReadOnlyStr>,
         view_id: String,
-    ) -> Option<&T> {
+    ) -> Option<Arc<T>> {
         self.views
-            .get(&group_id)?
+            .get(&group_id.into())?
             .iter()
             .find(|item| item.id == view_id)
-            .and_then(|item| item.model.downcast_ref::<T>())
+            .and_then(|item| Arc::downcast::<T>(Arc::clone(&item.model)).ok())
     }
 
     pub(crate) fn get_groups_by_location(
         &self,
         location: &TreeViewGroupLocation,
     ) -> Option<&Vec<TreeViewGroup>> {
-        self.view_groups.get(location)
+        self.groups.get(location)
     }
 }

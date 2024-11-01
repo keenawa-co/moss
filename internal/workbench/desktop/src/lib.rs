@@ -1,27 +1,29 @@
 pub mod contribution;
+pub mod menu;
 pub mod parts;
 pub mod view;
 pub mod window;
 
 pub mod contributions;
 
+mod util;
+
 use std::{
     any::Any,
     cell::{Cell, RefCell},
+    fmt::Debug,
     path::PathBuf,
     rc::Rc,
     sync::Arc,
 };
 
 use anyhow::Result;
-use contribution::WORKBENCH_TAO_WINDOW;
-use contributions::{
-    links::LinksContribution, resents::RecentsContribution,
-    tree_view_groups::launchpad::LaunchpadGroupContribution,
-};
+use contribution::{WorkbenchContribution, WORKBENCH_TAO_WINDOW};
+use contributions::{links::LinksContribution, resents::RecentsContribution};
 use hashbrown::HashMap;
-use hecs::Entity;
+use menu::{MenuItem, MenuRegistry};
 use once_cell::unsync::OnceCell;
+use parking_lot::RwLock;
 use parts::{
     primary_activitybar::PrimaryActivityBarPart, primary_sidebar::PrimarySideBarPart, AnyPart,
     PartId,
@@ -41,7 +43,8 @@ use platform_fs::disk::file_system_service::{
 use platform_user_profile::user_profile_service::UserProfileService as PlatformUserProfileService;
 use platform_workspace::{Workspace, WorkspaceId};
 use tauri::{AppHandle, Emitter, WebviewWindow};
-use view::{GroupId, ViewsRegistry};
+use util::ReadOnlyStr;
+use view::ViewsRegistry;
 use workbench_service_configuration_tao::configuration_service::WorkspaceConfigurationService;
 use workbench_service_environment_tao::environment_service::NativeEnvironmentService;
 use workbench_service_user_profile_tao::user_profile_service::UserProfileService;
@@ -88,14 +91,16 @@ pub trait Contribution {
 }
 
 pub struct RegistryManager {
-    pub views: ViewsRegistry,
+    pub views: Arc<RwLock<ViewsRegistry>>,
+    pub menus: Arc<RwLock<MenuRegistry>>,
 }
 
 impl RegistryManager {
     pub fn new() -> Self {
-        Self {
-            views: ViewsRegistry::new(),
-        }
+        let views = Arc::new(RwLock::new(ViewsRegistry::new()));
+        let menus = Arc::new(RwLock::new(MenuRegistry::new()));
+
+        Self { views, menus }
     }
 }
 
@@ -108,10 +113,6 @@ pub struct Workbench {
     font_size_service: Atom<MockFontSizeService>,
     _observe_font_size_service: OnceCell<Subscription>,
     tao_handle: OnceCell<Rc<AppHandle>>,
-    // sizes: SecondaryMap<ViewKey, S>
-    // known_views: SlotMap<ViewKey, View>,
-    // activity_bar_part: Part<ActivityBar>,
-    pub project_context_menu: OnceCell<Entity>,
 
     parts: HashMap<PartId, Box<dyn Any>>,
 }
@@ -153,7 +154,6 @@ impl Workbench {
             font_size_service: font_service_atom,
             _observe_font_size_service: OnceCell::new(),
             tao_handle: OnceCell::new(),
-            project_context_menu: OnceCell::new(),
             parts: HashMap::new(),
         })
     }
@@ -177,13 +177,29 @@ impl Workbench {
         self.parts.get(part_id)?.downcast_ref::<T>()
     }
 
-    pub fn get_view<T: 'static>(&self, group_id: GroupId, view_id: String) -> Option<&T> {
-        self.registry.views.get_view_model(group_id, view_id)
+    pub fn get_view<T: Send + Sync + Debug + 'static>(
+        &self,
+        group_id: impl Into<ReadOnlyStr>,
+        view_id: String,
+    ) -> Option<Arc<T>> {
+        let views_registry_lock = self.registry.views.read();
+        views_registry_lock.get_view_model::<T>(group_id, view_id)
+    }
+
+    pub fn get_menu_items<'a>(
+        &self,
+        menu_id: impl Into<&'a ReadOnlyStr>,
+    ) -> Option<&Vec<MenuItem>> {
+        // let menu_registry_lock = self.registry.menus.read();
+        // menu_registry_lock.get_menu_items(menu_id).cloned()
+
+        todo!()
     }
 
     pub fn initialize<'a>(&'a mut self, ctx: &mut AsyncContext) -> Result<()> {
-        self.add_contribution(LaunchpadGroupContribution::contribute)?;
+        // let menu_service = Arc::new(MenuService::new(Arc::clone(&self.registry.menus)));
 
+        self.add_contribution(WorkbenchContribution::contribute)?;
         self.add_contribution(RecentsContribution::contribute)?;
         self.add_contribution(LinksContribution::contribute)?;
 
