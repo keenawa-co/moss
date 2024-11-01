@@ -133,7 +133,7 @@ export const HeadBar = () => {
                     ? createPortal(
                         <DragOverlay>
                           <HeadBarButton
-                            className="cursor-grabbing !bg-[#C6C6C6]  px-[10px] py-[5px]"
+                            className="cursor-grabbing !bg-[#C6C6C6]  px-[10px] py-[5px] shadow-lg"
                             icon={items.find((item) => item.id === activeId)?.icon!}
                             label={items.find((item) => item.id === activeId)?.label}
                           />
