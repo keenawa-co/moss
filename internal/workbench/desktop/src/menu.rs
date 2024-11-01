@@ -1,43 +1,109 @@
 use hashbrown::HashMap;
-use parking_lot::RwLock;
-use static_str_ops::destaticize;
-use std::sync::Arc;
 
-use crate::util::ReadOnlyId;
+use crate::util::ReadOnlyStr;
 
+pub type MenuId = ReadOnlyStr;
+
+#[rustfmt::skip]
 lazy_static! {
-    static ref READ_ONLY_ID_VIEW_TITLE: ReadOnlyId = ReadOnlyId::new("viewTitle");
-    static ref READ_ONLY_ID_VIEW_TITLE_CONTEXT: ReadOnlyId = ReadOnlyId::new("viewTitleContext");
-    static ref READ_ONLY_ID_VIEW_ITEM: ReadOnlyId = ReadOnlyId::new("viewItem");
-    static ref READ_ONLY_ID_VIEW_ITEM_CONTEXT: ReadOnlyId = ReadOnlyId::new("viewItemContext");
+    static ref MENU_NAMESPACE_ID_VIEW_TITLE: ReadOnlyStr = ReadOnlyStr::new("viewTitle");
+    static ref MENU_NAMESPACE_ID_VIEW_TITLE_CONTEXT: ReadOnlyStr = ReadOnlyStr::new("viewTitleContext");
+    static ref MENU_NAMESPACE_ID_VIEW_ITEM: ReadOnlyStr = ReadOnlyStr::new("viewItem");
+    static ref MENU_NAMESPACE_ID_VIEW_ITEM_CONTEXT: ReadOnlyStr = ReadOnlyStr::new("viewItemContext");
 }
 
 #[derive(Debug)]
-pub enum BuiltInMenus {
+pub enum BuiltInMenuNamespaces {
     ViewTitle,
     ViewTitleContext,
     ViewItem,
     ViewItemContext,
 }
 
-impl From<BuiltInMenus> for ReadOnlyId {
-    fn from(value: BuiltInMenus) -> Self {
+#[rustfmt::skip]
+impl From<BuiltInMenuNamespaces> for ReadOnlyStr {
+    fn from(value: BuiltInMenuNamespaces) -> Self {
+        use BuiltInMenuNamespaces as Namespace;
+
         match value {
-            BuiltInMenus::ViewTitle => READ_ONLY_ID_VIEW_TITLE.clone(),
-            BuiltInMenus::ViewTitleContext => READ_ONLY_ID_VIEW_TITLE_CONTEXT.clone(),
-            BuiltInMenus::ViewItem => READ_ONLY_ID_VIEW_ITEM.clone(),
-            BuiltInMenus::ViewItemContext => READ_ONLY_ID_VIEW_ITEM_CONTEXT.clone(),
+            Namespace::ViewTitle => MENU_NAMESPACE_ID_VIEW_TITLE.clone(),
+            Namespace::ViewTitleContext => MENU_NAMESPACE_ID_VIEW_TITLE_CONTEXT.clone(),
+            Namespace::ViewItem => MENU_NAMESPACE_ID_VIEW_ITEM.clone(),
+            Namespace::ViewItemContext => MENU_NAMESPACE_ID_VIEW_ITEM_CONTEXT.clone(),
         }
     }
 }
 
-impl ToString for BuiltInMenus {
+#[rustfmt::skip]
+impl ToString for BuiltInMenuNamespaces {
     fn to_string(&self) -> String {
+        use BuiltInMenuNamespaces as Namespace;
+
         match &self {
-            BuiltInMenus::ViewTitle => READ_ONLY_ID_VIEW_TITLE.to_string(),
-            BuiltInMenus::ViewTitleContext => READ_ONLY_ID_VIEW_TITLE_CONTEXT.to_string(),
-            BuiltInMenus::ViewItem => READ_ONLY_ID_VIEW_ITEM.to_string(),
-            BuiltInMenus::ViewItemContext => READ_ONLY_ID_VIEW_ITEM_CONTEXT.to_string(),
+            Namespace::ViewTitle => MENU_NAMESPACE_ID_VIEW_TITLE.to_string(),
+            Namespace::ViewTitleContext => MENU_NAMESPACE_ID_VIEW_TITLE_CONTEXT.to_string(),
+            Namespace::ViewItem => MENU_NAMESPACE_ID_VIEW_ITEM.to_string(),
+            Namespace::ViewItemContext => MENU_NAMESPACE_ID_VIEW_ITEM_CONTEXT.to_string(),
+        }
+    }
+}
+
+#[rustfmt::skip]
+lazy_static! {
+    static ref MENU_GROUP_ID_THIS: ReadOnlyStr = ReadOnlyStr::new("this");
+    static ref MENU_GROUP_ID_INLINE: ReadOnlyStr = ReadOnlyStr::new("inline");
+    static ref MENU_GROUP_ID_NAVIGATION: ReadOnlyStr = ReadOnlyStr::new("navigation");
+    static ref MENU_GROUP_ID_MODIFICATION: ReadOnlyStr = ReadOnlyStr::new("modification");
+    static ref MENU_GROUP_ID_HELP: ReadOnlyStr = ReadOnlyStr::new("help");
+    static ref MENU_GROUP_ID_PREVIEW: ReadOnlyStr = ReadOnlyStr::new("preview");
+    static ref MENU_GROUP_ID_VIEWS: ReadOnlyStr = ReadOnlyStr::new("views");
+    static ref MENU_GROUP_ID_REMOVE: ReadOnlyStr = ReadOnlyStr::new("remove");
+}
+
+#[derive(Debug)]
+pub enum BuiltInMenuGroups {
+    This,
+    Inline,
+    Navigation,
+    Modification,
+    Help,
+    Preview,
+    Views,
+    Remove,
+}
+
+#[rustfmt::skip]
+impl From<BuiltInMenuGroups> for ReadOnlyStr {
+    fn from(value: BuiltInMenuGroups) -> Self {
+        use BuiltInMenuGroups as Group;
+
+        match value {
+            Group::This => MENU_GROUP_ID_THIS.clone(),
+            Group::Inline => MENU_GROUP_ID_INLINE.clone(),
+            Group::Navigation => MENU_GROUP_ID_NAVIGATION.clone(),
+            Group::Modification => MENU_GROUP_ID_MODIFICATION.clone(),
+            Group::Help => MENU_GROUP_ID_HELP.clone(),
+            Group::Preview => MENU_GROUP_ID_PREVIEW.clone(),
+            Group::Views => MENU_GROUP_ID_VIEWS.clone(),
+            Group::Remove => MENU_GROUP_ID_REMOVE.clone(),
+        }
+    }
+}
+
+#[rustfmt::skip]
+impl ToString for BuiltInMenuGroups {
+    fn to_string(&self) -> String {
+        use BuiltInMenuGroups as Group;
+
+        match &self {
+            Group::This => MENU_GROUP_ID_THIS.to_string(),
+            Group::Inline => MENU_GROUP_ID_INLINE.to_string(),
+            Group::Navigation => MENU_GROUP_ID_NAVIGATION.to_string(),
+            Group::Modification => MENU_GROUP_ID_MODIFICATION.to_string(),
+            Group::Help => MENU_GROUP_ID_HELP.to_string(),
+            Group::Preview => MENU_GROUP_ID_PREVIEW.to_string(),
+            Group::Views => MENU_GROUP_ID_VIEWS.to_string(),
+            Group::Remove => MENU_GROUP_ID_REMOVE.to_string(),
         }
     }
 }
@@ -48,9 +114,31 @@ pub enum MenuItem {
     Submenu(SubmenuMenuItem),
 }
 
+#[derive(Debug, Clone, Serialize)]
+pub struct MenuGroup {
+    order: Option<i64>,
+    name: ReadOnlyStr,
+}
+
+impl MenuGroup {
+    pub fn new_ordered(order: i64, name: impl Into<ReadOnlyStr>) -> Self {
+        Self {
+            order: Some(order),
+            name: name.into(),
+        }
+    }
+
+    pub fn new_unordered(name: impl Into<ReadOnlyStr>) -> Self {
+        Self {
+            order: None,
+            name: name.into(),
+        }
+    }
+}
+
 #[derive(Debug, Serialize, Clone)]
 pub struct CommandAction {
-    pub id: String,
+    pub id: MenuId,
     pub title: String,
     pub tooltip: Option<String>,
     pub description: Option<String>,
@@ -59,35 +147,23 @@ pub struct CommandAction {
 #[derive(Debug, Serialize, Clone)]
 pub struct ActionMenuItem {
     pub command: CommandAction,
-    pub group: Option<ReadOnlyId>,
+    pub group: Option<MenuGroup>,
     pub order: Option<i64>,
-    pub when: &'static str,
-    pub toggled: Option<&'static str>,
-}
-
-impl Drop for ActionMenuItem {
-    fn drop(&mut self) {
-        destaticize(self.when);
-    }
+    pub when: Option<ReadOnlyStr>,
+    pub toggled: Option<ReadOnlyStr>,
 }
 
 #[derive(Debug, Serialize, Clone)]
 pub struct SubmenuMenuItem {
-    pub submenu_id: ReadOnlyId,
+    pub submenu_id: MenuId,
     pub title: String,
-    pub group: Option<ReadOnlyId>,
+    pub group: Option<MenuGroup>,
     pub order: Option<i64>,
-    pub when: &'static str,
-}
-
-impl Drop for SubmenuMenuItem {
-    fn drop(&mut self) {
-        destaticize(self.when);
-    }
+    pub when: Option<ReadOnlyStr>,
 }
 
 pub struct MenuRegistry {
-    menus: HashMap<ReadOnlyId, Vec<MenuItem>>,
+    menus: HashMap<ReadOnlyStr, Vec<MenuItem>>,
 }
 
 impl MenuRegistry {
@@ -97,7 +173,7 @@ impl MenuRegistry {
         }
     }
 
-    pub fn append_menu_item(&mut self, menu_id: ReadOnlyId, item: MenuItem) {
+    pub fn append_menu_item(&mut self, menu_id: ReadOnlyStr, item: MenuItem) {
         self.menus
             .entry(menu_id.into())
             .or_insert_with(Vec::new)
@@ -106,50 +182,14 @@ impl MenuRegistry {
 
     pub fn append_menu_items<I>(&mut self, items: I)
     where
-        I: IntoIterator<Item = (ReadOnlyId, MenuItem)>,
+        I: IntoIterator<Item = (ReadOnlyStr, MenuItem)>,
     {
         for (menu_id, item) in items {
             self.append_menu_item(menu_id, item);
         }
     }
 
-    pub fn get_menu_items(&self, menu_id: &ReadOnlyId) -> Option<&Vec<MenuItem>> {
+    pub fn get_menu_items(&self, menu_id: &ReadOnlyStr) -> Option<&Vec<MenuItem>> {
         self.menus.get(menu_id)
-    }
-}
-
-#[derive(Debug, Serialize, Clone)]
-pub struct MenuGroup {
-    order: Option<i64>,
-    content: Vec<MenuItem>,
-}
-
-#[derive(Debug, Serialize, Clone)]
-pub struct Menu(HashMap<ReadOnlyId, Vec<MenuGroup>>);
-
-impl Menu {
-    pub fn new() -> Self {
-        Self(HashMap::new())
-    }
-}
-
-pub struct MenuService {
-    registry: Arc<RwLock<MenuRegistry>>,
-}
-
-impl MenuService {
-    pub fn new(registry: Arc<RwLock<MenuRegistry>>) -> Self {
-        Self { registry }
-    }
-
-    pub fn create_menu_by_menu_id(
-        &self,
-        id: impl AsRef<ReadOnlyId>,
-        f: impl FnOnce(&Vec<MenuItem>) -> Menu,
-    ) -> Option<Menu> {
-        let registry_lock = self.registry.read();
-        let items = registry_lock.menus.get(id.as_ref())?;
-
-        Some(f(items))
     }
 }

@@ -1,14 +1,18 @@
-use crate::{
-    menu::{ActionMenuItem, BuiltInMenus, CommandAction, MenuItem, SubmenuMenuItem},
-    util::ReadOnlyId,
-    view::{BuiltInGroups, TreeViewDescriptor},
-    Contribution,
-};
 use anyhow::Result;
 use once_cell::sync::Lazy;
 use quote::quote;
 use static_str_ops::static_format;
 use std::sync::Arc;
+
+use crate::{
+    menu::{
+        ActionMenuItem, BuiltInMenuGroups, BuiltInMenuNamespaces, CommandAction, MenuGroup,
+        MenuItem, SubmenuMenuItem,
+    },
+    util::ReadOnlyStr,
+    view::{BuiltInGroups, TreeViewDescriptor},
+    Contribution,
+};
 
 #[derive(Debug, Serialize)]
 pub struct RecentsViewTreeItem {
@@ -76,33 +80,33 @@ impl Contribution for RecentsContribution {
 
         menus_registry_lock.append_menu_items(vec![
             (
-                BuiltInMenus::ViewTitleContext.into(),
+                BuiltInMenuNamespaces::ViewTitleContext.into(),
                 MenuItem::Action(ActionMenuItem {
                     command: CommandAction {
-                        id: "someId_1".to_string(),
+                        id: "recents.hideRecentsView".into(),
                         title: "Hide 'Recents'".to_string(),
                         tooltip: None,
                         description: None,
                     },
-                    group: Some("0_self".into()),
+                    group: Some(MenuGroup::new_ordered(0, BuiltInMenuGroups::This)),
                     order: Some(1),
-                    when: recents_context,
+                    when: Some(recents_context.into()),
                     toggled: None,
                 }),
             ),
             (
-                BuiltInMenus::ViewTitleContext.into(),
+                BuiltInMenuNamespaces::ViewTitleContext.into(),
                 MenuItem::Action(ActionMenuItem {
                     command: CommandAction {
-                        id: "someId_1".to_string(),
+                        id: "workbench.view.recents".into(),
                         title: "Recents".to_string(),
                         tooltip: None,
                         description: None,
                     },
-                    group: Some("1_views".into()),
+                    group: Some(MenuGroup::new_ordered(1, BuiltInMenuGroups::Views)),
                     order: Some(1),
-                    when: recents_context,
-                    toggled: Some(static_format!("viewState == 'mockState'")),
+                    when: Some(recents_context.into()),
+                    toggled: Some("viewState == 'mockState'".into()),
                 }),
             ),
         ]);
@@ -114,32 +118,32 @@ impl Contribution for RecentsContribution {
 
         menus_registry_lock.append_menu_items(vec![
             (
-                BuiltInMenus::ViewItem.into(),
+                BuiltInMenuNamespaces::ViewItem.into(),
                 MenuItem::Action(ActionMenuItem {
                     command: CommandAction {
-                        id: "someId_1".to_string(),
+                        id: "recents.remove".into(),
                         title: "Remove".to_string(),
                         tooltip: None,
                         description: None,
                     },
-                    group: Some("inline".into()),
+                    group: Some(MenuGroup::new_unordered(BuiltInMenuGroups::Inline)),
                     order: Some(1),
-                    when: recents_item_context,
+                    when: Some(recents_item_context.into()),
                     toggled: None,
                 }),
             ),
             (
-                BuiltInMenus::ViewItem.into(),
+                BuiltInMenuNamespaces::ViewItem.into(),
                 MenuItem::Action(ActionMenuItem {
                     command: CommandAction {
-                        id: "someId_1".to_string(),
+                        id: "recents.preview".into(),
                         title: "Preview".to_string(),
                         tooltip: None,
                         description: None,
                     },
-                    group: Some("inline".into()),
+                    group: Some(MenuGroup::new_unordered(BuiltInMenuGroups::Inline)),
                     order: Some(2),
-                    when: recents_item_context,
+                    when: Some(recents_item_context.into()),
                     toggled: None,
                 }),
             ),
@@ -147,20 +151,20 @@ impl Contribution for RecentsContribution {
 
         // View Item Context
 
-        let open_with_profile_menu_id = ReadOnlyId::new("recents.openWithProfileSubmenu");
+        let open_with_profile_menu_id = ReadOnlyStr::new("recents.openWithProfileSubmenu");
         menus_registry_lock.append_menu_items(vec![
             (
                 open_with_profile_menu_id.clone(),
                 MenuItem::Action(ActionMenuItem {
                     command: CommandAction {
-                        id: "someId_1".to_string(),
+                        id: "profile.default".into(),
                         title: "Default".to_string(),
                         tooltip: None,
                         description: None,
                     },
                     group: None,
                     order: Some(1),
-                    when: recents_item_context,
+                    when: Some(recents_item_context.into()),
                     toggled: None,
                 }),
             ),
@@ -168,14 +172,14 @@ impl Contribution for RecentsContribution {
                 open_with_profile_menu_id.clone(),
                 MenuItem::Action(ActionMenuItem {
                     command: CommandAction {
-                        id: "someId_2".to_string(),
+                        id: "profile.custom".into(),
                         title: "Custom".to_string(),
                         tooltip: None,
                         description: None,
                     },
                     group: None,
                     order: None,
-                    when: recents_item_context,
+                    when: Some(recents_item_context.into()),
                     toggled: None,
                 }),
             ),
@@ -183,76 +187,76 @@ impl Contribution for RecentsContribution {
 
         menus_registry_lock.append_menu_items(vec![
             (
-                BuiltInMenus::ViewItemContext.into(),
+                BuiltInMenuNamespaces::ViewItemContext.into(),
                 MenuItem::Action(ActionMenuItem {
                     command: CommandAction {
-                        id: "someId_1".to_string(),
+                        id: "recents.Open".into(),
                         title: "Open".to_string(),
                         tooltip: None,
                         description: None,
                     },
-                    group: Some("1_open".into()),
+                    group: Some(MenuGroup::new_ordered(0, BuiltInMenuGroups::Navigation)),
                     order: Some(1),
-                    when: recents_item_context,
+                    when: Some(recents_item_context.into()),
                     toggled: None,
                 }),
             ),
             (
-                BuiltInMenus::ViewItemContext.into(),
+                BuiltInMenuNamespaces::ViewItemContext.into(),
                 MenuItem::Action(ActionMenuItem {
                     command: CommandAction {
-                        id: "someId_2".to_string(),
+                        id: "recents.openInNewWindow".into(),
                         title: "Open in New Window".to_string(),
                         tooltip: None,
                         description: None,
                     },
-                    group: Some("1_open".into()),
+                    group: Some(MenuGroup::new_ordered(0, BuiltInMenuGroups::Navigation)),
                     order: Some(2),
-                    when: recents_item_context,
+                    when: Some(recents_item_context.into()),
                     toggled: None,
                 }),
             ),
         ]);
 
         menus_registry_lock.append_menu_items(vec![(
-            BuiltInMenus::ViewItemContext.into(),
+            BuiltInMenuNamespaces::ViewItemContext.into(),
             MenuItem::Submenu(SubmenuMenuItem {
                 submenu_id: open_with_profile_menu_id,
                 title: "Open with Profile".to_string(),
-                group: Some("1_open".into()),
+                group: Some(MenuGroup::new_ordered(0, BuiltInMenuGroups::Navigation)),
                 order: Some(3),
-                when: recents_item_context,
+                when: Some(recents_item_context.into()),
             }),
         )]);
 
         menus_registry_lock.append_menu_items(vec![
             (
-                BuiltInMenus::ViewItemContext.into(),
+                BuiltInMenuNamespaces::ViewItemContext.into(),
                 MenuItem::Action(ActionMenuItem {
                     command: CommandAction {
-                        id: "someId_4".to_string(),
+                        id: "recents.preview".into(),
                         title: "Preview".to_string(),
                         tooltip: None,
                         description: None,
                     },
-                    group: Some("2_preview".into()),
+                    group: Some(MenuGroup::new_ordered(1, BuiltInMenuGroups::Preview)),
                     order: Some(1),
-                    when: recents_item_context,
+                    when: Some(recents_item_context.into()),
                     toggled: None,
                 }),
             ),
             (
-                BuiltInMenus::ViewItemContext.into(),
+                BuiltInMenuNamespaces::ViewItemContext.into(),
                 MenuItem::Action(ActionMenuItem {
                     command: CommandAction {
-                        id: "someId_5".to_string(),
+                        id: "recents.removeFromRecents".into(),
                         title: "Remove from Recents".to_string(),
                         tooltip: None,
                         description: None,
                     },
-                    group: Some("3_remove".into()),
+                    group: Some(MenuGroup::new_ordered(2, BuiltInMenuGroups::Remove)),
                     order: Some(1),
-                    when: recents_item_context,
+                    when: Some(recents_item_context.into()),
                     toggled: None,
                 }),
             ),

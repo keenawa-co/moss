@@ -2,12 +2,12 @@ use hashbrown::HashMap;
 use once_cell::sync::Lazy;
 use std::{any::Any, fmt::Debug, sync::Arc};
 
-use crate::util::ReadOnlyId;
+use crate::util::ReadOnlyStr;
 
-pub type GroupId = ReadOnlyId;
+pub type GroupId = ReadOnlyStr;
 
 lazy_static! {
-    static ref READ_ONLY_ID_LAUNCHPAD: ReadOnlyId = ReadOnlyId::new("workbench.group.launchpad");
+    static ref READ_ONLY_ID_LAUNCHPAD: ReadOnlyStr = ReadOnlyStr::new("workbench.group.launchpad");
 }
 
 #[derive(Debug)]
@@ -15,7 +15,7 @@ pub enum BuiltInGroups {
     Launchpad,
 }
 
-impl From<BuiltInGroups> for ReadOnlyId {
+impl From<BuiltInGroups> for ReadOnlyStr {
     fn from(value: BuiltInGroups) -> Self {
         match value {
             BuiltInGroups::Launchpad => READ_ONLY_ID_LAUNCHPAD.clone(),
@@ -33,7 +33,7 @@ impl ToString for BuiltInGroups {
 
 #[derive(Serialize, Debug, Clone)]
 pub struct TreeViewGroup {
-    pub id: ReadOnlyId,
+    pub id: ReadOnlyStr,
     pub name: String,
     pub order: usize,
 }
@@ -106,7 +106,7 @@ impl ViewsRegistry {
 
     pub(crate) fn register_views(
         &mut self,
-        id: ReadOnlyId,
+        id: ReadOnlyStr,
         batch: impl IntoIterator<Item = TreeViewDescriptor>,
     ) {
         self.views.entry(id).or_insert_with(Vec::new).extend(batch);
@@ -114,14 +114,14 @@ impl ViewsRegistry {
 
     pub(crate) fn get_view_descriptors_by_group_id(
         &self,
-        id: &ReadOnlyId,
+        id: &ReadOnlyStr,
     ) -> Option<&Vec<TreeViewDescriptor>> {
         self.views.get(id)
     }
 
     pub(crate) fn get_view_model<T: Send + Sync + Debug + 'static>(
         &self,
-        group_id: impl Into<ReadOnlyId>,
+        group_id: impl Into<ReadOnlyStr>,
         view_id: String,
     ) -> Option<Arc<T>> {
         self.views

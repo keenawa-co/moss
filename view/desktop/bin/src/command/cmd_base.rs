@@ -4,7 +4,7 @@ use tauri::State;
 use workbench_desktop::contributions::resents::{
     RecentsViewContentProviderOutput, RecentsViewModel,
 };
-use workbench_desktop::menu::{BuiltInMenus, MenuItem};
+use workbench_desktop::menu::{BuiltInMenuNamespaces, MenuItem};
 use workbench_desktop::parts::primary_activitybar::{
     DescribeActivityBarPartOutput, PrimaryActivityBarPart,
 };
@@ -66,7 +66,7 @@ pub fn get_view_content(
 pub fn get_menu_items(state: State<'_, AppState>) -> Option<Vec<MenuItem>> {
     if let Some(items) = state
         .workbench
-        .get_menu_items(&BuiltInMenus::ViewItemContext.into())
+        .get_menu_items(&BuiltInMenuNamespaces::ViewItemContext.into())
     {
         Some(items.clone())
     } else {

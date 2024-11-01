@@ -21,7 +21,7 @@ use anyhow::Result;
 use contribution::{WorkbenchContribution, WORKBENCH_TAO_WINDOW};
 use contributions::{links::LinksContribution, resents::RecentsContribution};
 use hashbrown::HashMap;
-use menu::{MenuItem, MenuRegistry, MenuService};
+use menu::{MenuItem, MenuRegistry};
 use once_cell::unsync::OnceCell;
 use parking_lot::RwLock;
 use parts::{
@@ -43,7 +43,7 @@ use platform_fs::disk::file_system_service::{
 use platform_user_profile::user_profile_service::UserProfileService as PlatformUserProfileService;
 use platform_workspace::{Workspace, WorkspaceId};
 use tauri::{AppHandle, Emitter, WebviewWindow};
-use util::ReadOnlyId;
+use util::ReadOnlyStr;
 use view::ViewsRegistry;
 use workbench_service_configuration_tao::configuration_service::WorkspaceConfigurationService;
 use workbench_service_environment_tao::environment_service::NativeEnvironmentService;
@@ -179,14 +179,17 @@ impl Workbench {
 
     pub fn get_view<T: Send + Sync + Debug + 'static>(
         &self,
-        group_id: impl Into<ReadOnlyId>,
+        group_id: impl Into<ReadOnlyStr>,
         view_id: String,
     ) -> Option<Arc<T>> {
         let views_registry_lock = self.registry.views.read();
         views_registry_lock.get_view_model::<T>(group_id, view_id)
     }
 
-    pub fn get_menu_items<'a>(&self, menu_id: impl Into<&'a ReadOnlyId>) -> Option<&Vec<MenuItem>> {
+    pub fn get_menu_items<'a>(
+        &self,
+        menu_id: impl Into<&'a ReadOnlyStr>,
+    ) -> Option<&Vec<MenuItem>> {
         // let menu_registry_lock = self.registry.menus.read();
         // menu_registry_lock.get_menu_items(menu_id).cloned()
 
@@ -194,14 +197,14 @@ impl Workbench {
     }
 
     pub fn initialize<'a>(&'a mut self, ctx: &mut AsyncContext) -> Result<()> {
-        let menu_service = Arc::new(MenuService::new(Arc::clone(&self.registry.menus)));
+        // let menu_service = Arc::new(MenuService::new(Arc::clone(&self.registry.menus)));
 
         self.add_contribution(WorkbenchContribution::contribute)?;
         self.add_contribution(RecentsContribution::contribute)?;
         self.add_contribution(LinksContribution::contribute)?;
 
         self.add_part(PrimaryActivityBarPart::new());
-        self.add_part(PrimarySideBarPart::new(Arc::clone(&menu_service)));
+        self.add_part(PrimarySideBarPart::new());
 
         ctx.apply(|cx| self.initialize_services(cx))??;
 

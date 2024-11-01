@@ -1,7 +1,5 @@
-use std::sync::Arc;
-
 use crate::{
-    menu::{BuiltInMenus, MenuItem, MenuService},
+    menu::{BuiltInMenuNamespaces, MenuItem},
     view::{TreeViewGroupLocation, TreeViewOutput},
 };
 
@@ -15,13 +13,11 @@ pub struct DescribeSideBarPartOutput {
     pub menus: HashMap<String, Vec<MenuItem>>,
 }
 
-pub struct PrimarySideBarPart {
-    menu_service: Arc<MenuService>,
-}
+pub struct PrimarySideBarPart {}
 
 impl PrimarySideBarPart {
-    pub fn new(menu_service: Arc<MenuService>) -> Self {
-        Self { menu_service }
+    pub fn new() -> Self {
+        Self {}
     }
 }
 
@@ -54,25 +50,25 @@ impl AnyPart for PrimarySideBarPart {
 
         let menus_lock = registry.menus.read();
         menus.insert(
-            BuiltInMenus::ViewItemContext.to_string(),
+            BuiltInMenuNamespaces::ViewItemContext.to_string(),
             menus_lock
-                .get_menu_items(&BuiltInMenus::ViewItemContext.into())
+                .get_menu_items(&BuiltInMenuNamespaces::ViewItemContext.into())
                 .cloned()
                 .unwrap(),
         );
 
         menus.insert(
-            BuiltInMenus::ViewItem.to_string(),
+            BuiltInMenuNamespaces::ViewItem.to_string(),
             menus_lock
-                .get_menu_items(&BuiltInMenus::ViewItem.into())
+                .get_menu_items(&BuiltInMenuNamespaces::ViewItem.into())
                 .cloned()
                 .unwrap(),
         );
 
         menus.insert(
-            BuiltInMenus::ViewTitleContext.to_string(),
+            BuiltInMenuNamespaces::ViewTitleContext.to_string(),
             menus_lock
-                .get_menu_items(&BuiltInMenus::ViewTitleContext.into())
+                .get_menu_items(&BuiltInMenuNamespaces::ViewTitleContext.into())
                 .cloned()
                 .unwrap(),
         );
