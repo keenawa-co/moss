@@ -4,63 +4,42 @@ import { cn } from "@/components/window-controls/libs/utils";
 import { Button } from "@/components/window-controls/components/button";
 import { TauriAppWindowContext } from "@/components/window-controls/contexts";
 
+const buttonStyles = `text-black/60 active:text-black/60 size-[12px] cursor-default grid  items-center justify-center self-center rounded-full `;
+const iconStyles = `hidden size-1.5 group-hover:block`;
+
 export function MacOS({ className, ...props }: HTMLProps<HTMLDivElement>) {
   const { minimizeWindow, maximizeWindow, fullscreenWindow, closeWindow } = useContext(TauriAppWindowContext);
 
   const [isAltKeyPressed, setIsAltKeyPressed] = useState(false);
-  const [isHovering, setIsHovering] = useState(false);
 
-  const last = isAltKeyPressed ? <Icons.plusMac /> : <Icons.fullMac />;
-  const key = "Alt";
-
-  const handleMouseEnter = () => {
-    setIsHovering(true);
-  };
-  const handleMouseLeave = () => {
-    setIsHovering(false);
-  };
-
-  const handleAltKeyDown = (e: KeyboardEvent) => {
-    if (e.key === key) {
-      setIsAltKeyPressed(true);
-    }
-  };
-  const handleAltKeyUp = (e: KeyboardEvent) => {
-    if (e.key === key) {
-      setIsAltKeyPressed(false);
-    }
-  };
   useEffect(() => {
-    window.addEventListener("keydown", handleAltKeyDown);
-    window.addEventListener("keyup", handleAltKeyUp);
+    window.addEventListener("keydown", (e: KeyboardEvent) => {
+      if (e.key === "Alt") setIsAltKeyPressed(true);
+    });
+    window.addEventListener("keyup", (e: KeyboardEvent) => {
+      if (e.key === "Alt") setIsAltKeyPressed(false);
+    });
   }, []);
 
   return (
-    <div
-      className={cn("text-black active:text-black dark:text-black space-x-2 px-3", className)}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
-      {...props}
-    >
+    <div className={cn("text-black group flex gap-2 px-4", className)} {...props}>
       <Button
         onClick={closeWindow}
-        className="border-black/[.12] text-black/60 active:text-black/60 aspect-square h-3 w-3 cursor-default content-center items-center justify-center self-center rounded-full border bg-[#ff544d] text-center hover:bg-[#ff544d] active:bg-[#bf403a] dark:border-none"
+        className={cn(buttonStyles, "bg-[#ff544d] hover:bg-[#ff544d] active:bg-[#bf403a] dark:border-none")}
       >
-        {isHovering && <Icons.closeMac />}
+        <Icons.closeMac className={cn(iconStyles)} />
       </Button>
       <Button
         onClick={minimizeWindow}
-        className="border-black/[.12] text-black/60 active:text-black/60 aspect-square h-3 w-3 cursor-default content-center items-center justify-center self-center  rounded-full border bg-[#ffbd2e] text-center hover:bg-[#ffbd2e] active:bg-[#bf9122] dark:border-none"
+        className={cn(buttonStyles, "bg-[#ffbd2e] hover:bg-[#ffbd2e] active:bg-[#bf9122] dark:border-none")}
       >
-        {isHovering && <Icons.minMac />}
+        <Icons.minMac className={cn(iconStyles)} />
       </Button>
       <Button
-        // onKeyDown={handleAltKeyDown}
-        // onKeyUp={handleAltKeyUp}
         onClick={isAltKeyPressed ? maximizeWindow : fullscreenWindow}
-        className="border-black/[.12] text-black/60 active:text-black/60 aspect-square h-3 w-3 cursor-default content-center items-center justify-center self-center rounded-full border bg-[#28c93f] text-center hover:bg-[#28c93f] active:bg-[#1e9930] dark:border-none"
+        className={cn(buttonStyles, "bg-[#28c93f] hover:bg-[#28c93f] active:bg-[#1e9930] dark:border-none")}
       >
-        {isHovering && last}
+        {isAltKeyPressed ? <Icons.plusMac className={cn(iconStyles)} /> : <Icons.fullMac className={cn(iconStyles)} />}
       </Button>
     </div>
   );

@@ -14,7 +14,7 @@ export function Windows({ className, ...props }: HTMLProps<HTMLDivElement>) {
     <div className={cn("h-full", className)} {...props}>
       <Button
         onClick={minimizeWindow}
-        className="h-full w-[46px] cursor-default rounded-none bg-transparent text-[rgba(var(--color-primary))]/90 hover:bg-[rgba(var(--color-primary))]/[.05] active:bg-[rgba(var(--color-primary))]/[.03]  dark:text-white dark:hover:bg-white/[.06] dark:active:bg-white/[.04]"
+        className="h-full w-[46px] cursor-default rounded-none bg-transparent text-[rgba(var(--color-primary))]/90 hover:bg-[#0000000d] active:bg-[rgba(var(--color-primary))]/[.03]  dark:text-white dark:hover:bg-white/[.06] dark:active:bg-white/[.04]"
       >
         <Icons.minimizeWin />
       </Button>
@@ -22,7 +22,7 @@ export function Windows({ className, ...props }: HTMLProps<HTMLDivElement>) {
         onClick={maximizeWindow}
         className={cn(
           "h-full w-[46px] cursor-default rounded-none bg-transparent",
-          "text-[rgba(var(--color-primary))]/90 hover:bg-[rgba(var(--color-primary))]/[.05] active:bg-[rgba(var(--color-primary))]/[.03] dark:text-white dark:hover:bg-white/[.06] dark:active:bg-white/[.04]"
+          "text-[rgba(var(--color-primary))]/90 hover:bg-[#0000000d] active:bg-[rgba(var(--color-primary))]/[.03] dark:text-white dark:hover:bg-white/[.06] dark:active:bg-white/[.04]"
           // !isMaximizable && "text-white/[.36]",
         )}
       >
