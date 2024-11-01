@@ -106,7 +106,11 @@ export const HeadBar = () => {
             <Separator />
 
             <div className="flex w-full justify-between">
-              <div className="flex items-center gap-2 overflow-hidden">
+              <div
+                className={cn("flex items-center gap-2 overflow-hidden", {
+                  "rounded bg-[#c8c8c8]": isSorting,
+                })}
+              >
                 <DndContext
                   sensors={sensors}
                   collisionDetection={closestCenter}
