@@ -7,10 +7,10 @@ import { store } from "./store";
 import { type } from "@tauri-apps/plugin-os";
 
 if (type() !== "windows") {
+  document.querySelectorAll("html, body").forEach((el) => {
+    el.classList.add("rounded-t-lg");
+  });
 }
-document.querySelectorAll("html, body").forEach((el) => {
-  el.classList.add("rounded-2xl");
-});
 
 createRoot(document.getElementById("root") as HTMLElement).render(
   <StrictMode>
