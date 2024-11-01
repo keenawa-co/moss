@@ -29,7 +29,8 @@ export const HeadBarButton = ({ icon, label, sortableId = -1, ...props }: HeadBa
       className={cn(
         "group z-40 flex items-center gap-1.5 rounded-[3px] font-normal transition-colors hover:bg-[#C6C6C6]",
         {
-          "z-50 cursor-grabbing border border-dashed border-[#727272]": isDragging == true,
+          "z-50 box-border cursor-grabbing border border-dashed border-[#727272] bg-[#e6e6e6] opacity-50 shadow-2xl":
+            isDragging == true,
         },
         props.className
       )}
