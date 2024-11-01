@@ -1,4 +1,3 @@
-import { WindowControls } from "../window-controls/WindowControls";
 import { HeadBarButton } from "./HeadBarButton";
 import { type } from "@tauri-apps/plugin-os";
 import { cn, Icon } from "@repo/ui";
@@ -11,7 +10,6 @@ import {
   KeyboardSensor,
   PointerSensor,
   UniqueIdentifier,
-  useDroppable,
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
@@ -26,13 +24,15 @@ import { RootState, useAppDispatch } from "@/store";
 import { toggleSidebarVisibility } from "@/store/sidebar/sidebarSlice";
 import { useSelector } from "react-redux";
 import { createPortal } from "react-dom";
+import { Controls } from "./Controls/Controls";
 
 export const HeadBar = () => {
   const dispatch = useAppDispatch();
   const isSidebarVisible = useSelector((state: RootState) => state.sidebar.sidebarVisible);
+
   let os = type();
 
-  os = "macos";
+  // os = "macos";
   // os = "linux";
 
   const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null);
@@ -81,16 +81,10 @@ export const HeadBar = () => {
       coordinateGetter: sortableKeyboardCoordinates,
     })
   );
-  const { setNodeRef, isOver, active, over, rect } = useDroppable({
-    id: "HeadBarWidget",
-    data: {},
-  });
-
-  console.log({ isOver, active, over, rect });
 
   return (
     <header data-tauri-drag-region className={cn("flex h-full bg-[#E0E0E0] shadow-[inset_0_-1px_0_0_#C6C6C6]")}>
-      {os === "macos" && <WindowControls platform={os} />}
+      {os === "macos" && <Controls os={os} />}
       <div className="flex w-full items-center py-[3px]">
         <div
           className={cn("flex w-full items-center justify-between", {
@@ -109,7 +103,7 @@ export const HeadBar = () => {
             <Separator />
 
             <div className="flex w-full justify-between">
-              <div className="flex items-center gap-2 overflow-hidden font-[700]" ref={setNodeRef}>
+              <div className="flex items-center gap-2 overflow-hidden font-[700]">
                 <DndContext
                   sensors={sensors}
                   collisionDetection={closestCenter}
@@ -188,8 +182,8 @@ export const HeadBar = () => {
           </div>
         </div>
       </div>
-      {os !== undefined && os !== "macos" && (os === "windows" || os === "linux") && <WindowControls platform={os} />}
-      {os !== undefined && os !== "macos" && os !== "windows" && os !== "linux" && <WindowControls />}
+      {os !== undefined && os !== "macos" && (os === "windows" || os === "linux") && <Controls os={os} />}
+      {os !== undefined && os !== "macos" && os !== "windows" && os !== "linux" && <Controls os={os} />}
     </header>
   );
 };
