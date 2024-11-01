@@ -94,7 +94,7 @@ export const HeadBar = () => {
           data-tauri-drag-region
         >
           <div className="flex items-center">
-            <button className="flex w-max items-center rounded-[3px] px-[10px] py-[7px] transition-colors hover:bg-[#C6C6C6]">
+            <button className="flex w-max items-center rounded-[3px] px-[10px] py-[5px] transition-colors hover:bg-[#C6C6C6]">
               <Icon icon="HeadBarMossStudio" className="mr-1.5 size-[22px] text-[#525252]" />
               <span className="mr-[2px] w-max font-medium text-[#161616]">moss-studio</span>
               <Icon icon="ArrowheadDown" className="text-[#525252]" />
@@ -103,7 +103,7 @@ export const HeadBar = () => {
             <Separator />
 
             <div className="flex w-full justify-between">
-              <div className="flex items-center gap-2 overflow-hidden font-[700]">
+              <div className="flex items-center gap-2 overflow-hidden">
                 <DndContext
                   sensors={sensors}
                   collisionDetection={closestCenter}
@@ -117,7 +117,7 @@ export const HeadBar = () => {
                         sortableId={item.id}
                         icon={item.icon}
                         label={item.label}
-                        className="text-ellipsis px-[10px] py-[7px] font-medium"
+                        className="text-ellipsis px-[10px] py-[5px]"
                       />
                     ))}
                   </SortableContext>
@@ -126,7 +126,7 @@ export const HeadBar = () => {
                     ? createPortal(
                         <DragOverlay>
                           <HeadBarButton
-                            className="cursor-grabbing !bg-[#C6C6C6]  px-[10px] py-[7px]"
+                            className="cursor-grabbing !bg-[#C6C6C6]  px-[10px] py-[5px]"
                             icon={items.find((item) => item.id === activeId)?.icon!}
                             label={items.find((item) => item.id === activeId)?.label}
                           />
@@ -141,10 +141,10 @@ export const HeadBar = () => {
           <div className="flex items-center gap-4">
             <div className="flex items-center">
               <button className="flex items-center gap-[1px] transition-colors">
-                <div className="flex h-full items-center gap-[6px] rounded-[3px] py-[9px] pl-[10px] pr-[8px] hover:bg-[#C6C6C6] ">
+                <div className="flex h-full items-center gap-[6px] rounded-[3px] py-[5px] pl-[10px] pr-[8px] hover:bg-[#C6C6C6] ">
                   <Icon icon="HeadBarBranch" className="size-[18px] text-[#525252]" />
                   <div className="flex items-center gap-[2px]">
-                    <span className=" font-semibold leading-4 text-[#161616]">main</span>
+                    <span className=" leading-4 text-[#161616]">main</span>
                     <span className="rounded bg-[#C6C6C6] px-1 text-xs font-semibold text-[#525252]">#50</span>
                   </div>
                 </div>
