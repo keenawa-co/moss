@@ -97,9 +97,9 @@ export const HeadBar = () => {
           data-tauri-drag-region
         >
           <div className="flex items-center">
-            <button className="flex w-max items-center rounded px-[10px] py-[5px] transition-colors hover:bg-[#C6C6C6]">
+            <button className="flex w-max items-center rounded px-[10px] py-[5px] transition-colors hover:bg-[#D3D3D3]">
               <Icon icon="HeadBarMossStudio" className="mr-1.5 size-[22px] text-[#525252]" />
-              <span className="mr-[2px] w-max font-medium text-[#161616]">moss-studio</span>
+              <span className="mr-[2px] w-max text-[#161616]">moss-studio</span>
               <Icon icon="ArrowheadDown" className="text-[#525252]" />
             </button>
 
@@ -144,7 +144,7 @@ export const HeadBar = () => {
           <div className="flex items-center gap-4">
             <div className="flex items-center">
               <button className="flex items-center gap-[1px] transition-colors">
-                <div className="flex h-full items-center gap-[6px] rounded py-[5px] pl-[10px] pr-[8px] hover:bg-[#C6C6C6] ">
+                <div className="flex h-full items-center gap-[6px] rounded py-[5px] pl-[10px] pr-[8px] hover:bg-[#D3D3D3] ">
                   <Icon icon="HeadBarBranch" className="size-[18px] text-[#525252]" />
                   <div className="flex items-center gap-[2px]">
                     <span className=" leading-4 text-[#161616]">main</span>
@@ -154,8 +154,8 @@ export const HeadBar = () => {
 
                 <div className="flex items-center gap-1 pr-[10px]">
                   <Icon icon="HeadBarBranchSuccess" className="size-[16px] rounded" />
-                  <Icon icon="HeadBarBranchRefresh" className="size-[16px] rounded text-[#525252] hover:bg-[#C6C6C6]" />
-                  <Icon icon="ArrowheadDown" className="size-[16px] rounded text-[#525252] hover:bg-[#C6C6C6]" />
+                  <Icon icon="HeadBarBranchRefresh" className="size-[16px] rounded text-[#525252] hover:bg-[#D3D3D3]" />
+                  <Icon icon="ArrowheadDown" className="size-[16px] rounded text-[#525252] hover:bg-[#D3D3D3]" />
                 </div>
               </button>
             </div>
