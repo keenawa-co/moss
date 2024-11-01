@@ -1,7 +1,7 @@
 import { ContentLayout, LaunchPad, Menu, RootLayout } from "@/components";
 import "@/i18n";
 import "@repo/ui/src/fonts.css";
-import { Suspense, useEffect } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Resizable, ResizablePanel } from "./components/Resizable";
@@ -13,8 +13,8 @@ import { initializeThemes } from "./store/themes";
 function App() {
   const dispatch = useAppDispatch();
 
+  const [sideBarVisible] = useState(true);
   const isThemeSelected = useSelector((state: RootState) => state.themes.isThemeSelected);
-  const isSidebarVisible = useSelector((state: RootState) => state.sidebar.sidebarVisible);
 
   useEffect(() => {
     dispatch(setLanguageFromLocalStorage());
@@ -32,7 +32,7 @@ function App() {
       ) : (
         <RootLayout>
           <Resizable proportionalLayout={false}>
-            <ResizablePanel minSize={100} preferredSize={255} snap visible={isSidebarVisible} className="select-none">
+            <ResizablePanel minSize={100} preferredSize={255} snap visible={sideBarVisible} className="select-none">
               <LaunchPad />
             </ResizablePanel>
             <ResizablePanel>
