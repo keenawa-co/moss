@@ -27,7 +27,7 @@
         "center": true,
         "transparent": true,
         "shadow": false,
-
+        "zoomHotkeysEnabled": true,
         "windowEffects": {
           "effects": ["sidebar"],
           "state": "followsWindowActiveState",
