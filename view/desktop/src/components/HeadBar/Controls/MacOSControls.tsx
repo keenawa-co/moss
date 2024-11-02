@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState, type HTMLProps } from "react";
+import { useContext, type HTMLProps } from "react";
 import { ControlButton } from "./ControlButton";
 import TauriAppWindowContext from "./plugin-window";
 import { Icons } from "./icons";
@@ -8,18 +8,7 @@ const buttonStyles = `text-black/60 active:text-black/60 size-[12px] cursor-defa
 const iconStyles = `hidden size-1.5 group-hover:block`;
 
 export function MacOSControls({ className, ...props }: HTMLProps<HTMLDivElement>) {
-  const { minimizeWindow, maximizeWindow, fullscreenWindow, closeWindow } = useContext(TauriAppWindowContext);
-
-  const [isAltKeyPressed, setIsAltKeyPressed] = useState(false);
-
-  useEffect(() => {
-    window.addEventListener("keydown", (e: KeyboardEvent) => {
-      if (e.key === "Alt") setIsAltKeyPressed(true);
-    });
-    window.addEventListener("keyup", (e: KeyboardEvent) => {
-      if (e.key === "Alt") setIsAltKeyPressed(false);
-    });
-  }, []);
+  const { minimizeWindow, fullscreenWindow, closeWindow } = useContext(TauriAppWindowContext);
 
   return (
     <div className={cn("text-black group flex gap-2 px-4", className)} {...props}>
@@ -36,10 +25,10 @@ export function MacOSControls({ className, ...props }: HTMLProps<HTMLDivElement>
         <Icons.minMac className={cn(iconStyles)} />
       </ControlButton>
       <ControlButton
-        onClick={isAltKeyPressed ? maximizeWindow : fullscreenWindow}
+        onClick={fullscreenWindow}
         className={cn(buttonStyles, "bg-[#28c93f] hover:bg-[#28c93f] active:bg-[#1e9930] dark:border-none")}
       >
-        {isAltKeyPressed ? <Icons.plusMac className={cn(iconStyles)} /> : <Icons.fullMac className={cn(iconStyles)} />}
+        <Icons.fullMac className={cn(iconStyles)} />
       </ControlButton>
     </div>
   );

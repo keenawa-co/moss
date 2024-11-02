@@ -10,4 +10,4 @@ export * from "./SidebarGeneral";
 export * from "./SidebarLinks";
 export * from "./LaunchPad";
 export * from "./Resizable";
-export * from "./HeadBar";
+export * from "./HeadBar/HeadBar";
