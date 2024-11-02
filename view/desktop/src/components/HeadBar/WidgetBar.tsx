@@ -17,10 +17,10 @@ import {
   sortableKeyboardCoordinates,
 } from "@dnd-kit/sortable";
 import { Icon, cn } from "@repo/ui";
+import { OsType } from "@tauri-apps/plugin-os";
 import { HTMLProps, useState } from "react";
 import { createPortal } from "react-dom";
 import { HeadBarButton } from "./HeadBarButton";
-import { OsType } from "@tauri-apps/plugin-os";
 
 interface WidgetBarProps extends HTMLProps<HTMLDivElement> {
   os: OsType;
