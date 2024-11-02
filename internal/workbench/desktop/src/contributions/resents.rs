@@ -10,7 +10,7 @@ use crate::{
         MenuItem, SubmenuMenuItem,
     },
     util::ReadOnlyStr,
-    view::{BuiltInGroups, TreeViewDescriptor},
+    view::{BuiltInViewGroups, TreeViewDescriptor},
     Contribution,
 };
 
@@ -56,7 +56,7 @@ impl Contribution for RecentsContribution {
 
         let recents_view_id = "workbench.view.recentsView";
         views_registry_lock.register_views(
-            BuiltInGroups::Launchpad.into(),
+            BuiltInViewGroups::Launchpad.into(),
             vec![TreeViewDescriptor {
                 id: recents_view_id.to_string(),
                 name: "Recents".to_string(),

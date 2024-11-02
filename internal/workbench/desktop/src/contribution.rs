@@ -7,7 +7,7 @@ use platform_configuration::{
 };
 
 use crate::{
-    view::{BuiltInGroups, TreeViewGroup, TreeViewGroupLocation},
+    view::{BuiltInViewGroups, TreeViewGroup, TreeViewGroupLocation},
     Contribution,
 };
 
@@ -101,7 +101,7 @@ impl Contribution for WorkbenchContribution {
         views_registry_lock.append_view_group(
             TreeViewGroupLocation::PrimaryBar,
             TreeViewGroup {
-                id: BuiltInGroups::Launchpad.into(),
+                id: BuiltInViewGroups::Launchpad.into(),
                 name: "Launchpad".to_string(),
                 order: 1,
             },

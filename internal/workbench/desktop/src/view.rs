@@ -6,27 +6,32 @@ use crate::util::ReadOnlyStr;
 
 pub type GroupId = ReadOnlyStr;
 
+#[rustfmt::skip]
 lazy_static! {
-    static ref READ_ONLY_ID_LAUNCHPAD: ReadOnlyStr = ReadOnlyStr::new("workbench.group.launchpad");
+    static ref VIEW_GROUP_ID_LAUNCHPAD: ReadOnlyStr = ReadOnlyStr::new("workbench.group.launchpad");
 }
 
 #[derive(Debug)]
-pub enum BuiltInGroups {
+pub enum BuiltInViewGroups {
     Launchpad,
 }
 
-impl From<BuiltInGroups> for ReadOnlyStr {
-    fn from(value: BuiltInGroups) -> Self {
+impl From<BuiltInViewGroups> for ReadOnlyStr {
+    fn from(value: BuiltInViewGroups) -> Self {
+        use BuiltInViewGroups as Group;
+
         match value {
-            BuiltInGroups::Launchpad => READ_ONLY_ID_LAUNCHPAD.clone(),
+            Group::Launchpad => VIEW_GROUP_ID_LAUNCHPAD.clone(),
         }
     }
 }
 
-impl ToString for BuiltInGroups {
+impl ToString for BuiltInViewGroups {
     fn to_string(&self) -> String {
+        use BuiltInViewGroups as Group;
+
         match &self {
-            BuiltInGroups::Launchpad => READ_ONLY_ID_LAUNCHPAD.to_string(),
+            Group::Launchpad => VIEW_GROUP_ID_LAUNCHPAD.to_string(),
         }
     }
 }
