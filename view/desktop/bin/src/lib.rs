@@ -8,14 +8,13 @@ use anyhow::{Context as _, Result};
 use platform_core::context_v2::async_context::AsyncContext;
 use platform_core::context_v2::ContextCell;
 use platform_core::platform::cross::client::CrossPlatformClient;
-use platform_core::platform::AnyPlatform;
 use platform_formation::service_registry::ServiceRegistry;
 use platform_fs::disk::file_system_service::DiskFileSystemService;
 use platform_workspace::WorkspaceId;
 use std::env;
 use std::rc::Rc;
 use std::sync::Arc;
-use tauri::{App, Manager};
+use tauri::{App, Emitter, Manager};
 use workbench_desktop::window::{NativePlatformInfo, NativeWindowConfiguration};
 use workbench_desktop::Workbench;
 use workbench_service_environment_tao::environment_service::NativeEnvironmentService;
@@ -65,7 +64,19 @@ pub fn run(native_window_configuration: NativeWindowConfiguration) -> Result<()>
         )
         .expect("Failed to build tauri app");
 
-        Ok(tao_app.run(|_, _| {}))
+        Ok(tao_app.run(|app_handle, event| {
+            #[cfg(target_os = "macos")]
+            if let tauri::RunEvent::ExitRequested { api, .. } = event {
+                app_handle.hide().ok();
+                api.prevent_exit();
+            }
+
+            // To make the compiler happy.
+            #[cfg(not(target_os = "macos"))]
+            {
+                let _ = (app_handle, event);
+            }
+        }))
     })
 }
 
@@ -105,6 +116,18 @@ fn initialize_app(
         ])
         .setup(move |app: &mut App| setup_app(app, ctx, service_group, platform_info_clone))
         .menu(menu::setup_window_menu)
+        .on_window_event(|window, event| match event {
+            #[cfg(target_os = "macos")]
+            tauri::WindowEvent::CloseRequested { api, .. } => {
+                if window.app_handle().webview_windows().len() == 1 {
+                    window.app_handle().hide().ok();
+                    api.prevent_close();
+                }
+            }
+            tauri::WindowEvent::Destroyed => {}
+            tauri::WindowEvent::Focused(focused) if *focused => {}
+            _ => {}
+        })
         .plugin(tauri_plugin_os::init())
         .build(tauri::generate_context!())?;
 
@@ -136,7 +159,7 @@ fn setup_app(
     ctx.apply(|tx_ctx| {
         app_state
             .workbench
-            .set_configuration_window_size(window)
+            .set_configuration_window_size(&window)
             .unwrap();
 
         app_state
@@ -148,6 +171,9 @@ fn setup_app(
         app.handle().manage(ctx);
         app.handle().manage(app_state);
     }
+
+    let window = app.get_webview_window("main").unwrap();
+    window.emit("app-loaded", "Hello, World!").unwrap();
 
     Ok(())
 }
