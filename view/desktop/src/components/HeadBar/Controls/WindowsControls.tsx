@@ -1,4 +1,4 @@
-import { type HTMLProps } from "react";
+import { useState, type HTMLProps } from "react";
 import { ControlButton } from "./ControlButton";
 import { Icons } from "./icons";
 import { cn } from "@repo/ui";
@@ -9,6 +9,13 @@ import { getCurrentWindow } from "@tauri-apps/api/window";
 
 export function WindowsControls({ className, ...props }: HTMLProps<HTMLDivElement>) {
   const apiWindow = getCurrentWindow();
+  const [isMaximized, setIsMaximized] = useState(false);
+
+  const handleToggleMaximize = async () => {
+    const isMaximized = await apiWindow.isMaximized();
+    setIsMaximized(isMaximized);
+    await apiWindow.toggleMaximize();
+  };
 
   return (
     <div className={cn("flex h-full", className)} {...props}>
@@ -19,13 +26,13 @@ export function WindowsControls({ className, ...props }: HTMLProps<HTMLDivElemen
         <Icons.minimizeWin />
       </ControlButton>
       <ControlButton
-        onClick={() => apiWindow.maximize()}
+        onClick={handleToggleMaximize}
         className={cn(
           "h-full w-[46px] cursor-default rounded-none bg-transparent",
           "text-[rgba(var(--color-primary))]/90 hover:bg-[#0000000d] active:bg-[rgba(var(--color-primary))]/[.03] dark:text-white dark:hover:bg-white/[.06] dark:active:bg-white/[.04]"
         )}
       >
-        {!apiWindow.isMaximized ? <Icons.maximizeWin /> : <Icons.maximizeRestoreWin />}
+        {isMaximized ? <Icons.maximizeWin /> : <Icons.maximizeRestoreWin />}
       </ControlButton>
       <ControlButton
         onClick={() => apiWindow.close()}
