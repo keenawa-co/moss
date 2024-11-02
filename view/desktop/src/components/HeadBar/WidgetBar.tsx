@@ -88,7 +88,7 @@ export const WidgetBar = ({ os, ...props }: WidgetBarProps) => {
       </button>
 
       <div className="flex w-full justify-between">
-        <div className={cn("flex items-center gap-1 overflow-hidden")}>
+        <div className={cn("flex items-center gap-1")}>
           <DndContext
             sensors={sensors}
             collisionDetection={closestCenter}
