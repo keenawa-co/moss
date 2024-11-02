@@ -9,16 +9,27 @@ import { Home, Logs, Settings } from "./components/pages";
 import { RootState, useAppDispatch } from "./store";
 import { setLanguageFromLocalStorage } from "./store/languages/languagesSlice";
 import { initializeThemes } from "./store/themes";
+import { mainWindowIsReadyCommand } from "./tauri";
+import { initializeEvents } from "./events/initializeEvents";
 
-function App() {
+const App: React.FC = () => {
   const dispatch = useAppDispatch();
 
   const [sideBarVisible] = useState(true);
   const isThemeSelected = useSelector((state: RootState) => state.themes.isThemeSelected);
 
   useEffect(() => {
-    dispatch(setLanguageFromLocalStorage());
-    dispatch(initializeThemes());
+    (async () => {
+      try {
+        await initializeEvents();
+        await mainWindowIsReadyCommand();
+
+        dispatch(setLanguageFromLocalStorage());
+        dispatch(initializeThemes());
+      } catch (error) {
+        console.error("Initialization error:", error);
+      }
+    })();
   }, []);
 
   return (
@@ -54,5 +65,5 @@ function App() {
       )}
     </>
   );
-}
+};
 export default App;

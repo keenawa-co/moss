@@ -1,5 +1,9 @@
 {
   "extends": "@repo/typescript-config/base.json",
+  "compilerOptions": {
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true
+  },
   "files": [],
   "references": [
     {

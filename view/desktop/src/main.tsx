@@ -1,3 +1,4 @@
+import "reflect-metadata";
 import App from "@/App";
 import "@/assets/index.css";
 import { StrictMode } from "react";

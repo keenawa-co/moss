@@ -14,12 +14,12 @@ use platform_workspace::WorkspaceId;
 use std::env;
 use std::rc::Rc;
 use std::sync::Arc;
-use tauri::{App, Emitter, Manager};
+use tauri::{App, Manager};
 use workbench_desktop::window::{NativePlatformInfo, NativeWindowConfiguration};
 use workbench_desktop::Workbench;
 use workbench_service_environment_tao::environment_service::NativeEnvironmentService;
 
-use crate::command::{cmd_base, cmd_dummy};
+use crate::command::*;
 
 #[macro_use]
 extern crate serde;
@@ -101,6 +101,7 @@ fn initialize_app(
     let service_group = create_service_registry(native_window_configuration)?;
     let tao_app = tauri::Builder::default()
         .invoke_handler(tauri::generate_handler![
+            cmd_initial::main_window_is_ready,
             cmd_dummy::workbench_get_state,
             // cmd_dummy::create_project,
             // cmd_dummy::restore_session,
@@ -149,6 +150,7 @@ fn setup_app(
     workbench.initialize(&mut ctx)?;
 
     let window = app.get_webview_window("main").unwrap();
+
     let app_state = AppState {
         workbench: Arc::new(workbench),
         platform_info,
@@ -172,8 +174,8 @@ fn setup_app(
         app.handle().manage(app_state);
     }
 
-    let window = app.get_webview_window("main").unwrap();
-    window.emit("app-loaded", "Hello, World!").unwrap();
+    // let window = app.get_webview_window("main").unwrap();
+    // window.emit("app-loaded", "Hello, World!").unwrap();
 
     Ok(())
 }
