@@ -1,5 +1,4 @@
 import { OsType, type } from "@tauri-apps/plugin-os";
-import { TauriAppWindowProvider } from "./plugin-window";
 import { MacOSControls } from "./MacOSControls";
 import { LinuxControls } from "./LinuxControls";
 import { WindowsControls } from "./WindowsControls";
@@ -29,9 +28,5 @@ export const Controls = ({ os, className, ...props }: ControlsProps) => {
     }
   };
 
-  return (
-    <TauriAppWindowProvider>
-      <ControlsComponent />
-    </TauriAppWindowProvider>
-  );
+  return <ControlsComponent />;
 };
