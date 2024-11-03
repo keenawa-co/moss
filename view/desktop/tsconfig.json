@@ -2,8 +2,10 @@
   "extends": "@repo/typescript-config/base.json",
   "compilerOptions": {
     "experimentalDecorators": true,
-    "emitDecoratorMetadata": true
+    "emitDecoratorMetadata": true,
+    "target": "es2022"
   },
+
   "files": [],
   "references": [
     {

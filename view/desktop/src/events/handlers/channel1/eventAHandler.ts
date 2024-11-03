@@ -1,19 +1,19 @@
-import { injectable, inject } from "inversify";
-import { TYPES } from "../../../di/types";
-import { Logger } from "../../logger";
+import { ILoggerService } from "@/services/loggerService";
 import { PayloadOf } from "../../eventTypes";
-import { container } from "../../../di/container";
 
-@injectable()
-export class EventAHandler {
-  constructor(@inject(TYPES.Logger) private logger: Logger) {}
+export interface IEventAHandler {
+  handle(payload: PayloadOf<"channel1", "eventA">): Promise<void>;
+}
+
+export class EventAHandler implements IEventAHandler {
+  private logger: ILoggerService;
+
+  constructor(logger: ILoggerService) {
+    this.logger = logger;
+  }
 
   async handle(payload: PayloadOf<"channel1", "eventA">): Promise<void> {
     this.logger.log(`Handling eventA: ${payload.data}`);
     // Some logic here
   }
 }
-
-export const createEventAHandler = (): EventAHandler => {
-  return container.get<EventAHandler>(EventAHandler);
-};

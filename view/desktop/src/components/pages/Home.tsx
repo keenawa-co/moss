@@ -12,9 +12,6 @@ import {
   Icon,
 } from "@repo/ui";
 import { invokeCommand } from "@/tauri";
-import { container } from "@/di/container";
-import { EventBus } from "@/events/eventBus";
-import { TYPES } from "@/di/types";
 
 export type DescribeActivityOutput = { tooltip: string; order: number };
 

@@ -1,12 +1,20 @@
-import { injectable, inject } from "inversify";
 import { Subject, Subscription } from "rxjs";
 import PQueue from "p-queue";
-import { filter, mergeMap } from "rxjs/operators";
-import { EventPayloads, Channels, EventsOf, PayloadOf } from "./eventTypes";
-import { Logger } from "./logger";
+import { mergeMap } from "rxjs/operators";
+import { Channels, EventsOf, PayloadOf } from "./eventTypes";
 import { getPriority } from "./priorities";
 import { loadHandler } from "./handlerLoader";
-import { TYPES } from "@/di/types";
+import { ILoggerService } from "@/services/loggerService";
+
+export interface IEventBus {
+  subscribeChannel(channel: Channels): void;
+  unsubscribeChannel(channel: Channels): void;
+  receiveEvent<Channel extends Channels, EventName extends EventsOf<Channel>>(
+    channel: Channel,
+    event: EventName,
+    payload: PayloadOf<Channel, EventName>
+  ): void;
+}
 
 export interface Event<Channel extends Channels, EventName extends EventsOf<Channel>> {
   channel: Channel;
@@ -14,21 +22,16 @@ export interface Event<Channel extends Channels, EventName extends EventsOf<Chan
   payload: PayloadOf<Channel, EventName>;
 }
 
-@injectable()
 export class EventBus {
   private eventSubjects = new Map<Channels, Subject<Event<any, any>>>();
   private subscriptions = new Map<Channels, Subscription>();
   private queue = new PQueue({ concurrency: 1, autoStart: true });
-  private logger: Logger;
 
-  constructor(@inject(TYPES.Logger) logger: Logger) {
-    this.logger = logger;
-  }
+  constructor(private logger: ILoggerService) {}
 
   subscribeChannel(channel: Channels) {
     if (this.eventSubjects.has(channel)) {
-      // Already subscribed
-      return;
+      return; // already subscribed
     }
 
     const subject = new Subject<Event<any, any>>();
@@ -36,10 +39,9 @@ export class EventBus {
 
     const subscription = subject
       .pipe(
-        // All events pass through (no filters)
         mergeMap(async (event) => {
           const priority = getPriority(event.channel, event.event);
-          const handler = await loadHandler(event.channel, event.event);
+          const handler = await loadHandler(event.channel, event.event, this.logger);
           return { handler, event, priority };
         })
       )

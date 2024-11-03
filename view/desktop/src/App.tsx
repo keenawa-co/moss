@@ -1,69 +1,60 @@
 import { ContentLayout, LaunchPad, Menu, RootLayout } from "@/components";
 import "@/i18n";
 import "@repo/ui/src/fonts.css";
-import { Suspense, useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { Suspense, useState } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Resizable, ResizablePanel } from "./components/Resizable";
 import { Home, Logs, Settings } from "./components/pages";
-import { RootState, useAppDispatch } from "./store";
-import { setLanguageFromLocalStorage } from "./store/languages/languagesSlice";
-import { initializeThemes } from "./store/themes";
-import { mainWindowIsReadyCommand } from "./tauri";
-import { initializeEvents } from "./events/initializeEvents";
+import { useInitializeApp } from "./hooks/useInitializeApp";
 
 const App: React.FC = () => {
-  const dispatch = useAppDispatch();
-
+  const { isInitializing, initializationError } = useInitializeApp();
   const [sideBarVisible] = useState(true);
-  const isThemeSelected = useSelector((state: RootState) => state.themes.isThemeSelected);
 
-  useEffect(() => {
-    (async () => {
-      try {
-        await initializeEvents();
-        await mainWindowIsReadyCommand();
+  if (isInitializing) {
+    return (
+      <div className="relative flex min-h-screen bg-storm-800">
+        <div className="container mx-auto flex max-w-screen-xl items-center justify-center text-4xl text-white">
+          Loading...
+        </div>
+      </div>
+    );
+  }
 
-        dispatch(setLanguageFromLocalStorage());
-        dispatch(initializeThemes());
-      } catch (error) {
-        console.error("Initialization error:", error);
-      }
-    })();
-  }, []);
+  if (initializationError) {
+    return (
+      <div className="relative flex min-h-screen bg-storm-800">
+        <div className="container mx-auto flex max-w-screen-xl flex-col items-center justify-center text-2xl text-red-500">
+          <p>Initialization Failed</p>
+          <p>{initializationError.message}</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <>
-      {!isThemeSelected ? (
-        <div className="relative flex min-h-screen bg-storm-800">
-          <div className="container mx-auto flex max-w-screen-xl items-center justify-center text-4xl text-white">
-            Loading...
-          </div>
-        </div>
-      ) : (
-        <RootLayout>
-          <Resizable proportionalLayout={false}>
-            <ResizablePanel minSize={100} preferredSize={255} snap visible={sideBarVisible} className="select-none">
-              <LaunchPad />
-            </ResizablePanel>
-            <ResizablePanel>
-              <ContentLayout className="content relative flex h-full flex-col overflow-auto">
-                <Suspense fallback="loading">
-                  <BrowserRouter>
-                    <Menu />
-                    <Routes>
-                      <Route path="/" element={<Home />} />
-                      <Route path="/settings" element={<Settings />} />
-                      <Route path="/logs" element={<Logs />} />
-                    </Routes>
-                  </BrowserRouter>
-                </Suspense>
-              </ContentLayout>
-            </ResizablePanel>
-          </Resizable>
-        </RootLayout>
-      )}
-    </>
+    <RootLayout>
+      <Resizable proportionalLayout={false}>
+        <ResizablePanel minSize={100} preferredSize={255} snap visible={sideBarVisible} className="select-none">
+          <LaunchPad />
+        </ResizablePanel>
+        <ResizablePanel>
+          <ContentLayout className="content relative flex h-full flex-col overflow-auto">
+            <Suspense fallback={<div className="loading">Loading...</div>}>
+              <BrowserRouter>
+                <Menu />
+                <Routes>
+                  <Route path="/" element={<Home />} />
+                  <Route path="/settings" element={<Settings />} />
+                  <Route path="/logs" element={<Logs />} />
+                </Routes>
+              </BrowserRouter>
+            </Suspense>
+          </ContentLayout>
+        </ResizablePanel>
+      </Resizable>
+    </RootLayout>
   );
 };
+
 export default App;

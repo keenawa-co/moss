@@ -15,5 +15,5 @@ export const invokeCommand = async <T>(cmd: TauriCommand, args?: InvokeArgs): Pr
 };
 
 export const mainWindowIsReadyCommand = async (): Promise<void> => {
-  await invokeCommand("main_window_is_ready");
+  invokeCommand("main_window_is_ready");
 };
