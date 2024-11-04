@@ -102,7 +102,7 @@ export const WidgetBar = ({ os, ...props }: WidgetBarProps) => {
                   sortableId={item.id}
                   icon={item.icon}
                   label={item.label}
-                  className={cn("text-ellipsis px-[10px] py-[8px]")}
+                  className={cn("text-ellipsis px-[10px] py-[6px]")}
                 />
               ))}
             </SortableContext>
@@ -111,7 +111,7 @@ export const WidgetBar = ({ os, ...props }: WidgetBarProps) => {
               ? createPortal(
                   <DragOverlay>
                     <HeadBarButton
-                      className="cursor-grabbing !bg-[#e0e0e0]  px-[10px] py-[8px] shadow-lg"
+                      className="cursor-grabbing !bg-[#e0e0e0]  px-[10px] py-[6px] shadow-lg"
                       icon={items.find((item) => item.id === activeId)?.icon!}
                       label={items.find((item) => item.id === activeId)?.label}
                     />
