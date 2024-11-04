@@ -81,7 +81,7 @@ export const WidgetBar = ({ os, ...props }: WidgetBarProps) => {
         <HeadBarButton icon="HeadBarSettingsWithNotification" className="p-[4px]" iconClassName="size-[18px]" />
       )}
 
-      <button className="flex w-max items-center rounded py-[7px] pl-[10px] pr-[4px] transition-colors hover:bg-[#D3D3D3]">
+      <button className="flex w-max items-center rounded py-[6px] pl-[10px] pr-[4px] transition-colors hover:bg-[#D3D3D3]">
         <Icon icon="HeadBarMossStudio" className="mr-1.5 size-[22px] text-[#525252]" />
         <span className="mr-[2px] w-max text-[#161616]">moss-studio</span>
         <Icon icon="ArrowheadDown" className="text-[#525252]" />
@@ -111,7 +111,7 @@ export const WidgetBar = ({ os, ...props }: WidgetBarProps) => {
               ? createPortal(
                   <DragOverlay>
                     <HeadBarButton
-                      className="cursor-grabbing !bg-[#e0e0e0]  px-[8px] py-[6px] shadow-lg"
+                      className="cursor-grabbing !bg-[#e0e0e0] px-[8px] py-[6px] shadow-lg"
                       icon={items.find((item) => item.id === activeId)?.icon!}
                       label={items.find((item) => item.id === activeId)?.label}
                     />

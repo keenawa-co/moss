@@ -13,7 +13,7 @@ export const ActionsBar = (props: HTMLProps<HTMLDivElement>) => {
     <div className="flex items-center gap-2" {...props}>
       <div className="flex items-center">
         <button className="flex items-center gap-[1px] transition-colors">
-          <div className="flex h-full items-center gap-[6px] rounded py-[9px] pl-[10px] pr-[8px] hover:bg-[#D3D3D3] ">
+          <div className="flex h-full items-center gap-[6px] rounded py-[6px] pl-[10px] pr-[8px] hover:bg-[#D3D3D3] ">
             <Icon icon="HeadBarBranch" className="size-[18px] text-[#525252]" />
             <div className="flex items-center gap-[2px]">
               <span className=" leading-4 text-[#161616]">main</span>
@@ -29,24 +29,24 @@ export const ActionsBar = (props: HTMLProps<HTMLDivElement>) => {
         </button>
       </div>
 
-      <div className="flex items-center gap-0.5">
+      <div className="flex items-center">
         <HeadBarButton
           icon={isSidebarVisible ? "HeadBarPrimarySideBarActive" : "HeadBarPrimarySideBar"}
-          className="p-[6px] "
+          className="p-[8px] "
           iconClassName="w-[16px] h-[14px]"
           onClick={() => dispatch(toggleSidebarVisibility({}))}
         />
-        <HeadBarButton icon="HeadBarPanelActive" className="p-[6px]  " iconClassName="w-[16px] h-[14px]" />
-        <HeadBarButton icon="HeadBarSecondarySideBar" className="p-[6px]  " iconClassName="w-[16px] h-[14px]" />
-        <HeadBarButton icon="HeadBarCustomizeLayout" className="p-[6px]  " iconClassName="w-[16px] h-[14px]" />
+        <HeadBarButton icon="HeadBarPanelActive" className="p-[8px]  " iconClassName="w-[16px] h-[14px]" />
+        <HeadBarButton icon="HeadBarSecondarySideBar" className="p-[8px]  " iconClassName="w-[16px] h-[14px]" />
+        <HeadBarButton icon="HeadBarCustomizeLayout" className="p-[8px]  " iconClassName="w-[16px] h-[14px]" />
       </div>
 
       <Separator />
 
-      <div className="flex items-center gap-1">
-        <HeadBarButton icon="HeadBarAccount" className="p-[4px]" iconClassName="size-[18px]" />
-        <HeadBarButton icon="HeadBarNotifications" className="p-[4px]" iconClassName="size-[18px]" />
-        <HeadBarButton icon="HeadBarWrench" className="p-[4px]" iconClassName="size-[18px]" />
+      <div className="flex items-center">
+        <HeadBarButton icon="HeadBarAccount" className="p-[6px]" iconClassName="size-[18px]" />
+        <HeadBarButton icon="HeadBarNotifications" className="p-[6px]" iconClassName="size-[18px]" />
+        <HeadBarButton icon="HeadBarWrench" className="p-[6px]" iconClassName="size-[18px]" />
       </div>
     </div>
   );
