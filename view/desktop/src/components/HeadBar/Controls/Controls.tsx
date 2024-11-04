@@ -4,6 +4,7 @@ import { LinuxControls } from "./LinuxControls";
 import { WindowsControls } from "./WindowsControls";
 import { cn } from "@repo/ui";
 import { HTMLProps } from "react";
+import { TauriAppWindowProvider } from "./ControlsContext";
 
 interface ControlsProps extends HTMLProps<HTMLDivElement> {
   os?: OsType;
@@ -28,5 +29,9 @@ export const Controls = ({ os, className, ...props }: ControlsProps) => {
     }
   };
 
-  return <ControlsComponent />;
+  return (
+    <TauriAppWindowProvider>
+      <ControlsComponent />
+    </TauriAppWindowProvider>
+  );
 };
