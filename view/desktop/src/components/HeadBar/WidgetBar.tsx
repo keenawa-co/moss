@@ -76,50 +76,54 @@ export const WidgetBar = ({ os, ...props }: WidgetBarProps) => {
   );
 
   return (
-    <div className="flex items-center gap-1" {...props}>
+    <div className="flex items-center gap-1 " {...props}>
       {os !== "macos" && (
-        <HeadBarButton icon="HeadBarSettingsWithNotification" className="p-[4px]" iconClassName="size-[18px]" />
+        <HeadBarButton
+          icon="HeadBarSettingsWithNotification"
+          className="flex size-[30px] items-center justify-center px-2"
+        />
       )}
+      <div className="flex items-center gap-3">
+        <button className="flex h-[30px] w-max items-center rounded pl-[10px] pr-[4px] transition-colors hover:bg-[#D3D3D3]">
+          <Icon icon="HeadBarMossStudio" className="mr-1.5 size-[22px] text-[#525252]" />
+          <span className="mr-[2px] w-max text-[#161616]">moss-studio</span>
+          <Icon icon="ArrowheadDown" className="text-[#525252]" />
+        </button>
 
-      <button className="flex w-max items-center rounded py-[6px] pl-[10px] pr-[4px] transition-colors hover:bg-[#D3D3D3]">
-        <Icon icon="HeadBarMossStudio" className="mr-1.5 size-[22px] text-[#525252]" />
-        <span className="mr-[2px] w-max text-[#161616]">moss-studio</span>
-        <Icon icon="ArrowheadDown" className="text-[#525252]" />
-      </button>
+        <div className="flex w-full justify-between">
+          <div className={cn("flex items-center gap-1")}>
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={handleDragEnd}
+              onDragStart={handleDragStart}
+            >
+              <SortableContext items={items} strategy={horizontalListSortingStrategy}>
+                {items.map((item) => (
+                  <HeadBarButton
+                    key={item.id}
+                    sortableId={item.id}
+                    icon={item.icon}
+                    label={item.label}
+                    className={cn("h-[30px] text-ellipsis px-[8px]")}
+                  />
+                ))}
+              </SortableContext>
 
-      <div className="flex w-full justify-between">
-        <div className={cn("flex items-center gap-1")}>
-          <DndContext
-            sensors={sensors}
-            collisionDetection={closestCenter}
-            onDragEnd={handleDragEnd}
-            onDragStart={handleDragStart}
-          >
-            <SortableContext items={items} strategy={horizontalListSortingStrategy}>
-              {items.map((item) => (
-                <HeadBarButton
-                  key={item.id}
-                  sortableId={item.id}
-                  icon={item.icon}
-                  label={item.label}
-                  className={cn("text-ellipsis px-[8px] py-[6px]")}
-                />
-              ))}
-            </SortableContext>
-
-            {activeId
-              ? createPortal(
-                  <DragOverlay>
-                    <HeadBarButton
-                      className="cursor-grabbing !bg-[#e0e0e0] px-[8px] py-[6px] shadow-lg"
-                      icon={items.find((item) => item.id === activeId)?.icon!}
-                      label={items.find((item) => item.id === activeId)?.label}
-                    />
-                  </DragOverlay>,
-                  document.body
-                )
-              : null}
-          </DndContext>
+              {activeId
+                ? createPortal(
+                    <DragOverlay>
+                      <HeadBarButton
+                        className="h-[30px] cursor-grabbing !bg-[#e0e0e0] px-[8px] shadow-lg"
+                        icon={items.find((item) => item.id === activeId)?.icon!}
+                        label={items.find((item) => item.id === activeId)?.label}
+                      />
+                    </DragOverlay>,
+                    document.body
+                  )
+                : null}
+            </DndContext>
+          </div>
         </div>
       </div>
     </div>

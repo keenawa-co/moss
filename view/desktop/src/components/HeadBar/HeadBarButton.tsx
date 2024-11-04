@@ -34,7 +34,7 @@ export const HeadBarButton = ({ icon, label, sortableId = -1, ...props }: HeadBa
         props.className
       )}
     >
-      <Icon icon={icon} className={cn("group-active:text-black size-[18px] text-[#525252]", props.iconClassName)} />
+      <Icon icon={icon} className={cn("group-active:text-black text-[#525252]", props.iconClassName)} />
       {label && <span className="group-active:text-black text-ellipsis text-[#161616]">{label}</span>}
     </button>
   );

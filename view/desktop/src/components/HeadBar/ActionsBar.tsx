@@ -10,7 +10,7 @@ export const ActionsBar = (props: HTMLProps<HTMLDivElement>) => {
   const isSidebarVisible = useSelector((state: RootState) => state.sidebar.sidebarVisible);
 
   return (
-    <div className="flex items-center gap-2" {...props}>
+    <div className="flex items-center gap-3" {...props}>
       <div className="flex items-center">
         <button className="flex items-center gap-[1px] transition-colors">
           <div className="flex h-full items-center gap-[6px] rounded py-[6px] pl-[10px] pr-[8px] hover:bg-[#D3D3D3] ">
@@ -32,24 +32,19 @@ export const ActionsBar = (props: HTMLProps<HTMLDivElement>) => {
       <div className="flex items-center">
         <HeadBarButton
           icon={isSidebarVisible ? "HeadBarPrimarySideBarActive" : "HeadBarPrimarySideBar"}
-          className="p-[8px] "
-          iconClassName="w-[16px] h-[14px]"
+          className="flex size-[30px] items-center justify-center "
           onClick={() => dispatch(toggleSidebarVisibility({}))}
         />
-        <HeadBarButton icon="HeadBarPanelActive" className="p-[8px]  " iconClassName="w-[16px] h-[14px]" />
-        <HeadBarButton icon="HeadBarSecondarySideBar" className="p-[8px]  " iconClassName="w-[16px] h-[14px]" />
-        <HeadBarButton icon="HeadBarCustomizeLayout" className="p-[8px]  " iconClassName="w-[16px] h-[14px]" />
+        <HeadBarButton icon="HeadBarPanelActive" className="flex size-[30px] items-center justify-center  " />
+        <HeadBarButton icon="HeadBarSecondarySideBar" className="flex size-[30px] items-center justify-center  " />
+        <HeadBarButton icon="HeadBarCustomizeLayout" className="flex size-[30px] items-center justify-center  " />
       </div>
 
-      <Separator />
-
       <div className="flex items-center">
-        <HeadBarButton icon="HeadBarAccount" className="p-[6px]" iconClassName="size-[18px]" />
-        <HeadBarButton icon="HeadBarNotifications" className="p-[6px]" iconClassName="size-[18px]" />
-        <HeadBarButton icon="HeadBarWrench" className="p-[6px]" iconClassName="size-[18px]" />
+        <HeadBarButton icon="HeadBarAccount" className="flex size-[30px] items-center justify-center" />
+        <HeadBarButton icon="HeadBarNotifications" className="flex size-[30px] items-center justify-center" />
+        <HeadBarButton icon="HeadBarWrench" className="flex size-[30px] items-center justify-center" />
       </div>
     </div>
   );
 };
-
-const Separator = () => <div className="separator h-[15px] w-px bg-[#C6C6C6]" />;
