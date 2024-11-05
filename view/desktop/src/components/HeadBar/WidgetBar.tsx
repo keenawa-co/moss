@@ -4,7 +4,7 @@ import {
   DragOverlay,
   DragStartEvent,
   KeyboardSensor,
-  PointerSensor,
+  MouseSensor,
   UniqueIdentifier,
   closestCenter,
   useSensor,
@@ -69,7 +69,11 @@ export const WidgetBar = ({ os, ...props }: WidgetBarProps) => {
   };
 
   const sensors = useSensors(
-    useSensor(PointerSensor),
+    useSensor(MouseSensor, {
+      activationConstraint: {
+        distance: 5,
+      },
+    }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
     })
@@ -84,9 +88,9 @@ export const WidgetBar = ({ os, ...props }: WidgetBarProps) => {
         />
       )}
       <div className="flex items-center gap-3">
-        <button className="flex h-[30px] w-max items-center rounded pl-[10px] pr-[4px] transition-colors hover:bg-[#D3D3D3]">
+        <button className="flex h-[30px] w-max items-center rounded pl-2.5 pr-1 transition-colors hover:bg-[#D3D3D3]">
           <Icon icon="HeadBarMossStudio" className="mr-1.5 size-[22px] text-[#525252]" />
-          <span className="mr-[2px] w-max text-[#161616]">moss-studio</span>
+          <span className="mr-0.5 w-max text-[#161616]">moss-studio</span>
           <Icon icon="ArrowheadDown" className="text-[#525252]" />
         </button>
 
@@ -105,7 +109,7 @@ export const WidgetBar = ({ os, ...props }: WidgetBarProps) => {
                     sortableId={item.id}
                     icon={item.icon}
                     label={item.label}
-                    className={cn("h-[30px] text-ellipsis px-[8px]")}
+                    className={cn("h-[30px] text-ellipsis px-2")}
                   />
                 ))}
               </SortableContext>
@@ -114,7 +118,7 @@ export const WidgetBar = ({ os, ...props }: WidgetBarProps) => {
                 ? createPortal(
                     <DragOverlay>
                       <HeadBarButton
-                        className="h-[30px] cursor-grabbing !bg-[#e0e0e0] px-[8px] shadow-lg"
+                        className="h-[30px] cursor-grabbing !bg-[#e0e0e0] px-2 shadow-lg"
                         icon={items.find((item) => item.id === activeId)?.icon!}
                         label={items.find((item) => item.id === activeId)?.label}
                       />

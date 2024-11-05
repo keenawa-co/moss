@@ -4,7 +4,7 @@ import { Icons } from "./icons";
 import { cn } from "@repo/ui";
 import ControlsContext from "./ControlsContext";
 
-const buttonStyles = `text-black/60 active:text-black/60 size-[12px] cursor-default grid  items-center justify-center self-center rounded-full `;
+const buttonStyles = `text-black/60 active:text-black/60 size-3 cursor-default grid  items-center justify-center self-center rounded-full `;
 const iconStyles = `hidden size-1.5 group-hover:block`;
 
 export function MacOSControls({ className, ...props }: HTMLProps<HTMLDivElement>) {
