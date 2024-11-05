@@ -8,7 +8,7 @@ import { ActionsBar } from "./ActionsBar";
 export const HeadBar = () => {
   let os = type();
 
-  // os = "macos";
+  os = "macos";
   // os = "linux";
 
   return (

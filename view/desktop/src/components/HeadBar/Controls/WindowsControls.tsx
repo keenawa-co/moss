@@ -1,6 +1,6 @@
 import { useContext, type HTMLProps } from "react";
 import { ControlButton } from "./ControlButton";
-import { Icons } from "./icons";
+import { ControlsIcons } from "./icons";
 import { cn } from "@repo/ui";
 import ControlsContext from "./ControlsContext";
 
@@ -16,7 +16,7 @@ export function WindowsControls({ className, ...props }: HTMLProps<HTMLDivElemen
         onClick={minimizeWindow}
         className="h-full w-[46px] cursor-default rounded-none bg-transparent text-[rgba(var(--color-primary))]/90 hover:bg-[#0000000d] active:bg-[rgba(var(--color-primary))]/[.03]  dark:text-white dark:hover:bg-white/[.06] dark:active:bg-white/[.04]"
       >
-        <Icons.minimizeWin />
+        <ControlsIcons.minimizeWin />
       </ControlButton>
       <ControlButton
         onClick={maximizeWindow}
@@ -25,13 +25,13 @@ export function WindowsControls({ className, ...props }: HTMLProps<HTMLDivElemen
           "text-[rgba(var(--color-primary))]/90 hover:bg-[#0000000d] active:bg-[rgba(var(--color-primary))]/[.03] dark:text-white dark:hover:bg-white/[.06] dark:active:bg-white/[.04]"
         )}
       >
-        {isWindowMaximized ? <Icons.maximizeRestoreWin /> : <Icons.maximizeWin />}
+        {isWindowMaximized ? <ControlsIcons.maximizeRestoreWin /> : <ControlsIcons.maximizeWin />}
       </ControlButton>
       <ControlButton
         onClick={closeWindow}
         className="h-full w-[46px] cursor-default rounded-none bg-transparent text-[rgba(var(--color-primary))]/90 hover:bg-[rgba(var(--color-windows-close-button-background))] hover:text-white active:bg-[rgba(var(--color-windows-close-button-background))]/90 dark:text-white"
       >
-        <Icons.closeWin />
+        <ControlsIcons.closeWin />
       </ControlButton>
     </div>
   );
