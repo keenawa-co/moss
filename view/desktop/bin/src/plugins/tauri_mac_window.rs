@@ -1,3 +1,17 @@
+/*!
+ * # Hic Sunt Dracones 🐉
+ *
+ * ## Overview
+ * "Hic sunt dracones" (Latin: "Here be dragons") was used on ancient maps
+ * to denote dangerous or unexplored areas. This file follows the same spirit,
+ * exploring complex or experimental code that may need caution and further review.
+ *
+ * ## License
+ * Licensed under the MIT License. See LICENSE file in the project root for more details.
+ *
+ * Happy hacking, and may the dragons be friendly! 🐲
+ */
+
 use crate::MAIN_WINDOW_PREFIX;
 use rand::{distributions::Alphanumeric, Rng};
 use tauri::{
