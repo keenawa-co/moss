@@ -22,11 +22,10 @@ export const TitleBar = ({}: TitleBarProps) => {
   return (
     <header
       data-tauri-drag-region
-      className={cn("inset-0 bg-[rgba(var(--color-tool-bar-background))]", {
-        "rounded-t-lg": osType != "windows",
-      })}
-    >
-      <WindowTitlebar />
-    </header>
+      className="h-12 w-full cursor-pointer bg-[rgba(var(--color-tool-bar-background))]"
+      // className={cn("inset-0 h-12 bg-[rgba(var(--color-tool-bar-background))]", {
+      //   "rounded-t-lg": osType != "windows",
+      // })}
+    ></header>
   );
 };

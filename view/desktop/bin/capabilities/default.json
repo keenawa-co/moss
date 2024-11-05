@@ -21,6 +21,7 @@
     "core:window:allow-toggle-maximize",
     "core:window:allow-start-dragging",
     "core:window:allow-set-fullscreen",
+    "core:window:allow-set-decorations",
     "core:webview:allow-internal-toggle-devtools",
     "fs:default",
     {

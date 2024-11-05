@@ -13,9 +13,17 @@
     "withGlobalTauri": false,
     "macOSPrivateApi": true,
     "security": {
-      "csp": null
+      "csp": null,
+      "capabilities": [
+        {
+          "identifier": "draggable-window",
+          "windows": ["*"],
+          "permissions": ["core:window:allow-start-dragging"]
+        }
+      ]
     }
   },
+
   "bundle": {
     "active": true,
     "targets": "all",
