@@ -20,7 +20,7 @@ pub fn set_enabled(menu: &Menu<Wry>, event: &MenuEvent, enabled: bool) -> tauri:
         Some(MenuItemKind::Check(i)) => i.set_enabled(enabled),
         Some(MenuItemKind::Icon(i)) => i.set_enabled(enabled),
         None => {
-            error!("Failed to get menu item: {event:?}");
+            // FIXME: error!("Failed to get menu item: {event:?}");
             Ok(())
         }
     }
@@ -79,7 +79,7 @@ pub fn setup_window_menu(manager: &AppHandle) -> tauri::Result<Menu<Wry>> {
 
         for event in REQUIRE_LIBRARY {
             if let Err(err) = set_enabled(&menu, event, false) {
-                error!("Failed to set up menu item state: {err:#?}");
+                // FIXME: error!("Failed to set up menu item state: {err:#?}");
             }
         }
 
