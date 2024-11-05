@@ -10,29 +10,8 @@
     "beforeBuildCommand": "pnpm build"
   },
   "app": {
-    "withGlobalTauri": true,
+    "withGlobalTauri": false,
     "macOSPrivateApi": true,
-    "windows": [
-      {
-        "title": "Moss Studio",
-        "hiddenTitle": true,
-        "width": 1400,
-        "height": 750,
-        "minWidth": 768,
-        "minHeight": 500,
-        "decorations": false,
-        "alwaysOnTop": false,
-        "focus": false,
-        "dragDropEnabled": true,
-        "center": true,
-        "transparent": false,
-        "windowEffects": {
-          "effects": ["sidebar"],
-          "state": "followsWindowActiveState",
-          "radius": 9
-        }
-      }
-    ],
     "security": {
       "csp": null
     }
@@ -40,6 +19,15 @@
   "bundle": {
     "active": true,
     "targets": "all",
-    "icon": ["icons/32x32.png", "icons/128x128.png", "icons/128x128@2x.png", "icons/icon.icns", "icons/icon.ico"]
+    "icon": ["icons/32x32.png", "icons/128x128.png", "icons/128x128@2x.png", "icons/icon.icns", "icons/icon.ico"],
+    "macOS": {
+      "minimumSystemVersion": "13.0",
+      "exceptionDomain": "",
+      "entitlements": "lib/macos/entitlements.plist",
+      "frameworks": []
+    },
+    "windows": {
+      "digestAlgorithm": "sha256"
+    }
   }
 }
