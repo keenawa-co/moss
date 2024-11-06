@@ -1,9 +1,7 @@
 use std::sync::Arc;
 
 use tauri::State;
-use workbench_desktop::contributions::resents::{
-    RecentsViewContentProviderOutput, RecentsViewModel,
-};
+use workbench_desktop::contributions::resents::{RecentsViewContent, RecentsViewModel};
 use workbench_desktop::menu::{BuiltInMenuNamespaces, MenuItem};
 use workbench_desktop::parts::primary_activitybar::{
     DescribeActivityBarPartOutput, PrimaryActivityBarPart,
@@ -46,9 +44,7 @@ pub fn describe_primary_sidebar_part(
 }
 
 #[tauri::command]
-pub fn get_view_content(
-    state: State<'_, AppState>,
-) -> Result<RecentsViewContentProviderOutput, String> {
+pub fn get_view_content(state: State<'_, AppState>) -> Result<RecentsViewContent, String> {
     let model = state
         .workbench
         .get_view::<RecentsViewModel>(

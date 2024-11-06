@@ -321,7 +321,7 @@ impl Workbench {
         ));
     }
 
-    pub fn set_configuration_window_size(&self, window: WebviewWindow) -> Result<()> {
+    pub fn set_configuration_window_size(&self, window: &WebviewWindow) -> Result<()> {
         use tauri::{LogicalSize, Size::Logical};
 
         let service_registry = self.service_registry.as_ref().borrow();

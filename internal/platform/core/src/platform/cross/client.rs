@@ -2,6 +2,7 @@ use async_task::Runnable;
 use flume::Receiver;
 use std::future::Future;
 use std::{cell::RefCell, rc::Rc};
+use tokio::runtime::Handle;
 use tokio::task::LocalSet;
 
 use crate::{
@@ -14,7 +15,7 @@ use super::{config, platform::CrossPlatform};
 // FIXME: Must be private.
 // This must be reworked when platform-dependent clients are implemented.
 pub struct CrossPlatformClientState {
-    pub runtime: tokio::runtime::Runtime,
+    pub runtime: Handle,
     pub local_set: LocalSet,
     pub platform: CrossPlatform,
     pub main_rx: Receiver<Runnable>,
@@ -22,17 +23,19 @@ pub struct CrossPlatformClientState {
 
 impl CrossPlatformClientState {
     pub fn new(main_rx: Receiver<Runnable>, platform: CrossPlatform) -> Self {
-        let runtime = tokio::runtime::Builder::new_multi_thread()
-            .enable_all()
-            .max_blocking_threads(*config::RUNTIME_MAX_BLOCKING_THREADS)
-            .thread_stack_size(*config::RUNTIME_STACK_SIZE)
-            .build()
-            .unwrap();
+        let handle = tokio::runtime::Handle::current();
+
+        // let runtime = tokio::runtime::Builder::new_multi_thread()
+        //     .enable_all()
+        //     .max_blocking_threads(*config::RUNTIME_MAX_BLOCKING_THREADS)
+        //     .thread_stack_size(*config::RUNTIME_STACK_SIZE)
+        //     .build()
+        //     .unwrap();
 
         let local_set = tokio::task::LocalSet::new();
 
         Self {
-            runtime,
+            runtime: handle,
             local_set,
             platform,
             main_rx,
@@ -57,7 +60,6 @@ impl CrossPlatformClient {
 
         state.local_set.spawn_local(async move {
             while let Ok(runnable) = main_rx_clone.recv_async().await {
-                dbg!(111);
                 runnable.run();
             }
         });

@@ -3,13 +3,6 @@ use ts_rs::TS;
 
 use uikit_models::primitive::Tooltip;
 
-#[derive(Serialize, Debug, Clone, Eq, PartialEq, TS)]
-#[ts(export)]
-pub struct MyStruct {
-    #[ts(type = "Tooltip")]
-    test: Tooltip,
-}
-
 pub mod theming {
     use super::*;
 

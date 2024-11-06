@@ -10,7 +10,7 @@ static_str_ops = "0.1.2"
 readonly.workspace = true
 workbench_models.workspace = true
 thiserror.workspace = true
-strum = { worksoace = true, features = ["derive"] }
+strum = { workspace = true, features = ["derive"] }
 hecs = { workspace = true, features = ["macros"] }
 hecs-hierarchy = { workspace = true }
 uikit_models.workspace = true

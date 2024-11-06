@@ -10,7 +10,7 @@ use crate::{
         MenuItem, SubmenuMenuItem,
     },
     util::ReadOnlyStr,
-    view::{BuiltInGroups, TreeViewDescriptor},
+    view::{BuiltInViewGroups, TreeViewDescriptor},
     Contribution,
 };
 
@@ -21,7 +21,7 @@ pub struct RecentsViewTreeItem {
 }
 
 #[derive(Debug, Serialize)]
-pub struct RecentsViewContentProviderOutput {
+pub struct RecentsViewContent {
     pub data: Vec<RecentsViewTreeItem>,
     pub html: String,
 }
@@ -30,10 +30,10 @@ pub struct RecentsViewContentProviderOutput {
 pub struct RecentsViewModel {}
 
 impl RecentsViewModel {
-    pub fn content(&self) -> Result<RecentsViewContentProviderOutput> {
+    pub fn content(&self) -> Result<RecentsViewContent> {
         let tokens = quote! { <p className="text-sm">"Hello, World!"</p> };
 
-        Ok(RecentsViewContentProviderOutput {
+        Ok(RecentsViewContent {
             html: tokens.to_string(),
             data: vec![
                 RecentsViewTreeItem {
@@ -56,7 +56,7 @@ impl Contribution for RecentsContribution {
 
         let recents_view_id = "workbench.view.recentsView";
         views_registry_lock.register_views(
-            BuiltInGroups::Launchpad.into(),
+            BuiltInViewGroups::Launchpad.into(),
             vec![TreeViewDescriptor {
                 id: recents_view_id.to_string(),
                 name: "Recents".to_string(),

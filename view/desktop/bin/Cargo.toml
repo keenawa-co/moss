@@ -9,13 +9,18 @@ edition = "2021"
 rust-version = "1.70"
 
 [lib]
-name = "app_lib"
+name = "desktop_app_lib"
 crate-type = ["lib", "cdylib", "staticlib"]
 
 [build-dependencies]
-tauri-build = { version = "2.0.0-rc", features = [] }
+tauri-build = { version = "2.0.2", features = [] }
 
 [dependencies]
+hex_color = "3.0.0"
+log = "0.4.21"
+rand = "0.8.5"
+fern = "0.7.0"
+
 uikit_models.workspace = true
 futures.workspace = true
 anyhow.workspace = true
@@ -37,16 +42,19 @@ workbench_service_configuration_tao.workspace = true
 workbench_service_environment_tao.workspace = true
 
 # surrealdb = { workspace = true, features = ["kv-rocksdb"] }
-strum = { workspace = true, features = ["derive"] }
 tokio = { workspace = true, features = ["full", "macros", "signal"] }
 serde_json.workspace = true
 serde = { workspace = true, features = ["derive"] }
 hashbrown = { workspace = true, features = ["serde"] }
 
 tauri = { workspace = true, features = ["macos-private-api"] }
-tauri-plugin-shell = "2.0.0-rc"
-tauri-plugin-os = "2.0.0-rc.0"
+tauri-plugin-shell = "2.0.2"
+tauri-plugin-os = "2.0.1"
+tauri-plugin-log = { version = "2.0.1", features = ["colored"] }
+tauri-plugin-window-state = "2.0.1"
+tauri-plugin-clipboard-manager = "2.0.1"
 
+strum = { workspace = true, features = ["derive"] }
 specta.workspace = true
 specta-typescript.workspace = true
 tauri-specta = { version = "2.0.0-rc.12", features = ["typescript"] }
@@ -56,4 +64,6 @@ tauri-plugin-fs = "2.0.0-rc.0"
 mimalloc = { version = "0.1.39", default-features = false }
 
 [target.'cfg(target_os = "macos")'.dependencies]
+objc = "0.2.7"
+cocoa = "0.26.0"
 macos-trampoline = { path = "./lib/macos" }

@@ -11,7 +11,7 @@ import {
   DropdownMenuLabel,
   Icon,
 } from "@repo/ui";
-import { invokeCmd } from "@/tauri";
+import { invokeCommand } from "@/lib/tauri";
 
 export type DescribeActivityOutput = { tooltip: string; order: number };
 
@@ -34,9 +34,9 @@ const SessionComponent = () => {
 
   let getAllActivities = async () => {
     try {
-      console.log((await invokeCmd("describe_primary_activitybar_part")) as object);
-      console.log((await invokeCmd("describe_primary_sidebar_part")) as object);
-      console.log((await invokeCmd("get_view_content")) as object);
+      console.log((await invokeCommand("describe_primary_activitybar_part")) as object);
+      console.log((await invokeCommand("describe_primary_sidebar_part")) as object);
+      console.log((await invokeCommand("get_view_content")) as object);
       // console.log((await invokeCmd("get_menu_items")) as object);
     } catch (err) {
       console.error("Failed to get workbench state:", err);

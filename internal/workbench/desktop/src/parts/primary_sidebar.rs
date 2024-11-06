@@ -29,8 +29,6 @@ impl AnyPart for PrimarySideBarPart {
         let mut views = HashMap::new();
         let views_registry_lock = registry.views.read();
 
-        dbg!(&views_registry_lock);
-
         if let Some(containers) =
             views_registry_lock.get_groups_by_location(&TreeViewGroupLocation::PrimaryBar)
         {
