@@ -3,25 +3,14 @@ use std::sync::Arc;
 use anyhow::Result;
 use platform_formation::service_registry::ServiceRegistry;
 use platform_fs::disk::file_system_service::DiskFileSystemService;
-use platform_workspace::WorkspaceId;
 use workbench_desktop::window::NativeWindowConfiguration;
 use workbench_service_environment_tao::environment_service::NativeEnvironmentService;
 
 pub struct MockStorageService {}
 
-struct SimpleWindowState {
-    workspace_id: WorkspaceId,
-}
-
 impl MockStorageService {
     fn new() -> Self {
         Self {}
-    }
-
-    fn get_last_window_state(&self) -> SimpleWindowState {
-        SimpleWindowState {
-            workspace_id: WorkspaceId::Some("workspace_path_hash".to_string()),
-        }
     }
 }
 

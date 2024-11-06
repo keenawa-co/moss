@@ -119,39 +119,32 @@ pub fn run() {
             cmd_base::get_menu_items,
         ])
         .on_window_event(|window, event| match event {
+            #[cfg(target_os = "macos")]
             WindowEvent::CloseRequested { api, .. } => {
                 if window.app_handle().webview_windows().len() == 1 {
                     window.app_handle().hide().ok();
                     api.prevent_close();
                 }
             }
-            WindowEvent::Focused(_) => { /*call updates, git fetch, etc. */ }
+
+            WindowEvent::Focused(_) => { /* call updates, git fetch, etc. */ }
+
             _ => (),
         })
         .build(tauri::generate_context!())
         .expect("failed to run")
-        .run(|app_handle, event| {
-            match event {
-                RunEvent::Ready => {
-                    let _ = create_main_window(app_handle, "/");
-                }
-
-                #[cfg(target_os = "macos")]
-                RunEvent::ExitRequested { api, .. } => {
-                    app_handle.hide().ok();
-                    api.prevent_exit();
-                }
-
-                RunEvent::WindowEvent {
-                    event: WindowEvent::Focused(true),
-                    ..
-                } => {
-
-                    // TODO: call updates, git fetch, etc.
-                }
-
-                _ => {}
+        .run(|app_handle, event| match event {
+            RunEvent::Ready => {
+                let _ = create_main_window(app_handle, "/");
             }
+
+            #[cfg(target_os = "macos")]
+            RunEvent::ExitRequested { api, .. } => {
+                app_handle.hide().ok();
+                api.prevent_exit();
+            }
+
+            _ => {}
         });
 }
 
