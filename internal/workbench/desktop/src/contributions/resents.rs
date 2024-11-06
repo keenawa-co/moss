@@ -21,7 +21,7 @@ pub struct RecentsViewTreeItem {
 }
 
 #[derive(Debug, Serialize)]
-pub struct RecentsViewContentProviderOutput {
+pub struct RecentsViewContent {
     pub data: Vec<RecentsViewTreeItem>,
     pub html: String,
 }
@@ -30,10 +30,10 @@ pub struct RecentsViewContentProviderOutput {
 pub struct RecentsViewModel {}
 
 impl RecentsViewModel {
-    pub fn content(&self) -> Result<RecentsViewContentProviderOutput> {
+    pub fn content(&self) -> Result<RecentsViewContent> {
         let tokens = quote! { <p className="text-sm">"Hello, World!"</p> };
 
-        Ok(RecentsViewContentProviderOutput {
+        Ok(RecentsViewContent {
             html: tokens.to_string(),
             data: vec![
                 RecentsViewTreeItem {

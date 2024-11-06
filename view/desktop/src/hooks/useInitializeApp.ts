@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useAppDispatch } from "../store";
 import { setLanguageFromLocalStorage } from "../store/languages/languagesSlice";
 import { initializeThemes } from "../store/themes";
-import { mainWindowIsReadyCommand } from "../tauri";
+import { mainWindowIsReadyCommand } from "../lib/tauri";
 import { ILoggerService, LoggerService } from "@/services/loggerService";
 import { ServiceCollection } from "@/lib/instantiation/serviceCollection";
 import { InstantiationService } from "@/lib/instantiation/instantiationService";
