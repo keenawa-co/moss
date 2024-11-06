@@ -4,7 +4,6 @@ use anyhow::Result;
 use platform_formation::service_registry::ServiceRegistry;
 use platform_fs::disk::file_system_service::DiskFileSystemService;
 use platform_workspace::WorkspaceId;
-use serde_json::Value;
 use workbench_desktop::window::NativeWindowConfiguration;
 use workbench_service_environment_tao::environment_service::NativeEnvironmentService;
 

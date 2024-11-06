@@ -29,8 +29,6 @@ dunce.workspace = true
 rustc-hash.workspace = true
 im.workspace = true
 
-tauri.workspace = true
-
 
 [features]
 default = []

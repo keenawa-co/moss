@@ -31,7 +31,6 @@ pub struct AppState {
     pub platform_info: NativePlatformInfo,
 }
 
-#[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     #[allow(unused_mut)]
     let mut builder = tauri::Builder::default()
@@ -119,6 +118,16 @@ pub fn run() {
             cmd_base::get_view_content,
             cmd_base::get_menu_items,
         ])
+        .on_window_event(|window, event| match event {
+            WindowEvent::CloseRequested { api, .. } => {
+                if window.app_handle().webview_windows().len() == 1 {
+                    window.app_handle().hide().ok();
+                    api.prevent_close();
+                }
+            }
+            WindowEvent::Focused(_) => { /*call updates, git fetch, etc. */ }
+            _ => (),
+        })
         .build(tauri::generate_context!())
         .expect("failed to run")
         .run(|app_handle, event| {
@@ -140,6 +149,7 @@ pub fn run() {
 
                     // TODO: call updates, git fetch, etc.
                 }
+
                 _ => {}
             }
         });

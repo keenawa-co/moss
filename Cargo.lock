@@ -3575,7 +3575,6 @@ dependencies = [
  "slotmap",
  "smallvec",
  "smol",
- "tauri",
  "tokio",
  "waker-fn",
 ]
