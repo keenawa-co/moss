@@ -2,18 +2,21 @@
   "$schema": "../gen/schemas/desktop-schema.json",
   "identifier": "default",
   "description": "enables the default permissions",
-  "windows": ["main"],
+  "windows": ["*"],
   "permissions": [
-    "shell:allow-open",
-    "core:app:default",
+    "core:event:allow-emit",
+    "core:event:allow-listen",
+    "core:event:allow-unlisten",
     "core:event:default",
-    "core:image:default",
+
+    "core:app:default",
     "core:menu:default",
     "core:path:default",
     "core:resources:default",
-    "core:window:default",
     "core:tray:default",
-    "core:webview:default",
+    "core:image:default",
+
+    "core:window:default",
     "core:window:allow-close",
     "core:window:allow-create",
     "core:window:allow-maximize",
@@ -22,7 +25,12 @@
     "core:window:allow-start-dragging",
     "core:window:allow-set-fullscreen",
     "core:window:allow-set-decorations",
+
+    "core:webview:default",
     "core:webview:allow-internal-toggle-devtools",
+
+    "shell:allow-open",
+
     "fs:default",
     {
       "identifier": "fs:allow-home-read-recursive",
