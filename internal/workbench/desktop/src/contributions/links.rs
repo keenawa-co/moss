@@ -1,7 +1,7 @@
 use anyhow::Result;
 use once_cell::sync::Lazy;
 use std::sync::Arc;
-use workbench_models::primitive::navigation::HtmlLink;
+use uikit_models::html::link::HtmlLink;
 
 use crate::{
     view::{BuiltInViewGroups, TreeViewDescriptor},
