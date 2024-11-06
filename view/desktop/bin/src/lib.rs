@@ -1,10 +1,10 @@
 mod commands;
 mod mem;
 mod menu;
+mod plugins;
 mod utl;
 
-mod constants;
-mod plugins;
+pub mod constants;
 
 use log::info;
 use platform_core::context_v2::ContextCell;
