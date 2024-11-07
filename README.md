@@ -32,6 +32,32 @@ sudo apt install libsoup-3.0-dev
 sudo apt install clang
 ```
 
+<!-- ## Nix usage (not ready to be used!)
+
+Before starting the project, ensure you have [NIX](https://nixos.org/download/) installed and enable the [flakes](https://nixos.wiki/wiki/Flakes) experimental feature.
+
+To do this, add the following line to your Nix configuration file:
+
+- For user-specific settings, edit `~/.config/nix/nix.conf`:
+
+- For system-wide settings, edit `/etc/nix/nix.conf`:
+
+```
+experimental-features = nix-command flakes
+```
+
+### Installing Dependencies
+
+To install the necessary dependencies for the project, run the following command:
+
+```bash
+nix develop
+```
+
+This command will set up a development environment with all the required tools and libraries specified in the `flake.nix` file.
+
+**Note**: You will need to run `nix develop` in every new terminal session before starting development to make the tools available in that shell. This is because the environment is only active within the current shell session and does not persist across multiple terminal sessions. -->
+
 # Usage
 
 - Before running any applications, ensure that SurrealDB is started:
