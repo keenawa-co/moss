@@ -1,3 +1,6 @@
+# Warning: the script is not ready for use:
+# - the app was showing blank screen after nix develop of Ubuntu (Could not create default EGL display: EGL_BAD_PARAMETER)
+# - before using it should be tested on MacOS, Windows and errors have to be fixed
 {
   inputs = {
     unstablePkgs.url = "github:nixos/nixpkgs/nixos-unstable";
@@ -55,7 +58,6 @@
             webkitgtk_4_1
             nodejs_20
             corepack_20
-            locale
           ];
 
           # runtime Deps
@@ -89,7 +91,6 @@
               export GIO_MODULE_DIR="${unstable.glib}/lib/gio/modules/"
               export GIO_EXTRA_MODULES=$GIO_MODULE_DIR
               export GTK_PATH="${unstable.libcanberra-gtk3}/lib/gtk-3.0"
-              export LC_ALL="en.utf-8"
             '';
           };
         }

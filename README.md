@@ -12,6 +12,28 @@ We would for you to get involved with Moss development! If you wish to help, you
 
 # Requirements
 
+Before starting the project, ensure you have the following installed:
+
+- [SurrealDB](https://surrealdb.com/)
+- [Tauri](https://tauri.app/)
+- [pnpm](https://pnpm.io/)
+- [Rust](https://www.rust-lang.org/)
+
+On the first app start, Tauri may prompt you to install additional dependencies. These dependencies are described in the [Tauri Getting Started Guide](https://tauri.app/v1/guides/getting-started/prerequisites).
+
+**Note for Ubuntu Linux users:**
+
+Based on personal experience, some additional libraries may be required:
+
+```sh
+sudo apt install libwebkit2gtk-4.1-dev
+sudo apt install libjavascriptcoregtk-4.1-dev
+sudo apt install libsoup-3.0-dev
+sudo apt install clang
+```
+
+<!-- ## Nix usage (not ready to be used!)
+
 Before starting the project, ensure you have [NIX](https://nixos.org/download/) installed and enable the [flakes](https://nixos.wiki/wiki/Flakes) experimental feature.
 
 To do this, add the following line to your Nix configuration file:
@@ -24,7 +46,7 @@ To do this, add the following line to your Nix configuration file:
 experimental-features = nix-command flakes
 ```
 
-## Installing Dependencies
+### Installing Dependencies
 
 To install the necessary dependencies for the project, run the following command:
 
@@ -34,7 +56,7 @@ nix develop
 
 This command will set up a development environment with all the required tools and libraries specified in the `flake.nix` file.
 
-**Note**: You will need to run `nix develop` in every new terminal session before starting development to make the tools available in that shell. This is because the environment is only active within the current shell session and does not persist across multiple terminal sessions.
+**Note**: You will need to run `nix develop` in every new terminal session before starting development to make the tools available in that shell. This is because the environment is only active within the current shell session and does not persist across multiple terminal sessions. -->
 
 # Usage
 
