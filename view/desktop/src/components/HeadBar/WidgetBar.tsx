@@ -26,7 +26,7 @@ interface WidgetBarProps extends HTMLProps<HTMLDivElement> {
   os: OsType;
 }
 
-export const WidgetBar = ({ os, ...props }: WidgetBarProps) => {
+export const WidgetBar = ({ os, className, ...props }: WidgetBarProps) => {
   const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null);
 
   const [items, setItems] = useState([
@@ -80,11 +80,12 @@ export const WidgetBar = ({ os, ...props }: WidgetBarProps) => {
   );
 
   return (
-    <div className="flex items-center gap-1 " {...props}>
+    <div className={cn("flex items-center gap-1", className)} {...props}>
       {os !== "macos" && (
         <HeadBarButton
           icon="HeadBarSettingsWithNotification"
           className="flex size-[30px] items-center justify-center px-2"
+          iconClassName="size-[18px]"
         />
       )}
       <div className="flex items-center gap-3">
