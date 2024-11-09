@@ -1,18 +1,24 @@
-use specta::Type;
 use strum::{AsRefStr as StrumAsRefStr, Display as StrumDisplay, EnumString as StrumEnumString};
 use tauri::{
-    menu::{Menu, MenuItemKind, PredefinedMenuItem},
-    AppHandle, Wry,
+    menu::{Menu, MenuEvent, MenuId, MenuItemKind, PredefinedMenuItem},
+    AppHandle, Emitter, Manager, WebviewWindow, Window, Wry,
 };
 
-#[derive(Debug, Type, StrumEnumString, StrumDisplay, StrumAsRefStr)]
-pub enum MenuEvent {
+use crate::{
+    window::create_child_window, DEFAULT_WINDOW_HEIGHT, DEFAULT_WINDOW_WIDTH, OTHER_WINDOW_PREFIX,
+};
+
+#[derive(Debug, StrumEnumString, StrumDisplay, StrumAsRefStr)]
+pub enum BuiltInMenuEvent {
+    #[strum(serialize = "file.newWindow")]
     NewWindow,
+    #[strum(serialize = "file.closeWindow")]
+    CloseWindow,
 }
 
-const REQUIRE_LIBRARY: &[MenuEvent] = &[MenuEvent::NewWindow];
+const REQUIRE_LIBRARY: &[BuiltInMenuEvent] = &[BuiltInMenuEvent::NewWindow];
 
-pub fn set_enabled(menu: &Menu<Wry>, event: &MenuEvent, enabled: bool) -> tauri::Result<()> {
+pub fn set_enabled(menu: &Menu<Wry>, event: &BuiltInMenuEvent, enabled: bool) -> tauri::Result<()> {
     match menu.get(event.as_ref()) {
         Some(MenuItemKind::MenuItem(i)) => i.set_enabled(enabled),
         Some(MenuItemKind::Submenu(i)) => i.set_enabled(enabled),
@@ -26,27 +32,40 @@ pub fn set_enabled(menu: &Menu<Wry>, event: &MenuEvent, enabled: bool) -> tauri:
     }
 }
 
-pub fn setup_window_menu(manager: &AppHandle) -> tauri::Result<Menu<Wry>> {
-    manager.on_menu_event(move |_app, _event| {
-        // TODO: handle known and unknown menu events
-    });
+pub fn handle_event(_window: &Window, webview: &WebviewWindow, event: &MenuEvent) {
+    let event_id = event.id().0.as_str();
+    match event_id {
+        "file.newWindow" => create_child_window(
+            webview.clone(),
+            "/",
+            &format!("{OTHER_WINDOW_PREFIX}{}", webview.webview_windows().len()),
+            "Moss Studio",
+            (DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT),
+        )
+        .expect("Failed to create new window"),
 
+        _ => {}
+    }
+}
+
+pub fn app_menu(app_handle: &AppHandle) -> tauri::Result<Menu<Wry>> {
     #[cfg(not(target_os = "macos"))]
     {
-        Menu::new(manager)
+        Menu::new(app_handle)
     }
+
     #[cfg(target_os = "macos")]
     {
         use tauri::menu::{AboutMetadataBuilder, MenuBuilder, MenuItemBuilder, SubmenuBuilder};
 
         unsafe {
-            macos_trampoline::set_app_name(&"Moss Compass".into());
+            macos_trampoline::set_app_name(&"Moss Studio".into());
         }
 
-        let app_menu = SubmenuBuilder::new(manager, "Moss")
+        let app_menu = SubmenuBuilder::new(app_handle, "Moss")
             .item(&PredefinedMenuItem::about(
-                manager,
-                Some("About Moss Compass"),
+                app_handle,
+                Some("About Moss Studio"),
                 Some(
                     AboutMetadataBuilder::new()
                         .license(Some(env!("CARGO_PKG_VERSION")))
@@ -58,8 +77,8 @@ pub fn setup_window_menu(manager: &AppHandle) -> tauri::Result<Menu<Wry>> {
             )?)
             .separator()
             .item(&PredefinedMenuItem::hide(
-                manager,
-                Some("Hide Moss Compass"),
+                app_handle,
+                Some("Hide Moss Studio"),
             )?)
             .hide_others()
             .show_all()
@@ -67,21 +86,18 @@ pub fn setup_window_menu(manager: &AppHandle) -> tauri::Result<Menu<Wry>> {
             .quit()
             .build()?;
 
-        let window_menu = SubmenuBuilder::new(manager, "Window")
+        let window_menu = SubmenuBuilder::new(app_handle, "Window")
             .minimize()
-            .item(&MenuItemBuilder::with_id(MenuEvent::NewWindow, "New Window").build(manager)?)
+            .item(
+                &MenuItemBuilder::with_id(BuiltInMenuEvent::NewWindow, "New Window")
+                    .build(app_handle)?,
+            )
             .build()?;
 
-        let menu = MenuBuilder::new(manager)
+        let menu = MenuBuilder::new(app_handle)
             .item(&app_menu)
             .item(&window_menu)
             .build()?;
-
-        for event in REQUIRE_LIBRARY {
-            if let Err(err) = set_enabled(&menu, event, false) {
-                // FIXME: error!("Failed to set up menu item state: {err:#?}");
-            }
-        }
 
         Ok(menu)
     }

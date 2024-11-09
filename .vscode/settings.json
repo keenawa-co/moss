@@ -57,6 +57,7 @@
     "thiserror",
     "Turborepo",
     "Uncapitalize",
+    "unlisten",
     "unpark",
     "unparker",
     "unsync",

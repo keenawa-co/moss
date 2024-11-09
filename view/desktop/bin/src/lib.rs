@@ -3,10 +3,10 @@ mod mem;
 mod menu;
 mod plugins;
 mod utl;
+mod window;
 
 pub mod constants;
 
-use log::info;
 use platform_core::context_v2::ContextCell;
 use platform_core::platform::cross::client::CrossPlatformClient;
 use platform_workspace::WorkspaceId;
@@ -16,6 +16,7 @@ use std::rc::Rc;
 use std::sync::Arc;
 use tauri::{AppHandle, Manager, RunEvent, WebviewUrl, WebviewWindow, WindowEvent};
 use tauri_plugin_log::{fern::colors::ColoredLevelConfig, Target, TargetKind};
+use window::{create_window, CreateWindowInput};
 use workbench_desktop::window::{NativePlatformInfo, NativeWindowConfiguration};
 use workbench_desktop::Workbench;
 
@@ -104,9 +105,9 @@ pub fn run() {
 
             Ok(())
         })
-        .menu(menu::setup_window_menu)
         .invoke_handler(tauri::generate_handler![
-            cmd_initial::main_window_is_ready,
+            cmd_window::main_window_is_ready,
+            cmd_window::create_new_window,
             cmd_dummy::workbench_get_state,
             cmd_dummy::app_ready,
             cmd_dummy::update_font_size,
@@ -126,7 +127,6 @@ pub fn run() {
                     api.prevent_close();
                 }
             }
-
             WindowEvent::Focused(_) => { /* call updates, git fetch, etc. */ }
 
             _ => (),
@@ -150,7 +150,7 @@ pub fn run() {
 
 fn create_main_window(handle: &AppHandle, url: &str) -> WebviewWindow {
     let label = format!("{MAIN_WINDOW_PREFIX}{}", handle.webview_windows().len());
-    let config = CreateWindowConfig {
+    let config = CreateWindowInput {
         url,
         label: label.as_str(),
         title: "Moss Studio",
@@ -160,61 +160,14 @@ fn create_main_window(handle: &AppHandle, url: &str) -> WebviewWindow {
             100.0 + random::<f64>() * 20.0,
         ),
     };
-    create_window(handle, config)
-}
+    let webview_window = create_window(handle, config);
 
-struct CreateWindowConfig<'s> {
-    url: &'s str,
-    label: &'s str,
-    title: &'s str,
-    inner_size: (f64, f64),
-    position: (f64, f64),
-}
+    let webview_window_clone = webview_window.clone();
+    webview_window.on_menu_event(move |window, event| {
+        menu::handle_event(window, &webview_window_clone, &event)
+    });
 
-fn create_window(handle: &AppHandle, config: CreateWindowConfig) -> WebviewWindow {
-    info!("Create new window label={}", config.label);
-
-    // TODO: set menu here
-
-    let mut win_builder =
-        tauri::WebviewWindowBuilder::new(handle, config.label, WebviewUrl::App(config.url.into()))
-            .title(config.title)
-            .center()
-            .resizable(true)
-            .visible(false)
-            .fullscreen(false)
-            .disable_drag_drop_handler()
-            .inner_size(config.inner_size.0, config.inner_size.1)
-            .position(config.position.0, config.position.1)
-            .min_inner_size(MIN_WINDOW_WIDTH, MIN_WINDOW_HEIGHT);
-
-    #[cfg(target_os = "windows")]
-    {
-        win_builder = win_builder
-            .transparent(true)
-            .shadow(false)
-            .decorations(false);
-    }
-
-    #[cfg(target_os = "macos")]
-    {
-        win_builder = win_builder
-            .hidden_title(true)
-            .title_bar_style(tauri::TitleBarStyle::Overlay);
-    }
-
-    if let Some(w) = handle.webview_windows().get(config.label) {
-        info!(
-            "Webview with label {} already exists. Focusing existing",
-            config.label
-        );
-        w.set_focus().unwrap();
-        return w.to_owned();
-    }
-
-    let win = win_builder.build().unwrap();
-
-    win
+    webview_window
 }
 
 fn is_dev() -> bool {

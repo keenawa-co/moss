@@ -7,10 +7,28 @@ import { createRoot } from "react-dom/client";
 import { Provider } from "react-redux";
 import { store } from "./store";
 
-if (type() !== "windows") {
-  document.querySelectorAll("html, body").forEach((el) => {
-    // el.classList.add("rounded-xl");
+const sharedWorker = new SharedWorker("./shared-worker.js");
+
+sharedWorker.port.onmessage = (event) => {
+  const { action, data } = event.data;
+
+  if (action === "result") {
+    console.log("Result:", data);
+  }
+};
+
+sharedWorker.port.start();
+
+export function callServiceMethod(methodName: string, args: any[] = []) {
+  sharedWorker.port.postMessage({
+    action: "callMethod",
+    data: {
+      method: methodName,
+      args: args,
+    },
   });
+
+  console.log("test");
 }
 
 const osType = type();

@@ -8,11 +8,13 @@ import { Resizable, ResizablePanel } from "./components/Resizable";
 import { Home, Logs, Settings } from "./components/pages";
 import { useInitializeApp } from "./hooks/useInitializeApp";
 import { RootState } from "./store";
+import { callServiceMethod } from "./main";
 
 const App: React.FC = () => {
   const { isInitializing, initializationError } = useInitializeApp();
-
   const isSidebarVisible = useSelector((state: RootState) => state.sidebar.sidebarVisible);
+
+  callServiceMethod("doSomething");
 
   if (isInitializing) {
     return (
