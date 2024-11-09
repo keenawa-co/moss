@@ -17,6 +17,8 @@
     "core:image:default",
 
     "core:window:default",
+    "core:window:allow-show",
+    "core:window:allow-theme",
     "core:window:allow-close",
     "core:window:allow-create",
     "core:window:allow-maximize",

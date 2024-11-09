@@ -6,10 +6,13 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Resizable, ResizablePanel } from "./components/Resizable";
 import { Home, Logs, Settings } from "./components/pages";
 import { useInitializeApp } from "./hooks/useInitializeApp";
+import { callServiceMethod } from "./main";
 
 const App: React.FC = () => {
   const { isInitializing, initializationError } = useInitializeApp();
   const [sideBarVisible] = useState(true);
+
+  callServiceMethod("doSomething");
 
   if (isInitializing) {
     return (

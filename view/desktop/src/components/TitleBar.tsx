@@ -1,7 +1,7 @@
 import { WindowTitlebar } from "@/components";
 import { getOsType } from "@/components/window-controls/libs/plugin-os";
 import { OsType } from "@tauri-apps/plugin-os";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { cn } from "@/utils";
 
 interface TitleBarProps {
