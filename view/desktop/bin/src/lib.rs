@@ -14,7 +14,7 @@ use rand::random;
 use std::env;
 use std::rc::Rc;
 use std::sync::Arc;
-use tauri::{AppHandle, Manager, RunEvent, TitleBarStyle, WebviewUrl, WebviewWindow, WindowEvent};
+use tauri::{AppHandle, Manager, RunEvent, WebviewUrl, WebviewWindow, WindowEvent};
 use tauri_plugin_log::{fern::colors::ColoredLevelConfig, Target, TargetKind};
 use workbench_desktop::window::{NativePlatformInfo, NativeWindowConfiguration};
 use workbench_desktop::Workbench;
@@ -188,11 +188,19 @@ fn create_window(handle: &AppHandle, config: CreateWindowConfig) -> WebviewWindo
             .position(config.position.0, config.position.1)
             .min_inner_size(MIN_WINDOW_WIDTH, MIN_WINDOW_HEIGHT);
 
+    #[cfg(target_os = "windows")]
+    {
+        win_builder = win_builder
+            .transparent(true)
+            .shadow(false)
+            .decorations(false);
+    }
+
     #[cfg(target_os = "macos")]
     {
         win_builder = win_builder
             .hidden_title(true)
-            .title_bar_style(TitleBarStyle::Overlay);
+            .title_bar_style(tauri::TitleBarStyle::Overlay);
     }
 
     if let Some(w) = handle.webview_windows().get(config.label) {
