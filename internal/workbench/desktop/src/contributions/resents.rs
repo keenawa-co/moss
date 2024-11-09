@@ -29,6 +29,8 @@ pub struct RecentsViewContent {
 #[derive(Debug, Serialize)]
 pub struct RecentsViewModel {}
 
+pub struct LocaleStr(&'static str, &'static str);
+
 impl RecentsViewModel {
     pub fn content(&self) -> Result<RecentsViewContent> {
         let tokens = quote! { <p className="text-sm">"Hello, World!"</p> };
@@ -217,6 +219,8 @@ impl Contribution for RecentsContribution {
                 }),
             ),
         ]);
+
+        let _ = LocaleStr("openInNewWindow", "Open in New Window");
 
         menus_registry_lock.append_menu_items(vec![(
             BuiltInMenuNamespaces::ViewItemContext.into(),

@@ -1,8 +1,8 @@
-use font::Font;
 use once_cell::sync::OnceCell;
 use std::{path::PathBuf, rc::Rc};
 use sysinfo::System;
 use tauri::AppHandle;
+use typography::Font;
 
 /// A color in the `sRGB` color space.
 #[derive(Debug, Clone, Copy, PartialEq, Default)]
@@ -41,7 +41,7 @@ impl Color {
     }
 }
 
-pub mod font {
+pub mod typography {
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Serialize)]
     pub struct Font {
         family: Family,

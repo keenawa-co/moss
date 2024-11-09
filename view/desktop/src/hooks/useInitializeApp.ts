@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { useAppDispatch } from "../store";
 import { setLanguageFromLocalStorage } from "../store/languages/languagesSlice";
 import { initializeThemes } from "../store/themes";
-import { mainWindowIsReadyCommand } from "../lib/tauri";
 import { ILoggerService, LoggerService } from "@/services/loggerService";
 import { ServiceCollection } from "@/lib/instantiation/serviceCollection";
 import { InstantiationService } from "@/lib/instantiation/instantiationService";
@@ -10,6 +9,10 @@ import { SyncDescriptor } from "@/lib/instantiation/descriptor";
 import { EventService, IEventService } from "@/services/eventService";
 import { IInstantiationService } from "@/lib/instantiation/instantiation";
 import { Channels } from "@/events/eventTypes";
+import { WindowService } from "@/lib/window/windowService";
+import { IWindowService } from "@/lib/window/window";
+import { invokeIpc, ITauriIpcService } from "@/lib/backend/tauri";
+import { TauriIpcService } from "@/lib/backend/tauriService";
 
 export const useInitializeApp = () => {
   const dispatch = useAppDispatch();
@@ -25,8 +28,10 @@ export const useInitializeApp = () => {
       try {
         const services = new ServiceCollection();
 
+        services.set(ITauriIpcService, new SyncDescriptor(TauriIpcService));
         services.set(ILoggerService, new SyncDescriptor(LoggerService));
         services.set(IEventService, new SyncDescriptor(EventService));
+        services.set(IWindowService, new SyncDescriptor(WindowService));
 
         const instantiationService = new InstantiationService(services);
         setInstantiationService(instantiationService);
@@ -37,7 +42,7 @@ export const useInitializeApp = () => {
         const initialChannels: Channels[] = ["channel1"];
         await eventService.initialize(initialChannels);
 
-        mainWindowIsReadyCommand();
+        await invokeIpc("main_window_is_ready");
 
         // Dispatch Redux actions
         dispatch(setLanguageFromLocalStorage());
