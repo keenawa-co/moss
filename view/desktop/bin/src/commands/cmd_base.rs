@@ -1,7 +1,8 @@
+use std::sync::Arc;
+
 use tauri::State;
-use workbench_desktop::contributions::resents::{
-    RecentsViewContentProviderOutput, RecentsViewModel,
-};
+use workbench_desktop::contributions::resents::{RecentsViewContent, RecentsViewModel};
+use workbench_desktop::menu::{BuiltInMenuNamespaces, MenuItem};
 use workbench_desktop::parts::primary_activitybar::{
     DescribeActivityBarPartOutput, PrimaryActivityBarPart,
 };
@@ -22,7 +23,7 @@ pub fn describe_primary_activitybar_part(
 ) -> Result<DescribeActivityBarPartOutput, String> {
     let part = state
         .workbench
-        .get_part::<PrimaryActivityBarPart>(Parts::PrimaryActivityBar.as_part_id())
+        .get_part::<PrimaryActivityBarPart>(Parts::PrimaryActivityBar.as_str())
         .unwrap();
 
     part.describe(state.workbench.registry())
@@ -35,7 +36,7 @@ pub fn describe_primary_sidebar_part(
 ) -> Result<DescribeSideBarPartOutput, String> {
     let part = state
         .workbench
-        .get_part::<PrimarySideBarPart>(Parts::PrimarySideBar.as_part_id())
+        .get_part::<PrimarySideBarPart>(Parts::PrimarySideBar.as_str())
         .unwrap();
 
     part.describe(state.workbench.registry())
@@ -43,9 +44,7 @@ pub fn describe_primary_sidebar_part(
 }
 
 #[tauri::command]
-pub fn get_view_content(
-    state: State<'_, AppState>,
-) -> Result<RecentsViewContentProviderOutput, String> {
+pub fn get_view_content(state: State<'_, AppState>) -> Result<RecentsViewContent, String> {
     let model = state
         .workbench
         .get_view::<RecentsViewModel>(
@@ -57,4 +56,16 @@ pub fn get_view_content(
     model
         .content()
         .map_err(|err| format!("failed to get view content: {err}"))
+}
+
+#[tauri::command]
+pub fn get_menu_items(state: State<'_, AppState>) -> Option<Vec<MenuItem>> {
+    if let Some(items) = state
+        .workbench
+        .get_menu_items(&BuiltInMenuNamespaces::ViewItemContext.into())
+    {
+        Some(items.clone())
+    } else {
+        None
+    }
 }

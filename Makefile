@@ -1,85 +1,134 @@
-DESKTOP_DIR = view/desktop
-STORYBOOK_DIR = view/storybook
-DOCS_DIR = view/docs
-WEB_DIR = view/web
-THEME_GENERATOR_DIR = tools/theme-generator
-ICONS_DIR = view/shared/icons
-
-WORKBENCH_MODELS = internal/workbench/models
-SHARED_MODELS = view/shared/models
-
-PNPM = pnpm
-SURREAL = surreal
-CARGO = cargo
-
 .DEFAULT_GOAL := run-desktop
 
-.PHONY: \
-	run-desktop \
-	run-desktop-web \
-	run-storybook \
-	run-database \
-	stop-database \
-	run-docs \
-	run-web \
-	gen-themes \
-	gen-icons \
-	check-db \
-	loc \
-	cleanup \
+# Detect Operating System
+ifeq ($(OS),Windows_NT)
+    DETECTED_OS := Windows
+else
+    DETECTED_OS := $(shell uname)
+endif
 
+# Directories
+DESKTOP_DIR := view/desktop
+STORYBOOK_DIR := view/storybook
+DOCS_DIR := view/docs
+WEB_DIR := view/web
+THEME_GENERATOR_DIR := tools/theme-generator
+ICONS_DIR := view/shared/icons
 
+WORKBENCH_MODELS_DIR := internal/workbench/models
+SHARED_MODELS_DIR := view/shared/models
+
+# Executables
+PNPM := pnpm
+SURREAL := surreal
+CARGO := cargo
+
+# Database settings
+DATABASE_FILE := file:rocksdb
+SURREAL_PROCESS_NAME := surreal
+
+# Source extensions and directories to exclude for loc
+SRC_EXT := rs,ts
+EXCLUDE_DIRS := target,node_modules
+
+# Run Commands
+
+## Run Desktop Application
+.PHONY: run-desktop
 run-desktop:
 	@cd $(DESKTOP_DIR) && $(PNPM) tauri dev
 
+## Run Desktop Application in Web Mode
+.PHONY: run-desktop-web
 run-desktop-web:
 	@cd $(DESKTOP_DIR) && $(PNPM) vite dev
 
+## Run Storybook
+.PHONY: run-storybook
 run-storybook:
 	@cd $(STORYBOOK_DIR) && $(PNPM) dev
 
-run-database:
-	@cd $(DESKTOP_DIR) && $(SURREAL) start file:rocksdb &
-
-stop-database:
-	@pkill -x surreal
-
+## Run Documentation
+.PHONY: run-docs
 run-docs:
 	@cd $(DOCS_DIR) && $(PNPM) dev
 
+## Run Web Application
+.PHONY: run-web
 run-web:
 	@cd $(WEB_DIR) && $(PNPM) dev
 
+# Database Commands
+
+## Start the Database
+.PHONY: run-database
+run-database:
+ifeq ($(DETECTED_OS),Windows)
+	@cd $(DESKTOP_DIR) && start /B $(SURREAL) start $(DATABASE_FILE)
+else
+	@cd $(DESKTOP_DIR) && $(SURREAL) start $(DATABASE_FILE) &
+endif
+
+## Stop the Database
+.PHONY: stop-database
+stop-database:
+ifeq ($(DETECTED_OS),Windows)
+	@taskkill /IM $(SURREAL_PROCESS_NAME).exe /F
+else
+	@pkill -x $(SURREAL_PROCESS_NAME)
+endif
+
+## Check if the database is running, if not, start it in the background
+.PHONY: check-db
+check-db:
+ifeq ($(DETECTED_OS),Windows)
+	@tasklist /FI "IMAGENAME eq $(SURREAL_PROCESS_NAME).exe" | find /I "$(SURREAL_PROCESS_NAME).exe" > NUL
+	@if errorlevel 1 ($(MAKE) run-database)
+else
+	@if ! pgrep -x "$(SURREAL_PROCESS_NAME)" > /dev/null; then \
+		$(MAKE) run-database; \
+	fi
+endif
+
+# Generation Commands
+
+## Generate Themes
+.PHONY: gen-themes
 gen-themes:
 	@cd $(THEME_GENERATOR_DIR) && $(PNPM) start
 
+## Generate Icons
+.PHONY: gen-icons
 gen-icons:
 	@cd $(ICONS_DIR) && $(PNPM) run build
 
+## Generate Shared Models
+.PHONY: gen-shared-models
 gen-shared-models:
-	cargo test --manifest-path $(SHARED_MODELS)/uikit/Cargo.toml
+	@$(CARGO) test --manifest-path $(SHARED_MODELS_DIR)/uikit/Cargo.toml
 
+## Generate Workbench Models
+.PHONY: gen-workbench-models
 gen-workbench-models:
-	cargo test --manifest-path $(WORKBENCH_MODELS)/Cargo.toml
-	cargo build --manifest-path $(WORKBENCH_MODELS)/Cargo.toml
+	@$(CARGO) test --manifest-path $(WORKBENCH_MODELS_DIR)/Cargo.toml
+	@$(CARGO) build --manifest-path $(WORKBENCH_MODELS_DIR)/Cargo.toml
 
+## Generate All Models
+.PHONY: gen-models
 gen-models: gen-shared-models gen-workbench-models
 
-# Check if the database is running, if not, start it in the background
-check-db:
-	@if ! pgrep -x "surreal" > /dev/null; then \
-		$(MAKE) run-database; \
-	fi	
+# Utility Commands
 
-# Comma separated list of file extensions to count
-SRC_EXT := rs,ts
-# Comma separated list of directories to exclude
-EXCLUDE_DIRS := target,node_modules
-
-# Count lines of code
+## Count Lines of Code
+.PHONY: loc
 loc:
 	@cloc --exclude-dir=$(EXCLUDE_DIRS) --include-ext=$(SRC_EXT) .
 
-# Clean up merged branches except master, main, and dev
+## Clean up merged Git branches except master, main, and dev
+.PHONY: cleanup-git
 cleanup-git:
+ifeq ($(DETECTED_OS),Windows)
+	@for /F "tokens=*" %i in ('git branch --merged ^| findstr /V "master main dev"') do git branch -d %i
+else
 	@git branch --merged | grep -Ev "(^\*|master|main|dev)" | xargs git branch -d
+endif

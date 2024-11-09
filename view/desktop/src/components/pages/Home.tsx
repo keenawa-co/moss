@@ -11,7 +11,7 @@ import {
   DropdownMenuLabel,
   Icon,
 } from "@repo/ui";
-import { invokeCmd } from "@/tauri";
+import { invokeCommand } from "@/lib/tauri";
 
 export type DescribeActivityOutput = { tooltip: string; order: number };
 

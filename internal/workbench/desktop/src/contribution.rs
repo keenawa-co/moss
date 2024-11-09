@@ -6,6 +6,11 @@ use platform_configuration::{
     property_key,
 };
 
+use crate::{
+    view::{BuiltInViewGroups, TreeViewGroup, TreeViewGroupLocation},
+    Contribution,
+};
+
 lazy_static! {
     pub static ref WORKBENCH_TAO_WINDOW: ConfigurationNode = ConfigurationNode {
         id: "window".to_string(),
@@ -86,4 +91,22 @@ lazy_static! {
         },
         parent_of: None,
     };
+}
+
+pub struct WorkbenchContribution;
+impl Contribution for WorkbenchContribution {
+    fn contribute(registry: &mut crate::RegistryManager) -> anyhow::Result<()> {
+        let mut views_registry_lock = registry.views.write();
+
+        views_registry_lock.append_view_group(
+            TreeViewGroupLocation::PrimaryBar,
+            TreeViewGroup {
+                id: BuiltInViewGroups::Launchpad.into(),
+                name: "Launchpad".to_string(),
+                order: 1,
+            },
+        );
+
+        Ok(())
+    }
 }
