@@ -4,7 +4,7 @@
 
 We're looking for talented developers with skills in either **TypeScript**, **React**, or **Rust** to help us build _Moss Studio_.
 
-⚠️ Interested? 👉 g10z3r@duck.com
+#### ⚠️ Interested? 👉 g10z3r@duck.com
 
 - [Contributing](#contributing)
 - [Requirements](#requirements)
