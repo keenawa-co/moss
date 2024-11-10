@@ -1,5 +1,20 @@
 # Moss
 
+<style>
+invitation{
+    color: black;
+    background: #fbbf24;
+}
+</style>
+
+Join Our Team 🚀
+
+<invitation>
+We're looking for talented developers with skills in TypeScript, React, and Rust to help us build Moss Studio.
+</invitation>
+
+Interested? 👉 g10z3r@duck.com
+
 - [Contributing](#contributing)
 - [Requirements](#requirements)
 - [Usage](#usage)
