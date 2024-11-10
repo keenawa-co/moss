@@ -1,15 +1,14 @@
 use hashbrown::HashMap;
-
-use crate::util::ReadOnlyStr;
+use moss_str::{bstring::BStringForFrontend, read_only_str, ReadOnlyStr};
 
 pub type MenuId = ReadOnlyStr;
 
 #[rustfmt::skip]
 lazy_static! {
-    static ref MENU_NAMESPACE_ID_VIEW_TITLE: ReadOnlyStr = ReadOnlyStr::new("viewTitle");
-    static ref MENU_NAMESPACE_ID_VIEW_TITLE_CONTEXT: ReadOnlyStr = ReadOnlyStr::new("viewTitleContext");
-    static ref MENU_NAMESPACE_ID_VIEW_ITEM: ReadOnlyStr = ReadOnlyStr::new("viewItem");
-    static ref MENU_NAMESPACE_ID_VIEW_ITEM_CONTEXT: ReadOnlyStr = ReadOnlyStr::new("viewItemContext");
+    static ref MENU_NAMESPACE_ID_VIEW_TITLE: ReadOnlyStr = read_only_str!("viewTitle");
+    static ref MENU_NAMESPACE_ID_VIEW_TITLE_CONTEXT: ReadOnlyStr = read_only_str!("viewTitleContext");
+    static ref MENU_NAMESPACE_ID_VIEW_ITEM: ReadOnlyStr = read_only_str!("viewItem");
+    static ref MENU_NAMESPACE_ID_VIEW_ITEM_CONTEXT: ReadOnlyStr = read_only_str!("viewItemContext");
 }
 
 #[derive(Debug)]
@@ -50,14 +49,14 @@ impl ToString for BuiltInMenuNamespaces {
 
 #[rustfmt::skip]
 lazy_static! {
-    static ref MENU_GROUP_ID_THIS: ReadOnlyStr = ReadOnlyStr::new("this");
-    static ref MENU_GROUP_ID_INLINE: ReadOnlyStr = ReadOnlyStr::new("inline");
-    static ref MENU_GROUP_ID_NAVIGATION: ReadOnlyStr = ReadOnlyStr::new("navigation");
-    static ref MENU_GROUP_ID_MODIFICATION: ReadOnlyStr = ReadOnlyStr::new("modification");
-    static ref MENU_GROUP_ID_HELP: ReadOnlyStr = ReadOnlyStr::new("help");
-    static ref MENU_GROUP_ID_PREVIEW: ReadOnlyStr = ReadOnlyStr::new("preview");
-    static ref MENU_GROUP_ID_VIEWS: ReadOnlyStr = ReadOnlyStr::new("views");
-    static ref MENU_GROUP_ID_REMOVE: ReadOnlyStr = ReadOnlyStr::new("remove");
+    static ref MENU_GROUP_ID_THIS: ReadOnlyStr = read_only_str!("this");
+    static ref MENU_GROUP_ID_INLINE: ReadOnlyStr = read_only_str!("inline");
+    static ref MENU_GROUP_ID_NAVIGATION: ReadOnlyStr = read_only_str!("navigation");
+    static ref MENU_GROUP_ID_MODIFICATION: ReadOnlyStr = read_only_str!("modification");
+    static ref MENU_GROUP_ID_HELP: ReadOnlyStr = read_only_str!("help");
+    static ref MENU_GROUP_ID_PREVIEW: ReadOnlyStr = read_only_str!("preview");
+    static ref MENU_GROUP_ID_VIEWS: ReadOnlyStr = read_only_str!("views");
+    static ref MENU_GROUP_ID_REMOVE: ReadOnlyStr = read_only_str!("remove");
 }
 
 #[derive(Debug)]
@@ -139,9 +138,9 @@ impl MenuGroup {
 #[derive(Debug, Serialize, Clone)]
 pub struct CommandAction {
     pub id: MenuId,
-    pub title: String,
+    pub title: BStringForFrontend,
     pub tooltip: Option<String>,
-    pub description: Option<String>,
+    pub description: Option<BStringForFrontend>,
 }
 
 #[derive(Debug, Serialize, Clone)]
@@ -156,7 +155,7 @@ pub struct ActionMenuItem {
 #[derive(Debug, Serialize, Clone)]
 pub struct SubmenuMenuItem {
     pub submenu_id: MenuId,
-    pub title: String,
+    pub title: BStringForFrontend,
     pub group: Option<MenuGroup>,
     pub order: Option<i64>,
     pub when: Option<ReadOnlyStr>,

@@ -1,4 +1,5 @@
 use anyhow::Result;
+use moss_str::ReadOnlyStr;
 use once_cell::sync::Lazy;
 use quote::quote;
 use static_str_ops::static_format;
@@ -9,7 +10,6 @@ use crate::{
         ActionMenuItem, BuiltInMenuGroups, BuiltInMenuNamespaces, CommandAction, MenuGroup,
         MenuItem, SubmenuMenuItem,
     },
-    util::ReadOnlyStr,
     view::{BuiltInViewGroups, TreeViewDescriptor},
     Contribution,
 };
@@ -28,8 +28,6 @@ pub struct RecentsViewContent {
 
 #[derive(Debug, Serialize)]
 pub struct RecentsViewModel {}
-
-pub struct LocaleStr(&'static str, &'static str);
 
 impl RecentsViewModel {
     pub fn content(&self) -> Result<RecentsViewContent> {
@@ -86,7 +84,7 @@ impl Contribution for RecentsContribution {
                 MenuItem::Action(ActionMenuItem {
                     command: CommandAction {
                         id: "recents.hideRecentsView".into(),
-                        title: "Hide 'Recents'".to_string(),
+                        title: "Hide 'Recents'".into(),
                         tooltip: None,
                         description: None,
                     },
@@ -101,7 +99,7 @@ impl Contribution for RecentsContribution {
                 MenuItem::Action(ActionMenuItem {
                     command: CommandAction {
                         id: "workbench.view.recents".into(),
-                        title: "Recents".to_string(),
+                        title: "Recents".into(),
                         tooltip: None,
                         description: None,
                     },
@@ -124,7 +122,7 @@ impl Contribution for RecentsContribution {
                 MenuItem::Action(ActionMenuItem {
                     command: CommandAction {
                         id: "recents.remove".into(),
-                        title: "Remove".to_string(),
+                        title: "Remove".into(),
                         tooltip: None,
                         description: None,
                     },
@@ -139,7 +137,7 @@ impl Contribution for RecentsContribution {
                 MenuItem::Action(ActionMenuItem {
                     command: CommandAction {
                         id: "recents.preview".into(),
-                        title: "Preview".to_string(),
+                        title: "Preview".into(),
                         tooltip: None,
                         description: None,
                     },
@@ -153,14 +151,14 @@ impl Contribution for RecentsContribution {
 
         // View Item Context
 
-        let open_with_profile_menu_id = ReadOnlyStr::new("recents.openWithProfileSubmenu");
+        let open_with_profile_menu_id = ReadOnlyStr::from("recents.openWithProfileSubmenu");
         menus_registry_lock.append_menu_items(vec![
             (
                 open_with_profile_menu_id.clone(),
                 MenuItem::Action(ActionMenuItem {
                     command: CommandAction {
                         id: "profile.default".into(),
-                        title: "Default".to_string(),
+                        title: "Default".into(),
                         tooltip: None,
                         description: None,
                     },
@@ -175,7 +173,7 @@ impl Contribution for RecentsContribution {
                 MenuItem::Action(ActionMenuItem {
                     command: CommandAction {
                         id: "profile.custom".into(),
-                        title: "Custom".to_string(),
+                        title: "Custom".into(),
                         tooltip: None,
                         description: None,
                     },
@@ -193,7 +191,7 @@ impl Contribution for RecentsContribution {
                 MenuItem::Action(ActionMenuItem {
                     command: CommandAction {
                         id: "recents.Open".into(),
-                        title: "Open".to_string(),
+                        title: "Open".into(),
                         tooltip: None,
                         description: None,
                     },
@@ -208,7 +206,7 @@ impl Contribution for RecentsContribution {
                 MenuItem::Action(ActionMenuItem {
                     command: CommandAction {
                         id: "recents.openInNewWindow".into(),
-                        title: "Open in New Window".to_string(),
+                        title: "Open in New Window".into(),
                         tooltip: None,
                         description: None,
                     },
@@ -220,13 +218,11 @@ impl Contribution for RecentsContribution {
             ),
         ]);
 
-        let _ = LocaleStr("openInNewWindow", "Open in New Window");
-
         menus_registry_lock.append_menu_items(vec![(
             BuiltInMenuNamespaces::ViewItemContext.into(),
             MenuItem::Submenu(SubmenuMenuItem {
                 submenu_id: open_with_profile_menu_id,
-                title: "Open with Profile".to_string(),
+                title: "Open with Profile".into(),
                 group: Some(MenuGroup::new_ordered(0, BuiltInMenuGroups::Navigation)),
                 order: Some(3),
                 when: Some(recents_item_context.into()),
@@ -239,7 +235,7 @@ impl Contribution for RecentsContribution {
                 MenuItem::Action(ActionMenuItem {
                     command: CommandAction {
                         id: "recents.preview".into(),
-                        title: "Preview".to_string(),
+                        title: "Preview".into(),
                         tooltip: None,
                         description: None,
                     },
@@ -254,7 +250,7 @@ impl Contribution for RecentsContribution {
                 MenuItem::Action(ActionMenuItem {
                     command: CommandAction {
                         id: "recents.removeFromRecents".into(),
-                        title: "Remove from Recents".to_string(),
+                        title: "Remove from Recents".into(),
                         tooltip: None,
                         description: None,
                     },

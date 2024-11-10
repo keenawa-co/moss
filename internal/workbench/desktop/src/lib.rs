@@ -22,6 +22,7 @@ use contribution::{WorkbenchContribution, WORKBENCH_TAO_WINDOW};
 use contributions::{links::LinksContribution, resents::RecentsContribution};
 use hashbrown::HashMap;
 use menu::{MenuItem, MenuRegistry};
+use moss_str::ReadOnlyStr;
 use once_cell::unsync::OnceCell;
 use parking_lot::RwLock;
 use parts::{
@@ -43,7 +44,6 @@ use platform_fs::disk::file_system_service::{
 use platform_user_profile::user_profile_service::UserProfileService as PlatformUserProfileService;
 use platform_workspace::{Workspace, WorkspaceId};
 use tauri::{AppHandle, Emitter, WebviewWindow};
-use util::ReadOnlyStr;
 use view::ViewsRegistry;
 use workbench_service_configuration_tao::configuration_service::WorkspaceConfigurationService;
 use workbench_service_environment_tao::environment_service::NativeEnvironmentService;
@@ -51,9 +51,6 @@ use workbench_service_user_profile_tao::user_profile_service::UserProfileService
 
 #[macro_use]
 extern crate serde;
-
-#[macro_use]
-extern crate anyhow;
 
 #[macro_use]
 extern crate lazy_static;

@@ -2,13 +2,13 @@ use hashbrown::HashMap;
 use once_cell::sync::Lazy;
 use std::{any::Any, fmt::Debug, sync::Arc};
 
-use crate::util::ReadOnlyStr;
+use moss_str::{read_only_str, ReadOnlyStr};
 
 pub type GroupId = ReadOnlyStr;
 
 #[rustfmt::skip]
 lazy_static! {
-    static ref VIEW_GROUP_ID_LAUNCHPAD: ReadOnlyStr = ReadOnlyStr::new("workbench.group.launchpad");
+    static ref VIEW_GROUP_ID_LAUNCHPAD: ReadOnlyStr = read_only_str!("workbench.group.launchpad");
 }
 
 #[derive(Debug)]

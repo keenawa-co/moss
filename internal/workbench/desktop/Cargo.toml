@@ -5,6 +5,7 @@ edition = "2021"
 
 
 [dependencies]
+moss_str.workspace = true
 quote = "1.0"
 static_str_ops = "0.1.2"
 workbench_models.workspace = true
