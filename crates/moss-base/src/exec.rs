@@ -70,7 +70,7 @@ where
 #[macro_export]
 macro_rules! defer {
     ($e:expr) => {
-        let _defer = $crate::base::exec::defer(|| $e);
+        let _defer = $crate::exec::defer(|| $e);
     };
 }
 

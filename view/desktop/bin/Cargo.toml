@@ -21,6 +21,8 @@ log = "0.4.21"
 rand = "0.8.5"
 fern = "0.7.0"
 
+moss_base.workspace = true
+
 uikit_models.workspace = true
 futures.workspace = true
 anyhow.workspace = true

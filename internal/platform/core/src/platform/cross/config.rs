@@ -1,4 +1,4 @@
-use crate::{lazy_env_parse, lazy_env_parse_or_else};
+use moss_base::{lazy_env_parse, lazy_env_parse_or_else};
 use once_cell::sync::Lazy;
 
 pub(super) static RUNTIME_MAX_BLOCKING_THREADS: Lazy<usize> =
