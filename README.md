@@ -9,9 +9,11 @@ invitation{
 
 Join Our Team 🚀
 
-<invitation>
+<p>
 We're looking for talented developers with skills in TypeScript, React, and Rust to help us build Moss Studio.
-</invitation>
+</p>
+
+<span style="color:blue">some _blue_ text</span>.
 
 Interested? 👉 g10z3r@duck.com
 
