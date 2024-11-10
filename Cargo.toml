@@ -4,6 +4,10 @@ members = [
     "view/desktop/bin",
     "view/shared/models/uikit",
 
+    "crates/moss-base",
+    "crates/moss-str",
+    "crates/moss-fs",
+
     "internal/platform/core",
     "internal/platform/fs",
     "internal/platform/formation",
@@ -21,6 +25,8 @@ members = [
     "internal/workbench/service/environment/tao",
 
     "tools/xtask",
+    "crates/moss-str",
+    "crates/moss-fs",
 ]
 
 [profile.release]
@@ -38,6 +44,10 @@ opt-level = 3
 [workspace.dependencies]
 uikit_models = { path = "view/shared/models/uikit" }
 
+moss_base = { path = "crates/moss-base" }
+moss_str = { path = "crates/moss-str" }
+moss_fs = { path = "crates/moss-fs" }
+
 platform_core = { path = "internal/platform/core" }
 platform_utl = { path = "internal/platform/utl" }
 platform_configuration = { path = "internal/platform/configuration" }
@@ -54,7 +64,8 @@ workbench_service_configuration_tao = { path = "internal/workbench/service/confi
 workbench_service_user_profile_tao = { path = "internal/workbench/service/user_profile/tao" }
 workbench_service_environment_tao = { path = "internal/workbench/service/environment/tao" }
 
-readonly = "0.2.12"
+arcstr = "1.2.0"
+bstr = "1.10.0"
 ts-rs = "10.0"
 thiserror = "1.0"
 tauri = { version = "2.0.6", features = ["devtools"] }
