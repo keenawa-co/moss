@@ -20,7 +20,7 @@ members = [
     "internal/workbench/service/user_profile/tao",
     "internal/workbench/service/environment/tao",
 
-    "tools/xtask",
+    "tools/xtask", "tools/rule-builder",
 ]
 
 [profile.release]
