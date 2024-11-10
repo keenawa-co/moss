@@ -2626,6 +2626,7 @@ version = "0.1.0"
 dependencies = [
  "arcstr",
  "bstr",
+ "derive_more",
  "serde",
 ]
 
@@ -5294,6 +5295,7 @@ name = "uikit_models"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "moss_str",
  "serde",
  "ts-rs",
 ]

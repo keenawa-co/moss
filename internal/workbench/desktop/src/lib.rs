@@ -53,6 +53,9 @@ use workbench_service_user_profile_tao::user_profile_service::UserProfileService
 extern crate serde;
 
 #[macro_use]
+extern crate anyhow;
+
+#[macro_use]
 extern crate lazy_static;
 
 // TODO: this will be removed after testing is

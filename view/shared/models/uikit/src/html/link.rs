@@ -1,7 +1,5 @@
-use serde::Serialize;
-
 /// Represents an HTML link (`<a>`) with attributes commonly used in web development.
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, TS)]
 pub struct HtmlLink {
     href: String,           // The URL the link points to
     target: Option<Target>, // Optional target attribute for specifying where to open the link
@@ -46,7 +44,7 @@ impl HtmlLink {
 /// Represents possible values for the `target` attribute in an HTML link.
 ///
 /// The `target` attribute specifies where to open the linked document.
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, TS)]
 pub enum Target {
     /// Opens the link in the same frame as it was clicked (default behavior).
     #[serde(rename = "_self")]
@@ -77,7 +75,7 @@ impl ToString for Target {
 ///
 /// The `rel` attribute specifies the relationship between the current document
 /// and the linked document.
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, TS)]
 pub enum Rel {
     /// Specifies that the target should not have any control over the current page.
     #[serde(rename = "noopener")]

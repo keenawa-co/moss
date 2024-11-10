@@ -1,5 +1,7 @@
 use hashbrown::HashMap;
-use moss_str::{bstring::BStringForFrontend, read_only_str, ReadOnlyStr};
+use moss_str::{
+    bstring::BStringForFrontend, localized_string::LocalizedString, read_only_str, ReadOnlyStr,
+};
 
 pub type MenuId = ReadOnlyStr;
 
@@ -115,22 +117,22 @@ pub enum MenuItem {
 
 #[derive(Debug, Clone, Serialize)]
 pub struct MenuGroup {
+    id: ReadOnlyStr,
     order: Option<i64>,
-    name: ReadOnlyStr,
 }
 
 impl MenuGroup {
-    pub fn new_ordered(order: i64, name: impl Into<ReadOnlyStr>) -> Self {
+    pub fn new_ordered(order: i64, id: impl Into<ReadOnlyStr>) -> Self {
         Self {
+            id: id.into(),
             order: Some(order),
-            name: name.into(),
         }
     }
 
-    pub fn new_unordered(name: impl Into<ReadOnlyStr>) -> Self {
+    pub fn new_unordered(id: impl Into<ReadOnlyStr>) -> Self {
         Self {
+            id: id.into(),
             order: None,
-            name: name.into(),
         }
     }
 }
@@ -138,9 +140,9 @@ impl MenuGroup {
 #[derive(Debug, Serialize, Clone)]
 pub struct CommandAction {
     pub id: MenuId,
-    pub title: BStringForFrontend,
+    pub title: LocalizedString,
     pub tooltip: Option<String>,
-    pub description: Option<BStringForFrontend>,
+    pub description: Option<LocalizedString>,
 }
 
 #[derive(Debug, Serialize, Clone)]
@@ -155,7 +157,7 @@ pub struct ActionMenuItem {
 #[derive(Debug, Serialize, Clone)]
 pub struct SubmenuMenuItem {
     pub submenu_id: MenuId,
-    pub title: BStringForFrontend,
+    pub title: LocalizedString,
     pub group: Option<MenuGroup>,
     pub order: Option<i64>,
     pub when: Option<ReadOnlyStr>,

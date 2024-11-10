@@ -1,5 +1,5 @@
 use anyhow::Result;
-use moss_str::ReadOnlyStr;
+use moss_str::{localize, localized_string::LocalizedString, ReadOnlyStr};
 use once_cell::sync::Lazy;
 use quote::quote;
 use static_str_ops::static_format;
@@ -59,7 +59,7 @@ impl Contribution for RecentsContribution {
             BuiltInViewGroups::Launchpad.into(),
             vec![TreeViewDescriptor {
                 id: recents_view_id.to_string(),
-                name: "Recents".to_string(),
+                name: localize!("recents.view.name", "Recents"),
                 order: 1,
                 hide_by_default: false,
                 can_toggle_visibility: false,
@@ -84,7 +84,7 @@ impl Contribution for RecentsContribution {
                 MenuItem::Action(ActionMenuItem {
                     command: CommandAction {
                         id: "recents.hideRecentsView".into(),
-                        title: "Hide 'Recents'".into(),
+                        title: localize!("recents.hideRecentsView", "Hide 'Recents'"),
                         tooltip: None,
                         description: None,
                     },
@@ -99,7 +99,7 @@ impl Contribution for RecentsContribution {
                 MenuItem::Action(ActionMenuItem {
                     command: CommandAction {
                         id: "workbench.view.recents".into(),
-                        title: "Recents".into(),
+                        title: localize!("recents.title", "Recents"),
                         tooltip: None,
                         description: None,
                     },
@@ -122,7 +122,7 @@ impl Contribution for RecentsContribution {
                 MenuItem::Action(ActionMenuItem {
                     command: CommandAction {
                         id: "recents.remove".into(),
-                        title: "Remove".into(),
+                        title: localize!("recents.remove", "Remove"),
                         tooltip: None,
                         description: None,
                     },
@@ -137,7 +137,7 @@ impl Contribution for RecentsContribution {
                 MenuItem::Action(ActionMenuItem {
                     command: CommandAction {
                         id: "recents.preview".into(),
-                        title: "Preview".into(),
+                        title: localize!("recents.preview", "Preview"),
                         tooltip: None,
                         description: None,
                     },
@@ -158,7 +158,7 @@ impl Contribution for RecentsContribution {
                 MenuItem::Action(ActionMenuItem {
                     command: CommandAction {
                         id: "profile.default".into(),
-                        title: "Default".into(),
+                        title: localize!("profile.default", "Default"),
                         tooltip: None,
                         description: None,
                     },
@@ -173,7 +173,7 @@ impl Contribution for RecentsContribution {
                 MenuItem::Action(ActionMenuItem {
                     command: CommandAction {
                         id: "profile.custom".into(),
-                        title: "Custom".into(),
+                        title: localize!("profile.custom", "Custom"),
                         tooltip: None,
                         description: None,
                     },
@@ -191,7 +191,7 @@ impl Contribution for RecentsContribution {
                 MenuItem::Action(ActionMenuItem {
                     command: CommandAction {
                         id: "recents.Open".into(),
-                        title: "Open".into(),
+                        title: localize!("recents.open", "Open"),
                         tooltip: None,
                         description: None,
                     },
@@ -206,7 +206,7 @@ impl Contribution for RecentsContribution {
                 MenuItem::Action(ActionMenuItem {
                     command: CommandAction {
                         id: "recents.openInNewWindow".into(),
-                        title: "Open in New Window".into(),
+                        title: localize!("recents.openInNewWindow", "Open in New Window"),
                         tooltip: None,
                         description: None,
                     },
@@ -222,7 +222,7 @@ impl Contribution for RecentsContribution {
             BuiltInMenuNamespaces::ViewItemContext.into(),
             MenuItem::Submenu(SubmenuMenuItem {
                 submenu_id: open_with_profile_menu_id,
-                title: "Open with Profile".into(),
+                title: localize!("recents.openWithProfile", "Open with Profile"),
                 group: Some(MenuGroup::new_ordered(0, BuiltInMenuGroups::Navigation)),
                 order: Some(3),
                 when: Some(recents_item_context.into()),
@@ -235,7 +235,7 @@ impl Contribution for RecentsContribution {
                 MenuItem::Action(ActionMenuItem {
                     command: CommandAction {
                         id: "recents.preview".into(),
-                        title: "Preview".into(),
+                        title: localize!("recents.preview", "Preview"),
                         tooltip: None,
                         description: None,
                     },
@@ -250,7 +250,7 @@ impl Contribution for RecentsContribution {
                 MenuItem::Action(ActionMenuItem {
                     command: CommandAction {
                         id: "recents.removeFromRecents".into(),
-                        title: "Remove from Recents".into(),
+                        title: localize!("recents.removeFromRecents", "Remove from Recents"),
                         tooltip: None,
                         description: None,
                     },
