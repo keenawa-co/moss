@@ -143,7 +143,8 @@ export const WidgetBar = ({ os, className, ...props }: WidgetBarProps) => {
         <ContextMenu.Content className={cn("flex flex-col items-start z-100", classNameContent)}>
           {reversedList.map((id) => {
             return (
-              <button className="rounded px-2 hover:bg-stone-300">{items.find((item) => id === item.id)?.label}</button>
+              <ContextMenu.Item label={items.find((item) => id === item.id)?.label} hideIcon />
+              // <button className="rounded px-2 hover:bg-stone-300">{items.find((item) => id === item.id)?.label}</button>
             );
           })}
         </ContextMenu.Content>
