@@ -30,7 +30,7 @@ export const HeadBar = () => {
         data-tauri-drag-region
       >
         <WidgetBar os={os} className="overflow-x-hidden " />
-        <ActionsBar />
+        <ActionsBar className="z-50" />
       </div>
 
       {os !== undefined && os !== "macos" && (os === "windows" || os === "linux") && <Controls os={os} />}

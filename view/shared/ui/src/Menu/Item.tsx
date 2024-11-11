@@ -1,8 +1,7 @@
-import Icon, { Icons } from "@/src/Icon";
-import { cn } from "@/src/utils/utils";
-import { Scope } from "@radix-ui/react-context";
+import { cn } from "../utils/utils";
 import * as MenuPrimitive from "@radix-ui/react-menu";
-import { ElementRef, ComponentPropsWithoutRef, forwardRef } from "react";
+import { ComponentPropsWithoutRef, ElementRef, forwardRef } from "react";
+import Icon, { Icons } from "../Icon";
 import { ScopedProps } from "./types";
 
 export type ItemElement = ElementRef<typeof MenuPrimitive.Item>;
