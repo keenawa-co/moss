@@ -20,6 +20,7 @@ hex_color = "3.0.0"
 log = "0.4.21"
 rand = "0.8.5"
 fern = "0.7.0"
+homedir = "0.3.4"
 
 moss_base.workspace = true
 
