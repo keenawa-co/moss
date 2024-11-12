@@ -30,7 +30,7 @@ interface WidgetBarProps extends HTMLProps<HTMLDivElement> {
 export const WidgetBar = ({ os, className, ...props }: WidgetBarProps) => {
   const [draggedId, setDraggedId] = useState<UniqueIdentifier | null>(null);
 
-  const [items, setItems] = useState([
+  const [DNDItems, setDNDItems] = useState([
     {
       id: 1,
       label: "Alerts",
@@ -60,7 +60,7 @@ export const WidgetBar = ({ os, className, ...props }: WidgetBarProps) => {
     if (!over) return;
 
     if (active.id !== over.id) {
-      setItems((items) => {
+      setDNDItems((items) => {
         const oldIndex = items.findIndex((a) => a.id === active.id);
         const newIndex = items.findIndex((a) => a.id === over.id);
 
@@ -80,28 +80,31 @@ export const WidgetBar = ({ os, className, ...props }: WidgetBarProps) => {
     })
   );
 
-  const [overflownItemsIds, setOverflownItemsIds] = useState<number[]>([]);
+  const [overflownDNDItemsIds, setOverflownDNDItemsIds] = useState<number[]>([]);
 
   const DNDListRef = useRef<HTMLDivElement>(null);
   const handleIntersection = (entries: IntersectionObserverEntry[]) => {
-    setOverflownItemsIds((prevOverflownIds) => {
+    setOverflownDNDItemsIds((prevOverflownIds) => {
       const updatedOverflownIds = [...prevOverflownIds];
 
       entries.forEach((entry) => {
-        const targetId = Number(entry.target.dataset.itemid);
+        const target = entry.target as HTMLElement;
+        const targetId = Number(target.dataset.itemid);
 
         if (!entry.isIntersecting) {
-          entry.target.classList.add("invisible", "pointer-events-none", "touch-none");
-          //@ts-ignore
-          entry.target.disabled = true;
+          target.classList.add("invisible", "pointer-events-none", "touch-none");
+          if (target instanceof HTMLButtonElement) {
+            target.disabled = true;
+          }
 
           if (!updatedOverflownIds.includes(targetId)) {
             updatedOverflownIds.push(targetId);
           }
         } else {
-          entry.target.classList.remove("invisible", "pointer-events-none", "touch-none");
-          //@ts-ignore
-          entry.target.disabled = false;
+          target.classList.remove("invisible", "pointer-events-none", "touch-none");
+          if (target instanceof HTMLButtonElement) {
+            target.disabled = false;
+          }
 
           const index = updatedOverflownIds.indexOf(targetId);
           if (index !== -1) {
@@ -122,30 +125,30 @@ export const WidgetBar = ({ os, className, ...props }: WidgetBarProps) => {
       threshold: 1,
     });
 
-    Array.from(DNDListRef.current.children).forEach((item) => {
-      //@ts-ignore
-      if (item.dataset.listitem) observer.observe(item);
+    Array.from(DNDListRef.current.children).forEach((child) => {
+      const element = child as HTMLElement;
+      if (element.dataset.listitem) observer.observe(element);
     });
 
     return () => {
       observer.disconnect();
     };
-  }, [DNDListRef, items]);
+  }, [DNDListRef, DNDItems]);
 
   const OverflownMenu = ({ classNameContent, classNameTrigger, ...props }: any) => {
-    const reversedList = [...overflownItemsIds].reverse();
+    const reversedList = [...overflownDNDItemsIds].reverse();
 
+    // TODO replace with a DropdownMenu
     return (
       <ContextMenu.Root {...props}>
         <ContextMenu.Trigger className={classNameTrigger}>
-          <Icon icon="ThreeHorizontalDots" />
+          <button className="rounded p-[7px] transition-colors hover:bg-[#D3D3D3]">
+            <Icon icon="ThreeHorizontalDots" className="flex size-4 items-center justify-center" />
+          </button>
         </ContextMenu.Trigger>
         <ContextMenu.Content className={cn("flex flex-col items-start z-100", classNameContent)}>
           {reversedList.map((id) => {
-            return (
-              <ContextMenu.Item label={items.find((item) => id === item.id)?.label} hideIcon />
-              // <button className="rounded px-2 hover:bg-stone-300">{items.find((item) => id === item.id)?.label}</button>
-            );
+            return <ContextMenu.Item label={DNDItems.find((item) => id === item.id)?.label || ""} hideIcon />;
           })}
         </ContextMenu.Content>
       </ContextMenu.Root>
@@ -168,20 +171,20 @@ export const WidgetBar = ({ os, className, ...props }: WidgetBarProps) => {
           <Icon icon="ArrowheadDown" className="text-[#525252]" />
         </button>
 
-        <div className=" flex w-full items-center justify-start gap-1" ref={DNDListRef}>
+        <div className="flex w-full items-center justify-start gap-1" ref={DNDListRef}>
           <DndContext
             sensors={sensors}
             collisionDetection={closestCenter}
             onDragEnd={handleDragEnd}
             onDragStart={handleDragStart}
           >
-            <SortableContext items={items} strategy={horizontalListSortingStrategy}>
-              {items.map((item, index) => (
+            <SortableContext items={DNDItems} strategy={horizontalListSortingStrategy}>
+              {DNDItems.map((item, index) => (
                 <>
-                  {items.length === overflownItemsIds.length && index === 0 && (
-                    <OverflownMenu classNameTrigger="pl-5" key={`OverflowMenuAtStart-${index}`} />
+                  {DNDItems.length === overflownDNDItemsIds.length && index === 0 && (
+                    <OverflownMenu classNameTrigger="pl-[14px]" key={`OverflowMenuAtStart-${index}`} />
                   )}
-                  <span className="flex items-center" data-listItem={true} data-itemId={item.id}>
+                  <span className="flex items-center gap-2" data-listItem={true} data-itemId={item.id}>
                     <HeadBarButton
                       key={item.id}
                       sortableId={item.id}
@@ -189,7 +192,7 @@ export const WidgetBar = ({ os, className, ...props }: WidgetBarProps) => {
                       label={item.label}
                       className={cn("h-[30px] text-ellipsis px-2")}
                     />
-                    {overflownItemsIds.length > 0 && items.length - overflownItemsIds.length === index + 1 && (
+                    {overflownDNDItemsIds.length > 0 && DNDItems.length - overflownDNDItemsIds.length === index + 1 && (
                       <OverflownMenu key={`OverflowMenuBetweenMenuItems-${index}`} />
                     )}
                   </span>
@@ -202,8 +205,8 @@ export const WidgetBar = ({ os, className, ...props }: WidgetBarProps) => {
                   <DragOverlay>
                     <HeadBarButton
                       className="h-[30px] cursor-grabbing !bg-[#e0e0e0] px-2 shadow-lg"
-                      icon={items.find((item) => item.id === draggedId)?.icon!}
-                      label={items.find((item) => item.id === draggedId)?.label}
+                      icon={DNDItems.find((item) => item.id === draggedId)?.icon!}
+                      label={DNDItems.find((item) => item.id === draggedId)?.label}
                     />
                   </DragOverlay>,
                   document.body
