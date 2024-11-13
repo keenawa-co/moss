@@ -188,6 +188,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "69f7f8c3906b62b754cd5326047894316021dcfe5a194c8ea52bdd94934a3457"
 
 [[package]]
+name = "arcstr"
+version = "1.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "03918c3dbd7701a85c6b9887732e2921175f26c350b4563841d0958c21d57e6d"
+dependencies = [
+ "serde",
+]
+
+[[package]]
 name = "arrayvec"
 version = "0.7.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -508,6 +517,17 @@ checksum = "9a45bd2e4095a8b518033b128020dd4a55aab1c0a381ba4404a472630f4bc362"
 dependencies = [
  "alloc-no-stdlib",
  "alloc-stdlib",
+]
+
+[[package]]
+name = "bstr"
+version = "1.10.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "40723b8fb387abc38f4f4a37c09073622e41dd12327033091ef8950659e6dc0c"
+dependencies = [
+ "memchr",
+ "regex-automata",
+ "serde",
 ]
 
 [[package]]
@@ -1070,6 +1090,7 @@ dependencies = [
  "log",
  "macos-trampoline",
  "mimalloc",
+ "moss_base",
  "objc",
  "once_cell",
  "parking_lot",
@@ -2580,6 +2601,36 @@ dependencies = [
 ]
 
 [[package]]
+name = "moss_base"
+version = "0.0.0"
+dependencies = [
+ "async-trait",
+ "dunce",
+ "hashbrown 0.15.0",
+ "im",
+ "radix_trie",
+ "rustc-hash",
+ "serde",
+]
+
+[[package]]
+name = "moss_fs"
+version = "0.1.0"
+dependencies = [
+ "dunce",
+]
+
+[[package]]
+name = "moss_str"
+version = "0.1.0"
+dependencies = [
+ "arcstr",
+ "bstr",
+ "derive_more",
+ "serde",
+]
+
+[[package]]
 name = "muda"
 version = "0.15.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3253,6 +3304,7 @@ dependencies = [
  "async-trait",
  "hashbrown 0.15.0",
  "lazy-regex",
+ "moss_base",
  "parking_lot",
  "platform_core",
  "platform_fs",
@@ -3280,11 +3332,13 @@ dependencies = [
  "hashbrown 0.15.0",
  "im",
  "lazy_static",
+ "moss_base",
  "once_cell",
  "parking",
  "parking_lot",
  "radix_trie",
  "rustc-hash",
+ "serde",
  "slotmap",
  "smallvec",
  "smol",
@@ -3639,17 +3693,6 @@ checksum = "1465873a3dfdaa8ae7cb14b4383657caab0b3e8a0aa9ae8e04b044854c8dfce2"
 dependencies = [
  "crossbeam-deque",
  "crossbeam-utils",
-]
-
-[[package]]
-name = "readonly"
-version = "0.2.12"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a25d631e41bfb5fdcde1d4e2215f62f7f0afa3ff11e26563765bd6ea1d229aeb"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn 2.0.79",
 ]
 
 [[package]]
@@ -5252,6 +5295,7 @@ name = "uikit_models"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "moss_str",
  "serde",
  "ts-rs",
 ]
@@ -6076,6 +6120,7 @@ dependencies = [
  "hecs",
  "hecs-hierarchy",
  "lazy_static",
+ "moss_str",
  "once_cell",
  "parking_lot",
  "platform_configuration",
@@ -6085,7 +6130,6 @@ dependencies = [
  "platform_user_profile",
  "platform_workspace",
  "quote",
- "readonly",
  "serde",
  "serde_json",
  "slotmap",

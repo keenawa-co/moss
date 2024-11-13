@@ -1,3 +1,4 @@
+use moss_str::{localize, localized_string::LocalizedString};
 use platform_configuration::{
     configuration_registry::{
         ConfigurationNode, ConfigurationNodeType as Type,
@@ -102,7 +103,7 @@ impl Contribution for WorkbenchContribution {
             TreeViewGroupLocation::PrimaryBar,
             TreeViewGroup {
                 id: BuiltInViewGroups::Launchpad.into(),
-                name: "Launchpad".to_string(),
+                name: localize!("launchpad.group.name", "Launchpad"),
                 order: 1,
             },
         );

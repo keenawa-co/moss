@@ -1,5 +1,5 @@
+use moss_base::{lazy_env_parse, lazy_env_parse_or_else};
 use once_cell::sync::Lazy;
-use platform_core::{lazy_env_parse, lazy_env_parse_or_else};
 
 pub const MAIN_WINDOW_PREFIX: &str = "main_";
 pub const OTHER_WINDOW_PREFIX: &str = "other_";

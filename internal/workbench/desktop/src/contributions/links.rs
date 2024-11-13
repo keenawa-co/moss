@@ -1,4 +1,5 @@
 use anyhow::Result;
+use moss_str::{localize, localized_string::LocalizedString};
 use once_cell::sync::Lazy;
 use std::sync::Arc;
 use uikit_models::html::link::HtmlLink;
@@ -32,7 +33,7 @@ impl Contribution for LinksContribution {
             BuiltInViewGroups::Launchpad.into(),
             vec![TreeViewDescriptor {
                 id: "workbench.view.linksView".to_string(),
-                name: "Links".to_string(),
+                name: localize!("links.view.name", "Links"),
                 order: 2,
                 hide_by_default: false,
                 can_toggle_visibility: true,
