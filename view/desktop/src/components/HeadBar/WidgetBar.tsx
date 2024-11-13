@@ -16,12 +16,11 @@ import {
   horizontalListSortingStrategy,
   sortableKeyboardCoordinates,
 } from "@dnd-kit/sortable";
-import { Icon, cn } from "@repo/ui";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger, Icon, cn } from "@repo/ui";
 import { OsType } from "@tauri-apps/plugin-os";
 import React, { HTMLProps, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { HeadBarButton } from "./HeadBarButton";
-import { ContextMenu } from "@repo/ui";
 
 interface WidgetBarProps extends HTMLProps<HTMLDivElement> {
   os: OsType;
@@ -138,29 +137,32 @@ export const WidgetBar = ({ os, className, ...props }: WidgetBarProps) => {
   const OverflownMenu = ({
     classNameContent,
     classNameTrigger,
-    key,
-    ...props
   }: {
     classNameContent?: string;
     classNameTrigger?: string;
-    key?: React.Key;
   }) => {
     const reversedList = [...overflownDNDItemsIds].reverse();
 
-    // TODO replace with a DropdownMenu
     return (
-      <ContextMenu.Root {...props}>
-        <ContextMenu.Trigger className={classNameTrigger}>
-          <button className="rounded p-[7px] transition-colors hover:bg-[#D3D3D3]">
-            <Icon icon="ThreeHorizontalDots" className="flex size-4 items-center justify-center" />
-          </button>
-        </ContextMenu.Trigger>
-        <ContextMenu.Content className={cn("flex flex-col items-start z-100", classNameContent)}>
+      <DropdownMenu>
+        <DropdownMenuTrigger
+          className={cn("DropdownMenuTrigger rounded p-[7px] transition-colors hover:bg-[#D3D3D3]", classNameTrigger)}
+        >
+          <Icon icon="ThreeHorizontalDots" className="flex size-4 items-center justify-center" />
+        </DropdownMenuTrigger>
+
+        <DropdownMenuContent className={cn("bg-white", classNameContent)}>
           {reversedList.map((id) => {
-            return <ContextMenu.Item label={DNDItems.find((item) => id === item.id)?.label || ""} hideIcon />;
+            const item = DNDItems.find((item) => id === item.id)!;
+            return (
+              <button className="flex w-full gap-1 rounded px-2 py-2 text-[#000] hover:bg-[#D3D3D3] hover:bg-none">
+                <Icon icon={item.icon} />
+                <span>{item.label}</span>
+              </button>
+            );
           })}
-        </ContextMenu.Content>
-      </ContextMenu.Root>
+        </DropdownMenuContent>
+      </DropdownMenu>
     );
   };
 
@@ -191,7 +193,7 @@ export const WidgetBar = ({ os, className, ...props }: WidgetBarProps) => {
               {DNDItems.map((item, index) => (
                 <React.Fragment key={item.id}>
                   {DNDItems.length === overflownDNDItemsIds.length && index === 0 && (
-                    <OverflownMenu classNameTrigger="pl-[14px]" key={`OverflowMenuAtStart-${item.id}-${index}`} />
+                    <OverflownMenu classNameTrigger="ml-[14px]" key={`OverflowMenuAtStart-${item.id}-${index}`} />
                   )}
                   <span
                     className="flex items-center gap-2"
