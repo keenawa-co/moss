@@ -1,4 +1,5 @@
 mod builder;
+mod builder_tests;
 
 use builder::RuleBuilder;
 
