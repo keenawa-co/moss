@@ -6,20 +6,24 @@ mod utl;
 mod window;
 
 pub mod constants;
+mod cli;
 
 use platform_core::context_v2::ContextCell;
 use platform_core::platform::cross::client::CrossPlatformClient;
 use platform_workspace::WorkspaceId;
 use rand::random;
 use std::env;
+use std::path::PathBuf;
 use std::rc::Rc;
 use std::sync::Arc;
+use homedir::{my_home};
 use tauri::{AppHandle, Manager, RunEvent, WebviewUrl, WebviewWindow, WindowEvent};
+use tauri_plugin_cli::CliExt;
 use tauri_plugin_log::{fern::colors::ColoredLevelConfig, Target, TargetKind};
 use window::{create_window, CreateWindowInput};
 use workbench_desktop::window::{NativePlatformInfo, NativeWindowConfiguration};
 use workbench_desktop::Workbench;
-
+use crate::cli::cli_handler;
 use crate::commands::*;
 use crate::constants::*;
 use crate::plugins as moss_plugins;
@@ -35,6 +39,7 @@ pub struct AppState {
 pub fn run() {
     #[allow(unused_mut)]
     let mut builder = tauri::Builder::default()
+        .plugin(tauri_plugin_cli::init())
         .plugin(
             tauri_plugin_log::Builder::default()
                 .targets([
@@ -97,6 +102,14 @@ pub fn run() {
                 workbench: Arc::new(workbench),
                 platform_info,
             };
+            // Setting up CLI
+            match app.cli().matches() {
+                Ok(matches) => {
+                    cli_handler(matches, &app_state, app.handle())
+                },
+                Err(_) => {}
+            };
+
 
             {
                 app.handle().manage(ctx);
