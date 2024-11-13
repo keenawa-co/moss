@@ -27,8 +27,6 @@ export function callServiceMethod(methodName: string, args: any[] = []) {
       args: args,
     },
   });
-
-  console.log("test");
 }
 
 const osType = type();

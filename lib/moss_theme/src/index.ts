@@ -9,7 +9,7 @@ function toKebabCase(str: string): string {
 }
 
 // Type to convert string keys to CSS variable format
-type ThemeCssVariables = {
+export type ThemeCssVariables = {
   [K in keyof Colors as `--color-${KebabCase<K>}`]: string;
 };
 

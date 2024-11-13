@@ -1,9 +1,9 @@
-import Icon, { Icons } from "@/src/Icon";
-import { cn } from "@/src/utils/utils";
 import { Scope } from "@radix-ui/react-context";
 import * as MenuPrimitive from "@radix-ui/react-menu";
 import { ElementRef, ComponentPropsWithoutRef, forwardRef } from "react";
 import { ScopedProps } from "./types";
+import Icon, { Icons } from "../Icon";
+import { cn } from "../utils/utils";
 
 /* -------------------------------------------------------------------------------------------------
  * SubTrigger

@@ -69,7 +69,7 @@ const DropdownMenuContent = ({
   <DropdownMenuPrimitive.Portal>
     <DropdownMenuPrimitive.Content
       sideOffset={sideOffset}
-      className={cn(ContentStyles, TextStyles, "min-w-64 ", className)}
+      className={cn(ContentStyles, TextStyles, "min-w-32", className)}
       {...props}
     >
       {children}
