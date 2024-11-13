@@ -18,7 +18,7 @@ import {
 } from "@dnd-kit/sortable";
 import { Icon, cn } from "@repo/ui";
 import { OsType } from "@tauri-apps/plugin-os";
-import { HTMLProps, useEffect, useRef, useState } from "react";
+import React, { HTMLProps, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { HeadBarButton } from "./HeadBarButton";
 import { ContextMenu } from "@repo/ui";
@@ -127,7 +127,7 @@ export const WidgetBar = ({ os, className, ...props }: WidgetBarProps) => {
 
     Array.from(DNDListRef.current.children).forEach((child) => {
       const element = child as HTMLElement;
-      if (element.dataset.listitem) observer.observe(element);
+      if (element.dataset.islistitem) observer.observe(element);
     });
 
     return () => {
@@ -135,7 +135,16 @@ export const WidgetBar = ({ os, className, ...props }: WidgetBarProps) => {
     };
   }, [DNDListRef, DNDItems]);
 
-  const OverflownMenu = ({ classNameContent, classNameTrigger, ...props }: any) => {
+  const OverflownMenu = ({
+    classNameContent,
+    classNameTrigger,
+    key,
+    ...props
+  }: {
+    classNameContent?: string;
+    classNameTrigger?: string;
+    key?: React.Key;
+  }) => {
     const reversedList = [...overflownDNDItemsIds].reverse();
 
     // TODO replace with a DropdownMenu
@@ -180,23 +189,28 @@ export const WidgetBar = ({ os, className, ...props }: WidgetBarProps) => {
           >
             <SortableContext items={DNDItems} strategy={horizontalListSortingStrategy}>
               {DNDItems.map((item, index) => (
-                <>
+                <React.Fragment key={item.id}>
                   {DNDItems.length === overflownDNDItemsIds.length && index === 0 && (
-                    <OverflownMenu classNameTrigger="pl-[14px]" key={`OverflowMenuAtStart-${index}`} />
+                    <OverflownMenu classNameTrigger="pl-[14px]" key={`OverflowMenuAtStart-${item.id}-${index}`} />
                   )}
-                  <span className="flex items-center gap-2" data-listItem={true} data-itemId={item.id}>
+                  <span
+                    className="flex items-center gap-2"
+                    data-islistitem={true}
+                    data-itemid={item.id}
+                    key={`listItem-${item.id}`}
+                  >
                     <HeadBarButton
-                      key={item.id}
+                      key={`listButton-${item.id}`}
                       sortableId={item.id}
                       icon={item.icon}
                       label={item.label}
                       className={cn("h-[30px] text-ellipsis px-2")}
                     />
                     {overflownDNDItemsIds.length > 0 && DNDItems.length - overflownDNDItemsIds.length === index + 1 && (
-                      <OverflownMenu key={`OverflowMenuBetweenMenuItems-${index}`} />
+                      <OverflownMenu key={`OverflowMenuBetweenMenuItems-${item.id}-${index}`} />
                     )}
                   </span>
-                </>
+                </React.Fragment>
               ))}
             </SortableContext>
 
