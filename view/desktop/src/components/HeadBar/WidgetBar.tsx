@@ -91,8 +91,6 @@ export const WidgetBar = ({ os, className, ...props }: WidgetBarProps) => {
         const target = entry.target as HTMLElement;
         const targetId = Number(target.dataset.itemid);
 
-        console.log(entry.intersectionRatio);
-
         if (!entry.isIntersecting) {
           target.classList.add("invisible", "pointer-events-none", "touch-none");
           if (target instanceof HTMLButtonElement) {
