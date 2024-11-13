@@ -16,9 +16,9 @@ crate-type = ["lib", "cdylib", "staticlib"]
 tauri-build = { version = "2.0.2", features = [] }
 
 [dependencies]
-log = "0.4.21"
-rand = "0.8.5"
-fern = "0.7.0"
+log.workspace = true
+rand.workspace = true
+fern.workspace = true
 
 moss_base.workspace = true
 

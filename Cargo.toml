@@ -108,3 +108,9 @@ dyn-clone = "1.0.17"
 
 hecs = "0.10.5"
 hecs-hierarchy = "0.12.1"
+
+fern = "0.7.0"
+rand = "0.8.5"
+log = "0.4.21"
+quote = "1.0"
+static_str_ops = "0.1.2"
