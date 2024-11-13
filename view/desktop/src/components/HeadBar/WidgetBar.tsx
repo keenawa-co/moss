@@ -91,6 +91,8 @@ export const WidgetBar = ({ os, className, ...props }: WidgetBarProps) => {
         const target = entry.target as HTMLElement;
         const targetId = Number(target.dataset.itemid);
 
+        console.log(entry.intersectionRatio);
+
         if (!entry.isIntersecting) {
           target.classList.add("invisible", "pointer-events-none", "touch-none");
           if (target instanceof HTMLButtonElement) {
@@ -122,7 +124,7 @@ export const WidgetBar = ({ os, className, ...props }: WidgetBarProps) => {
 
     const observer = new IntersectionObserver(handleIntersection, {
       root: document.querySelector("header"),
-      threshold: 1,
+      threshold: 0.99, // this is set to 0.99 because for some reason it doesn't work with 1 on linux
     });
 
     Array.from(DNDListRef.current.children).forEach((child) => {
