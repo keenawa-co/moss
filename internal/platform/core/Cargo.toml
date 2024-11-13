@@ -7,7 +7,6 @@ edition = "2021"
 
 [dependencies]
 moss_base.workspace = true
-fnv.workspace = true
 slotmap.workspace = true
 parking_lot.workspace = true
 derive_more.workspace = true
@@ -19,14 +18,12 @@ async-task.workspace = true
 flume.workspace = true
 parking.workspace = true
 waker-fn.workspace = true
-lazy_static.workspace = true
 once_cell.workspace = true
 smallvec.workspace = true
 dyn-clone.workspace = true
 async-trait.workspace = true
 hashbrown = { workspace = true, features = [] }
 radix_trie.workspace = true
-dunce.workspace = true
 rustc-hash.workspace = true
 im.workspace = true
 serde = { workspace = true, features = ["derive"] }

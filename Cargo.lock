@@ -35,18 +35,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "ahash"
-version = "0.8.11"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e89da841a80418a9b391ebaea17f5c112ffaaa96f621d2c285b5174da76b9011"
-dependencies = [
- "cfg-if",
- "once_cell",
- "version_check",
- "zerocopy",
-]
-
-[[package]]
 name = "aho-corasick"
 version = "1.1.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -361,12 +349,6 @@ name = "atomic-waker"
 version = "1.1.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1505bd5d3d116872e7271a6d4e16d81d0c8570876c8de68093a09ac269d8aac0"
-
-[[package]]
-name = "atomic_refcell"
-version = "0.1.13"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "41e67cd8309bbd06cd603a9e693a784ac2e5d1e955f11286e355089fcab3047c"
 
 [[package]]
 name = "autocfg"
@@ -1086,7 +1068,6 @@ dependencies = [
  "flume",
  "futures",
  "hashbrown 0.15.0",
- "hex_color",
  "log",
  "macos-trampoline",
  "mimalloc",
@@ -1116,7 +1097,6 @@ dependencies = [
  "tauri-specta",
  "tokio",
  "tracing",
- "tracing-subscriber",
  "uikit_models",
  "workbench_desktop",
  "workbench_service_configuration_tao",
@@ -1821,19 +1801,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d2fabcfbdc87f4758337ca535fb41a6d701b65693ce38287d856d1674551ec9b"
 
 [[package]]
-name = "gloo-utils"
-version = "0.1.7"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "037fcb07216cb3a30f7292bd0176b050b7b9a052ba830ef7d5d65f6dc64ba58e"
-dependencies = [
- "js-sys",
- "serde",
- "serde_json",
- "wasm-bindgen",
- "web-sys",
-]
-
-[[package]]
 name = "gobject-sys"
 version = "0.18.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1902,16 +1869,7 @@ version = "0.12.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8a9ee70c43aaf417c914396645a0fa852624801b24ebb7ae78fe8272889ac888"
 dependencies = [
- "ahash 0.7.8",
-]
-
-[[package]]
-name = "hashbrown"
-version = "0.14.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e5274423e17b7c9fc20b6e7e208532f9b19825d82dfd615708b70edd83df41f1"
-dependencies = [
- "ahash 0.8.11",
+ "ahash",
 ]
 
 [[package]]
@@ -1939,53 +1897,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2304e00983f87ffb38b55b444b5e3b60a884b5d30c0fca7d82fe33449bbe55ea"
 
 [[package]]
-name = "hecs"
-version = "0.10.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e1cbc675ee8d97b4d206a985137f8ad59666538f56f906474f554467a63c776d"
-dependencies = [
- "hashbrown 0.14.5",
- "hecs-macros",
- "spin",
-]
-
-[[package]]
-name = "hecs-hierarchy"
-version = "0.12.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "addd824b77e8f43b25e630fe5a97ae51e4f16f411607310b034f609e0e4293cd"
-dependencies = [
- "hecs",
- "hecs-schedule",
- "once_cell",
- "smallvec",
-]
-
-[[package]]
-name = "hecs-macros"
-version = "0.10.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "052fc25b12dc326082605cd2098eb76050a72fa0c0e9ea7faaa3f58b565fc970"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn 2.0.79",
-]
-
-[[package]]
-name = "hecs-schedule"
-version = "0.7.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8efdd727f5665b12f6d92ee2fc0184420a07bd7044e602cff1ea8ea063c397ce"
-dependencies = [
- "anyhow",
- "atomic_refcell",
- "hecs",
- "smallvec",
- "thiserror",
-]
-
-[[package]]
 name = "hermit-abi"
 version = "0.3.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2002,15 +1913,6 @@ name = "hex"
 version = "0.4.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7f24254aa9a54b5c858eaee2f5bccdb46aaf0e486a595ed5fd8f86ba55232a70"
-
-[[package]]
-name = "hex_color"
-version = "3.0.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d37f101bf4c633f7ca2e4b5e136050314503dd198e78e325ea602c327c484ef0"
-dependencies = [
- "rand 0.8.5",
-]
 
 [[package]]
 name = "html5ever"
@@ -2605,7 +2507,6 @@ name = "moss_base"
 version = "0.0.0"
 dependencies = [
  "async-trait",
- "dunce",
  "hashbrown 0.15.0",
  "im",
  "radix_trie",
@@ -2626,7 +2527,6 @@ version = "0.1.0"
 dependencies = [
  "arcstr",
  "bstr",
- "derive_more",
  "serde",
 ]
 
@@ -3324,14 +3224,11 @@ dependencies = [
  "async-task",
  "async-trait",
  "derive_more",
- "dunce",
  "dyn-clone",
  "flume",
- "fnv",
  "futures",
  "hashbrown 0.15.0",
  "im",
- "lazy_static",
  "moss_base",
  "once_cell",
  "parking",
@@ -3384,12 +3281,10 @@ dependencies = [
 name = "platform_utl"
 version = "0.1.0"
 dependencies = [
- "anyhow",
  "async-task",
  "async-trait",
  "flume",
  "once_cell",
- "smol",
 ]
 
 [[package]]
@@ -3913,7 +3808,7 @@ checksum = "b1eee588578aff73f856ab961cd2f79e36bc45d7ded33a7562adba4667aecc0e"
 dependencies = [
  "proc-macro2",
  "quote",
- "serde_derive_internals 0.29.1",
+ "serde_derive_internals",
  "syn 2.0.79",
 ]
 
@@ -3983,17 +3878,6 @@ name = "serde_derive"
 version = "1.0.210"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "243902eda00fad750862fc144cea25caca5e20d615af0a81bee94ca738f1df1f"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn 2.0.79",
-]
-
-[[package]]
-name = "serde_derive_internals"
-version = "0.28.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e578a843d40b4189a4d66bba51d7684f57da5bd7c304c64e14bd63efbef49509"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -5254,31 +5138,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "tsify"
-version = "0.4.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d6b26cf145f2f3b9ff84e182c448eaf05468e247f148cf3d2a7d67d78ff023a0"
-dependencies = [
- "gloo-utils",
- "serde",
- "serde_json",
- "tsify-macros",
- "wasm-bindgen",
-]
-
-[[package]]
-name = "tsify-macros"
-version = "0.4.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7a94b0f0954b3e59bfc2c246b4c8574390d94a4ad4ad246aaf2fb07d7dfd3b47"
-dependencies = [
- "proc-macro2",
- "quote",
- "serde_derive_internals 0.28.0",
- "syn 2.0.79",
-]
-
-[[package]]
 name = "typeid"
 version = "1.0.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -5294,8 +5153,6 @@ checksum = "42ff0bf0c66b8238c6f3b578df37d0b7848e55df8577b3f74f92a69acceeb825"
 name = "uikit_models"
 version = "0.1.0"
 dependencies = [
- "anyhow",
- "moss_str",
  "serde",
  "ts-rs",
 ]
@@ -6117,8 +5974,6 @@ dependencies = [
  "anyhow",
  "derive_more",
  "hashbrown 0.15.0",
- "hecs",
- "hecs-hierarchy",
  "lazy_static",
  "moss_str",
  "once_cell",
@@ -6135,12 +5990,10 @@ dependencies = [
  "slotmap",
  "specta",
  "static_str_ops",
- "strum",
  "sysinfo",
  "tauri",
  "thiserror",
  "uikit_models",
- "workbench_models",
  "workbench_service_configuration_tao",
  "workbench_service_environment_tao",
  "workbench_service_user_profile_tao",
@@ -6152,9 +6005,7 @@ version = "0.1.0"
 dependencies = [
  "serde",
  "ts-rs",
- "tsify",
  "uikit_models",
- "wasm-bindgen",
 ]
 
 [[package]]
@@ -6174,11 +6025,9 @@ dependencies = [
  "platform_configuration",
  "platform_core",
  "platform_fs",
- "platform_user_profile",
  "platform_workspace",
  "serde_json",
  "workbench_service_configuration_common",
- "workbench_service_user_profile_tao",
 ]
 
 [[package]]
@@ -6294,7 +6143,6 @@ dependencies = [
  "anyhow",
  "cargo_metadata",
  "clap",
- "flume",
  "futures",
  "parking_lot",
  "pathdiff",
