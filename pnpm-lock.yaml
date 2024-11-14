@@ -58,12 +58,12 @@ importers:
     devDependencies:
       '@repo/moss-models':
         specifier: workspace:*
-        version: link:../../sdk/ts
+        version: link:../../sdk-ts/moss-models
       '@repo/typescript-config':
         specifier: workspace:*
         version: link:../../view/shared/config-typescript
 
-  sdk/ts:
+  sdk-ts/moss-models:
     dependencies:
       typescript:
         specifier: ^5.5.4
@@ -106,7 +106,7 @@ importers:
     devDependencies:
       '@repo/moss-models':
         specifier: workspace:*
-        version: link:../../sdk/ts
+        version: link:../../sdk-ts/moss-models
       '@repo/typescript-config':
         specifier: workspace:*
         version: link:../../view/shared/config-typescript
@@ -409,7 +409,7 @@ importers:
         version: link:../../../tools/icongen
       '@repo/moss-models':
         specifier: workspace:*
-        version: link:../../../sdk/ts
+        version: link:../../../sdk-ts/moss-models
       '@repo/moss-theme':
         specifier: workspace:*
         version: link:../../../lib/moss_theme
@@ -461,7 +461,7 @@ importers:
         version: link:../shared/config-eslint
       '@repo/moss-models':
         specifier: workspace:*
-        version: link:../../sdk/ts
+        version: link:../../sdk-ts/moss-models
       '@repo/moss-theme':
         specifier: workspace:*
         version: link:../../lib/moss_theme

@@ -29,7 +29,7 @@
       "path": "tools/icongen"
     },
     {
-      "path": "sdk/ts"
+      "path": "sdk-ts"
     },
     {
       "path": "view/shared/models/uikit"
