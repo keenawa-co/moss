@@ -1,6 +1,6 @@
 use arc_swap::{ArcSwap, ArcSwapOption};
 use hashbrown::HashSet;
-use platform_core::base::collection::extend::Extend;
+use moss_base::collection::extend::Extend;
 use radix_trie::{Trie, TrieCommon};
 use serde_json::Value;
 use std::sync::Arc;

@@ -1,0 +1,10 @@
+[package]
+name = "moss_str"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+arcstr = { workspace = true, features = ["serde"] }
+bstr.workspace = true
+derive_more.workspace = true
+serde = { workspace = true, features = ["derive"] }

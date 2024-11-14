@@ -1,5 +1,11 @@
 # Moss
 
+### Join Our Team 🚀
+
+We're looking for talented developers with skills in either **TypeScript**, **React**, or **Rust** to help us build _Moss Studio_.
+
+#### ⚠️ Interested? 👉 g10z3r@duck.com
+
 - [Contributing](#contributing)
 - [Requirements](#requirements)
 - [Usage](#usage)
@@ -31,6 +37,42 @@ sudo apt install libjavascriptcoregtk-4.1-dev
 sudo apt install libsoup-3.0-dev
 sudo apt install clang
 ```
+
+**Note for Windows users:**
+
+You need to first install GNU make before running the `make` scripts:
+
+1. Install Chocolatey from https://chocolatey.org/install
+
+2. In an administrative shell, run `choco install make`
+
+Now you should be free to go!
+
+<!-- ## Nix usage (not ready to be used!)
+
+Before starting the project, ensure you have [NIX](https://nixos.org/download/) installed and enable the [flakes](https://nixos.wiki/wiki/Flakes) experimental feature.
+
+To do this, add the following line to your Nix configuration file:
+
+- For user-specific settings, edit `~/.config/nix/nix.conf`:
+
+- For system-wide settings, edit `/etc/nix/nix.conf`:
+
+```
+experimental-features = nix-command flakes
+```
+
+### Installing Dependencies
+
+To install the necessary dependencies for the project, run the following command:
+
+```bash
+nix develop
+```
+
+This command will set up a development environment with all the required tools and libraries specified in the `flake.nix` file.
+
+**Note**: You will need to run `nix develop` in every new terminal session before starting development to make the tools available in that shell. This is because the environment is only active within the current shell session and does not persist across multiple terminal sessions. -->
 
 # Usage
 

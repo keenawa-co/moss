@@ -11,7 +11,7 @@ import {
   DropdownMenuLabel,
   Icon,
 } from "@repo/ui";
-import { invokeCmd } from "@/tauri";
+import { invokeIpc } from "@/lib/backend/tauri";
 
 export type DescribeActivityOutput = { tooltip: string; order: number };
 
@@ -34,9 +34,10 @@ const SessionComponent = () => {
 
   let getAllActivities = async () => {
     try {
-      console.log((await invokeCmd("describe_primary_activitybar_part")) as object);
-      console.log((await invokeCmd("describe_primary_sidebar_part")) as object);
-      console.log((await invokeCmd("get_view_content")) as object);
+      // console.log((await invokeIpc("describe_primary_activitybar_part")) as object);
+      // console.log((await invokeIpc("describe_primary_sidebar_part")) as object);
+      // console.log((await invokeIpc("get_view_content")) as object);
+      // console.log((await invokeCmd("get_menu_items")) as object);
     } catch (err) {
       console.error("Failed to get workbench state:", err);
     }
@@ -104,9 +105,18 @@ const SessionComponent = () => {
 export const Home: React.FC = () => {
   const { t } = useTranslation(["ns1", "ns2"]);
 
+  const handleNewWindowButton = async () => {
+    const response = await invokeIpc("create_new_window");
+    console.log(response);
+  };
+
   return (
     <div>
       <h1 className="text-[rgba(var(--color-primary))]">{t("title")}</h1>
+
+      <button className="bg-green-500 px-3" onClick={handleNewWindowButton}>
+        New Window
+      </button>
 
       <div>
         <Tooltip label="Test" className="text-[rgba(var(--color-primary))]">

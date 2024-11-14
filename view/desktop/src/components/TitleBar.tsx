@@ -1,8 +1,7 @@
-import { twMerge } from "tailwind-merge";
 import { WindowTitlebar } from "@/components";
 import { getOsType } from "@/components/window-controls/libs/plugin-os";
 import { OsType } from "@tauri-apps/plugin-os";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { cn } from "@/utils";
 
 interface TitleBarProps {
@@ -22,7 +21,7 @@ export const TitleBar = ({}: TitleBarProps) => {
   return (
     <header
       data-tauri-drag-region
-      className={cn("inset-0 bg-[rgba(var(--color-tool-bar-background))]", {
+      className={cn("inset-0 h-12 bg-[rgba(var(--color-tool-bar-background))]", {
         "rounded-t-lg": osType != "windows",
       })}
     >

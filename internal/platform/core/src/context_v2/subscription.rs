@@ -4,7 +4,7 @@ use std::mem;
 use std::ops::AddAssign;
 use std::{cell::Cell, rc::Rc, sync::Arc};
 
-use crate::base::collection::{BTreeMap, BTreeSet};
+use moss_base::collection::{BTreeMap, BTreeSet};
 
 pub fn post_inc<T: From<u8> + AddAssign<T> + Copy>(value: &mut T) -> T {
     let prev = *value;

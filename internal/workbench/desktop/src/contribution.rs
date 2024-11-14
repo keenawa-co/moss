@@ -1,9 +1,15 @@
+use moss_str::{localize, localized_string::LocalizedString};
 use platform_configuration::{
     configuration_registry::{
         ConfigurationNode, ConfigurationNodeType as Type,
         ConfigurationPropertySchema as PropertySchema, PropertyMap,
     },
     property_key,
+};
+
+use crate::{
+    view::{BuiltInViewGroups, TreeViewGroup, TreeViewGroupLocation},
+    Contribution,
 };
 
 lazy_static! {
@@ -86,4 +92,22 @@ lazy_static! {
         },
         parent_of: None,
     };
+}
+
+pub struct WorkbenchContribution;
+impl Contribution for WorkbenchContribution {
+    fn contribute(registry: &mut crate::RegistryManager) -> anyhow::Result<()> {
+        let mut views_registry_lock = registry.views.write();
+
+        views_registry_lock.append_view_group(
+            TreeViewGroupLocation::PrimaryBar,
+            TreeViewGroup {
+                id: BuiltInViewGroups::Launchpad.into(),
+                name: localize!("launchpad.group.name", "Launchpad"),
+                order: 1,
+            },
+        );
+
+        Ok(())
+    }
 }

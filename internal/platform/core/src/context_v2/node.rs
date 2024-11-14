@@ -12,7 +12,7 @@ use std::{
     },
 };
 
-use crate::base::collection::ImHashMap;
+use moss_base::collection::ImHashMap;
 
 // Represents the key for a node.
 slotmap::new_key_type! {

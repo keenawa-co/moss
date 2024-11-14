@@ -1,6 +1,3 @@
-use serde::Serialize;
-use ts_rs::TS;
-
 #[derive(Serialize, Debug, Clone, Eq, PartialEq, TS)]
 #[serde(rename_all = "camelCase")]
 #[ts(export, export_to = "models.ts")]

@@ -4,6 +4,10 @@ members = [
     "view/desktop/bin",
     "view/shared/models/uikit",
 
+    "crates/moss-base",
+    "crates/moss-str",
+    "crates/moss-fs",
+
     "internal/platform/core",
     "internal/platform/fs",
     "internal/platform/formation",
@@ -21,6 +25,8 @@ members = [
     "internal/workbench/service/environment/tao",
 
     "tools/xtask",
+    "crates/moss-str",
+    "crates/moss-fs",
 ]
 
 [profile.release]
@@ -38,6 +44,10 @@ opt-level = 3
 [workspace.dependencies]
 uikit_models = { path = "view/shared/models/uikit" }
 
+moss_base = { path = "crates/moss-base" }
+moss_str = { path = "crates/moss-str" }
+moss_fs = { path = "crates/moss-fs" }
+
 platform_core = { path = "internal/platform/core" }
 platform_utl = { path = "internal/platform/utl" }
 platform_configuration = { path = "internal/platform/configuration" }
@@ -54,16 +64,18 @@ workbench_service_configuration_tao = { path = "internal/workbench/service/confi
 workbench_service_user_profile_tao = { path = "internal/workbench/service/user_profile/tao" }
 workbench_service_environment_tao = { path = "internal/workbench/service/environment/tao" }
 
+arcstr = "1.2.0"
+bstr = "1.10.0"
 ts-rs = "10.0"
 thiserror = "1.0"
-tauri = "2.0.0-rc"
+tauri = { version = "2.0.6", features = ["devtools"] }
 specta = "2.0.0-rc.20"
 specta-typescript = "0.0.7"
 libc = "0.2.155"
 fnv = "1.0.7"
 anyhow = "1.0"
 notify = "6.1.1"
-hashbrown = "0.14.5"
+hashbrown = "0.15.0"
 arc-swap = "1.7.1"
 radix_trie = "0.2.1"
 parking_lot = "0.12.3"
@@ -96,3 +108,4 @@ dyn-clone = "1.0.17"
 
 hecs = "0.10.5"
 hecs-hierarchy = "0.12.1"
+homedir = "0.3.4"
