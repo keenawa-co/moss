@@ -29,8 +29,6 @@ impl<'a> UserSettings {
     }
 
     pub fn load_configuration(&self, ctx: &mut Context) -> Result<ConfigurationModel> {
-        // When the file doesn't exist, the code should not panic
-        // Instead, it should treat it as if the config file is empty
         let mut file = ctx.block_on_with(self.fs_service.read_file(&self.resource));
         let mut content = String::new();
 

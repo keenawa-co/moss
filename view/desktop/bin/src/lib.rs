@@ -81,10 +81,7 @@ pub fn run() {
     builder
         .setup(|app| {
             let platform_info = NativePlatformInfo::new();
-            // Windows does not use the "HOME" environmental variable
-            // Better to switch to a more platform-independent method
-            let home_dir = if cfg!(target_os = "unix") {
-                // homedir does not handle unix very well
+            let home_dir = if cfg!(target_family = "unix") {
                 PathBuf::from(env::var("HOME").unwrap())
             } else {
                 my_home()
