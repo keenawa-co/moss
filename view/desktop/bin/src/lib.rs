@@ -26,6 +26,7 @@ use workbench_desktop::Workbench;
 use crate::commands::*;
 use crate::constants::*;
 use crate::plugins as moss_plugins;
+use crate::utl::get_home_dir;
 
 #[macro_use]
 extern crate serde;
@@ -81,13 +82,7 @@ pub fn run() {
     builder
         .setup(|app| {
             let platform_info = NativePlatformInfo::new();
-            let home_dir = if cfg!(target_family = "unix") {
-                PathBuf::from(env::var("HOME").unwrap())
-            } else {
-                my_home()
-                    .unwrap()
-                    .expect("Failed to retrieve the home directory")
-            };
+            let home_dir = get_home_dir()?;
 
             let service_group = utl::create_service_registry(NativeWindowConfiguration {
                 home_dir,
