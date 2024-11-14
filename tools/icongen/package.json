@@ -1,10 +1,13 @@
 {
-  "name": "@repo/icons",
-  "exports": {},
+  "name": "@repo/icongen",
+  "exports": {
+    ".": "./build"
+  },
   "scripts": {
     "build": "rimraf build && svgr --no-prettier -d build assets"
   },
   "devDependencies": {
+    "@repo/typescript-config": "workspace:*",
     "@svgr/cli": "^8.1.0",
     "@svgr/rollup": "^8.1.0",
     "@types/react": "^18.3.3",
