@@ -32,15 +32,17 @@ pub fn set_enabled(menu: &Menu<Wry>, event: &BuiltInMenuEvent, enabled: bool) ->
     }
 }
 
-pub fn handle_event(_window: &Window, webview: &WebviewWindow, event: &MenuEvent) {
+pub fn handle_event(_window: &Window, webview_label: &str, event: &MenuEvent) {
     let event_id = event.id().0.as_str();
+    let app_handle = _window.app_handle().clone();
     match event_id {
         "file.newWindow" => create_child_window(
-            webview.clone(),
+            webview_label,
             "/",
-            &format!("{OTHER_WINDOW_PREFIX}{}", webview.webview_windows().len()),
+            &format!("{OTHER_WINDOW_PREFIX}{}",app_handle.webview_windows().len()),
             "Moss Studio",
             (DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT),
+            app_handle
         )
         .expect("Failed to create new window"),
 
