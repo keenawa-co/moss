@@ -1,10 +1,12 @@
 use anyhow::Result;
 use platform_core::context_v2::async_context::AsyncContext;
 use std::path::PathBuf;
+use homedir::my_home;
 use tauri::{AppHandle, Manager, State};
 use workbench_desktop::WorkbenchState;
 
 use crate::AppState;
+use crate::utl::get_home_dir;
 
 #[tauri::command(async)]
 #[specta::specta]
@@ -19,7 +21,8 @@ pub async fn fetch_all_themes() -> Result<Vec<String>, String> {
 #[tauri::command(async)]
 #[specta::specta]
 pub async fn read_theme(theme_name: String) -> Result<String, String> {
-    let theme_file_path = PathBuf::from(std::env::var("HOME").unwrap())
+    let home_dir = get_home_dir()?;
+    let theme_file_path = home_dir
         .join(".config")
         .join("moss")
         .join("themes")

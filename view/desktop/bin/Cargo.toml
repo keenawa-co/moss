@@ -32,6 +32,7 @@ tracing.workspace = true
 tracing-subscriber.workspace = true
 flume.workspace = true
 async-task.workspace = true
+homedir.workspace = true
 
 platform_core.workspace = true
 platform_workspace.workspace = true
