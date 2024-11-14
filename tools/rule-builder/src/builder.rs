@@ -1,9 +1,28 @@
 // use serde::Serialize;
 use serde_json::{json, Value};
 
+// TODO:
+// define AST parts ("===", "==", "var", etc.) as constants 
+// #[rustfmt::skip]
+// lazy_static! {
+//     static ref EQUALS_LITERAL: ReadOnlyStr = read_only_str!("==");
+//     static ref EQUAL_LITERAL: ReadOnlyStr = read_only_str!("viewTitleContext");
+//     static ref MENU_NAMESPACE_ID_VIEW_ITEM: ReadOnlyStr = read_only_str!("viewItem");
+//     static ref MENU_NAMESPACE_ID_VIEW_ITEM_CONTEXT: ReadOnlyStr = read_only_str!("viewItemContext");
+// }
+
+
 pub struct Rule {
     pub value: Value,
 }
+
+impl ToString for Rule {
+    fn to_string(&self) -> String {
+        // should return READABLE string (example: jexl format)
+        todo!()
+    }
+}
+
 
 pub struct RuleBuilder {
     conditions: Vec<Value>,
@@ -18,7 +37,7 @@ impl RuleBuilder {
 
     pub fn equal(mut self, key: &str, value: impl Into<Value>) -> Self {
         // Equality condition (`==`)
-        let condition = json!({ "==": [{ "var": key }, value.into()] });
+        let condition = json!({ EQUAL_LITERAL: [{ "var": key }, value.into()] });
         self.conditions.push(condition);
         self
     }
