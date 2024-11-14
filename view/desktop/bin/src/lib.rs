@@ -161,10 +161,8 @@ fn create_main_window(handle: &AppHandle, url: &str) -> WebviewWindow {
         ),
     };
     let webview_window = create_window(handle, config);
-
-    let webview_window_clone = webview_window.clone();
     webview_window.on_menu_event(move |window, event| {
-        menu::handle_event(window, &webview_window_clone, &event)
+        menu::handle_event(window, label.as_str(), &event)
     });
 
     webview_window

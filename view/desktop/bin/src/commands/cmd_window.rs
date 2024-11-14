@@ -8,11 +8,13 @@ struct EventAData {
     data: String,
 }
 
+// According to https://docs.rs/tauri/2.1.1/tauri/webview/struct.WebviewWindowBuilder.html
+// We should call WebviewWindowBuilder from async commands
 #[tauri::command]
-pub fn create_new_window(parent_window: WebviewWindow) {
+pub async fn create_new_window(parent_window: WebviewWindow) {
     let app_handle = parent_window.app_handle().clone();
     create_child_window(
-        parent_window,
+        parent_window.label(),
         "/",
         &format!(
             "{OTHER_WINDOW_PREFIX}{}",
@@ -20,6 +22,7 @@ pub fn create_new_window(parent_window: WebviewWindow) {
         ),
         "Moss Studio",
         (DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT),
+        app_handle,
     )
     .expect("Failed to create new window");
 }
