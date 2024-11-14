@@ -3,7 +3,7 @@ use moss_str::{
     bstring::BStringForFrontend, localized_string::LocalizedString, read_only_str, ReadOnlyStr,
 };
 
-pub type MenuId = ReadOnlyStr;
+pub type ActionCommandId = ReadOnlyStr;
 
 #[rustfmt::skip]
 lazy_static! {
@@ -139,10 +139,11 @@ impl MenuGroup {
 
 #[derive(Debug, Serialize, Clone)]
 pub struct CommandAction {
-    pub id: MenuId,
+    pub id: ActionCommandId,
     pub title: LocalizedString,
     pub tooltip: Option<String>,
     pub description: Option<LocalizedString>,
+    pub icon: Option<String>,
 }
 
 #[derive(Debug, Serialize, Clone)]
@@ -156,8 +157,9 @@ pub struct ActionMenuItem {
 
 #[derive(Debug, Serialize, Clone)]
 pub struct SubmenuMenuItem {
-    pub submenu_id: MenuId,
-    pub title: LocalizedString,
+    pub submenu_id: ActionCommandId,
+    pub default_action_id: Option<ActionCommandId>,
+    pub title: Option<LocalizedString>,
     pub group: Option<MenuGroup>,
     pub order: Option<i64>,
     pub when: Option<ReadOnlyStr>,
