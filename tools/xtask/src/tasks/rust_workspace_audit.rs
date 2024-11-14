@@ -5,7 +5,7 @@ use futures::future::join_all;
 use smol::fs;
 use std::{io, sync::Arc};
 use toml::Value;
-use tracing::{error, info, warn};
+use tracing::{trace, error, info, warn};
 
 use crate::config::ConfigFile;
 
@@ -28,8 +28,7 @@ pub async fn check_dependencies_job(
             let config_file_clone = Arc::clone(&config_file);
 
             tokio::task::spawn(async move {
-                info!("analyzing '{}'...", package.name);
-
+                trace!("analyzing '{}'...", package.name);
                 let cargo_toml_content = match fs::read_to_string(&package.manifest_path).await {
                     Ok(content) => content,
                     Err(e) => {
@@ -80,7 +79,7 @@ async fn handle_package_dependencies(
             if let Some(ignored_list) = ignored_deps.rust_workspace_audit.ignore.get(&package.name)
             {
                 if ignored_list.contains(&dep_name) {
-                    info!("ignoring {} dependency in '{}'", dep_name, package.name);
+                    trace!("ignoring {} dependency in '{}'", dep_name, package.name);
                     continue;
                 }
             }
@@ -100,3 +99,4 @@ async fn handle_package_dependencies(
         }
     }
 }
+
