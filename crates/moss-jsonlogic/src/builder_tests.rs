@@ -1,6 +1,6 @@
 #[cfg(test)]
 mod tests {
-    use crate::builder::RuleBuilder;
+    use crate::builder::{RuleBuilder, LogicRuleBuilder};
     use serde_json::json;
 
     #[test]
@@ -70,25 +70,12 @@ mod tests {
 
     #[test]
     fn test_or_operation() {
-        let age_rule = RuleBuilder::new().greater_than("age", 18);
-        let status_rule = RuleBuilder::new().equal("status", "active");
-
-        let rule = RuleBuilder::new()
-            .or(vec![age_rule, status_rule])
+        let rule = LogicRuleBuilder::new()
+            .child(RuleBuilder::new().greater_than("age", 18))
+            .or()
+            .child(RuleBuilder::new().equal("status", "active"))
             .build()
             .expect("Failed to build rule");
-
-        // let rulenew = RuleBuilder::new()
-        //     .child(
-        //         RuleBuilder::new().less_than(key, value)
-        //         //...
-        //     )
-        //     .and()
-        //     .child(
-        //         //...
-        //     )
-        //     .build()
-        //     .expect("Failed to build rule");
 
         assert_eq!(
             rule.value,
@@ -103,9 +90,10 @@ mod tests {
 
     #[test]
     fn test_combined_and_operation() {
-        let rule = RuleBuilder::new()
-            .greater_than("age", 18)
-            .and(RuleBuilder::new().equal("status", "active"))
+        let rule = LogicRuleBuilder::new()
+            .child(RuleBuilder::new().greater_than("age", 18))
+            .and()
+            .child(RuleBuilder::new().equal("status", "active"))
             .build()
             .expect("Failed to build rule");
 
@@ -122,8 +110,9 @@ mod tests {
 
     #[test]
     fn test_not_operation() {
-        let rule = RuleBuilder::new()
-            .not(RuleBuilder::new().equal("status", "inactive"))
+        let rule = LogicRuleBuilder::new()
+            .not()
+            .child(RuleBuilder::new().equal("status", "inactive"))
             .build()
             .expect("Failed to build rule");
 
@@ -131,6 +120,87 @@ mod tests {
             rule.value,
             json!({
                 "!": { "==": [{ "var": "status" }, "inactive"] }
+            })
+        );
+    }
+
+    #[test]
+    fn test_nested_and_or_operations() {
+        let rule = LogicRuleBuilder::new()
+            .child(
+                LogicRuleBuilder::new()
+                    .child(RuleBuilder::new().greater_than("age", 18))
+                    .or()
+                    .child(RuleBuilder::new().equal("status", "active"))
+            )
+            .and()
+            .child(RuleBuilder::new().less_than("score", 100))
+            .build()
+            .expect("Failed to build rule");
+
+        assert_eq!(
+            rule.value,
+            json!({
+                "and": [
+                    {
+                        "or": [
+                            { ">": [{ "var": "age" }, 18] },
+                            { "==": [{ "var": "status" }, "active"] }
+                        ]
+                    },
+                    { "<": [{ "var": "score" }, 100] }
+                ]
+            })
+        );
+    }
+
+    #[test]
+    fn test_cast_to_boolean_operation() {
+        let rule = RuleBuilder::new()
+            .cast_to_boolean("verified")
+            .build()
+            .expect("Failed to build rule");
+
+        assert_eq!(
+            rule.value,
+            json!({
+                "!!": { "var": "verified" }
+            })
+        );
+    }
+
+    #[test]
+    fn test_complex_condition_with_all_operations() {
+        let rule = LogicRuleBuilder::new()
+            .child(
+                LogicRuleBuilder::new()
+                    .child(RuleBuilder::new().greater_than("age", 18))
+                    .and()
+                    .child(RuleBuilder::new().less_than_or_equal("age", 65))
+            )
+            .or()
+            .child(
+                LogicRuleBuilder::new()
+                    .not()
+                    .child(RuleBuilder::new().equal("status", "retired"))
+            )
+            .build()
+            .expect("Failed to build rule");
+
+        assert_eq!(
+            rule.value,
+            json!({
+                "or": [
+                    {
+                        "and": [
+                            { ">": [{ "var": "age" }, 18] },
+                            { "<=": [{ "var": "age" }, 65] }
+                        ]
+                    },
+                    {
+                        "!": { "==": [{ "var": "status" }, "retired"] }
+                    }
+                ]
             })
         );
     }

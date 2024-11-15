@@ -1,11 +1,8 @@
-// use serde::Serialize;
 use serde_json::{json, Value};
 use lazy_static::lazy_static;
 use moss_str::{read_only_str, ReadOnlyStr};
 
-// TODO:
-// define AST parts ("===", "==", VAR_LITERAL, etc.) as constants 
-#[rustfmt::skip]
+// Constants for AST parts
 lazy_static! {
     static ref EQUAL_LITERAL: ReadOnlyStr = read_only_str!("==");
     static ref STRICT_EQUAL_LITERAL: ReadOnlyStr = read_only_str!("===");
@@ -22,18 +19,15 @@ lazy_static! {
     static ref GREATER_THAN_OR_EQUAL_LITERAL: ReadOnlyStr = read_only_str!(">=");
 }
 
-
 pub struct Rule {
     pub value: Value,
 }
 
 impl ToString for Rule {
     fn to_string(&self) -> String {
-        // should return READABLE string (example: jexl format)
-        todo!()
+        format!("{:?}", self.value)
     }
 }
-
 
 pub struct RuleBuilder {
     conditions: Vec<Value>,
@@ -41,89 +35,60 @@ pub struct RuleBuilder {
 
 impl RuleBuilder {
     pub fn new() -> Self {
-        RuleBuilder {
-            conditions: Vec::new(),
-        }
+        RuleBuilder { conditions: Vec::new() }
     }
 
-    pub fn equal(mut self, key: &str, value: impl Into<Value>) -> Self {
-        // Equality condition (`==`)
-        let condition = json!({ EQUAL_LITERAL.to_string(): [{ VAR_LITERAL.to_string(): key }, value.into()] });
-        self.conditions.push(condition);
-        self
-    }
-
-    pub fn strict_equal(mut self, key: &str, value: impl Into<Value>) -> Self {
-        // Strict equality condition (`===`)
-        let condition = json!({ STRICT_EQUAL_LITERAL.to_string(): [{ VAR_LITERAL.to_string(): key }, value.into()] });
-        self.conditions.push(condition);
-        self
-    }
-
-    pub fn and(mut self, other: RuleBuilder) -> Self {
-        self.conditions.extend(other.conditions);
-        self
-    }
-
-    pub fn or(mut self, conditions: Vec<RuleBuilder>) -> Self {
-        let or_conditions: Vec<Value> = conditions.into_iter().map(|c| c.build().unwrap().value).collect();
-        let condition = json!({ OR_LITERAL.to_string(): or_conditions });
-        self.conditions.push(condition);
-        self
-    }
     pub fn not_equal(mut self, key: &str, value: impl Into<Value>) -> Self {
-        // Inequality (`!=`)
         let condition = json!({ NOT_EQUAL_LITERAL.to_string(): [{ VAR_LITERAL.to_string(): key }, value.into()] });
         self.conditions.push(condition);
         self
     }
 
     pub fn strict_not_equal(mut self, key: &str, value: impl Into<Value>) -> Self {
-        // Strict inequality (`!==`)
         let condition = json!({ STRICT_NOT_EQUAL_LITERAL.to_string(): [{ VAR_LITERAL.to_string(): key }, value.into()] });
         self.conditions.push(condition);
         self
     }
 
-    pub fn not(mut self, condition: RuleBuilder) -> Self {
-        // Logical NOT (`!`)
-        let condition = json!({ NOT_LITERAL.to_string(): condition.build().unwrap().value });
+    pub fn equal(mut self, key: &str, value: impl Into<Value>) -> Self {
+        let condition = json!({ EQUAL_LITERAL.to_string(): [{ VAR_LITERAL.to_string(): key }, value.into()] });
         self.conditions.push(condition);
         self
     }
 
-    pub fn double_not(mut self, key: &str) -> Self {
-        // Double NOT (`!!`)
-        let condition = json!({ DOUBLE_NOT_LITERAL.to_string(): { VAR_LITERAL.to_string(): key } });
+    pub fn strict_equal(mut self, key: &str, value: impl Into<Value>) -> Self {
+        let condition = json!({ STRICT_EQUAL_LITERAL.to_string(): [{ VAR_LITERAL.to_string(): key }, value.into()] });
         self.conditions.push(condition);
         self
     }
-
 
     pub fn less_than(mut self, key: &str, value: impl Into<Value>) -> Self {
-        // Less than (`<`)
         let condition = json!({ LESS_THAN_LITERAL.to_string(): [{ VAR_LITERAL.to_string(): key }, value.into()] });
         self.conditions.push(condition);
         self
     }
 
+
     pub fn less_than_or_equal(mut self, key: &str, value: impl Into<Value>) -> Self {
-        // Less than or equal (`<=`)
         let condition = json!({ LESS_THAN_OR_EQUAL_LITERAL.to_string(): [{ VAR_LITERAL.to_string(): key }, value.into()] });
         self.conditions.push(condition);
         self
     }
 
     pub fn greater_than(mut self, key: &str, value: impl Into<Value>) -> Self {
-        // Greater than (`>`)
         let condition = json!({ GREATER_THAN_LITERAL.to_string(): [{ VAR_LITERAL.to_string(): key }, value.into()] });
         self.conditions.push(condition);
         self
     }
 
     pub fn greater_than_or_equal(mut self, key: &str, value: impl Into<Value>) -> Self {
-        // Greater than or equal (`>=`)
         let condition = json!({ GREATER_THAN_OR_EQUAL_LITERAL.to_string(): [{ VAR_LITERAL.to_string(): key }, value.into()] });
+        self.conditions.push(condition);
+        self
+    }
+
+    pub fn cast_to_boolean(mut self, key: &str) -> Self {
+        let condition = json!({ DOUBLE_NOT_LITERAL.to_string(): { VAR_LITERAL.to_string(): key } });
         self.conditions.push(condition);
         self
     }
@@ -134,7 +99,54 @@ impl RuleBuilder {
         } else if self.conditions.len() == 1 {
             Ok(Rule { value: self.conditions.into_iter().next().unwrap() })
         } else {
-            // Multiple conditions - wrap in "and"
+            Ok(Rule { value: json!({ AND_LITERAL.to_string(): self.conditions }) })
+        }
+    }
+}
+
+pub struct LogicRuleBuilder {
+    pub conditions: Vec<Value>,
+}
+
+impl LogicRuleBuilder {
+    pub fn new() -> Self {
+        LogicRuleBuilder { conditions: Vec::new() }
+    }
+
+    pub fn child(mut self, rule: RuleBuilder) -> Self {
+        match rule.build() {
+            Ok(r) => self.conditions.push(r.value),
+            Err(_) => (),
+        }
+        self
+    }
+
+    pub fn and(mut self) -> Self {
+        let wrapped = json!({ AND_LITERAL.to_string(): self.conditions });
+        self.conditions = vec![wrapped];
+        self
+    }
+
+    pub fn or(mut self) -> Self {
+        let wrapped = json!({ OR_LITERAL.to_string(): self.conditions });
+        self.conditions = vec![wrapped];
+        self
+    }
+
+    pub fn not(mut self) -> Self {
+        if let Some(cond) = self.conditions.pop() {
+            let wrapped = json!({ NOT_LITERAL.to_string(): cond });
+            self.conditions.push(wrapped);
+        }
+        self
+    }
+
+    pub fn build(self) -> Result<Rule, &'static str> {
+        if self.conditions.is_empty() {
+            Err("No conditions provided")
+        } else if self.conditions.len() == 1 {
+            Ok(Rule { value: self.conditions.into_iter().next().unwrap() })
+        } else {
             Ok(Rule { value: json!({ AND_LITERAL.to_string(): self.conditions }) })
         }
     }
