@@ -9,6 +9,5 @@ im.workspace = true
 rustc-hash.workspace = true
 serde = { workspace = true, features = ["derive"] }
 async-trait.workspace = true
-dunce.workspace = true
 radix_trie.workspace = true
 hashbrown = { workspace = true }

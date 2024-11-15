@@ -7,8 +7,6 @@ edition = "2021"
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
-tsify = "0.4.5"
-wasm-bindgen = "0.2.95"
 serde = { workspace = true, features = ["derive"] }
 ts-rs.workspace = true
 uikit_models.workspace = true

@@ -38,6 +38,16 @@ sudo apt install libsoup-3.0-dev
 sudo apt install clang
 ```
 
+**Note for Windows users:**
+
+You need to first install GNU make before running the `make` scripts:
+
+1. Install Chocolatey from https://chocolatey.org/install
+
+2. In an administrative shell, run `choco install make`
+
+Now you should be free to go!
+
 <!-- ## Nix usage (not ready to be used!)
 
 Before starting the project, ensure you have [NIX](https://nixos.org/download/) installed and enable the [flakes](https://nixos.wiki/wiki/Flakes) experimental feature.

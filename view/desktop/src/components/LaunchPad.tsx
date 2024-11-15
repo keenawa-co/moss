@@ -45,7 +45,7 @@ const AccordionsList = () => {
   };
 
   return (
-    <div className="h-[calc(100%_-_42px)] overflow-auto">
+    <div className="h-[calc(100%_-_42px)] overflow-auto bg-[#F4F4F4]">
       <Resizable ref={ref} vertical className="h-full" proportionalLayout={false} onDragEnd={handleOnDragEnd}>
         {accordions.map((accordion, index) => (
           <ResizablePanel

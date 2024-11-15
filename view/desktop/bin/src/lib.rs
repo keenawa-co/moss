@@ -24,9 +24,11 @@ use window::{create_window, CreateWindowInput};
 use workbench_desktop::window::{NativePlatformInfo, NativeWindowConfiguration};
 use workbench_desktop::Workbench;
 use crate::cli::cli_handler;
+
 use crate::commands::*;
 use crate::constants::*;
 use crate::plugins as moss_plugins;
+use crate::utl::get_home_dir;
 
 #[macro_use]
 extern crate serde;
@@ -83,11 +85,10 @@ pub fn run() {
     builder
         .setup(|app| {
             let platform_info = NativePlatformInfo::new();
+            let home_dir = get_home_dir()?;
 
             let service_group = utl::create_service_registry(NativeWindowConfiguration {
-                home_dir: std::env::var("HOME")
-                    .expect("Failed to retrieve the $HOME environment variable")
-                    .into(),
+                home_dir,
                 full_screen: false,
                 platform_info: platform_info.clone(),
             })?;

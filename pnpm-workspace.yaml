@@ -3,4 +3,6 @@ packages:
   - "view/shared/*"
   - "lib/*"
   - "tools/*"
-  - "sdk/*"
+  - "sdk-ts/*"
+  - "internal/workbench/*"
+  - "view/shared/models/*"

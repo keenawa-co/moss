@@ -1,8 +1,7 @@
-import Icon, { Icons } from "@/src/Icon";
+import { cn } from "../utils/utils";
 import * as MenuPrimitive from "@radix-ui/react-menu";
-import { ElementRef, ComponentPropsWithoutRef, forwardRef } from "react";
-import { Scope } from "@radix-ui/react-context";
-import { cn } from "@/src/utils/utils";
+import { ComponentPropsWithoutRef, ElementRef, forwardRef } from "react";
+import Icon from "../Icon";
 import { ScopedProps } from "./types";
 
 export type CheckboxItemElement = ElementRef<typeof MenuPrimitive.CheckboxItem>;
