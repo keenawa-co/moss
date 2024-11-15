@@ -12,13 +12,16 @@ use platform_core::platform::cross::client::CrossPlatformClient;
 use platform_workspace::WorkspaceId;
 use rand::random;
 use std::env;
+use std::path::PathBuf;
 use std::rc::Rc;
 use std::sync::Arc;
+use homedir::{my_home};
 use tauri::{AppHandle, Manager, RunEvent, WebviewUrl, WebviewWindow, WindowEvent};
 use tauri_plugin_log::{fern::colors::ColoredLevelConfig, Target, TargetKind};
 use window::{create_window, CreateWindowInput};
 use workbench_desktop::window::{NativePlatformInfo, NativeWindowConfiguration};
 use workbench_desktop::Workbench;
+
 
 use crate::commands::*;
 use crate::constants::*;
@@ -78,11 +81,19 @@ pub fn run() {
     builder
         .setup(|app| {
             let platform_info = NativePlatformInfo::new();
+            // Windows does not use the "HOME" environmental variable
+            // Better to switch to a more platform-independent method
+            let home_dir = if cfg!(target_os = "unix") {
+                // homedir does not handle unix very well
+                PathBuf::from(env::var("HOME").unwrap())
+            } else {
+                my_home()
+                    .unwrap()
+                    .expect("Failed to retrieve the home directory")
+            };
 
             let service_group = utl::create_service_registry(NativeWindowConfiguration {
-                home_dir: std::env::var("HOME")
-                    .expect("Failed to retrieve the $HOME environment variable")
-                    .into(),
+                home_dir,
                 full_screen: false,
                 platform_info: platform_info.clone(),
             })?;
