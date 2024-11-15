@@ -1,6 +1,16 @@
-{
+ {
     "name": "@repo/workbench-models",
-    "private": true,
-    "version": "1.0.0",
-    "main": "index.ts"
-}
+    "exports": {
+      ".": "./index.ts"
+    },
+    "scripts": {
+      "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "devDependencies": {
+      "@repo/typescript-config": "workspace:*"
+    },
+    "dependencies": {
+      "typescript": "^5.5.4"
+    }
+  }
+  

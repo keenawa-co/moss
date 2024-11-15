@@ -39,4 +39,4 @@ A monorepo is a single repository containing multiple distinct projects, with we
 
 ### Icons
 
-To add new icon add **`.svg`** file to `view/shared/icons/assets` directory and than run `pnpm build` inside `view/shared/icons`
+To add new icon add **`.svg`** file to `tools/icongen/assets` directory and than run `pnpm build` inside `tools/icongen`

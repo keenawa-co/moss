@@ -6,4 +6,14 @@ desktop = [
     "tauri-plugin-os",
     "tauri-specta",
     "tauri-plugin-fs",
+    "tauri-plugin-log",
+    "tauri-plugin-clipboard-manager",
+    "tauri-plugin-window-state"
+]
+
+xtask = [
+    "cargo_metadata",
+    "clap",
+    "pathdiff",
+    "toml"
 ]
