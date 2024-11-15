@@ -125,7 +125,7 @@ export const Home: React.FC = () => {
       </div>
       <SessionComponent />
       <div>
-        <DropdownMenu>
+        {/* <DropdownMenu>
           <DropdownMenuTrigger className="text-[rgba(var(--color-primary))]">Click me!</DropdownMenuTrigger>
 
           <DropdownMenuContent>
@@ -134,7 +134,7 @@ export const Home: React.FC = () => {
               <DropdownMenuLabel>Menu item 2</DropdownMenuLabel>
             </DropdownMenuItem>
           </DropdownMenuContent>
-        </DropdownMenu>
+        </DropdownMenu> */}
       </div>
 
       <div className="flex">

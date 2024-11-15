@@ -5,6 +5,7 @@ import {
   DragStartEvent,
   KeyboardSensor,
   MouseSensor,
+  PointerSensor,
   UniqueIdentifier,
   closestCenter,
   useSensor,
@@ -16,11 +17,13 @@ import {
   horizontalListSortingStrategy,
   sortableKeyboardCoordinates,
 } from "@dnd-kit/sortable";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger, Icon, cn } from "@repo/ui";
+import { DropdownMenu as DM, Icon, cn } from "@repo/ui";
 import { OsType } from "@tauri-apps/plugin-os";
 import React, { HTMLProps, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { HeadBarButton } from "./HeadBarButton";
+import { ActionsGroup } from "../ActionsGroup";
+import { DNDWrapper } from "./DNDWrapper";
 
 interface WidgetBarProps extends HTMLProps<HTMLDivElement> {
   os: OsType;
@@ -34,16 +37,22 @@ export const WidgetBar = ({ os, className, ...props }: WidgetBarProps) => {
       id: 1,
       label: "Alerts",
       icon: "HeadBarAlerts" as const,
+      actions: ["1"],
+      defaultAction: false,
     },
     {
       id: 2,
       label: "Discovery",
       icon: "HeadBarDiscovery" as const,
+      actions: ["1"],
+      defaultAction: true,
     },
     {
       id: 3,
       label: "Community",
       icon: "HeadBarCommunity" as const,
+      actions: ["1", "2"],
+      defaultAction: true,
     },
   ]);
 
@@ -121,7 +130,7 @@ export const WidgetBar = ({ os, className, ...props }: WidgetBarProps) => {
 
     const observer = new IntersectionObserver(handleIntersection, {
       root: document.querySelector("header"),
-      threshold: 0.99, // this is set to 0.99 because for some reason it doesn't work with 1 on linux
+      threshold: 0.99, // this is set to 0.99 instead of 1 because for some reason Linux always sees the last item as not intersecting
     });
 
     Array.from(DNDListRef.current.children).forEach((child) => {
@@ -144,14 +153,12 @@ export const WidgetBar = ({ os, className, ...props }: WidgetBarProps) => {
     const reversedList = [...overflownDNDItemsIds].reverse();
 
     return (
-      <DropdownMenu>
-        <DropdownMenuTrigger
-          className={cn("DropdownMenuTrigger rounded p-[7px] transition-colors hover:bg-[#D3D3D3]", classNameTrigger)}
-        >
+      <DM.Root>
+        <DM.Trigger className={cn("DM.Trigger rounded p-[7px] transition-colors hover:bg-[#D3D3D3]", classNameTrigger)}>
           <Icon icon="ThreeHorizontalDots" className="flex size-4 items-center justify-center" />
-        </DropdownMenuTrigger>
+        </DM.Trigger>
 
-        <DropdownMenuContent className={cn("bg-white", classNameContent)}>
+        <DM.Content className={cn("z-50 bg-white", classNameContent)}>
           {reversedList.map((id) => {
             const item = DNDItems.find((item) => id === item.id)!;
             return (
@@ -161,8 +168,8 @@ export const WidgetBar = ({ os, className, ...props }: WidgetBarProps) => {
               </button>
             );
           })}
-        </DropdownMenuContent>
-      </DropdownMenu>
+        </DM.Content>
+      </DM.Root>
     );
   };
 
@@ -201,13 +208,19 @@ export const WidgetBar = ({ os, className, ...props }: WidgetBarProps) => {
                     data-itemid={item.id}
                     key={`listItem-${item.id}`}
                   >
-                    <HeadBarButton
+                    <DNDWrapper
                       key={`listButton-${item.id}`}
                       sortableId={item.id}
-                      icon={item.icon}
-                      label={item.label}
-                      className={cn("h-[30px] text-ellipsis px-2")}
-                    />
+                      draggingClassName="z-50 cursor-grabbing opacity-50 shadow-2xl"
+                    >
+                      <ActionsGroup
+                        icon={item.icon}
+                        label={item.label}
+                        actions={item.actions}
+                        defaultAction={item.defaultAction}
+                      />
+                    </DNDWrapper>
+
                     {overflownDNDItemsIds.length > 0 && DNDItems.length - overflownDNDItemsIds.length === index + 1 && (
                       <OverflownMenu key={`OverflowMenuBetweenMenuItems-${item.id}-${index}`} />
                     )}
@@ -219,10 +232,12 @@ export const WidgetBar = ({ os, className, ...props }: WidgetBarProps) => {
             {draggedId
               ? createPortal(
                   <DragOverlay>
-                    <HeadBarButton
-                      className="h-[30px] cursor-grabbing !bg-[#e0e0e0] px-2 shadow-lg"
+                    <ActionsGroup
                       icon={DNDItems.find((item) => item.id === draggedId)?.icon!}
                       label={DNDItems.find((item) => item.id === draggedId)?.label}
+                      actions={DNDItems.find((item) => item.id === draggedId)?.actions!}
+                      defaultAction={DNDItems.find((item) => item.id === draggedId)?.defaultAction}
+                      className="flex h-[30px] cursor-grabbing rounded border !border-[#c5c5c5] bg-[#D3D3D3] shadow-lg"
                     />
                   </DragOverlay>,
                   document.body
