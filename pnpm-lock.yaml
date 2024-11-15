@@ -37,6 +37,8 @@ importers:
         specifier: workspace:*
         version: link:../../../view/shared/config-typescript
 
+  internal/workbench/models: {}
+
   lib/moss_lang:
     dependencies:
       i18next-resources-for-ts:

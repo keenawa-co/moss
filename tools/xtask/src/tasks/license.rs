@@ -106,7 +106,7 @@ async fn get_first_license_symlink_path(
     let crate_path = crate_path.as_ref();
     for (index, license_file) in license_files.iter().enumerate() {
         let path_to_license = crate_path.join(license_file);
-        info!("analyzing '{}'...", path_to_license.display());
+        trace!("analyzing '{}'...", path_to_license.display());
         match fs::symlink_metadata(&path_to_license).await {
             Ok(metadata) if metadata.is_file() || metadata.file_type().is_symlink() => {
                 return Some((path_to_license, index));
