@@ -13,6 +13,8 @@ lazy_static! {
     static ref MENU_NAMESPACE_ID_VIEW_ITEM_CONTEXT: ReadOnlyStr = read_only_str!("viewItemContext");
 }
 
+pub const MENU_NAMESPACE_ID_HEAD_ITEM: ReadOnlyStr = read_only_str!("headItem");
+
 #[derive(Debug)]
 pub enum BuiltInMenuNamespaces {
     ViewTitle,

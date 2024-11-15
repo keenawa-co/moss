@@ -19,7 +19,10 @@ use std::{
 
 use anyhow::Result;
 use contribution::{WorkbenchContribution, WORKBENCH_TAO_WINDOW};
-use contributions::{links::LinksContribution, resents::RecentsContribution};
+use contributions::{
+    layout_controls::LayoutControlsContribution, links::LinksContribution,
+    resents::RecentsContribution,
+};
 use hashbrown::HashMap;
 use menu::{MenuItem, MenuRegistry};
 use moss_str::ReadOnlyStr;
@@ -202,6 +205,7 @@ impl Workbench {
         self.add_contribution(WorkbenchContribution::contribute)?;
         self.add_contribution(RecentsContribution::contribute)?;
         self.add_contribution(LinksContribution::contribute)?;
+        self.add_contribution(LayoutControlsContribution::contribute)?;
 
         self.add_part(PrimaryActivityBarPart::new());
         self.add_part(PrimarySideBarPart::new());

@@ -1,7 +1,7 @@
-use moss_str::localize;
+use moss_str::{localize, ReadOnlyStr};
 
 use crate::{
-    menu::{ActionMenuItem, BuiltInMenuNamespaces, CommandAction, MenuItem},
+    menu::{ActionMenuItem, CommandAction, MenuItem, SubmenuMenuItem},
     Contribution,
 };
 
@@ -17,7 +17,7 @@ impl Contribution for LayoutControlsContribution {
             // Toggle Primary Side Bar
             //
             (
-                BuiltInMenuNamespaces::ViewTitleContext.into(), // FIXME:
+                crate::menu::MENU_NAMESPACE_ID_HEAD_ITEM,
                 MenuItem::Action(ActionMenuItem {
                     command: CommandAction {
                         id: "layoutControls.openPrimarySidebar".into(),
@@ -33,7 +33,7 @@ impl Contribution for LayoutControlsContribution {
                 }),
             ),
             (
-                BuiltInMenuNamespaces::ViewTitleContext.into(), // FIXME:
+                crate::menu::MENU_NAMESPACE_ID_HEAD_ITEM,
                 MenuItem::Action(ActionMenuItem {
                     command: CommandAction {
                         id: "layoutControls.closePrimarySidebar".into(),
@@ -52,7 +52,7 @@ impl Contribution for LayoutControlsContribution {
             // Toggle Secondary Side Bar
             //
             (
-                BuiltInMenuNamespaces::ViewTitleContext.into(), // FIXME:
+                crate::menu::MENU_NAMESPACE_ID_HEAD_ITEM,
                 MenuItem::Action(ActionMenuItem {
                     command: CommandAction {
                         id: "layoutControls.openSecondarySidebar".into(),
@@ -71,7 +71,7 @@ impl Contribution for LayoutControlsContribution {
                 }),
             ),
             (
-                BuiltInMenuNamespaces::ViewTitleContext.into(), // FIXME:
+                crate::menu::MENU_NAMESPACE_ID_HEAD_ITEM,
                 MenuItem::Action(ActionMenuItem {
                     command: CommandAction {
                         id: "layoutControls.closeSecondarySidebar".into(),
@@ -93,7 +93,7 @@ impl Contribution for LayoutControlsContribution {
             // Toggle Panel
             //
             (
-                BuiltInMenuNamespaces::ViewTitleContext.into(), // FIXME:
+                crate::menu::MENU_NAMESPACE_ID_HEAD_ITEM,
                 MenuItem::Action(ActionMenuItem {
                     command: CommandAction {
                         id: "layoutControls.openPanel".into(),
@@ -109,7 +109,7 @@ impl Contribution for LayoutControlsContribution {
                 }),
             ),
             (
-                BuiltInMenuNamespaces::ViewTitleContext.into(), // FIXME:
+                crate::menu::MENU_NAMESPACE_ID_HEAD_ITEM,
                 MenuItem::Action(ActionMenuItem {
                     command: CommandAction {
                         id: "layoutControls.closePanel".into(),
@@ -129,7 +129,21 @@ impl Contribution for LayoutControlsContribution {
         //
         // Customize Layout
         //
-        // menus_registry_lock.append_menu_item(menu_id, item);
+        let customize_layout_menu_id = ReadOnlyStr::from("layoutControls.customizeLayout");
+        menus_registry_lock.append_menu_item(
+            crate::menu::MENU_NAMESPACE_ID_HEAD_ITEM,
+            MenuItem::Submenu(SubmenuMenuItem {
+                submenu_id: customize_layout_menu_id,
+                default_action_id: None,
+                title: Some(localize!(
+                    "layoutControls.customizeLayout",
+                    "Customize Layout"
+                )),
+                group: None,
+                order: None,
+                when: None,
+            }),
+        );
 
         drop(menus_registry_lock);
 
