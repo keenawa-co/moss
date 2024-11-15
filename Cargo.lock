@@ -2604,6 +2604,8 @@ dependencies = [
 name = "moss-jsonlogic"
 version = "0.1.0"
 dependencies = [
+ "lazy_static",
+ "moss_str",
  "serde",
  "serde_json",
 ]

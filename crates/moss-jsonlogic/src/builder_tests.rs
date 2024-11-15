@@ -78,17 +78,17 @@ mod tests {
             .build()
             .expect("Failed to build rule");
 
-        let rulenew = RuleBuilder::new()
-            .child(
-                RuleBuilder::new().less_than(key, value)
-                //...
-            )
-            .and()
-            .child(
-                //...
-            )
-            .build()
-            .expect("Failed to build rule");
+        // let rulenew = RuleBuilder::new()
+        //     .child(
+        //         RuleBuilder::new().less_than(key, value)
+        //         //...
+        //     )
+        //     .and()
+        //     .child(
+        //         //...
+        //     )
+        //     .build()
+        //     .expect("Failed to build rule");
 
         assert_eq!(
             rule.value,
