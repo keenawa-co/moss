@@ -1,5 +1,5 @@
 [package]
-name = "rule-builder"
+name = "moss-jsonlogic"
 version = "0.1.0"
 edition = "2021"
 

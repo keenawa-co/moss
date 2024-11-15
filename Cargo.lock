@@ -2601,6 +2601,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "moss-jsonlogic"
+version = "0.1.0"
+dependencies = [
+ "serde",
+ "serde_json",
+]
+
+[[package]]
 name = "moss_base"
 version = "0.0.0"
 dependencies = [
@@ -3817,14 +3825,6 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 1.0.109",
-]
-
-[[package]]
-name = "rule-builder"
-version = "0.1.0"
-dependencies = [
- "serde",
- "serde_json",
 ]
 
 [[package]]
