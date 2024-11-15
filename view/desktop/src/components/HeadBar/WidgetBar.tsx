@@ -5,7 +5,6 @@ import {
   DragStartEvent,
   KeyboardSensor,
   MouseSensor,
-  PointerSensor,
   UniqueIdentifier,
   closestCenter,
   useSensor,
@@ -162,10 +161,12 @@ export const WidgetBar = ({ os, className, ...props }: WidgetBarProps) => {
           {reversedList.map((id) => {
             const item = DNDItems.find((item) => id === item.id)!;
             return (
-              <button className="flex w-full gap-1 rounded px-2 py-2 text-[#000] hover:bg-[#D3D3D3] hover:bg-none">
-                <Icon icon={item.icon} />
-                <span>{item.label}</span>
-              </button>
+              <ActionsGroup
+                icon={item.icon}
+                label={item.label}
+                actions={item.actions}
+                defaultAction={item.defaultAction}
+              />
             );
           })}
         </DM.Content>
