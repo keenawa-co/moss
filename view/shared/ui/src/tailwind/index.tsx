@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useMemo } from "react";
-import applyTheme from "./applyTheme";
+import { applyTheme } from "@repo/moss-theme";
 import { Theme } from "@repo/moss-models";
 
 type Props = {

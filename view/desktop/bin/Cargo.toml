@@ -30,6 +30,7 @@ parking_lot.workspace = true
 tracing.workspace = true
 flume.workspace = true
 async-task.workspace = true
+homedir.workspace = true
 
 platform_core.workspace = true
 platform_workspace.workspace = true

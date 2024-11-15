@@ -1,16 +1,18 @@
 import { ContentLayout, LaunchPad, Menu, RootLayout } from "@/components";
 import "@/i18n";
 import "@repo/ui/src/fonts.css";
-import { Suspense, useState } from "react";
+import { Suspense } from "react";
+import { useSelector } from "react-redux";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Resizable, ResizablePanel } from "./components/Resizable";
 import { Home, Logs, Settings } from "./components/pages";
 import { useInitializeApp } from "./hooks/useInitializeApp";
+import { RootState } from "./store";
 import { callServiceMethod } from "./main";
 
 const App: React.FC = () => {
   const { isInitializing, initializationError } = useInitializeApp();
-  const [sideBarVisible] = useState(true);
+  const isSidebarVisible = useSelector((state: RootState) => state.sidebar.sidebarVisible);
 
   callServiceMethod("doSomething");
 
@@ -38,7 +40,7 @@ const App: React.FC = () => {
   return (
     <RootLayout>
       <Resizable proportionalLayout={false}>
-        <ResizablePanel minSize={100} preferredSize={255} snap visible={sideBarVisible} className="select-none">
+        <ResizablePanel minSize={100} preferredSize={255} snap visible={isSidebarVisible} className="select-none">
           <LaunchPad />
         </ResizablePanel>
         <ResizablePanel>
