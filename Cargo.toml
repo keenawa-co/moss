@@ -7,6 +7,7 @@ members = [
     "crates/moss-base",
     "crates/moss-str",
     "crates/moss-fs",
+    "crates/moss-jsonlogic",
 
     "internal/platform/core",
     "internal/platform/fs",
@@ -25,7 +26,6 @@ members = [
     "internal/workbench/service/environment/tao",
 
     "tools/xtask", 
-    "tools/rule-builder",
     "crates/moss-str",
     "crates/moss-fs",
 ]
