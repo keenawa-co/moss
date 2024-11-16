@@ -1,8 +1,6 @@
 use serde::Serialize;
 use ts_rs::TS;
 
-use uikit_models::primitive::Tooltip;
-
 pub mod theming {
     use super::*;
 

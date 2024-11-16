@@ -28,10 +28,6 @@ use hashbrown::HashMap;
 use menu::MenuItem;
 use moss_str::ReadOnlyStr;
 use once_cell::unsync::OnceCell;
-use parts::{
-    primary_activitybar::PrimaryActivityBarPart, primary_sidebar::PrimarySideBarPart, AnyPart,
-    PartId,
-};
 use platform_configuration::{
     attribute_name, configuration_policy::ConfigurationPolicyService,
     configuration_registry::ConfigurationRegistry, AbstractConfigurationService,
@@ -102,8 +98,6 @@ pub struct Workbench {
     font_size_service: Atom<MockFontSizeService>,
     _observe_font_size_service: OnceCell<Subscription>,
     tao_handle: OnceCell<Rc<AppHandle>>,
-
-    parts: HashMap<PartId, Box<dyn Any>>,
 }
 
 unsafe impl<'a> Sync for Workbench {}
@@ -143,7 +137,6 @@ impl Workbench {
             font_size_service: font_service_atom,
             _observe_font_size_service: OnceCell::new(),
             tao_handle: OnceCell::new(),
-            parts: HashMap::new(),
         })
     }
 
@@ -151,19 +144,11 @@ impl Workbench {
         &self.registry
     }
 
-    pub fn add_part<T: AnyPart + 'static>(&mut self, part: T) {
-        self.parts.insert(part.id(), Box::new(part));
-    }
-
     pub fn add_contribution(
         &mut self,
         f: impl FnOnce(&mut crate::RegistryManager) -> anyhow::Result<()>,
     ) -> Result<()> {
         f(&mut self.registry)
-    }
-
-    pub fn get_part<T: AnyPart + 'static>(&self, part_id: PartId) -> Option<&T> {
-        self.parts.get(part_id)?.downcast_ref::<T>()
     }
 
     pub fn get_view<T: Send + Sync + Debug + 'static>(
@@ -190,9 +175,6 @@ impl Workbench {
         self.add_contribution(RecentsContribution::contribute)?;
         self.add_contribution(LinksContribution::contribute)?;
         self.add_contribution(LayoutControlsContribution::contribute)?;
-
-        self.add_part(PrimaryActivityBarPart::new());
-        self.add_part(PrimarySideBarPart::new());
 
         ctx.apply(|cx| self.initialize_services(cx))??;
 

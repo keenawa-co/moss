@@ -1,13 +1,6 @@
-use std::sync::Arc;
-
 use tauri::State;
 use workbench_desktop::contributions::resents::{RecentsViewContent, RecentsViewModel};
-use workbench_desktop::menu::{BuiltInMenuNamespaces, MenuItem};
-use workbench_desktop::parts::primary_activitybar::{
-    DescribeActivityBarPartOutput, PrimaryActivityBarPart,
-};
-use workbench_desktop::parts::primary_sidebar::{DescribeSideBarPartOutput, PrimarySideBarPart};
-use workbench_desktop::parts::{AnyPart, Parts};
+use workbench_desktop::menu::MenuItem;
 use workbench_desktop::window::NativePlatformInfo;
 
 use crate::AppState;
