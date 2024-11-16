@@ -12,7 +12,7 @@ DESKTOP_DIR := view/desktop
 STORYBOOK_DIR := view/storybook
 DOCS_DIR := view/docs
 WEB_DIR := view/web
-THEME_GENERATOR_DIR := tools/theme-generator
+THEME_GENERATOR_DIR := tools/themegen
 ICONS_DIR := tools/icongen
 
 WORKBENCH_MODELS_DIR := internal/workbench/models
@@ -103,7 +103,7 @@ gen-themes:
 ## Generate Icons
 .PHONY: gen-icons
 gen-icons:
-	@cd $(ICONS_DIR) && $(PNPM) run build
+	@cd $(ICONS_DIR) && $(PNPM) start
 
 ## Generate Shared Models
 .PHONY: gen-shared-models
