@@ -1,14 +1,14 @@
 use anyhow::Result;
-use moss_str::{localize, localized_string::LocalizedString, ReadOnlyStr};
+use moss_str::{localize, ReadOnlyStr};
 use once_cell::sync::Lazy;
 use quote::quote;
 use static_str_ops::static_format;
-use std::sync::Arc;
+use std::{rc::Rc, sync::Arc};
 
 use crate::{
     menu::{
         ActionMenuItem, BuiltInMenuGroups, BuiltInMenuNamespaces, CommandAction, MenuGroup,
-        MenuItem, SubmenuMenuItem,
+        MenuItem, MenuItemVisibility, SubmenuMenuItem,
     },
     view::{BuiltInViewGroups, TreeViewDescriptor},
     Contribution,
@@ -78,6 +78,19 @@ impl Contribution for RecentsContribution {
 
         let recents_context = static_format!("view == '{recents_view_id}'");
 
+        #[rustfmt::skip]
+        let (
+            view_title_context_menu_group_this,
+            view_title_context_menu_group_views,
+            view_title_context_menu_group_inline,
+        ) = {
+            let this = Rc::new(MenuGroup::new_ordered(0, BuiltInMenuGroups::This));
+            let views = Rc::new(MenuGroup::new_ordered(1, BuiltInMenuGroups::Views));
+            let inline = Rc::new(MenuGroup::new_ordered(2, BuiltInMenuGroups::Inline));
+
+            (this, views, inline)
+        };
+
         menus_registry_lock.append_menu_items(vec![
             (
                 BuiltInMenuNamespaces::ViewTitleContext.into(),
@@ -88,11 +101,12 @@ impl Contribution for RecentsContribution {
                         tooltip: None,
                         description: None,
                         icon: None,
+                        toggled: None,
                     },
-                    group: Some(MenuGroup::new_ordered(0, BuiltInMenuGroups::This)),
+                    group: Some(Rc::clone(&view_title_context_menu_group_this)),
                     order: Some(1),
                     when: Some(recents_context.into()),
-                    toggled: None,
+                    visibility: MenuItemVisibility::Classic,
                 }),
             ),
             (
@@ -104,11 +118,12 @@ impl Contribution for RecentsContribution {
                         tooltip: None,
                         description: None,
                         icon: None,
+                        toggled: None,
                     },
-                    group: Some(MenuGroup::new_ordered(1, BuiltInMenuGroups::Views)),
+                    group: Some(Rc::clone(&view_title_context_menu_group_views)),
                     order: Some(1),
                     when: Some(recents_context.into()),
-                    toggled: Some("viewState == 'mockState'".into()),
+                    visibility: MenuItemVisibility::Classic,
                 }),
             ),
         ]);
@@ -128,11 +143,12 @@ impl Contribution for RecentsContribution {
                         tooltip: None,
                         description: None,
                         icon: None,
+                        toggled: None,
                     },
-                    group: Some(MenuGroup::new_unordered(BuiltInMenuGroups::Inline)),
+                    group: Some(Rc::clone(&view_title_context_menu_group_inline)),
                     order: Some(1),
                     when: Some(recents_item_context.into()),
-                    toggled: None,
+                    visibility: MenuItemVisibility::Classic,
                 }),
             ),
             (
@@ -144,11 +160,12 @@ impl Contribution for RecentsContribution {
                         tooltip: None,
                         description: None,
                         icon: None,
+                        toggled: None,
                     },
-                    group: Some(MenuGroup::new_unordered(BuiltInMenuGroups::Inline)),
+                    group: Some(Rc::clone(&view_title_context_menu_group_inline)),
                     order: Some(2),
                     when: Some(recents_item_context.into()),
-                    toggled: None,
+                    visibility: MenuItemVisibility::Classic,
                 }),
             ),
         ]);
@@ -166,11 +183,12 @@ impl Contribution for RecentsContribution {
                         tooltip: None,
                         description: None,
                         icon: None,
+                        toggled: None,
                     },
                     group: None,
                     order: Some(1),
                     when: Some(recents_item_context.into()),
-                    toggled: None,
+                    visibility: MenuItemVisibility::Classic,
                 }),
             ),
             (
@@ -182,14 +200,28 @@ impl Contribution for RecentsContribution {
                         tooltip: None,
                         description: None,
                         icon: None,
+                        toggled: None,
                     },
                     group: None,
                     order: None,
                     when: Some(recents_item_context.into()),
-                    toggled: None,
+                    visibility: MenuItemVisibility::Classic,
                 }),
             ),
         ]);
+
+        #[rustfmt::skip]
+        let (
+            view_item_context_menu_group_navigation,
+            view_item_context_menu_group_preview,
+            view_item_context_menu_group_remove,
+        ) = {
+            let navigation = Rc::new(MenuGroup::new_ordered(0, BuiltInMenuGroups::Navigation));
+            let preview = Rc::new(MenuGroup::new_ordered(1, BuiltInMenuGroups::Preview));
+            let remove = Rc::new(MenuGroup::new_ordered(2, BuiltInMenuGroups::Remove));
+
+            (navigation, preview, remove)
+        };
 
         menus_registry_lock.append_menu_items(vec![
             (
@@ -201,11 +233,12 @@ impl Contribution for RecentsContribution {
                         tooltip: None,
                         description: None,
                         icon: None,
+                        toggled: None,
                     },
-                    group: Some(MenuGroup::new_ordered(0, BuiltInMenuGroups::Navigation)),
+                    group: Some(Rc::clone(&view_item_context_menu_group_navigation)),
                     order: Some(1),
                     when: Some(recents_item_context.into()),
-                    toggled: None,
+                    visibility: MenuItemVisibility::Classic,
                 }),
             ),
             (
@@ -217,11 +250,12 @@ impl Contribution for RecentsContribution {
                         tooltip: None,
                         description: None,
                         icon: None,
+                        toggled: None,
                     },
-                    group: Some(MenuGroup::new_ordered(0, BuiltInMenuGroups::Navigation)),
+                    group: Some(Rc::clone(&view_item_context_menu_group_navigation)),
                     order: Some(2),
                     when: Some(recents_item_context.into()),
-                    toggled: None,
+                    visibility: MenuItemVisibility::Classic,
                 }),
             ),
         ]);
@@ -232,9 +266,10 @@ impl Contribution for RecentsContribution {
                 submenu_id: open_with_profile_menu_id,
                 default_action_id: None,
                 title: Some(localize!("recents.openWithProfile", "Open with Profile")),
-                group: Some(MenuGroup::new_ordered(0, BuiltInMenuGroups::Navigation)),
+                group: Some(Rc::clone(&view_item_context_menu_group_navigation)),
                 order: Some(3),
                 when: Some(recents_item_context.into()),
+                visibility: MenuItemVisibility::Classic,
             }),
         )]);
 
@@ -248,11 +283,12 @@ impl Contribution for RecentsContribution {
                         tooltip: None,
                         description: None,
                         icon: None,
+                        toggled: None,
                     },
-                    group: Some(MenuGroup::new_ordered(1, BuiltInMenuGroups::Preview)),
+                    group: Some(Rc::clone(&view_item_context_menu_group_preview)),
                     order: Some(1),
                     when: Some(recents_item_context.into()),
-                    toggled: None,
+                    visibility: MenuItemVisibility::Classic,
                 }),
             ),
             (
@@ -264,11 +300,12 @@ impl Contribution for RecentsContribution {
                         tooltip: None,
                         description: None,
                         icon: None,
+                        toggled: None,
                     },
-                    group: Some(MenuGroup::new_ordered(2, BuiltInMenuGroups::Remove)),
+                    group: Some(Rc::clone(&view_item_context_menu_group_remove)),
                     order: Some(1),
                     when: Some(recents_item_context.into()),
-                    toggled: None,
+                    visibility: MenuItemVisibility::Classic,
                 }),
             ),
         ]);
