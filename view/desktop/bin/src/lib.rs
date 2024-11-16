@@ -12,16 +12,13 @@ use platform_core::platform::cross::client::CrossPlatformClient;
 use platform_workspace::WorkspaceId;
 use rand::random;
 use std::env;
-use std::path::PathBuf;
 use std::rc::Rc;
 use std::sync::Arc;
-use homedir::{my_home};
-use tauri::{AppHandle, Manager, RunEvent, WebviewUrl, WebviewWindow, WindowEvent};
+use tauri::{AppHandle, Manager, RunEvent, WebviewWindow, WindowEvent};
 use tauri_plugin_log::{fern::colors::ColoredLevelConfig, Target, TargetKind};
 use window::{create_window, CreateWindowInput};
 use workbench_desktop::window::{NativePlatformInfo, NativeWindowConfiguration};
 use workbench_desktop::Workbench;
-
 
 use crate::commands::*;
 use crate::constants::*;
@@ -117,10 +114,8 @@ pub fn run() {
             cmd_dummy::fetch_all_themes,
             cmd_dummy::read_theme,
             cmd_base::native_platform_info,
-            cmd_base::describe_primary_activitybar_part,
-            cmd_base::describe_primary_sidebar_part,
             cmd_base::get_view_content,
-            cmd_base::get_menu_items,
+            cmd_base::get_menu_items_by_namespace,
         ])
         .on_window_event(|window, event| match event {
             #[cfg(target_os = "macos")]

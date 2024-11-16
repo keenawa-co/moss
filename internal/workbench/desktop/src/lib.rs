@@ -1,6 +1,7 @@
 pub mod contribution;
 pub mod menu;
 pub mod parts;
+pub mod registry;
 pub mod view;
 pub mod window;
 
@@ -24,10 +25,9 @@ use contributions::{
     resents::RecentsContribution,
 };
 use hashbrown::HashMap;
-use menu::{MenuItem, MenuRegistry};
+use menu::MenuItem;
 use moss_str::ReadOnlyStr;
 use once_cell::unsync::OnceCell;
-use parking_lot::RwLock;
 use parts::{
     primary_activitybar::PrimaryActivityBarPart, primary_sidebar::PrimarySideBarPart, AnyPart,
     PartId,
@@ -46,8 +46,8 @@ use platform_fs::disk::file_system_service::{
 };
 use platform_user_profile::user_profile_service::UserProfileService as PlatformUserProfileService;
 use platform_workspace::{Workspace, WorkspaceId};
+use registry::RegistryManager;
 use tauri::{AppHandle, Emitter, WebviewWindow};
-use view::ViewsRegistry;
 use workbench_service_configuration_tao::configuration_service::WorkspaceConfigurationService;
 use workbench_service_environment_tao::environment_service::NativeEnvironmentService;
 use workbench_service_user_profile_tao::user_profile_service::UserProfileService;
@@ -91,20 +91,6 @@ pub enum WorkbenchState {
 
 pub trait Contribution {
     fn contribute(registry: &mut RegistryManager) -> Result<()>;
-}
-
-pub struct RegistryManager {
-    pub views: Arc<RwLock<ViewsRegistry>>,
-    pub menus: Arc<RwLock<MenuRegistry>>,
-}
-
-impl RegistryManager {
-    pub fn new() -> Self {
-        let views = Arc::new(RwLock::new(ViewsRegistry::new()));
-        let menus = Arc::new(RwLock::new(MenuRegistry::new()));
-
-        Self { views, menus }
-    }
 }
 
 pub struct Workbench {
@@ -189,14 +175,12 @@ impl Workbench {
         views_registry_lock.get_view_model::<T>(group_id, view_id)
     }
 
-    pub fn get_menu_items<'a>(
-        &self,
-        menu_id: impl Into<&'a ReadOnlyStr>,
-    ) -> Option<&Vec<MenuItem>> {
-        // let menu_registry_lock = self.registry.menus.read();
-        // menu_registry_lock.get_menu_items(menu_id).cloned()
+    pub fn get_menu_items_by_namespace<'a>(&self, namespace: String) -> Option<Vec<MenuItem>> {
+        let menu_registry_lock = self.registry.menus.read();
 
-        todo!()
+        menu_registry_lock
+            .get_menu_items_by_namespace(&ReadOnlyStr::from(namespace))
+            .cloned()
     }
 
     pub fn initialize<'a>(&'a mut self, ctx: &mut AsyncContext) -> Result<()> {

@@ -192,35 +192,3 @@ pub struct SubmenuMenuItem {
     pub when: Option<ReadOnlyStr>,
     pub visibility: MenuItemVisibility,
 }
-
-pub struct MenuRegistry {
-    menus: HashMap<ReadOnlyStr, Vec<MenuItem>>,
-}
-
-impl MenuRegistry {
-    pub fn new() -> Self {
-        Self {
-            menus: HashMap::new(),
-        }
-    }
-
-    pub fn append_menu_item(&mut self, menu_id: ReadOnlyStr, item: MenuItem) {
-        self.menus
-            .entry(menu_id.into())
-            .or_insert_with(Vec::new)
-            .push(item);
-    }
-
-    pub fn append_menu_items<I>(&mut self, items: I)
-    where
-        I: IntoIterator<Item = (ReadOnlyStr, MenuItem)>,
-    {
-        for (menu_id, item) in items {
-            self.append_menu_item(menu_id, item);
-        }
-    }
-
-    pub fn get_menu_items(&self, menu_id: &ReadOnlyStr) -> Option<&Vec<MenuItem>> {
-        self.menus.get(menu_id)
-    }
-}
