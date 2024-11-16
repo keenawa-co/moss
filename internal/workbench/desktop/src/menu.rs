@@ -1,7 +1,7 @@
+use std::rc::Rc;
+
 use hashbrown::HashMap;
-use moss_str::{
-    bstring::BStringForFrontend, localized_string::LocalizedString, read_only_str, ReadOnlyStr,
-};
+use moss_str::{localized_string::LocalizedString, read_only_str, ReadOnlyStr};
 
 pub type ActionCommandId = ReadOnlyStr;
 
@@ -117,10 +117,22 @@ pub enum MenuItem {
     Submenu(SubmenuMenuItem),
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Serialize)]
+pub enum MenuItemVisibility {
+    #[serde(rename = "classic")]
+    #[default]
+    Classic,
+    #[serde(rename = "hidden")]
+    Hidden,
+    #[serde(rename = "compact")]
+    Compact,
+}
+
 #[derive(Debug, Clone, Serialize)]
 pub struct MenuGroup {
     id: ReadOnlyStr,
     order: Option<i64>,
+    description: Option<LocalizedString>,
 }
 
 impl MenuGroup {
@@ -128,6 +140,7 @@ impl MenuGroup {
         Self {
             id: id.into(),
             order: Some(order),
+            description: None,
         }
     }
 
@@ -135,6 +148,7 @@ impl MenuGroup {
         Self {
             id: id.into(),
             order: None,
+            description: None,
         }
     }
 }
@@ -146,25 +160,37 @@ pub struct CommandAction {
     pub tooltip: Option<String>,
     pub description: Option<LocalizedString>,
     pub icon: Option<String>,
+    pub toggled: Option<CommandActionToggle>,
+}
+
+#[derive(Debug, Serialize, Clone)]
+pub struct CommandActionToggle {
+    pub condition: ReadOnlyStr,
+    pub icon: Option<String>,
+    pub tooltip: Option<String>,
+    pub title: Option<LocalizedString>,
 }
 
 #[derive(Debug, Serialize, Clone)]
 pub struct ActionMenuItem {
     pub command: CommandAction,
-    pub group: Option<MenuGroup>,
+    pub group: Option<Rc<MenuGroup>>,
     pub order: Option<i64>,
     pub when: Option<ReadOnlyStr>,
-    pub toggled: Option<ReadOnlyStr>,
+    pub visibility: MenuItemVisibility,
 }
+
+pub type SubmenuRef = moss_str::ReadOnlyStr;
 
 #[derive(Debug, Serialize, Clone)]
 pub struct SubmenuMenuItem {
     pub submenu_id: ActionCommandId,
     pub default_action_id: Option<ActionCommandId>,
     pub title: Option<LocalizedString>,
-    pub group: Option<MenuGroup>,
+    pub group: Option<Rc<MenuGroup>>,
     pub order: Option<i64>,
     pub when: Option<ReadOnlyStr>,
+    pub visibility: MenuItemVisibility,
 }
 
 pub struct MenuRegistry {
