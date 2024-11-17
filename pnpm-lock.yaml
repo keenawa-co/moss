@@ -27,12 +27,25 @@ importers:
         specifier: ^2.0.6
         version: 2.3.0
 
+  crates/moss-str:
+    dependencies:
+      typescript:
+        specifier: ^5.5.4
+        version: 5.6.3
+    devDependencies:
+      '@repo/typescript-config':
+        specifier: workspace:*
+        version: link:../../view/shared/config-typescript
+
   internal/workbench/models:
     dependencies:
       typescript:
         specifier: ^5.5.4
         version: 5.6.3
     devDependencies:
+      '@repo/moss-str':
+        specifier: workspace:*
+        version: link:../../../crates/moss-str
       '@repo/typescript-config':
         specifier: workspace:*
         version: link:../../../view/shared/config-typescript

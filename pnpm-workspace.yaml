@@ -6,3 +6,4 @@ packages:
   - "sdk-ts/*"
   - "internal/workbench/*"
   - "view/shared/models/*"
+  - "crates/*"

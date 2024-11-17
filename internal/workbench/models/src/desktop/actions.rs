@@ -30,7 +30,7 @@ pub struct MenuGroup {
     #[ts(type = "string")]
     id: ReadOnlyStr,
     order: Option<i64>,
-    #[ts(type = "string | null")]
+    #[ts(type = "LocalizedString | null")]
     description: Option<LocalizedString>,
 }
 
