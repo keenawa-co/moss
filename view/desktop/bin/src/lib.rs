@@ -5,8 +5,8 @@ mod plugins;
 mod utl;
 mod window;
 
-pub mod constants;
 mod cli;
+pub mod constants;
 
 use platform_core::context_v2::ContextCell;
 use platform_core::platform::cross::client::CrossPlatformClient;
@@ -14,20 +14,20 @@ use platform_workspace::WorkspaceId;
 use rand::random;
 use std::env;
 use std::rc::Rc;
-use std::sync::Arc;
 use std::sync::atomic::{AtomicU32, AtomicUsize, Ordering};
+use std::sync::Arc;
 
+use crate::cli::cli_handler;
+use crate::commands::*;
+use crate::constants::*;
+use crate::plugins as moss_plugins;
+use crate::utl::get_home_dir;
 use tauri::{AppHandle, Manager, RunEvent, WebviewUrl, WebviewWindow, WindowEvent};
 use tauri_plugin_cli::CliExt;
 use tauri_plugin_log::{fern::colors::ColoredLevelConfig, Target, TargetKind};
 use window::{create_window, CreateWindowInput};
 use workbench_desktop::window::{NativePlatformInfo, NativeWindowConfiguration};
 use workbench_desktop::Workbench;
-use crate::cli::cli_handler;
-use crate::commands::*;
-use crate::constants::*;
-use crate::utl::get_home_dir;
-use crate::plugins as moss_plugins;
 
 #[macro_use]
 extern crate serde;
@@ -102,7 +102,7 @@ pub fn run() {
             let app_state = AppState {
                 workbench: Arc::new(workbench),
                 platform_info,
-                window_counter: AtomicUsize::new(0)
+                window_counter: AtomicUsize::new(0),
             };
 
             {
@@ -146,18 +146,20 @@ pub fn run() {
                 match app_handle.cli().matches() {
                     Ok(matches) => {
                         let subcommand = matches.subcommand;
-                        if subcommand.is_none(){
+                        if subcommand.is_none() {
                             let _ = create_main_window(app_handle, "/");
+
+                            // let _ = create_main_window(app_handle, "/");
                         } else {
-                            tauri::async_runtime::spawn(
-                                cli_handler(subcommand.unwrap(), app_handle.clone())
-                            );
+                            tauri::async_runtime::spawn(cli_handler(
+                                subcommand.unwrap(),
+                                app_handle.clone(),
+                            ));
                         }
-                    },
+                    }
                     Err(_) => {}
                 };
-
-            },
+            }
 
             #[cfg(target_os = "macos")]
             RunEvent::ExitRequested { api, .. } => {
@@ -170,7 +172,8 @@ pub fn run() {
 }
 
 fn create_main_window(handle: &AppHandle, url: &str) -> WebviewWindow {
-    let window_number = handle.state::<AppState>()
+    let window_number = handle
+        .state::<AppState>()
         .window_counter
         .fetch_add(1, Ordering::SeqCst);
     let label = format!("{MAIN_WINDOW_PREFIX}{}", window_number);
@@ -185,9 +188,7 @@ fn create_main_window(handle: &AppHandle, url: &str) -> WebviewWindow {
         ),
     };
     let webview_window = create_window(handle, config);
-    webview_window.on_menu_event(move |window, event| {
-        menu::handle_event(window, label.as_str(), &event)
-    });
+    webview_window.on_menu_event(move |window, event| menu::handle_event(window, &event));
 
     webview_window
 }

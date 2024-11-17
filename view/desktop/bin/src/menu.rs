@@ -1,10 +1,10 @@
 use strum::{AsRefStr as StrumAsRefStr, Display as StrumDisplay, EnumString as StrumEnumString};
 use tauri::{
-    menu::{Menu, MenuEvent, MenuId, MenuItemKind, PredefinedMenuItem},
-    AppHandle, Emitter, Manager, WebviewWindow, Window, Wry,
+    menu::{Menu, MenuEvent, PredefinedMenuItem},
+    AppHandle, Manager, Window, Wry,
 };
 
-use crate::{create_main_window, window::create_child_window, DEFAULT_WINDOW_HEIGHT, DEFAULT_WINDOW_WIDTH, OTHER_WINDOW_PREFIX};
+use crate::create_main_window;
 
 #[derive(Debug, StrumEnumString, StrumDisplay, StrumAsRefStr)]
 pub enum BuiltInMenuEvent {
@@ -14,29 +14,15 @@ pub enum BuiltInMenuEvent {
     CloseWindow,
 }
 
-const REQUIRE_LIBRARY: &[BuiltInMenuEvent] = &[BuiltInMenuEvent::NewWindow];
-
-pub fn set_enabled(menu: &Menu<Wry>, event: &BuiltInMenuEvent, enabled: bool) -> tauri::Result<()> {
-    match menu.get(event.as_ref()) {
-        Some(MenuItemKind::MenuItem(i)) => i.set_enabled(enabled),
-        Some(MenuItemKind::Submenu(i)) => i.set_enabled(enabled),
-        Some(MenuItemKind::Predefined(_)) => Ok(()),
-        Some(MenuItemKind::Check(i)) => i.set_enabled(enabled),
-        Some(MenuItemKind::Icon(i)) => i.set_enabled(enabled),
-        None => {
-            // FIXME: error!("Failed to get menu item: {event:?}");
-            Ok(())
-        }
-    }
-}
-
-pub fn handle_event(_window: &Window, webview_label: &str, event: &MenuEvent) {
+pub fn handle_event(_window: &Window, event: &MenuEvent) {
     let event_id = event.id().0.as_str();
     let app_handle = _window.app_handle().clone();
     match event_id {
         "file.newWindow" => {
-            create_main_window(&app_handle, "/");
-        },
+            tauri::async_runtime::spawn(async move {
+                create_main_window(&app_handle, "/");
+            });
+        }
         _ => {}
     }
 }

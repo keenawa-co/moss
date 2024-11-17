@@ -4,15 +4,15 @@ use tauri::{AppHandle, Manager, WebviewUrl, WebviewWindow, WindowEvent};
 
 use crate::{menu, MIN_WINDOW_HEIGHT, MIN_WINDOW_WIDTH, OTHER_WINDOW_PREFIX};
 
-pub struct CreateWindowInput<'s> {
-    pub url: &'s str,
-    pub label: &'s str,
-    pub title: &'s str,
+pub struct CreateWindowInput<'a> {
+    pub url: &'a str,
+    pub label: &'a str,
+    pub title: &'a str,
     pub inner_size: (f64, f64),
     pub position: (f64, f64),
 }
 
-pub fn create_window(app_handle: &AppHandle, input: CreateWindowInput) -> WebviewWindow {
+pub fn create_window(app_handle: &AppHandle, input: CreateWindowInput<'_>) -> WebviewWindow {
     info!("Create new window label={}", input.label);
 
     #[cfg(target_os = "macos")]
@@ -65,13 +65,13 @@ pub fn create_window(app_handle: &AppHandle, input: CreateWindowInput) -> Webvie
     webview_window
 }
 // We will reserve this function for future use (Settings window, for example)
-pub fn create_child_window(
+pub async fn create_child_window(
     parent_label: &str,
     url: &str,
     label: &str,
     title: &str,
     inner_size: (f64, f64),
-    app_handle: AppHandle
+    app_handle: AppHandle,
 ) -> Result<(), String> {
     let config = CreateWindowInput {
         url,
@@ -85,12 +85,12 @@ pub fn create_child_window(
     };
     let child_window = create_window(&app_handle, config);
 
-    if let Some(parent_window) = app_handle.get_webview_window(parent_label){
+    if let Some(parent_window) = app_handle.get_webview_window(parent_label) {
         child_window.on_window_event(move |e| match e {
             // When the child window is destroyed, bring up the parent window
             WindowEvent::Destroyed => {
                 parent_window.set_focus().unwrap();
-            },
+            }
             _ => {}
         });
     }
