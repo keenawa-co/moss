@@ -5,8 +5,10 @@ mod plugins;
 mod utl;
 mod window;
 
+mod cli;
 pub mod constants;
 
+use commands::*;
 use platform_core::context_v2::ContextCell;
 use platform_core::platform::cross::client::CrossPlatformClient;
 use platform_workspace::WorkspaceId;
@@ -15,15 +17,14 @@ use std::env;
 use std::rc::Rc;
 use std::sync::Arc;
 use tauri::{AppHandle, Manager, RunEvent, WebviewWindow, WindowEvent};
+use tauri_plugin_cli::CliExt;
 use tauri_plugin_log::{fern::colors::ColoredLevelConfig, Target, TargetKind};
 use window::{create_window, CreateWindowInput};
 use workbench_desktop::window::{NativePlatformInfo, NativeWindowConfiguration};
 use workbench_desktop::Workbench;
 
-use crate::commands::*;
 use crate::constants::*;
 use crate::plugins as moss_plugins;
-use crate::utl::get_home_dir;
 
 #[macro_use]
 extern crate serde;
@@ -36,6 +37,7 @@ pub struct AppState {
 pub fn run() {
     #[allow(unused_mut)]
     let mut builder = tauri::Builder::default()
+        .plugin(tauri_plugin_cli::init())
         .plugin(
             tauri_plugin_log::Builder::default()
                 .targets([
@@ -79,7 +81,7 @@ pub fn run() {
     builder
         .setup(|app| {
             let platform_info = NativePlatformInfo::new();
-            let home_dir = get_home_dir()?;
+            let home_dir = crate::utl::get_home_dir()?;
 
             let service_group = utl::create_service_registry(NativeWindowConfiguration {
                 home_dir,
@@ -133,7 +135,21 @@ pub fn run() {
         .expect("failed to run")
         .run(|app_handle, event| match event {
             RunEvent::Ready => {
-                let _ = create_main_window(app_handle, "/");
+                // Setting up CLI
+                match app_handle.cli().matches() {
+                    Ok(matches) => {
+                        let subcommand = matches.subcommand;
+                        if subcommand.is_none() {
+                            let _ = create_main_window(app_handle, "/");
+                        } else {
+                            tauri::async_runtime::spawn(crate::cli::cli_handler(
+                                subcommand.unwrap(),
+                                app_handle.clone(),
+                            ));
+                        }
+                    }
+                    Err(_) => {}
+                };
             }
 
             #[cfg(target_os = "macos")]
