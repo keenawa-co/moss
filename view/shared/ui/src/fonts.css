@@ -71,3 +71,77 @@
   font-weight: 900;
   src: url("../../static/fonts/Inter/Inter-Black.woff2") format("woff2");
 }
+
+/* IBMPlexMono */
+
+@font-face {
+  font-family: "IBMPlexMono";
+  font-display: swap;
+  font-style: normal;
+  font-weight: 100;
+  src: url("../../static/fonts/IBMPlexMono/IBMPlexMono-Thin.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "IBMPlexMono";
+  font-display: swap;
+  font-style: normal;
+  font-weight: 200;
+  src: url("../../static/fonts/IBMPlexMono/IBMPlexMono-ExtraLight.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "IBMPlexMono";
+  font-display: swap;
+  font-style: normal;
+  font-weight: 300;
+  src: url("../../static/fonts/IBMPlexMono/IBMPlexMono-Light.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "IBMPlexMono";
+  font-display: swap;
+  font-style: normal;
+  font-weight: 400;
+  src: url("../../static/fonts/IBMPlexMono/IBMPlexMono-Regular.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "IBMPlexMono";
+  font-display: swap;
+  font-style: normal;
+  font-weight: 500;
+  src: url("../../static/fonts/IBMPlexMono/IBMPlexMono-Medium.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "IBMPlexMono";
+  font-display: swap;
+  font-style: normal;
+  font-weight: 600;
+  src: url("../../static/fonts/IBMPlexMono/IBMPlexMono-SemiBold.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "IBMPlexMono";
+  font-display: swap;
+  font-style: normal;
+  font-weight: 700;
+  src: url("../../static/fonts/IBMPlexMono/IBMPlexMono-Bold.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "IBMPlexMono";
+  font-display: swap;
+  font-style: normal;
+  font-weight: 800;
+  src: url("../../static/fonts/IBMPlexMono/IBMPlexMono-ExtraBold.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "IBMPlexMono";
+  font-display: swap;
+  font-style: normal;
+  font-weight: 900;
+  src: url("../../static/fonts/IBMPlexMono/IBMPlexMono-Black.woff2") format("woff2");
+}
