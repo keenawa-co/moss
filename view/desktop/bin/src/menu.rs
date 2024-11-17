@@ -4,9 +4,7 @@ use tauri::{
     AppHandle, Emitter, Manager, WebviewWindow, Window, Wry,
 };
 
-use crate::{
-    window::create_child_window, DEFAULT_WINDOW_HEIGHT, DEFAULT_WINDOW_WIDTH, OTHER_WINDOW_PREFIX,
-};
+use crate::{create_main_window, window::create_child_window, DEFAULT_WINDOW_HEIGHT, DEFAULT_WINDOW_WIDTH, OTHER_WINDOW_PREFIX};
 
 #[derive(Debug, StrumEnumString, StrumDisplay, StrumAsRefStr)]
 pub enum BuiltInMenuEvent {
@@ -36,16 +34,9 @@ pub fn handle_event(_window: &Window, webview_label: &str, event: &MenuEvent) {
     let event_id = event.id().0.as_str();
     let app_handle = _window.app_handle().clone();
     match event_id {
-        "file.newWindow" => create_child_window(
-            webview_label,
-            "/",
-            &format!("{OTHER_WINDOW_PREFIX}{}",app_handle.webview_windows().len()),
-            "Moss Studio",
-            (DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT),
-            app_handle
-        )
-        .expect("Failed to create new window"),
-
+        "file.newWindow" => {
+            create_main_window(&app_handle, "/");
+        },
         _ => {}
     }
 }

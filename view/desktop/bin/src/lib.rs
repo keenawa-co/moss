@@ -15,6 +15,7 @@ use std::env;
 use std::path::PathBuf;
 use std::rc::Rc;
 use std::sync::Arc;
+use std::sync::atomic::{AtomicU32, AtomicUsize, Ordering};
 use homedir::{my_home};
 use tauri::{AppHandle, Manager, RunEvent, WebviewUrl, WebviewWindow, WindowEvent};
 use tauri_plugin_log::{fern::colors::ColoredLevelConfig, Target, TargetKind};
@@ -34,6 +35,7 @@ extern crate serde;
 pub struct AppState {
     pub workbench: Arc<Workbench>,
     pub platform_info: NativePlatformInfo,
+    pub window_counter: AtomicUsize,
 }
 
 pub fn run() {
@@ -99,6 +101,7 @@ pub fn run() {
             let app_state = AppState {
                 workbench: Arc::new(workbench),
                 platform_info,
+                window_counter: AtomicUsize::new(0)
             };
 
             {
@@ -152,7 +155,10 @@ pub fn run() {
 }
 
 fn create_main_window(handle: &AppHandle, url: &str) -> WebviewWindow {
-    let label = format!("{MAIN_WINDOW_PREFIX}{}", handle.webview_windows().len());
+    let window_number = handle.state::<AppState>()
+        .window_counter
+        .fetch_add(1, Ordering::SeqCst);
+    let label = format!("{MAIN_WINDOW_PREFIX}{}", window_number);
     let config = CreateWindowInput {
         url,
         label: label.as_str(),

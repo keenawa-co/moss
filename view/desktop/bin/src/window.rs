@@ -64,7 +64,7 @@ pub fn create_window(app_handle: &AppHandle, input: CreateWindowInput) -> Webvie
 
     webview_window
 }
-// Maybe we should access the parent_window through manager by label
+// We will reserve this function for future use (Settings window, for example)
 pub fn create_child_window(
     parent_label: &str,
     url: &str,
@@ -91,19 +91,6 @@ pub fn create_child_window(
             WindowEvent::Destroyed => {
                 parent_window.set_focus().unwrap();
             },
-            _ => {}
-        });
-    }
-    if let Some(parent_window) = app_handle.get_webview_window(parent_label) {
-        parent_window.on_window_event(move |e| match e {
-            // When the parent window is focused, bring the child above
-            WindowEvent::Focused(focus) => {
-                if *focus {
-                    if let Some(w) = app_handle.get_webview_window(child_window.label()) {
-                        w.set_focus().unwrap();
-                    };
-                }
-            }
             _ => {}
         });
     }
