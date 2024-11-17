@@ -14,7 +14,7 @@ pub struct LinksView;
 impl LinksView {
     pub fn content(&self) -> Result<LinksViewContent> {
         Ok(LinksViewContent(vec![
-            HtmlLink::new("https://example.com", "Docs"),
+            HtmlLink::new("https://example.com", "Docs"), // TODO: localize!("links.docs", "Docs")
             HtmlLink::new("https://example.com", "Releases"),
             HtmlLink::new("https://example.com", "GitHub"),
             HtmlLink::new("https://example.com", "Support"),
