@@ -54,7 +54,7 @@ const DropdownMenuSeparator = ({ className }: DropdownMenuSeparatorProps) => (
 
 // TODO add functionality for DropdownMenuShortcut
 const DropdownMenuShortcut = ({ className, ...props }: React.HTMLAttributes<HTMLSpanElement>) => {
-  return <span className={cn("ml-auto font-[Inter] font-normal opacity-60", className)} {...props} />;
+  return <span className={cn("ml-auto font-[IBMPlexMono] font-normal opacity-60", className)} {...props} />;
 };
 
 // CONTENT
