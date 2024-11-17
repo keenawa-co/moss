@@ -20,7 +20,6 @@ import { DropdownMenu as DM, Icon, cn } from "@repo/ui";
 import { OsType } from "@tauri-apps/plugin-os";
 import { HTMLProps, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { HeadBarButton } from "./HeadBarButton";
 import { ActionsGroup } from "../ActionsGroup";
 import { DNDWrapper } from "./DNDWrapper";
 
@@ -33,7 +32,7 @@ const widgetsList = [
     id: 1,
     label: "Alerts",
     icon: "HeadBarAlerts" as const,
-    actions: ["1"],
+    actions: ["1", "2"],
     defaultAction: false,
   },
   {
@@ -189,19 +188,15 @@ export const WidgetBar = ({ os, className, ...props }: WidgetBarProps) => {
 
   return (
     <div className={cn("flex items-center gap-1", className)} {...props}>
-      {os !== "macos" && (
-        <HeadBarButton
-          icon="HeadBarSettingsWithNotification"
-          className="flex size-[30px] items-center justify-center px-2"
-          iconClassName="size-[18px]"
-        />
-      )}
+      {os !== "macos" && <ActionsGroup icon="HeadBarSettingsWithNotification" iconClassName="size-[19px]" />}
       <div className="flex items-center gap-3">
-        <button className="flex h-[30px] w-max items-center rounded pl-2.5 pr-1 transition-colors hover:bg-[#D3D3D3]">
-          <Icon icon="HeadBarMossStudio" className="mr-1.5 size-[22px] text-[#525252]" />
-          <span className="mr-0.5 w-max text-[#161616]">moss-studio</span>
-          <Icon icon="ArrowheadDown" className="text-[#525252]" />
-        </button>
+        <ActionsGroup
+          icon="HeadBarMossStudio"
+          label="moss-studio"
+          className="break-keep"
+          actions={["1", "2"]}
+          iconClassName="size-[22px] -my-[4px]"
+        />
 
         <div className="flex w-full items-center justify-start gap-1">
           {DNDlist.length === 0 && <OverflownMenu classNameTrigger="ml-[13px]" />}
