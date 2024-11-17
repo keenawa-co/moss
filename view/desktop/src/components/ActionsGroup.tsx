@@ -14,7 +14,7 @@ interface ActionsGroupProps extends ComponentPropsWithoutRef<"div"> {
 const buttonStyle = "hover:border-[#c5c5c5] box-border transition group flex rounded border border-transparent";
 const triggerStyle = "hover:bg-[#D3D3D3] group flex w-full items-center justify-center gap-1.5 text-ellipsis";
 const iconStyle = "group-active:text-black text-[#525252]";
-const labelStyle = "group-active:text-black text-ellipsis text-[#161616]";
+const labelStyle = "group-active:text-black text-[#161616] break-keep w-max";
 
 export const ActionsGroup = ({
   compact = false,
@@ -36,7 +36,7 @@ export const ActionsGroup = ({
           <DM.Trigger className={cn(triggerStyle, "rounded-r px-1.5 py-1.5")} onClick={() => setOpen((prev) => !prev)}>
             <Icon icon={icon} className={cn(iconStyle, iconClassName)} />
             {!compact && label && <span className={labelStyle}>{label}</span>}
-            {showActions && <Icon icon="ArrowheadDown" className="ml-auto" />}
+            {showActions && <Icon icon="ArrowheadDown" className="ml-auto " />}
           </DM.Trigger>
 
           {showActions && (

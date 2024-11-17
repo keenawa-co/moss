@@ -188,12 +188,11 @@ export const WidgetBar = ({ os, className, ...props }: WidgetBarProps) => {
 
   return (
     <div className={cn("flex items-center gap-1", className)} {...props}>
-      {os !== "macos" && <ActionsGroup icon="HeadBarSettingsWithNotification" iconClassName="size-[19px]" />}
+      {os !== "macos" && <ActionsGroup icon="HeadBarSettingsWithNotification" iconClassName="size-[18px]" />}
       <div className="flex items-center gap-3">
         <ActionsGroup
           icon="HeadBarMossStudio"
           label="moss-studio"
-          className="break-keep"
           actions={["1", "2"]}
           iconClassName="size-[22px] -my-[4px]"
         />
@@ -243,7 +242,7 @@ export const WidgetBar = ({ os, className, ...props }: WidgetBarProps) => {
                         label={widgetsList.find((item) => item.id === draggedId)?.label}
                         actions={widgetsList.find((item) => item.id === draggedId)?.actions!}
                         defaultAction={widgetsList.find((item) => item.id === draggedId)?.defaultAction}
-                        className="flex h-[30px] cursor-grabbing rounded border !border-[#c5c5c5] bg-[#D3D3D3] shadow-lg"
+                        className=" cursor-grabbing rounded border !border-[#c5c5c5] bg-[#D3D3D3] shadow-lg"
                       />
                     </DragOverlay>,
                     document.body
