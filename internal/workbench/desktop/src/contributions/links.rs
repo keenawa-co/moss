@@ -1,13 +1,10 @@
 use anyhow::Result;
-use moss_str::{localize, localized_string::LocalizedString};
+use moss_str::localize;
 use once_cell::sync::Lazy;
 use std::sync::Arc;
 use uikit_models::html::link::HtmlLink;
 
-use crate::{
-    view::{BuiltInViewGroups, TreeViewDescriptor},
-    Contribution,
-};
+use crate::{view::TreeViewDescriptor, Contribution};
 
 #[derive(Debug, Serialize)]
 pub struct LinksViewContent(Vec<HtmlLink>);
@@ -30,7 +27,7 @@ impl Contribution for LinksContribution {
     fn contribute(registry: &mut crate::RegistryManager) -> anyhow::Result<()> {
         let mut views_registry_lock = registry.views.write();
         views_registry_lock.register_views(
-            BuiltInViewGroups::Launchpad.into(),
+            crate::view::VIEW_GROUP_ID_LAUNCHPAD,
             vec![TreeViewDescriptor {
                 id: "workbench.view.linksView".to_string(),
                 name: localize!("links.view.name", "Links"),

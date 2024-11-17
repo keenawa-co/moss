@@ -1,40 +1,10 @@
-use hashbrown::HashMap;
+use moss_str::{localized_string::LocalizedString, read_only_str, ReadOnlyStr};
 use once_cell::sync::Lazy;
 use std::{any::Any, fmt::Debug, sync::Arc};
 
-use moss_str::{localized_string::LocalizedString, read_only_str, ReadOnlyStr};
-
 pub type GroupId = ReadOnlyStr;
 
-#[rustfmt::skip]
-lazy_static! {
-    static ref VIEW_GROUP_ID_LAUNCHPAD: ReadOnlyStr = read_only_str!("workbench.group.launchpad");
-}
-
-#[derive(Debug)]
-pub enum BuiltInViewGroups {
-    Launchpad,
-}
-
-impl From<BuiltInViewGroups> for ReadOnlyStr {
-    fn from(value: BuiltInViewGroups) -> Self {
-        use BuiltInViewGroups as Group;
-
-        match value {
-            Group::Launchpad => VIEW_GROUP_ID_LAUNCHPAD.clone(),
-        }
-    }
-}
-
-impl ToString for BuiltInViewGroups {
-    fn to_string(&self) -> String {
-        use BuiltInViewGroups as Group;
-
-        match &self {
-            Group::Launchpad => VIEW_GROUP_ID_LAUNCHPAD.to_string(),
-        }
-    }
-}
+pub const VIEW_GROUP_ID_LAUNCHPAD: ReadOnlyStr = read_only_str!("workbench.group.launchpad");
 
 #[derive(Serialize, Debug, Clone)]
 pub struct TreeViewGroup {

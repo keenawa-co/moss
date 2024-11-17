@@ -1,4 +1,4 @@
-use moss_str::{localize, localized_string::LocalizedString};
+use moss_str::localize;
 use platform_configuration::{
     configuration_registry::{
         ConfigurationNode, ConfigurationNodeType as Type,
@@ -8,7 +8,7 @@ use platform_configuration::{
 };
 
 use crate::{
-    view::{BuiltInViewGroups, TreeViewGroup, TreeViewGroupLocation},
+    view::{TreeViewGroup, TreeViewGroupLocation},
     Contribution,
 };
 
@@ -102,7 +102,7 @@ impl Contribution for WorkbenchContribution {
         views_registry_lock.append_view_group(
             TreeViewGroupLocation::PrimaryBar,
             TreeViewGroup {
-                id: BuiltInViewGroups::Launchpad.into(),
+                id: crate::view::VIEW_GROUP_ID_LAUNCHPAD,
                 name: localize!("launchpad.group.name", "Launchpad"),
                 order: 1,
             },
