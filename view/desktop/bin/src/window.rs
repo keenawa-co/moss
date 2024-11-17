@@ -4,15 +4,15 @@ use tauri::{AppHandle, Manager, WebviewUrl, WebviewWindow, WindowEvent};
 
 use crate::{menu, MIN_WINDOW_HEIGHT, MIN_WINDOW_WIDTH, OTHER_WINDOW_PREFIX};
 
-pub struct CreateWindowInput<'s> {
-    pub url: &'s str,
-    pub label: &'s str,
-    pub title: &'s str,
+pub struct CreateWindowInput<'a> {
+    pub url: &'a str,
+    pub label: &'a str,
+    pub title: &'a str,
     pub inner_size: (f64, f64),
     pub position: (f64, f64),
 }
 
-pub fn create_window(app_handle: &AppHandle, input: CreateWindowInput) -> WebviewWindow {
+pub fn create_window(app_handle: &AppHandle, input: CreateWindowInput<'_>) -> WebviewWindow {
     info!("Create new window label={}", input.label);
 
     #[cfg(target_os = "macos")]
@@ -64,15 +64,15 @@ pub fn create_window(app_handle: &AppHandle, input: CreateWindowInput) -> Webvie
 
     webview_window
 }
-
-pub fn create_child_window(
-    parent_window: WebviewWindow,
+// We will reserve this function for future use (Settings window, for example)
+pub async fn create_child_window(
+    parent_label: &str,
     url: &str,
     label: &str,
     title: &str,
     inner_size: (f64, f64),
+    app_handle: AppHandle,
 ) -> Result<(), String> {
-    let app_handle = parent_window.app_handle();
     let config = CreateWindowInput {
         url,
         label,
@@ -83,34 +83,13 @@ pub fn create_child_window(
             100.0 + random::<f64>() * 20.0,
         ),
     };
-
     let child_window = create_window(&app_handle, config);
 
-    {
-        let parent_window = parent_window.clone();
-        let child_window = child_window.clone();
-        child_window.clone().on_window_event(move |e| match e {
-            // When the new window is destroyed, bring the other up behind it
+    if let Some(parent_window) = app_handle.get_webview_window(parent_label) {
+        child_window.on_window_event(move |e| match e {
+            // When the child window is destroyed, bring up the parent window
             WindowEvent::Destroyed => {
-                if let Some(w) = parent_window.get_webview_window(child_window.label()) {
-                    w.set_focus().unwrap();
-                }
-            }
-            _ => {}
-        });
-    }
-
-    {
-        let parent_window = parent_window.clone();
-        let child_window = child_window.clone();
-        parent_window.clone().on_window_event(move |e| match e {
-            // When the parent window is focused, bring the child above
-            WindowEvent::Focused(focus) => {
-                if *focus {
-                    if let Some(w) = parent_window.get_webview_window(child_window.label()) {
-                        w.set_focus().unwrap();
-                    };
-                }
+                parent_window.set_focus().unwrap();
             }
             _ => {}
         });
