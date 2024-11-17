@@ -106,7 +106,9 @@ const DropdownMenuTrigger = React.forwardRef<DropdownMenuTriggerElement, Dropdow
               context.onOpenToggle();
               // prevent trigger focusing when opening
               // this allows the content to be given focus without competition
-              if (!context.open) event.preventDefault();
+              // if (!context.open) event.preventDefault();
+            } else {
+              event.preventDefault();
             }
           })}
           onKeyDown={composeEventHandlers(props.onKeyDown, (event) => {

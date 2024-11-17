@@ -79,7 +79,7 @@ export const WidgetBar = ({ os, className, ...props }: WidgetBarProps) => {
   const sensors = useSensors(
     useSensor(MouseSensor, {
       activationConstraint: {
-        distance: 5,
+        distance: 1,
       },
     }),
     useSensor(KeyboardSensor, {
@@ -215,6 +215,7 @@ export const WidgetBar = ({ os, className, ...props }: WidgetBarProps) => {
                       draggingClassName="z-50 cursor-grabbing opacity-50 shadow-2xl"
                     >
                       <ActionsGroup
+                        key={`listButton-${item.id}`}
                         icon={item.icon}
                         label={item.label}
                         actions={item.actions}
