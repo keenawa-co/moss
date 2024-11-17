@@ -20,6 +20,7 @@ export const ActionsGroup = ({ compact = false, defaultAction = false, icon, lab
           "group box-border  flex h-[30px] items-center rounded border border-transparent transition hover:border-[#c5c5c5]",
           props.className
         )}
+        {...props}
       >
         <DM.Root open={open} onOpenChange={() => {}}>
           <DM.Trigger asChild>
@@ -47,6 +48,7 @@ export const ActionsGroup = ({ compact = false, defaultAction = false, icon, lab
         "group relative box-border flex h-[30px] items-center rounded border border-transparent transition hover:border-[#c5c5c5]",
         props.className
       )}
+      {...props}
     >
       <button className="group flex h-full w-full items-center gap-1.5 text-ellipsis rounded-l px-2 hover:bg-[#D3D3D3]">
         <Icon icon={icon} className="group-active:text-black text-[#525252]" />

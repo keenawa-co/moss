@@ -23,13 +23,13 @@ export const HeadBar = () => {
       {os === "macos" && <Controls os={os} />}
 
       <div
-        className={cn("flex w-full items-center justify-between overflow-hidden", {
+        className={cn("flex w-full items-center justify-between overflow-clip", {
           "pr-[12px]": os === "macos",
           "px-[16px]": os === "windows" || os === "linux",
         })}
         data-tauri-drag-region
       >
-        <WidgetBar os={os} className="overflow-x-hidden" />
+        <WidgetBar os={os} className="overflow-x-clip" />
         <ActionsBar className="z-50" />
       </div>
 

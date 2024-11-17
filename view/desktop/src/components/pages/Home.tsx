@@ -141,7 +141,7 @@ export const Home: React.FC = () => {
         <Icon icon="Accessibility" className="text-6xl hover:*:fill-green-500" />
         <Icon icon="NewProject" className="text-red-700 text-6xl hover:fill-green-500" />
       </div>
-
+      {/* 
       <div className="w-96 bg-red-600">
         {new Array(77).fill(0).map((_, index) => (
           <div key={index}>
@@ -149,7 +149,7 @@ export const Home: React.FC = () => {
           </div>
         ))}
         <div> last element</div>
-      </div>
+      </div> */}
     </div>
   );
 };
