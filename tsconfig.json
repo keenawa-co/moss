@@ -38,7 +38,7 @@
       "path": "view/shared/models/uikit"
     },
     {
-      "path": "internal/workbench/models"
+      "path": "internal/workbench/desktop/models"
     }
   ]
 }

@@ -5,7 +5,7 @@
 // within this module.
 //
 // If you need to add or modify imports, please update the import_map in the script and
-// re-run `make gen-workbench-models` command to regenerate the file accordingly.
+// re-run `make gen-models` it to regenerate the file accordingly.
 
 import type { LocalizedString } from "@repo/moss-str";
 

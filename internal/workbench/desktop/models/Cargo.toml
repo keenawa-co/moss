@@ -1,5 +1,5 @@
 [package]
-name = "workbench_models"
+name = "desktop_models"
 version = "0.1.0"
 edition = "2021"
 
@@ -8,6 +8,7 @@ crate-type = ["cdylib", "rlib"]
 
 [dependencies]
 moss_str.workspace = true
+uikit_models.workspace = true
+
 serde = { workspace = true, features = ["derive"] }
 ts-rs.workspace = true
-uikit_models.workspace = true

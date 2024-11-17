@@ -1,5 +1,5 @@
  {
-    "name": "@repo/workbench-models",
+    "name": "@repo/desktop-models",
     "exports": {
       ".": "./index.ts"
     },

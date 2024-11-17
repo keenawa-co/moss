@@ -37,7 +37,7 @@ importers:
         specifier: workspace:*
         version: link:../../view/shared/config-typescript
 
-  internal/workbench/models:
+  internal/workbench/desktop/models:
     dependencies:
       typescript:
         specifier: ^5.5.4
@@ -45,10 +45,10 @@ importers:
     devDependencies:
       '@repo/moss-str':
         specifier: workspace:*
-        version: link:../../../crates/moss-str
+        version: link:../../../../crates/moss-str
       '@repo/typescript-config':
         specifier: workspace:*
-        version: link:../../../view/shared/config-typescript
+        version: link:../../../../view/shared/config-typescript
 
   lib/moss_lang:
     dependencies:

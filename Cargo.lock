@@ -1105,6 +1105,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "desktop_models"
+version = "0.1.0"
+dependencies = [
+ "moss_str",
+ "serde",
+ "ts-rs",
+ "uikit_models",
+]
+
+[[package]]
 name = "digest"
 version = "0.10.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -6044,16 +6054,6 @@ dependencies = [
  "workbench_service_configuration_tao",
  "workbench_service_environment_tao",
  "workbench_service_user_profile_tao",
-]
-
-[[package]]
-name = "workbench_models"
-version = "0.1.0"
-dependencies = [
- "moss_str",
- "serde",
- "ts-rs",
- "uikit_models",
 ]
 
 [[package]]

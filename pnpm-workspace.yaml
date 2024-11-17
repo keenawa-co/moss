@@ -4,6 +4,6 @@ packages:
   - "lib/*"
   - "tools/*"
   - "sdk-ts/*"
-  - "internal/workbench/*"
+  - "internal/workbench/desktop/*"
   - "view/shared/models/*"
   - "crates/*"

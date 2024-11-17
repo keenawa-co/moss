@@ -12,7 +12,7 @@ auto_generated_comment = """\
 // within this module.
 //
 // If you need to add or modify imports, please update the import_map in the script and
-// re-run it to regenerate the file accordingly.
+// re-run `make gen-models` it to regenerate the file accordingly.
 """
 
 import_map: Dict[str, Dict[str, Dict[str, any]]] = {

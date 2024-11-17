@@ -15,7 +15,7 @@ WEB_DIR := view/web
 THEME_GENERATOR_DIR := tools/themegen
 ICONS_DIR := tools/icongen
 
-WORKBENCH_MODELS_DIR := internal/workbench/models
+DESKTOP_MODELS_DIR := internal/workbench/desktop/models
 SHARED_MODELS_DIR := view/shared/models
 
 XTASK_DIR := tools/xtask
@@ -110,15 +110,15 @@ gen-icons:
 gen-shared-models:
 	@$(CARGO) test --manifest-path $(SHARED_MODELS_DIR)/uikit/Cargo.toml
 
-## Generate Workbench Models
-.PHONY: gen-workbench-models
-gen-workbench-models:
-	@$(CARGO) test --manifest-path $(WORKBENCH_MODELS_DIR)/Cargo.toml
-	@$(CARGO) build --manifest-path $(WORKBENCH_MODELS_DIR)/Cargo.toml
+## Generate Desktop Models
+.PHONY: gen-desktop-models
+gen-desktop-models:
+	@$(CARGO) test --manifest-path $(DESKTOP_MODELS_DIR)/Cargo.toml
+	@$(CARGO) build --manifest-path $(DESKTOP_MODELS_DIR)/Cargo.toml
 
 ## Generate All Models
 .PHONY: gen-models
-gen-models: gen-shared-models gen-workbench-models
+gen-models: gen-shared-models gen-desktop-models
 
 # Utility Commands
 
@@ -147,7 +147,7 @@ clean-pnpm:
 	@cd $(WEB_DIR) && $(PNPM) prune
 	@cd $(THEME_GENERATOR_DIR) && $(PNPM) prune
 	@cd $(ICONS_DIR) && $(PNPM) prune
-	@cd $(WORKBENCH_MODELS_DIR) && $(PNPM) prune
+	@cd $(DESKTOP_MODELS_DIR) && $(PNPM) prune
 	@cd $(SHARED_MODELS_DIR) && $(PNPM) prune
 	$(PNPM) store prune
 
