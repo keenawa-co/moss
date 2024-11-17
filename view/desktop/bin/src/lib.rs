@@ -14,7 +14,7 @@ use platform_workspace::WorkspaceId;
 use rand::random;
 use std::env;
 use std::rc::Rc;
-use std::sync::atomic::{AtomicU32, AtomicUsize, Ordering};
+use std::sync::atomic::{AtomicUsize, Ordering};
 use std::sync::Arc;
 
 use crate::cli::cli_handler;
