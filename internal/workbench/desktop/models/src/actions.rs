@@ -19,12 +19,9 @@ pub enum MenuItem {
 #[serde(rename_all = "camelCase")]
 #[ts(export, export_to = "actions.ts")]
 pub enum MenuItemVisibility {
-    #[serde(rename = "classic")]
     #[default]
     Classic,
-    #[serde(rename = "hidden")]
     Hidden,
-    #[serde(rename = "compact")]
     Compact,
 }
 

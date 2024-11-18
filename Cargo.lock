@@ -1063,6 +1063,7 @@ dependencies = [
  "anyhow",
  "async-task",
  "cocoa",
+ "desktop_models",
  "fern",
  "flume",
  "futures",
@@ -1109,6 +1110,7 @@ name = "desktop_models"
 version = "0.1.0"
 dependencies = [
  "moss_str",
+ "once_cell",
  "serde",
  "ts-rs",
  "uikit_models",
@@ -6030,6 +6032,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "derive_more",
+ "desktop_models",
  "hashbrown 0.15.0",
  "lazy_static",
  "moss_str",

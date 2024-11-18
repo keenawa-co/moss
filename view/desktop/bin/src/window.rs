@@ -2,7 +2,7 @@ use log::{info, warn};
 use rand::random;
 use tauri::{AppHandle, Manager, WebviewUrl, WebviewWindow, WindowEvent};
 
-use crate::{menu, MIN_WINDOW_HEIGHT, MIN_WINDOW_WIDTH, OTHER_WINDOW_PREFIX};
+use crate::{menu, MIN_WINDOW_HEIGHT, MIN_WINDOW_WIDTH};
 
 pub struct CreateWindowInput<'s> {
     pub url: &'s str,

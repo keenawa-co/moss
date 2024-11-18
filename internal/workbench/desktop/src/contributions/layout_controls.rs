@@ -1,14 +1,14 @@
-use std::rc::Rc;
-
-use moss_str::{localize, ReadOnlyStr};
-
-use crate::{
-    menu::{
+use desktop_models::{
+    actions::{
         ActionMenuItem, CommandAction, CommandActionToggle, MenuGroup, MenuItem,
         MenuItemVisibility, SubmenuMenuItem, SubmenuRef,
     },
-    Contribution,
+    constants,
 };
+use moss_str::{localize, ReadOnlyStr};
+use std::rc::Rc;
+
+use crate::Contribution;
 
 pub struct LayoutControlsContribution;
 impl Contribution for LayoutControlsContribution {
@@ -22,7 +22,7 @@ impl Contribution for LayoutControlsContribution {
 
         menus_registry_lock.append_menu_items(vec![
             (
-                crate::menu::MENU_NAMESPACE_ID_HEAD_ITEM,
+                constants::menu::MENU_NAMESPACE_ID_HEAD_ITEM,
                 MenuItem::Action(ActionMenuItem {
                     command: CommandAction {
                         id: "workbench.action.togglePrimarySidebar".into(),
@@ -50,7 +50,7 @@ impl Contribution for LayoutControlsContribution {
             // Toggle Secondary Side Bar
             //
             (
-                crate::menu::MENU_NAMESPACE_ID_HEAD_ITEM,
+                constants::menu::MENU_NAMESPACE_ID_HEAD_ITEM,
                 MenuItem::Action(ActionMenuItem {
                     command: CommandAction {
                         id: "workbench.action.toggleSecondarySidebar".into(),
@@ -75,7 +75,7 @@ impl Contribution for LayoutControlsContribution {
                 }),
             ),
             (
-                crate::menu::MENU_NAMESPACE_ID_HEAD_ITEM,
+                constants::menu::MENU_NAMESPACE_ID_HEAD_ITEM,
                 MenuItem::Action(ActionMenuItem {
                     command: CommandAction {
                         id: "workbench.action.togglePanel".into(),
@@ -103,7 +103,7 @@ impl Contribution for LayoutControlsContribution {
         //
         let customize_layout_menu_id = ReadOnlyStr::from("layoutControls.customizeLayout");
         menus_registry_lock.append_menu_item(
-            crate::menu::MENU_NAMESPACE_ID_HEAD_ITEM,
+            constants::menu::MENU_NAMESPACE_ID_HEAD_ITEM,
             MenuItem::Submenu(SubmenuMenuItem {
                 submenu_id: customize_layout_menu_id.clone(),
                 default_action_id: None,

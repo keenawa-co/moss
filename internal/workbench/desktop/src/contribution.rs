@@ -1,3 +1,7 @@
+use desktop_models::{
+    constants,
+    view::{TreeViewGroup, TreeViewGroupLocation},
+};
 use moss_str::localize;
 use platform_configuration::{
     configuration_registry::{
@@ -7,10 +11,7 @@ use platform_configuration::{
     property_key,
 };
 
-use crate::{
-    view::{TreeViewGroup, TreeViewGroupLocation},
-    Contribution,
-};
+use crate::Contribution;
 
 lazy_static! {
     pub static ref WORKBENCH_TAO_WINDOW: ConfigurationNode = ConfigurationNode {
@@ -102,7 +103,7 @@ impl Contribution for WorkbenchContribution {
         views_registry_lock.append_view_group(
             TreeViewGroupLocation::PrimaryBar,
             TreeViewGroup {
-                id: crate::view::VIEW_GROUP_ID_LAUNCHPAD,
+                id: constants::view::VIEW_GROUP_ID_LAUNCHPAD,
                 name: localize!("launchpad.group.name", "Launchpad"),
                 order: 1,
             },

@@ -6,6 +6,7 @@ edition = "2021"
 
 [dependencies]
 moss_str.workspace = true
+desktop_models.workspace = true
 quote.workspace = true
 static_str_ops.workspace = true
 thiserror.workspace = true

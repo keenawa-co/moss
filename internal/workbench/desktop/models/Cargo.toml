@@ -12,3 +12,4 @@ uikit_models.workspace = true
 
 serde = { workspace = true, features = ["derive", "rc"] }
 ts-rs.workspace = true
+once_cell.workspace = true

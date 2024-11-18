@@ -1,8 +1,6 @@
 pub mod contribution;
-pub mod menu;
 pub mod parts;
 pub mod registry;
-pub mod view;
 pub mod window;
 
 pub mod contributions;
@@ -24,8 +22,7 @@ use contributions::{
     layout_controls::LayoutControlsContribution, links::LinksContribution,
     resents::RecentsContribution,
 };
-use hashbrown::HashMap;
-use menu::MenuItem;
+use desktop_models::actions::MenuItem;
 use moss_str::ReadOnlyStr;
 use once_cell::unsync::OnceCell;
 use platform_configuration::{

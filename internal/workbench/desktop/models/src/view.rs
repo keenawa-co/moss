@@ -1,10 +1,9 @@
-use moss_str::{localized_string::LocalizedString, read_only_str, ReadOnlyStr};
+use moss_str::{localized_string::LocalizedString, ReadOnlyStr};
 use once_cell::sync::Lazy;
+use serde::Serialize;
 use std::{any::Any, fmt::Debug, sync::Arc};
 
 pub type GroupId = ReadOnlyStr;
-
-pub const VIEW_GROUP_ID_LAUNCHPAD: ReadOnlyStr = read_only_str!("workbench.group.launchpad");
 
 #[derive(Serialize, Debug, Clone)]
 pub struct TreeViewGroup {

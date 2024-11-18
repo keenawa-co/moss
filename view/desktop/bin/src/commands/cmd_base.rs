@@ -1,6 +1,6 @@
+use desktop_models::actions::MenuItem;
 use tauri::State;
 use workbench_desktop::contributions::resents::{RecentsViewContent, RecentsViewModel};
-use workbench_desktop::menu::MenuItem;
 use workbench_desktop::window::NativePlatformInfo;
 
 use crate::AppState;

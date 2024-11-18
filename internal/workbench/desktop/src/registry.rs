@@ -1,13 +1,12 @@
+use desktop_models::{
+    actions::MenuItem,
+    view::{GroupId, TreeViewDescriptor, TreeViewGroup, TreeViewGroupLocation},
+};
 use hashbrown::HashMap;
 use moss_str::ReadOnlyStr;
 use parking_lot::RwLock;
 use std::fmt::Debug;
 use std::sync::Arc;
-
-use crate::{
-    menu::MenuItem,
-    view::{GroupId, TreeViewDescriptor, TreeViewGroup, TreeViewGroupLocation},
-};
 
 pub struct MenuRegistry {
     menus: HashMap<ReadOnlyStr, Vec<MenuItem>>,
