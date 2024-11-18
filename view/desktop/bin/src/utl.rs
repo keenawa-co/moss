@@ -2,7 +2,6 @@ use std::path::PathBuf;
 use std::sync::Arc;
 
 use anyhow::Result;
-use homedir::my_home;
 use platform_formation::service_registry::ServiceRegistry;
 use platform_fs::disk::file_system_service::DiskFileSystemService;
 use workbench_desktop::window::NativeWindowConfiguration;
@@ -59,11 +58,10 @@ fn unix_home_dir() -> Result<PathBuf, String> {
         .map_err(|e| format!("Failed to retrieve HOME environment variable: {}", e))
 }
 
-
 /// Retrieves the home directory on Windows.
 #[cfg(target_os = "windows")]
 fn windows_home_dir() -> Result<PathBuf, String> {
-    match my_home() {
+    match homedir::my_home() {
         Ok(result) => result.ok_or("Home directory not found".to_string()),
         Err(e) => Err(format!("Failed to retrieve HOME directory: {}", e)),
     }

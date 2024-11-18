@@ -1063,6 +1063,7 @@ dependencies = [
  "anyhow",
  "async-task",
  "cocoa",
+ "desktop_models",
  "fern",
  "flume",
  "futures",
@@ -1102,6 +1103,17 @@ dependencies = [
  "workbench_desktop",
  "workbench_service_configuration_tao",
  "workbench_service_environment_tao",
+]
+
+[[package]]
+name = "desktop_models"
+version = "0.1.0"
+dependencies = [
+ "moss_str",
+ "once_cell",
+ "serde",
+ "ts-rs",
+ "uikit_models",
 ]
 
 [[package]]
@@ -5193,6 +5205,7 @@ checksum = "42ff0bf0c66b8238c6f3b578df37d0b7848e55df8577b3f74f92a69acceeb825"
 name = "uikit_models"
 version = "0.1.0"
 dependencies = [
+ "moss_str",
  "serde",
  "ts-rs",
 ]
@@ -6019,6 +6032,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "derive_more",
+ "desktop_models",
  "hashbrown 0.15.0",
  "lazy_static",
  "moss_str",
@@ -6043,15 +6057,6 @@ dependencies = [
  "workbench_service_configuration_tao",
  "workbench_service_environment_tao",
  "workbench_service_user_profile_tao",
-]
-
-[[package]]
-name = "workbench_models"
-version = "0.1.0"
-dependencies = [
- "serde",
- "ts-rs",
- "uikit_models",
 ]
 
 [[package]]

@@ -19,7 +19,7 @@ use crate::{bstring::BStringForFrontend, ReadOnlyStr};
 macro_rules! localize {
     // Pattern for two arguments: key and origin
     ($key:expr, $origin:expr) => {
-        LocalizedString::new(
+        $crate::localized_string::LocalizedString::new(
             $key,
             $origin,
             Option::<moss_str::bstring::BStringForFrontend>::None,

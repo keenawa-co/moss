@@ -39,6 +39,7 @@
     "revisioned",
     "rocksdb",
     "rustc",
+    "rustfmt",
     "schemable",
     "seaorm",
     "sess",
