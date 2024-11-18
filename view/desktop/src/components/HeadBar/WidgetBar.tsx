@@ -168,7 +168,7 @@ export const WidgetBar = ({ os, className, ...props }: WidgetBarProps) => {
           <Icon icon="ThreeHorizontalDots" className="flex size-4 items-center justify-center" />
         </DM.Trigger>
 
-        <DM.Content className={cn("z-50 flex flex-col gap-0.5 bg-white", classNameContent)}>
+        <DM.Content className={cn("z-50 flex flex-col gap-0.5 bg-white", classNameContent)} align="start">
           {overflownList.map((id) => {
             const item = widgetsList.find((item) => id === item.id)!;
             return <DM.Item label={item.label} icon={item.icon} key={item.id} iconClassName="size-[15px]" />;

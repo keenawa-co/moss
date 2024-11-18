@@ -42,7 +42,9 @@ export const ActionsGroup = ({
             className={cn(triggerStyle, "rounded-r px-1.5 py-1", {
               "bg-[#D3D3D3]": open,
             })}
-            onClick={() => setOpen((prev) => !prev)}
+            onClick={() => {
+              if (showActions) setOpen((prev) => !prev);
+            }}
           >
             <Icon icon={icon} className={cn(iconStyle, iconClassName)} />
             {!compact && label && <span className={labelStyle}>{label}</span>}
