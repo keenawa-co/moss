@@ -45,7 +45,7 @@ export const ActionsGroup = ({
           </DM.Trigger>
 
           {showActions && (
-            <DM.Content className="z-50 flex flex-col " onPointerDownOutside={() => setOpen(false)}>
+            <DM.Content className="z-50 flex flex-col" onPointerDownOutside={() => setOpen(false)}>
               {props.actions?.map((id) => <button key={id}>Action {id}</button>)}
             </DM.Content>
           )}
