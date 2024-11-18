@@ -16,7 +16,8 @@ THEME_GENERATOR_DIR := tools/themegen
 ICONS_DIR := tools/icongen
 
 DESKTOP_MODELS_DIR := internal/workbench/desktop/models
-SHARED_MODELS_DIR := view/shared/models
+HTML_MODELS_DIR := crates/moss-html
+UIKIT_MODELS_DIR := crates/moss-uikit
 
 XTASK_DIR := tools/xtask
 # Executables
@@ -105,10 +106,17 @@ gen-themes:
 gen-icons:
 	@cd $(ICONS_DIR) && $(PNPM) start
 
-## Generate Shared Models
-.PHONY: gen-shared-models
-gen-shared-models:
-	@$(CARGO) test --manifest-path $(SHARED_MODELS_DIR)/uikit/Cargo.toml
+## Generate HTML Models
+.PHONY: gen-html-models
+gen-html-models:
+	@$(CARGO) test --manifest-path $(HTML_MODELS_DIR)/Cargo.toml
+	@$(CARGO) build --manifest-path $(HTML_MODELS_DIR)/Cargo.toml
+
+## Generate UI Kit Models
+.PHONY: gen-uikit-models
+gen-uikit-models:
+	@$(CARGO) test --manifest-path $(UIKIT_MODELS_DIR)/Cargo.toml
+	@$(CARGO) build --manifest-path $(UIKIT_MODELS_DIR)/Cargo.toml
 
 ## Generate Desktop Models
 .PHONY: gen-desktop-models
@@ -118,7 +126,7 @@ gen-desktop-models:
 
 ## Generate All Models
 .PHONY: gen-models
-gen-models: gen-shared-models gen-desktop-models
+gen-models: gen-html-models gen-uikit-models gen-desktop-models
 
 # Utility Commands
 

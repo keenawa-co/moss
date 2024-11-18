@@ -9,6 +9,8 @@
 
 import type { LocalizedString } from "@repo/moss-str";
 
+export type Action = string;
+
 export type ActionMenuItem = {
   command: CommandAction;
   group: MenuGroup | null;

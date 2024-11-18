@@ -1,5 +1,5 @@
-{
-    "name": "@repo/uikit-models",
+ {
+    "name": "@repo/moss-uikit",
     "exports": {
       ".": "./index.ts"
     },
