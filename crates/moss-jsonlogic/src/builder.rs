@@ -29,8 +29,8 @@ impl ToString for Rule {
     }
 }
 
-pub trait BuildableRule {
-    fn build(self) -> Result<Rule, &'static str>;
+trait BuildableRule {
+    fn build_condition_tree(self) -> Result<Rule, &'static str>;
 }
 
 pub struct RuleBuilder {
@@ -96,10 +96,14 @@ impl RuleBuilder {
         self.conditions.push(condition);
         self
     }
+
+    pub fn build(self) -> Result<Rule, &'static str> {
+        self.build_condition_tree()
+    }
 }
 
 impl BuildableRule for RuleBuilder {
-    fn build(self) -> Result<Rule, &'static str> {
+    fn build_condition_tree(self) -> Result<Rule, &'static str> {
         if self.conditions.is_empty() {
             Err("No conditions provided")
         } else if self.conditions.len() == 1 {
@@ -120,7 +124,7 @@ impl LogicRuleBuilder {
     }
 
     pub fn child(mut self, rule: impl BuildableRule) -> Self {
-        match rule.build() {
+        match rule.build_condition_tree() {
             Ok(r) => self.conditions.push(r.value),
             Err(_) => (),
         }
@@ -146,10 +150,14 @@ impl LogicRuleBuilder {
         }
         self
     }
+
+    pub fn build(self) -> Result<Rule, &'static str> {
+        self.build_condition_tree()
+    }
 }
 
 impl BuildableRule for LogicRuleBuilder {
-    fn build(self) -> Result<Rule, &'static str> {
+    fn build_condition_tree(self) -> Result<Rule, &'static str> {
         if self.conditions.is_empty() {
             Err("No conditions provided")
         } else if self.conditions.len() == 1 {

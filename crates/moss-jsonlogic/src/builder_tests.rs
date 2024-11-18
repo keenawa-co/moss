@@ -1,6 +1,6 @@
 #[cfg(test)]
 mod tests {
-    use crate::builder::{RuleBuilder, LogicRuleBuilder, BuildableRule};
+    use crate::builder::{RuleBuilder, LogicRuleBuilder};
     use serde_json::json;
 
     #[test]
@@ -111,8 +111,8 @@ mod tests {
     #[test]
     fn test_not_operation() {
         let rule = LogicRuleBuilder::new()
-            .not()
             .child(RuleBuilder::new().equal("status", "inactive"))
+            .not()
             .build()
             .expect("Failed to build rule");
 
