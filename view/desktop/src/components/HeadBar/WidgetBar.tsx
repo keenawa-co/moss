@@ -163,7 +163,7 @@ export const WidgetBar = ({ os, className, ...props }: WidgetBarProps) => {
     classNameTrigger?: string;
   }) => {
     return (
-      <DM.Root>
+      <DM.Root open>
         <DM.Trigger className={cn("DM.Trigger rounded p-[7px] transition-colors hover:bg-[#D3D3D3]", classNameTrigger)}>
           <Icon icon="ThreeHorizontalDots" className="flex size-4 items-center justify-center" />
         </DM.Trigger>
@@ -171,7 +171,7 @@ export const WidgetBar = ({ os, className, ...props }: WidgetBarProps) => {
         <DM.Content className={cn("z-50 flex flex-col gap-0.5 bg-white", classNameContent)}>
           {overflownList.map((id) => {
             const item = widgetsList.find((item) => id === item.id)!;
-            return <DM.Item label={item.label} icon={item.icon} key={item.id} iconClassName="size-[16px]" />;
+            return <DM.Item label={item.label} icon={item.icon} key={item.id} iconClassName="size-[15px]" />;
           })}
         </DM.Content>
       </DM.Root>
