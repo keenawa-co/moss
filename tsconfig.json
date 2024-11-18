@@ -2,6 +2,9 @@
   "files": [],
   "references": [
     {
+      "path": "crates/moss-str"
+    },
+    {
       "path": "view/desktop"
     },
     {
@@ -23,16 +26,19 @@
       "path": "lib/moss_lang"
     },
     {
-      "path": "tools/theme-generator"
+      "path": "tools/themegen"
     },
     {
-      "path": "sdk/ts"
+      "path": "tools/icongen"
+    },
+    {
+      "path": "sdk-ts"
     },
     {
       "path": "view/shared/models/uikit"
     },
     {
-      "path": "internal/workbench/models"
+      "path": "internal/workbench/desktop/models"
     }
   ]
 }

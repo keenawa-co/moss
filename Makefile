@@ -12,16 +12,18 @@ DESKTOP_DIR := view/desktop
 STORYBOOK_DIR := view/storybook
 DOCS_DIR := view/docs
 WEB_DIR := view/web
-THEME_GENERATOR_DIR := tools/theme-generator
-ICONS_DIR := view/shared/icons
+THEME_GENERATOR_DIR := tools/themegen
+ICONS_DIR := tools/icongen
 
-WORKBENCH_MODELS_DIR := internal/workbench/models
+DESKTOP_MODELS_DIR := internal/workbench/desktop/models
 SHARED_MODELS_DIR := view/shared/models
 
+XTASK_DIR := tools/xtask
 # Executables
 PNPM := pnpm
 SURREAL := surreal
 CARGO := cargo
+RUSTUP := rustup
 
 # Database settings
 DATABASE_FILE := file:rocksdb
@@ -31,6 +33,7 @@ SURREAL_PROCESS_NAME := surreal
 SRC_EXT := rs,ts
 EXCLUDE_DIRS := target,node_modules
 
+export RUSTFLAGS := -Awarnings
 # Run Commands
 
 ## Run Desktop Application
@@ -100,22 +103,22 @@ gen-themes:
 ## Generate Icons
 .PHONY: gen-icons
 gen-icons:
-	@cd $(ICONS_DIR) && $(PNPM) run build
+	@cd $(ICONS_DIR) && $(PNPM) start
 
 ## Generate Shared Models
 .PHONY: gen-shared-models
 gen-shared-models:
 	@$(CARGO) test --manifest-path $(SHARED_MODELS_DIR)/uikit/Cargo.toml
 
-## Generate Workbench Models
-.PHONY: gen-workbench-models
-gen-workbench-models:
-	@$(CARGO) test --manifest-path $(WORKBENCH_MODELS_DIR)/Cargo.toml
-	@$(CARGO) build --manifest-path $(WORKBENCH_MODELS_DIR)/Cargo.toml
+## Generate Desktop Models
+.PHONY: gen-desktop-models
+gen-desktop-models:
+	@$(CARGO) test --manifest-path $(DESKTOP_MODELS_DIR)/Cargo.toml
+	@$(CARGO) build --manifest-path $(DESKTOP_MODELS_DIR)/Cargo.toml
 
 ## Generate All Models
 .PHONY: gen-models
-gen-models: gen-shared-models gen-workbench-models
+gen-models: gen-shared-models gen-desktop-models
 
 # Utility Commands
 
@@ -128,7 +131,51 @@ loc:
 .PHONY: cleanup-git
 cleanup-git:
 ifeq ($(DETECTED_OS),Windows)
-	@for /F "tokens=*" %i in ('git branch --merged ^| findstr /V "master main dev"') do git branch -d %i
+	# TODO: make this work on Windows
+	# @for /F "tokens=*" %i in ('git branch --merged ^| findstr /V "master main dev"') do git branch -d %i
 else
 	@git branch --merged | grep -Ev "(^\*|master|main|dev)" | xargs git branch -d
 endif
+
+# Clean up unused pnpm packages in all directories and store
+# pnpm does not support recursive prune
+.PHONY: clean-pnpm
+clean-pnpm:
+	@cd $(DESKTOP_DIR) && $(PNPM) prune
+	@cd $(STORYBOOK_DIR) && $(PNPM) prune
+	@cd $(DOCS_DIR) && $(PNPM) prune
+	@cd $(WEB_DIR) && $(PNPM) prune
+	@cd $(THEME_GENERATOR_DIR) && $(PNPM) prune
+	@cd $(ICONS_DIR) && $(PNPM) prune
+	@cd $(DESKTOP_MODELS_DIR) && $(PNPM) prune
+	@cd $(SHARED_MODELS_DIR) && $(PNPM) prune
+	$(PNPM) store prune
+
+# Clean up various artifacts across the project
+.PHONY: clean
+clean: cleanup-git clean-pnpm
+
+# Generate license with xtask
+.PHONY: gen-license
+gen-license:
+	@cd $(XTASK_DIR) && $(CARGO) run license
+
+# Audit workspace dependency
+.PHONY: workspace-audit
+workspace-audit:
+	@cd $(XTASK_DIR) && $(CARGO) run rwa
+
+# Check unused dependency
+.PHONY: check-unused-deps
+check-unused-deps:
+	$(CARGO) --quiet install cargo-udeps --locked
+	$(RUSTUP) --quiet toolchain install nightly
+	$(CARGO) +nightly udeps --quiet
+
+# Runs a series of maintenance tasks to keep the project organized and up-to-date.
+# TODO: output workspace-audit and check-unused-deps to file
+.PHONY: tidy
+
+tidy: gen-license workspace-audit check-unused-deps
+	$(MAKE) clean
+

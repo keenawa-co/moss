@@ -48,6 +48,19 @@ function rgbaWithOpacity(variableName: keyof ThemeCssVariables): string {
   return `rgba(var(${variableName}), var(--tw-bg-opacity, 1))`;
 }
 
+// Applies theme to root element of app.
+export function applyTheme(theme: Theme) {
+  const themeObject: ThemeCssVariables = mapThemeToCssVariables(theme);
+  const root = document.documentElement;
+
+  Object.keys(themeObject).forEach((v) => {
+    const propertyVal = themeObject[v as keyof ThemeCssVariables];
+    if (propertyVal !== undefined) {
+      root.style.setProperty(v, propertyVal);
+    }
+  });
+}
+
 // Conversion class using JSON parsing with type safety
 export class Convert {
   public static toTheme(json: string): Theme {

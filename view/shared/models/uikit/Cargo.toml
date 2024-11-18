@@ -8,5 +8,4 @@ edition = "2021"
 [dependencies]
 moss_str.workspace = true
 ts-rs.workspace = true
-anyhow.workspace = true
 serde = { workspace = true, features = ["derive"] }

@@ -30,5 +30,18 @@
     "windows": {
       "digestAlgorithm": "sha256"
     }
+  },
+
+  "plugins": {
+    "cli": {
+      "description": "Moss CLI",
+      "args": [],
+      "subcommands": {
+        "info": {
+          "description": "Provide information about the Moss application, including environment and packages",
+          "args": []
+        }
+      }
+    }
   }
 }

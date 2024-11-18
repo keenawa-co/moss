@@ -16,6 +16,8 @@ impl HtmlLink {
     ///
     /// # Example
     /// ```
+    /// use uikit_models::html::link::HtmlLink;
+    ///
     /// let link = HtmlLink::new("https://example.com", "Visit Example");
     /// ```
     pub fn new(href: &str, text: &str) -> Self {
