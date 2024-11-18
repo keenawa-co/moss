@@ -163,7 +163,7 @@ export const WidgetBar = ({ os, className, ...props }: WidgetBarProps) => {
     classNameTrigger?: string;
   }) => {
     return (
-      <DM.Root open>
+      <DM.Root>
         <DM.Trigger className={cn("DM.Trigger rounded p-[7px] transition-colors hover:bg-[#D3D3D3]", classNameTrigger)}>
           <Icon icon="ThreeHorizontalDots" className="flex size-4 items-center justify-center" />
         </DM.Trigger>
