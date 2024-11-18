@@ -29,6 +29,10 @@ impl ToString for Rule {
     }
 }
 
+pub trait BuildableRule {
+    fn build(self) -> Result<Rule, &'static str>;
+}
+
 pub struct RuleBuilder {
     conditions: Vec<Value>,
 }
@@ -92,8 +96,10 @@ impl RuleBuilder {
         self.conditions.push(condition);
         self
     }
+}
 
-    pub fn build(self) -> Result<Rule, &'static str> {
+impl BuildableRule for RuleBuilder {
+    fn build(self) -> Result<Rule, &'static str> {
         if self.conditions.is_empty() {
             Err("No conditions provided")
         } else if self.conditions.len() == 1 {
@@ -113,7 +119,7 @@ impl LogicRuleBuilder {
         LogicRuleBuilder { conditions: Vec::new() }
     }
 
-    pub fn child(mut self, rule: RuleBuilder) -> Self {
+    pub fn child(mut self, rule: impl BuildableRule) -> Self {
         match rule.build() {
             Ok(r) => self.conditions.push(r.value),
             Err(_) => (),
@@ -140,8 +146,10 @@ impl LogicRuleBuilder {
         }
         self
     }
+}
 
-    pub fn build(self) -> Result<Rule, &'static str> {
+impl BuildableRule for LogicRuleBuilder {
+    fn build(self) -> Result<Rule, &'static str> {
         if self.conditions.is_empty() {
             Err("No conditions provided")
         } else if self.conditions.len() == 1 {

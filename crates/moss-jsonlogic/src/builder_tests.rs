@@ -1,6 +1,6 @@
 #[cfg(test)]
 mod tests {
-    use crate::builder::{RuleBuilder, LogicRuleBuilder};
+    use crate::builder::{RuleBuilder, LogicRuleBuilder, BuildableRule};
     use serde_json::json;
 
     #[test]
