@@ -31,7 +31,12 @@ export const ActionsGroup = ({
 
   if (!defaultAction) {
     return (
-      <div className={cn(buttonStyle, className)} {...props}>
+      <div
+        className={cn(buttonStyle, className, {
+          "border-[#c5c5c5]": open,
+        })}
+        {...props}
+      >
         <DM.Root open={open} onOpenChange={() => {}}>
           <DM.Trigger
             className={cn(triggerStyle, "rounded-r px-1.5 py-1", {
@@ -55,7 +60,12 @@ export const ActionsGroup = ({
   }
 
   return (
-    <div className={cn(buttonStyle, className)} {...props}>
+    <div
+      className={cn(buttonStyle, className, {
+        "border-[#c5c5c5]": open,
+      })}
+      {...props}
+    >
       <div className="flex items-stretch">
         <button className={cn(triggerStyle, "px-1.5 py-1")}>
           <Icon icon={icon} className={cn(iconStyle, iconClassName)} />
@@ -64,7 +74,11 @@ export const ActionsGroup = ({
 
         {showActions && (
           <>
-            <div className="flex min-w-px grow self-stretch bg-transparent group-hover:bg-[#c5c5c5]" />
+            <div
+              className={cn("flex min-w-px grow self-stretch bg-transparent group-hover:bg-[#c5c5c5]", {
+                "bg-[#c5c5c5]": open,
+              })}
+            />
             <DM.Root open={open}>
               <DM.Trigger
                 className={cn(triggerStyle, "self-stretch rounded-r", {
