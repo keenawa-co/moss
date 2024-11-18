@@ -3,7 +3,7 @@ import * as DM from "../DropdownMenu/DropdownMenu";
 import { useState } from "react";
 
 const meta: Meta<typeof DM.Root> = {
-  title: "Shared/DropdownMenuNew",
+  title: "Shared/DropdownMenu",
   component: DM.Root,
   tags: ["autodocs"],
   decorators: [

@@ -162,10 +162,6 @@ export const WidgetBar = ({ os, className, ...props }: WidgetBarProps) => {
     classNameContent?: string;
     classNameTrigger?: string;
   }) => {
-    console.log({
-      classNameContent,
-      classNameTrigger,
-    });
     return (
       <DM.Root>
         <DM.Trigger className={cn("DM.Trigger rounded p-[7px] transition-colors hover:bg-[#D3D3D3]", classNameTrigger)}>
