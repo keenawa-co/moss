@@ -175,15 +175,7 @@ export const WidgetBar = ({ os, className, ...props }: WidgetBarProps) => {
         <DM.Content className={cn("z-50 bg-white", classNameContent)}>
           {overflownList.map((id) => {
             const item = widgetsList.find((item) => id === item.id)!;
-            return (
-              <ActionsGroup
-                icon={item.icon}
-                label={item.label}
-                actions={item.actions}
-                defaultAction={item.defaultAction}
-                key={item.id}
-              />
-            );
+            return <DM.Item label={item.label} icon={item.icon} key={item.id} />;
           })}
         </DM.Content>
       </DM.Root>
@@ -202,7 +194,7 @@ export const WidgetBar = ({ os, className, ...props }: WidgetBarProps) => {
         />
 
         <div className="flex w-full items-center justify-start gap-1">
-          {DNDlist.length === 0 && <OverflownMenu classNameTrigger="ml-[7px]" />}
+          {DNDlist.length === 0 && <OverflownMenu />}
           <div className="sortable flex w-full items-center" ref={DNDListRef}>
             <DndContext
               sensors={sensors}
