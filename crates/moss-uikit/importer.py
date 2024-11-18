@@ -15,11 +15,7 @@ auto_generated_comment = """\
 // re-run `make gen-models` it to regenerate the file accordingly.
 """
 
-import_map: Dict[str, Dict[str, Dict[str, any]]] = {
-    "bindings/actions.ts": {
-        "@repo/moss-str": {"types": ["LocalizedString"], "is_type_import": True}
-    },
-}
+import_map: Dict[str, Dict[str, Dict[str, any]]] = {}
 
 
 def parse_existing_imports(content: str) -> Dict[str, Set[str]]:
