@@ -33,7 +33,7 @@ export const ActionsGroup = ({
     return (
       <div className={cn(buttonStyle, className)} {...props}>
         <DM.Root open={open} onOpenChange={() => {}}>
-          <DM.Trigger className={cn(triggerStyle, "rounded-r px-1.5 py-1.5")} onClick={() => setOpen((prev) => !prev)}>
+          <DM.Trigger className={cn(triggerStyle, "rounded-r px-1.5 py-1")} onClick={() => setOpen((prev) => !prev)}>
             <Icon icon={icon} className={cn(iconStyle, iconClassName)} />
             {!compact && label && <span className={labelStyle}>{label}</span>}
             {showActions && <Icon icon="ArrowheadDown" className="ml-auto " />}
@@ -52,7 +52,7 @@ export const ActionsGroup = ({
   return (
     <div className={cn(buttonStyle, className)} {...props}>
       <div className="flex items-stretch">
-        <button className={cn(triggerStyle, "px-1.5 py-1.5")}>
+        <button className={cn(triggerStyle, "px-1.5 py-1")}>
           <Icon icon={icon} className={cn(iconStyle, iconClassName)} />
           {!compact && label && <span className={labelStyle}>{label}</span>}
         </button>
