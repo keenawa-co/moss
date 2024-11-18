@@ -162,6 +162,10 @@ export const WidgetBar = ({ os, className, ...props }: WidgetBarProps) => {
     classNameContent?: string;
     classNameTrigger?: string;
   }) => {
+    console.log({
+      classNameContent,
+      classNameTrigger,
+    });
     return (
       <DM.Root>
         <DM.Trigger className={cn("DM.Trigger rounded p-[7px] transition-colors hover:bg-[#D3D3D3]", classNameTrigger)}>
@@ -198,7 +202,7 @@ export const WidgetBar = ({ os, className, ...props }: WidgetBarProps) => {
         />
 
         <div className="flex w-full items-center justify-start gap-1">
-          {DNDlist.length === 0 && <OverflownMenu classNameTrigger="ml-[13px]" />}
+          {DNDlist.length === 0 && <OverflownMenu classNameTrigger="ml-1.5" />}
           <div className="sortable flex w-full items-center" ref={DNDListRef}>
             <DndContext
               sensors={sensors}
