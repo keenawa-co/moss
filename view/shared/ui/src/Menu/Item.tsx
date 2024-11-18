@@ -31,9 +31,9 @@ export const Item = forwardRef<ItemElement, ItemProps>(
       >
         {!hideIcon &&
           (props.icon ? (
-            <Icon icon={props.icon} className="text-[#8D8D8D]" />
+            <Icon icon={props.icon} className={cn("flex-shrink-0 text-[#8D8D8D]", iconClassName)} />
           ) : (
-            <Icon icon="Documentation" className="opacity-0" />
+            <Icon icon="Documentation" className={cn("flex-shrink-0 opacity-0", iconClassName)} />
           ))}
         <div className="flex w-full items-center gap-2.5">
           <span>{props.label}</span>

@@ -171,7 +171,7 @@ export const WidgetBar = ({ os, className, ...props }: WidgetBarProps) => {
         <DM.Content className={cn("z-50 bg-white", classNameContent)}>
           {overflownList.map((id) => {
             const item = widgetsList.find((item) => id === item.id)!;
-            return <DM.Item label={item.label} icon={item.icon} key={item.id} />;
+            return <DM.Item label={item.label} icon={item.icon} key={item.id} iconClassName="size-[16px]" />;
           })}
         </DM.Content>
       </DM.Root>
