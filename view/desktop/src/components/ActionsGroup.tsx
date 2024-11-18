@@ -33,14 +33,19 @@ export const ActionsGroup = ({
     return (
       <div className={cn(buttonStyle, className)} {...props}>
         <DM.Root open={open} onOpenChange={() => {}}>
-          <DM.Trigger className={cn(triggerStyle, "rounded-r px-1.5 py-1")} onClick={() => setOpen((prev) => !prev)}>
+          <DM.Trigger
+            className={cn(triggerStyle, "rounded-r px-1.5 py-1", {
+              "bg-[#D3D3D3]": open,
+            })}
+            onClick={() => setOpen((prev) => !prev)}
+          >
             <Icon icon={icon} className={cn(iconStyle, iconClassName)} />
             {!compact && label && <span className={labelStyle}>{label}</span>}
             {showActions && <Icon icon="ArrowheadDown" className="ml-auto " />}
           </DM.Trigger>
 
           {showActions && (
-            <DM.Content className="z-50 flex flex-col" onPointerDownOutside={() => setOpen(false)}>
+            <DM.Content className="z-50 flex flex-col " onPointerDownOutside={() => setOpen(false)}>
               {props.actions?.map((id) => <button key={id}>Action {id}</button>)}
             </DM.Content>
           )}
@@ -62,13 +67,15 @@ export const ActionsGroup = ({
             <div className="flex min-w-px grow self-stretch bg-transparent group-hover:bg-[#c5c5c5]" />
             <DM.Root open={open}>
               <DM.Trigger
-                className={cn(triggerStyle, "self-stretch rounded-r")}
+                className={cn(triggerStyle, "self-stretch rounded-r", {
+                  "bg-[#D3D3D3]": open,
+                })}
                 onClick={() => setOpen((prev) => !prev)}
               >
                 <Icon icon="ArrowheadDown" />
               </DM.Trigger>
 
-              <DM.Content className="z-50 flex flex-col" onPointerDownOutside={() => setOpen(false)}>
+              <DM.Content className="z-50 flex flex-col " onPointerDownOutside={() => setOpen(false)}>
                 {props.actions?.map((id) => <button key={id}>Action {id}</button>)}
               </DM.Content>
             </DM.Root>

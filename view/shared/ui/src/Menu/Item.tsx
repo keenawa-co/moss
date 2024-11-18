@@ -13,15 +13,19 @@ export type ItemProps = ScopedProps<ComponentPropsWithoutRef<typeof MenuPrimitiv
   hideIcon?: boolean;
 };
 
-export const Item = forwardRef<ItemElement, ItemProps>(({ hideIcon = false, ...props }, forwardedRef) => {
+export const Item = forwardRef<ItemElement, ItemProps>(({ className, hideIcon = false, ...props }, forwardedRef) => {
   return (
     <MenuPrimitive.Item
       {...props}
       ref={forwardedRef}
-      className={cn("flex items-center gap-1.5 rounded px-2 py-1", {
-        "cursor-not-allowed opacity-50": props.disabled,
-        "cursor-pointer hover:bg-[#D4E2FF] hover:outline-none": !props.disabled,
-      })}
+      className={cn(
+        "flex items-center gap-1.5 rounded py-1 pl-2 pr-3",
+        {
+          "cursor-not-allowed opacity-50": props.disabled,
+          "cursor-pointer hover:bg-[#D4E2FF] hover:outline-none": !props.disabled,
+        },
+        className
+      )}
     >
       {!hideIcon &&
         (props.icon ? (
