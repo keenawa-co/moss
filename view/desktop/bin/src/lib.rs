@@ -15,7 +15,9 @@ use platform_workspace::WorkspaceId;
 use rand::random;
 use std::env;
 use std::rc::Rc;
+use std::sync::atomic::{AtomicUsize, Ordering};
 use std::sync::Arc;
+
 use tauri::{AppHandle, Manager, RunEvent, WebviewWindow, WindowEvent};
 use tauri_plugin_cli::CliExt;
 use tauri_plugin_log::{fern::colors::ColoredLevelConfig, Target, TargetKind};
@@ -32,6 +34,7 @@ extern crate serde;
 pub struct AppState {
     pub workbench: Arc<Workbench>,
     pub platform_info: NativePlatformInfo,
+    pub window_counter: AtomicUsize,
 }
 
 pub fn run() {
@@ -98,6 +101,7 @@ pub fn run() {
             let app_state = AppState {
                 workbench: Arc::new(workbench),
                 platform_info,
+                window_counter: AtomicUsize::new(0),
             };
 
             {
@@ -141,6 +145,8 @@ pub fn run() {
                         let subcommand = matches.subcommand;
                         if subcommand.is_none() {
                             let _ = create_main_window(app_handle, "/");
+
+                            // let _ = create_main_window(app_handle, "/");
                         } else {
                             tauri::async_runtime::spawn(crate::cli::cli_handler(
                                 subcommand.unwrap(),
@@ -163,7 +169,11 @@ pub fn run() {
 }
 
 fn create_main_window(handle: &AppHandle, url: &str) -> WebviewWindow {
-    let label = format!("{MAIN_WINDOW_PREFIX}{}", handle.webview_windows().len());
+    let window_number = handle
+        .state::<AppState>()
+        .window_counter
+        .fetch_add(1, Ordering::SeqCst);
+    let label = format!("{MAIN_WINDOW_PREFIX}{}", window_number);
     let config = CreateWindowInput {
         url,
         label: label.as_str(),
@@ -175,11 +185,7 @@ fn create_main_window(handle: &AppHandle, url: &str) -> WebviewWindow {
         ),
     };
     let webview_window = create_window(handle, config);
-
-    let webview_window_clone = webview_window.clone();
-    webview_window.on_menu_event(move |window, event| {
-        menu::handle_event(window, &webview_window_clone, &event)
-    });
+    webview_window.on_menu_event(move |window, event| menu::handle_event(window, &event));
 
     webview_window
 }
