@@ -1,10 +1,10 @@
 use crate::Contribution;
 use anyhow::Result;
 use desktop_models::{constants, view::TreeViewDescriptor};
+use moss_html::link::HtmlLink;
 use moss_str::localize;
 use once_cell::sync::Lazy;
 use std::sync::Arc;
-use uikit_models::html::link::HtmlLink;
 
 #[derive(Debug, Serialize)]
 pub struct LinksViewContent(Vec<HtmlLink>);
@@ -12,12 +12,14 @@ pub struct LinksViewContent(Vec<HtmlLink>);
 pub struct LinksView;
 
 impl LinksView {
+    #[rustfmt::skip]
     pub fn content(&self) -> Result<LinksViewContent> {
-        Ok(LinksViewContent(vec![
-            HtmlLink::new("https://example.com", "Docs"), // TODO: localize!("links.docs", "Docs")
-            HtmlLink::new("https://example.com", "Releases"),
-            HtmlLink::new("https://example.com", "GitHub"),
-            HtmlLink::new("https://example.com", "Support"),
+        Ok(LinksViewContent(
+            vec![
+            HtmlLink::new("https://example.com", Some(localize!("links.docs", "Docs"))),
+            HtmlLink::new("https://example.com", Some(localize!("links.releases", "Releases"))),
+            HtmlLink::new("https://example.com", Some(localize!("links.gitHub", "GitHub"))),
+            HtmlLink::new("https://example.com", Some(localize!("links.support", "Support"))),
         ]))
     }
 }

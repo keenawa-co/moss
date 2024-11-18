@@ -1,10 +1,15 @@
+use moss_str::localized_string::LocalizedString;
+
 /// Represents an HTML link (`<a>`) with attributes commonly used in web development.
 #[derive(Debug, Serialize, TS)]
+#[serde(rename_all = "camelCase")]
+#[ts(export, export_to = "link.ts")]
 pub struct HtmlLink {
     href: String,           // The URL the link points to
     target: Option<Target>, // Optional target attribute for specifying where to open the link
     rel: Option<Rel>, // Optional rel attribute for relationship between linked document and current document
-    text: String,     // The text displayed for the link
+    #[ts(type = "LocalizedString | null")]
+    text: Option<LocalizedString>, // The text displayed for the link
 }
 
 impl HtmlLink {
@@ -16,16 +21,17 @@ impl HtmlLink {
     ///
     /// # Example
     /// ```
-    /// use uikit_models::html::link::HtmlLink;
+    /// use moss_html::link::HtmlLink;
+    /// use moss_str::{localized_string::LocalizedString, localize};
     ///
-    /// let link = HtmlLink::new("https://example.com", "Visit Example");
+    /// let link = HtmlLink::new("https://example.com", Some(localize!("welcome.message", "Welcome!")));
     /// ```
-    pub fn new(href: &str, text: &str) -> Self {
+    pub fn new(href: &str, text: Option<LocalizedString>) -> Self {
         Self {
             href: href.to_string(),
             target: None,
             rel: None,
-            text: text.to_string(),
+            text,
         }
     }
 
@@ -47,6 +53,8 @@ impl HtmlLink {
 ///
 /// The `target` attribute specifies where to open the linked document.
 #[derive(Debug, Serialize, TS)]
+#[serde(rename_all = "camelCase")]
+#[ts(export, export_to = "link.ts")]
 pub enum Target {
     /// Opens the link in the same frame as it was clicked (default behavior).
     #[serde(rename = "_self")]
@@ -78,6 +86,8 @@ impl ToString for Target {
 /// The `rel` attribute specifies the relationship between the current document
 /// and the linked document.
 #[derive(Debug, Serialize, TS)]
+#[serde(rename_all = "camelCase")]
+#[ts(export, export_to = "link.ts")]
 pub enum Rel {
     /// Specifies that the target should not have any control over the current page.
     #[serde(rename = "noopener")]

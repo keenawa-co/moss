@@ -27,7 +27,27 @@ importers:
         specifier: ^2.0.6
         version: 2.3.0
 
+  crates/moss-html:
+    dependencies:
+      typescript:
+        specifier: ^5.5.4
+        version: 5.6.3
+    devDependencies:
+      '@repo/typescript-config':
+        specifier: workspace:*
+        version: link:../../view/shared/config-typescript
+
   crates/moss-str:
+    dependencies:
+      typescript:
+        specifier: ^5.5.4
+        version: 5.6.3
+    devDependencies:
+      '@repo/typescript-config':
+        specifier: workspace:*
+        version: link:../../view/shared/config-typescript
+
+  crates/moss-uikit:
     dependencies:
       typescript:
         specifier: ^5.5.4
@@ -373,16 +393,6 @@ importers:
         version: 3.4.15
 
   view/shared/config-typescript: {}
-
-  view/shared/models/uikit:
-    dependencies:
-      typescript:
-        specifier: ^5.5.4
-        version: 5.6.3
-    devDependencies:
-      '@repo/typescript-config':
-        specifier: workspace:*
-        version: link:../../config-typescript
 
   view/shared/ui:
     dependencies:
