@@ -202,7 +202,7 @@ export const WidgetBar = ({ os, className, ...props }: WidgetBarProps) => {
         />
 
         <div className="flex w-full items-center justify-start gap-1">
-          {DNDlist.length === 0 && <OverflownMenu classNameTrigger="ml-1.5" />}
+          {DNDlist.length === 0 && <OverflownMenu classNameTrigger="ml-[7px]" />}
           <div className="sortable flex w-full items-center" ref={DNDListRef}>
             <DndContext
               sensors={sensors}
