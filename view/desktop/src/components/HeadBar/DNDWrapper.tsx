@@ -2,17 +2,17 @@ import { ComponentPropsWithoutRef } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { cn } from "@repo/ui";
+import { UniqueIdentifier } from "@dnd-kit/core";
 
-interface DNDWrapperProps extends ComponentPropsWithoutRef<"span"> {
-  sortableId: string | number;
+interface DNDItemWrapperProps extends Omit<ComponentPropsWithoutRef<"div">, "id"> {
+  id: UniqueIdentifier;
   idleClassName?: string;
   draggingClassName?: string;
-  children: React.ReactNode;
 }
 
-export const DNDWrapper = ({ sortableId, idleClassName, draggingClassName, ...props }: DNDWrapperProps) => {
+export const DNDSortableItemWrapper = ({ id, idleClassName, draggingClassName, ...props }: DNDItemWrapperProps) => {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
-    id: sortableId,
+    id,
   });
 
   const style = {
@@ -21,7 +21,7 @@ export const DNDWrapper = ({ sortableId, idleClassName, draggingClassName, ...pr
   };
 
   return (
-    <span
+    <div
       ref={setNodeRef}
       {...attributes}
       {...listeners}
@@ -29,6 +29,6 @@ export const DNDWrapper = ({ sortableId, idleClassName, draggingClassName, ...pr
       className={cn(isDragging ? draggingClassName : idleClassName, props.className)}
     >
       {props.children}
-    </span>
+    </div>
   );
 };

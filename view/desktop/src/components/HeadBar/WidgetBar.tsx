@@ -10,18 +10,13 @@ import {
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
-import {
-  SortableContext,
-  arrayMove,
-  horizontalListSortingStrategy,
-  sortableKeyboardCoordinates,
-} from "@dnd-kit/sortable";
+import { SortableContext, arrayMove, horizontalListSortingStrategy } from "@dnd-kit/sortable";
 import { DropdownMenu as DM, Icon, cn } from "@repo/ui";
 import { OsType } from "@tauri-apps/plugin-os";
 import { HTMLProps, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { ActionsGroup } from "../ActionsGroup";
-import { DNDWrapper } from "./DNDWrapper";
+import { DNDSortableItemWrapper } from "./DNDWrapper";
 
 interface WidgetBarProps extends HTMLProps<HTMLDivElement> {
   os: OsType;
@@ -208,14 +203,17 @@ export const WidgetBar = ({ os, className, ...props }: WidgetBarProps) => {
                       data-itemid={item.id}
                       key={item.id}
                     >
-                      <DNDWrapper sortableId={item.id} draggingClassName="z-50 cursor-grabbing opacity-50 shadow-2xl">
+                      <DNDSortableItemWrapper
+                        id={item.id}
+                        draggingClassName="z-50 cursor-grabbing opacity-50 shadow-2xl"
+                      >
                         <ActionsGroup
                           icon={item.icon}
                           label={item.label}
                           actions={item.actions}
                           defaultAction={item.defaultAction}
                         />
-                      </DNDWrapper>
+                      </DNDSortableItemWrapper>
 
                       {shouldShowSelect && <OverflownMenu />}
                     </span>

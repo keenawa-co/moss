@@ -4,7 +4,7 @@ export * from "./Button";
 export * from "./LanguageSelector";
 export * from "./ThemeSelector";
 export * from "./Sidebar";
-export * from "./DraggableAccordion";
+export * from "./Accordion";
 export * from "./SidebarHeader";
 export * from "./SidebarGeneral";
 export * from "./SidebarLinks";
