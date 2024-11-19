@@ -43,9 +43,11 @@
   },
   "dependencies": {
     "@radix-ui/primitive": "^1.1.0",
+    "@radix-ui/react-compose-refs": "^1.1.0",
     "@radix-ui/react-context": "^1.1.1",
     "@radix-ui/react-context-menu": "^2.2.2",
     "@radix-ui/react-direction": "^1.1.0",
+    "@radix-ui/react-id": "^1.1.0",
     "@radix-ui/react-menu": "^2.1.2",
     "@radix-ui/react-primitive": "^2.0.0",
     "@radix-ui/react-use-callback-ref": "^1.1.0",
