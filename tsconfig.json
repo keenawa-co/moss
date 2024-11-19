@@ -5,6 +5,12 @@
       "path": "crates/moss-str"
     },
     {
+      "path": "crates/moss-html"
+    },
+    {
+      "path": "crates/moss-uikit"
+    },
+    {
       "path": "view/desktop"
     },
     {
@@ -33,9 +39,6 @@
     },
     {
       "path": "sdk-ts"
-    },
-    {
-      "path": "view/shared/models/uikit"
     },
     {
       "path": "internal/workbench/desktop/models"

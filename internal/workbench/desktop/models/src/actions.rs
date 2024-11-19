@@ -4,6 +4,10 @@ use moss_str::{localized_string::LocalizedString, ReadOnlyStr};
 use serde::Serialize;
 use ts_rs::TS;
 
+#[derive(Serialize, Debug, Clone, Default, Eq, PartialEq, TS)]
+#[ts(export, export_to = "actions.ts")]
+pub struct Action(#[ts(type = "string")] ReadOnlyStr);
+
 pub type SubmenuRef = moss_str::ReadOnlyStr;
 pub type ActionCommandId = ReadOnlyStr;
 

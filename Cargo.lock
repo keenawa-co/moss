@@ -1073,6 +1073,7 @@ dependencies = [
  "macos-trampoline",
  "mimalloc",
  "moss_base",
+ "moss_uikit",
  "objc",
  "once_cell",
  "parking_lot",
@@ -1099,7 +1100,6 @@ dependencies = [
  "tauri-specta",
  "tokio",
  "tracing",
- "uikit_models",
  "workbench_desktop",
  "workbench_service_configuration_tao",
  "workbench_service_environment_tao",
@@ -1110,10 +1110,10 @@ name = "desktop_models"
 version = "0.1.0"
 dependencies = [
  "moss_str",
+ "moss_uikit",
  "once_cell",
  "serde",
  "ts-rs",
- "uikit_models",
 ]
 
 [[package]]
@@ -2547,12 +2547,29 @@ dependencies = [
 ]
 
 [[package]]
+name = "moss_html"
+version = "0.1.0"
+dependencies = [
+ "moss_str",
+ "serde",
+ "ts-rs",
+]
+
+[[package]]
 name = "moss_str"
 version = "0.1.0"
 dependencies = [
  "arcstr",
  "bstr",
  "serde",
+]
+
+[[package]]
+name = "moss_uikit"
+version = "0.1.0"
+dependencies = [
+ "serde",
+ "ts-rs",
 ]
 
 [[package]]
@@ -5202,15 +5219,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "42ff0bf0c66b8238c6f3b578df37d0b7848e55df8577b3f74f92a69acceeb825"
 
 [[package]]
-name = "uikit_models"
-version = "0.1.0"
-dependencies = [
- "moss_str",
- "serde",
- "ts-rs",
-]
-
-[[package]]
 name = "unic-char-property"
 version = "0.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -6035,7 +6043,9 @@ dependencies = [
  "desktop_models",
  "hashbrown 0.15.0",
  "lazy_static",
+ "moss_html",
  "moss_str",
+ "moss_uikit",
  "once_cell",
  "parking_lot",
  "platform_configuration",
@@ -6053,7 +6063,6 @@ dependencies = [
  "sysinfo",
  "tauri",
  "thiserror",
- "uikit_models",
  "workbench_service_configuration_tao",
  "workbench_service_environment_tao",
  "workbench_service_user_profile_tao",

@@ -6,11 +6,12 @@ edition = "2021"
 
 [dependencies]
 moss_str.workspace = true
+moss_uikit.workspace = true
+moss_html.workspace = true
 desktop_models.workspace = true
 quote.workspace = true
 static_str_ops.workspace = true
 thiserror.workspace = true
-uikit_models.workspace = true
 serde = { workspace = true, features = ["derive"] }
 serde_json.workspace = true
 sysinfo.workspace = true

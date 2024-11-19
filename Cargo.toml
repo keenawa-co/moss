@@ -2,11 +2,12 @@
 resolver = "2"
 members = [
     "view/desktop/bin",
-    "view/shared/models/uikit",
 
     "crates/moss-base",
     "crates/moss-str",
     "crates/moss-fs",
+    "crates/moss-uikit",
+    "crates/moss-html",
 
     "internal/platform/core",
     "internal/platform/fs",
@@ -24,8 +25,6 @@ members = [
     "internal/workbench/service/environment/tao",
 
     "tools/xtask",
-    "crates/moss-str",
-    "crates/moss-fs",
 ]
 
 [profile.release]
@@ -41,8 +40,8 @@ opt-level = 3
 
 
 [workspace.dependencies]
-uikit_models = { path = "view/shared/models/uikit" }
-
+moss_uikit = { path = "crates/moss-uikit" }
+moss_html = { path = "crates/moss-html" }
 moss_base = { path = "crates/moss-base" }
 moss_str = { path = "crates/moss-str" }
 moss_fs = { path = "crates/moss-fs" }
