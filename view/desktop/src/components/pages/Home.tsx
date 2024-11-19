@@ -2,16 +2,9 @@ import { useTranslation } from "react-i18next";
 import { commands, SessionInfoDTO } from "@/bindings";
 import React, { useEffect, useState } from "react";
 import { listen } from "@tauri-apps/api/event";
-import {
-  Tooltip,
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  Icon,
-} from "@repo/ui";
+import { Tooltip, DropdownMenu, Icon } from "@repo/ui";
 import { invokeIpc } from "@/lib/backend/tauri";
+import { useStoredString, useUpdateStoredString } from "@/hooks/useReactQuery";
 
 export type DescribeActivityOutput = { tooltip: string; order: number };
 
@@ -115,7 +108,7 @@ export const Home: React.FC = () => {
       <button className="bg-green-500 px-3" onClick={handleNewWindowButton}>
         New Window
       </button>
-
+      <StoredStringUpdater />
       <div>
         <Tooltip label="Test" className="text-[rgba(var(--color-primary))]">
           <Icon icon="Code" />
@@ -151,6 +144,44 @@ export const Home: React.FC = () => {
     </div>
   );
 };
-function invokeCmd(arg0: string): object | PromiseLike<object> {
-  throw new Error("Function not implemented.");
-}
+
+const StoredStringUpdater: React.FC = () => {
+  const [newString, setNewString] = useState<string>("");
+  const mutation = useUpdateStoredString();
+  const { data: storedString, refetch } = useStoredString();
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    mutation.mutate(newString);
+    setNewString("");
+  };
+
+  const handleLogCurrentString = async () => {
+    await refetch();
+    console.log("Current Stored String:", storedString);
+  };
+
+  return (
+    <div>
+      <h2>Update String:</h2>
+      <form onSubmit={handleSubmit}>
+        <input
+          type="text"
+          value={newString}
+          onChange={(e) => setNewString(e.target.value)}
+          placeholder="Enter new string"
+          required
+        />
+        <button type="submit" disabled={mutation.isPending}>
+          {mutation.isPending ? "Updating..." : "Update"}
+        </button>
+      </form>
+      {mutation.isError && <p style={{ color: "red" }}>Error: {mutation.error?.message}</p>}
+      {mutation.isSuccess && <p style={{ color: "green" }}>String successfully updated!</p>}
+
+      <button onClick={handleLogCurrentString} style={{ marginTop: "10px" }}>
+        Log Current String
+      </button>
+    </div>
+  );
+};

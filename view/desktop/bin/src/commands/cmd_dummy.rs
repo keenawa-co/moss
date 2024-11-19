@@ -1,12 +1,12 @@
 use anyhow::Result;
+use homedir::my_home;
 use platform_core::context_v2::async_context::AsyncContext;
 use std::path::PathBuf;
-use homedir::my_home;
 use tauri::{AppHandle, Manager, State};
 use workbench_desktop::WorkbenchState;
 
-use crate::AppState;
 use crate::utl::get_home_dir;
+use crate::AppState;
 
 #[tauri::command(async)]
 #[specta::specta]
@@ -80,19 +80,16 @@ pub async fn workbench_get_state(state: State<'_, AppState>) -> Result<Workbench
     Ok(WorkbenchState::Empty)
 }
 
-// #[tauri::command(async)]
-// #[specta::specta]
-// pub async fn restore_session(
-//     state: State<'_, AppState>,
-//     project_source: Option<String>,
-// ) -> Result<Option<SessionInfoDTO>, String> {
-//     match state.session_service.restore_session(project_source).await {
-//         Ok(Some(session_info)) => return Ok(Some(session_info.into())),
-//         Ok(None) => return Ok(None),
-//         Err(e) => {
-//             let err = format!("An error occurred while restoring the session: {e}");
-//             error!(err);
-//             return Err(err);
-//         }
-//     }
-// }
+#[tauri::command]
+pub fn get_stored_string(state: State<'_, AppState>) -> String {
+    dbg!("read");
+    let stored_string = state.react_query_string.lock();
+    stored_string.clone()
+}
+
+#[tauri::command]
+pub fn set_stored_string(new_string: String, state: State<'_, AppState>) {
+    dbg!("write");
+    let mut stored_string = state.react_query_string.lock();
+    *stored_string = new_string;
+}
