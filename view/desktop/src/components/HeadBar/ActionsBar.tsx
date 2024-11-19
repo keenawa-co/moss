@@ -3,7 +3,7 @@ import { toggleSidebarVisibility } from "@/store/sidebar/sidebarSlice";
 import { cn, Icon } from "@repo/ui";
 import { HTMLProps } from "react";
 import { useSelector } from "react-redux";
-import { HeadBarButton } from "./HeadBarButton";
+import { ActionsGroup } from "../ActionsGroup";
 
 export const ActionsBar = ({ className, ...props }: HTMLProps<HTMLDivElement>) => {
   const dispatch = useAppDispatch();
@@ -30,45 +30,21 @@ export const ActionsBar = ({ className, ...props }: HTMLProps<HTMLDivElement>) =
       </div>
 
       <div className="flex items-center">
-        <HeadBarButton
+        <ActionsGroup
           icon={isSidebarVisible ? "HeadBarPrimarySideBarActive" : "HeadBarPrimarySideBar"}
-          className="flex size-[30px] items-center justify-center "
           onClick={() => dispatch(toggleSidebarVisibility({}))}
           iconClassName="size-[18px]"
+          className="size-[30px] "
         />
-        <HeadBarButton
-          icon="HeadBarPanelActive"
-          className="flex size-[30px] items-center justify-center"
-          iconClassName="size-[18px]"
-        />
-        <HeadBarButton
-          icon="HeadBarSecondarySideBar"
-          className="flex size-[30px] items-center justify-center"
-          iconClassName="size-[18px]"
-        />
-        <HeadBarButton
-          icon="HeadBarCustomizeLayout"
-          className="flex size-[30px] items-center justify-center"
-          iconClassName="size-[18px]"
-        />
+        <ActionsGroup icon="HeadBarPanelActive" className="size-[30px] " iconClassName="size-[18px]" />
+        <ActionsGroup icon="HeadBarSecondarySideBar" className="size-[30px] " iconClassName="size-[18px]" />
+        <ActionsGroup icon="HeadBarCustomizeLayout" className="size-[30px] " iconClassName="size-[18px]" />
       </div>
 
       <div className="flex items-center">
-        <HeadBarButton
-          icon="HeadBarAccount"
-          className="flex size-[30px] items-center justify-center"
-          iconClassName="size-[18px]"
-        />
-        <HeadBarButton
-          icon="HeadBarNotifications"
-          className="flex size-[30px] items-center justify-center"
-          iconClassName="size-[18px]"
-        />
-        <HeadBarButton
-          icon="HeadBarWrench"
-          className="flex size-[30px] items-center justify-center"
-          iconClassName="size-[18px]"
-        />
+        <ActionsGroup icon="HeadBarAccount" className="size-[30px] " iconClassName="size-[18px]" />
+        <ActionsGroup icon="HeadBarNotifications" className="size-[30px] " iconClassName="size-[18px]" />
+        <ActionsGroup icon="HeadBarWrench" className="size-[30px] " iconClassName="size-[18px]" />
       </div>
     </div>
   );

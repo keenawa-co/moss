@@ -10,42 +10,50 @@ import {
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
-import {
-  SortableContext,
-  arrayMove,
-  horizontalListSortingStrategy,
-  sortableKeyboardCoordinates,
-} from "@dnd-kit/sortable";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger, Icon, cn } from "@repo/ui";
+import { SortableContext, arrayMove, horizontalListSortingStrategy } from "@dnd-kit/sortable";
+import { DropdownMenu as DM, Icon, cn } from "@repo/ui";
 import { OsType } from "@tauri-apps/plugin-os";
-import React, { HTMLProps, useEffect, useRef, useState } from "react";
+import { HTMLProps, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { HeadBarButton } from "./HeadBarButton";
+import { ActionsGroup } from "../ActionsGroup";
+import { DNDSortableItemWrapper } from "./DNDWrapper";
 
 interface WidgetBarProps extends HTMLProps<HTMLDivElement> {
   os: OsType;
 }
 
+const widgetsList = [
+  {
+    id: 1,
+    label: "Alerts",
+    icon: "HeadBarAlerts" as const,
+    actions: ["1", "2"],
+    defaultAction: false,
+  },
+  {
+    id: 2,
+    label: "Discovery",
+    icon: "HeadBarDiscovery" as const,
+    actions: ["1"],
+    defaultAction: true,
+  },
+  {
+    id: 3,
+    label: "Community",
+    icon: "HeadBarCommunity" as const,
+    actions: ["1", "2"],
+    defaultAction: true,
+  },
+];
+
 export const WidgetBar = ({ os, className, ...props }: WidgetBarProps) => {
   const [draggedId, setDraggedId] = useState<UniqueIdentifier | null>(null);
 
-  const [DNDItems, setDNDItems] = useState([
-    {
-      id: 1,
-      label: "Alerts",
-      icon: "HeadBarAlerts" as const,
-    },
-    {
-      id: 2,
-      label: "Discovery",
-      icon: "HeadBarDiscovery" as const,
-    },
-    {
-      id: 3,
-      label: "Community",
-      icon: "HeadBarCommunity" as const,
-    },
-  ]);
+  const [DNDList, setDNDList] = useState<number[]>([]);
+  const [overflownList, setOverflownList] = useState<number[]>(widgetsList.map((item) => item.id));
+
+  const DNDListRef = useRef<HTMLDivElement>(null);
+  const overflownListRef = useRef<HTMLDivElement>(null);
 
   function handleDragStart(event: DragStartEvent) {
     setDraggedId(event.active.id);
@@ -59,9 +67,9 @@ export const WidgetBar = ({ os, className, ...props }: WidgetBarProps) => {
     if (!over) return;
 
     if (active.id !== over.id) {
-      setDNDItems((items) => {
-        const oldIndex = items.findIndex((a) => a.id === active.id);
-        const newIndex = items.findIndex((a) => a.id === over.id);
+      setDNDList((items) => {
+        const oldIndex = items.indexOf(active.id as number);
+        const newIndex = items.indexOf(over.id as number);
 
         return arrayMove(items, oldIndex, newIndex);
       });
@@ -71,68 +79,73 @@ export const WidgetBar = ({ os, className, ...props }: WidgetBarProps) => {
   const sensors = useSensors(
     useSensor(MouseSensor, {
       activationConstraint: {
-        distance: 5,
+        distance: 1,
       },
-    }),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
     })
   );
 
-  const [overflownDNDItemsIds, setOverflownDNDItemsIds] = useState<number[]>([]);
+  const handleVisibleList = (entries: IntersectionObserverEntry[]) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) return;
 
-  const DNDListRef = useRef<HTMLDivElement>(null);
-  const handleIntersection = (entries: IntersectionObserverEntry[]) => {
-    setOverflownDNDItemsIds((prevOverflownIds) => {
-      const updatedOverflownIds = [...prevOverflownIds];
+      const target = entry.target as HTMLElement;
+      const targetId = Number(target.dataset.itemid);
 
-      entries.forEach((entry) => {
-        const target = entry.target as HTMLElement;
-        const targetId = Number(target.dataset.itemid);
-
-        if (!entry.isIntersecting) {
-          target.classList.add("invisible", "pointer-events-none", "touch-none");
-          if (target instanceof HTMLButtonElement) {
-            target.disabled = true;
-          }
-
-          if (!updatedOverflownIds.includes(targetId)) {
-            updatedOverflownIds.push(targetId);
-          }
-        } else {
-          target.classList.remove("invisible", "pointer-events-none", "touch-none");
-          if (target instanceof HTMLButtonElement) {
-            target.disabled = false;
-          }
-
-          const index = updatedOverflownIds.indexOf(targetId);
-          if (index !== -1) {
-            updatedOverflownIds.splice(index, 1);
-          }
-        }
+      setDNDList((prevList) => {
+        return prevList.filter((id) => id !== targetId);
       });
+      setOverflownList((prevOverflownIds) => {
+        if (prevOverflownIds.includes(targetId)) return prevOverflownIds;
+        return [targetId, ...prevOverflownIds];
+      });
+    });
+  };
 
-      return updatedOverflownIds;
+  const handleOverflownList = (entries: IntersectionObserverEntry[]) => {
+    entries.forEach((entry) => {
+      if (!entry.isIntersecting) return;
+
+      const target = entry.target as HTMLElement;
+      const targetId = Number(target.dataset.itemid);
+
+      setDNDList((prevList) => {
+        if (prevList.includes(targetId)) return prevList;
+        return [...prevList, targetId];
+      });
+      setOverflownList((prevOverflownIds) => {
+        return prevOverflownIds.filter((id) => id !== targetId);
+      });
     });
   };
 
   useEffect(() => {
-    if (!DNDListRef.current) return;
+    if (!DNDListRef.current || !overflownListRef.current) return;
 
-    const observer = new IntersectionObserver(handleIntersection, {
+    const visibleListObserver = new IntersectionObserver(handleVisibleList, {
       root: document.querySelector("header"),
-      threshold: 0.99, // this is set to 0.99 because for some reason it doesn't work with 1 on linux
+      threshold: 0.99, // this is set to 0.99 instead of 1 because for some reason Linux always sees the last item as not intersecting
+    });
+
+    const overflownListObserver = new IntersectionObserver(handleOverflownList, {
+      root: document.querySelector("header"),
+      threshold: 0.99, // this is set to 0.99 instead of 1 because for some reason Linux always sees the last item as not intersecting
     });
 
     Array.from(DNDListRef.current.children).forEach((child) => {
       const element = child as HTMLElement;
-      if (element.dataset.islistitem) observer.observe(element);
+      if (element.dataset.overflowable) visibleListObserver.observe(element);
+    });
+
+    Array.from(overflownListRef.current.children).forEach((child) => {
+      const element = child as HTMLElement;
+      if (element.dataset.overflowable) overflownListObserver.observe(element);
     });
 
     return () => {
-      observer.disconnect();
+      visibleListObserver.disconnect();
+      overflownListObserver.disconnect();
     };
-  }, [DNDListRef, DNDItems]);
+  }, [DNDList, overflownList]);
 
   const OverflownMenu = ({
     classNameContent,
@@ -141,94 +154,105 @@ export const WidgetBar = ({ os, className, ...props }: WidgetBarProps) => {
     classNameContent?: string;
     classNameTrigger?: string;
   }) => {
-    const reversedList = [...overflownDNDItemsIds].reverse();
-
     return (
-      <DropdownMenu>
-        <DropdownMenuTrigger
-          className={cn("DropdownMenuTrigger rounded p-[7px] transition-colors hover:bg-[#D3D3D3]", classNameTrigger)}
-        >
+      <DM.Root>
+        <DM.Trigger className={cn("DM.Trigger rounded p-[7px] transition-colors hover:bg-[#D3D3D3]", classNameTrigger)}>
           <Icon icon="ThreeHorizontalDots" className="flex size-4 items-center justify-center" />
-        </DropdownMenuTrigger>
+        </DM.Trigger>
 
-        <DropdownMenuContent className={cn("bg-white", classNameContent)}>
-          {reversedList.map((id) => {
-            const item = DNDItems.find((item) => id === item.id)!;
-            return (
-              <button className="flex w-full gap-1 rounded px-2 py-2 text-[#000] hover:bg-[#D3D3D3] hover:bg-none">
-                <Icon icon={item.icon} />
-                <span>{item.label}</span>
-              </button>
-            );
+        <DM.Content className={cn("z-50 flex flex-col gap-0.5 bg-white", classNameContent)} align="start">
+          {overflownList.map((id) => {
+            const item = widgetsList.find((item) => id === item.id)!;
+            return <DM.Item label={item.label} icon={item.icon} key={item.id} iconClassName="size-[15px]" />;
           })}
-        </DropdownMenuContent>
-      </DropdownMenu>
+        </DM.Content>
+      </DM.Root>
     );
   };
 
   return (
     <div className={cn("flex items-center gap-1", className)} {...props}>
-      {os !== "macos" && (
-        <HeadBarButton
-          icon="HeadBarSettingsWithNotification"
-          className="flex size-[30px] items-center justify-center px-2"
-          iconClassName="size-[18px]"
-        />
-      )}
+      {os !== "macos" && <ActionsGroup icon="HeadBarSettingsWithNotification" iconClassName="size-[18px]" />}
       <div className="flex items-center gap-3">
-        <button className="flex h-[30px] w-max items-center rounded pl-2.5 pr-1 transition-colors hover:bg-[#D3D3D3]">
-          <Icon icon="HeadBarMossStudio" className="mr-1.5 size-[22px] text-[#525252]" />
-          <span className="mr-0.5 w-max text-[#161616]">moss-studio</span>
-          <Icon icon="ArrowheadDown" className="text-[#525252]" />
-        </button>
+        <ActionsGroup
+          icon="HeadBarMossStudio"
+          label="moss-studio"
+          actions={["1", "2"]}
+          iconClassName="size-[22px] -my-[4px]"
+        />
 
-        <div className="flex w-full items-center justify-start gap-1" ref={DNDListRef}>
-          <DndContext
-            sensors={sensors}
-            collisionDetection={closestCenter}
-            onDragEnd={handleDragEnd}
-            onDragStart={handleDragStart}
-          >
-            <SortableContext items={DNDItems} strategy={horizontalListSortingStrategy}>
-              {DNDItems.map((item, index) => (
-                <React.Fragment key={item.id}>
-                  {DNDItems.length === overflownDNDItemsIds.length && index === 0 && (
-                    <OverflownMenu classNameTrigger="ml-[14px]" key={`OverflowMenuAtStart-${item.id}-${index}`} />
-                  )}
-                  <span
-                    className="flex items-center gap-2"
-                    data-islistitem={true}
-                    data-itemid={item.id}
-                    key={`listItem-${item.id}`}
-                  >
-                    <HeadBarButton
-                      key={`listButton-${item.id}`}
-                      sortableId={item.id}
-                      icon={item.icon}
-                      label={item.label}
-                      className={cn("h-[30px] text-ellipsis px-2")}
-                    />
-                    {overflownDNDItemsIds.length > 0 && DNDItems.length - overflownDNDItemsIds.length === index + 1 && (
-                      <OverflownMenu key={`OverflowMenuBetweenMenuItems-${item.id}-${index}`} />
-                    )}
-                  </span>
-                </React.Fragment>
-              ))}
-            </SortableContext>
+        <div className="flex w-full items-center justify-start gap-1">
+          {DNDList.length === 0 && <OverflownMenu />}
+          <div className="sortable flex w-full items-center" ref={DNDListRef}>
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={handleDragEnd}
+              onDragStart={handleDragStart}
+            >
+              <SortableContext items={DNDList} strategy={horizontalListSortingStrategy}>
+                {DNDList.map((id, index) => {
+                  const item = widgetsList.find((item) => item.id === id)!;
+                  const shouldShowSelect =
+                    overflownList.length > 0 && DNDList.length !== 0 && index + 1 === DNDList.length;
 
-            {draggedId
-              ? createPortal(
-                  <DragOverlay>
-                    <HeadBarButton
-                      className="h-[30px] cursor-grabbing !bg-[#e0e0e0] px-2 shadow-lg"
-                      icon={DNDItems.find((item) => item.id === draggedId)?.icon!}
-                      label={DNDItems.find((item) => item.id === draggedId)?.label}
-                    />
-                  </DragOverlay>,
-                  document.body
-                )
-              : null}
-          </DndContext>
+                  return (
+                    <span
+                      className="flex items-center gap-2"
+                      data-overflowable={true}
+                      data-itemid={item.id}
+                      key={item.id}
+                    >
+                      <DNDSortableItemWrapper
+                        id={item.id}
+                        draggingClassName="z-50 cursor-grabbing opacity-50 shadow-2xl"
+                      >
+                        <ActionsGroup
+                          icon={item.icon}
+                          label={item.label}
+                          actions={item.actions}
+                          defaultAction={item.defaultAction}
+                        />
+                      </DNDSortableItemWrapper>
+
+                      {shouldShowSelect && <OverflownMenu />}
+                    </span>
+                  );
+                })}
+              </SortableContext>
+
+              {draggedId
+                ? createPortal(
+                    <DragOverlay>
+                      <ActionsGroup
+                        icon={widgetsList.find((item) => item.id === draggedId)?.icon!}
+                        label={widgetsList.find((item) => item.id === draggedId)?.label}
+                        actions={widgetsList.find((item) => item.id === draggedId)?.actions!}
+                        defaultAction={widgetsList.find((item) => item.id === draggedId)?.defaultAction}
+                        className=" cursor-grabbing rounded border !border-[#c5c5c5] bg-[#D3D3D3] shadow-lg"
+                      />
+                    </DragOverlay>,
+                    document.body
+                  )
+                : null}
+            </DndContext>
+          </div>
+          <div className="overflown invisible flex" ref={overflownListRef}>
+            {overflownList.map((id) => {
+              const item = widgetsList.find((item) => item.id === id)!;
+              return (
+                <ActionsGroup
+                  key={item.id}
+                  icon={item.icon}
+                  label={item.label}
+                  actions={item.actions}
+                  defaultAction={item.defaultAction}
+                  data-overflowable={true}
+                  data-itemid={item.id}
+                />
+              );
+            })}
+          </div>
         </div>
       </div>
     </div>
