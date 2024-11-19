@@ -54,7 +54,7 @@ const widgetsList = [
 export const WidgetBar = ({ os, className, ...props }: WidgetBarProps) => {
   const [draggedId, setDraggedId] = useState<UniqueIdentifier | null>(null);
 
-  const [DNDlist, setDNDList] = useState<number[]>([]);
+  const [DNDList, setDNDList] = useState<number[]>([]);
   const [overflownList, setOverflownList] = useState<number[]>(widgetsList.map((item) => item.id));
 
   const DNDListRef = useRef<HTMLDivElement>(null);
@@ -86,9 +86,6 @@ export const WidgetBar = ({ os, className, ...props }: WidgetBarProps) => {
       activationConstraint: {
         distance: 1,
       },
-    }),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
     })
   );
 
@@ -153,7 +150,7 @@ export const WidgetBar = ({ os, className, ...props }: WidgetBarProps) => {
       visibleListObserver.disconnect();
       overflownListObserver.disconnect();
     };
-  }, [DNDlist, overflownList]);
+  }, [DNDList, overflownList]);
 
   const OverflownMenu = ({
     classNameContent,
@@ -190,7 +187,7 @@ export const WidgetBar = ({ os, className, ...props }: WidgetBarProps) => {
         />
 
         <div className="flex w-full items-center justify-start gap-1">
-          {DNDlist.length === 0 && <OverflownMenu />}
+          {DNDList.length === 0 && <OverflownMenu />}
           <div className="sortable flex w-full items-center" ref={DNDListRef}>
             <DndContext
               sensors={sensors}
@@ -198,11 +195,11 @@ export const WidgetBar = ({ os, className, ...props }: WidgetBarProps) => {
               onDragEnd={handleDragEnd}
               onDragStart={handleDragStart}
             >
-              <SortableContext items={DNDlist} strategy={horizontalListSortingStrategy}>
-                {DNDlist.map((id, index) => {
+              <SortableContext items={DNDList} strategy={horizontalListSortingStrategy}>
+                {DNDList.map((id, index) => {
                   const item = widgetsList.find((item) => item.id === id)!;
                   const shouldShowSelect =
-                    overflownList.length > 0 && DNDlist.length !== 0 && index + 1 === DNDlist.length;
+                    overflownList.length > 0 && DNDList.length !== 0 && index + 1 === DNDList.length;
 
                   return (
                     <span

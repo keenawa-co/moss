@@ -6,7 +6,6 @@ interface ActionsGroupProps extends ComponentPropsWithoutRef<"div"> {
   label?: string;
   compact?: boolean;
   iconClassName?: string;
-
   defaultAction?: boolean;
   actions?: string[];
 }
@@ -91,7 +90,7 @@ export const ActionsGroup = ({
                 <Icon icon="ArrowheadDown" />
               </DM.Trigger>
 
-              <DM.Content className="z-50 flex flex-col " onPointerDownOutside={() => setOpen(false)}>
+              <DM.Content className="z-50 flex flex-col" onPointerDownOutside={() => setOpen(false)}>
                 {props.actions?.map((id) => <button key={id}>Action {id}</button>)}
               </DM.Content>
             </DM.Root>
