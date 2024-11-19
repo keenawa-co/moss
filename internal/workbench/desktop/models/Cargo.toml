@@ -13,3 +13,5 @@ moss_uikit.workspace = true
 serde = { workspace = true, features = ["derive", "rc"] }
 ts-rs.workspace = true
 once_cell.workspace = true
+csscolorparser.workspace = true
+serde_json.workspace = true
