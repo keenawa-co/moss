@@ -9,6 +9,7 @@ import { Home, Logs, Settings } from "./components/pages";
 import { useInitializeApp } from "./hooks/useInitializeApp";
 import { RootState } from "./store";
 import { callServiceMethod } from "./main";
+import { PageLoader } from "./components/PageLoader";
 
 const App: React.FC = () => {
   const { isInitializing, initializationError } = useInitializeApp();
@@ -17,13 +18,7 @@ const App: React.FC = () => {
   callServiceMethod("doSomething");
 
   if (isInitializing) {
-    return (
-      <div className="relative flex min-h-screen bg-storm-800">
-        <div className="container mx-auto flex max-w-screen-xl items-center justify-center text-4xl text-white">
-          Loading...
-        </div>
-      </div>
-    );
+    return <PageLoader />;
   }
 
   if (initializationError) {
@@ -45,7 +40,7 @@ const App: React.FC = () => {
         </ResizablePanel>
         <ResizablePanel>
           <ContentLayout className="content relative flex h-full flex-col overflow-auto">
-            <Suspense fallback={<div className="loading">Loading...</div>}>
+            <Suspense fallback={<PageLoader />}>
               <BrowserRouter>
                 <Menu />
                 <Routes>
