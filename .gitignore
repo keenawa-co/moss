@@ -41,3 +41,7 @@ dist/
 /*.txt
 /*.db*
 /*.session*
+
+### IDEs and Editors
+.idea
+.idea/**
