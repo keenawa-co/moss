@@ -10,9 +10,9 @@ const fetchStoredString = async (): Promise<string> => {
 export const useStoredString = () => {
   return useQuery<string, Error>({
     queryKey: ["storedString"],
-    staleTime: 1000 * 60 * 5,
+    // staleTime: 1000 * 60 * 5,
     queryFn: fetchStoredString,
-    refetchOnWindowFocus: false,
+    // refetchOnWindowFocus: false,
   });
 };
 
