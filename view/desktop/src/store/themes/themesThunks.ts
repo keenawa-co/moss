@@ -24,7 +24,7 @@ export const setTheme = createAsyncThunk(
       const response = await commands.readTheme(themeCode);
       if (response.status === "error") throw new Error("Failed to read theme");
 
-      applyTheme(Convert.toTheme(response.data));
+      applyTheme(response.data);
       dispatch(setSelectedTheme(themeCode));
     } catch (error) {
       if (error instanceof Error) return rejectWithValue(error.message);

@@ -1,5 +1,6 @@
 import { commands } from "@/bindings";
-import { Convert } from "@repo/moss-theme";
+
+import { Theme } from "@repo/desktop-models";
 
 export const handleReadTheme = async (themeName: string) => {
   try {
@@ -7,7 +8,7 @@ export const handleReadTheme = async (themeName: string) => {
 
     if (response.status === "error") throw new Error("Failed to read theme");
 
-    return Convert.toTheme(response.data);
+    return response.data;
   } catch (error) {
     console.error(error);
   }
