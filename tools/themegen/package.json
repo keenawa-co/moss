@@ -6,6 +6,7 @@
   "devDependencies": {
     "@repo/moss-models": "workspace:*",
     "@repo/typescript-config": "workspace:*",
+    "@repo/desktop-models": "workspace:*",
     "@types/node": "^22.5.3",
     "vite-node": "^2.1.1"
   },

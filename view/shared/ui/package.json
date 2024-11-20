@@ -33,6 +33,7 @@
     "@repo/tailwind-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
     "@repo/icongen": "workspace:*",
+    "@repo/desktop-models": "workspace:*",
     "@storybook/react": "^8.1.11",
     "@storybook/test": "^8.1.11",
     "@types/react": "^18.2.61",

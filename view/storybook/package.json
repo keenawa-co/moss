@@ -25,6 +25,7 @@
     "@repo/moss-models": "workspace:*",
     "@repo/typescript-config": "workspace:*",
     "@repo/ui": "workspace:*",
+    "@repo/desktop-models": "workspace:*",
     "@storybook/addon-designs": "^8.0.3",
     "@storybook/addon-essentials": "^8.1.11",
     "@storybook/addon-interactions": "^8.1.11",

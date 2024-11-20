@@ -1,10 +1,10 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { commands } from "@/bindings";
-import { Convert } from "@repo/moss-theme";
 import { setSelectedTheme, setThemes } from "./themesSlice";
 //FIXME TS Import error
 import { applyTheme } from "@repo/moss-theme";
 import { handleReadTheme } from "./themesHelpers";
+import { Theme } from "@repo/desktop-models";
 
 export const fetchAllThemes = createAsyncThunk("themes/fetchAllThemes", async (_, { dispatch, rejectWithValue }) => {
   try {
@@ -23,8 +23,8 @@ export const setTheme = createAsyncThunk(
     try {
       const response = await commands.readTheme(themeCode);
       if (response.status === "error") throw new Error("Failed to read theme");
-
-      applyTheme(response.data);
+      const theme: Theme = response.data;
+      applyTheme(theme);
       dispatch(setSelectedTheme(themeCode));
     } catch (error) {
       if (error instanceof Error) return rejectWithValue(error.message);
