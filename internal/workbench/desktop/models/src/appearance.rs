@@ -1,8 +1,6 @@
 pub mod theming {
     use ts_rs::TS;
-    use std::string::ParseError;
     use serde::{Serialize, Deserialize, Deserializer};
-    use super::*;
 
 
     #[derive(Deserialize,Serialize, Debug, Clone, Eq, PartialEq, TS)]
@@ -121,83 +119,101 @@ pub mod theming {
 
     #[cfg(test)]
     mod tests {
+        use serde::de::{ IntoDeserializer};
         use super::*;
+        use serde::de::value::{StrDeserializer, Error};
         #[test]
-        fn test_rgba_theme() {
-            let theme = r###"
-{
-  "name": "Moss Pink",
-  "slug": "moss-pink",
-  "type": "pink",
-  "isDefault": false,
-  "colors": {
-    "primary": "rgba(0, 0, 0, 1)",
-    "sideBar.background": "rgba(234, 157, 242, 1)",
-    "toolBar.background": "rgba(222, 125, 232, 1)",
-    "page.background": "rgba(227, 54, 245, 1)",
-    "statusBar.background": "rgba(63, 11, 69, 1)",
-    "windowsCloseButton.background": "rgba(196, 43, 28, 1)",
-    "windowControlsLinux.background": "rgba(218, 218, 218, 1)",
-    "windowControlsLinux.text": "rgb(61, 61, 61, 1)",
-    "windowControlsLinux.hoverBackground": "rgb(209, 209, 209, 1)",
-    "windowControlsLinux.activeBackground": "rgb(191, 191, 191, 1)"
-  }
-}
-"###;
-            let theme: Theme = serde_json::from_str(theme).unwrap();
-            println!("{:#?}", theme);
+        fn test_parsing_correctly_formatted_rgba(){
+            let value: StrDeserializer<Error> = "rgba(1, 2, 3, 1)".into_deserializer();
+            assert_eq!(
+                transform_to_rgba(value).unwrap(),
+                "1,2,3,1.00".to_string()
+            )
         }
 
         #[test]
-        fn test_hex_theme () {
-            let theme = r###"
-{
-  "name": "Moss Pink",
-  "slug": "moss-pink",
-  "type": "pink",
-  "isDefault": false,
-  "colors": {
-    "primary": "#000000",
-    "sideBar.background": "#000000",
-    "toolBar.background": "#0000FF",
-    "page.background": "#0000FF",
-    "statusBar.background": "#00FF00",
-    "windowsCloseButton.background": "#00FF00",
-    "windowControlsLinux.background": "#FF0000",
-    "windowControlsLinux.text": "#FF0000",
-    "windowControlsLinux.hoverBackground": "#FFFFFF",
-    "windowControlsLinux.activeBackground": "#FFFFFF"
-  }
-}
-"###;
-            let theme: Theme = serde_json::from_str(theme).unwrap();
-            println!("{:#?}", theme);
+        fn test_parsing_correctly_formatted_rgb(){
+            let value: StrDeserializer<Error> = "rgb(1, 2, 3)".into_deserializer();
+            assert_eq!(
+                transform_to_rgba(value).unwrap(),
+                "1,2,3,1.00".to_string()
+            )
         }
 
         #[test]
-        fn test_hsl_theme() {
-            let theme = r###"
-{
-  "name": "Moss Pink",
-  "slug": "moss-pink",
-  "type": "pink",
-  "isDefault": false,
-  "colors": {
-    "primary": "hsl(0, 100%, 50%)",
-    "sideBar.background": "hsl(120, 100%, 50%)",
-    "toolBar.background": "hsl(240, 100%, 50%)",
-    "page.background": "hsl(0, 0%, 0%)",
-    "statusBar.background": "hsl(0, 0%, 50%)",
-    "windowsCloseButton.background": "hsl(0, 0%, 100%)",
-    "windowControlsLinux.background": "hsl(0, 50%, 50%)",
-    "windowControlsLinux.text": "hsl(120, 50%, 50%)",
-    "windowControlsLinux.hoverBackground": "hsl(240, 50%, 50%)",
-    "windowControlsLinux.activeBackground": "hsl(360, 50%, 50%)"
-  }
-}
-"###;
-            let theme: Theme = serde_json::from_str(theme).unwrap();
-            println!("{:#?}", theme);
+        fn test_parsing_correctly_formatted_hex(){
+            let value: StrDeserializer<Error> = "#010203".into_deserializer();
+            assert_eq!(
+                transform_to_rgba(value).unwrap(),
+                "1,2,3,1.00".to_string()
+            )
         }
+        #[test]
+        fn test_parsing_correctly_formatted_hsl(){
+            let value: StrDeserializer<Error> = "hsl(0, 100%, 50%)".into_deserializer();
+            assert_eq!(
+                transform_to_rgba(value).unwrap(),
+                "255,0,0,1.00".to_string()
+            )
+        }
+
+        #[test]
+        fn test_parsing_without_spaces(){
+            let value: StrDeserializer<Error> = "rgba(1,2,3,1)".into_deserializer();
+            assert_eq!(
+                transform_to_rgba(value).unwrap(),
+                "1,2,3,1.00".to_string()
+            )
+        }
+
+        #[test]
+        fn test_parsing_missing_alpha(){
+            let value: StrDeserializer<Error> = "rgba(0, 0, 0)".into_deserializer();
+            assert_eq!(
+                transform_to_rgba(value).unwrap(),
+                "0,0,0,1.00".to_string()
+            )
+        }
+
+        #[test]
+        fn test_parsing_extra_alpha(){
+            let value: StrDeserializer<Error> = "rgb(0, 0, 0, 1)".into_deserializer();
+            transform_to_rgba(value).unwrap();
+            assert_eq!(
+                transform_to_rgba(value).unwrap(),
+                "0,0,0,1.00".to_string()
+            )
+        }
+
+        #[test]
+        #[should_panic]
+        fn test_parsing_empty_color(){
+            let value: StrDeserializer<Error> = "".into_deserializer();
+            transform_to_rgba(value).unwrap();
+        }
+
+        #[test]
+        #[should_panic]
+        fn test_parsing_invalid_rgba(){
+            let value: StrDeserializer<Error> = "rgba(-1, 0, 0, 1)".into_deserializer();
+            transform_to_rgba(value).unwrap();
+        }
+
+
+        #[test]
+        #[should_panic]
+        fn test_parsing_invalid_hex(){
+            let value: StrDeserializer<Error> = "#gggggg".into_deserializer();
+            transform_to_rgba(value).unwrap();
+        }
+
+        //
+        // #[test]
+        // #[should_panic]
+        // fn test_parsing_invalid_hsl(){
+        //     let value: StrDeserializer<Error> = "hsl(0, 0%, -100%)".into_deserializer();
+        //     println!("{}", transform_to_rgba(value).unwrap());
+        // }
+
     }
 }
