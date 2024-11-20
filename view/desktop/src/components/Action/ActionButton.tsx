@@ -1,6 +1,6 @@
 import { CommandAction, MenuItemVisibility } from "@repo/desktop-models";
 import { cn, Icon, Icons } from "@repo/ui";
-import { ComponentPropsWithoutRef, useState } from "react";
+import { ComponentPropsWithoutRef } from "react";
 
 interface ActionsGroupProps extends Omit<ComponentPropsWithoutRef<"div">, "id" | "title">, CommandAction {
   // icon: Icons;
