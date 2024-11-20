@@ -2,15 +2,7 @@ import { useTranslation } from "react-i18next";
 import { commands, SessionInfoDTO } from "@/bindings";
 import React, { useEffect, useState } from "react";
 import { listen } from "@tauri-apps/api/event";
-import {
-  Tooltip,
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  Icon,
-} from "@repo/ui";
+import { Tooltip, Icon } from "@repo/ui";
 import { invokeIpc } from "@/lib/backend/tauri";
 
 export type DescribeActivityOutput = { tooltip: string; order: number };
@@ -47,7 +39,7 @@ const SessionComponent = () => {
     });
 
     getWorkbenchState();
-    getAllActivities();
+    // getAllActivities();
 
     return () => {
       unlisten.then((f) => f());
@@ -122,24 +114,13 @@ export const Home: React.FC = () => {
         </Tooltip>
       </div>
       <SessionComponent />
-      <div>
-        {/* <DropdownMenu>
-          <DropdownMenuTrigger className="text-[rgba(var(--color-primary))]">Click me!</DropdownMenuTrigger>
-
-          <DropdownMenuContent>
-            <DropdownMenuItem icon="Search">Menu item 1</DropdownMenuItem>
-            <DropdownMenuItem>
-              <DropdownMenuLabel>Menu item 2</DropdownMenuLabel>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu> */}
-      </div>
+      <div></div>
 
       <div className="flex">
         <Icon icon="Accessibility" className="text-6xl hover:*:fill-green-500" />
         <Icon icon="NewProject" className="text-red-700 text-6xl hover:fill-green-500" />
       </div>
-      {/* 
+      {/*
       <div className="w-96 bg-red-600">
         {new Array(77).fill(0).map((_, index) => (
           <div key={index}>
