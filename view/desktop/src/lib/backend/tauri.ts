@@ -6,6 +6,8 @@ import { createDecorator } from "../instantiation/instantiation";
 export type IpcResult<T, E> = { status: "ok"; data: T } | { status: "error"; error: E };
 
 export type TauriIpcCommand =
+  | "fetch_all_themes"
+  | "read_theme"
   | "main_window_is_ready"
   | "create_new_window"
   | "sidebar_get_all_activities"
