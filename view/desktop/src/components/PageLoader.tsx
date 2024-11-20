@@ -5,6 +5,7 @@ const tips = [
   "You can change the order of widget actions. Try it!",
   "Some other tip",
 ];
+
 export const PageLoader = () => {
   const [tip, setTip] = useState(tips[0]);
   useEffect(() => {

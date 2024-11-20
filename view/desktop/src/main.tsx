@@ -2,6 +2,7 @@ import "reflect-metadata";
 import { type } from "@tauri-apps/plugin-os";
 import { getCurrentWebviewWindow } from "@tauri-apps/api/webviewWindow";
 import "@/assets/index.css";
+import "@repo/ui/src/fonts.css";
 import { lazy, StrictMode, Suspense } from "react";
 import { createRoot } from "react-dom/client";
 import { Provider } from "react-redux";

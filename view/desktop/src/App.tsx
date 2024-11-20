@@ -1,6 +1,5 @@
 import { ContentLayout, LaunchPad, Menu, RootLayout } from "@/components";
 import "@/i18n";
-import "@repo/ui/src/fonts.css";
 import { Suspense } from "react";
 import { useSelector } from "react-redux";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
