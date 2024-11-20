@@ -50,7 +50,7 @@ impl AnyPart for PrimarySideBarPart {
         menus.insert(
             BuiltInMenuNamespaces::ViewItemContext.to_string(),
             menus_lock
-                .get_menu_items(&BuiltInMenuNamespaces::ViewItemContext.into())
+                .get_menu_items_by_namespace(&BuiltInMenuNamespaces::ViewItemContext.into())
                 .cloned()
                 .unwrap(),
         );
@@ -58,7 +58,7 @@ impl AnyPart for PrimarySideBarPart {
         menus.insert(
             BuiltInMenuNamespaces::ViewItem.to_string(),
             menus_lock
-                .get_menu_items(&BuiltInMenuNamespaces::ViewItem.into())
+                .get_menu_items_by_namespace(&BuiltInMenuNamespaces::ViewItem.into())
                 .cloned()
                 .unwrap(),
         );
@@ -66,7 +66,7 @@ impl AnyPart for PrimarySideBarPart {
         menus.insert(
             BuiltInMenuNamespaces::ViewTitleContext.to_string(),
             menus_lock
-                .get_menu_items(&BuiltInMenuNamespaces::ViewTitleContext.into())
+                .get_menu_items_by_namespace(&BuiltInMenuNamespaces::ViewTitleContext.into())
                 .cloned()
                 .unwrap(),
         );

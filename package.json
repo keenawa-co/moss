@@ -12,7 +12,8 @@
     "precommit": "lint-staged"
   },
   "lint-staged": {
-    "*.{js,jsx,ts,tsx,css,md,json}": "prettier --plugin=prettier-plugin-tailwindcss --write"
+    "*.{js,jsx,ts,tsx,css,md,json}": "prettier --plugin=prettier-plugin-tailwindcss --write",
+    "*.rs": "rustfmt"
   },
   "devDependencies": {
     "@ianvs/prettier-plugin-sort-imports": "^4.3.1",

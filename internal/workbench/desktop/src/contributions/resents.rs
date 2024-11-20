@@ -1,18 +1,19 @@
 use anyhow::Result;
-use moss_str::{localize, localized_string::LocalizedString, ReadOnlyStr};
+use desktop_models::{
+    actions::{
+        ActionMenuItem, CommandAction, MenuGroup, MenuItem, MenuItemVisibility, SubmenuMenuItem,
+        SubmenuRef,
+    },
+    constants,
+    view::TreeViewDescriptor,
+};
+use moss_str::{localize, ReadOnlyStr};
 use once_cell::sync::Lazy;
 use quote::quote;
 use static_str_ops::static_format;
-use std::sync::Arc;
+use std::{rc::Rc, sync::Arc};
 
-use crate::{
-    menu::{
-        ActionMenuItem, BuiltInMenuGroups, BuiltInMenuNamespaces, CommandAction, MenuGroup,
-        MenuItem, SubmenuMenuItem,
-    },
-    view::{BuiltInViewGroups, TreeViewDescriptor},
-    Contribution,
-};
+use crate::Contribution;
 
 #[derive(Debug, Serialize)]
 pub struct RecentsViewTreeItem {
@@ -56,7 +57,7 @@ impl Contribution for RecentsContribution {
 
         let recents_view_id = "workbench.view.recentsView";
         views_registry_lock.register_views(
-            BuiltInViewGroups::Launchpad.into(),
+            constants::view::VIEW_GROUP_ID_LAUNCHPAD,
             vec![TreeViewDescriptor {
                 id: recents_view_id.to_string(),
                 name: localize!("recents.view.name", "Recents"),
@@ -78,35 +79,52 @@ impl Contribution for RecentsContribution {
 
         let recents_context = static_format!("view == '{recents_view_id}'");
 
+        #[rustfmt::skip]
+        let (
+            view_title_context_menu_group_this,
+            view_title_context_menu_group_views,
+            view_title_context_menu_group_inline,
+        ) = {
+            let this = Rc::new(MenuGroup::new_ordered(0, constants::menu::MENU_GROUP_ID_THIS));
+            let views = Rc::new(MenuGroup::new_ordered(1, constants::menu::MENU_GROUP_ID_VIEWS));
+            let inline = Rc::new(MenuGroup::new_ordered(2, constants::menu::MENU_GROUP_ID_INLINE));
+
+            (this, views, inline)
+        };
+
         menus_registry_lock.append_menu_items(vec![
             (
-                BuiltInMenuNamespaces::ViewTitleContext.into(),
+                constants::menu::MENU_NAMESPACE_ID_VIEW_TITLE_CONTEXT,
                 MenuItem::Action(ActionMenuItem {
                     command: CommandAction {
                         id: "recents.hideRecentsView".into(),
                         title: localize!("recents.hideRecentsView", "Hide 'Recents'"),
                         tooltip: None,
                         description: None,
+                        icon: None,
+                        toggled: None,
                     },
-                    group: Some(MenuGroup::new_ordered(0, BuiltInMenuGroups::This)),
+                    group: Some(Rc::clone(&view_title_context_menu_group_this)),
                     order: Some(1),
                     when: Some(recents_context.into()),
-                    toggled: None,
+                    visibility: MenuItemVisibility::Classic,
                 }),
             ),
             (
-                BuiltInMenuNamespaces::ViewTitleContext.into(),
+                constants::menu::MENU_NAMESPACE_ID_VIEW_TITLE_CONTEXT,
                 MenuItem::Action(ActionMenuItem {
                     command: CommandAction {
                         id: "workbench.view.recents".into(),
                         title: localize!("recents.title", "Recents"),
                         tooltip: None,
                         description: None,
+                        icon: None,
+                        toggled: None,
                     },
-                    group: Some(MenuGroup::new_ordered(1, BuiltInMenuGroups::Views)),
+                    group: Some(Rc::clone(&view_title_context_menu_group_views)),
                     order: Some(1),
                     when: Some(recents_context.into()),
-                    toggled: Some("viewState == 'mockState'".into()),
+                    visibility: MenuItemVisibility::Classic,
                 }),
             ),
         ]);
@@ -118,33 +136,37 @@ impl Contribution for RecentsContribution {
 
         menus_registry_lock.append_menu_items(vec![
             (
-                BuiltInMenuNamespaces::ViewItem.into(),
+                constants::menu::MENU_NAMESPACE_ID_VIEW_ITEM,
                 MenuItem::Action(ActionMenuItem {
                     command: CommandAction {
                         id: "recents.remove".into(),
                         title: localize!("recents.remove", "Remove"),
                         tooltip: None,
                         description: None,
+                        icon: None,
+                        toggled: None,
                     },
-                    group: Some(MenuGroup::new_unordered(BuiltInMenuGroups::Inline)),
+                    group: Some(Rc::clone(&view_title_context_menu_group_inline)),
                     order: Some(1),
                     when: Some(recents_item_context.into()),
-                    toggled: None,
+                    visibility: MenuItemVisibility::Classic,
                 }),
             ),
             (
-                BuiltInMenuNamespaces::ViewItem.into(),
+                constants::menu::MENU_NAMESPACE_ID_VIEW_ITEM,
                 MenuItem::Action(ActionMenuItem {
                     command: CommandAction {
                         id: "recents.preview".into(),
                         title: localize!("recents.preview", "Preview"),
                         tooltip: None,
                         description: None,
+                        icon: None,
+                        toggled: None,
                     },
-                    group: Some(MenuGroup::new_unordered(BuiltInMenuGroups::Inline)),
+                    group: Some(Rc::clone(&view_title_context_menu_group_inline)),
                     order: Some(2),
                     when: Some(recents_item_context.into()),
-                    toggled: None,
+                    visibility: MenuItemVisibility::Classic,
                 }),
             ),
         ]);
@@ -154,110 +176,137 @@ impl Contribution for RecentsContribution {
         let open_with_profile_menu_id = ReadOnlyStr::from("recents.openWithProfileSubmenu");
         menus_registry_lock.append_menu_items(vec![
             (
-                open_with_profile_menu_id.clone(),
+                SubmenuRef::from(&open_with_profile_menu_id),
                 MenuItem::Action(ActionMenuItem {
                     command: CommandAction {
                         id: "profile.default".into(),
                         title: localize!("profile.default", "Default"),
                         tooltip: None,
                         description: None,
+                        icon: None,
+                        toggled: None,
                     },
                     group: None,
                     order: Some(1),
                     when: Some(recents_item_context.into()),
-                    toggled: None,
+                    visibility: MenuItemVisibility::Classic,
                 }),
             ),
             (
-                open_with_profile_menu_id.clone(),
+                SubmenuRef::from(&open_with_profile_menu_id),
                 MenuItem::Action(ActionMenuItem {
                     command: CommandAction {
                         id: "profile.custom".into(),
                         title: localize!("profile.custom", "Custom"),
                         tooltip: None,
                         description: None,
+                        icon: None,
+                        toggled: None,
                     },
                     group: None,
                     order: None,
                     when: Some(recents_item_context.into()),
-                    toggled: None,
+                    visibility: MenuItemVisibility::Classic,
                 }),
             ),
         ]);
 
+        #[rustfmt::skip]
+        let (
+            view_item_context_menu_group_navigation,
+            view_item_context_menu_group_preview,
+            view_item_context_menu_group_remove,
+        ) = {
+            let navigation = Rc::new(MenuGroup::new_ordered(0, constants::menu::MENU_GROUP_ID_NAVIGATION));
+            let preview = Rc::new(MenuGroup::new_ordered(1, constants::menu::MENU_GROUP_ID_PREVIEW));
+            let remove = Rc::new(MenuGroup::new_ordered(2, constants::menu::MENU_GROUP_ID_REMOVE));
+
+            (navigation, preview, remove)
+        };
+
         menus_registry_lock.append_menu_items(vec![
             (
-                BuiltInMenuNamespaces::ViewItemContext.into(),
+                constants::menu::MENU_NAMESPACE_ID_VIEW_ITEM_CONTEXT,
                 MenuItem::Action(ActionMenuItem {
                     command: CommandAction {
                         id: "recents.Open".into(),
                         title: localize!("recents.open", "Open"),
                         tooltip: None,
                         description: None,
+                        icon: None,
+                        toggled: None,
                     },
-                    group: Some(MenuGroup::new_ordered(0, BuiltInMenuGroups::Navigation)),
+                    group: Some(Rc::clone(&view_item_context_menu_group_navigation)),
                     order: Some(1),
                     when: Some(recents_item_context.into()),
-                    toggled: None,
+                    visibility: MenuItemVisibility::Classic,
                 }),
             ),
             (
-                BuiltInMenuNamespaces::ViewItemContext.into(),
+                constants::menu::MENU_NAMESPACE_ID_VIEW_ITEM_CONTEXT,
                 MenuItem::Action(ActionMenuItem {
                     command: CommandAction {
                         id: "recents.openInNewWindow".into(),
                         title: localize!("recents.openInNewWindow", "Open in New Window"),
                         tooltip: None,
                         description: None,
+                        icon: None,
+                        toggled: None,
                     },
-                    group: Some(MenuGroup::new_ordered(0, BuiltInMenuGroups::Navigation)),
+                    group: Some(Rc::clone(&view_item_context_menu_group_navigation)),
                     order: Some(2),
                     when: Some(recents_item_context.into()),
-                    toggled: None,
+                    visibility: MenuItemVisibility::Classic,
                 }),
             ),
         ]);
 
         menus_registry_lock.append_menu_items(vec![(
-            BuiltInMenuNamespaces::ViewItemContext.into(),
+            constants::menu::MENU_NAMESPACE_ID_VIEW_ITEM_CONTEXT,
             MenuItem::Submenu(SubmenuMenuItem {
                 submenu_id: open_with_profile_menu_id,
-                title: localize!("recents.openWithProfile", "Open with Profile"),
-                group: Some(MenuGroup::new_ordered(0, BuiltInMenuGroups::Navigation)),
+                default_action_id: None,
+                title: Some(localize!("recents.openWithProfile", "Open with Profile")),
+                group: Some(Rc::clone(&view_item_context_menu_group_navigation)),
                 order: Some(3),
                 when: Some(recents_item_context.into()),
+                visibility: MenuItemVisibility::Classic,
             }),
         )]);
 
         menus_registry_lock.append_menu_items(vec![
             (
-                BuiltInMenuNamespaces::ViewItemContext.into(),
+                constants::menu::MENU_NAMESPACE_ID_VIEW_ITEM_CONTEXT,
                 MenuItem::Action(ActionMenuItem {
                     command: CommandAction {
                         id: "recents.preview".into(),
                         title: localize!("recents.preview", "Preview"),
                         tooltip: None,
                         description: None,
+                        icon: None,
+                        toggled: None,
                     },
-                    group: Some(MenuGroup::new_ordered(1, BuiltInMenuGroups::Preview)),
+                    group: Some(Rc::clone(&view_item_context_menu_group_preview)),
                     order: Some(1),
                     when: Some(recents_item_context.into()),
-                    toggled: None,
+                    visibility: MenuItemVisibility::Classic,
                 }),
             ),
             (
-                BuiltInMenuNamespaces::ViewItemContext.into(),
+                constants::menu::MENU_NAMESPACE_ID_VIEW_ITEM_CONTEXT,
                 MenuItem::Action(ActionMenuItem {
                     command: CommandAction {
                         id: "recents.removeFromRecents".into(),
                         title: localize!("recents.removeFromRecents", "Remove from Recents"),
                         tooltip: None,
                         description: None,
+                        icon: None,
+                        toggled: None,
                     },
-                    group: Some(MenuGroup::new_ordered(2, BuiltInMenuGroups::Remove)),
+                    group: Some(Rc::clone(&view_item_context_menu_group_remove)),
                     order: Some(1),
                     when: Some(recents_item_context.into()),
-                    toggled: None,
+                    visibility: MenuItemVisibility::Classic,
                 }),
             ),
         ]);

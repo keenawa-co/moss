@@ -6,13 +6,13 @@ import { createDecorator } from "../instantiation/instantiation";
 export type IpcResult<T, E> = { status: "ok"; data: T } | { status: "error"; error: E };
 
 export type TauriIpcCommand =
+  | "fetch_all_themes"
+  | "read_theme"
   | "main_window_is_ready"
   | "create_new_window"
   | "sidebar_get_all_activities"
-  | "describe_primary_activitybar_part"
-  | "describe_primary_sidebar_part"
   | "get_view_content"
-  | "get_menu_items";
+  | "get_menu_items_by_namespace";
 
 export const handleIpcError = (cmd: TauriIpcCommand, error: unknown) => {
   console.error(`Error in IPC command "${cmd}":`, error);

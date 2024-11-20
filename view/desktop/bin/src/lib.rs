@@ -8,6 +8,7 @@ mod window;
 mod cli;
 pub mod constants;
 
+use commands::*;
 use platform_core::context_v2::ContextCell;
 use platform_core::platform::cross::client::CrossPlatformClient;
 use platform_workspace::WorkspaceId;
@@ -17,17 +18,15 @@ use std::rc::Rc;
 use std::sync::atomic::{AtomicUsize, Ordering};
 use std::sync::Arc;
 
-use crate::cli::cli_handler;
-use crate::commands::*;
-use crate::constants::*;
-use crate::plugins as moss_plugins;
-use crate::utl::get_home_dir;
-use tauri::{AppHandle, Manager, RunEvent, WebviewUrl, WebviewWindow, WindowEvent};
+use tauri::{AppHandle, Manager, RunEvent, WebviewWindow, WindowEvent};
 use tauri_plugin_cli::CliExt;
 use tauri_plugin_log::{fern::colors::ColoredLevelConfig, Target, TargetKind};
 use window::{create_window, CreateWindowInput};
 use workbench_desktop::window::{NativePlatformInfo, NativeWindowConfiguration};
 use workbench_desktop::Workbench;
+
+use crate::constants::*;
+use crate::plugins as moss_plugins;
 
 #[macro_use]
 extern crate serde;
@@ -85,7 +84,7 @@ pub fn run() {
     builder
         .setup(|app| {
             let platform_info = NativePlatformInfo::new();
-            let home_dir = get_home_dir()?;
+            let home_dir = crate::utl::get_home_dir()?;
 
             let service_group = utl::create_service_registry(NativeWindowConfiguration {
                 home_dir,
@@ -115,16 +114,11 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![
             cmd_window::main_window_is_ready,
             cmd_window::create_new_window,
-            cmd_dummy::workbench_get_state,
-            cmd_dummy::app_ready,
-            cmd_dummy::update_font_size,
             cmd_dummy::fetch_all_themes,
             cmd_dummy::read_theme,
             cmd_base::native_platform_info,
-            cmd_base::describe_primary_activitybar_part,
-            cmd_base::describe_primary_sidebar_part,
             cmd_base::get_view_content,
-            cmd_base::get_menu_items,
+            cmd_base::get_menu_items_by_namespace,
         ])
         .on_window_event(|window, event| match event {
             #[cfg(target_os = "macos")]
@@ -151,7 +145,7 @@ pub fn run() {
 
                             // let _ = create_main_window(app_handle, "/");
                         } else {
-                            tauri::async_runtime::spawn(cli_handler(
+                            tauri::async_runtime::spawn(crate::cli::cli_handler(
                                 subcommand.unwrap(),
                                 app_handle.clone(),
                             ));

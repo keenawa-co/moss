@@ -27,7 +27,7 @@ importers:
         specifier: ^2.0.6
         version: 2.3.0
 
-  internal/workbench/models:
+  crates/moss-html:
     dependencies:
       typescript:
         specifier: ^5.5.4
@@ -35,7 +35,40 @@ importers:
     devDependencies:
       '@repo/typescript-config':
         specifier: workspace:*
-        version: link:../../../view/shared/config-typescript
+        version: link:../../view/shared/config-typescript
+
+  crates/moss-str:
+    dependencies:
+      typescript:
+        specifier: ^5.5.4
+        version: 5.6.3
+    devDependencies:
+      '@repo/typescript-config':
+        specifier: workspace:*
+        version: link:../../view/shared/config-typescript
+
+  crates/moss-uikit:
+    dependencies:
+      typescript:
+        specifier: ^5.5.4
+        version: 5.6.3
+    devDependencies:
+      '@repo/typescript-config':
+        specifier: workspace:*
+        version: link:../../view/shared/config-typescript
+
+  internal/workbench/desktop/models:
+    dependencies:
+      typescript:
+        specifier: ^5.5.4
+        version: 5.6.3
+    devDependencies:
+      '@repo/moss-str':
+        specifier: workspace:*
+        version: link:../../../../crates/moss-str
+      '@repo/typescript-config':
+        specifier: workspace:*
+        version: link:../../../../view/shared/config-typescript
 
   lib/moss_lang:
     dependencies:
@@ -56,6 +89,9 @@ importers:
         specifier: ^5.5.4
         version: 5.6.3
     devDependencies:
+      '@repo/desktop-models':
+        specifier: workspace:*
+        version: link:../../internal/workbench/desktop/models
       '@repo/moss-models':
         specifier: workspace:*
         version: link:../../sdk-ts/moss-models
@@ -104,6 +140,9 @@ importers:
         specifier: ^5.3.3
         version: 5.6.3
     devDependencies:
+      '@repo/desktop-models':
+        specifier: workspace:*
+        version: link:../../internal/workbench/desktop/models
       '@repo/moss-models':
         specifier: workspace:*
         version: link:../../sdk-ts/moss-models
@@ -177,6 +216,9 @@ importers:
         specifier: ^7.8.1
         version: 7.8.1
     devDependencies:
+      '@repo/desktop-models':
+        specifier: workspace:*
+        version: link:../../internal/workbench/desktop/models
       '@repo/eslint-config':
         specifier: workspace:*
         version: link:../shared/config-eslint
@@ -361,21 +403,14 @@ importers:
 
   view/shared/config-typescript: {}
 
-  view/shared/models/uikit:
-    dependencies:
-      typescript:
-        specifier: ^5.5.4
-        version: 5.6.3
-    devDependencies:
-      '@repo/typescript-config':
-        specifier: workspace:*
-        version: link:../../config-typescript
-
   view/shared/ui:
     dependencies:
       '@radix-ui/primitive':
         specifier: ^1.1.0
         version: 1.1.0
+      '@radix-ui/react-compose-refs':
+        specifier: ^1.1.0
+        version: 1.1.0(@types/react@18.3.12)(react@18.3.1)
       '@radix-ui/react-context':
         specifier: ^1.1.1
         version: 1.1.1(@types/react@18.3.12)(react@18.3.1)
@@ -383,6 +418,9 @@ importers:
         specifier: ^2.2.2
         version: 2.2.2(@types/react-dom@18.3.1)(@types/react@18.3.12)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@radix-ui/react-direction':
+        specifier: ^1.1.0
+        version: 1.1.0(@types/react@18.3.12)(react@18.3.1)
+      '@radix-ui/react-id':
         specifier: ^1.1.0
         version: 1.1.0(@types/react@18.3.12)(react@18.3.1)
       '@radix-ui/react-menu':
@@ -422,6 +460,9 @@ importers:
       '@radix-ui/react-tooltip':
         specifier: ^1.1.2
         version: 1.1.4(@types/react-dom@18.3.1)(@types/react@18.3.12)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@repo/desktop-models':
+        specifier: workspace:*
+        version: link:../../../internal/workbench/desktop/models
       '@repo/eslint-config':
         specifier: workspace:*
         version: link:../config-eslint
@@ -477,6 +518,9 @@ importers:
       '@chromatic-com/storybook':
         specifier: 1.6.1
         version: 1.6.1(react@18.3.1)
+      '@repo/desktop-models':
+        specifier: workspace:*
+        version: link:../../internal/workbench/desktop/models
       '@repo/eslint-config':
         specifier: workspace:*
         version: link:../shared/config-eslint
@@ -11806,7 +11850,7 @@ snapshots:
       '@typescript-eslint/eslint-plugin': 6.21.0(@typescript-eslint/parser@6.21.0(eslint@8.57.1)(typescript@5.6.3))(eslint@8.57.1)(typescript@5.6.3)
       '@typescript-eslint/parser': 6.21.0(eslint@8.57.1)(typescript@5.6.3)
       eslint-config-prettier: 9.1.0(eslint@8.57.1)
-      eslint-import-resolver-alias: 1.1.2(eslint-plugin-import@2.31.0(@typescript-eslint/parser@6.21.0(eslint@8.57.1)(typescript@5.6.3))(eslint-import-resolver-typescript@3.6.3)(eslint@8.57.1))
+      eslint-import-resolver-alias: 1.1.2(eslint-plugin-import@2.31.0)
       eslint-import-resolver-typescript: 3.6.3(@typescript-eslint/parser@6.21.0(eslint@8.57.1)(typescript@5.6.3))(eslint-plugin-import@2.31.0)(eslint@8.57.1)
       eslint-plugin-eslint-comments: 3.2.0(eslint@8.57.1)
       eslint-plugin-import: 2.31.0(@typescript-eslint/parser@6.21.0(eslint@8.57.1)(typescript@5.6.3))(eslint-import-resolver-typescript@3.6.3)(eslint@8.57.1)
@@ -13187,7 +13231,7 @@ snapshots:
       eslint: 8.57.1
       eslint-plugin-turbo: 2.3.0(eslint@8.57.1)
 
-  eslint-import-resolver-alias@1.1.2(eslint-plugin-import@2.31.0(@typescript-eslint/parser@6.21.0(eslint@8.57.1)(typescript@5.6.3))(eslint-import-resolver-typescript@3.6.3)(eslint@8.57.1)):
+  eslint-import-resolver-alias@1.1.2(eslint-plugin-import@2.31.0):
     dependencies:
       eslint-plugin-import: 2.31.0(@typescript-eslint/parser@6.21.0(eslint@8.57.1)(typescript@5.6.3))(eslint-import-resolver-typescript@3.6.3)(eslint@8.57.1)
 
@@ -13205,7 +13249,7 @@ snapshots:
       debug: 4.3.7
       enhanced-resolve: 5.17.1
       eslint: 8.57.1
-      eslint-module-utils: 2.12.0(@typescript-eslint/parser@6.21.0(eslint@8.57.1)(typescript@5.6.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.3(@typescript-eslint/parser@6.21.0(eslint@8.57.1)(typescript@5.6.3))(eslint-plugin-import@2.31.0)(eslint@8.57.1))(eslint@8.57.1)
+      eslint-module-utils: 2.12.0(@typescript-eslint/parser@6.21.0(eslint@8.57.1)(typescript@5.6.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.3)(eslint@8.57.1)
       fast-glob: 3.3.2
       get-tsconfig: 4.8.1
       is-bun-module: 1.2.1
@@ -13218,7 +13262,7 @@ snapshots:
       - eslint-import-resolver-webpack
       - supports-color
 
-  eslint-module-utils@2.12.0(@typescript-eslint/parser@6.21.0(eslint@8.57.1)(typescript@5.6.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.3(@typescript-eslint/parser@6.21.0(eslint@8.57.1)(typescript@5.6.3))(eslint-plugin-import@2.31.0)(eslint@8.57.1))(eslint@8.57.1):
+  eslint-module-utils@2.12.0(@typescript-eslint/parser@6.21.0(eslint@8.57.1)(typescript@5.6.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.3)(eslint@8.57.1):
     dependencies:
       debug: 3.2.7
     optionalDependencies:
@@ -13246,7 +13290,7 @@ snapshots:
       doctrine: 2.1.0
       eslint: 8.57.1
       eslint-import-resolver-node: 0.3.9
-      eslint-module-utils: 2.12.0(@typescript-eslint/parser@6.21.0(eslint@8.57.1)(typescript@5.6.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.3(@typescript-eslint/parser@6.21.0(eslint@8.57.1)(typescript@5.6.3))(eslint-plugin-import@2.31.0)(eslint@8.57.1))(eslint@8.57.1)
+      eslint-module-utils: 2.12.0(@typescript-eslint/parser@6.21.0(eslint@8.57.1)(typescript@5.6.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.3)(eslint@8.57.1)
       hasown: 2.0.2
       is-core-module: 2.15.1
       is-glob: 4.0.3

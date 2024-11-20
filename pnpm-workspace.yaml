@@ -1,8 +1,7 @@
 packages:
+  - "crates/*"
   - "view/*"
-  - "view/shared/*"
   - "lib/*"
   - "tools/*"
-  - "sdk-ts/*"
-  - "internal/workbench/*"
-  - "view/shared/models/*"
+  - "view/shared/*"
+  - "internal/workbench/desktop/*"

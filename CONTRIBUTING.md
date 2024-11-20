@@ -23,6 +23,13 @@ proposing new features, or enhancing documentation, your contributions are great
 
 ## Getting Started
 
+Before starting the project, ensure you have the following installed:
+
+- [SurrealDB](https://surrealdb.com/)
+- [Tauri](https://tauri.app/)
+- [pnpm](https://pnpm.io/)
+- [Rust](https://www.rust-lang.org/)
+
 ### Forking the Repository
 
 1. Navigate to the Moss repository on GitHub, <https://github.com/keenawa-co/moss>
@@ -42,6 +49,55 @@ proposing new features, or enhancing documentation, your contributions are great
 2. Install the necessary dependencies: `cargo install`
 3. Make sure the project requirements are met. Follow the [requirements](README.md#requirements) section in the project
    Readme.
+
+**Note for Ubuntu Linux users:**
+
+Based on personal experience, some additional libraries may be required:
+
+```sh
+sudo apt install libwebkit2gtk-4.1-dev
+sudo apt install libjavascriptcoregtk-4.1-dev
+sudo apt install libsoup-3.0-dev
+sudo apt install clang
+```
+
+**Note for Windows users:**
+
+You need to first install GNU make before running the `make` scripts:
+
+1. Install Chocolatey from https://chocolatey.org/install
+
+2. In an administrative shell, run `choco install make`
+
+<!-- ## Nix usage (not ready to be used!)
+
+Before starting the project, ensure you have [NIX](https://nixos.org/download/) installed and enable
+the [flakes](https://nixos.wiki/wiki/Flakes) experimental feature.
+
+To do this, add the following line to your Nix configuration file:
+
+- For user-specific settings, edit `~/.config/nix/nix.conf`:
+
+- For system-wide settings, edit `/etc/nix/nix.conf`:
+
+```
+experimental-features = nix-command flakes
+```
+
+### Installing Dependencies
+
+To install the necessary dependencies for the project, run the following command:
+
+```bash
+nix develop
+```
+
+This command will set up a development environment with all the required tools and libraries specified in the
+`flake.nix` file.
+
+**Note**: You will need to run `nix develop` in every new terminal session before starting development to make the tools
+available in that shell. This is because the environment is only active within the current shell session and does not
+persist across multiple terminal sessions. -->
 
 ## Code of conduct
 
@@ -75,17 +131,17 @@ the [Conventional Commits](https://semantic-release.gitbook.io/semantic-release)
 
 ### Semantic Release Format
 
-- **feat**: A new feature
-- **fix**: A bug fix
-- **docs**: Documentation only changes
-- **style**: Changes that do not affect the meaning of the code (white-space, formatting, missing semicolons, etc.)
-- **refactor**: A code change that neither fixes a bug nor adds a feature
-- **perf**: A code change that improves performance
-- **test**: Adding missing or correcting existing tests
-- **build**: Changes that affect the build system or external dependencies (example scopes: gulp, broccoli, npm)
-- **ci**: Changes to our CI configuration files and scripts (example scopes: Travis, Circle, BrowserStack, SauceLabs)
-- **chore**: Other changes that don't modify src or test files
-- **revert**: Reverts a previous commit
+**feat**: A new feature
+**fix**: A bug fix
+**docs**: Documentation only changes
+**perf**: A code change that improves performance
+**style**: Changes that do not affect the meaning of the code (white-space, formatting, missing semi-colons, etc)
+**refactor**: A code change that neither fixes a bug nor adds a feature
+**test**: Adding missing or correcting existing tests
+**build**: Changes that affect the build system or external dependencies (example scopes: gulp, broccoli, npm)
+**ci**: Changes to our CI configuration files and scripts (example scopes: Travis, Circle, BrowserStack, SauceLabs)
+**chore**: Other changes that don't modify src or test files
+**revert**: Reverts a previous commit
 
 ### Example Commit Messages
 
