@@ -20,12 +20,7 @@ pub async fn fetch_all_themes() -> Result<Vec<String>, String> {
         if !file_name.ends_with(".json") {
             continue;
         }
-        if let Ok(content) = std::fs::read_to_string(entry.path()) {
-            match serde_json::from_str::<Theme>(&content) {
-                Ok(theme) => {valid_themes.push(file_name.strip_suffix(".json").unwrap().to_string());},
-                Err(_) => {}
-            }
-        }
+        valid_themes.push(file_name.strip_suffix(".json").unwrap().to_string());
     }
     Ok(valid_themes)
 }
