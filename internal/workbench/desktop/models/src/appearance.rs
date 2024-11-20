@@ -206,14 +206,5 @@ pub mod theming {
             let value: StrDeserializer<Error> = "#gggggg".into_deserializer();
             transform_to_rgba(value).unwrap();
         }
-
-        //
-        // #[test]
-        // #[should_panic]
-        // fn test_parsing_invalid_hsl(){
-        //     let value: StrDeserializer<Error> = "hsl(0, 0%, -100%)".into_deserializer();
-        //     println!("{}", transform_to_rgba(value).unwrap());
-        // }
-
     }
 }
