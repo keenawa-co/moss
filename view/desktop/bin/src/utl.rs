@@ -68,8 +68,5 @@ fn windows_home_dir() -> Result<PathBuf, String> {
 }
 
 pub fn get_themes_dir() -> Result<PathBuf, String> {
-    Ok(get_home_dir()?
-        .join(".config")
-        .join("moss")
-        .join("themes"))
+    Ok(get_home_dir()?.join(".config").join("moss").join("themes"))
 }

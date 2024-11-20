@@ -38,9 +38,6 @@
       "path": "tools/icongen"
     },
     {
-      "path": "sdk-ts"
-    },
-    {
       "path": "internal/workbench/desktop/models"
     }
   ]

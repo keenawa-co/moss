@@ -68,8 +68,6 @@ bstr = "1.10.0"
 ts-rs = "10.0"
 thiserror = "1.0"
 tauri = { version = "2.0.6", features = ["devtools"] }
-specta = "2.0.0-rc.20"
-specta-typescript = "0.0.7"
 libc = "0.2.155"
 fnv = "1.0.7"
 anyhow = "1.0"
