@@ -66,3 +66,11 @@ fn windows_home_dir() -> Result<PathBuf, String> {
         Err(e) => Err(format!("Failed to retrieve HOME directory: {}", e)),
     }
 }
+
+pub fn get_themes_dir() -> Result<PathBuf, String> {
+    let home_dir = get_home_dir()?;
+    Ok(home_dir
+        .join(".config")
+        .join("moss")
+        .join("themes"))
+}
