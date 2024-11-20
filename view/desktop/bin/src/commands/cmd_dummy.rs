@@ -1,39 +1,42 @@
 use anyhow::Result;
 use platform_core::context_v2::async_context::AsyncContext;
-use std::path::PathBuf;
-use homedir::my_home;
 use tauri::{AppHandle, Manager, State};
+use desktop_models::appearance::theming::Theme;
 use workbench_desktop::WorkbenchState;
 
 use crate::AppState;
-use crate::utl::get_home_dir;
+use crate::utl::{get_themes_dir};
 
 #[tauri::command(async)]
 #[specta::specta]
 pub async fn fetch_all_themes() -> Result<Vec<String>, String> {
-    Ok(vec![
-        "moss-dark".to_string(),
-        "moss-light".to_string(),
-        "moss-pink".to_string(),
-    ])
+    println!("fetch_all_themes()");
+    let mut valid_themes: Vec<String> = vec![];
+    let themes_dir = get_themes_dir()?;
+    let dir_iter = std::fs::read_dir(themes_dir).map_err(|e| e.to_string())?;
+    for entry in dir_iter {
+        let entry = entry.map_err(|e| e.to_string())?;
+        let file_name = entry.file_name().to_str().unwrap().to_owned();
+        if !file_name.ends_with(".json") {
+            continue;
+        }
+        valid_themes.push(file_name.strip_suffix(".json").unwrap().to_string());
+    }
+    Ok(valid_themes)
 }
 
 #[tauri::command(async)]
 #[specta::specta]
-pub async fn read_theme(theme_name: String) -> Result<String, String> {
-    let home_dir = get_home_dir()?;
-    let theme_file_path = home_dir
-        .join(".config")
-        .join("moss")
-        .join("themes")
+pub async fn read_theme(theme_name: String) -> Result<Theme, String> {
+    println!("read_theme");
+    let theme_file_path =
+        get_themes_dir()?
         .join(format!("{theme_name}.json"));
 
-    match std::fs::read_to_string(theme_file_path) {
-        Ok(content) => Ok(content),
-        Err(err) => {
-            dbg!(&err);
-            Err(format!("filed to read theme file: {err}"))
-        }
+    let content = std::fs::read_to_string(theme_file_path).map_err(|e| e.to_string())?;
+    match serde_json::from_str::<Theme>(&content){
+        Ok(theme) => Ok(theme),
+        Err(e) => Err(e.to_string())
     }
 }
 

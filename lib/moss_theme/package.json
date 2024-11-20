@@ -8,6 +8,7 @@
   },
   "devDependencies": {
     "@repo/moss-models": "workspace:*",
+    "@repo/desktop-models": "workspace:*",
     "@repo/typescript-config": "workspace:*"
   },
   "dependencies": {
