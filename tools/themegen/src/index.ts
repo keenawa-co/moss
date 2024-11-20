@@ -14,16 +14,16 @@ const defaultDarkTheme: Theme = {
   type: "dark",
   isDefault: false,
   colors: {
-    "primary": "255, 255, 255, 1", // prettier-ignore
-    "sideBar.background": "39, 39, 42, 1",
-    "toolBar.background": "30, 32, 33, 1",
-    "page.background": "22, 24, 25, 1",
-    "statusBar.background": "0, 122, 205, 1",
-    "windowsCloseButton.background": "196, 43, 28, 1",
-    "windowControlsLinux.background": "55, 55, 55, 1",
-    "windowControlsLinux.text": "255, 255, 255, 1",
-    "windowControlsLinux.hoverBackground": "66, 66, 66, 1",
-    "windowControlsLinux.activeBackground": "86, 86, 86, 1",
+    "primary": "rgba(255, 255, 255, 1)", // prettier-ignore
+    "sideBar.background": "rgba(39, 39, 42, 1)",
+    "toolBar.background": "rgba(30, 32, 33, 1)",
+    "page.background": "rgba(22, 24, 25, 1)",
+    "statusBar.background": "rgba(0, 122, 205, 1)",
+    "windowsCloseButton.background": "rgba(196, 43, 28, 1)",
+    "windowControlsLinux.background": "rgba(55, 55, 55, 1)",
+    "windowControlsLinux.text": "rgba(255, 255, 255, 1)",
+    "windowControlsLinux.hoverBackground": "rgba(66, 66, 66, 1)",
+    "windowControlsLinux.activeBackground": "rgba(86, 86, 86, 1)",
   },
 };
 
@@ -33,16 +33,16 @@ const defaultLightTheme: Theme = {
   type: "light",
   isDefault: true,
   colors: {
-    "primary": "0, 0, 0, 1", // prettier-ignore
-    "sideBar.background": "244, 244, 245, 1",
-    "toolBar.background": "224, 224, 224, 1",
-    "page.background": "255, 255, 255, 1",
-    "statusBar.background": "0, 122, 205, 1",
-    "windowsCloseButton.background": "196, 43, 28, 1",
-    "windowControlsLinux.background": "218, 218, 218, 1",
-    "windowControlsLinux.text": "61, 61, 61, 1",
-    "windowControlsLinux.hoverBackground": "209, 209, 209, 1",
-    "windowControlsLinux.activeBackground": "191, 191, 191, 1",
+    "primary": "rgba(0, 0, 0, 1)", // prettier-ignore
+    "sideBar.background": "rgba(244, 244, 245, 1)",
+    "toolBar.background": "rgba(224, 224, 224, 1)",
+    "page.background": "rgba(255, 255, 255, 1)",
+    "statusBar.background": "rgba(0, 122, 205, 1)",
+    "windowsCloseButton.background": "rgba(196, 43, 28, 1)",
+    "windowControlsLinux.background": "rgba(218, 218, 218, 1)",
+    "windowControlsLinux.text": "rgba(61, 61, 61, 1)",
+    "windowControlsLinux.hoverBackground": "rgba(209, 209, 209, 1)",
+    "windowControlsLinux.activeBackground": "rgba(191, 191, 191, 1)",
   },
 };
 
@@ -54,16 +54,16 @@ const pinkTheme: Theme = {
   type: "pink",
   isDefault: false,
   colors: {
-    "primary": "0, 0, 0, 1", // prettier-ignore
-    "sideBar.background": "234, 157, 242, 1",
-    "toolBar.background": "222, 125, 232, 1",
-    "page.background": "227, 54, 245, 1",
-    "statusBar.background": "63, 11, 69, 1",
-    "windowsCloseButton.background": "196, 43, 28, 1",
-    "windowControlsLinux.background": "218, 218, 218, 1",
-    "windowControlsLinux.text": "61, 61, 61, 1",
-    "windowControlsLinux.hoverBackground": "209, 209, 209, 1",
-    "windowControlsLinux.activeBackground": "191, 191, 191, 1",
+    "primary": "rgba(0, 0, 0, 1)", // prettier-ignore
+    "sideBar.background": "rgba(234, 157, 242, 1)",
+    "toolBar.background": "rgba(222, 125, 232, 1)",
+    "page.background": "rgba(227, 54, 245, 1)",
+    "statusBar.background": "rgba(63, 11, 69, 1)",
+    "windowsCloseButton.background": "rgba(196, 43, 28, 1)",
+    "windowControlsLinux.background": "rgba(218, 218, 218, 1)",
+    "windowControlsLinux.text": "rgba(61, 61, 61, 1)",
+    "windowControlsLinux.hoverBackground": "rgba(209, 209, 209, 1)",
+    "windowControlsLinux.activeBackground": "rgba(191, 191, 191, 1)",
   },
 };
 
