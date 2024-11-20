@@ -181,8 +181,7 @@ mod tests {
             .or()
             .child(
                 LogicRuleBuilder::new()
-                    .not()
-                    .child(RuleBuilder::new().equal("status", "retired"))
+                .child(RuleBuilder::new().equal("status", "retired")).not()
             )
             .build()
             .expect("Failed to build rule");
