@@ -9,12 +9,31 @@ export const Icon = ({
   className,
   ...props
 }: {
-  icon: Icons;
+  icon: Icons | null;
   className?: string;
 } & ComponentPropsWithoutRef<"svg">) => {
-  const IconTag = icons[icon];
+  if (!icon) {
+    return (
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16">
+        <path fill="#ff69b4" d="M0 0h4v4H0z" />
+        <path d="M4 0h4v4H4z" />
+        <path fill="#ff69b4" d="M8 0h4v4H8z" />
+        <path d="M12 0h4v4h-4zM0 4h4v4H0z" />
+        <path fill="#ff69b4" d="M4 4h4v4H4z" />
+        <path d="M8 4h4v4H8z" />
+        <path fill="#ff69b4" d="M12 4h4v4h-4zM0 8h4v4H0z" />
+        <path d="M4 8h4v4H4z" />
+        <path fill="#ff69b4" d="M8 8h4v4H8z" />
+        <path d="M12 8h4v4h-4zM0 12h4v4H0z" />
+        <path fill="#ff69b4" d="M4 12h4v4H4z" />
+        <path d="M8 12h4v4H8z" />
+        <path fill="#ff69b4" d="M12 12h4v4h-4z" />
+      </svg>
+    );
+  }
 
-  return <IconTag className={cn("size-4 text-[rgba(var(--colorPrimary))]", className)} {...props} />;
+  const IconTag = icons[icon];
+  return <IconTag className={cn("size-4 flex-shrink-0 text-[rgba(var(--colorPrimary))]", className)} {...props} />;
 };
 
 export default Icon;
