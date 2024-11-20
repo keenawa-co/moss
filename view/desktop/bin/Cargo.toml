@@ -50,10 +50,6 @@ hashbrown = { workspace = true, features = ["serde"] }
 
 tauri = { workspace = true, features = ["macos-private-api"] }
 strum = { workspace = true, features = ["derive"] }
-specta.workspace = true
-specta-typescript.workspace = true
-tauri-specta = { version = "2.0.0-rc.12", features = ["typescript"] }
-
 tauri-plugin-shell = "2.0.2"
 tauri-plugin-os = "2.0.1"
 tauri-plugin-log = { version = "2.0.1", features = ["colored"] }

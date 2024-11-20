@@ -40,6 +40,7 @@
     "@repo/typescript-config": "workspace:*",
     "@repo/desktop-models": "workspace:*",
     "@repo/ui": "workspace:*",
+    "@repo/desktop-models": "workspace:*",
     "@storybook/react": "^8.2.8",
     "@tailwindcss/typography": "^0.5.13",
     "@tauri-apps/cli": ">=2.0.0-rc.0",

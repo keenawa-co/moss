@@ -5,7 +5,7 @@ import "@repo/ui/src/styles.css";
 import { ThemeProvider, staticColors } from "@repo/ui";
 import * as themeFiles from "./themes";
 import { Convert } from "@repo/moss-theme";
-import { Theme } from "@repo/moss-models";
+import { Theme } from "@repo/desktop-models";
 
 const themes: Map<string, Theme> = new Map();
 for (const themeName in themeFiles) {
