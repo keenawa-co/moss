@@ -97,7 +97,7 @@ impl RuleBuilder {
             })
         } else {
             Ok(Rule {
-                value: json!({ AND_LITERAL.to_string(): self.conditions }),
+                value: json!(self.conditions),
             })
         }
     }
@@ -137,6 +137,7 @@ impl LogicRuleBuilder<Initial> {
 impl LogicRuleBuilder<AfterChild> {
     pub fn and(self) -> LogicRuleBuilder<AfterLogicOp> {
         let wrapped = json!({ AND_LITERAL.to_string(): self.conditions });
+        
         LogicRuleBuilder {
             conditions: vec![wrapped],
             _state: std::marker::PhantomData,
@@ -145,6 +146,7 @@ impl LogicRuleBuilder<AfterChild> {
 
     pub fn or(self) -> LogicRuleBuilder<AfterLogicOp> {
         let wrapped = json!({ OR_LITERAL.to_string(): self.conditions });
+        
         LogicRuleBuilder {
             conditions: vec![wrapped],
             _state: std::marker::PhantomData,
@@ -153,8 +155,9 @@ impl LogicRuleBuilder<AfterChild> {
 
     pub fn not(mut self) -> Self {
         if let Some(cond) = self.conditions.pop() {
-            let wrapped = json!({ NOT_LITERAL.to_string(): cond });
-            self.conditions.push(wrapped);
+            self.conditions.push(json!({
+                NOT_LITERAL.to_string(): cond // Wrap the last condition under "!"
+            }));
         }
         self
     }
@@ -196,7 +199,7 @@ impl BuildableRule for LogicRuleBuilder<AfterChild> {
             })
         } else {
             Ok(Rule {
-                value: json!({ AND_LITERAL.to_string(): self.conditions }),
+                value: json!(self.conditions),
             })
         }
     }
@@ -212,7 +215,7 @@ impl BuildableRule for LogicRuleBuilder<AfterLogicOp> {
             })
         } else {
             Ok(Rule {
-                value: json!({ AND_LITERAL.to_string(): self.conditions }),
+                value: json!(self.conditions),
             })
         }
     }
@@ -229,7 +232,7 @@ impl BuildableRule for RuleBuilder {
             })
         } else {
             Ok(Rule {
-                value: json!({ AND_LITERAL.to_string(): self.conditions }),
+                value: json!(self.conditions),
             })
         }
     }
