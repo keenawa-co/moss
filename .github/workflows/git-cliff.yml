@@ -26,9 +26,8 @@ jobs:
       - name: Print the changelog
         run: cat "${{ steps.git-cliff.outputs.changelog }}"
 
-      - name: Commit
-        run: |
-          git config user.name 'github-actions[bot]'
-          git config user.email 'github-actions[bot]@users.noreply.github.com'
-          git add CHANGELOG.md
-          git commit -m "Update changelog"
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: CHANGELOG.md
+          path: CHANGELOG.md
