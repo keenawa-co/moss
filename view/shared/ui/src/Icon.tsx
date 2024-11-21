@@ -12,9 +12,11 @@ export const Icon = ({
   icon: Icons | null;
   className?: string;
 } & ComponentPropsWithoutRef<"svg">) => {
-  if (!icon) {
+  const IconTag = icons[icon];
+
+  if (!IconTag) {
     return (
-      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" className={cn("size-4 flex-shrink-0", className)}>
         <path fill="#ff69b4" d="M0 0h4v4H0z" />
         <path d="M4 0h4v4H4z" />
         <path fill="#ff69b4" d="M8 0h4v4H8z" />
@@ -32,7 +34,6 @@ export const Icon = ({
     );
   }
 
-  const IconTag = icons[icon];
   return <IconTag className={cn("size-4 flex-shrink-0 text-[rgba(var(--colorPrimary))]", className)} {...props} />;
 };
 
