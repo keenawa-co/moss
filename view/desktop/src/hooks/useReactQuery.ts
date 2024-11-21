@@ -29,12 +29,7 @@ export const useUpdateStoredString = () => {
     mutationKey: ["updateStoredString"],
     mutationFn: updateStoredString,
     onSuccess: () => {
-      queryClient.invalidateQueries(
-        { queryKey: ["storedString"] },
-        {
-          cancelRefetch: false,
-        }
-      );
+      queryClient.invalidateQueries({ queryKey: ["storedString"] });
     },
   });
 };
