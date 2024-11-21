@@ -22,3 +22,9 @@ jobs:
 
       - name: Print the changelog
         run: cat "${{ steps.git-cliff.outputs.changelog }}"
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          name: CHANGELOG.md
+          path: CHANGELOG.md
