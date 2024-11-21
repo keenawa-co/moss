@@ -10,9 +10,11 @@ const fetchStoredString = async (): Promise<string> => {
 export const useStoredString = () => {
   return useQuery<string, Error>({
     queryKey: ["storedString"],
-    // staleTime: 1000 * 60 * 5,
     queryFn: fetchStoredString,
-    // refetchOnWindowFocus: false,
+    // staleTime: Infinity,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+    refetchOnMount: false,
   });
 };
 
@@ -27,7 +29,12 @@ export const useUpdateStoredString = () => {
     mutationKey: ["updateStoredString"],
     mutationFn: updateStoredString,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["storedString"] });
+      queryClient.invalidateQueries(
+        { queryKey: ["storedString"] },
+        {
+          cancelRefetch: false,
+        }
+      );
     },
   });
 };

@@ -132,7 +132,7 @@ export const Home: React.FC = () => {
         <Icon icon="Accessibility" className="text-6xl hover:*:fill-green-500" />
         <Icon icon="NewProject" className="text-red-700 text-6xl hover:fill-green-500" />
       </div>
-      {/* 
+      {/*
       <div className="w-96 bg-red-600">
         {new Array(77).fill(0).map((_, index) => (
           <div key={index}>
@@ -148,21 +148,20 @@ export const Home: React.FC = () => {
 const StoredStringUpdater: React.FC = () => {
   const [newString, setNewString] = useState<string>("");
   const mutation = useUpdateStoredString();
-  const { data: storedString, refetch } = useStoredString();
+  const { data: storedString } = useStoredString();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     mutation.mutate(newString);
-    setNewString("");
   };
 
   const handleLogCurrentString = async () => {
-    await refetch();
     console.log("Current Stored String:", storedString);
   };
 
   return (
     <div>
+      <hr />
       <h2>Update String:</h2>
       <form onSubmit={handleSubmit}>
         <input
@@ -179,9 +178,10 @@ const StoredStringUpdater: React.FC = () => {
       {mutation.isError && <p style={{ color: "red" }}>Error: {mutation.error?.message}</p>}
       {mutation.isSuccess && <p style={{ color: "green" }}>String successfully updated!</p>}
 
-      <button onClick={handleLogCurrentString} style={{ marginTop: "10px" }}>
-        Log Current String
-      </button>
+      <div>
+        currentString: <span className="font-extrabold">{storedString}</span>
+      </div>
+      <hr />
     </div>
   );
 };
