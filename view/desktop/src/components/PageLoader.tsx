@@ -12,7 +12,7 @@ export const PageLoader = () => {
     const interval = setInterval(() => {
       const randomTip = tips[Math.floor(Math.random() * tips.length)];
       setTip(randomTip);
-    }, 2000);
+    }, 5000);
 
     return () => clearInterval(interval);
   }, []);
