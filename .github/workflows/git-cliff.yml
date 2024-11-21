@@ -20,7 +20,7 @@ jobs:
           config: cliff.toml
           args: --verbose
         env:
-          OUTPUT: CHANGES.md
+          OUTPUT: CHANGELOG.md
           GITHUB_REPO: ${{ github.repository }}
 
       - name: Print the changelog
