@@ -22,7 +22,7 @@ export const PageLoader = () => {
       <div className="fixed top-0 h-36 w-screen" data-tauri-drag-region />
 
       <div className="flex h-full flex-col items-center justify-center gap-5">
-        <div className="animate-spin">
+        <div className="animate-[spin_1s_ease-in-out_infinite] ">
           <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="none" viewBox="0 0 32 32">
             <path
               fill="#C6C6C6"
