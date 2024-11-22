@@ -1,6 +1,5 @@
 import type { Config } from "tailwindcss";
 import sharedConfig from "@repo/tailwind-config";
-
 import tailwindAnimate from "tailwindcss-animate";
 import fontSize from "./src/tailwind/custom-config/fontSize";
 

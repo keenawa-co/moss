@@ -63,7 +63,7 @@ const App: React.FC = () => {
           </ResizablePanel>
           <ResizablePanel>
             <ContentLayout className="content relative flex h-full flex-col overflow-auto">
-              <Suspense fallback={<PageLoader />}>
+              <Suspense fallback={<div>Loading...</div>}>
                 <BrowserRouter>
                   <Menu />
                   <Routes>
