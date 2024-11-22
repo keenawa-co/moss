@@ -3,7 +3,6 @@ import {
   DragEndEvent,
   DragOverlay,
   DragStartEvent,
-  KeyboardSensor,
   MouseSensor,
   UniqueIdentifier,
   closestCenter,

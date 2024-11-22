@@ -1,4 +1,4 @@
-import { Theme, Colors } from "@repo/moss-models";
+import { Theme, Colors } from "@repo/desktop-models";
 
 // Utility function to convert camelCase to kebab-case
 function toKebabCase(str: string): string {

@@ -1,14 +1,13 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { commands } from "@/bindings";
-import { Convert } from "@repo/moss-theme";
 import { setSelectedTheme, setThemes } from "./themesSlice";
-//FIXME TS Import error
+import { invokeIpc } from "@/lib/backend/tauri";
 import { applyTheme } from "@repo/moss-theme";
 import { handleReadTheme } from "./themesHelpers";
+import { Theme } from "@repo/desktop-models";
 
 export const fetchAllThemes = createAsyncThunk("themes/fetchAllThemes", async (_, { dispatch, rejectWithValue }) => {
   try {
-    const response = await commands.fetchAllThemes();
+    const response = await invokeIpc<string[], string>("fetch_all_themes");
     if (response.status === "error") throw new Error("Failed to fetch themes");
 
     dispatch(setThemes(response.data));
@@ -19,13 +18,13 @@ export const fetchAllThemes = createAsyncThunk("themes/fetchAllThemes", async (_
 
 export const setTheme = createAsyncThunk(
   "themes/setTheme",
-  async (themeCode: string, { dispatch, rejectWithValue }) => {
+  async (themeName: string, { dispatch, rejectWithValue }) => {
     try {
-      const response = await commands.readTheme(themeCode);
+      const response = await invokeIpc<Theme, string>("read_theme", { themeName });
       if (response.status === "error") throw new Error("Failed to read theme");
-
-      applyTheme(Convert.toTheme(response.data));
-      dispatch(setSelectedTheme(themeCode));
+      const theme: Theme = response.data;
+      applyTheme(theme);
+      dispatch(setSelectedTheme(themeName));
     } catch (error) {
       if (error instanceof Error) return rejectWithValue(error.message);
     }

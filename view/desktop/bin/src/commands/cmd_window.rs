@@ -15,7 +15,6 @@ struct EventAData {
 pub async fn create_new_window(parent_window: WebviewWindow) {
     let app_handle = parent_window.app_handle().clone();
     create_main_window(&app_handle, "/");
-
 }
 
 #[tauri::command]
