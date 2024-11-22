@@ -14,15 +14,15 @@ All notable changes to this project will be documented in this file.
 - Implementation of a mechanism for working with exceptions + docs
 - Refactoring
 - Started implementing the registry into the parser
-- *(create-turbo)* Apply official-starter transform
-- *(create-turbo)* Apply pnpm-eslint transform
-- *(create-turbo)* Install dependencies
-- *(create-turbo)* Apply official-starter transform
-- *(create-turbo)* Apply pnpm-eslint transform
-- *(create-turbo)* Install dependencies
-- *(create-turbo)* Apply official-starter transform
-- *(create-turbo)* Apply pnpm-eslint transform
-- *(create-turbo)* Install dependencies
+- _(create-turbo)_ Apply official-starter transform
+- _(create-turbo)_ Apply pnpm-eslint transform
+- _(create-turbo)_ Install dependencies
+- _(create-turbo)_ Apply official-starter transform
+- _(create-turbo)_ Apply pnpm-eslint transform
+- _(create-turbo)_ Install dependencies
+- _(create-turbo)_ Apply official-starter transform
+- _(create-turbo)_ Apply pnpm-eslint transform
+- _(create-turbo)_ Install dependencies
 - Finalizing the configuration scheme registration logic
 - Added secondary fields which
 - Added simple statusbar
@@ -44,14 +44,14 @@ All notable changes to this project will be documented in this file.
 - Implemented the functionality of using certain policies when reading data
 - Implemented a key inspection mechanism
 - Implemented the functionality of updating data in the file and the system
-- *(MOSSMVP-85)* Backend initial configuration policy ([#62](<REPO>/issues/62))
-- *(configuration)* Implementation of the structure and macro of the key
+- _(MOSSMVP-85)_ Backend initial configuration policy ([#62](<REPO>/issues/62))
+- _(configuration)_ Implementation of the structure and macro of the key
 - Add fonts.css to build process and exports
 - Added Inter font to shared tailwind config
 - Imported Inter font to desktop app
 - Implemented an updated mechanism for working with keys for update operations
 - Optimized work with attribute names in configuration models
-- *(MOSSMVP-119)* Implement a more advanced approach to working with keys ([#64](<REPO>/issues/64))
+- _(MOSSMVP-119)_ Implement a more advanced approach to working with keys ([#64](<REPO>/issues/64))
 - Tooltip component in progress
 - Added storybook script alias
 - Added Tooltip
@@ -61,7 +61,7 @@ All notable changes to this project will be documented in this file.
 - Set Tooltip with arrow as a default
 - Added asChil property to Tooltip
 - Added Story to Tooltip and changed default Tooltip text
-- (MOSSMVP-111) Frontend Create Tooltip component  ([#67](<REPO>/issues/67))
+- (MOSSMVP-111) Frontend Create Tooltip component ([#67](<REPO>/issues/67))
 - (MOSSMVP-116) Frontend App header ([#65](<REPO>/issues/65))
 - Added Dropdown menu
 - Added Dropdown menu dependency
@@ -72,7 +72,7 @@ All notable changes to this project will be documented in this file.
 - Added Dropdown menu export from shared folder
 - Changed styles for icons
 - Added TODO
-- *(MOSSMVP-117)* Frontend Implement Dropdown Menu ([#69](<REPO>/issues/69))
+- _(MOSSMVP-117)_ Frontend Implement Dropdown Menu ([#69](<REPO>/issues/69))
 - Svgr example
 - Updated svgr config
 - Added new icon component to Home page
@@ -87,31 +87,31 @@ All notable changes to this project will be documented in this file.
 - Advanced implementation of service collection
 - Made a small API pass to the frontend
 - Implemented integration of the workspace services with the work area
-- *(MOSSMVP-105)* Workspace configuration service ([#66](<REPO>/issues/66))
+- _(MOSSMVP-105)_ Workspace configuration service ([#66](<REPO>/issues/66))
 - Updated DropdownMenu icon functionallity
 - Added simple README to icons
 - Added icon stories
 - Added removal of builded icons before new builds
-- *(MOSSMVP 141)* Frontend Review the icon integration mechanism ([#71](<REPO>/issues/71))
+- _(MOSSMVP 141)_ Frontend Review the icon integration mechanism ([#71](<REPO>/issues/71))
 - Added Lato font
 - Added font family for shortcut
-- *(MOSSMVP 134)* Frontend Change Desktop Application Font ([#73](<REPO>/issues/73))
+- _(MOSSMVP 134)_ Frontend Change Desktop Application Font ([#73](<REPO>/issues/73))
 - (MOSSMVP 138): Frontend Test implemented windows controls buttons on Linux ([#72](<REPO>/issues/72))
-- *(MOSSMVP-128)* Organize the application layout  ([#74](<REPO>/issues/74))
+- _(MOSSMVP-128)_ Organize the application layout ([#74](<REPO>/issues/74))
 - Added command to start surrealDB from root
 - Added Badge component
 - Added All Variants story to Icon stories
-- *(MOSSMVP 136)* Frontend Badge component ([#75](<REPO>/issues/75))
+- _(MOSSMVP 136)_ Frontend Badge component ([#75](<REPO>/issues/75))
 - First drafts of real configurations
 - Attempt to implement optimizations
 - Using first configurations
 - Implemented the application of window size configuration settings
 - Implemented the environment module
-- *(MOSSMVP-142)* Expanding and stabilizing workspace modules ([#70](<REPO>/issues/70))
+- _(MOSSMVP-142)_ Expanding and stabilizing workspace modules ([#70](<REPO>/issues/70))
 - Initialized theme generation service
 - Implemented FileService into UserService
 - Implemented FileService into UserConfiguration
-- *(MOSSMVP-118)* Platform file service ([#77](<REPO>/issues/77))
+- _(MOSSMVP-118)_ Platform file service ([#77](<REPO>/issues/77))
 - Implemented dynamic tailwind themes
 - Implemented dynamic themes to linux window controls
 - Implemented dynamic themes to windows window controls
@@ -130,11 +130,11 @@ All notable changes to this project will be documented in this file.
 - Added base of Resizable component
 - Added stories to Resizable component
 - Added new Resizable library
-- *(MOSSMVP-146)* Frontend Implementation of a functional sidebar  ([#81](<REPO>/issues/81))
-- *(MOSSMVP-157)* Frontend Transfer all secondary commands to Makefile ([#82](<REPO>/issues/82))
+- _(MOSSMVP-146)_ Frontend Implementation of a functional sidebar ([#81](<REPO>/issues/81))
+- _(MOSSMVP-157)_ Frontend Transfer all secondary commands to Makefile ([#82](<REPO>/issues/82))
 - Added command to get native platform information
 - Added the ability to start and stop the database in the background
-- *(MOSSMVP-151)* Backend exchange of events through the pub sub mechanism ([#84](<REPO>/issues/84))
+- _(MOSSMVP-151)_ Backend exchange of events through the pub sub mechanism ([#84](<REPO>/issues/84))
 - Added sdk-ts and tools directories to root
 - Implemented @repo/theme sdk-ts and added to theme provider
 - Added validation of theme HEX colors
@@ -146,7 +146,7 @@ All notable changes to this project will be documented in this file.
 - Added text ellipsis and content overflow for Resizable component on desktop main page
 - Added overflow scroll on X axis on sidebar component
 - Added conditionas border radius to header
-- *(MOSSMVP-156)* Frontend Content adaptation mechanism ([#83](<REPO>/issues/83))
+- _(MOSSMVP-156)_ Frontend Content adaptation mechanism ([#83](<REPO>/issues/83))
 - Tracing-subscriber integration into the platform
 - Added temporary Logs page to the desktop app
 - Logging init & send them to frontend
@@ -155,8 +155,8 @@ All notable changes to this project will be documented in this file.
 - Added temporary Logs page to the desktop app
 - Logging init & send them to frontend
 - Cleanup. Added some comments
-- *(MOSSMVP-152, MOSSMVP-153)* Backend logging library integration and forwarding to the frontend ([#88](<REPO>/issues/88))
-- *(MOSSMVP-158)* Implement theme generation  ([#87](<REPO>/issues/87))
+- _(MOSSMVP-152, MOSSMVP-153)_ Backend logging library integration and forwarding to the frontend ([#88](<REPO>/issues/88))
+- _(MOSSMVP-158)_ Implement theme generation ([#87](<REPO>/issues/87))
 - Env macros
 - Core configurations
 - NativePlatformInfo
@@ -167,20 +167,20 @@ All notable changes to this project will be documented in this file.
 - Implemented rust workspace audit (rwa) xtask
 - Provider
 - Implemented the ability for users to specify a config file using the --config-file flag when running the rwa subcommand
-- *(MOSSMVP-182)* Replaced Tailwind custom variables with CSS variables in classNames ([#95](<REPO>/issues/95))
-- *(MOSSMVP-178)* Atoms and selectors ([#93](<REPO>/issues/93))
+- _(MOSSMVP-182)_ Replaced Tailwind custom variables with CSS variables in classNames ([#95](<REPO>/issues/95))
+- _(MOSSMVP-178)_ Atoms and selectors ([#93](<REPO>/issues/93))
 - Added redux
 - Integrated language selector into redux
 - Added react-devtools
 - Moved theme logic to Redux
-- *(MOSSMVP-172)* Frontend Redux integration  ([#96](<REPO>/issues/96))
+- _(MOSSMVP-172)_ Frontend Redux integration ([#96](<REPO>/issues/96))
 - Integrated event subscription mechanism
-- *(MOSSMVP-191)* Install Prettier plugin for Tailwind CSS ([#98](<REPO>/issues/98))
-- *(MOSSMVP-181)* Auto-generation of mapping functions for generating themes ([#97](<REPO>/issues/97))
+- _(MOSSMVP-191)_ Install Prettier plugin for Tailwind CSS ([#98](<REPO>/issues/98))
+- _(MOSSMVP-181)_ Auto-generation of mapping functions for generating themes ([#97](<REPO>/issues/97))
 - Implementation of generic functions for working with nodes in all contexts
 - Moved storage of selector computers to global storage
 - A generic immutable map type for storing any type of node
-- *(MOSSMVP-190)* Backend subscriptions observers and effects ([#99](<REPO>/issues/99))
+- _(MOSSMVP-190)_ Backend subscriptions observers and effects ([#99](<REPO>/issues/99))
 - `crater` library integration
 - First UI implementation using ESC lib
 - Added `loc` command
@@ -198,33 +198,33 @@ All notable changes to this project will be documented in this file.
 - Added implementation of Beautiful DND with resizeable accordion
 - Uncomplete implementation of react-resizable-panels
 - Sidebar implementation with allotment
-- *(MOSSMVP-186)* Frontend Implement a common sidebar ([#100](<REPO>/issues/100))
-- *(MOSSMVP-198)* Backend implementation of the composition mechanism ([#105](<REPO>/issues/105))
+- _(MOSSMVP-186)_ Frontend Implement a common sidebar ([#100](<REPO>/issues/100))
+- _(MOSSMVP-198)_ Backend implementation of the composition mechanism ([#105](<REPO>/issues/105))
 - Group
 - Disabled the use of the database
 - New impl of the implementation of parts and contributions
 - Side bar part draft impl
 - Implemented the functionality to bind a View model to a view descriptor
 - Passed data retrieval to the frontend
-- *(MOSSMVP-215)* Backend implementation of frontend architecture description ([#108](<REPO>/issues/108))
+- _(MOSSMVP-215)_ Backend implementation of frontend architecture description ([#108](<REPO>/issues/108))
 - Moved uikit library
 - Implemented and configured shared models
 - Added models generation command
 - TS types import mechanism
 - Implemented workbench-level models
-- *(MOSSMVP-216)* Backend type script bindings from rust ([#109](<REPO>/issues/109))
+- _(MOSSMVP-216)_ Backend type script bindings from rust ([#109](<REPO>/issues/109))
 - Implemented the first context menus
 - Simple language interface generation
 - Simple implementation of backend lang
-- *(MOSSMVP-126)* Frontent UI localization ([#111](<REPO>/issues/111))
+- _(MOSSMVP-126)_ Frontent UI localization ([#111](<REPO>/issues/111))
 - Added LinkArrow.svg
 - Added Link component and reworked Tooltip
 - Added Context Menu
 - Added simple icon gallery
-- *(MOSSMVP-202)* Frontend UI cleanup  ([#110](<REPO>/issues/110))
+- _(MOSSMVP-202)_ Frontend UI cleanup ([#110](<REPO>/issues/110))
 - Added implementation of toggled context menu item
 - Implementation of optimized identifiers for builtin tokens
-- *(MOSSMVP-218)* Menu registry ([#114](<REPO>/issues/114))
+- _(MOSSMVP-218)_ Menu registry ([#114](<REPO>/issues/114))
 - First version of event bus
 - Initial version of the service architecture
 - Integrated a plugin responsible for positioning window control buttons on a macOS
@@ -232,7 +232,7 @@ All notable changes to this project will be documented in this file.
 - Implemented HTML link models
 - `Links` view content
 - Moved definition of HTML models to UI Kit
-- *(MOSSMVP-224)* Preparing primary side bar contributions to provide them on the frontend ([#115](<REPO>/issues/115))
+- _(MOSSMVP-224)_ Preparing primary side bar contributions to provide them on the frontend ([#115](<REPO>/issues/115))
 - Added shell.nix
 - Added versions to flake.nix
 - Updated flake.nix so that the desired versions would be used. Upd README.md
@@ -243,9 +243,9 @@ All notable changes to this project will be documented in this file.
 - Fixed error with glib and openssl version. Attempting to fix BAD_DISPLAY error
 - Pre-merge changes
 - Implemented the multi-window
-- *(MOSSMVP-232)* Window state integration ([#117](<REPO>/issues/117))
+- _(MOSSMVP-232)_ Window state integration ([#117](<REPO>/issues/117))
 - Implemented content localization
-- *(MOSSMVP-127)* Localization of returned content ([#118](<REPO>/issues/118))
+- _(MOSSMVP-127)_ Localization of returned content ([#118](<REPO>/issues/118))
 - Added HeadBar without DnD
 - Added conditional rounded borders fo different OS
 - Added DnDKit to HeadBar
@@ -253,17 +253,17 @@ All notable changes to this project will be documented in this file.
 - Added overflow to HeadBar
 - HeadBar wrappable menu
 - (MOSSMVP-220): HeadBar implementation ([#123](<REPO>/issues/123))
-- *(MOSSMVP-229)* Fix the workspace dependencies ([#129](<REPO>/issues/129))
+- _(MOSSMVP-229)_ Fix the workspace dependencies ([#129](<REPO>/issues/129))
 - Added IBMPlexMono font
-- *(MOSSMVP-176)* Frontend New fonts ([#130](<REPO>/issues/130))
-- *(MOSSMVP-229)* Implement CLI entry point with `info` command
-- *(MOSSMVP-229)* Implement CLI entry point with `info` command ([#128](<REPO>/issues/128))
+- _(MOSSMVP-176)_ Frontend New fonts ([#130](<REPO>/issues/130))
+- _(MOSSMVP-229)_ Implement CLI entry point with `info` command
+- _(MOSSMVP-229)_ Implement CLI entry point with `info` command ([#128](<REPO>/issues/128))
 - Added new dropdown menu using menu primitives
 - Added auto-generation of actions models
-- *(MOSSMVP-221)* Preparing head bar contributions to provide them on the frontend ([#126](<REPO>/issues/126))
-- *(MOSSMVP-238)* Frontend Finalizing UI Headbar  ([#133](<REPO>/issues/133))
+- _(MOSSMVP-221)_ Preparing head bar contributions to provide them on the frontend ([#126](<REPO>/issues/126))
+- _(MOSSMVP-238)_ Frontend Finalizing UI Headbar ([#133](<REPO>/issues/133))
 - Backend support for different color formats in themes
-- *(MOSSMVP-247)* Forwarding the theme to the frontend ([#138](<REPO>/issues/138))
+- _(MOSSMVP-247)_ Forwarding the theme to the frontend ([#138](<REPO>/issues/138))
 
 ### 🐛 Bug Fixes
 
@@ -271,7 +271,7 @@ All notable changes to this project will be documented in this file.
 - Platform-specific code isolation
 - Tauri deps
 - Made the ID field required
-- *(configuration)* Moved the configuration module to the platform level
+- _(configuration)_ Moved the configuration module to the platform level
 - Problem with data loss when merging models
 - Removed docusaurus auto generated files
 - Fixed fonts import for storybook
@@ -279,7 +279,7 @@ All notable changes to this project will be documented in this file.
 - Fixed gap between arrow and tooltip
 - Tooltip name in storybook
 - Trigger tooltip only if trigger is button
-- *(https://github.com/4rchr4y/moss/commit/38e61a84d46b532c9ec266ee89850d5c873bf59c)* Pnpm version
+- _(https://github.com/4rchr4y/moss/commit/38e61a84d46b532c9ec266ee89850d5c873bf59c)_ Pnpm version
 - Https://github.com/4rchr4y/moss/commit/01e83076fa25f904ff51059605fabfaea45e5c21
 - DropdownMenu stories type error
 - The problem with configuration fields being lost
@@ -295,8 +295,8 @@ All notable changes to this project will be documented in this file.
 - Conditional border radius not working
 - Fixed introduced bug from merging from master
 - Pull from main branch, merging error fixes
-- Themes fix  ([#90](<REPO>/issues/90))
-- *(MOSSMVP-152, MOSSMVP-153)* Advance merge with MOSSMVP-164 ([#91](<REPO>/issues/91))
+- Themes fix ([#90](<REPO>/issues/90))
+- _(MOSSMVP-152, MOSSMVP-153)_ Advance merge with MOSSMVP-164 ([#91](<REPO>/issues/91))
 - Async logic
 - Rwa
 - Conditionally load react-devtools script for development mode
@@ -306,7 +306,7 @@ All notable changes to this project will be documented in this file.
 - Accordion trigger activation
 - TS error wen calling setLanguageFromLocalStorage
 - CompilerOptions->jsx field
-- Removed  gen-bindings
+- Removed gen-bindings
 - Build problem on windows
 - Rerended whole app when theme changes
 - Reduced color change delay(but i didn't remove it completely )
@@ -319,11 +319,11 @@ All notable changes to this project will be documented in this file.
 - Fix corners and transparency on linux
 - Not rounded window
 - Window fullscreen toggle
-- First element of DND  overflow list is always overflown on linux
+- First element of DND overflow list is always overflown on linux
 - Treat the absence of user config file as an empty config
 - Update readme and change logic for checking home directory & user config file ([#120](<REPO>/issues/120))
 - Gen-icons command
-- *(MOSSMVP-234)* Fix deadlock on clicking New Window button ([#127](<REPO>/issues/127))
+- _(MOSSMVP-234)_ Fix deadlock on clicking New Window button ([#127](<REPO>/issues/127))
 - DropdownMenu trigger couldn't be dragged
 - Draggable ActionGroup could be swapped with invisible items
 - Label words breaking in ActionsGroup on Windows
@@ -352,12 +352,12 @@ All notable changes to this project will be documented in this file.
 - Renamed Community index.md to Overview, removed example page
 - Fix typo in Overview
 - Update docusaurus.config.ts, added NOTE about commented-out code
-- *(MOSSMVP135)* README.md rewrite. Changes to documentation website structure (header, footer navigation) ([#78](<REPO>/issues/78))
+- _(MOSSMVP135)_ README.md rewrite. Changes to documentation website structure (header, footer navigation) ([#78](<REPO>/issues/78))
 - Updated README
 - Updated README
 - Updated description
 - Fix typo
-- *(MOSSMVP-211)* Preparing the base and structure of pages ([#106](<REPO>/issues/106))
+- _(MOSSMVP-211)_ Preparing the base and structure of pages ([#106](<REPO>/issues/106))
 - Added documentation for quote macro
 
 ### ⚡ Performance
@@ -454,12 +454,12 @@ All notable changes to this project will be documented in this file.
 - Renaming modules to follow convention
 - Renaming files
 - Removed icon group state
-- *(configuration_registry)* Improved API
+- _(configuration_registry)_ Improved API
 - Moss_base -> moss_std
 - Service_group -> service_registry
-- *(configuration)* Structuring and separating modules
+- _(configuration)_ Structuring and separating modules
 - Created THEMES const
-- Added fixme to remove all hardcoded values from  constants
+- Added fixme to remove all hardcoded values from constants
 - Migrated to platform core
 - Restructuring and simplifying access to entities
 - Min size
@@ -515,7 +515,7 @@ All notable changes to this project will be documented in this file.
 - Imports
 - More flexible level implementation of part contributions
 - More in-depth architecture development of tree-like representation
-- Separated views  from containers
+- Separated views from containers
 - Switched to using the term TreeViewGroup instead of TreeViewContainer
 - Cleanup
 - Simplifying the structure of shared models
@@ -543,20 +543,20 @@ All notable changes to this project will be documented in this file.
 - HeadBar DND oberflow list
 - Changed Context Menu to Dropdown in HeadBar
 - Use homedir crate to retrieve the home directory
-- *(MOSSMVP-236)* Remove unused dependencies and move crate dependencies to workspace ([#122](<REPO>/issues/122))
+- _(MOSSMVP-236)_ Remove unused dependencies and move crate dependencies to workspace ([#122](<REPO>/issues/122))
 - Changed item in headbar list
 - Removed HeadBarButton
 - Changed Overflown menu items
 - Removed excessive overcomplication from the code
 - Moved the model definitions to the models crate
 - Split the shared models crate into two independent crates and configured type export to TypeScript.
-- *(MOSSMVP-264)* Move the UIKit models to the crate folder ([#137](<REPO>/issues/137))
+- _(MOSSMVP-264)_ Move the UIKit models to the crate folder ([#137](<REPO>/issues/137))
 - Change color format in theme files
 - Add `get_themes_dir` utility function
 - Move theme parsing logic to the backend
 - Make `fetch_all_themes` command list invalid theme files as well
 - Replace `moss-models` with `desktop-models`
-- *(MOSSMVP-267)* Remove all specta dependencies ([#139](<REPO>/issues/139))
+- _(MOSSMVP-267)_ Remove all specta dependencies ([#139](<REPO>/issues/139))
 
 ### 🧪 Testing
 
@@ -564,30 +564,30 @@ All notable changes to this project will be documented in this file.
 
 ### 🏗️ Build
 
-- *(rust)* Bump hashbrown from 0.7.2 to 0.14.5
-- *(rust)* Bump hashbrown from 0.7.2 to 0.14.5 ([#61](<REPO>/issues/61))
-- *(rust)* Bump serde_with from 3.8.3 to 3.9.0
-- *(rust)* Bump serde_with from 3.8.3 to 3.9.0 ([#60](<REPO>/issues/60))
-- *(rust)* Bump lazy-regex from 3.1.0 to 3.2.0
-- *(rust)* Bump lazy-regex from 3.1.0 to 3.2.0 ([#57](<REPO>/issues/57))
-- *(rust)* Bump tokio from 1.38.0 to 1.39.2
-- *(rust)* Bump tokio from 1.38.0 to 1.39.2 ([#59](<REPO>/issues/59))
-- *(rust)* Bump async-executor from 1.12.0 to 1.13.0
-- *(rust)* Bump async-executor from 1.12.0 to 1.13.0 ([#58](<REPO>/issues/58))
+- _(rust)_ Bump hashbrown from 0.7.2 to 0.14.5
+- _(rust)_ Bump hashbrown from 0.7.2 to 0.14.5 ([#61](<REPO>/issues/61))
+- _(rust)_ Bump serde_with from 3.8.3 to 3.9.0
+- _(rust)_ Bump serde_with from 3.8.3 to 3.9.0 ([#60](<REPO>/issues/60))
+- _(rust)_ Bump lazy-regex from 3.1.0 to 3.2.0
+- _(rust)_ Bump lazy-regex from 3.1.0 to 3.2.0 ([#57](<REPO>/issues/57))
+- _(rust)_ Bump tokio from 1.38.0 to 1.39.2
+- _(rust)_ Bump tokio from 1.38.0 to 1.39.2 ([#59](<REPO>/issues/59))
+- _(rust)_ Bump async-executor from 1.12.0 to 1.13.0
+- _(rust)_ Bump async-executor from 1.12.0 to 1.13.0 ([#58](<REPO>/issues/58))
 - Updated pnpm version
 - Removed separate fonts.css file from build
 - Updated pnpm-lock dependency
 - Removed pragmatic-drag-and-drop from project
 - Added dnd-kit to project
-- *(rust)* Bump lazy-regex from 3.2.0 to 3.3.0
-- *(rust)* Bump lazy-regex from 3.2.0 to 3.3.0 ([#85](<REPO>/issues/85))
-- *(rust)* Bump tokio from 1.39.2 to 1.40.0
-- *(rust)* Bump tokio from 1.39.2 to 1.40.0 ([#86](<REPO>/issues/86))
+- _(rust)_ Bump lazy-regex from 3.2.0 to 3.3.0
+- _(rust)_ Bump lazy-regex from 3.2.0 to 3.3.0 ([#85](<REPO>/issues/85))
+- _(rust)_ Bump tokio from 1.39.2 to 1.40.0
+- _(rust)_ Bump tokio from 1.39.2 to 1.40.0 ([#86](<REPO>/issues/86))
 - Pnpm-lock update
-- *(rust)* Bump hashbrown from 0.14.5 to 0.15.0
-- *(rust)* Bump hashbrown from 0.14.5 to 0.15.0 ([#113](<REPO>/issues/113))
-- *(rust)* Bump tokio from 1.40.0 to 1.41.0
-- *(rust)* Bump tokio from 1.40.0 to 1.41.0 ([#112](<REPO>/issues/112))
+- _(rust)_ Bump hashbrown from 0.14.5 to 0.15.0
+- _(rust)_ Bump hashbrown from 0.14.5 to 0.15.0 ([#113](<REPO>/issues/113))
+- _(rust)_ Bump tokio from 1.40.0 to 1.41.0
+- _(rust)_ Bump tokio from 1.40.0 to 1.41.0 ([#112](<REPO>/issues/112))
 - Pnpm-lock update
 - Update pnpm-lock.yaml
 
@@ -600,15 +600,15 @@ All notable changes to this project will be documented in this file.
 - Cleaned up imports
 - Added word to workspace settings
 - Changed icon color back to stone
-- Update turbo.json to include build/** in outputs
+- Update turbo.json to include build/\*\* in outputs
 - Update docusaurus scripts in package.json
 - Changed github pages deployment path
 - Remove obsolete settings
-- *(MOSSMVP-101)* Prepare the publication of the documentation site on GitHub pages ([#52](<REPO>/issues/52))
+- _(MOSSMVP-101)_ Prepare the publication of the documentation site on GitHub pages ([#52](<REPO>/issues/52))
 - Settings migration
 - Final setup
-- *(deps)* Bump actions/download-artifact from 3 to 4
-- *(deps)* Bump actions/upload-artifact from 3 to 4
+- _(deps)_ Bump actions/download-artifact from 3 to 4
+- _(deps)_ Bump actions/upload-artifact from 3 to 4
 - Update static.yml
 - Cleanup
 - Extend docusaurus tsconfig.json with base configuration
@@ -633,7 +633,7 @@ All notable changes to this project will be documented in this file.
 - Implemented reading of themes from files
 - Added `cleanup` command
 - Cleaning outdated libraries
-- *(platform)* Simplification of the folder structure for platform modules
+- _(platform)_ Simplification of the folder structure for platform modules
 - Moved tailwind theme provider from desktop to shared
 - Remove jsonnet implementation
 - Styles indentation
@@ -687,14 +687,14 @@ All notable changes to this project will be documented in this file.
 - HeadBar chore
 - HeadBar chores
 - HeadBar chores
-- *(MOSSMVP-237)* Set up Github Action for `git-cliff` ([#134](<REPO>/issues/134))
+- _(MOSSMVP-237)_ Set up Github Action for `git-cliff` ([#134](<REPO>/issues/134))
 - Setting up `git-cliff` for automatic changelog generation
-- *(MOSSMVP-237)* Setting up `git-cliff` for automatic changelog generation ([#135](<REPO>/issues/135))
+- _(MOSSMVP-237)_ Setting up `git-cliff` for automatic changelog generation ([#135](<REPO>/issues/135))
 - Fixed an error in the README file
 
 ### DevOps
 
-- *(MOSSMVP-263)* Set up pre-commit `rustfmt` hook ([#132](<REPO>/issues/132))
+- _(MOSSMVP-263)_ Set up pre-commit `rustfmt` hook ([#132](<REPO>/issues/132))
 
 ### WIP
 
@@ -702,8 +702,8 @@ All notable changes to this project will be documented in this file.
 
 ### Chrone
 
-- *(lib)* Restructured `moss_std`
-- *(async_utl)* Restructured and removed this module
+- _(lib)_ Restructured `moss_std`
+- _(async_utl)_ Restructured and removed this module
 - Added `workspace.resolver` = 2
 
 ### Deps
