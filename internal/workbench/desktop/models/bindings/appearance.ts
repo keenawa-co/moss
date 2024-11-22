@@ -2,15 +2,21 @@
 
 export type Colors = {
   primary: string;
-  "linux.windowCloseButtonBackground": string;
-  "linux.windowCloseButtonBackground.hovered": string;
-  "linux.windowCloseButtonBackground.focused": string;
-  "linux.windowButton": string;
-  "linux.windowButton.hovered": string;
-  "linux.windowButton.focused": string;
-  "headBar.background": string;
   "sideBar.background": string;
-  "pageView.background": string;
+  "toolBar.background": string;
+  "page.background": string;
+  "statusBar.background": string;
+  "windowsCloseButton.background": string;
+  "windowControlsLinux.background": string;
+  "windowControlsLinux.text": string;
+  "windowControlsLinux.hoverBackground": string;
+  "windowControlsLinux.activeBackground": string;
 };
 
-export type Theme = { name: string; slug: string; type: string; isDefault: boolean; colors: Colors };
+export type Theme = {
+  name: string;
+  slug: string;
+  type: string;
+  isDefault: boolean;
+  colors: Colors;
+};

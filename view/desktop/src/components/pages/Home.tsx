@@ -1,5 +1,4 @@
 import { useTranslation } from "react-i18next";
-import { commands, SessionInfoDTO } from "@/bindings";
 import React, { useEffect, useState } from "react";
 import { listen } from "@tauri-apps/api/event";
 import { Tooltip, DropdownMenu, Icon } from "@repo/ui";
@@ -10,20 +9,7 @@ export type DescribeActivityOutput = { tooltip: string; order: number };
 
 const SessionComponent = () => {
   const { t } = useTranslation(["ns1", "ns2"]);
-  const [sessionInfo, setSessionInfo] = useState<SessionInfoDTO | null>(null);
   const [data, setData] = useState<number | null>(null);
-  const [workbenchState, setWorkbenchState] = useState<string>("empty");
-
-  let getWorkbenchState = async () => {
-    try {
-      const response = await commands.workbenchGetState();
-      if (response.status === "ok") {
-        setWorkbenchState(response.data);
-      }
-    } catch (err) {
-      console.error("Failed to get workbench state:", err);
-    }
-  };
 
   let getAllActivities = async () => {
     try {
@@ -39,7 +25,6 @@ const SessionComponent = () => {
       setData(event.payload);
     });
 
-    getWorkbenchState();
     getAllActivities();
 
     return () => {
@@ -47,44 +32,8 @@ const SessionComponent = () => {
     };
   }, []);
 
-  useEffect(() => {
-    if (sessionInfo) {
-      console.log("Session restored:", sessionInfo);
-    }
-  }, [sessionInfo]);
-
-  const handleRestoreSession = async () => {
-    try {
-      let response = await commands.restoreSession(null);
-      if (response.status === "ok") {
-        setSessionInfo(response.data);
-      }
-    } catch (error) {
-      console.error("Failed to restore session:", error);
-    }
-  };
-
   return (
     <>
-      {sessionInfo ? (
-        <div>
-          <p>Session: {sessionInfo.session.id}</p>
-          <p>Project: {sessionInfo.project.source}</p>
-        </div>
-      ) : (
-        <p>No session</p>
-      )}
-
-      <p className="text-[rgba(var(--color-primary))]">
-        Workspace: <span className="bg-red-500 text-[rgba(var(--color-primary))]"> {workbenchState}</span>
-      </p>
-      <br />
-
-      <button className="bg-red-500 text-[rgba(var(--color-primary))]" onClick={handleRestoreSession}>
-        Restore Session
-      </button>
-      <br />
-
       <span className="text-[rgba(var(--color-primary))]">{t("description.part1")}</span>
       <br />
       <span className="bg-secondary text-[rgba(var(--color-primary))]">{t("description.part1", { ns: "ns2" })}</span>

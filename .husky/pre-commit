@@ -1,1 +1,2 @@
+rustup component add rustfmt
 pnpm exec lint-staged
