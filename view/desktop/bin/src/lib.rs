@@ -18,6 +18,7 @@ use std::rc::Rc;
 use std::sync::atomic::{AtomicUsize, Ordering};
 use std::sync::Arc;
 
+use parking_lot::Mutex;
 use tauri::{AppHandle, Manager, RunEvent, WebviewWindow, WindowEvent};
 use tauri_plugin_cli::CliExt;
 use tauri_plugin_log::{fern::colors::ColoredLevelConfig, Target, TargetKind};
@@ -35,6 +36,7 @@ pub struct AppState {
     pub workbench: Arc<Workbench>,
     pub platform_info: NativePlatformInfo,
     pub window_counter: AtomicUsize,
+    pub react_query_string: Mutex<String>,
 }
 
 pub fn run() {
@@ -102,6 +104,7 @@ pub fn run() {
                 workbench: Arc::new(workbench),
                 platform_info,
                 window_counter: AtomicUsize::new(0),
+                react_query_string: Mutex::new(String::from("Hello, Tauri!")),
             };
 
             {
@@ -114,6 +117,10 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![
             cmd_window::main_window_is_ready,
             cmd_window::create_new_window,
+            cmd_dummy::get_stored_string,
+            cmd_dummy::set_stored_string,
+            cmd_dummy::fetch_all_themes,
+            cmd_dummy::read_theme,
             cmd_dummy::fetch_all_themes,
             cmd_dummy::read_theme,
             cmd_base::native_platform_info,

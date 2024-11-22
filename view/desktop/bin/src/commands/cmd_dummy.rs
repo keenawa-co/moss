@@ -1,7 +1,9 @@
 use anyhow::Result;
 use desktop_models::appearance::theming::Theme;
+use tauri::State;
 
 use crate::utl::get_themes_dir;
+use crate::AppState;
 
 #[tauri::command(async)]
 pub async fn fetch_all_themes() -> Result<Vec<String>, String> {
@@ -28,4 +30,18 @@ pub async fn read_theme(theme_name: String) -> Result<Theme, String> {
         Ok(theme) => Ok(theme),
         Err(e) => Err(e.to_string()),
     }
+}
+
+#[tauri::command]
+pub fn get_stored_string(state: State<'_, AppState>) -> String {
+    dbg!("read");
+    let stored_string = state.react_query_string.lock();
+    stored_string.clone()
+}
+
+#[tauri::command]
+pub fn set_stored_string(new_string: String, state: State<'_, AppState>) {
+    dbg!("write");
+    let mut stored_string = state.react_query_string.lock();
+    *stored_string = new_string;
 }

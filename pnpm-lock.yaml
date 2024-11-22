@@ -92,19 +92,6 @@ importers:
       '@repo/desktop-models':
         specifier: workspace:*
         version: link:../../internal/workbench/desktop/models
-      '@repo/moss-models':
-        specifier: workspace:*
-        version: link:../../sdk-ts/moss-models
-      '@repo/typescript-config':
-        specifier: workspace:*
-        version: link:../../view/shared/config-typescript
-
-  sdk-ts/moss-models:
-    dependencies:
-      typescript:
-        specifier: ^5.5.4
-        version: 5.6.3
-    devDependencies:
       '@repo/typescript-config':
         specifier: workspace:*
         version: link:../../view/shared/config-typescript
@@ -143,9 +130,6 @@ importers:
       '@repo/desktop-models':
         specifier: workspace:*
         version: link:../../internal/workbench/desktop/models
-      '@repo/moss-models':
-        specifier: workspace:*
-        version: link:../../sdk-ts/moss-models
       '@repo/typescript-config':
         specifier: workspace:*
         version: link:../../view/shared/config-typescript
@@ -173,6 +157,12 @@ importers:
       '@tailwindcss/nesting':
         specifier: 0.0.0-insiders.565cd3e
         version: 0.0.0-insiders.565cd3e(postcss@8.4.49)
+      '@tanstack/react-query':
+        specifier: ^5.60.6
+        version: 5.60.6(react@18.3.1)
+      '@tanstack/react-query-devtools':
+        specifier: ^5.60.6
+        version: 5.60.6(@tanstack/react-query@5.60.6(react@18.3.1))(react@18.3.1)
       '@tauri-apps/api':
         specifier: '>=2.0.0-rc.0'
         version: 2.1.1
@@ -469,9 +459,6 @@ importers:
       '@repo/icongen':
         specifier: workspace:*
         version: link:../../../tools/icongen
-      '@repo/moss-models':
-        specifier: workspace:*
-        version: link:../../../sdk-ts/moss-models
       '@repo/moss-theme':
         specifier: workspace:*
         version: link:../../../lib/moss_theme
@@ -524,9 +511,6 @@ importers:
       '@repo/eslint-config':
         specifier: workspace:*
         version: link:../shared/config-eslint
-      '@repo/moss-models':
-        specifier: workspace:*
-        version: link:../../sdk-ts/moss-models
       '@repo/moss-theme':
         specifier: workspace:*
         version: link:../../lib/moss_theme
@@ -2920,6 +2904,23 @@ packages:
     resolution: {integrity: sha512-AqhlCXl+8grUz8uqExv5OTtgpjuVIwFTSXTrh8y9/pw6q2ek7fJ+Y8ZEVw7EB2DCcuCOtEjf9w3+J3rzts01uA==}
     peerDependencies:
       tailwindcss: '>=3.0.0 || insiders || >=4.0.0-alpha.20'
+
+  '@tanstack/query-core@5.60.6':
+    resolution: {integrity: sha512-tI+k0KyCo1EBJ54vxK1kY24LWj673ujTydCZmzEZKAew4NqZzTaVQJEuaG1qKj2M03kUHN46rchLRd+TxVq/zQ==}
+
+  '@tanstack/query-devtools@5.59.20':
+    resolution: {integrity: sha512-vxhuQ+8VV4YWQSFxQLsuM+dnEKRY7VeRzpNabFXdhEwsBYLrjXlF1pM38A8WyKNLqZy8JjyRO8oP4Wd/oKHwuQ==}
+
+  '@tanstack/react-query-devtools@5.60.6':
+    resolution: {integrity: sha512-b55QgJs2PSzOtLdE3p9fxPOPmeXXfkzcsyVBFFyXwINIilSwz/wWoz2D5fwg5Vbp60CX34LccstzryU6Bg6Rqw==}
+    peerDependencies:
+      '@tanstack/react-query': ^5.60.6
+      react: ^18 || ^19
+
+  '@tanstack/react-query@5.60.6':
+    resolution: {integrity: sha512-FUzSDaiPkuZCmuGqrixfRRXJV9u+nrUh9lAlA5Q3ZFrOw1Js1VeBfxi1NIcJO3ZWJdKceBqKeBJdNcWStCYZnw==}
+    peerDependencies:
+      react: ^18 || ^19
 
   '@tauri-apps/api@2.1.1':
     resolution: {integrity: sha512-fzUfFFKo4lknXGJq8qrCidkUcKcH2UHhfaaCNt4GzgzGaW2iS26uFOg4tS3H4P8D6ZEeUxtiD5z0nwFF0UN30A==}
@@ -11310,6 +11311,21 @@ snapshots:
       postcss-selector-parser: 6.0.10
       tailwindcss: 3.4.15
 
+  '@tanstack/query-core@5.60.6': {}
+
+  '@tanstack/query-devtools@5.59.20': {}
+
+  '@tanstack/react-query-devtools@5.60.6(@tanstack/react-query@5.60.6(react@18.3.1))(react@18.3.1)':
+    dependencies:
+      '@tanstack/query-devtools': 5.59.20
+      '@tanstack/react-query': 5.60.6(react@18.3.1)
+      react: 18.3.1
+
+  '@tanstack/react-query@5.60.6(react@18.3.1)':
+    dependencies:
+      '@tanstack/query-core': 5.60.6
+      react: 18.3.1
+
   '@tauri-apps/api@2.1.1': {}
 
   '@tauri-apps/cli-darwin-arm64@2.1.0':
@@ -11850,7 +11866,7 @@ snapshots:
       '@typescript-eslint/eslint-plugin': 6.21.0(@typescript-eslint/parser@6.21.0(eslint@8.57.1)(typescript@5.6.3))(eslint@8.57.1)(typescript@5.6.3)
       '@typescript-eslint/parser': 6.21.0(eslint@8.57.1)(typescript@5.6.3)
       eslint-config-prettier: 9.1.0(eslint@8.57.1)
-      eslint-import-resolver-alias: 1.1.2(eslint-plugin-import@2.31.0)
+      eslint-import-resolver-alias: 1.1.2(eslint-plugin-import@2.31.0(@typescript-eslint/parser@6.21.0(eslint@8.57.1)(typescript@5.6.3))(eslint-import-resolver-typescript@3.6.3)(eslint@8.57.1))
       eslint-import-resolver-typescript: 3.6.3(@typescript-eslint/parser@6.21.0(eslint@8.57.1)(typescript@5.6.3))(eslint-plugin-import@2.31.0)(eslint@8.57.1)
       eslint-plugin-eslint-comments: 3.2.0(eslint@8.57.1)
       eslint-plugin-import: 2.31.0(@typescript-eslint/parser@6.21.0(eslint@8.57.1)(typescript@5.6.3))(eslint-import-resolver-typescript@3.6.3)(eslint@8.57.1)
@@ -13231,7 +13247,7 @@ snapshots:
       eslint: 8.57.1
       eslint-plugin-turbo: 2.3.0(eslint@8.57.1)
 
-  eslint-import-resolver-alias@1.1.2(eslint-plugin-import@2.31.0):
+  eslint-import-resolver-alias@1.1.2(eslint-plugin-import@2.31.0(@typescript-eslint/parser@6.21.0(eslint@8.57.1)(typescript@5.6.3))(eslint-import-resolver-typescript@3.6.3)(eslint@8.57.1)):
     dependencies:
       eslint-plugin-import: 2.31.0(@typescript-eslint/parser@6.21.0(eslint@8.57.1)(typescript@5.6.3))(eslint-import-resolver-typescript@3.6.3)(eslint@8.57.1)
 
@@ -13249,7 +13265,7 @@ snapshots:
       debug: 4.3.7
       enhanced-resolve: 5.17.1
       eslint: 8.57.1
-      eslint-module-utils: 2.12.0(@typescript-eslint/parser@6.21.0(eslint@8.57.1)(typescript@5.6.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.3)(eslint@8.57.1)
+      eslint-module-utils: 2.12.0(@typescript-eslint/parser@6.21.0(eslint@8.57.1)(typescript@5.6.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.3(@typescript-eslint/parser@6.21.0(eslint@8.57.1)(typescript@5.6.3))(eslint-plugin-import@2.31.0)(eslint@8.57.1))(eslint@8.57.1)
       fast-glob: 3.3.2
       get-tsconfig: 4.8.1
       is-bun-module: 1.2.1
@@ -13262,7 +13278,7 @@ snapshots:
       - eslint-import-resolver-webpack
       - supports-color
 
-  eslint-module-utils@2.12.0(@typescript-eslint/parser@6.21.0(eslint@8.57.1)(typescript@5.6.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.3)(eslint@8.57.1):
+  eslint-module-utils@2.12.0(@typescript-eslint/parser@6.21.0(eslint@8.57.1)(typescript@5.6.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.3(@typescript-eslint/parser@6.21.0(eslint@8.57.1)(typescript@5.6.3))(eslint-plugin-import@2.31.0)(eslint@8.57.1))(eslint@8.57.1):
     dependencies:
       debug: 3.2.7
     optionalDependencies:
@@ -13290,7 +13306,7 @@ snapshots:
       doctrine: 2.1.0
       eslint: 8.57.1
       eslint-import-resolver-node: 0.3.9
-      eslint-module-utils: 2.12.0(@typescript-eslint/parser@6.21.0(eslint@8.57.1)(typescript@5.6.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.3)(eslint@8.57.1)
+      eslint-module-utils: 2.12.0(@typescript-eslint/parser@6.21.0(eslint@8.57.1)(typescript@5.6.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.3(@typescript-eslint/parser@6.21.0(eslint@8.57.1)(typescript@5.6.3))(eslint-plugin-import@2.31.0)(eslint@8.57.1))(eslint@8.57.1)
       hasown: 2.0.2
       is-core-module: 2.15.1
       is-glob: 4.0.3
