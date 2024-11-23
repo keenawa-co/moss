@@ -3,7 +3,8 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { ContentLayout, LaunchPad, Menu, RootLayout } from "@/components";
 import "@/i18n";
 import "@repo/ui/src/fonts.css";
-import { Suspense, useState } from "react";
+import { Suspense } from "react";
+import { Provider as JotaiProvider } from "jotai";
 import { useSelector } from "react-redux";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Resizable, ResizablePanel } from "./components/Resizable";
@@ -11,7 +12,6 @@ import { Home, Logs, Settings } from "./components/pages";
 import { useInitializeApp } from "./hooks/useInitializeApp";
 import { RootState } from "./store";
 import { callServiceMethod } from "./main";
-import { useUpdateStoredString } from "./hooks/useReactQuery";
 
 const queryClient = new QueryClient({
   queryCache: new QueryCache({
@@ -62,27 +62,29 @@ const App: React.FC = () => {
   return (
     <QueryClientProvider client={queryClient}>
       {ENABLE_REACT_QUERY_DEVTOOLS && <ReactQueryDevtools buttonPosition="bottom-left" />}
-      <RootLayout>
-        <Resizable proportionalLayout={false}>
-          <ResizablePanel minSize={100} preferredSize={255} snap visible={isSidebarVisible} className="select-none">
-            <LaunchPad />
-          </ResizablePanel>
-          <ResizablePanel>
-            <ContentLayout className="content relative flex h-full flex-col overflow-auto">
-              <Suspense fallback={<div className="loading">Loading...</div>}>
-                <BrowserRouter>
-                  <Menu />
-                  <Routes>
-                    <Route path="/" element={<Home />} />
-                    <Route path="/settings" element={<Settings />} />
-                    <Route path="/logs" element={<Logs />} />
-                  </Routes>
-                </BrowserRouter>
-              </Suspense>
-            </ContentLayout>
-          </ResizablePanel>
-        </Resizable>
-      </RootLayout>
+      <JotaiProvider>
+        <RootLayout>
+          <Resizable proportionalLayout={false}>
+            <ResizablePanel minSize={100} preferredSize={255} snap visible={isSidebarVisible} className="select-none">
+              <LaunchPad />
+            </ResizablePanel>
+            <ResizablePanel>
+              <ContentLayout className="content relative flex h-full flex-col overflow-auto">
+                <Suspense fallback={<div className="loading">Loading...</div>}>
+                  <BrowserRouter>
+                    <Menu />
+                    <Routes>
+                      <Route path="/" element={<Home />} />
+                      <Route path="/settings" element={<Settings />} />
+                      <Route path="/logs" element={<Logs />} />
+                    </Routes>
+                  </BrowserRouter>
+                </Suspense>
+              </ContentLayout>
+            </ResizablePanel>
+          </Resizable>
+        </RootLayout>
+      </JotaiProvider>
     </QueryClientProvider>
   );
 };
