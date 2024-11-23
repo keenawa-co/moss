@@ -1,7 +1,5 @@
 import { ComponentProps, forwardRef } from "react";
 import { twMerge } from "tailwind-merge";
-import StatusBar from "./StatusBar";
-import { HeadBar } from "./HeadBar/HeadBar";
 
 export const SidebarLayout = ({ className, children, ...props }: ComponentProps<"aside">) => {
   return (

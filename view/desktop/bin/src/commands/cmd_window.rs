@@ -1,8 +1,6 @@
-use std::thread::current;
-use tauri::{AppHandle, Emitter, Manager, WebviewWindow};
+use tauri::{Emitter, Manager, WebviewWindow};
 
-use crate::window::create_child_window;
-use crate::{create_main_window, DEFAULT_WINDOW_HEIGHT, DEFAULT_WINDOW_WIDTH, OTHER_WINDOW_PREFIX};
+use crate::create_main_window;
 
 #[derive(Clone, Serialize)]
 struct EventAData {

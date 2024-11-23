@@ -31,18 +31,6 @@ pub async fn fetch_all_themes() -> Result<Vec<String>, String> {
 
 #[tauri::command(async)]
 pub async fn fetch_themes() -> Result<Vec<ThemeDescriptor>, String> {
-    // let mut valid_themes: Vec<String> = vec![];
-    // let themes_dir = get_themes_dir()?;
-    // let dir_iter = std::fs::read_dir(themes_dir).map_err(|e| e.to_string())?;
-    // for entry in dir_iter {
-    //     let entry = entry.map_err(|e| e.to_string())?;
-    //     let file_name = entry.file_name().to_str().unwrap().to_owned();
-    //     if !file_name.ends_with(".json") {
-    //         continue;
-    //     }
-    //     valid_themes.push(file_name.strip_suffix(".json").unwrap().to_string());
-    // }
-
     Ok(vec![
         ThemeDescriptor {
             id: "theme-light".to_string(),
