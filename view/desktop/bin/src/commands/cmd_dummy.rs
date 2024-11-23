@@ -5,6 +5,13 @@ use tauri::State;
 use crate::utl::get_themes_dir;
 use crate::AppState;
 
+#[derive(Deserialize, Serialize, Debug, Clone, Eq, PartialEq)]
+pub struct ThemeDescriptor {
+    id: String,
+    name: String,
+    source: String,
+}
+
 #[tauri::command(async)]
 pub async fn fetch_all_themes() -> Result<Vec<String>, String> {
     let mut valid_themes: Vec<String> = vec![];
@@ -18,7 +25,38 @@ pub async fn fetch_all_themes() -> Result<Vec<String>, String> {
         }
         valid_themes.push(file_name.strip_suffix(".json").unwrap().to_string());
     }
+
     Ok(valid_themes)
+}
+
+#[tauri::command(async)]
+pub async fn fetch_themes() -> Result<Vec<ThemeDescriptor>, String> {
+    // let mut valid_themes: Vec<String> = vec![];
+    // let themes_dir = get_themes_dir()?;
+    // let dir_iter = std::fs::read_dir(themes_dir).map_err(|e| e.to_string())?;
+    // for entry in dir_iter {
+    //     let entry = entry.map_err(|e| e.to_string())?;
+    //     let file_name = entry.file_name().to_str().unwrap().to_owned();
+    //     if !file_name.ends_with(".json") {
+    //         continue;
+    //     }
+    //     valid_themes.push(file_name.strip_suffix(".json").unwrap().to_string());
+    // }
+
+    Ok(vec![
+        ThemeDescriptor {
+            id: "theme-light".to_string(),
+            name: "Theme Light".to_string(),
+            source: "/Users/g10z3r/Project/keenawa-co/moss/view/desktop/src/assets/themes_1.css"
+                .to_string(),
+        },
+        ThemeDescriptor {
+            id: "theme-dark".to_string(),
+            name: "Theme Dark".to_string(),
+            source: "/Users/g10z3r/Project/keenawa-co/moss/view/desktop/src/assets/themes_2.css"
+                .to_string(),
+        },
+    ])
 }
 
 #[tauri::command(async)]

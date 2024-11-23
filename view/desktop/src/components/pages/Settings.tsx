@@ -1,5 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { LanguageSelector, ThemeSelector } from "@/components";
+import ThemeSwitcher from "../ThemeSwitcher";
 
 export const Settings = () => {
   const { t } = useTranslation(["ns1", "ns2"]);
@@ -14,6 +15,7 @@ export const Settings = () => {
         <h3>{t("selectTheme")}</h3>
         <ThemeSelector />
       </div>
+      <ThemeSwitcher />
     </main>
   );
 };

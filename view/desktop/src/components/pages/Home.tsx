@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next";
 import React, { useEffect, useState } from "react";
 import { listen } from "@tauri-apps/api/event";
-import { Tooltip, DropdownMenu, Icon } from "@repo/ui";
+import { Tooltip, Icon } from "@repo/ui";
 import { invokeIpc } from "@/lib/backend/tauri";
 import { useStoredString, useUpdateStoredString } from "@/hooks/useReactQuery";
 

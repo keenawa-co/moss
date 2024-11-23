@@ -9,13 +9,12 @@ const config: Omit<Config, "content"> = mergeConfig({
     plugin(function ({ matchUtilities, theme }) {
       matchUtilities(
         {
-          bgc: (value: string) => ({
+          background: (value: string) => ({
             background: value,
           }),
         },
         {
-          // Allow the use of arbitrary values
-          values: theme("colors"),
+          values: theme("colors"), // Allow the use of arbitrary values
           type: ["color", "any"], // Permit any color values
         }
       );
