@@ -3,10 +3,7 @@ import { twMerge } from "tailwind-merge";
 
 export const SidebarLayout = ({ className, children, ...props }: ComponentProps<"aside">) => {
   return (
-    <aside
-      className={twMerge("mb-5.5 flex flex-col bg-[rgba(var(--color-side-bar-background))]", className)}
-      {...props}
-    >
+    <aside className={twMerge("mb-5.5 flex flex-col bg-[var(--sidebar-background)]", className)} {...props}>
       {children}
     </aside>
   );

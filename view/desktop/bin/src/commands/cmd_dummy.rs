@@ -35,13 +35,19 @@ pub async fn fetch_themes() -> Result<Vec<ThemeDescriptor>, String> {
         ThemeDescriptor {
             id: "theme-light".to_string(),
             name: "Theme Light".to_string(),
-            source: "/Users/g10z3r/Project/keenawa-co/moss/view/desktop/src/assets/themes_1.css"
+            source: "/Users/g10z3r/Project/keenawa-co/moss/view/desktop/src/assets/moss-light.css"
                 .to_string(),
         },
         ThemeDescriptor {
             id: "theme-dark".to_string(),
             name: "Theme Dark".to_string(),
-            source: "/Users/g10z3r/Project/keenawa-co/moss/view/desktop/src/assets/themes_2.css"
+            source: "/Users/g10z3r/Project/keenawa-co/moss/view/desktop/src/assets/moss-dark.css"
+                .to_string(),
+        },
+        ThemeDescriptor {
+            id: "theme-pink".to_string(),
+            name: "Theme Pink".to_string(),
+            source: "/Users/g10z3r/Project/keenawa-co/moss/view/desktop/src/assets/moss-pink.css"
                 .to_string(),
         },
     ])

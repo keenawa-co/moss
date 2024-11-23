@@ -29,10 +29,7 @@ const ThemeSwitcher: React.FC = () => {
   if (error) return <p>Error loading themes: {error.message}</p>;
 
   return (
-    <div className="m-4">
-      <label htmlFor="theme-select" className="mr-2 background-[var(--page-background-color)]">
-        Select theme:
-      </label>
+    <div>
       <select id="theme-select" value={currentTheme?.id || ""} onChange={handleChange} className="rounded border p-2">
         {themes?.map((theme) => (
           <option key={theme.id} value={theme.id}>

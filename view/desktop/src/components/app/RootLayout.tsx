@@ -5,10 +5,10 @@ import StatusBar from "../StatusBar";
 
 const RootLayout = ({ children, className, ...props }: ComponentProps<"main">) => {
   return (
-    <div className="grid h-full grid-rows-[minmax(0px,46px)_1fr_auto] bg-[rgba(var(--color-page-background))]">
+    <div className="grid h-full grid-rows-[minmax(0px,46px)_1fr_auto] background-[var(--color-page-background)]">
       <HeadBar />
 
-      <main className={twMerge("bg-[rgba(var(--color-page-background))]", className)} {...props}>
+      <main className={twMerge("background-[var(--color-page-background)]", className)} {...props}>
         {children}
       </main>
 

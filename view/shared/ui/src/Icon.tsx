@@ -34,7 +34,7 @@ export const Icon = ({
     );
   }
 
-  return <IconTag className={cn("size-4 flex-shrink-0 text-[rgba(var(--colorPrimary))]", className)} {...props} />;
+  return <IconTag className={cn("size-4 flex-shrink-0 text-[var(--color-primary)]", className)} {...props} />;
 };
 
 export default Icon;
