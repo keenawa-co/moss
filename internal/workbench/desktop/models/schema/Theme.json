@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "Theme.json",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "slug": {
+      "type": "string"
+    },
+    "type": {
+      "type": "string"
+    },
+    "isDefault": {
+      "type": "boolean"
+    },
+    "colors": {
+      "$ref": "Colors.json"
+    }
+  },
+  "required": ["name", "slug", "type", "isDefault", "colors"]
+}

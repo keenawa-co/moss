@@ -1,0 +1,11 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "Colors.json",
+  "type": "object",
+  "properties": {
+    "primary": {
+      "$ref": "ColorType.json"
+    }
+  },
+  "required": ["primary"]
+}
