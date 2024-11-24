@@ -1,0 +1,31 @@
+{
+  "name": "Moss Dark Default",
+  "slug": "moss-dark",
+  "type": "dark",
+  "isDefault": false,
+  "color": {
+    "primary": {
+      "$type": "gradient",
+      "$direction": "90deg",
+      "$value": [
+        {
+          "color": "rgba(0, 0, 0, 1)",
+          "position": 0.25
+        },
+        {
+          "color": "rgba(255, 255, 255, 1)",
+          "position": 0.5
+        }
+      ]
+    },
+    "sideBar.background": { "$type": "solid", "$value": "rgba(255, 255, 255, 1)" },
+    "toolBar.background": { "$type": "solid", "$value": "rgba(255, 255, 255, 1)" },
+    "page.background": { "$type": "solid", "$value": "rgba(255, 255, 255, 1)" },
+    "statusBar.background": { "$type": "solid", "$value": "rgba(255, 255, 255, 1)" },
+    "windowsCloseButton.background": { "$type": "solid", "$value": "rgba(255, 255, 255, 1)" },
+    "windowControlsLinux.background": { "$type": "solid", "$value": "rgba(255, 255, 255, 1)" },
+    "windowControlsLinux.text": { "$type": "solid", "$value": "rgba(255, 255, 255, 1)" },
+    "windowControlsLinux.hoverBackground": { "$type": "solid", "$value": "rgba(255, 255, 255, 1)" },
+    "windowControlsLinux.activeBackground": { "$type": "solid", "$value": "rgba(255, 255, 255, 1)" }
+  }
+}
