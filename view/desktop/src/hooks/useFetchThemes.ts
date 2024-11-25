@@ -1,4 +1,4 @@
-import { ThemeDescriptor } from "@/api/theme";
+import { ThemeDescriptor } from "@repo/desktop-models";
 import { useQuery } from "@tanstack/react-query";
 import { invoke } from "@tauri-apps/api/core";
 

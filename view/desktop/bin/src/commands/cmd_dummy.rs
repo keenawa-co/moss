@@ -1,18 +1,11 @@
 use std::path::PathBuf;
 
 use anyhow::Result;
-use desktop_models::appearance::theming::Theme;
+use desktop_models::appearance::theming::{Theme, ThemeDescriptor};
 use tauri::State;
 
 use crate::utl::get_themes_dir;
 use crate::AppState;
-
-#[derive(Deserialize, Serialize, Debug, Clone, Eq, PartialEq)]
-pub struct ThemeDescriptor {
-    id: String,
-    name: String,
-    source: String,
-}
 
 #[tauri::command(async)]
 pub async fn fetch_all_themes() -> Result<Vec<String>, String> {

@@ -3,7 +3,7 @@ import { useAtom } from "jotai";
 import { useFetchThemes } from "@/hooks/useFetchThemes";
 import { useChangeTheme } from "@/hooks/useChangeTheme";
 import { themeAtom } from "@/atoms/themeAtom";
-import { readThemeFile } from "@/api/theme";
+import { readThemeFile } from "@/api/appearance";
 import { IpcResult } from "@/lib/backend/tauri";
 
 interface ThemeProviderProps {
