@@ -6035,6 +6035,10 @@ dependencies = [
 [[package]]
 name = "workbench_service_theme"
 version = "0.1.0"
+dependencies = [
+ "desktop_models",
+ "serde",
+]
 
 [[package]]
 name = "workbench_service_user_profile_tao"
