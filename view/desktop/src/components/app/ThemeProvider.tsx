@@ -3,6 +3,8 @@ import { useAtom } from "jotai";
 import { useFetchThemes } from "@/hooks/useFetchThemes";
 import { useChangeTheme } from "@/hooks/useChangeTheme";
 import { themeAtom } from "@/atoms/themeAtom";
+import { readThemeFile } from "@/api/theme";
+import { IpcResult } from "@/lib/backend/tauri";
 
 interface ThemeProviderProps {
   children: React.ReactNode;
@@ -26,29 +28,36 @@ const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
   };
 
   useEffect(() => {
-    if (currentTheme) {
-      console.log(`Current theme: ${currentTheme.name}`);
-      let themeLink = document.getElementById("theme-link") as HTMLLinkElement | null;
+    const applyTheme = async () => {
+      if (currentTheme) {
+        const result: IpcResult<string, string> = await readThemeFile(currentTheme.source);
 
-      if (themeLink) {
-        console.log(`Updating theme to "${currentTheme.name}"`);
-        themeLink.href = currentTheme.source;
-      } else {
-        console.log(`Loading theme "${currentTheme.name}"`);
-        themeLink = document.createElement("link");
-        themeLink.rel = "stylesheet";
-        themeLink.id = "theme-link";
-        themeLink.href = currentTheme.source;
-        document.head.appendChild(themeLink);
+        if (result.status === "ok") {
+          const cssContent = result.data;
+          let styleTag = document.getElementById("theme-style") as HTMLStyleElement | null;
+
+          if (styleTag) {
+            styleTag.innerHTML = cssContent;
+          } else {
+            styleTag = document.createElement("style");
+            styleTag.id = "theme-style";
+            styleTag.innerHTML = cssContent;
+            document.head.appendChild(styleTag);
+          }
+        } else {
+          console.error(`Error reading theme file for "${currentTheme.id}":`, result.error);
+        }
       }
-    }
-  }, [currentTheme, themes, setTheme]);
+    };
+
+    applyTheme();
+  }, [currentTheme]);
 
   useEffect(() => {
     if (!currentTheme && themes && themes.length > 0) {
       setTheme(themes[0].id);
     }
-  }, [currentTheme, themes, setTheme]);
+  }, [currentTheme, themes]);
 
   return <>{children}</>;
 };
