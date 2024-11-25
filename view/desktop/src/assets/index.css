@@ -1,6 +1,3 @@
-/* Fonts import should come first */
-@import url("https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,400i,600,600i,700,700i|Space+Mono:400,400i,700,700i&display=swap");
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
