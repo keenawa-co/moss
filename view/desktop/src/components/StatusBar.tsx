@@ -1,6 +1,5 @@
 import { cn, Icon, Icons } from "@repo/ui";
 import type { ComponentPropsWithoutRef } from "react";
-import { twMerge } from "tailwind-merge";
 
 const StatusBar = ({ className }: ComponentPropsWithoutRef<"div">) => {
   return (
@@ -21,8 +20,17 @@ const StatusBar = ({ className }: ComponentPropsWithoutRef<"div">) => {
         <StatusBarButton label="24 Ln, 16 Col" />
         <StatusBarButton label="4 Spaces" />
         <StatusBarButton label="Rust" />
-        <StatusBarButton icon="StatusBarError" label="2 Errors" iconClassName="size-[6px]" />
-        <StatusBarButton icon="StatusBarWarning" label="15 Warnings" iconClassName="size-[6px]" />
+
+        <div className="group flex h-full items-center gap-1 px-2 text-white transition hover:bg-white hover:bg-opacity-10 focus:bg-white focus:bg-opacity-10">
+          <StatusCircle className="bg-[#D62A18]" />
+          <span>2 Errors</span>
+        </div>
+
+        <div className="group flex h-full items-center gap-1 px-2 text-white transition hover:bg-white hover:bg-opacity-10 focus:bg-white focus:bg-opacity-10">
+          <StatusCircle className="bg-[#FFC505]" />
+          <span>15 Warnings</span>
+        </div>
+
         <StatusBarButton label="--READ--" />
       </div>
     </footer>
@@ -38,15 +46,19 @@ interface StatusBarButtonProps extends ComponentPropsWithoutRef<"button"> {
   iconClassName?: string;
 }
 
+const StatusCircle = ({ className }: { className?: string }) => {
+  return <div className={cn("flex size-[6px] items-center justify-center rounded-full", className)}></div>;
+};
+
 const StatusBarButton = ({ icon, iconClassName, label, className }: StatusBarButtonProps) => {
   return (
     <button
-      className={twMerge(
+      className={cn(
         "group flex h-full items-center gap-1 px-2 text-white transition hover:bg-white hover:bg-opacity-10 focus:bg-white focus:bg-opacity-10",
         className
       )}
     >
-      {icon && <Icon className={twMerge(" size-[18px]", iconClassName)} icon={icon} />}
+      {icon && <Icon className={cn(" size-[18px]", iconClassName)} icon={icon} />}
       {label && <span className="text-sm">{label}</span>}
     </button>
   );
