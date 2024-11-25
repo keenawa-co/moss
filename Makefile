@@ -104,7 +104,7 @@ gen-themes:
 ## Generate Icons
 .PHONY: gen-icons
 gen-icons:
-	@cd $(ICONS_DIR) && $(PNPM) start
+	@cd $(ICONS_DIR) && $(PNPM) build
 
 ## Generate HTML Models
 .PHONY: gen-html-models
