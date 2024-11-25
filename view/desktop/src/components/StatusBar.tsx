@@ -22,12 +22,12 @@ const StatusBar = ({ className }: ComponentPropsWithoutRef<"div">) => {
         <StatusBarButton label="Rust" />
 
         <div className="group flex h-full items-center gap-1 px-2 text-white transition hover:bg-white hover:bg-opacity-10 focus:bg-white focus:bg-opacity-10">
-          <StatusCircle className="bg-[#D62A18]" />
+          <StatusCircle className="size-[6px] bg-[#D62A18]" />
           <span>2 Errors</span>
         </div>
 
         <div className="group flex h-full items-center gap-1 px-2 text-white transition hover:bg-white hover:bg-opacity-10 focus:bg-white focus:bg-opacity-10">
-          <StatusCircle className="bg-[#FFC505]" />
+          <StatusCircle className="size-[6px] bg-[#FFC505]" />
           <span>15 Warnings</span>
         </div>
 
@@ -47,7 +47,7 @@ interface StatusBarButtonProps extends ComponentPropsWithoutRef<"button"> {
 }
 
 const StatusCircle = ({ className }: { className?: string }) => {
-  return <div className={cn("flex size-[6px] items-center justify-center rounded-full", className)}></div>;
+  return <div className={cn("flex items-center justify-center rounded-full", className)} />;
 };
 
 const StatusBarButton = ({ icon, iconClassName, label, className }: StatusBarButtonProps) => {
