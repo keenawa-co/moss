@@ -1,6 +1,5 @@
 import { ContentLayout, LaunchPad, Menu } from "@/components";
 import "@/i18n";
-import "@repo/ui/src/fonts.css";
 import { Suspense } from "react";
 import { useSelector } from "react-redux";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
@@ -9,8 +8,9 @@ import { Home, Logs, Settings } from "./components/pages";
 import { useInitializeApp } from "./hooks/useInitializeApp";
 import { RootState } from "./store";
 import { callServiceMethod } from "./main";
-import Provider from "./components/app/Provider";
+import { PageLoader } from "./components/PageLoader";
 import RootLayout from "./components/app/RootLayout";
+import Provider from "./components/app/Provider";
 
 const App: React.FC = () => {
   const { isInitializing, initializationError } = useInitializeApp();
@@ -19,19 +19,13 @@ const App: React.FC = () => {
   callServiceMethod("doSomething");
 
   if (isInitializing) {
-    return (
-      <div className="relative flex min-h-screen bg-storm-800">
-        <div className="container mx-auto flex max-w-screen-xl items-center justify-center text-4xl text-white">
-          Loading...
-        </div>
-      </div>
-    );
+    return <PageLoader />;
   }
 
   if (initializationError) {
     return (
       <div className="relative flex min-h-screen bg-storm-800">
-        <div className="container mx-auto flex max-w-screen-xl flex-col items-center justify-center text-2xl text-red-500">
+        <div className="mx-auto flex max-w-screen-xl flex-col items-center justify-center text-2xl text-red-500">
           <p>Initialization Failed</p>
           <p>{initializationError.message}</p>
         </div>
@@ -47,8 +41,8 @@ const App: React.FC = () => {
             <LaunchPad />
           </ResizablePanel>
           <ResizablePanel>
-            <ContentLayout className="content relative flex h-full flex-col overflow-auto">
-              <Suspense fallback={<div className="loading">Loading...</div>}>
+            <ContentLayout className="relative flex h-full flex-col overflow-auto">
+              <Suspense fallback={<div>Loading...</div>}>
                 <BrowserRouter>
                   <Menu />
                   <Routes>

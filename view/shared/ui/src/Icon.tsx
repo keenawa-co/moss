@@ -17,6 +17,12 @@ export const Icon = ({ icon, className, ...props }: IconProps) => {
   }
 
   // If the icon is null or not found, return the default SVG
+  return <FailedIcon />;
+};
+
+export default Icon;
+
+const FailedIcon = ({ className, ...props }: { className?: string } & ComponentPropsWithoutRef<"svg">) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -40,5 +46,3 @@ export const Icon = ({ icon, className, ...props }: IconProps) => {
     </svg>
   );
 };
-
-export default Icon;
