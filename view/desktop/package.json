@@ -35,12 +35,12 @@
     "rxjs": "^7.8.1"
   },
   "devDependencies": {
+    "@repo/desktop-models": "workspace:*",
     "@repo/eslint-config": "workspace:*",
     "@repo/moss-lang": "workspace:*",
     "@repo/moss-theme": "workspace:*",
     "@repo/tailwind-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
-    "@repo/desktop-models": "workspace:*",
     "@repo/ui": "workspace:*",
     "@storybook/react": "^8.2.8",
     "@tailwindcss/typography": "^0.5.13",
