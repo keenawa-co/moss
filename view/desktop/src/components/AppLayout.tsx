@@ -12,7 +12,7 @@ export const RootLayout = ({ children, className, ...props }: ComponentProps<"ma
         {children}
       </main>
 
-      <StatusBar className="h-5.5 w-full" branch="MOSSMVP-37-Backend-Migrate-existing-backend-in-Tauri" />
+      <StatusBar />
     </div>
   );
 };
