@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 const tips = [
   "The statusbar color can be changed in the appearance settings",
   "You can change the order of widget actions. Try it!",
-  "Some other tip",
+  "Lorem ipsum dolor sit amat. Met the statusbar color can be changed in the appearance settings",
 ];
 
 export const PageLoader = () => {
@@ -84,7 +84,7 @@ export const PageLoader = () => {
             />
           </svg>
         </div>
-        <div className="flex flex-col gap-4 text-center">
+        <div className="flex flex-col gap-3 text-center">
           <div className="font-black">Did you know</div>
           <div className="text animate-text-slide text-[#6F6F6F] ">{tip}</div>
         </div>
