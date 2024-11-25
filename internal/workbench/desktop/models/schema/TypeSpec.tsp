@@ -27,7 +27,8 @@ model Colors {
 
 }
 
-@format("color")
+
+@pattern("#[0-9a-fA-F]{3,8}|rgb(a)?\\(.+\\)|hsl(a)?\\(.+\\)|[a-z]+")
 scalar ColorValue extends string;
 
 union ColorType {

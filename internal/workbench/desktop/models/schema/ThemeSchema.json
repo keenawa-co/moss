@@ -106,7 +106,7 @@
     },
     "ColorValue": {
       "type": "string",
-      "format": "color"
+      "pattern": "#[0-9a-fA-F]{3,8}|rgb(a)?\\(.+\\)|hsl(a)?\\(.+\\)|[a-z]+"
     },
     "ColorGradientEntry": {
       "type": "object",

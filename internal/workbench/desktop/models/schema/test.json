@@ -1,6 +1,6 @@
 {
-  "name": "Moss Dark Default",
-  "slug": "moss-dark",
+  "name": "Test",
+  "slug": "test",
   "type": "dark",
   "isDefault": false,
   "color": {
@@ -19,10 +19,10 @@
       ]
     },
     "sideBar.background": { "$type": "solid", "$value": "rgba(255, 255, 255, 1)" },
-    "toolBar.background": { "$type": "solid", "$value": "rgba(255, 255, 255, 1)" },
-    "page.background": { "$type": "solid", "$value": "rgba(255, 255, 255, 1)" },
-    "statusBar.background": { "$type": "solid", "$value": "rgba(255, 255, 255, 1)" },
-    "windowsCloseButton.background": { "$type": "solid", "$value": "rgba(255, 255, 255, 1)" },
+    "toolBar.background": { "$type": "solid", "$value": "rgb(255, 255, 255)" },
+    "page.background": { "$type": "solid", "$value": "#00ff00" },
+    "statusBar.background": { "$type": "solid", "$value": "hsla(9, 100%, 64%, 0.4)" },
+    "windowsCloseButton.background": { "$type": "solid", "$value": "hsl(0, 100%, 50%)" },
     "windowControlsLinux.background": { "$type": "solid", "$value": "rgba(255, 255, 255, 1)" },
     "windowControlsLinux.text": { "$type": "solid", "$value": "rgba(255, 255, 255, 1)" },
     "windowControlsLinux.hoverBackground": { "$type": "solid", "$value": "rgba(255, 255, 255, 1)" },
