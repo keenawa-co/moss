@@ -2,12 +2,13 @@
 resolver = "2"
 members = [
     "view/desktop/bin",
-    "view/shared/models/uikit",
 
     "crates/moss-base",
     "crates/moss-str",
     "crates/moss-fs",
     "crates/moss-jsonlogic",
+    "crates/moss-uikit",
+    "crates/moss-html",
 
     "internal/platform/core",
     "internal/platform/fs",
@@ -18,16 +19,14 @@ members = [
     "internal/platform/utl",
     "internal/platform/workspace",
 
-    "internal/workbench/desktop",
-    "internal/workbench/models",
+    "internal/workbench/desktop/models",
     "internal/workbench/service/configuration/common",
     "internal/workbench/service/configuration/tao",
     "internal/workbench/service/user_profile/tao",
     "internal/workbench/service/environment/tao",
 
     "tools/xtask", 
-    "crates/moss-str",
-    "crates/moss-fs",
+
 ]
 
 [profile.release]
@@ -43,8 +42,8 @@ opt-level = 3
 
 
 [workspace.dependencies]
-uikit_models = { path = "view/shared/models/uikit" }
-
+moss_uikit = { path = "crates/moss-uikit" }
+moss_html = { path = "crates/moss-html" }
 moss_base = { path = "crates/moss-base" }
 moss_str = { path = "crates/moss-str" }
 moss_fs = { path = "crates/moss-fs" }
@@ -58,8 +57,9 @@ platform_environment = { path = "internal/platform/environment" }
 platform_workspace = { path = "internal/platform/workspace" }
 platform_fs = { path = "internal/platform/fs" }
 
+desktop_models = { path = "internal/workbench/desktop/models" }
+
 workbench_desktop = { path = "internal/workbench/desktop" }
-workbench_models = { path = "internal/workbench/models" }
 workbench_service_configuration_common = { path = "internal/workbench/service/configuration/common" }
 workbench_service_configuration_tao = { path = "internal/workbench/service/configuration/tao" }
 workbench_service_user_profile_tao = { path = "internal/workbench/service/user_profile/tao" }
@@ -70,8 +70,6 @@ bstr = "1.10.0"
 ts-rs = "10.0"
 thiserror = "1.0"
 tauri = { version = "2.0.6", features = ["devtools"] }
-specta = "2.0.0-rc.20"
-specta-typescript = "0.0.7"
 libc = "0.2.155"
 fnv = "1.0.7"
 anyhow = "1.0"
@@ -99,6 +97,7 @@ lazy_static = "1.4.0"
 surrealdb = "1.5.3"
 tracing = "0.1"
 tracing-subscriber = "0.3.18"
+tracing-appender = "0.2.3"
 slotmap = "1.0.7"
 rustc-hash = "2.0.0"
 parking = "2.2.1"
@@ -109,3 +108,11 @@ dyn-clone = "1.0.17"
 
 hecs = "0.10.5"
 hecs-hierarchy = "0.12.1"
+
+fern = "0.7.0"
+rand = "0.8.5"
+log = "0.4.21"
+quote = "1.0"
+static_str_ops = "0.1.2"
+homedir = "0.3.4"
+csscolorparser = "0.7.0"

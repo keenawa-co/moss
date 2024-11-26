@@ -1,4 +1,4 @@
-use uikit_models::layout::{Alignment, Orientation};
+use moss_uikit::layout::{Alignment, Orientation};
 
 use crate::{
     view::{TreeViewGroup, TreeViewGroupLocation},

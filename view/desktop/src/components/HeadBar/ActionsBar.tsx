@@ -1,13 +1,34 @@
 import { RootState, useAppDispatch } from "@/store";
 import { toggleSidebarVisibility } from "@/store/sidebar/sidebarSlice";
 import { cn, Icon } from "@repo/ui";
-import { HTMLProps } from "react";
+import { HTMLProps, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { HeadBarButton } from "./HeadBarButton";
+import { invokeIpc } from "@/lib/backend/tauri";
+import { MenuItem } from "@repo/desktop-models";
+import { ActionButton } from "../Action/ActionButton";
+import { ActionsSubmenu } from "../Action/ActionsSubmenu";
+import { ActionsGroup } from "../ActionsGroup";
 
 export const ActionsBar = ({ className, ...props }: HTMLProps<HTMLDivElement>) => {
   const dispatch = useAppDispatch();
   const isSidebarVisible = useSelector((state: RootState) => state.sidebar.sidebarVisible);
+  const [activities, setActivities] = useState<MenuItem[]>([]);
+
+  useEffect(() => {
+    const getAllActivities = async () => {
+      try {
+        const res = await invokeIpc<MenuItem[], Error>("get_menu_items_by_namespace", { namespace: "headItem" }); // this here should be a type
+
+        if (res.status === "ok") {
+          setActivities(res.data);
+          // console.log(res.data);
+        }
+      } catch (err) {
+        console.error("Failed to get workbench state:", err);
+      }
+    };
+    getAllActivities();
+  }, []);
 
   return (
     <div className={cn("flex items-center gap-3", className)} {...props}>
@@ -30,45 +51,67 @@ export const ActionsBar = ({ className, ...props }: HTMLProps<HTMLDivElement>) =
       </div>
 
       <div className="flex items-center">
-        <HeadBarButton
+        {activities.map((item, index) => {
+          const icons = [
+            "HeadBarPrimarySideBar",
+            "HeadBarPanelActive",
+            "HeadBarSecondarySideBar",
+            "HeadBarCustomizeLayout",
+          ];
+          console.log(item);
+
+          if ("action" in item) {
+            const command = item.action.command;
+
+            if (index === 0) {
+              return (
+                <ActionButton
+                  key={command.id}
+                  iconClassName="size-[18px]"
+                  {...command}
+                  icon={isSidebarVisible ? "HeadBarPrimarySideBarActive" : "HeadBarPrimarySideBar"}
+                  onClick={() => dispatch(toggleSidebarVisibility({}))}
+                  visibility={item.action.visibility}
+                />
+              );
+            }
+            return (
+              <ActionButton
+                key={command.id}
+                iconClassName="size-[18px]"
+                {...command}
+                icon={icons[index]}
+                visibility="compact"
+              />
+            );
+          }
+
+          if ("submenu" in item) {
+            return (
+              <ActionsSubmenu
+                key={item.submenu.submenuId}
+                iconClassName="size-[18px]"
+                {...item.submenu}
+                icon="HeadBarCustomizeLayout"
+              />
+            );
+          }
+        })}
+        {/* <ActionsGroup
           icon={isSidebarVisible ? "HeadBarPrimarySideBarActive" : "HeadBarPrimarySideBar"}
-          className="flex size-[30px] items-center justify-center "
           onClick={() => dispatch(toggleSidebarVisibility({}))}
           iconClassName="size-[18px]"
+          className="size-[30px] "
         />
-        <HeadBarButton
-          icon="HeadBarPanelActive"
-          className="flex size-[30px] items-center justify-center"
-          iconClassName="size-[18px]"
-        />
-        <HeadBarButton
-          icon="HeadBarSecondarySideBar"
-          className="flex size-[30px] items-center justify-center"
-          iconClassName="size-[18px]"
-        />
-        <HeadBarButton
-          icon="HeadBarCustomizeLayout"
-          className="flex size-[30px] items-center justify-center"
-          iconClassName="size-[18px]"
-        />
+        <ActionsGroup icon="HeadBarPanelActive" className="size-[30px] " iconClassName="size-[18px]" />
+        <ActionsGroup icon="HeadBarSecondarySideBar" className="size-[30px] " iconClassName="size-[18px]" />
+        <ActionsGroup icon="HeadBarCustomizeLayout" className="size-[30px] " iconClassName="size-[18px]" /> */}
       </div>
 
       <div className="flex items-center">
-        <HeadBarButton
-          icon="HeadBarAccount"
-          className="flex size-[30px] items-center justify-center"
-          iconClassName="size-[18px]"
-        />
-        <HeadBarButton
-          icon="HeadBarNotifications"
-          className="flex size-[30px] items-center justify-center"
-          iconClassName="size-[18px]"
-        />
-        <HeadBarButton
-          icon="HeadBarWrench"
-          className="flex size-[30px] items-center justify-center"
-          iconClassName="size-[18px]"
-        />
+        <ActionsGroup icon="HeadBarAccount" className="size-[30px] " iconClassName="size-[18px]" />
+        <ActionsGroup icon="HeadBarNotifications" className="size-[30px] " iconClassName="size-[18px]" />
+        <ActionsGroup icon="HeadBarWrench" className="size-[30px] " iconClassName="size-[18px]" />
       </div>
     </div>
   );

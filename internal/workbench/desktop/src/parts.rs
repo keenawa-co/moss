@@ -1,5 +1,5 @@
-pub mod primary_activitybar;
-pub mod primary_sidebar;
+// pub mod primary_activitybar;
+// pub mod primary_sidebar;
 
 use anyhow::Result;
 

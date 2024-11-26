@@ -1,7 +1,6 @@
 pub mod contribution;
-pub mod menu;
 pub mod parts;
-pub mod view;
+pub mod registry;
 pub mod window;
 
 pub mod contributions;
@@ -19,16 +18,13 @@ use std::{
 
 use anyhow::Result;
 use contribution::{WorkbenchContribution, WORKBENCH_TAO_WINDOW};
-use contributions::{links::LinksContribution, resents::RecentsContribution};
-use hashbrown::HashMap;
-use menu::{MenuItem, MenuRegistry};
+use contributions::{
+    layout_controls::LayoutControlsContribution, links::LinksContribution,
+    resents::RecentsContribution,
+};
+use desktop_models::actions::MenuItem;
 use moss_str::ReadOnlyStr;
 use once_cell::unsync::OnceCell;
-use parking_lot::RwLock;
-use parts::{
-    primary_activitybar::PrimaryActivityBarPart, primary_sidebar::PrimarySideBarPart, AnyPart,
-    PartId,
-};
 use platform_configuration::{
     attribute_name, configuration_policy::ConfigurationPolicyService,
     configuration_registry::ConfigurationRegistry, AbstractConfigurationService,
@@ -43,8 +39,8 @@ use platform_fs::disk::file_system_service::{
 };
 use platform_user_profile::user_profile_service::UserProfileService as PlatformUserProfileService;
 use platform_workspace::{Workspace, WorkspaceId};
+use registry::RegistryManager;
 use tauri::{AppHandle, Emitter, WebviewWindow};
-use view::ViewsRegistry;
 use workbench_service_configuration_tao::configuration_service::WorkspaceConfigurationService;
 use workbench_service_environment_tao::environment_service::NativeEnvironmentService;
 use workbench_service_user_profile_tao::user_profile_service::UserProfileService;
@@ -90,20 +86,6 @@ pub trait Contribution {
     fn contribute(registry: &mut RegistryManager) -> Result<()>;
 }
 
-pub struct RegistryManager {
-    pub views: Arc<RwLock<ViewsRegistry>>,
-    pub menus: Arc<RwLock<MenuRegistry>>,
-}
-
-impl RegistryManager {
-    pub fn new() -> Self {
-        let views = Arc::new(RwLock::new(ViewsRegistry::new()));
-        let menus = Arc::new(RwLock::new(MenuRegistry::new()));
-
-        Self { views, menus }
-    }
-}
-
 pub struct Workbench {
     workspace_id: WorkspaceId,
     registry: RegistryManager,
@@ -113,8 +95,6 @@ pub struct Workbench {
     font_size_service: Atom<MockFontSizeService>,
     _observe_font_size_service: OnceCell<Subscription>,
     tao_handle: OnceCell<Rc<AppHandle>>,
-
-    parts: HashMap<PartId, Box<dyn Any>>,
 }
 
 unsafe impl<'a> Sync for Workbench {}
@@ -154,7 +134,6 @@ impl Workbench {
             font_size_service: font_service_atom,
             _observe_font_size_service: OnceCell::new(),
             tao_handle: OnceCell::new(),
-            parts: HashMap::new(),
         })
     }
 
@@ -162,19 +141,11 @@ impl Workbench {
         &self.registry
     }
 
-    pub fn add_part<T: AnyPart + 'static>(&mut self, part: T) {
-        self.parts.insert(part.id(), Box::new(part));
-    }
-
     pub fn add_contribution(
         &mut self,
         f: impl FnOnce(&mut crate::RegistryManager) -> anyhow::Result<()>,
     ) -> Result<()> {
         f(&mut self.registry)
-    }
-
-    pub fn get_part<T: AnyPart + 'static>(&self, part_id: PartId) -> Option<&T> {
-        self.parts.get(part_id)?.downcast_ref::<T>()
     }
 
     pub fn get_view<T: Send + Sync + Debug + 'static>(
@@ -186,14 +157,12 @@ impl Workbench {
         views_registry_lock.get_view_model::<T>(group_id, view_id)
     }
 
-    pub fn get_menu_items<'a>(
-        &self,
-        menu_id: impl Into<&'a ReadOnlyStr>,
-    ) -> Option<&Vec<MenuItem>> {
-        // let menu_registry_lock = self.registry.menus.read();
-        // menu_registry_lock.get_menu_items(menu_id).cloned()
+    pub fn get_menu_items_by_namespace<'a>(&self, namespace: String) -> Option<Vec<MenuItem>> {
+        let menu_registry_lock = self.registry.menus.read();
 
-        todo!()
+        menu_registry_lock
+            .get_menu_items_by_namespace(&ReadOnlyStr::from(namespace))
+            .cloned()
     }
 
     pub fn initialize<'a>(&'a mut self, ctx: &mut AsyncContext) -> Result<()> {
@@ -202,9 +171,7 @@ impl Workbench {
         self.add_contribution(WorkbenchContribution::contribute)?;
         self.add_contribution(RecentsContribution::contribute)?;
         self.add_contribution(LinksContribution::contribute)?;
-
-        self.add_part(PrimaryActivityBarPart::new());
-        self.add_part(PrimarySideBarPart::new());
+        self.add_contribution(LayoutControlsContribution::contribute)?;
 
         ctx.apply(|cx| self.initialize_services(cx))??;
 

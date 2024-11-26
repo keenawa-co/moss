@@ -29,9 +29,17 @@ impl<'a> UserSettings {
     }
 
     pub fn load_configuration(&self, ctx: &mut Context) -> Result<ConfigurationModel> {
-        let mut file = ctx.block_on_with(self.fs_service.read_file(&self.resource))?;
+        let mut file = ctx.block_on_with(self.fs_service.read_file(&self.resource));
         let mut content = String::new();
-        file.read_to_string(&mut content)?;
+
+        match file {
+            Ok(ref mut file) => {
+                file.read_to_string(&mut content)?;
+            }
+            Err(_) => {
+                content = String::from("{}");
+            }
+        }
 
         if content.trim().is_empty() {
             content = String::from("{}")

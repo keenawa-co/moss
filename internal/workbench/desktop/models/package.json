@@ -1,0 +1,17 @@
+ {
+    "name": "@repo/desktop-models",
+    "exports": {
+      ".": "./index.ts"
+    },
+    "scripts": {
+      "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "devDependencies": {
+      "@repo/typescript-config": "workspace:*",
+      "@repo/moss-str": "workspace:*"
+    },
+    "dependencies": {
+      "typescript": "^5.5.4"
+    }
+  }
+  

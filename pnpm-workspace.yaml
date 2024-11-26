@@ -1,6 +1,7 @@
 packages:
+  - "crates/*"
   - "view/*"
-  - "view/shared/*"
   - "lib/*"
   - "tools/*"
-  - "sdk/*"
+  - "view/shared/*"
+  - "internal/workbench/desktop/*"

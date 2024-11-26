@@ -1,0 +1,15 @@
+{
+  "name": "@repo/themegen",
+  "scripts": {
+    "start": "npx vite-node ./src/index.ts"
+  },
+  "devDependencies": {
+    "@repo/typescript-config": "workspace:*",
+    "@repo/desktop-models": "workspace:*",
+    "@types/node": "^22.5.3",
+    "vite-node": "^2.1.1"
+  },
+  "dependencies": {
+    "typescript": "^5.3.3"
+  }
+}

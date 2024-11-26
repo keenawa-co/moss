@@ -1,4 +1,4 @@
-import { Theme, Colors } from "@repo/moss-models";
+import { Theme, Colors } from "@repo/desktop-models";
 
 // Utility function to convert camelCase to kebab-case
 function toKebabCase(str: string): string {
@@ -46,6 +46,19 @@ export const customTailwindColorVariables: Record<keyof Colors, string> = Object
 // Utility function to handle RGBA with opacity
 function rgbaWithOpacity(variableName: keyof ThemeCssVariables): string {
   return `rgba(var(${variableName}), var(--tw-bg-opacity, 1))`;
+}
+
+// Applies theme to root element of app.
+export function applyTheme(theme: Theme) {
+  const themeObject: ThemeCssVariables = mapThemeToCssVariables(theme);
+  const root = document.documentElement;
+
+  Object.keys(themeObject).forEach((v) => {
+    const propertyVal = themeObject[v as keyof ThemeCssVariables];
+    if (propertyVal !== undefined) {
+      root.style.setProperty(v, propertyVal);
+    }
+  });
 }
 
 // Conversion class using JSON parsing with type safety

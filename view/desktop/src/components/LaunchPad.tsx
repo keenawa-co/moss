@@ -1,4 +1,4 @@
-import Accordion from "./DraggableAccordion";
+import Accordion from "./Accordion";
 import SidebarHeader from "./SidebarHeader";
 import { useAppDispatch, RootState } from "@/store";
 import { setAccordions, setPreferredSizes } from "@/store/accordion/accordionSlice";

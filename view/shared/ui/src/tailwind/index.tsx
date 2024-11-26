@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useMemo } from "react";
-import applyTheme from "./applyTheme";
-import { Theme } from "@repo/moss-models";
+import { applyTheme } from "@repo/moss-theme";
+import { Theme } from "@repo/desktop-models";
 
 type Props = {
   children: React.ReactNode;

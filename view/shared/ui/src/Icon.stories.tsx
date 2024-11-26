@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { Icon, Icons } from "./Icon";
-import * as icons from "../../icons/build";
+import * as icons from "@repo/icongen";
 import { useState } from "react";
 import { cn } from "./utils/utils";
 

@@ -2,13 +2,22 @@ mod config;
 mod metadata;
 mod tasks;
 
+use crate::metadata::load_cargo_metadata;
 use anyhow::{Context as _, Result};
 use clap::{Parser, Subcommand};
+use smol::fs;
+use smol::io::BufWriter;
+use std::fs::File;
+use std::path::PathBuf;
+use std::sync::Mutex;
 use tasks::TaskRunner;
+use tracing::instrument::WithSubscriber;
 use tracing::Level;
-use tracing_subscriber::FmtSubscriber;
-
-use crate::metadata::load_cargo_metadata;
+use tracing_appender::rolling::{RollingFileAppender, Rotation};
+use tracing_subscriber::fmt::writer::MakeWriterExt;
+use tracing_subscriber::layer::SubscriberExt;
+use tracing_subscriber::util::SubscriberInitExt;
+use tracing_subscriber::{fmt, FmtSubscriber};
 
 #[macro_use]
 extern crate anyhow;
@@ -21,6 +30,17 @@ extern crate tracing;
 struct Args {
     #[command(subcommand)]
     command: CliCommand,
+    #[clap(short, long, value_enum)]
+    info_level: Option<InfoLevel>,
+    #[arg(short, long)]
+    file_path: Option<PathBuf>,
+}
+
+#[derive(clap::ValueEnum, Clone)]
+enum InfoLevel {
+    TRACE,
+    INFO,
+    WARN,
 }
 
 #[derive(Subcommand)]
@@ -32,12 +52,29 @@ enum CliCommand {
 #[tokio::main]
 async fn main() -> Result<()> {
     let args = Args::parse();
+    let info_level = match args.info_level.unwrap_or(InfoLevel::INFO) {
+        InfoLevel::WARN => Level::WARN,
+        InfoLevel::INFO => Level::INFO,
+        InfoLevel::TRACE => Level::TRACE,
+    };
 
-    let subscriber = FmtSubscriber::builder()
-        .with_max_level(Level::TRACE)
-        .finish();
-    tracing::subscriber::set_global_default(subscriber)
-        .context("setting default subscriber failed")?;
+    // TODO: Make output to file work
+    // Right now the info_level setting works for console output
+    if let Some(file_path) = args.file_path {
+        if file_path.exists() {
+            fs::remove_file(&file_path).await?;
+        }
+        let _ = File::create(&file_path);
+        let logfile = RollingFileAppender::new(Rotation::NEVER, &file_path, "xtask.log");
+        let (non_blocking, _guard) = tracing_appender::non_blocking(logfile);
+        let file_layer = fmt::layer().with_writer(non_blocking.with_max_level(info_level));
+
+        tracing_subscriber::registry().with(file_layer).init();
+    } else {
+        let subscriber = FmtSubscriber::builder().with_max_level(info_level).finish();
+        tracing::subscriber::set_global_default(subscriber)
+            .context("setting default subscriber failed")?;
+    }
 
     let metadata = load_cargo_metadata()?;
     let mut runner = TaskRunner::new();
