@@ -4,13 +4,11 @@ pub mod theming {
     use serde_json::Value;
     use std::fs;
 
-    // TODO: Use relative path
-    const THEME_SCHEMA_PATH: &str =
-        r"C:\git\moss\internal\workbench\desktop\models\schema\ThemeSchema.json";
-    const TEST_THEME_PATH: &str = r"C:\git\moss\internal\workbench\desktop\models\schema\test.json";
+    const THEME_SCHEMA_STR: &str = include_str!("../schema/ThemeSchema.json");
+    const TEST_THEME_STR: &str = include_str!("../schema/test.json");
+
     pub fn create_validator() -> Validator {
-        let file = fs::File::open(THEME_SCHEMA_PATH).unwrap();
-        let schema_json: Value = serde_json::from_reader(file).unwrap();
+        let schema_json: Value = serde_json::from_str(THEME_SCHEMA_STR).unwrap();
         jsonschema::validator_for(&schema_json).unwrap()
     }
 
@@ -27,8 +25,7 @@ pub mod theming {
 
         #[test]
         fn test() {
-            let file = fs::File::open(TEST_THEME_PATH).unwrap();
-            let theme: Value = serde_json::from_reader(file).unwrap();
+            let theme: Value = serde_json::from_str(TEST_THEME_STR).unwrap();
             assert!(validate_theme(&theme));
         }
 
