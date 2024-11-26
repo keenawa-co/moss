@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook/react";
+import type { Meta, StoryObj, Args } from "@storybook/react";
 import Tooltip from "./Tooltip";
 
 const meta = {
@@ -13,7 +13,7 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-const TooltipTemplate = (args: any) => <Tooltip {...args}>Hover me!</Tooltip>;
+const TooltipTemplate = (args: Args) => <Tooltip {...args}>Hover me!</Tooltip>;
 
 export const Full: Story = {
   args: {

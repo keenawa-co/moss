@@ -15,10 +15,4 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const WithBranch: Story = {
-  args: {
-    branch: "MOSSMVP-37-Backend-Migrate-existing-backend-in-Tauri",
-  },
-};
-
-export const NoBranch: Story = {};
+export const Default: Story = {};

@@ -97,63 +97,65 @@ export const Nested: Story = {
 };
 
 export const Controls: Story = {
-  render: () => {
-    const [oneVisible, setOneVisible] = useState(true);
-    const [twoVisible, setTwoVisible] = useState(true);
-    const [threeVisible, setThreeVisible] = useState(true);
-    const [fourVisible, setFourVisible] = useState(true);
+  render: () => <ControlsStory />,
+};
 
-    return (
-      <>
-        <div className="flex gap-2 p-4 ">
-          <button
-            className={cn(`rounded border p-2 duration-0`, { "border-sky-500 bg-sky-500 text-white": oneVisible })}
-            onClick={() => setOneVisible(!oneVisible)}
-          >
-            One
-          </button>
-          <button
-            className={cn(`rounded border p-2 duration-0`, { "border-sky-500 bg-sky-500 text-white": twoVisible })}
-            onClick={() => setTwoVisible(!twoVisible)}
-          >
-            Two
-          </button>
-          <button
-            className={cn(`rounded border p-2 duration-0`, { "border-sky-500 bg-sky-500 text-white": threeVisible })}
-            onClick={() => setThreeVisible(!threeVisible)}
-          >
-            Three
-          </button>
-          <button
-            className={cn(`rounded border p-2 duration-0`, { "border-sky-500 bg-sky-500 text-white": fourVisible })}
-            onClick={() => setFourVisible(!fourVisible)}
-          >
+export const ControlsStory = () => {
+  const [oneVisible, setOneVisible] = useState(true);
+  const [twoVisible, setTwoVisible] = useState(true);
+  const [threeVisible, setThreeVisible] = useState(true);
+  const [fourVisible, setFourVisible] = useState(true);
+
+  return (
+    <>
+      <div className="flex gap-2 p-4 ">
+        <button
+          className={cn(`rounded border p-2 duration-0`, { "border-sky-500 bg-sky-500 text-white": oneVisible })}
+          onClick={() => setOneVisible(!oneVisible)}
+        >
+          One
+        </button>
+        <button
+          className={cn(`rounded border p-2 duration-0`, { "border-sky-500 bg-sky-500 text-white": twoVisible })}
+          onClick={() => setTwoVisible(!twoVisible)}
+        >
+          Two
+        </button>
+        <button
+          className={cn(`rounded border p-2 duration-0`, { "border-sky-500 bg-sky-500 text-white": threeVisible })}
+          onClick={() => setThreeVisible(!threeVisible)}
+        >
+          Three
+        </button>
+        <button
+          className={cn(`rounded border p-2 duration-0`, { "border-sky-500 bg-sky-500 text-white": fourVisible })}
+          onClick={() => setFourVisible(!fourVisible)}
+        >
+          Four
+        </button>
+      </div>
+      <div className="h-80 pb-2">
+        <Resizable vertical>
+          <ResizablePanel className="grid place-items-center">
+            <Resizable>
+              <ResizablePanel className="grid place-items-center" visible={oneVisible}>
+                One
+              </ResizablePanel>
+              <ResizablePanel className="grid place-items-center" visible={twoVisible}>
+                Two
+              </ResizablePanel>
+              <ResizablePanel className="grid place-items-center" visible={threeVisible}>
+                Three
+              </ResizablePanel>
+            </Resizable>
+          </ResizablePanel>
+          <ResizablePanel className="grid place-items-center" visible={fourVisible}>
             Four
-          </button>
-        </div>
-        <div className="h-80 pb-2">
-          <Resizable vertical>
-            <ResizablePanel className="grid place-items-center">
-              <Resizable>
-                <ResizablePanel className="grid place-items-center" visible={oneVisible}>
-                  One
-                </ResizablePanel>
-                <ResizablePanel className="grid place-items-center" visible={twoVisible}>
-                  Two
-                </ResizablePanel>
-                <ResizablePanel className="grid place-items-center" visible={threeVisible}>
-                  Three
-                </ResizablePanel>
-              </Resizable>
-            </ResizablePanel>
-            <ResizablePanel className="grid place-items-center" visible={fourVisible}>
-              Four
-            </ResizablePanel>
-          </Resizable>
-        </div>
-      </>
-    );
-  },
+          </ResizablePanel>
+        </Resizable>
+      </div>
+    </>
+  );
 };
 
 export const DotsOnTextOverflow: Story = {

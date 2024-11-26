@@ -29,7 +29,7 @@ const queryClient = new QueryClient({
   },
 });
 
-const App: React.FC = () => {
+const App = () => {
   const { isInitializing, initializationError } = useInitializeApp();
   const isSidebarVisible = useSelector((state: RootState) => state.sidebar.sidebarVisible);
 
