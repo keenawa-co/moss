@@ -1,9 +1,6 @@
-import { QueryCache, QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-import { ContentLayout, LaunchPad, Menu, RootLayout } from "@/components";
+import { ContentLayout, LaunchPad, Menu } from "@/components";
 import "@/i18n";
-import "@repo/ui/src/fonts.css";
-import { Suspense, useState } from "react";
+import { Suspense } from "react";
 import { useSelector } from "react-redux";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Resizable, ResizablePanel } from "./components/Resizable";
@@ -11,24 +8,9 @@ import { Home, Logs, Settings } from "./components/pages";
 import { useInitializeApp } from "./hooks/useInitializeApp";
 import { RootState } from "./store";
 import { callServiceMethod } from "./main";
-import { useUpdateStoredString } from "./hooks/useReactQuery";
-
-const queryClient = new QueryClient({
-  queryCache: new QueryCache({
-    onError: (err, query) => {
-      console.log("Query client error", { err, query });
-    },
-  }),
-  defaultOptions: {
-    queries: {
-      retry: false,
-      networkMode: "always",
-      refetchOnWindowFocus: true,
-      refetchOnReconnect: false,
-      refetchOnMount: false, // Don't refetch when a hook mounts
-    },
-  },
-});
+import { PageLoader } from "./components/PageLoader";
+import RootLayout from "./components/app/RootLayout";
+import Provider from "./components/app/Provider";
 
 const App: React.FC = () => {
   const { isInitializing, initializationError } = useInitializeApp();
@@ -37,19 +19,13 @@ const App: React.FC = () => {
   callServiceMethod("doSomething");
 
   if (isInitializing) {
-    return (
-      <div className="relative flex min-h-screen bg-storm-800">
-        <div className="container mx-auto flex max-w-screen-xl items-center justify-center text-4xl text-white">
-          Loading...
-        </div>
-      </div>
-    );
+    return <PageLoader />;
   }
 
   if (initializationError) {
     return (
       <div className="relative flex min-h-screen bg-storm-800">
-        <div className="container mx-auto flex max-w-screen-xl flex-col items-center justify-center text-2xl text-red-500">
+        <div className="mx-auto flex max-w-screen-xl flex-col items-center justify-center text-2xl text-red-500">
           <p>Initialization Failed</p>
           <p>{initializationError.message}</p>
         </div>
@@ -57,19 +33,16 @@ const App: React.FC = () => {
     );
   }
 
-  const ENABLE_REACT_QUERY_DEVTOOLS = true;
-
   return (
-    <QueryClientProvider client={queryClient}>
-      {ENABLE_REACT_QUERY_DEVTOOLS && <ReactQueryDevtools buttonPosition="bottom-left" />}
+    <Provider>
       <RootLayout>
         <Resizable proportionalLayout={false}>
           <ResizablePanel minSize={100} preferredSize={255} snap visible={isSidebarVisible} className="select-none">
             <LaunchPad />
           </ResizablePanel>
           <ResizablePanel>
-            <ContentLayout className="content relative flex h-full flex-col overflow-auto">
-              <Suspense fallback={<div className="loading">Loading...</div>}>
+            <ContentLayout className="relative flex h-full flex-col overflow-auto">
+              <Suspense fallback={<div>Loading...</div>}>
                 <BrowserRouter>
                   <Menu />
                   <Routes>
@@ -83,7 +56,7 @@ const App: React.FC = () => {
           </ResizablePanel>
         </Resizable>
       </RootLayout>
-    </QueryClientProvider>
+    </Provider>
   );
 };
 

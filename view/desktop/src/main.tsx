@@ -2,10 +2,12 @@ import "reflect-metadata";
 import { type } from "@tauri-apps/plugin-os";
 import { getCurrentWebviewWindow } from "@tauri-apps/api/webviewWindow";
 import "@/assets/index.css";
+import "@repo/ui/src/fonts.css";
 import { lazy, StrictMode, Suspense } from "react";
 import { createRoot } from "react-dom/client";
 import { Provider } from "react-redux";
 import { store } from "./store";
+import { PageLoader } from "./components/PageLoader";
 
 const sharedWorker = new SharedWorker("./shared-worker.js");
 
@@ -41,7 +43,7 @@ if (rootElement) {
   createRoot(rootElement).render(
     <StrictMode>
       <Provider store={store}>
-        <Suspense fallback={<div>Loading...</div>}>
+        <Suspense fallback={<PageLoader />}>
           <App />
         </Suspense>
       </Provider>
