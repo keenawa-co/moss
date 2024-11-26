@@ -41,6 +41,7 @@ homedir.workspace = true
 log.workspace = true
 rand.workspace = true
 fern.workspace = true
+smol.workspace = true
 
 # surrealdb = { workspace = true, features = ["kv-rocksdb"] }
 tokio = { workspace = true, features = ["full", "macros", "signal"] }

@@ -6,7 +6,7 @@ import { cn } from "./utils/utils";
 
 const iconOptions = Object.keys(icons) as Icons[];
 
-const meta = {
+const meta: Meta<typeof Icon> = {
   title: "Shared/Icon",
   component: Icon,
   tags: ["autodocs"],
