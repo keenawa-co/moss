@@ -16,12 +16,12 @@
       "type": "boolean"
     },
     "color": {
-      "$ref": "#/$defs/Colors"
+      "$ref": "#/$defs/Color"
     }
   },
   "required": ["name", "slug", "type", "isDefault", "color"],
   "$defs": {
-    "Colors": {
+    "Color": {
       "type": "object",
       "properties": {
         "primary": {
@@ -78,7 +78,7 @@
               "const": "solid"
             },
             "$value": {
-              "$ref": "#/$defs/ColorValue"
+              "$ref": "#/$defs/ColorTokenValue"
             }
           },
           "required": ["$type", "$value"]
@@ -104,7 +104,7 @@
         }
       ]
     },
-    "ColorValue": {
+    "ColorTokenValue": {
       "type": "string",
       "pattern": "#[0-9a-fA-F]{3,8}|rgb(a)?\\(.+\\)|hsl(a)?\\(.+\\)|[a-z]+"
     },
@@ -112,12 +112,17 @@
       "type": "object",
       "properties": {
         "color": {
-          "$ref": "#/$defs/ColorValue"
+          "$ref": "#/$defs/ColorTokenValue"
         },
         "position": {
-          "type": "number",
-          "minimum": 0,
-          "maximum": 1
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "string"
+            }
+          ]
         }
       },
       "required": ["color", "position"]

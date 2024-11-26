@@ -3,17 +3,17 @@ import "@typespec/json-schema";
 using TypeSpec.JsonSchema;
 
 @jsonSchema
-namespace Schemas {
+namespace Schema {
   model Theme {
     "name": string,
     "slug": string,
     "type": string,
     "isDefault": boolean,
-    "color": Colors
+    "color": Color
   }
 }
 
-model Colors {
+model Color {
   "primary": ColorType,
   "sideBar.background": ColorType,
   "toolBar.background": ColorType,
@@ -29,12 +29,12 @@ model Colors {
 
 
 @pattern("#[0-9a-fA-F]{3,8}|rgb(a)?\\(.+\\)|hsl(a)?\\(.+\\)|[a-z]+")
-scalar ColorValue extends string;
+scalar ColorTokenValue extends string;
 
 union ColorType {
   {
     "$type": "solid",
-    "$value": ColorValue
+    "$value": ColorTokenValue
   },
   {
     "$type": "gradient",
@@ -44,9 +44,6 @@ union ColorType {
 }
 
 model ColorGradientEntry {
-  "color": ColorValue,
-
-  @minValue(0.0)
-  @maxValue(1.0)
-  "position": numeric
+  "color": ColorTokenValue,
+  "position": numeric | string
 }
