@@ -1,6 +1,5 @@
+use desktop_models::appearance::theming::{ColorDetail, ColorValue};
 use indexmap::IndexMap;
-
-use crate::model::*;
 
 pub(crate) fn convert_colors_to_css_variables(
     category: &str,

@@ -32,7 +32,7 @@ pub mod theming {
     #[derive(Debug, Deserialize, Serialize, PartialEq, Clone, TS)]
     #[ts(export, export_to = "appearance.ts")]
     pub struct ColorPosition {
-        /// Hex or RGB(A) color value.
+        /// Color value.
         pub color: String,
         /// Position of the color in the gradient, as a value between 0.0 and 1.0.
         pub position: f64,

@@ -1,5 +1,4 @@
 pub mod json_converter;
-pub mod model;
 
 mod util;
 
