@@ -115,13 +115,13 @@ pub fn run() {
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
+            cmd_fs::read_theme_file,
             cmd_window::main_window_is_ready,
             cmd_window::create_new_window,
             cmd_dummy::get_stored_string,
             cmd_dummy::set_stored_string,
             cmd_dummy::fetch_all_themes,
-            cmd_dummy::read_theme,
-            cmd_dummy::fetch_all_themes,
+            cmd_dummy::fetch_themes,
             cmd_dummy::read_theme,
             cmd_base::native_platform_info,
             cmd_base::get_view_content,
