@@ -4,7 +4,6 @@ import reactRefreshPlugin from "eslint-plugin-react-refresh";
 
 export default tseslint.config({
   extends: [tseslint.configs.recommended],
-  files: ["**/*.ts", "**/*.tsx"],
   ignores: ["node_modules/", "dist/", ".gitignore", ".prettierignore", "target/", ".turbo/", ".vscode/", "*.stories.*"],
   languageOptions: {},
   settings: {},
