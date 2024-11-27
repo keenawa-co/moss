@@ -3,6 +3,15 @@ pub mod theming {
     use ts_rs::TS;
 
     #[derive(Deserialize, Serialize, Debug, Clone, Eq, PartialEq, TS)]
+    #[ts(export, export_to = "appearance.ts")]
+    pub enum ThemeType {
+        #[serde(rename = "light")]
+        Light,
+        #[serde(rename = "dark")]
+        Dark,
+    }
+
+    #[derive(Deserialize, Serialize, Debug, Clone, Eq, PartialEq, TS)]
     #[serde(rename_all = "camelCase")]
     #[ts(export, export_to = "appearance.ts")]
     pub struct ThemeDescriptor {
