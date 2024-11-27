@@ -14,7 +14,7 @@
       "path": "packages/moss_lang"
     },
     {
-      "path": "packages/ui"
+      "path": "packages/moss-ui"
     },
     {
       "path": "view/desktop"

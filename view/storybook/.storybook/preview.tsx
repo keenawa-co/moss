@@ -1,8 +1,8 @@
 import { INITIAL_VIEWPORTS } from "@storybook/addon-viewport";
 import type { Preview } from "@storybook/react";
 import React from "react";
-import "@repo/ui/src/styles.css";
-import { staticColors } from "@repo/ui";
+import "@repo/moss-ui/src/styles.css";
+import { staticColors } from "@repo/moss-ui";
 import * as themeFiles from "./themes";
 import { Theme } from "@repo/desktop-models";
 

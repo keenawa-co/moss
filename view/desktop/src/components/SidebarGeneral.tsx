@@ -1,4 +1,4 @@
-import { Icon } from "@repo/ui";
+import { Icon } from "../../../../packages/moss-ui/src";
 
 export const SidebarGeneral = () => {
   return (

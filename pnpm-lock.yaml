@@ -99,20 +99,7 @@ importers:
 
   packages/config-typescript: {}
 
-  packages/moss_lang:
-    dependencies:
-      i18next-resources-for-ts:
-        specifier: ^1.5.0
-        version: 1.5.0
-      typescript:
-        specifier: ^5.5.4
-        version: 5.7.2
-    devDependencies:
-      '@repo/typescript-config':
-        specifier: workspace:*
-        version: link:../config-typescript
-
-  packages/ui:
+  packages/moss-ui:
     dependencies:
       '@radix-ui/primitive':
         specifier: ^1.1.0
@@ -205,6 +192,19 @@ importers:
       typescript:
         specifier: ^5.3.3
         version: 5.7.2
+
+  packages/moss_lang:
+    dependencies:
+      i18next-resources-for-ts:
+        specifier: ^1.5.0
+        version: 1.5.0
+      typescript:
+        specifier: ^5.5.4
+        version: 5.7.2
+    devDependencies:
+      '@repo/typescript-config':
+        specifier: workspace:*
+        version: link:../config-typescript
 
   tools/icongen:
     dependencies:
@@ -331,15 +331,15 @@ importers:
       '@repo/moss-lang':
         specifier: workspace:*
         version: link:../../packages/moss_lang
+      '@repo/moss-ui':
+        specifier: workspace:*
+        version: link:../../packages/moss-ui
       '@repo/tailwind-config':
         specifier: workspace:*
         version: link:../../packages/config-tailwind
       '@repo/typescript-config':
         specifier: workspace:*
         version: link:../../packages/config-typescript
-      '@repo/ui':
-        specifier: workspace:*
-        version: link:../../packages/ui
       '@storybook/react':
         specifier: ^8.4.5
         version: 8.4.5(@storybook/test@8.4.4(storybook@8.4.4(prettier@3.3.3)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(storybook@8.4.4(prettier@3.3.3))(typescript@5.7.2)
@@ -409,9 +409,9 @@ importers:
       '@mdx-js/react':
         specifier: ^3.0.0
         version: 3.1.0(@types/react@18.3.12)(react@18.3.1)
-      '@repo/ui':
+      '@repo/moss-ui':
         specifier: workspace:*
-        version: link:../../packages/ui
+        version: link:../../packages/moss-ui
       clsx:
         specifier: ^2.0.0
         version: 2.1.1
@@ -492,15 +492,15 @@ importers:
       '@repo/eslint-config':
         specifier: workspace:*
         version: link:../../packages/config-eslint
+      '@repo/moss-ui':
+        specifier: workspace:*
+        version: link:../../packages/moss-ui
       '@repo/tailwind-config':
         specifier: workspace:*
         version: link:../../packages/config-tailwind
       '@repo/typescript-config':
         specifier: workspace:*
         version: link:../../packages/config-typescript
-      '@repo/ui':
-        specifier: workspace:*
-        version: link:../../packages/ui
       '@storybook/addon-designs':
         specifier: ^8.0.3
         version: 8.0.4(@storybook/blocks@8.4.4(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(storybook@8.4.4(prettier@3.3.3)))(@storybook/components@8.4.5(storybook@8.4.4(prettier@3.3.3)))(@storybook/theming@8.4.5(storybook@8.4.4(prettier@3.3.3)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -570,9 +570,9 @@ importers:
 
   view/web:
     dependencies:
-      '@repo/ui':
+      '@repo/moss-ui':
         specifier: workspace:*
-        version: link:../../packages/ui
+        version: link:../../packages/moss-ui
       next:
         specifier: ^14.2.3
         version: 14.2.18(react-dom@18.3.1(react@18.3.1))(react@18.3.1)

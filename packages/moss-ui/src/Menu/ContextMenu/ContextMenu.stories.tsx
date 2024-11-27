@@ -1,5 +1,5 @@
 import { Meta, StoryObj } from "@storybook/react";
-import * as CM from "../ContextMenu/ContextMenu";
+import * as CM from "./ContextMenu";
 import { useState } from "react";
 
 const meta: Meta<typeof CM.Root> = {

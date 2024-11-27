@@ -10,7 +10,7 @@ import {
   useSensors,
 } from "@dnd-kit/core";
 import { SortableContext, arrayMove, horizontalListSortingStrategy } from "@dnd-kit/sortable";
-import { DropdownMenu as DM, Icon, cn } from "@repo/ui";
+import { DropdownMenu as DM, Icon, cn } from "../../../../../packages/moss-ui/src";
 import { OsType } from "@tauri-apps/plugin-os";
 import { HTMLProps, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";

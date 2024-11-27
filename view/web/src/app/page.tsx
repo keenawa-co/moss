@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { Card } from "@repo/ui/card";
+import { Card } from "@repo/moss-ui/card";
 
 function Gradient({ conic, className, small }: { small?: boolean; conic?: boolean; className?: string }): JSX.Element {
   return (

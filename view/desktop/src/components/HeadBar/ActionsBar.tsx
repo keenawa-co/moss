@@ -1,6 +1,6 @@
 import { RootState, useAppDispatch } from "@/store";
 import { toggleSidebarVisibility } from "@/store/sidebar/sidebarSlice";
-import { cn, Icon } from "@repo/ui";
+import { cn, Icon } from "../../../../../packages/moss-ui/src";
 import { HTMLProps, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { invokeIpc } from "@/lib/backend/tauri";

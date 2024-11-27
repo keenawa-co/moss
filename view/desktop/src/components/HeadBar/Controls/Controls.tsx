@@ -2,7 +2,7 @@ import { OsType, type } from "@tauri-apps/plugin-os";
 import { MacOSControls } from "./MacOSControls";
 import { LinuxControls } from "./LinuxControls";
 import { WindowsControls } from "./WindowsControls";
-import { cn } from "@repo/ui";
+import { cn } from "../../../../../../packages/moss-ui/src";
 import { HTMLProps } from "react";
 import { TauriAppWindowProvider } from "./ControlsContext";
 

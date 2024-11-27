@@ -7,7 +7,7 @@ import typography from "./custom-config/typography";
 import fontSize from "./custom-config/fontSize";
 
 const reactComponentsTailwindConfig: Config = {
-  content: ["@repo/ui/**/*.{js,ts,jsx,tsx}"],
+  content: ["@repo/moss-ui/**/*.{js,ts,jsx,tsx}"],
   plugins,
   theme: {
     gradientColorStops: colors,

@@ -1,6 +1,6 @@
 import { MenuItemVisibility, SubmenuMenuItem } from "@repo/desktop-models";
 
-import { cn, Icon, Icons, DropdownMenu as DM } from "@repo/ui";
+import { cn, Icon, Icons, DropdownMenu as DM } from "../../../../../packages/moss-ui/src";
 import { ComponentPropsWithoutRef, useState } from "react";
 
 const buttonStyle =

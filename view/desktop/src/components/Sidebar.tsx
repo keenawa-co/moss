@@ -1,4 +1,4 @@
-import { Icon, IconTitle, MenuItem } from "@repo/ui";
+import { Icon, IconTitle, MenuItem } from "../../../../packages/moss-ui/src";
 import { SidebarLayout } from "@/components";
 import { twMerge } from "tailwind-merge";
 

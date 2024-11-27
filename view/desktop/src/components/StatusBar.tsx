@@ -1,4 +1,4 @@
-import { cn, Icon, Icons } from "@repo/ui";
+import { cn, Icon, Icons } from "../../../../packages/moss-ui/src";
 import type { ComponentPropsWithoutRef } from "react";
 
 const StatusBar = ({ className }: ComponentPropsWithoutRef<"div">) => {

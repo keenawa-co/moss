@@ -1,5 +1,5 @@
 import { Meta, StoryObj } from "@storybook/react";
-import * as DM from "../DropdownMenu/DropdownMenu";
+import * as DM from "./DropdownMenu";
 import { useState } from "react";
 
 const meta: Meta<typeof DM.Root> = {
