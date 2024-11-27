@@ -5,17 +5,20 @@ import reactRefreshPlugin from "eslint-plugin-react-refresh";
 export default tseslint.config({
   extends: [tseslint.configs.recommended],
   files: ["**/*.ts", "**/*.tsx"],
-  ignores: ["node_modules", "dist"],
+  ignores: ["node_modules/", "dist/", ".gitignore", ".prettierignore", "target/", ".turbo/", ".vscode/", "*.stories.*"],
   languageOptions: {},
   settings: {},
   plugins: {
     "react-hooks": reactHooksPlugin,
     "react-refresh": reactRefreshPlugin,
+    "@typescript-eslint": tseslint.plugin,
   },
   rules: {
     "react-hooks/rules-of-hooks": "error",
     "react-hooks/exhaustive-deps": "warn",
     "react-refresh/only-export-components": ["warn", { allowConstantExport: true }],
-    semi: "warn",
+    "@typescript-eslint/no-unused-vars": "warn",
+    "@typescript-eslint/no-explicit-any": "warn",
+    "prefer-const": "warn",
   },
 });

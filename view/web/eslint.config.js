@@ -1,3 +1,3 @@
-import webConfig from "@repo/eslint-config/web.js";
+import reactLintConfig from "@repo/eslint-config/react.js";
 
-export default [...webConfig];
+export default [...reactLintConfig];

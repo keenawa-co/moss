@@ -1,12 +1,12 @@
 import path from "node:path";
 import { dirname } from "node:path";
 import { fileURLToPath } from "node:url";
-import webConfig from "@repo/eslint-config/web.js";
+import reactLintConfig from "@repo/eslint-config/react.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 export default [
-  ...webConfig,
+  ...reactLintConfig,
   {
     files: ["**/*.ts", "**/*.tsx"],
     settings: {

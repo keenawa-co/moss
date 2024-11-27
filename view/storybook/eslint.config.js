@@ -1,10 +1,10 @@
 import storybook from "eslint-plugin-storybook";
-import webConfig from "@repo/eslint-config/web.js";
+import reactLintConfig from "@repo/eslint-config/react.js";
 
 export default [
+  ...reactLintConfig,
   ...storybook.configs["flat/recommended"],
-  ...webConfig,
   {
-    files: ["**/*.ts", "**/*.tsx"],
+    files: ["**/*.stories.ts", "**/*.stories.tsx"],
   },
 ];

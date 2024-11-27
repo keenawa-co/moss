@@ -1,6 +1,0 @@
-.gitignore
-.prettierignore
-node_modules/
-target/
-.turbo/
-.vscode/
