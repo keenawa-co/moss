@@ -112,6 +112,33 @@ pub fn run() {
                 app.handle().manage(app_state);
             }
 
+            #[cfg(desktop)]
+            {
+                use tauri_plugin_global_shortcut::{
+                    Code, GlobalShortcutExt, Modifiers, Shortcut, ShortcutState,
+                };
+                let ctrl_n_shortcut = Shortcut::new(Some(Modifiers::CONTROL), Code::KeyN);
+
+                app.handle().plugin(
+                    tauri_plugin_global_shortcut::Builder::new()
+                        .with_handler(move |app, shortcut, event| {
+                            println!("{:?}", shortcut);
+                            if shortcut == &ctrl_n_shortcut {
+                                match event.state() {
+                                    ShortcutState::Pressed => {
+                                        tauri::async_runtime::spawn(cmd_window::create_new_window(
+                                            app.clone(),
+                                        ));
+                                    }
+                                    ShortcutState::Released => {}
+                                }
+                            }
+                        })
+                        .build(),
+                )?;
+                app.global_shortcut().register(ctrl_n_shortcut)?;
+            }
+
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
@@ -190,7 +217,6 @@ fn create_main_window(handle: &AppHandle, url: &str) -> WebviewWindow {
     };
     let webview_window = create_window(handle, config);
     webview_window.on_menu_event(move |window, event| menu::handle_event(window, &event));
-
     webview_window
 }
 
