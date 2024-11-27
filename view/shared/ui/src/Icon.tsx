@@ -4,19 +4,20 @@ import { cn } from "./utils/utils";
 
 export type Icons = keyof typeof icons;
 
-export const Icon = ({
-  icon,
-  className,
-  ...props
-}: {
+interface IconProps extends ComponentPropsWithoutRef<"svg"> {
   icon: Icons | null;
   className?: string;
-} & ComponentPropsWithoutRef<"svg">) => {
-  const IconTag = icons[icon];
+}
 
-  if (!IconTag) return <FailedIcon />;
+export const Icon = ({ icon, className, ...props }: IconProps) => {
+  // Check that the icon is not null and exists in icons
+  if (icon && icons[icon]) {
+    const IconTag = icons[icon];
+    return <IconTag className={cn("size-4 flex-shrink-0 text-[var(--color-primary)]", className)} {...props} />;
+  }
 
-  return <IconTag className={cn("size-4 flex-shrink-0 text-[rgba(var(--colorPrimary))]", className)} {...props} />;
+  // If the icon is null or not found, return the default SVG
+  return <FailedIcon />;
 };
 
 export default Icon;

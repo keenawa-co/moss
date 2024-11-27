@@ -111,8 +111,10 @@ importers:
       '@svgr/cli':
         specifier: ^8.1.0
         version: 8.1.0(typescript@5.7.2)
+        version: 8.1.0(typescript@5.7.2)
       '@svgr/rollup':
         specifier: ^8.1.0
+        version: 8.1.0(rollup@4.27.2)(typescript@5.7.2)
         version: 8.1.0(rollup@4.27.2)(typescript@5.7.2)
       '@types/react':
         specifier: ^18.3.3
@@ -120,6 +122,9 @@ importers:
       rimraf:
         specifier: ^6.0.1
         version: 6.0.1
+      typescript:
+        specifier: ^5.7.2
+        version: 5.7.2
 
   tools/themegen:
     dependencies:
@@ -187,6 +192,9 @@ importers:
       inversify:
         specifier: ^6.1.4
         version: 6.1.4(reflect-metadata@0.2.2)
+      jotai:
+        specifier: ^2.10.3
+        version: 2.10.3(@types/react@18.3.12)(react@18.3.1)
       p-queue:
         specifier: ^8.0.1
         version: 8.0.1
@@ -5188,6 +5196,18 @@ packages:
   joi@17.13.3:
     resolution: {integrity: sha512-otDA4ldcIx+ZXsKHWmp0YizCweVRZG96J10b0FevjfuncLO1oX59THoAmHkNubYJ+9gWsYsp5k8v4ib6oDv1fA==}
 
+  jotai@2.10.3:
+    resolution: {integrity: sha512-Nnf4IwrLhNfuz2JOQLI0V/AgwcpxvVy8Ec8PidIIDeRi4KCFpwTFIpHAAcU+yCgnw/oASYElq9UY0YdUUegsSA==}
+    engines: {node: '>=12.20.0'}
+    peerDependencies:
+      '@types/react': '>=17.0.0'
+      react: '>=17.0.0'
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
+      react:
+        optional: true
+
   js-tokens@4.0.0:
     resolution: {integrity: sha512-RdJUflcE3cUzKiMqQgsCu06FPu9UdIJO0beYbPhHN4k6apgJtifcoCtT9bcxOpYBtpD2kCM6Sbzg4CausW/PKQ==}
 
@@ -7362,6 +7382,9 @@ packages:
     resolution: {integrity: sha512-i5t66RHxDvVN40HfDd1PsEThGNnlMCMT3jMUuoh9/0TaqWevNontacunWyN02LA9/fIbEWlcHZcgTKb9QoaLfg==}
     engines: {node: '>=14.17'}
     hasBin: true
+
+  unbox-primitive@1.0.2:
+    resolution: {integrity: sha512-61pPlCD9h51VoreyJ0BReideM3MDKMKnh6+V9L08331ipq6Q8OFXZYiqP6n/tbHx4s5I9uRhcye6BrbkizkBDw==}
 
   undici-types@6.19.8:
     resolution: {integrity: sha512-ve2KP6f/JnbPBFyobGHuerC9g1FYGn/F8n1LWTwNxCEzd6IfqTwUQcNXgEtmmQ6DlRrC1hrSrBnCZPokRrDHjw==}
@@ -13340,6 +13363,11 @@ snapshots:
       '@sideway/formula': 3.0.1
       '@sideway/pinpoint': 2.0.0
 
+  jotai@2.10.3(@types/react@18.3.12)(react@18.3.1):
+    optionalDependencies:
+      '@types/react': 18.3.12
+      react: 18.3.1
+
   js-tokens@4.0.0: {}
 
   js-yaml@3.14.1:
@@ -15747,6 +15775,10 @@ snapshots:
     dependencies:
       typescript: 5.6.3
 
+  ts-api-utils@1.4.0(typescript@5.7.2):
+    dependencies:
+      typescript: 5.7.2
+
   ts-dedent@2.2.0: {}
 
   ts-interface-checker@0.1.13: {}
@@ -15762,6 +15794,16 @@ snapshots:
       strip-bom: 3.0.0
 
   tslib@2.8.1: {}
+
+  tsutils@3.21.0(typescript@5.6.3):
+    dependencies:
+      tslib: 1.14.1
+      typescript: 5.6.3
+
+  tsutils@3.21.0(typescript@5.7.2):
+    dependencies:
+      tslib: 1.14.1
+      typescript: 5.7.2
 
   turbo-darwin-64@2.3.0:
     optional: true
@@ -15819,6 +15861,10 @@ snapshots:
       - supports-color
 
   typescript@5.6.3: {}
+
+  typescript@5.7.2: {}
+
+
 
   typescript@5.7.2: {}
 
