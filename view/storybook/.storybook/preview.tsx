@@ -2,15 +2,15 @@ import { INITIAL_VIEWPORTS } from "@storybook/addon-viewport";
 import type { Preview } from "@storybook/react";
 import React from "react";
 import "@repo/ui/src/styles.css";
-import { ThemeProvider, staticColors } from "@repo/ui";
+import { staticColors } from "@repo/ui";
 import * as themeFiles from "./themes";
-import { Convert } from "@repo/moss-theme";
 import { Theme } from "@repo/desktop-models";
+
 // TODO: remove old storybook theme integration
 const themes: Map<string, Theme> = new Map();
 for (const themeName in themeFiles) {
   const theme = themeFiles[themeName];
-  themes.set(theme.name, Convert.toTheme(JSON.stringify(theme)));
+  // themes.set(theme.name, Convert.toTheme(JSON.stringify(theme)));
 }
 
 const preview: Preview = {
@@ -56,9 +56,12 @@ const preview: Preview = {
       const theme = context.args.theme ?? context.globals.theme;
       console.warn("-------------------->", theme);
       return (
-        <ThemeProvider themeOverrides={themes.get(theme)} updateOnChange>
-          <Story />
-        </ThemeProvider>
+        // FIXME: remove old storybook theme implementation
+        // <ThemeProvider themeOverrides={themes.get(theme)} updateOnChange>
+        //   <Story />
+        // </ThemeProvider>
+
+        <></>
       );
     },
   ],

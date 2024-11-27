@@ -26,9 +26,6 @@
       "path": "view/shared/ui"
     },
     {
-      "path": "lib/moss_theme"
-    },
-    {
       "path": "lib/moss_lang"
     },
     {

@@ -1,5 +1,4 @@
 import tailwindColors from "tailwindcss/colors";
-import { customTailwindColorVariables } from "@repo/moss-theme";
 
 const extendedTailwindColors = {
   amber: tailwindColors.amber,
@@ -118,7 +117,6 @@ export const staticColors = {
 const colors = {
   ...staticColors,
   ...extendedTailwindColors,
-  ...customTailwindColorVariables,
 };
 
 export default colors;

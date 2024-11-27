@@ -29,7 +29,6 @@
     "@radix-ui/react-dropdown-menu": "^2.1.1",
     "@radix-ui/react-tooltip": "^1.1.2",
     "@repo/eslint-config": "workspace:*",
-    "@repo/moss-theme": "workspace:*",
     "@repo/tailwind-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
     "@repo/icongen": "workspace:*",
