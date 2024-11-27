@@ -1,23 +1,27 @@
 use anyhow::{Context as _, Result};
-use indexmap::IndexMap;
 
-use crate::theme_model::{ColorDetail, ColorValue, ThemeModel};
+use crate::{model::ThemeModel, util::convert_colors_to_css_variables, ThemeConverter};
 
-pub struct ThemeConvertService;
+#[cfg(feature = "json")]
+pub struct JsonThemeConverter;
 
-impl ThemeConvertService {
+#[cfg(feature = "json")]
+impl JsonThemeConverter {
     pub fn new() -> Self {
         Self
     }
+}
 
-    pub fn convert_theme_to_css(&self, content: String) -> Result<String> {
+#[cfg(feature = "json")]
+impl ThemeConverter for JsonThemeConverter {
+    fn convert_to_css(&self, content: String) -> Result<String> {
         let theme: ThemeModel =
             serde_json::from_str(&content).context("JSON deserialization failed")?;
 
         let mut css_sections = Vec::new();
 
         if !theme.color.is_empty() {
-            let color_vars = self.convert_colors_to_css_variables("color", &theme.color);
+            let color_vars = convert_colors_to_css_variables("color", &theme.color);
             let mut color_css = String::with_capacity(color_vars.len() * 40); // Estimate capacity
             for (var, val) in &color_vars {
                 color_css.push_str(&format!("  {}: {};\n", var, val));
@@ -37,60 +41,15 @@ impl ThemeConvertService {
 
         Ok(result)
     }
-
-    fn convert_colors_to_css_variables(
-        &self,
-        category: &str,
-        colors: &IndexMap<String, ColorDetail>,
-    ) -> IndexMap<String, String> {
-        self.convert_category_to_css_variables(category, colors, |color_detail| match &color_detail
-            .value
-        {
-            ColorValue::Solid(val) => val.clone(),
-            ColorValue::Gradient(vals) => {
-                let direction = color_detail.direction.as_deref().unwrap_or("to right");
-
-                let gradient = vals
-                    .iter()
-                    .map(|cp| {
-                        let percentage = (cp.position * 100.0).round() as usize;
-                        format!("{} {}%", cp.color, percentage)
-                    })
-                    .collect::<Vec<String>>()
-                    .join(", ");
-
-                format!("linear-gradient({}, {})", direction, gradient)
-            }
-        })
-    }
-
-    fn convert_category_to_css_variables<F, T>(
-        &self,
-        category: &str,
-        tokens: &IndexMap<String, T>,
-        converter: F,
-    ) -> IndexMap<String, String>
-    where
-        F: Fn(&T) -> String,
-    {
-        let mut css_vars = IndexMap::with_capacity(tokens.len());
-
-        for (key, token) in tokens {
-            let css_var_name = format!("--{}-{}", category, key.replace('.', "-"));
-            let css_var_value = converter(token);
-            css_vars.insert(css_var_name, css_var_value);
-        }
-
-        css_vars
-    }
 }
 
 #[cfg(test)]
 mod tests {
     use anyhow::Result;
     use desktop_models::appearance::theming::ThemeType;
+    use indexmap::IndexMap;
 
-    use crate::theme_model::ColorPosition;
+    use crate::model::{ColorDetail, ColorPosition, ColorValue};
 
     use super::*;
 
@@ -109,8 +68,8 @@ mod tests {
         }
     }
     "#;
-        let service = ThemeConvertService::new();
-        let result = service.convert_theme_to_css(json.to_string());
+        let service = JsonThemeConverter::new();
+        let result = service.convert_to_css(json.to_string());
         assert!(result.is_err());
         Ok(())
     }
@@ -174,8 +133,8 @@ mod tests {
             color: color_map,
         };
 
-        let service = ThemeConvertService::new();
-        let css = service.convert_theme_to_css(serde_json::to_string(&theme)?)?;
+        let service = JsonThemeConverter::new();
+        let css = service.convert_to_css(serde_json::to_string(&theme)?)?;
 
         let expected_css = "\
 :root {
@@ -219,8 +178,8 @@ mod tests {
             color: color_map,
         };
 
-        let service = ThemeConvertService::new();
-        let css = service.convert_theme_to_css(serde_json::to_string(&theme)?)?;
+        let service = JsonThemeConverter::new();
+        let css = service.convert_to_css(serde_json::to_string(&theme)?)?;
 
         let expected_css = "\
 :root {
@@ -254,8 +213,8 @@ mod tests {
             color: color_map,
         };
 
-        let service = ThemeConvertService::new();
-        let css = service.convert_theme_to_css(serde_json::to_string(&theme)?)?;
+        let service = JsonThemeConverter::new();
+        let css = service.convert_to_css(serde_json::to_string(&theme)?)?;
 
         let expected_css = "\
 :root {
@@ -280,8 +239,8 @@ mod tests {
             color: color_map,
         };
 
-        let service = ThemeConvertService::new();
-        let css = service.convert_theme_to_css(serde_json::to_string(&theme)?)?;
+        let service = JsonThemeConverter::new();
+        let css = service.convert_to_css(serde_json::to_string(&theme)?)?;
 
         let expected_css = "\
 :root {

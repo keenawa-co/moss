@@ -8,6 +8,7 @@ members = [
     "crates/moss-fs",
     "crates/moss-uikit",
     "crates/moss-html",
+    "crates/moss-themeconv",
 
     "internal/platform/core",
     "internal/platform/fs",
@@ -23,7 +24,6 @@ members = [
     "internal/workbench/service/configuration/tao",
     "internal/workbench/service/user_profile/tao",
     "internal/workbench/service/environment/tao",
-    "internal/workbench/service/theme",
 
     "tools/xtask",
 ]
@@ -46,6 +46,7 @@ moss_html = { path = "crates/moss-html" }
 moss_base = { path = "crates/moss-base" }
 moss_str = { path = "crates/moss-str" }
 moss_fs = { path = "crates/moss-fs" }
+moss_themeconv = { path = "crates/moss-themeconv" }
 
 platform_core = { path = "internal/platform/core" }
 platform_utl = { path = "internal/platform/utl" }
@@ -63,7 +64,6 @@ workbench_service_configuration_common = { path = "internal/workbench/service/co
 workbench_service_configuration_tao = { path = "internal/workbench/service/configuration/tao" }
 workbench_service_user_profile_tao = { path = "internal/workbench/service/user_profile/tao" }
 workbench_service_environment_tao = { path = "internal/workbench/service/environment/tao" }
-workbench_service_theme = { path = "internal/workbench/service/theme" }
 
 indexmap = "2.6.0"
 arcstr = "1.2.0"

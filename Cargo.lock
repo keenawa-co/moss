@@ -2832,6 +2832,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "moss_themeconv"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "desktop_models",
+ "indexmap 2.6.0",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
 name = "moss_uikit"
 version = "0.1.0"
 dependencies = [
@@ -6455,17 +6466,6 @@ name = "workbench_service_environment_tao"
 version = "0.1.0"
 dependencies = [
  "platform_environment",
-]
-
-[[package]]
-name = "workbench_service_theme"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "desktop_models",
- "indexmap 2.6.0",
- "serde",
- "serde_json",
 ]
 
 [[package]]
