@@ -1,6 +1,5 @@
 import { cva } from "class-variance-authority";
 import Icon from "./Icon";
-import { Secondary } from "./Link.stories";
 
 interface Link {
   label?: string;

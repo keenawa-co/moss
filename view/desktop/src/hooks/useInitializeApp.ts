@@ -68,7 +68,7 @@ export const useInitializeApp = () => {
         instantiationService.dispose();
       }
     };
-  }, [dispatch]);
+  }, [dispatch]); // instantiationService causes infinite loop and app cannot be initialized
 
   return { isInitializing, initializationError, instantiationService };
 };

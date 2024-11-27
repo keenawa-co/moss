@@ -11,7 +11,7 @@ const SessionComponent = () => {
   const { t } = useTranslation(["ns1", "ns2"]);
   const [data, setData] = useState<number | null>(null);
 
-  let getAllActivities = async () => {
+  const getAllActivities = async () => {
     try {
       // console.log((await invokeIpc("get_view_content")) as object);
       console.log((await invokeIpc("get_menu_items_by_namespace", { namespace: "headItem" })) as object);
@@ -91,10 +91,6 @@ const StoredStringUpdater: React.FC = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     mutation.mutate(newString);
-  };
-
-  const handleLogCurrentString = async () => {
-    console.log("Current Stored String:", storedString);
   };
 
   return (

@@ -1,4 +1,4 @@
-import { Allotment, AllotmentHandle as ResizableHandleProps, AllotmentProps as ResizableProps } from "allotment";
+import { Allotment } from "allotment";
 import "allotment/dist/style.css";
 
 export const Resizable = Allotment;

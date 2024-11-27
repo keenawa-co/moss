@@ -12,7 +12,7 @@ interface ControlsProps extends HTMLProps<HTMLDivElement> {
 }
 
 export const Controls = ({ os, className, ...props }: ControlsProps) => {
-  let osFromTauri = type();
+  const osFromTauri = type();
 
   const switchValue = os || osFromTauri;
 

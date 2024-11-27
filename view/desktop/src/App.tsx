@@ -12,7 +12,7 @@ import { PageLoader } from "./components/PageLoader";
 import RootLayout from "./components/app/RootLayout";
 import Provider from "./components/app/Provider";
 
-const App: React.FC = () => {
+const App = () => {
   const { isInitializing, initializationError } = useInitializeApp();
   const isSidebarVisible = useSelector((state: RootState) => state.sidebar.sidebarVisible);
 

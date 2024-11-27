@@ -21,7 +21,6 @@ export interface Event<Channel extends Channels, EventName extends EventsOf<Chan
   event: EventName;
   payload: PayloadOf<Channel, EventName>;
 }
-
 export class EventBus {
   private eventSubjects = new Map<Channels, Subject<Event<any, any>>>();
   private subscriptions = new Map<Channels, Subscription>();

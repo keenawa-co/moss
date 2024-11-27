@@ -30,7 +30,7 @@ const AccordionsList = () => {
   useEffect(() => {
     if (!ref.current || preferredSizes.length === 0) return;
     ref.current.resize(preferredSizes);
-  }, [accordions]);
+  }, [accordions, preferredSizes]);
 
   const toggleAccordion = (index: number) => {
     const updatedAccordions = accordions.map((accordion, i) =>

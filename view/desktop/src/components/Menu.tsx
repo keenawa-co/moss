@@ -2,7 +2,7 @@
 import { useTranslation } from "react-i18next";
 import { NavLink } from "react-router-dom";
 
-const isActive = ({ isActive }: any) => `link ${isActive ? "active" : ""}`;
+const isActive = ({ isActive }: { isActive: boolean }) => `link ${isActive ? "active" : ""}`;
 
 export const Menu = () => {
   const { t } = useTranslation(["ns1", "ns2"]);

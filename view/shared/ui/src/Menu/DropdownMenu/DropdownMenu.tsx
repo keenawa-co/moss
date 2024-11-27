@@ -79,6 +79,7 @@ const DropdownMenu: React.FC<DropdownMenuProps> = (props: ScopedProps<DropdownMe
 
 type DropdownMenuTriggerElement = React.ElementRef<typeof Primitive.button>;
 type PrimitiveButtonProps = React.ComponentPropsWithoutRef<typeof Primitive.button>;
+// eslint-disable-next-line
 interface DropdownMenuTriggerProps extends PrimitiveButtonProps {}
 
 const DropdownMenuTrigger = React.forwardRef<DropdownMenuTriggerElement, DropdownMenuTriggerProps>(
@@ -130,6 +131,7 @@ const DropdownMenuTrigger = React.forwardRef<DropdownMenuTriggerElement, Dropdow
  * -----------------------------------------------------------------------------------------------*/
 
 type MenuPortalProps = React.ComponentPropsWithoutRef<typeof MenuPrimitive.Portal>;
+// eslint-disable-next-line
 interface DropdownMenuPortalProps extends MenuPortalProps {}
 
 const DropdownMenuPortal: React.FC<DropdownMenuPortalProps> = (props: ScopedProps<DropdownMenuPortalProps>) => {
@@ -144,6 +146,7 @@ const DropdownMenuPortal: React.FC<DropdownMenuPortalProps> = (props: ScopedProp
 
 type DropdownMenuContentElement = React.ElementRef<typeof MenuPrimitive.Content>;
 type MenuContentProps = React.ComponentPropsWithoutRef<typeof MenuPrimitive.Content>;
+// eslint-disable-next-line
 interface DropdownMenuContentProps extends Omit<MenuContentProps, "onEntryFocus"> {}
 
 const DropdownMenuContent = React.forwardRef<DropdownMenuContentElement, DropdownMenuContentProps>(
@@ -186,6 +189,7 @@ const DropdownMenuContent = React.forwardRef<DropdownMenuContentElement, Dropdow
 
 type DropdownMenuGroupElement = React.ElementRef<typeof MenuPrimitive.Group>;
 type MenuGroupProps = React.ComponentPropsWithoutRef<typeof MenuPrimitive.Group>;
+// eslint-disable-next-line
 interface DropdownMenuGroupProps extends MenuGroupProps {}
 
 const DropdownMenuGroup = React.forwardRef<DropdownMenuGroupElement, DropdownMenuGroupProps>(
@@ -202,6 +206,7 @@ const DropdownMenuGroup = React.forwardRef<DropdownMenuGroupElement, DropdownMen
 
 type DropdownMenuLabelElement = React.ElementRef<typeof MenuPrimitive.Label>;
 type MenuLabelProps = React.ComponentPropsWithoutRef<typeof MenuPrimitive.Label>;
+// eslint-disable-next-line
 interface DropdownMenuLabelProps extends MenuLabelProps {}
 
 const DropdownMenuLabel = React.forwardRef<DropdownMenuLabelElement, DropdownMenuLabelProps>(
@@ -242,6 +247,7 @@ const DropdownMenuCheckboxItem = forwardRef<CustomPrimitive.CheckboxItemElement,
 
 type DropdownMenuRadioGroupElement = React.ElementRef<typeof MenuPrimitive.RadioGroup>;
 type MenuRadioGroupProps = React.ComponentPropsWithoutRef<typeof MenuPrimitive.RadioGroup>;
+// eslint-disable-next-line
 interface DropdownMenuRadioGroupProps extends MenuRadioGroupProps {}
 
 const DropdownMenuRadioGroup = React.forwardRef<DropdownMenuRadioGroupElement, DropdownMenuRadioGroupProps>(
@@ -258,6 +264,7 @@ const DropdownMenuRadioGroup = React.forwardRef<DropdownMenuRadioGroupElement, D
 
 type DropdownMenuRadioItemElement = React.ElementRef<typeof MenuPrimitive.RadioItem>;
 type MenuRadioItemProps = React.ComponentPropsWithoutRef<typeof MenuPrimitive.RadioItem>;
+// eslint-disable-next-line
 interface DropdownMenuRadioItemProps extends MenuRadioItemProps {}
 
 const DropdownMenuRadioItem = React.forwardRef<DropdownMenuRadioItemElement, DropdownMenuRadioItemProps>(
@@ -274,6 +281,7 @@ const DropdownMenuRadioItem = React.forwardRef<DropdownMenuRadioItemElement, Dro
 
 type DropdownMenuItemIndicatorElement = React.ElementRef<typeof MenuPrimitive.ItemIndicator>;
 type MenuItemIndicatorProps = React.ComponentPropsWithoutRef<typeof MenuPrimitive.ItemIndicator>;
+// eslint-disable-next-line
 interface DropdownMenuItemIndicatorProps extends MenuItemIndicatorProps {}
 
 const DropdownMenuItemIndicator = React.forwardRef<DropdownMenuItemIndicatorElement, DropdownMenuItemIndicatorProps>(
@@ -290,6 +298,7 @@ const DropdownMenuItemIndicator = React.forwardRef<DropdownMenuItemIndicatorElem
 
 type DropdownMenuArrowElement = React.ElementRef<typeof MenuPrimitive.Arrow>;
 type MenuArrowProps = React.ComponentPropsWithoutRef<typeof MenuPrimitive.Arrow>;
+// eslint-disable-next-line
 interface DropdownMenuArrowProps extends MenuArrowProps {}
 
 const DropdownMenuArrow = React.forwardRef<DropdownMenuArrowElement, DropdownMenuArrowProps>(
@@ -345,6 +354,7 @@ const DropdownMenuSubTrigger = React.forwardRef<CustomPrimitive.SubTriggerElemen
 
 type DropdownMenuSubContentElement = React.ElementRef<typeof MenuPrimitive.Content>;
 type MenuSubContentProps = React.ComponentPropsWithoutRef<typeof MenuPrimitive.SubContent>;
+// eslint-disable-next-line
 interface DropdownMenuSubContentProps extends MenuSubContentProps {}
 
 const DropdownMenuSubContent = React.forwardRef<DropdownMenuSubContentElement, DropdownMenuSubContentProps>(

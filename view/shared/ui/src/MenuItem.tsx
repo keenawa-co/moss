@@ -1,7 +1,7 @@
 import { twMerge } from "tailwind-merge";
 import { ComponentPropsWithoutRef } from "react";
 
-export const MenuItem = ({ children, title, className }: { title?: string } & ComponentPropsWithoutRef<"div">) => {
+export const MenuItem = ({ children, className }: { title?: string } & ComponentPropsWithoutRef<"div">) => {
   return (
     <div
       className={twMerge(
