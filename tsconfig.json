@@ -14,6 +14,9 @@
       "path": "packages/moss_lang"
     },
     {
+      "path": "packages/ui"
+    },
+    {
       "path": "view/desktop"
     },
     {
@@ -24,9 +27,6 @@
     },
     {
       "path": "view/storybook"
-    },
-    {
-      "path": "view/shared/ui"
     },
     {
       "path": "tools/themegen"

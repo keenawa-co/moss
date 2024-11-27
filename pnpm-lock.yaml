@@ -35,7 +35,7 @@ importers:
     devDependencies:
       '@repo/typescript-config':
         specifier: workspace:*
-        version: link:../../view/shared/config-typescript
+        version: link:../../packages/config-typescript
 
   crates/moss-str:
     dependencies:
@@ -45,7 +45,7 @@ importers:
     devDependencies:
       '@repo/typescript-config':
         specifier: workspace:*
-        version: link:../../view/shared/config-typescript
+        version: link:../../packages/config-typescript
 
   crates/moss-uikit:
     dependencies:
@@ -55,7 +55,7 @@ importers:
     devDependencies:
       '@repo/typescript-config':
         specifier: workspace:*
-        version: link:../../view/shared/config-typescript
+        version: link:../../packages/config-typescript
 
   internal/workbench/desktop/models:
     dependencies:
@@ -68,7 +68,36 @@ importers:
         version: link:../../../../crates/moss-str
       '@repo/typescript-config':
         specifier: workspace:*
-        version: link:../../../../view/shared/config-typescript
+        version: link:../../../../packages/config-typescript
+
+  packages/config-eslint:
+    devDependencies:
+      eslint:
+        specifier: ^9.15.0
+        version: 9.15.0(jiti@1.21.6)
+      eslint-config-turbo:
+        specifier: ^2.0.0
+        version: 2.3.0(eslint@9.15.0(jiti@1.21.6))
+      eslint-plugin-react-hooks:
+        specifier: ^5.0.0
+        version: 5.0.0(eslint@9.15.0(jiti@1.21.6))
+      eslint-plugin-react-refresh:
+        specifier: ^0.4.14
+        version: 0.4.14(eslint@9.15.0(jiti@1.21.6))
+      typescript-eslint:
+        specifier: ^8.16.0
+        version: 8.16.0(eslint@9.15.0(jiti@1.21.6))(typescript@5.7.2)
+
+  packages/config-tailwind:
+    devDependencies:
+      '@repo/typescript-config':
+        specifier: workspace:*
+        version: link:../config-typescript
+      tailwindcss:
+        specifier: ^3.4.1
+        version: 3.4.15
+
+  packages/config-typescript: {}
 
   packages/moss_lang:
     dependencies:
@@ -81,7 +110,101 @@ importers:
     devDependencies:
       '@repo/typescript-config':
         specifier: workspace:*
-        version: link:../../view/shared/config-typescript
+        version: link:../config-typescript
+
+  packages/ui:
+    dependencies:
+      '@radix-ui/primitive':
+        specifier: ^1.1.0
+        version: 1.1.0
+      '@radix-ui/react-compose-refs':
+        specifier: ^1.1.0
+        version: 1.1.0(@types/react@18.3.12)(react@18.3.1)
+      '@radix-ui/react-context':
+        specifier: ^1.1.1
+        version: 1.1.1(@types/react@18.3.12)(react@18.3.1)
+      '@radix-ui/react-context-menu':
+        specifier: ^2.2.2
+        version: 2.2.2(@types/react-dom@18.3.1)(@types/react@18.3.12)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@radix-ui/react-direction':
+        specifier: ^1.1.0
+        version: 1.1.0(@types/react@18.3.12)(react@18.3.1)
+      '@radix-ui/react-id':
+        specifier: ^1.1.0
+        version: 1.1.0(@types/react@18.3.12)(react@18.3.1)
+      '@radix-ui/react-menu':
+        specifier: ^2.1.2
+        version: 2.1.2(@types/react-dom@18.3.1)(@types/react@18.3.12)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@radix-ui/react-primitive':
+        specifier: ^2.0.0
+        version: 2.0.0(@types/react-dom@18.3.1)(@types/react@18.3.12)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@radix-ui/react-use-callback-ref':
+        specifier: ^1.1.0
+        version: 1.1.0(@types/react@18.3.12)(react@18.3.1)
+      '@radix-ui/react-use-controllable-state':
+        specifier: ^1.1.0
+        version: 1.1.0(@types/react@18.3.12)(react@18.3.1)
+      class-variance-authority:
+        specifier: ^0.7.0
+        version: 0.7.0
+      clsx:
+        specifier: ^2.1.1
+        version: 2.1.1
+      deepmerge:
+        specifier: ^4.3.1
+        version: 4.3.1
+      lucide-react:
+        specifier: ^0.418.0
+        version: 0.418.0(react@18.3.1)
+      react:
+        specifier: ^18.2.0
+        version: 18.3.1
+      tailwindcss-animate:
+        specifier: ^1.0.7
+        version: 1.0.7(tailwindcss@3.4.15)
+    devDependencies:
+      '@radix-ui/react-dropdown-menu':
+        specifier: ^2.1.1
+        version: 2.1.2(@types/react-dom@18.3.1)(@types/react@18.3.12)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@radix-ui/react-tooltip':
+        specifier: ^1.1.2
+        version: 1.1.4(@types/react-dom@18.3.1)(@types/react@18.3.12)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@repo/desktop-models':
+        specifier: workspace:*
+        version: link:../../internal/workbench/desktop/models
+      '@repo/eslint-config':
+        specifier: workspace:*
+        version: link:../config-eslint
+      '@repo/icongen':
+        specifier: workspace:*
+        version: link:../../tools/icongen
+      '@repo/tailwind-config':
+        specifier: workspace:*
+        version: link:../config-tailwind
+      '@repo/typescript-config':
+        specifier: workspace:*
+        version: link:../config-typescript
+      '@storybook/react':
+        specifier: ^8.1.11
+        version: 8.4.5(@storybook/test@8.4.4(storybook@8.4.4(prettier@3.3.3)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(storybook@8.4.4(prettier@3.3.3))(typescript@5.7.2)
+      '@storybook/test':
+        specifier: ^8.1.11
+        version: 8.4.4(storybook@8.4.4(prettier@3.3.3))
+      '@types/react':
+        specifier: ^18.2.61
+        version: 18.3.12
+      autoprefixer:
+        specifier: ^10.4.18
+        version: 10.4.20(postcss@8.4.49)
+      tailwind-merge:
+        specifier: ^2.4.0
+        version: 2.5.5
+      tailwindcss:
+        specifier: ^3.4.1
+        version: 3.4.15
+      typescript:
+        specifier: ^5.3.3
+        version: 5.7.2
 
   tools/icongen:
     dependencies:
@@ -94,7 +217,7 @@ importers:
     devDependencies:
       '@repo/typescript-config':
         specifier: workspace:*
-        version: link:../../view/shared/config-typescript
+        version: link:../../packages/config-typescript
       '@svgr/cli':
         specifier: ^8.1.0
         version: 8.1.0(typescript@5.7.2)
@@ -122,7 +245,7 @@ importers:
         version: link:../../internal/workbench/desktop/models
       '@repo/typescript-config':
         specifier: workspace:*
-        version: link:../../view/shared/config-typescript
+        version: link:../../packages/config-typescript
       '@types/node':
         specifier: ^22.5.3
         version: 22.9.0
@@ -204,22 +327,22 @@ importers:
         version: link:../../internal/workbench/desktop/models
       '@repo/eslint-config':
         specifier: workspace:*
-        version: link:../shared/config-eslint
+        version: link:../../packages/config-eslint
       '@repo/moss-lang':
         specifier: workspace:*
         version: link:../../packages/moss_lang
       '@repo/tailwind-config':
         specifier: workspace:*
-        version: link:../shared/config-tailwind
+        version: link:../../packages/config-tailwind
       '@repo/typescript-config':
         specifier: workspace:*
-        version: link:../shared/config-typescript
+        version: link:../../packages/config-typescript
       '@repo/ui':
         specifier: workspace:*
-        version: link:../shared/ui
+        version: link:../../packages/ui
       '@storybook/react':
         specifier: ^8.4.5
-        version: 8.4.5(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(storybook@8.4.4(prettier@3.3.3))(typescript@5.7.2)
+        version: 8.4.5(@storybook/test@8.4.4(storybook@8.4.4(prettier@3.3.3)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(storybook@8.4.4(prettier@3.3.3))(typescript@5.7.2)
       '@tailwindcss/typography':
         specifier: ^0.5.15
         version: 0.5.15(tailwindcss@3.4.15)
@@ -288,7 +411,7 @@ importers:
         version: 3.1.0(@types/react@18.3.12)(react@18.3.1)
       '@repo/ui':
         specifier: workspace:*
-        version: link:../shared/ui
+        version: link:../../packages/ui
       clsx:
         specifier: ^2.0.0
         version: 2.1.1
@@ -313,13 +436,13 @@ importers:
         version: 3.4.0(acorn@8.14.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@repo/eslint-config':
         specifier: workspace:*
-        version: link:../shared/config-eslint
+        version: link:../../packages/config-eslint
       '@repo/tailwind-config':
         specifier: workspace:*
-        version: link:../shared/config-tailwind
+        version: link:../../packages/config-tailwind
       '@repo/typescript-config':
         specifier: workspace:*
-        version: link:../shared/config-typescript
+        version: link:../../packages/config-typescript
       '@types/node':
         specifier: ^20.11.24
         version: 20.17.6
@@ -348,129 +471,6 @@ importers:
         specifier: ^5.3.3
         version: 5.6.3
 
-  view/shared/config-eslint:
-    devDependencies:
-      eslint:
-        specifier: ^9.15.0
-        version: 9.15.0(jiti@1.21.6)
-      eslint-config-turbo:
-        specifier: ^2.0.0
-        version: 2.3.0(eslint@9.15.0(jiti@1.21.6))
-      eslint-plugin-react-hooks:
-        specifier: ^5.0.0
-        version: 5.0.0(eslint@9.15.0(jiti@1.21.6))
-      eslint-plugin-react-refresh:
-        specifier: ^0.4.14
-        version: 0.4.14(eslint@9.15.0(jiti@1.21.6))
-      typescript-eslint:
-        specifier: ^8.16.0
-        version: 8.16.0(eslint@9.15.0(jiti@1.21.6))(typescript@5.7.2)
-
-  view/shared/config-tailwind:
-    devDependencies:
-      '@repo/typescript-config':
-        specifier: workspace:*
-        version: link:../config-typescript
-      tailwindcss:
-        specifier: ^3.4.1
-        version: 3.4.15
-
-  view/shared/config-typescript: {}
-
-  view/shared/ui:
-    dependencies:
-      '@radix-ui/primitive':
-        specifier: ^1.1.0
-        version: 1.1.0
-      '@radix-ui/react-compose-refs':
-        specifier: ^1.1.0
-        version: 1.1.0(@types/react@18.3.12)(react@18.3.1)
-      '@radix-ui/react-context':
-        specifier: ^1.1.1
-        version: 1.1.1(@types/react@18.3.12)(react@18.3.1)
-      '@radix-ui/react-context-menu':
-        specifier: ^2.2.2
-        version: 2.2.2(@types/react-dom@18.3.1)(@types/react@18.3.12)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      '@radix-ui/react-direction':
-        specifier: ^1.1.0
-        version: 1.1.0(@types/react@18.3.12)(react@18.3.1)
-      '@radix-ui/react-id':
-        specifier: ^1.1.0
-        version: 1.1.0(@types/react@18.3.12)(react@18.3.1)
-      '@radix-ui/react-menu':
-        specifier: ^2.1.2
-        version: 2.1.2(@types/react-dom@18.3.1)(@types/react@18.3.12)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      '@radix-ui/react-primitive':
-        specifier: ^2.0.0
-        version: 2.0.0(@types/react-dom@18.3.1)(@types/react@18.3.12)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      '@radix-ui/react-use-callback-ref':
-        specifier: ^1.1.0
-        version: 1.1.0(@types/react@18.3.12)(react@18.3.1)
-      '@radix-ui/react-use-controllable-state':
-        specifier: ^1.1.0
-        version: 1.1.0(@types/react@18.3.12)(react@18.3.1)
-      class-variance-authority:
-        specifier: ^0.7.0
-        version: 0.7.0
-      clsx:
-        specifier: ^2.1.1
-        version: 2.1.1
-      deepmerge:
-        specifier: ^4.3.1
-        version: 4.3.1
-      lucide-react:
-        specifier: ^0.418.0
-        version: 0.418.0(react@18.3.1)
-      react:
-        specifier: ^18.2.0
-        version: 18.3.1
-      tailwindcss-animate:
-        specifier: ^1.0.7
-        version: 1.0.7(tailwindcss@3.4.15)
-    devDependencies:
-      '@radix-ui/react-dropdown-menu':
-        specifier: ^2.1.1
-        version: 2.1.2(@types/react-dom@18.3.1)(@types/react@18.3.12)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      '@radix-ui/react-tooltip':
-        specifier: ^1.1.2
-        version: 1.1.4(@types/react-dom@18.3.1)(@types/react@18.3.12)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      '@repo/desktop-models':
-        specifier: workspace:*
-        version: link:../../../internal/workbench/desktop/models
-      '@repo/eslint-config':
-        specifier: workspace:*
-        version: link:../config-eslint
-      '@repo/icongen':
-        specifier: workspace:*
-        version: link:../../../tools/icongen
-      '@repo/tailwind-config':
-        specifier: workspace:*
-        version: link:../config-tailwind
-      '@repo/typescript-config':
-        specifier: workspace:*
-        version: link:../config-typescript
-      '@storybook/react':
-        specifier: ^8.1.11
-        version: 8.4.4(@storybook/test@8.4.4(storybook@8.4.4(prettier@3.3.3)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(storybook@8.4.4(prettier@3.3.3))(typescript@5.6.3)
-      '@storybook/test':
-        specifier: ^8.1.11
-        version: 8.4.4(storybook@8.4.4(prettier@3.3.3))
-      '@types/react':
-        specifier: ^18.2.61
-        version: 18.3.12
-      autoprefixer:
-        specifier: ^10.4.18
-        version: 10.4.20(postcss@8.4.49)
-      tailwind-merge:
-        specifier: ^2.4.0
-        version: 2.5.4
-      tailwindcss:
-        specifier: ^3.4.1
-        version: 3.4.15
-      typescript:
-        specifier: ^5.3.3
-        version: 5.6.3
-
   view/storybook:
     dependencies:
       react:
@@ -491,16 +491,16 @@ importers:
         version: link:../../internal/workbench/desktop/models
       '@repo/eslint-config':
         specifier: workspace:*
-        version: link:../shared/config-eslint
+        version: link:../../packages/config-eslint
       '@repo/tailwind-config':
         specifier: workspace:*
-        version: link:../shared/config-tailwind
+        version: link:../../packages/config-tailwind
       '@repo/typescript-config':
         specifier: workspace:*
-        version: link:../shared/config-typescript
+        version: link:../../packages/config-typescript
       '@repo/ui':
         specifier: workspace:*
-        version: link:../shared/ui
+        version: link:../../packages/ui
       '@storybook/addon-designs':
         specifier: ^8.0.3
         version: 8.0.4(@storybook/blocks@8.4.4(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(storybook@8.4.4(prettier@3.3.3)))(@storybook/components@8.4.5(storybook@8.4.4(prettier@3.3.3)))(@storybook/theming@8.4.5(storybook@8.4.4(prettier@3.3.3)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -572,7 +572,7 @@ importers:
     dependencies:
       '@repo/ui':
         specifier: workspace:*
-        version: link:../shared/ui
+        version: link:../../packages/ui
       next:
         specifier: ^14.2.3
         version: 14.2.18(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -588,13 +588,13 @@ importers:
         version: 14.2.18
       '@repo/eslint-config':
         specifier: workspace:*
-        version: link:../shared/config-eslint
+        version: link:../../packages/config-eslint
       '@repo/tailwind-config':
         specifier: workspace:*
-        version: link:../shared/config-tailwind
+        version: link:../../packages/config-tailwind
       '@repo/typescript-config':
         specifier: workspace:*
-        version: link:../shared/config-typescript
+        version: link:../../packages/config-typescript
       '@types/node':
         specifier: ^20.11.24
         version: 20.17.6
@@ -7160,9 +7160,6 @@ packages:
     engines: {node: '>=14.0.0'}
     hasBin: true
 
-  tailwind-merge@2.5.4:
-    resolution: {integrity: sha512-0q8cfZHMu9nuYP/b5Shb7Y7Sh1B7Nnl5GqNr1U+n2p6+mybvRtayrQ+0042Z5byvTA8ihjlP8Odo8/VnHbZu4Q==}
-
   tailwind-merge@2.5.5:
     resolution: {integrity: sha512-0LXunzzAZzo0tEPxV3I297ffKZPlKDrjj7NXphC8V5ak9yHC5zRmxnOe2m/Rd/7ivsOMJe3JZ2JVocoDdQTRBA==}
 
@@ -10508,7 +10505,7 @@ snapshots:
       '@storybook/test': 8.4.4(storybook@8.4.4(prettier@3.3.3))
       typescript: 5.6.3
 
-  '@storybook/react@8.4.5(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(storybook@8.4.4(prettier@3.3.3))(typescript@5.7.2)':
+  '@storybook/react@8.4.5(@storybook/test@8.4.4(storybook@8.4.4(prettier@3.3.3)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(storybook@8.4.4(prettier@3.3.3))(typescript@5.7.2)':
     dependencies:
       '@storybook/components': 8.4.5(storybook@8.4.4(prettier@3.3.3))
       '@storybook/global': 5.0.0
@@ -10520,6 +10517,7 @@ snapshots:
       react-dom: 18.3.1(react@18.3.1)
       storybook: 8.4.4(prettier@3.3.3)
     optionalDependencies:
+      '@storybook/test': 8.4.4(storybook@8.4.4(prettier@3.3.3))
       typescript: 5.7.2
 
   '@storybook/test@8.4.4(storybook@8.4.4(prettier@3.3.3))':
@@ -15697,8 +15695,6 @@ snapshots:
       css-what: 6.1.0
       csso: 5.0.5
       picocolors: 1.1.1
-
-  tailwind-merge@2.5.4: {}
 
   tailwind-merge@2.5.5: {}
 

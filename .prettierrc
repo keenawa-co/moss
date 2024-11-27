@@ -7,8 +7,6 @@
   "arrowParens": "always",
   "bracketSpacing": true,
   "endOfLine": "lf",
-  "plugins": [
-    "prettier-plugin-tailwindcss"
-  ],
-  "tailwindConfig": "./view/shared/config-tailwind/tailwind.config.ts"
+  "plugins": ["prettier-plugin-tailwindcss"],
+  "tailwindConfig": "./packages/config-tailwind/tailwind.config.ts"
 }
