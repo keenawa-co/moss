@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook/react";
+import { Meta, StoryObj } from "@storybook/react";
 import { Resizable, ResizablePanel } from "./Resizable";
 import "allotment/dist/style.css";
 import { useState } from "react";

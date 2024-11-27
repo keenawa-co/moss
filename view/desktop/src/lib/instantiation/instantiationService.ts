@@ -60,7 +60,7 @@ export class InstantiationService implements IInstantiationService {
 
   createChild(services: ServiceCollection, store?: DisposableStore): IInstantiationService {
     this._throwIfDisposed();
-
+    //eslint-disable-next-line
     const that = this;
     const result = new (class extends InstantiationService {
       override dispose(): void {

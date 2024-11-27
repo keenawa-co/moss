@@ -24,10 +24,13 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-//@ts-ignore
 export const Gallery: Story = {
   parameters: {
     layout: "fullscreen",
+  },
+  args: {
+    icon: null, // Default value for the `icon` argument
+    className: "text-6xl", // Match defaults if necessary
   },
   render: () => <GalleryComponent />,
 };
@@ -39,7 +42,7 @@ const GalleryComponent = () => {
     if (search === "") {
       return Object.entries(icons);
     }
-    return Object.entries(icons).filter(([name, Icon]) => {
+    return Object.entries(icons).filter(([name]) => {
       return name.toLowerCase().includes(search.toLowerCase());
     });
   };

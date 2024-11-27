@@ -6,7 +6,7 @@ import { ThemeProvider, staticColors } from "@repo/ui";
 import * as themeFiles from "./themes";
 import { Convert } from "@repo/moss-theme";
 import { Theme } from "@repo/desktop-models";
-
+// TODO: remove old storybook theme integration
 const themes: Map<string, Theme> = new Map();
 for (const themeName in themeFiles) {
   const theme = themeFiles[themeName];

@@ -13,7 +13,7 @@ export const TitleBar = ({}: TitleBarProps) => {
   const [osType, setOsType] = useState<OsType | undefined>(undefined);
 
   useEffect(() => {
-    getOsType().then((type) => {
+    getOsType().then((type: any) => {
       setOsType(type);
     });
   });
