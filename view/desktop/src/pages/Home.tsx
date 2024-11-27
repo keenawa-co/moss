@@ -3,7 +3,6 @@ import React, { useEffect, useState } from "react";
 import { listen } from "@tauri-apps/api/event";
 import { Tooltip, Icon } from "@repo/ui";
 import { invokeIpc } from "@/lib/backend/tauri";
-import { useStoredString, useUpdateStoredString } from "@/hooks/useReactQuery";
 
 export type DescribeActivityOutput = { tooltip: string; order: number };
 
@@ -57,7 +56,7 @@ export const Home: React.FC = () => {
       <button className="bg-green-500 px-3" onClick={handleNewWindowButton}>
         New Window
       </button>
-      <StoredStringUpdater />
+
       <div>
         <Tooltip label="Test" className="text-[var(--color-primary)]">
           <Icon icon="Code" />
@@ -79,43 +78,6 @@ export const Home: React.FC = () => {
         ))}
         <div> last element</div>
       </div> */}
-    </div>
-  );
-};
-
-const StoredStringUpdater: React.FC = () => {
-  const [newString, setNewString] = useState<string>("");
-  const mutation = useUpdateStoredString();
-  const { data: storedString } = useStoredString();
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    mutation.mutate(newString);
-  };
-
-  return (
-    <div>
-      <hr />
-      <h2>Update String:</h2>
-      <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          value={newString}
-          onChange={(e) => setNewString(e.target.value)}
-          placeholder="Enter new string"
-          required
-        />
-        <button type="submit" disabled={mutation.isPending}>
-          {mutation.isPending ? "Updating..." : "Update"}
-        </button>
-      </form>
-      {mutation.isError && <p style={{ color: "red" }}>Error: {mutation.error?.message}</p>}
-      {mutation.isSuccess && <p style={{ color: "green" }}>String successfully updated!</p>}
-
-      <div>
-        currentString: <span className="font-extrabold">{storedString}</span>
-      </div>
-      <hr />
     </div>
   );
 };

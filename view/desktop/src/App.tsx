@@ -1,36 +1,22 @@
-import { ContentLayout, LaunchPad, Menu } from "@/components";
 import "@/i18n";
+import { ContentLayout, LaunchPad, Menu } from "@/components";
 import { Suspense } from "react";
 import { useSelector } from "react-redux";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Resizable, ResizablePanel } from "./components/Resizable";
 import { Home, Logs, Settings } from "./pages";
-import { useInitializeApp } from "./hooks/useInitializeApp";
 import { RootState } from "./store";
-import { callServiceMethod } from "./main";
 import { PageLoader } from "./components/PageLoader";
 import RootLayout from "./components/app/RootLayout";
 import Provider from "./components/app/Provider";
+import { usePrepareWindow } from "./hooks/usePrepareWindow";
 
 const App = () => {
-  const { isInitializing, initializationError } = useInitializeApp();
+  const { isPreparing } = usePrepareWindow();
   const isSidebarVisible = useSelector((state: RootState) => state.sidebar.sidebarVisible);
 
-  callServiceMethod("doSomething");
-
-  if (isInitializing) {
+  if (isPreparing) {
     return <PageLoader />;
-  }
-
-  if (initializationError) {
-    return (
-      <div className="relative flex min-h-screen bg-storm-800">
-        <div className="mx-auto flex max-w-screen-xl flex-col items-center justify-center text-2xl text-red-500">
-          <p>Initialization Failed</p>
-          <p>{initializationError.message}</p>
-        </div>
-      </div>
-    );
   }
 
   return (
