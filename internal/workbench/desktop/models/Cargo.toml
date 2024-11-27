@@ -15,3 +15,4 @@ ts-rs.workspace = true
 once_cell.workspace = true
 csscolorparser.workspace = true
 serde_json.workspace = true
+jsonschema.workspace = true
