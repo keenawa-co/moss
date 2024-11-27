@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { LanguageSelector } from "@/components";
-import ThemeSwitcher from "../ThemeSwitcher";
+import ThemeSwitcher from "../components/ThemeSwitcher";
 
 export const Settings = () => {
   const { t } = useTranslation(["ns1", "ns2"]);

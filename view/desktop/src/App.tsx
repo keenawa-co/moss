@@ -4,7 +4,7 @@ import { Suspense } from "react";
 import { useSelector } from "react-redux";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Resizable, ResizablePanel } from "./components/Resizable";
-import { Home, Logs, Settings } from "./components/pages";
+import { Home, Logs, Settings } from "./pages";
 import { useInitializeApp } from "./hooks/useInitializeApp";
 import { RootState } from "./store";
 import { callServiceMethod } from "./main";
