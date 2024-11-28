@@ -3,13 +3,13 @@ import { ContentLayout, LaunchPad, Menu } from "@/components";
 import { Suspense } from "react";
 import { useSelector } from "react-redux";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import { Resizable, ResizablePanel } from "./components/Resizable";
-import { Home, Logs, Settings } from "./pages";
-import { RootState } from "./store";
-import { PageLoader } from "./components/PageLoader";
-import RootLayout from "./components/app/RootLayout";
-import Provider from "./components/app/Provider";
-import { usePrepareWindow } from "./hooks/usePrepareWindow";
+import { Resizable, ResizablePanel } from "../components/Resizable";
+import { PageLoader } from "../components/PageLoader";
+import { usePrepareWindow } from "@/hooks/usePrepareWindow";
+import { RootState } from "@/store";
+import Provider from "./Provider";
+import RootLayout from "../components/layouts/RootLayout";
+import { Home, Logs, Settings } from "@/pages";
 
 const App = () => {
   const { isPreparing } = usePrepareWindow();

@@ -1,8 +1,7 @@
-export * from "./AppLayout";
+export * from "./layouts/AppLayout";
 export * from "./Menu";
 export * from "./Button";
 export * from "./LanguageSelector";
-// export * from "./ThemeSelector";
 export * from "./Sidebar";
 export * from "./Accordion";
 export * from "./SidebarHeader";
@@ -10,4 +9,3 @@ export * from "./SidebarGeneral";
 export * from "./SidebarLinks";
 export * from "./LaunchPad";
 export * from "./Resizable";
-export * from "./HeadBar/HeadBar";

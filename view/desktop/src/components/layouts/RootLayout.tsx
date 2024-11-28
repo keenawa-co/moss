@@ -1,7 +1,7 @@
 import { ComponentProps } from "react";
 import { twMerge } from "tailwind-merge";
-import { HeadBar } from "../HeadBar/HeadBar";
 import StatusBar from "../StatusBar";
+import { HeadBar } from "../parts/HeadBar/HeadBar";
 
 const RootLayout = ({ children, className, ...props }: ComponentProps<"main">) => {
   return (
@@ -12,7 +12,7 @@ const RootLayout = ({ children, className, ...props }: ComponentProps<"main">) =
         {children}
       </main>
 
-      <StatusBar className="h-5.5 w-full" branch="MOSSMVP-37-Backend-Migrate-existing-backend-in-Tauri" />
+      <StatusBar className="h-5.5 w-full" />
     </div>
   );
 };

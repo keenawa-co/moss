@@ -36,7 +36,7 @@ if (osType !== "macos") {
   await getCurrentWebviewWindow().setDecorations(false);
 }
 
-const App = lazy(() => import("@/App")); // lazy load the main App component
+const App = lazy(() => import("@/app")); // lazy load the main App component
 const rootElement = document.getElementById("root") as HTMLElement; // cache the root element reference
 
 if (rootElement) {
