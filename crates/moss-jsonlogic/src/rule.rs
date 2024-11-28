@@ -808,11 +808,9 @@ mod tests {
     /// Constructs a rule that checks if the sum of `x` and `y` is greater than `10`.
     #[test]
     fn test_arithmetic_operations() {
-        // Create variables
         let var_x = Rule::var("x");
         let var_y = Rule::var("y");
 
-        // Create constants
         let const_ten = Rule::value(10);
 
         // Build rule: (x + y) > 10
@@ -834,10 +832,8 @@ mod tests {
 
     #[test]
     fn test_logical_not() {
-        // Create variable
         let var_status = Rule::var("status");
 
-        // Create constant
         let const_active = Rule::from("active");
 
         // Build rule: !(status == "active")
@@ -861,12 +857,10 @@ mod tests {
 
     #[test]
     fn test_complex_nested_rules() {
-        // Variables
         let var_x = Rule::var("x");
         let var_y = Rule::var("y");
         let var_z = Rule::var("z");
 
-        // Constants
         let const_five = Rule::from(5);
         let const_ten = Rule::from(10);
         let const_twenty = Rule::from(20);
@@ -900,7 +894,6 @@ mod tests {
 
     #[test]
     fn test_chained_arithmetic_operations() {
-        // Variables
         let var_a = Rule::var("a");
         let var_b = Rule::var("b");
         let var_c = Rule::var("c");
@@ -927,11 +920,9 @@ mod tests {
     /// Constructs a rule that checks if `(x * y) + z <= 100`.
     #[test]
     fn test_combining_logical_and_arithmetic_operations() {
-        // Variables
         let var_score = Rule::var("score");
         let var_bonus = Rule::var("bonus");
 
-        // Constants
         let const_threshold = Rule::from(100);
 
         // Build rule: (score + bonus) >= 100
@@ -956,11 +947,9 @@ mod tests {
     /// Constructs a rule that represents `!(status == "locked" || attempts > 3)`.
     #[test]
     fn test_complex_nested_rules_with_not() {
-        // Variables
         let var_status = Rule::var("status");
         let var_attempts = Rule::var("attempts");
 
-        // Constants
         let const_locked = Rule::value("locked");
         let const_three = Rule::value(3);
 
@@ -989,7 +978,6 @@ mod tests {
     /// Constructs a rule that represents `(a * b) + (c / d) - e`.
     #[test]
     fn test_multiple_arithmetic_operations() {
-        // Variables
         let var_a = Rule::var("a");
         let var_b = Rule::var("b");
         let var_c = Rule::var("c");
@@ -1022,16 +1010,12 @@ mod tests {
     /// Constructs a rule using a custom operator `"customOp"` with operands `input` and `42`.
     #[test]
     fn test_custom_operator() {
-        // Variables
         let var_input = Rule::var("input");
 
         // Build rule using a custom operator "customOp"
         let custom_rule = Rule::custom("customOp", vec![var_input, Rule::from(42)]);
 
-        // Serialize to JSON Logic
         let json_logic = custom_rule.to_json();
-
-        // Expected JSON Logic
         let expected_json = json!({
             "customOp": [
                 { "var": "input" },
@@ -1047,18 +1031,15 @@ mod tests {
     /// Constructs a rule that checks if `(x + y) > 10 AND (z <= 5 OR w != 3)`.
     #[test]
     fn test_combined_logical_and_arithmetic_operations() {
-        // Variables
         let var_x = Rule::var("x");
         let var_y = Rule::var("y");
         let var_z = Rule::var("z");
         let var_w = Rule::var("w");
 
-        // Constants
         let const_ten = Rule::value(10);
         let const_five = Rule::value(5);
         let const_three = Rule::value(3);
 
-        // Build rules
         let rule_sum = var_x + var_y; // x + y
         let rule_gt = rule_sum.gt(const_ten); // (x + y) > 10
         let rule_le = var_z.lte(const_five); // z <= 5
@@ -1093,11 +1074,9 @@ mod tests {
 
     #[test]
     fn test_complex_rule_with_not_and_operator_overloading() {
-        // Variables
         let var_status = Rule::var("status");
         let var_attempts = Rule::var("attempts");
 
-        // Constants
         let const_locked = Rule::from("locked");
         let const_max_attempts = Rule::from(3);
 
@@ -1125,12 +1104,10 @@ mod tests {
     /// Constructs a rule that checks if `a == 5` AND (`b > 10` OR `c < 20`).
     #[test]
     fn test_logical_operations() {
-        // Create variables
         let var_a = Rule::var("a");
         let var_b = Rule::var("b");
         let var_c = Rule::var("c");
 
-        // Build rules
         let rule1 = var_a.eq(Rule::from(5));
         let rule2 = var_b.gt(Rule::from(10));
         let rule3 = var_c.lt(Rule::from(20));
