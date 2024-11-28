@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next";
 import React, { useEffect, useState } from "react";
 import { listen } from "@tauri-apps/api/event";
-import { Tooltip, DropdownMenu, Icon } from "@repo/ui";
+import { Tooltip, Icon } from "@repo/ui";
 import { invokeIpc } from "@/lib/backend/tauri";
 import { useStoredString, useUpdateStoredString } from "@/hooks/useReactQuery";
 
@@ -11,7 +11,7 @@ const SessionComponent = () => {
   const { t } = useTranslation(["ns1", "ns2"]);
   const [data, setData] = useState<number | null>(null);
 
-  let getAllActivities = async () => {
+  const getAllActivities = async () => {
     try {
       // console.log((await invokeIpc("get_view_content")) as object);
       console.log((await invokeIpc("get_menu_items_by_namespace", { namespace: "headItem" })) as object);
@@ -34,9 +34,9 @@ const SessionComponent = () => {
 
   return (
     <>
-      <span className="text-[rgba(var(--color-primary))]">{t("description.part1")}</span>
+      <span className="text-[var(--color-primary)]">{t("description.part1")}</span>
       <br />
-      <span className="bg-secondary text-[rgba(var(--color-primary))]">{t("description.part1", { ns: "ns2" })}</span>
+      <span className="bg-secondary text-[var(--color-primary)]">{t("description.part1", { ns: "ns2" })}</span>
       {data !== null && <p>Received data: {data}</p>}
     </>
   );
@@ -52,14 +52,14 @@ export const Home: React.FC = () => {
 
   return (
     <div>
-      <h1 className="text-[rgba(var(--color-primary))]">{t("title")}</h1>
+      <h1 className="text-[var(--color-primary)]">{t("title")}</h1>
 
       <button className="bg-green-500 px-3" onClick={handleNewWindowButton}>
         New Window
       </button>
       <StoredStringUpdater />
       <div>
-        <Tooltip label="Test" className="text-[rgba(var(--color-primary))]">
+        <Tooltip label="Test" className="text-[var(--color-primary)]">
           <Icon icon="Code" />
         </Tooltip>
       </div>
@@ -91,10 +91,6 @@ const StoredStringUpdater: React.FC = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     mutation.mutate(newString);
-  };
-
-  const handleLogCurrentString = async () => {
-    console.log("Current Stored String:", storedString);
   };
 
   return (

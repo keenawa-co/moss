@@ -1,5 +1,7 @@
+use std::path::PathBuf;
+
 use anyhow::Result;
-use desktop_models::appearance::theming::Theme;
+use desktop_models::appearance::theming::{Theme, ThemeDescriptor};
 use tauri::State;
 
 use crate::utl::get_themes_dir;
@@ -18,7 +20,31 @@ pub async fn fetch_all_themes() -> Result<Vec<String>, String> {
         }
         valid_themes.push(file_name.strip_suffix(".json").unwrap().to_string());
     }
+
     Ok(valid_themes)
+}
+
+#[tauri::command(async)]
+pub async fn fetch_themes() -> Result<Vec<ThemeDescriptor>, String> {
+    Ok(vec![
+        ThemeDescriptor {
+            id: "theme-light".to_string(),
+            name: "Theme Light".to_string(),
+            source: PathBuf::from("moss-light.css")
+                .to_string_lossy()
+                .to_string(),
+        },
+        ThemeDescriptor {
+            id: "theme-dark".to_string(),
+            name: "Theme Dark".to_string(),
+            source: PathBuf::from("moss-dark.css").to_string_lossy().to_string(),
+        },
+        ThemeDescriptor {
+            id: "theme-pink".to_string(),
+            name: "Theme Pink".to_string(),
+            source: PathBuf::from("moss-pink.css").to_string_lossy().to_string(),
+        },
+    ])
 }
 
 #[tauri::command(async)]

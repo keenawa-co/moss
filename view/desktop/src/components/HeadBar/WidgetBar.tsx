@@ -21,6 +21,7 @@ interface WidgetBarProps extends HTMLProps<HTMLDivElement> {
   os: OsType;
 }
 
+// FIXME: remove constant widgetsList
 const widgetsList = [
   {
     id: 1,
@@ -220,20 +221,7 @@ export const WidgetBar = ({ os, className, ...props }: WidgetBarProps) => {
                 })}
               </SortableContext>
 
-              {draggedId
-                ? createPortal(
-                    <DragOverlay>
-                      <ActionsGroup
-                        icon={widgetsList.find((item) => item.id === draggedId)?.icon!}
-                        label={widgetsList.find((item) => item.id === draggedId)?.label}
-                        actions={widgetsList.find((item) => item.id === draggedId)?.actions!}
-                        defaultAction={widgetsList.find((item) => item.id === draggedId)?.defaultAction}
-                        className=" cursor-grabbing rounded border !border-[#c5c5c5] bg-[#D3D3D3] shadow-lg"
-                      />
-                    </DragOverlay>,
-                    document.body
-                  )
-                : null}
+              {draggedId && <DraggedComponent draggedId={draggedId} />}
             </DndContext>
           </div>
           <div className="overflown invisible flex" ref={overflownListRef}>
@@ -255,5 +243,26 @@ export const WidgetBar = ({ os, className, ...props }: WidgetBarProps) => {
         </div>
       </div>
     </div>
+  );
+};
+
+const DraggedComponent = ({ draggedId }: { draggedId: UniqueIdentifier | null }) => {
+  if (!draggedId) return null;
+
+  const item = widgetsList.find((item) => item.id === draggedId);
+
+  if (!item) return null;
+
+  return createPortal(
+    <DragOverlay>
+      <ActionsGroup
+        icon={item.icon!}
+        label={item.label}
+        actions={item.actions!}
+        defaultAction={item.defaultAction}
+        className="cursor-grabbing rounded border !border-[#c5c5c5] bg-[#D3D3D3] shadow-lg"
+      />
+    </DragOverlay>,
+    document.body
   );
 };

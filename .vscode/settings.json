@@ -13,6 +13,7 @@
     "Downcaster",
     "filetree",
     "fullscreen",
+    "gloabls",
     "hashbrown",
     "Hasher",
     "headbar",
@@ -107,7 +108,7 @@
     }
   ],
   "files.associations": {
-    "*.css": "tailwindcss"
+    "*.css": "css"
   },
   "editor.quickSuggestions": {
     "strings": "on"

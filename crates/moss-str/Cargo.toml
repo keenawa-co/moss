@@ -2,6 +2,7 @@
 name = "moss_str"
 version = "0.1.0"
 edition = "2021"
+publish = false
 
 [dependencies]
 arcstr = { workspace = true, features = ["serde"] }

@@ -6,7 +6,7 @@ import { WidgetBar } from "./WidgetBar";
 import { ActionsBar } from "./ActionsBar";
 
 export const HeadBar = () => {
-  let os = type();
+  const os = type();
 
   // os = "windows";
   // os = "macos";

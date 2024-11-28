@@ -1,4 +1,3 @@
-import { Scope } from "@radix-ui/react-context";
 import * as MenuPrimitive from "@radix-ui/react-menu";
 import { ElementRef, ComponentPropsWithoutRef, forwardRef } from "react";
 import { ScopedProps } from "./types";

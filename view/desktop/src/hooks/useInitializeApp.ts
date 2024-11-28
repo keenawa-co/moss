@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useAppDispatch } from "../store";
 import { setLanguageFromLocalStorage } from "../store/languages/languagesSlice";
-import { initializeThemes } from "../store/themes";
+// import { initializeThemes } from "../store/themes";
 import { ILoggerService, LoggerService } from "@/services/loggerService";
 import { ServiceCollection } from "@/lib/instantiation/serviceCollection";
 import { InstantiationService } from "@/lib/instantiation/instantiationService";
@@ -46,7 +46,7 @@ export const useInitializeApp = () => {
 
         // Dispatch Redux actions
         dispatch(setLanguageFromLocalStorage());
-        dispatch(initializeThemes());
+        // dispatch(initializeThemes());
       } catch (error) {
         console.error("Initialization error:", error);
         if (!isDisposed) {
@@ -68,7 +68,7 @@ export const useInitializeApp = () => {
         instantiationService.dispose();
       }
     };
-  }, [dispatch]);
+  }, [dispatch]); // instantiationService causes infinite loop and app cannot be initialized
 
   return { isInitializing, initializationError, instantiationService };
 };

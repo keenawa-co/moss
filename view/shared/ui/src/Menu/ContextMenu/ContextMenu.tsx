@@ -160,6 +160,7 @@ const ContextMenuTrigger = forwardRef<ContextMenuTriggerElement, ContextMenuTrig
  * -----------------------------------------------------------------------------------------------*/
 
 type MenuPortalProps = ComponentPropsWithoutRef<typeof MenuPrimitive.Portal>;
+// eslint-disable-next-line
 interface ContextMenuPortalProps extends MenuPortalProps {}
 
 const ContextMenuPortal: FC<ContextMenuPortalProps> = (props: ScopedProps<ContextMenuPortalProps>) => {

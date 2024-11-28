@@ -1,55 +1,23 @@
-const { resolve } = require("node:path");
+import tseslint from "typescript-eslint";
+import reactHooksPlugin from "eslint-plugin-react-hooks";
+import reactRefreshPlugin from "eslint-plugin-react-refresh";
 
-const project = resolve(process.cwd(), "tsconfig.json");
-
-/*
- * This is a custom ESLint configuration for use a library
- * that utilizes React.
- *
- * This config extends the Vercel Engineering Style Guide.
- * For more information, see https://github.com/vercel/style-guide
- *
- */
-
-module.exports = {
-  extends: [
-    "@vercel/style-guide/eslint/browser",
-    "@vercel/style-guide/eslint/typescript",
-    "@vercel/style-guide/eslint/react",
-  ].map(require.resolve),
-  parserOptions: {
-    project,
+export default tseslint.config({
+  extends: [tseslint.configs.recommended],
+  ignores: ["node_modules/", "dist/", ".gitignore", ".prettierignore", "target/", ".turbo/", ".vscode/", "*.stories.*"],
+  languageOptions: {},
+  settings: {},
+  plugins: {
+    "react-hooks": reactHooksPlugin,
+    "react-refresh": reactRefreshPlugin,
+    "@typescript-eslint": tseslint.plugin,
   },
-  globals: {
-    JSX: true,
-  },
-  settings: {
-    "import/resolver": {
-      typescript: {
-        project,
-      },
-      node: {
-        extensions: [".mjs", ".js", ".jsx", ".ts", ".tsx"],
-      },
-    },
-  },
-  ignorePatterns: ["node_modules/", "dist/", ".eslintrc.js", "**/*.css"],
-  // add rules configurations here
   rules: {
-    "import/no-default-export": "off",
-    "react/function-component-definition": [
-      {
-        namedComponents: "arrow-function",
-        unnamedComponents: "arrow-function",
-      },
-    ],
+    "react-hooks/rules-of-hooks": "error",
+    "react-hooks/exhaustive-deps": "warn",
+    "react-refresh/only-export-components": ["warn", { allowConstantExport: true }],
+    "@typescript-eslint/no-unused-vars": "warn",
+    "@typescript-eslint/no-explicit-any": "error",
+    "prefer-const": "warn",
   },
-  overrides: [
-    {
-      files: ["*.config.js"],
-      env: {
-        node: true,
-      },
-    },
-  ],
-};
+});

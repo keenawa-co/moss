@@ -13,10 +13,8 @@ export type Colors = {
   "windowControlsLinux.activeBackground": string;
 };
 
-export type Theme = {
-  name: string;
-  slug: string;
-  type: string;
-  isDefault: boolean;
-  colors: Colors;
-};
+export type Theme = { name: string; slug: string; type: string; isDefault: boolean; colors: Colors };
+
+export type ThemeDescriptor = { id: string; name: string; source: string };
+
+export type ThemeType = "light" | "dark";

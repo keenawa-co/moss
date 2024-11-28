@@ -2,6 +2,7 @@ import React, { createContext, useContext, useEffect, useMemo } from "react";
 import { applyTheme } from "@repo/moss-theme";
 import { Theme } from "@repo/desktop-models";
 
+// FIXME - this tailwind config is no longer needed
 type Props = {
   children: React.ReactNode;
   themeOverrides?: Theme;
