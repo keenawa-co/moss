@@ -2802,6 +2802,7 @@ dependencies = [
  "moss_str",
  "serde",
  "serde_json",
+ "thiserror",
 ]
 
 [[package]]
