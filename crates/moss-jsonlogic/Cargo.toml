@@ -1,5 +1,5 @@
 [package]
-name = "moss-jsonlogic"
+name = "moss_jsonlogic"
 version = "0.1.0"
 edition = "2021"
 

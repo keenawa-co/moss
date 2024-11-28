@@ -141,24 +141,42 @@ impl fmt::Display for Operator {
 /// ### Creating a Variable
 ///
 /// ```rust
+/// use moss_jsonlogic::rule::Rule;
+///
 /// let rule = Rule::var("age");
 /// ```
 ///
 /// ### Creating a Constant
 ///
 /// ```rust
+/// use moss_jsonlogic::rule::Rule;
+///
 /// let rule = Rule::value(30);
+/// ```
+///
+/// ### Creating Multiple Constants
+///
+/// ```rust
+/// use moss_jsonlogic::rule::Rule;
+///
+/// let rule = Rule::value("hello");
+/// let number_rule = Rule::value(42);
+/// let bool_rule = Rule::value(true);
 /// ```
 ///
 /// ### Creating a Binary Operation
 ///
 /// ```rust
+/// use moss_jsonlogic::rule::Rule;
+///
 /// let rule = Rule::var("age").gt(Rule::value(18));
 /// ```
 ///
 /// ### Combining Rules with Logical AND
 ///
 /// ```rust
+/// use moss_jsonlogic::rule::Rule;
+///
 /// let rule = Rule::var("age")
 ///     .gt(Rule::value(18))
 ///     .and(Rule::var("status").eq(Rule::value("active")));
@@ -226,6 +244,8 @@ impl Rule {
     /// # Examples
     ///
     /// ```rust
+    /// use moss_jsonlogic::rule::Rule;
+    ///
     /// let rule = Rule::value("hello");
     /// let number_rule = Rule::value(42);
     /// let bool_rule = Rule::value(true);
@@ -241,6 +261,8 @@ impl Rule {
     /// # Examples
     ///
     /// ```rust
+    /// use moss_jsonlogic::rule::Rule;
+    ///
     /// let rule = Rule::constant("world");
     /// ```
     pub fn constant<V: Into<Value>>(value: V) -> Self {
@@ -254,6 +276,8 @@ impl Rule {
     /// # Examples
     ///
     /// ```rust
+    /// use moss_jsonlogic::rule::Rule;
+    ///
     /// let rule = Rule::var("user_age");
     /// ```
     pub fn var<S: Into<String>>(name: S) -> Self {
@@ -272,6 +296,8 @@ impl Rule {
     /// # Examples
     ///
     /// ```rust
+    /// use moss_jsonlogic::rule::{Rule, Operator};
+    ///
     /// let rule = Rule::var("is_active").not();
     /// ```
     pub fn unary(operator: Operator, operand: Self) -> Self {
@@ -294,6 +320,8 @@ impl Rule {
     /// # Examples
     ///
     /// ```rust
+    /// use moss_jsonlogic::rule::{Rule, Operator};
+    ///
     /// let rule = Rule::var("age").gt(Rule::value(18));
     /// ```
     pub fn binary(operator: Operator, left: Self, right: Self) -> Self {
@@ -317,6 +345,8 @@ impl Rule {
     /// # Examples
     ///
     /// ```rust
+    /// use moss_jsonlogic::rule::{Rule, Operator};
+    ///
     /// let rule = Rule::var("is_admin").and(Rule::var("is_owner")).and(Rule::var("is_active"));
     /// ```
     pub fn variadic(operator: Operator, operands: Vec<Self>) -> Self {
@@ -335,6 +365,8 @@ impl Rule {
     /// # Examples
     ///
     /// ```rust
+    /// use moss_jsonlogic::rule::Rule;
+    ///
     /// let rule = Rule::custom("customOp", vec![Rule::var("input"), Rule::value(42)]);
     /// ```
     pub fn custom<S: Into<String>>(operator: S, operands: Vec<Self>) -> Self {
@@ -359,6 +391,8 @@ impl Rule {
     /// # Examples
     ///
     /// ```rust
+    /// use moss_jsonlogic::rule::Rule;
+    ///
     /// let rule = Rule::var("is_active").not();
     /// ```
     pub fn not(self) -> Self {
@@ -374,6 +408,8 @@ impl Rule {
     /// # Examples
     ///
     /// ```rust
+    /// use moss_jsonlogic::rule::Rule;
+    ///
     /// let rule = Rule::var("is_admin").and(Rule::var("is_active"));
     /// ```
     pub fn and(self, other: Self) -> Self {
@@ -401,6 +437,8 @@ impl Rule {
     /// # Examples
     ///
     /// ```rust
+    /// use moss_jsonlogic::rule::Rule;
+    ///
     /// let rule = Rule::var("is_guest").or(Rule::var("is_banned"));
     /// ```
     pub fn or(self, other: Self) -> Self {
@@ -426,6 +464,8 @@ impl Rule {
     /// # Examples
     ///
     /// ```rust
+    /// use moss_jsonlogic::rule::Rule;
+    ///
     /// let rule = Rule::var("role").eq(Rule::value("admin"));
     /// ```
     pub fn eq(self, other: Self) -> Self {
@@ -439,6 +479,8 @@ impl Rule {
     /// # Examples
     ///
     /// ```rust
+    /// use moss_jsonlogic::rule::Rule;
+    ///
     /// let rule = Rule::var("status").ne(Rule::value("inactive"));
     /// ```
     pub fn ne(self, other: Self) -> Self {
@@ -452,6 +494,8 @@ impl Rule {
     /// # Examples
     ///
     /// ```rust
+    /// use moss_jsonlogic::rule::Rule;
+    ///
     /// let rule = Rule::var("score").gt(Rule::value(75));
     /// ```
     pub fn gt(self, other: Self) -> Self {
@@ -465,6 +509,8 @@ impl Rule {
     /// # Examples
     ///
     /// ```rust
+    /// use moss_jsonlogic::rule::Rule;
+    ///
     /// let rule = Rule::var("age").lt(Rule::value(18));
     /// ```
     pub fn lt(self, other: Self) -> Self {
@@ -478,6 +524,8 @@ impl Rule {
     /// # Examples
     ///
     /// ```rust
+    /// use moss_jsonlogic::rule::Rule;
+    ///
     /// let rule = Rule::var("experience").gte(Rule::value(5));
     /// ```
     pub fn gte(self, other: Self) -> Self {
@@ -491,6 +539,8 @@ impl Rule {
     /// # Examples
     ///
     /// ```rust
+    /// use moss_jsonlogic::rule::Rule;
+    ///
     /// let rule = Rule::var("height").lte(Rule::value(180));
     /// ```
     pub fn lte(self, other: Self) -> Self {
@@ -506,7 +556,9 @@ impl Rule {
     /// # Examples
     ///
     /// ```rust
-    /// let rule = Rule::var("quantity").add(Rule::value(10));
+    /// use moss_jsonlogic::rule::Rule;
+    ///
+    /// let rule = Rule::var("quantity") + Rule::value(10);
     /// ```
     pub fn add(self, other: Self) -> Self {
         match self {
@@ -531,7 +583,9 @@ impl Rule {
     /// # Examples
     ///
     /// ```rust
-    /// let rule = Rule::var("total").subtract(Rule::value(20));
+    /// use moss_jsonlogic::rule::Rule;
+    ///
+    /// let rule = Rule::var("total") - Rule::value(20);
     /// ```
     pub fn subtract(self, other: Self) -> Self {
         Rule::binary(Operator::Subtract, self, other)
@@ -546,7 +600,9 @@ impl Rule {
     /// # Examples
     ///
     /// ```rust
-    /// let rule = Rule::var("price").multiply(Rule::value(2));
+    /// use moss_jsonlogic::rule::Rule;
+    ///
+    /// let rule = Rule::var("price") * Rule::value(2);
     /// ```
     pub fn multiply(self, other: Self) -> Self {
         match self {
@@ -571,7 +627,9 @@ impl Rule {
     /// # Examples
     ///
     /// ```rust
-    /// let rule = Rule::var("total").divide(Rule::value(4));
+    /// use moss_jsonlogic::rule::Rule;
+    ///
+    /// let rule = Rule::var("total") / Rule::value(4);
     /// ```
     pub fn divide(self, other: Self) -> Self {
         Rule::binary(Operator::Divide, self, other)
@@ -584,33 +642,16 @@ impl Rule {
     /// # Examples
     ///
     /// ```rust
+    /// use moss_jsonlogic::rule::Rule;
+    ///
     /// let rule = Rule::var("number").modulo(Rule::value(3));
     /// ```
     pub fn modulo(self, other: Self) -> Self {
         Rule::binary(Operator::Modulo, self, other)
     }
 
-    // ----------------------------------------------------------------------------
-    // Serialization
-    //
-    // This section provides methods to serialize the `Rule` into a `serde_json::Value`
-    // that adheres to the JSON Logic format. Serialization enables the conversion of
-    // complex rule structures into a JSON-compatible format for evaluation or transmission.
-    // ----------------------------------------------------------------------------
-
-    /// Converts the rule into a `serde_json::Value` representing the JSON Logic.
-    ///
-    /// This method serializes the `Rule` enum into the corresponding JSON Logic structure,
-    /// making it ready for evaluation or transmission. Each variant of the `Rule` enum
-    /// is handled to produce the appropriate JSON representation.
-    ///
-    /// # Examples
-    ///
-    /// ```rust
-    /// let rule = Rule::var("age").gt(Rule::value(18));
-    /// let json_logic = rule.to_json();
-    /// assert_eq!(json_logic, json!({"gt": [{"var": "age"}, 18]}));
-    /// ```
+    // Serialization enables the conversion of complex rule structures into a
+    // JSON-compatible format for evaluation or transmission.
     pub fn to_json(&self) -> Value {
         match self {
             Rule::Constant(value) => value.clone(),
@@ -643,12 +684,14 @@ impl Rule {
 /// # Examples
 ///
 /// ```rust
+/// use moss_jsonlogic::rule::Rule;
+/// use serde_json::json;
+///
 /// let string_rule: Rule = "active".into();
 /// let number_rule: Rule = 42.into();
 /// let bool_rule: Rule = true.into();
-/// let json_rule: Rule = serde_json::json!({"key": "value"}).into();
+/// let json_rule: Rule = json!({"key": "value"}).into();
 /// ```
-
 impl From<&str> for Rule {
     fn from(s: &str) -> Self {
         Rule::constant(s)
@@ -701,6 +744,8 @@ impl BitAnd for Rule {
     /// # Examples
     ///
     /// ```rust
+    /// use moss_jsonlogic::rule::Rule;
+    ///
     /// let rule = Rule::var("is_admin") & Rule::var("is_active");
     /// ```
     fn bitand(self, rhs: Rule) -> Rule {
@@ -716,6 +761,8 @@ impl BitOr for Rule {
     /// # Examples
     ///
     /// ```rust
+    /// use moss_jsonlogic::rule::Rule;
+    ///
     /// let rule = Rule::var("is_guest") | Rule::var("is_banned");
     /// ```
     fn bitor(self, rhs: Rule) -> Rule {
@@ -731,6 +778,8 @@ impl Add for Rule {
     /// # Examples
     ///
     /// ```rust
+    /// use moss_jsonlogic::rule::Rule;
+    ///
     /// let rule = Rule::var("quantity") + Rule::value(10);
     /// ```
     fn add(self, rhs: Rule) -> Rule {
@@ -746,6 +795,8 @@ impl Sub for Rule {
     /// # Examples
     ///
     /// ```rust
+    /// use moss_jsonlogic::rule::Rule;
+    ///
     /// let rule = Rule::var("total") - Rule::value(20);
     /// ```
     fn sub(self, rhs: Rule) -> Rule {
@@ -761,6 +812,8 @@ impl Mul for Rule {
     /// # Examples
     ///
     /// ```rust
+    /// use moss_jsonlogic::rule::Rule;
+    ///
     /// let rule = Rule::var("price") * Rule::value(2);
     /// ```
     fn mul(self, rhs: Rule) -> Rule {
@@ -776,6 +829,8 @@ impl Div for Rule {
     /// # Examples
     ///
     /// ```rust
+    /// use moss_jsonlogic::rule::Rule;
+    ///
     /// let rule = Rule::var("total") / Rule::value(4);
     /// ```
     fn div(self, rhs: Rule) -> Rule {
@@ -791,6 +846,8 @@ impl Not for Rule {
     /// # Examples
     ///
     /// ```rust
+    /// use moss_jsonlogic::rule::Rule;
+    ///
     /// let rule = !Rule::var("is_active");
     /// ```
     fn not(self) -> Rule {
