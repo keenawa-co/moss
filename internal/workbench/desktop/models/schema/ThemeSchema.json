@@ -73,34 +73,34 @@
         {
           "type": "object",
           "properties": {
-            "$type": {
+            "type": {
               "type": "string",
               "const": "solid"
             },
-            "$value": {
+            "value": {
               "$ref": "#/$defs/ColorTokenValue"
             }
           },
-          "required": ["$type", "$value"]
+          "required": ["type", "value"]
         },
         {
           "type": "object",
           "properties": {
-            "$type": {
+            "type": {
               "type": "string",
               "const": "gradient"
             },
-            "$direction": {
+            "direction": {
               "type": "string"
             },
-            "$value": {
+            "value": {
               "type": "array",
               "items": {
                 "$ref": "#/$defs/ColorGradientEntry"
               }
             }
           },
-          "required": ["$type", "$direction", "$value"]
+          "required": ["type", "direction", "value"]
         }
       ]
     },

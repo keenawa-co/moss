@@ -33,13 +33,13 @@ scalar ColorTokenValue extends string;
 
 union ColorType {
   {
-    "$type": "solid",
-    "$value": ColorTokenValue
+    "type": "solid",
+    "value": ColorTokenValue
   },
   {
-    "$type": "gradient",
-    "$direction": string,
-    "$value": ColorGradientEntry[]
+    "type": "gradient",
+    "direction": string,
+    "value": ColorGradientEntry[]
   }
 }
 
