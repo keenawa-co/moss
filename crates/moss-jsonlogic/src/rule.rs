@@ -858,6 +858,7 @@ impl Not for Rule {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use moss_jsonlogic_macro::rule;
     use serde_json::json;
 
     /// Tests arithmetic operations and their serialization.
@@ -1361,5 +1362,60 @@ mod tests {
         });
 
         assert_eq!(json_logic, expected_json);
+    }
+
+    #[test]
+    fn test_rule_macro_simple() {
+        let rule = rule!(age > 18);
+        assert_eq!(rule.to_json(), json!({ ">": [{ "var": "age" }, 18] }));
+    }
+
+    #[test]
+    fn test_rule_macro_logical_and() {
+        let rule = rule!(age > 18 && status == "active");
+        assert_eq!(
+            rule.to_json(),
+            json!({
+                "and": [
+                    { ">": [{ "var": "age" }, 18] },
+                    { "==": [{ "var": "status" }, "active"] }
+                ]
+            })
+        );
+    }
+
+    #[test]
+    fn test_rule_macro_complex() {
+        let rule = rule!((age > 18 && status == "active") || is_admin);
+        assert_eq!(
+            rule.to_json(),
+            json!({
+                "or": [
+                    {
+                        "and": [
+                            { ">": [{ "var": "age" }, 18] },
+                            { "==": [{ "var": "status" }, "active"] }
+                        ]
+                    },
+                    { "var": "is_admin" }
+                ]
+            })
+        );
+    }
+
+    #[test]
+    fn test_rule_macro_modulo() {
+        let rule = rule!(number % 2 == 0);
+        assert_eq!(
+            rule.to_json(),
+            json!({
+                "==": [
+                    {
+                        "%": [{ "var": "number" }, 2]
+                    },
+                    0
+                ]
+            })
+        );
     }
 }
