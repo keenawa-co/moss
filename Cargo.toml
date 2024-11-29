@@ -6,6 +6,8 @@ members = [
     "crates/moss-base",
     "crates/moss-str",
     "crates/moss-fs",
+    "crates/moss-jsonlogic",
+    "crates/moss-jsonlogic-macro",
     "crates/moss-uikit",
     "crates/moss-html",
     "crates/moss-themeconv",
@@ -26,6 +28,7 @@ members = [
     "internal/workbench/service/environment/tao",
 
     "tools/xtask",
+
 ]
 
 [profile.release]
@@ -47,6 +50,8 @@ moss_base = { path = "crates/moss-base" }
 moss_str = { path = "crates/moss-str" }
 moss_fs = { path = "crates/moss-fs" }
 moss_themeconv = { path = "crates/moss-themeconv" }
+moss_jsonlogic = { path = "crates/moss-jsonlogic" }
+moss_jsonlogic_macro = { path = "crates/moss-jsonlogic-macro" }
 
 platform_core = { path = "internal/platform/core" }
 platform_utl = { path = "internal/platform/utl" }

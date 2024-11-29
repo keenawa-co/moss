@@ -5,7 +5,7 @@ use futures::future::join_all;
 use smol::fs;
 use std::{io, sync::Arc};
 use toml::Value;
-use tracing::{trace, error, info, warn};
+use tracing::{error, info, trace, warn};
 
 use crate::config::ConfigFile;
 
@@ -99,4 +99,3 @@ async fn handle_package_dependencies(
         }
     }
 }
-

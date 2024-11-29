@@ -2,23 +2,22 @@ mod config;
 mod metadata;
 mod tasks;
 
-use std::path::PathBuf;
-use std::sync::Mutex;
+use crate::metadata::load_cargo_metadata;
 use anyhow::{Context as _, Result};
 use clap::{Parser, Subcommand};
 use smol::fs;
 use smol::io::BufWriter;
-use tracing::instrument::WithSubscriber;
-use tasks::TaskRunner;
-use tracing::Level;
-use tracing_subscriber::{fmt, FmtSubscriber};
 use std::fs::File;
+use std::path::PathBuf;
+use std::sync::Mutex;
+use tasks::TaskRunner;
+use tracing::instrument::WithSubscriber;
+use tracing::Level;
 use tracing_appender::rolling::{RollingFileAppender, Rotation};
 use tracing_subscriber::fmt::writer::MakeWriterExt;
 use tracing_subscriber::layer::SubscriberExt;
 use tracing_subscriber::util::SubscriberInitExt;
-use crate::metadata::load_cargo_metadata;
-
+use tracing_subscriber::{fmt, FmtSubscriber};
 
 #[macro_use]
 extern crate anyhow;
@@ -35,7 +34,6 @@ struct Args {
     info_level: Option<InfoLevel>,
     #[arg(short, long)]
     file_path: Option<PathBuf>,
-
 }
 
 #[derive(clap::ValueEnum, Clone)]
@@ -44,7 +42,6 @@ enum InfoLevel {
     INFO,
     WARN,
 }
-
 
 #[derive(Subcommand)]
 enum CliCommand {
@@ -70,12 +67,9 @@ async fn main() -> Result<()> {
         let _ = File::create(&file_path);
         let logfile = RollingFileAppender::new(Rotation::NEVER, &file_path, "xtask.log");
         let (non_blocking, _guard) = tracing_appender::non_blocking(logfile);
-        let file_layer = fmt::layer()
-            .with_writer(non_blocking.with_max_level(info_level));
+        let file_layer = fmt::layer().with_writer(non_blocking.with_max_level(info_level));
 
-        tracing_subscriber::registry()
-            .with(file_layer)
-            .init();
+        tracing_subscriber::registry().with(file_layer).init();
     } else {
         let subscriber = FmtSubscriber::builder().with_max_level(info_level).finish();
         tracing::subscriber::set_global_default(subscriber)
