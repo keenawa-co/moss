@@ -21,6 +21,7 @@ use std::sync::Arc;
 use parking_lot::Mutex;
 use tauri::{AppHandle, Manager, RunEvent, WebviewWindow, WindowEvent};
 use tauri_plugin_cli::CliExt;
+use tauri_plugin_global_shortcut::{Code, GlobalShortcutExt, Modifiers, Shortcut, ShortcutState};
 use tauri_plugin_log::{fern::colors::ColoredLevelConfig, Target, TargetKind};
 use window::{create_window, CreateWindowInput};
 use workbench_desktop::window::{NativePlatformInfo, NativeWindowConfiguration};
@@ -112,32 +113,26 @@ pub fn run() {
                 app.handle().manage(app_state);
             }
 
-            #[cfg(desktop)]
-            {
-                use tauri_plugin_global_shortcut::{
-                    Code, GlobalShortcutExt, Modifiers, Shortcut, ShortcutState,
-                };
-                let ctrl_n_shortcut = Shortcut::new(Some(Modifiers::CONTROL), Code::KeyN);
+            let ctrl_n_shortcut = Shortcut::new(Some(Modifiers::CONTROL), Code::KeyN);
 
-                app.handle().plugin(
-                    tauri_plugin_global_shortcut::Builder::new()
-                        .with_handler(move |app, shortcut, event| {
-                            println!("{:?}", shortcut);
-                            if shortcut == &ctrl_n_shortcut {
-                                match event.state() {
-                                    ShortcutState::Pressed => {
-                                        tauri::async_runtime::spawn(cmd_window::create_new_window(
-                                            app.clone(),
-                                        ));
-                                    }
-                                    ShortcutState::Released => {}
+            app.handle().plugin(
+                tauri_plugin_global_shortcut::Builder::new()
+                    .with_handler(move |app, shortcut, event| {
+                        println!("{:?}", shortcut);
+                        if shortcut == &ctrl_n_shortcut {
+                            match event.state() {
+                                ShortcutState::Pressed => {
+                                    tauri::async_runtime::spawn(cmd_window::create_new_window(
+                                        app.clone(),
+                                    ));
                                 }
+                                ShortcutState::Released => {}
                             }
-                        })
-                        .build(),
-                )?;
-                app.global_shortcut().register(ctrl_n_shortcut)?;
-            }
+                        }
+                    })
+                    .build(),
+            )?;
+            app.global_shortcut().register(ctrl_n_shortcut)?;
 
             Ok(())
         })
