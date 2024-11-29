@@ -1,7 +1,7 @@
 import { useContext, type HTMLProps } from "react";
 import { ControlButton } from "./ControlButton";
 import { ControlsIcons } from "./icons";
-import { cn } from "../../../../../../packages/moss-ui/src";
+import { cn } from "@repo/moss-ui";
 import ControlsContext from "./ControlsContext";
 
 export function LinuxControls({ className, ...props }: HTMLProps<HTMLDivElement>) {

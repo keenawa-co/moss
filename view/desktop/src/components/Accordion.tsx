@@ -1,4 +1,4 @@
-import { Icon } from "../../../../packages/moss-ui/src";
+import { Icon } from "@repo/moss-ui";
 import { cn } from "@/utils";
 
 interface DraggableAccordionProps {

@@ -1,7 +1,7 @@
 import { ComponentPropsWithoutRef } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { cn } from "../../../../../packages/moss-ui/src";
+import { cn } from "@repo/moss-ui";
 import { UniqueIdentifier } from "@dnd-kit/core";
 
 interface DNDItemWrapperProps extends Omit<ComponentPropsWithoutRef<"div">, "id"> {

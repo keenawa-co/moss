@@ -1,7 +1,7 @@
 import { useContext, type HTMLProps } from "react";
 import { ControlButton } from "./ControlButton";
 import { ControlsIcons } from "./icons";
-import { cn } from "../../../../../../packages/moss-ui/src";
+import { cn } from "@repo/moss-ui";
 import ControlsContext from "./ControlsContext";
 
 // FIXME: fix opacity bg-[rgba(var(--color-windows-close-button-background))]/90

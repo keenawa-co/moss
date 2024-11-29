@@ -1,7 +1,7 @@
 import { useContext, type HTMLProps } from "react";
 import { ControlButton } from "./ControlButton";
 import { ControlsIcons } from "./icons";
-import { cn } from "../../../../../../packages/moss-ui/src";
+import { cn } from "@repo/moss-ui";
 import ControlsContext from "./ControlsContext";
 
 const buttonStyles = `text-black/60 active:text-black/60 size-3 cursor-default grid  items-center justify-center self-center rounded-full `;

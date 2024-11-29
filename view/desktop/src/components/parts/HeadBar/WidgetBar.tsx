@@ -10,12 +10,13 @@ import {
   useSensors,
 } from "@dnd-kit/core";
 import { SortableContext, arrayMove, horizontalListSortingStrategy } from "@dnd-kit/sortable";
-import { DropdownMenu as DM, Icon, cn } from "../../../../../packages/moss-ui/src";
+import { DropdownMenu as DM, Icon, cn } from "@repo/moss-ui";
 import { OsType } from "@tauri-apps/plugin-os";
 import { HTMLProps, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { ActionsGroup } from "../ActionsGroup";
+
 import { DNDSortableItemWrapper } from "./DNDWrapper";
+import { ActionsGroup } from "@/components/ActionsGroup";
 
 interface WidgetBarProps extends HTMLProps<HTMLDivElement> {
   os: OsType;

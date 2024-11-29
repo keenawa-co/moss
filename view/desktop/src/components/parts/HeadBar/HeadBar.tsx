@@ -1,4 +1,4 @@
-import { cn } from "../../../../../packages/moss-ui/src";
+import { cn } from "@repo/moss-ui";
 import { type } from "@tauri-apps/plugin-os";
 
 import { Controls } from "./Controls/Controls";

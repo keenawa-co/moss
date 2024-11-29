@@ -1,5 +1,6 @@
-import { Icon, IconTitle, MenuItem } from "../../../../packages/moss-ui/src";
 import { SidebarLayout } from "@/components";
+import { MenuItem, Icon, IconTitle } from "@repo/moss-ui";
+
 import { twMerge } from "tailwind-merge";
 
 enum IconState {

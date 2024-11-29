@@ -1,13 +1,13 @@
 import { RootState, useAppDispatch } from "@/store";
 import { toggleSidebarVisibility } from "@/store/sidebar/sidebarSlice";
-import { cn, Icon } from "../../../../../packages/moss-ui/src";
+import { cn, Icon } from "@repo/moss-ui";
 import { HTMLProps, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { invokeIpc } from "@/lib/backend/tauri";
 import { MenuItem } from "@repo/desktop-models";
-import { ActionButton } from "../Action/ActionButton";
-import { ActionsSubmenu } from "../Action/ActionsSubmenu";
-import { ActionsGroup } from "../ActionsGroup";
+import { ActionButton } from "@/components/Action/ActionButton";
+import { ActionsSubmenu } from "@/components/Action/ActionsSubmenu";
+import { ActionsGroup } from "@/components/ActionsGroup";
 
 export const ActionsBar = ({ className, ...props }: HTMLProps<HTMLDivElement>) => {
   const dispatch = useAppDispatch();
