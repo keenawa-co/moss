@@ -9,8 +9,6 @@ pub mod theming {
         Light,
         #[serde(rename = "dark")]
         Dark,
-        #[serde(rename = "pink")]
-        Pink,
     }
 
     #[derive(Deserialize, Serialize, Debug, Clone, Eq, PartialEq, TS)]

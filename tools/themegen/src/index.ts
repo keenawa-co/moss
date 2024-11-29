@@ -51,7 +51,7 @@ const defaultLightTheme: Theme = {
 const pinkTheme: Theme = {
   name: "Moss Pink",
   slug: "moss-pink",
-  type: "pink",
+  type: "light",
   isDefault: false,
   color: {
     "primary": { "type": "solid", "value": "rgba(0, 0, 0, 1)" }, // prettier-ignore
