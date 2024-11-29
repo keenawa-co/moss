@@ -1,6 +1,6 @@
-use indexmap::IndexMap;
-
 use crate::model::*;
+use crate::DEFAULT_DIRECTION;
+use indexmap::IndexMap;
 
 pub(crate) fn convert_colors_to_css_variables(
     category: &str,
@@ -13,7 +13,7 @@ pub(crate) fn convert_colors_to_css_variables(
                 .direction
                 .as_deref()
                 .filter(|s| !s.is_empty())
-                .unwrap_or("to right");
+                .unwrap_or(DEFAULT_DIRECTION);
 
             let gradient = vals
                 .iter()
