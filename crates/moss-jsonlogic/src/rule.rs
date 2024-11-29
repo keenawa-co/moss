@@ -1,4 +1,5 @@
-use serde::{Deserialize, Serialize};
+use serde::ser::SerializeMap;
+use serde::{Deserialize, Serialize, Serializer};
 use serde_json::{json, Value};
 use std::fmt;
 use std::ops::{Add, BitAnd, BitOr, Div, Mul, Not, Sub};
@@ -181,7 +182,7 @@ impl fmt::Display for Operator {
 ///     .gt(Rule::value(18))
 ///     .and(Rule::var("status").eq(Rule::value("active")));
 /// ```
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Deserialize)]
 #[serde(untagged)]
 pub enum Rule {
     /// A constant value (number, string, boolean, null, array, or object).
@@ -649,28 +650,47 @@ impl Rule {
     pub fn modulo(self, other: Self) -> Self {
         Rule::binary(Operator::Modulo, self, other)
     }
+}
 
+impl Serialize for Rule {
     // Serialization enables the conversion of complex rule structures into a
     // JSON-compatible format for evaluation or transmission.
-    pub fn to_json(&self) -> Value {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
         match self {
-            Rule::Constant(value) => value.clone(),
-            Rule::Variable(name) => json!({ "var": name }),
+            Rule::Constant(value) => value.serialize(serializer),
+            Rule::Variable(name) => {
+                let mut map = serializer.serialize_map(Some(1))?;
+                map.serialize_entry("var", name)?;
+                map.end()
+            }
             Rule::Unary { operator, operand } => {
-                json!({ operator.to_string(): operand.to_json() })
+                let mut map = serializer.serialize_map(Some(1))?;
+                map.serialize_entry(&operator.to_string(), operand)?;
+                map.end()
             }
             Rule::Binary {
                 operator,
                 left,
                 right,
-            } => json!({ operator.to_string(): [left.to_json(), right.to_json()] }),
+            } => {
+                let mut map = serializer.serialize_map(Some(1))?;
+                map.serialize_entry(&operator.to_string(), &[left.as_ref(), right.as_ref()])?;
+                map.end()
+            }
             Rule::Variadic { operator, operands } => {
-                let operands_json: Vec<Value> = operands.iter().map(|r| r.to_json()).collect();
-                json!({ operator.to_string(): operands_json })
+                let operands_refs: Vec<&Rule> = operands.iter().collect();
+                let mut map = serializer.serialize_map(Some(1))?;
+                map.serialize_entry(&operator.to_string(), &operands_refs)?;
+                map.end()
             }
             Rule::Custom { operator, operands } => {
-                let operands_json: Vec<Value> = operands.iter().map(|r| r.to_json()).collect();
-                json!({ operator: operands_json })
+                let operands_refs: Vec<&Rule> = operands.iter().collect();
+                let mut map = serializer.serialize_map(Some(1))?;
+                map.serialize_entry(operator, &operands_refs)?;
+                map.end()
             }
         }
     }
@@ -875,7 +895,8 @@ mod tests {
         let rule = (var_x + var_y).gt(const_ten);
 
         // Serialize to JSON Logic
-        let json_logic = rule.to_json();
+        let json_logic =
+            serde_json::to_value(rule).expect("Failed to serialize the rule into JSON.");
 
         // Expected JSON Logic
         let expected_json = json!({
@@ -898,7 +919,8 @@ mod tests {
         let rule = !(var_status.eq(const_active));
 
         // Serialize to JSON Logic
-        let json_logic = rule.to_json();
+        let json_logic =
+            serde_json::to_value(rule).expect("Failed to serialize the rule into JSON.");
 
         // Expected JSON Logic
         let expected_json = json!({
@@ -932,7 +954,8 @@ mod tests {
         let combined_rule = (rule1 & rule2) | rule3;
 
         // Serialize to JSON Logic
-        let json_logic = combined_rule.to_json();
+        let json_logic =
+            serde_json::to_value(combined_rule).expect("Failed to serialize the rule into JSON.");
 
         // Expected JSON Logic
         let expected_json = json!({
@@ -960,7 +983,8 @@ mod tests {
         let arithmetic_rule = (var_a * var_b) + var_c;
 
         // Serialize to JSON Logic
-        let json_logic = arithmetic_rule.to_json();
+        let json_logic =
+            serde_json::to_value(arithmetic_rule).expect("Failed to serialize the rule into JSON.");
 
         // Expected JSON Logic
         let expected_json = json!({
@@ -987,7 +1011,8 @@ mod tests {
         let rule = (var_score + var_bonus).gte(const_threshold);
 
         // Serialize to JSON Logic
-        let json_logic = rule.to_json();
+        let json_logic =
+            serde_json::to_value(rule).expect("Failed to serialize the rule into JSON.");
 
         // Expected JSON Logic
         let expected_json = json!({
@@ -1015,7 +1040,8 @@ mod tests {
         let rule = !(var_status.eq(const_locked) | var_attempts.gt(const_three));
 
         // Serialize to JSON Logic
-        let json_logic = rule.to_json();
+        let json_logic =
+            serde_json::to_value(rule).expect("Failed to serialize the rule into JSON.");
 
         // Define the expected JSON Logic
         let expected_json = json!({
@@ -1046,7 +1072,8 @@ mod tests {
         let rule = (var_a * var_b) + (var_c / var_d) - var_e;
 
         // Serialize to JSON Logic
-        let json_logic = rule.to_json();
+        let json_logic =
+            serde_json::to_value(rule).expect("Failed to serialize the rule into JSON.");
 
         // Define the expected JSON Logic
         let expected_json = json!({
@@ -1073,7 +1100,8 @@ mod tests {
         // Build rule using a custom operator "customOp"
         let custom_rule = Rule::custom("customOp", vec![var_input, Rule::from(42)]);
 
-        let json_logic = custom_rule.to_json();
+        let json_logic =
+            serde_json::to_value(custom_rule).expect("Failed to serialize the rule into JSON.");
         let expected_json = json!({
             "customOp": [
                 { "var": "input" },
@@ -1106,7 +1134,8 @@ mod tests {
         let combined_rule = rule_gt & rule_or; // (x + y) > 10 AND (z <= 5 OR w != 3)
 
         // Serialize to JSON Logic
-        let json_logic = combined_rule.to_json();
+        let json_logic =
+            serde_json::to_value(combined_rule).expect("Failed to serialize the rule into JSON.");
 
         // Define the expected JSON Logic
         let expected_json = json!({
@@ -1142,7 +1171,8 @@ mod tests {
         let rule = !(var_status.eq(const_locked) | var_attempts.gt(const_max_attempts));
 
         // Serialize to JSON Logic
-        let json_logic = rule.to_json();
+        let json_logic =
+            serde_json::to_value(rule).expect("Failed to serialize the rule into JSON.");
 
         // Expected JSON Logic
         let expected_json = json!({
@@ -1174,7 +1204,8 @@ mod tests {
         let combined_rule = rule1 & (rule2 | rule3);
 
         // Serialize to JSON Logic
-        let json_logic = combined_rule.to_json();
+        let json_logic =
+            serde_json::to_value(combined_rule).expect("Failed to serialize the rule into JSON.");
 
         // Expected JSON Logic
         let expected_json = json!({
@@ -1208,7 +1239,8 @@ mod tests {
             .eq(Rule::value("recents.view.id"))
             .and(Rule::var("viewItem").eq(Rule::value("recents.item")));
 
-        let json_logic = rule.to_json();
+        let json_logic =
+            serde_json::to_value(rule).expect("Failed to serialize the rule into JSON.");
 
         let expected_json = json!({
             "and": [
@@ -1243,7 +1275,10 @@ mod tests {
                 { "var": "is_active" }
             ]
         });
-        assert_eq!(rule_and.to_json(), expected_and);
+        assert_eq!(
+            serde_json::to_value(rule_and).expect("Failed to serialize the rule into JSON."),
+            expected_and
+        );
 
         // Logical OR
         let rule_or = Rule::var("is_guest") | Rule::var("is_banned");
@@ -1253,7 +1288,10 @@ mod tests {
                 { "var": "is_banned" }
             ]
         });
-        assert_eq!(rule_or.to_json(), expected_or);
+        assert_eq!(
+            serde_json::to_value(rule_or).expect("Failed to serialize the rule into JSON."),
+            expected_or
+        );
 
         // Logical NOT
         let rule_not = !Rule::var("is_active");
@@ -1262,7 +1300,10 @@ mod tests {
                 "var": "is_active"
             }
         });
-        assert_eq!(rule_not.to_json(), expected_not);
+        assert_eq!(
+            serde_json::to_value(rule_not).expect("Failed to serialize the rule into JSON."),
+            expected_not
+        );
 
         // Addition
         let rule_add = Rule::var("quantity") + Rule::value(10);
@@ -1272,7 +1313,10 @@ mod tests {
                 10
             ]
         });
-        assert_eq!(rule_add.to_json(), expected_add);
+        assert_eq!(
+            serde_json::to_value(rule_add).expect("Failed to serialize the rule into JSON."),
+            expected_add
+        );
 
         // Subtraction
         let rule_sub = Rule::var("total") - Rule::value(20);
@@ -1282,7 +1326,10 @@ mod tests {
                 20
             ]
         });
-        assert_eq!(rule_sub.to_json(), expected_sub);
+        assert_eq!(
+            serde_json::to_value(rule_sub).expect("Failed to serialize the rule into JSON."),
+            expected_sub
+        );
 
         // Multiplication
         let rule_mul = Rule::var("price") * Rule::value(2);
@@ -1292,7 +1339,10 @@ mod tests {
                 2
             ]
         });
-        assert_eq!(rule_mul.to_json(), expected_mul);
+        assert_eq!(
+            serde_json::to_value(rule_mul).expect("Failed to serialize the rule into JSON."),
+            expected_mul
+        );
 
         // Division
         let rule_div = Rule::var("total") / Rule::value(4);
@@ -1302,7 +1352,10 @@ mod tests {
                 4
             ]
         });
-        assert_eq!(rule_div.to_json(), expected_div);
+        assert_eq!(
+            serde_json::to_value(rule_div).expect("Failed to serialize the rule into JSON."),
+            expected_div
+        );
     }
 
     /// Tests method chaining capabilities in rule creation.
@@ -1314,7 +1367,8 @@ mod tests {
             .gte(Rule::value(18))
             .and(Rule::var("status").eq(Rule::value("active")));
 
-        let json_logic = rule.to_json();
+        let json_logic =
+            serde_json::to_value(rule).expect("Failed to serialize the rule into JSON.");
 
         let expected_json = json!({
             "and": [
@@ -1342,7 +1396,8 @@ mod tests {
             .ne(Rule::value("inactive"))
             .and(Rule::var("age").gte(Rule::value(18)));
 
-        let json_logic = rule.to_json();
+        let json_logic =
+            serde_json::to_value(rule).expect("Failed to serialize the rule into JSON.");
 
         let expected_json = json!({
             "and": [
@@ -1367,14 +1422,17 @@ mod tests {
     #[test]
     fn test_rule_macro_simple() {
         let rule = rule!(age > 18);
-        assert_eq!(rule.to_json(), json!({ ">": [{ "var": "age" }, 18] }));
+        assert_eq!(
+            serde_json::to_value(rule).expect("Failed to serialize the rule into JSON."),
+            json!({ ">": [{ "var": "age" }, 18] })
+        );
     }
 
     #[test]
     fn test_rule_macro_logical_and() {
         let rule = rule!(age > 18 && status == "active");
         assert_eq!(
-            rule.to_json(),
+            serde_json::to_value(rule).expect("Failed to serialize the rule into JSON."),
             json!({
                 "and": [
                     { ">": [{ "var": "age" }, 18] },
@@ -1388,7 +1446,7 @@ mod tests {
     fn test_rule_macro_complex() {
         let rule = rule!((age > 18 && status == "active") || is_admin);
         assert_eq!(
-            rule.to_json(),
+            serde_json::to_value(rule).expect("Failed to serialize the rule into JSON."),
             json!({
                 "or": [
                     {
@@ -1407,7 +1465,7 @@ mod tests {
     fn test_rule_macro_modulo() {
         let rule = rule!(number % 2 == 0);
         assert_eq!(
-            rule.to_json(),
+            serde_json::to_value(rule).expect("Failed to serialize the rule into JSON."),
             json!({
                 "==": [
                     {
