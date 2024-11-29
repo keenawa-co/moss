@@ -33,8 +33,12 @@ impl<'a> UserSettings {
         let mut content = String::new();
 
         match file {
-            Ok(ref mut file) => {file.read_to_string(&mut content)?;},
-            Err(_) => {content = String::from("{}");}
+            Ok(ref mut file) => {
+                file.read_to_string(&mut content)?;
+            }
+            Err(_) => {
+                content = String::from("{}");
+            }
         }
 
         if content.trim().is_empty() {
