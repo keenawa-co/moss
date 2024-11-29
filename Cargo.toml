@@ -28,7 +28,7 @@ members = [
     "internal/workbench/service/environment/tao",
 
     "tools/xtask",
-
+    "misc/themeinstall",
 ]
 
 [profile.release]
