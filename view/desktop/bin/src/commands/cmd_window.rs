@@ -1,4 +1,4 @@
-use tauri::{Emitter, Manager, WebviewWindow};
+use tauri::{AppHandle, Emitter, Manager, WebviewWindow};
 
 use crate::create_main_window;
 
@@ -10,8 +10,7 @@ struct EventAData {
 // According to https://docs.rs/tauri/2.1.1/tauri/webview/struct.WebviewWindowBuilder.html
 // We should call WebviewWindowBuilder from async commands
 #[tauri::command]
-pub async fn create_new_window(parent_window: WebviewWindow) {
-    let app_handle = parent_window.app_handle().clone();
+pub async fn create_new_window(app_handle: AppHandle) {
     create_main_window(&app_handle, "/");
 }
 
