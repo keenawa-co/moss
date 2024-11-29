@@ -27,8 +27,10 @@ export default {
     docs: {
       description: "Disallow bg- with arbitrary values in Tailwind CSS.",
       category: "Stylistic Issues",
+      recommended: true,
     },
     fixable: "code",
+    hasSuggestions: true,
     schema: [],
     messages: {
       replaceBg: `Use 'background-' selector instead of 'bg-' for background arbitrary values.\nTailwind maps the 'bg-' prefix to css 'background-color', which is unsuitable for gradients or complex custom properties.`,
