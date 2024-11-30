@@ -1,6 +1,13 @@
 import { atomWithStorage } from "jotai/utils";
+
 import i18n from "@/i18n";
-import { LANGUAGES } from "@/constants";
+
+// FIXME remove all the hardcoded values
+export const LANGUAGES = [
+  { label: "English", code: "en" },
+  { label: "Deutsche", code: "de" },
+  { label: "Русский", code: "ru" },
+] as const;
 
 export type LanguageCodes = (typeof LANGUAGES)[number]["code"];
 
