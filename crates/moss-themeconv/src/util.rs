@@ -1,5 +1,5 @@
-use crate::model::*;
 use crate::DEFAULT_DIRECTION;
+use desktop_models::appearance::theming::*;
 use indexmap::IndexMap;
 
 pub(crate) fn convert_colors_to_css_variables(

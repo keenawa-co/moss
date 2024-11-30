@@ -1,7 +1,6 @@
 import { InvokeArgs, invoke as invokeTauri } from "@tauri-apps/api/core";
 import { listen as listenTauri } from "@tauri-apps/api/event";
 import type { EventCallback, EventName } from "@tauri-apps/api/event";
-import { createDecorator } from "../instantiation/instantiation";
 
 export type IpcResult<T, E> = { status: "ok"; data: T } | { status: "error"; error: E };
 
@@ -35,11 +34,3 @@ export const listenIpc = <T>(event: EventName, handle: EventCallback<T>) => {
   const unlisten = listenTauri(event, handle);
   return async () => await unlisten.then((unlistenFn) => unlistenFn());
 };
-
-export interface ITauriIpcService {
-  readonly _serviceBrand: undefined;
-
-  invoke<T, E = unknown>(command: TauriIpcCommand, args?: InvokeArgs): Promise<IpcResult<T, E>>;
-  listen<T>(event: EventName, handle: EventCallback<T>): () => Promise<void>;
-}
-export const ITauriIpcService = createDecorator<ITauriIpcService>("tauriIpcService");

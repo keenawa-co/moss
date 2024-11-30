@@ -1,13 +1,16 @@
-import "reflect-metadata";
-import { type } from "@tauri-apps/plugin-os";
-import { getCurrentWebviewWindow } from "@tauri-apps/api/webviewWindow";
-import "@/assets/index.css";
-import "@repo/ui/src/fonts.css";
 import { lazy, StrictMode, Suspense } from "react";
 import { createRoot } from "react-dom/client";
 import { Provider } from "react-redux";
-import { store } from "./store";
+
+import { getCurrentWebviewWindow } from "@tauri-apps/api/webviewWindow";
+import { type } from "@tauri-apps/plugin-os";
+
 import { PageLoader } from "./components/PageLoader";
+import { store } from "./store";
+
+import "reflect-metadata";
+import "@/assets/index.css";
+import "@repo/moss-ui/src/fonts.css";
 
 const sharedWorker = new SharedWorker("./shared-worker.js");
 
@@ -21,7 +24,7 @@ sharedWorker.port.onmessage = (event) => {
 
 sharedWorker.port.start();
 
-export function callServiceMethod(methodName: string, args: any[] = []) {
+export function callServiceMethod(methodName: string, args: unknown[] = []) {
   sharedWorker.port.postMessage({
     action: "callMethod",
     data: {
@@ -36,7 +39,7 @@ if (osType !== "macos") {
   await getCurrentWebviewWindow().setDecorations(false);
 }
 
-const App = lazy(() => import("@/App")); // lazy load the main App component
+const App = lazy(() => import("@/app")); // lazy load the main App component
 const rootElement = document.getElementById("root") as HTMLElement; // cache the root element reference
 
 if (rootElement) {

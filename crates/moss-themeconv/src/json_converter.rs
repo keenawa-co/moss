@@ -1,6 +1,7 @@
 use anyhow::{Context as _, Result};
+use desktop_models::appearance::theming::Theme;
 
-use crate::{model::ThemeModel, util::convert_colors_to_css_variables, ThemeConverter};
+use crate::{util::convert_colors_to_css_variables, ThemeConverter};
 
 #[cfg(feature = "json")]
 pub struct JsonThemeConverter;
@@ -15,13 +16,12 @@ impl JsonThemeConverter {
 #[cfg(feature = "json")]
 impl ThemeConverter for JsonThemeConverter {
     fn convert_to_css(&self, content: String) -> Result<String> {
-        let theme: ThemeModel =
-            serde_json::from_str(&content).context("JSON deserialization failed")?;
+        let theme: Theme = serde_json::from_str(&content).context("JSON deserialization failed")?;
 
         let mut css_sections = Vec::new();
 
-        if !theme.color.is_empty() {
-            let color_vars = convert_colors_to_css_variables("color", &theme.color);
+        if !theme.colors.is_empty() {
+            let color_vars = convert_colors_to_css_variables("color", &theme.colors);
             let mut color_css = String::with_capacity(color_vars.len() * 40); // Estimate capacity
             for (var, val) in &color_vars {
                 color_css.push_str(&format!("  {}: {};\n", var, val));
@@ -46,10 +46,10 @@ impl ThemeConverter for JsonThemeConverter {
 #[cfg(test)]
 mod tests {
     use anyhow::Result;
-    use desktop_models::appearance::theming::ThemeType;
+    use desktop_models::appearance::theming::{ColorType, ThemeType};
     use indexmap::IndexMap;
 
-    use crate::model::{ColorDetail, ColorPosition, ColorValue};
+    use desktop_models::appearance::theming::{ColorDetail, ColorPosition, ColorValue};
 
     use super::*;
 
@@ -81,7 +81,7 @@ mod tests {
         color_map.insert(
             "primary".to_string(),
             ColorDetail {
-                color_type: "solid".to_string(),
+                color_type: ColorType::Solid,
                 direction: None,
                 value: ColorValue::Solid("rgba(0, 0, 0, 1)".to_string()),
             },
@@ -90,7 +90,7 @@ mod tests {
         color_map.insert(
             "toolBar.background".to_string(),
             ColorDetail {
-                color_type: "gradient".to_string(),
+                color_type: ColorType::Gradient,
                 direction: Some("to right".to_string()),
                 value: ColorValue::Gradient(vec![
                     ColorPosition {
@@ -125,12 +125,12 @@ mod tests {
             },
         );
 
-        let theme = ThemeModel {
+        let theme = Theme {
             name: "Test Theme".to_string(),
             slug: "test-theme".to_string(),
             theme_type: ThemeType::Light,
             is_default: true,
-            color: color_map,
+            colors: color_map,
         };
 
         let service = JsonThemeConverter::new();
@@ -155,7 +155,7 @@ mod tests {
         color_map.insert(
             "background.gradient".to_string(),
             ColorDetail {
-                color_type: "gradient".to_string(),
+                color_type: ColorType::Gradient,
                 direction: None,
                 value: ColorValue::Gradient(vec![
                     ColorPosition {
@@ -170,12 +170,12 @@ mod tests {
             },
         );
 
-        let theme = ThemeModel {
+        let theme = Theme {
             name: "Gradient Test".to_string(),
             slug: "gradient-test".to_string(),
             theme_type: ThemeType::Dark,
             is_default: false,
-            color: color_map,
+            colors: color_map,
         };
 
         let service = JsonThemeConverter::new();
@@ -199,18 +199,18 @@ mod tests {
         color_map.insert(
             "sidebar.text".to_string(),
             ColorDetail {
-                color_type: "solid".to_string(),
+                color_type: ColorType::Solid,
                 direction: None,
                 value: ColorValue::Solid("rgba(200, 200, 200, 1)".to_string()),
             },
         );
 
-        let theme = ThemeModel {
+        let theme = Theme {
             name: "Solid Test".to_string(),
             slug: "solid-test".to_string(),
             theme_type: ThemeType::Light,
             is_default: true,
-            color: color_map,
+            colors: color_map,
         };
 
         let service = JsonThemeConverter::new();
@@ -231,12 +231,12 @@ mod tests {
     fn test_convert_theme_to_css_empty_color_map() -> Result<()> {
         let color_map = IndexMap::new();
 
-        let theme = ThemeModel {
+        let theme = Theme {
             name: "Empty Color Theme".to_string(),
             slug: "empty-color-theme".to_string(),
             theme_type: ThemeType::Light,
             is_default: true,
-            color: color_map,
+            colors: color_map,
         };
 
         let service = JsonThemeConverter::new();

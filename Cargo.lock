@@ -1153,6 +1153,7 @@ name = "desktop_models"
 version = "0.1.0"
 dependencies = [
  "csscolorparser",
+ "indexmap 2.6.0",
  "jsonschema",
  "moss_str",
  "moss_uikit",
@@ -5595,7 +5596,9 @@ version = "10.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3a2f31991cee3dce1ca4f929a8a04fdd11fd8801aac0f2030b0fa8a0a3fef6b9"
 dependencies = [
+ "indexmap 2.6.0",
  "lazy_static",
+ "serde_json",
  "thiserror",
  "ts-rs-macros",
 ]

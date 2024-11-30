@@ -2,7 +2,7 @@ import { Meta, StoryObj } from "@storybook/react";
 import { Resizable, ResizablePanel } from "./Resizable";
 import "allotment/dist/style.css";
 import { useState } from "react";
-import { cn } from "@repo/ui";
+import { cn } from "../../../../packages/moss-ui/src";
 
 const meta: Meta = {
   title: "desktop/Resizable",

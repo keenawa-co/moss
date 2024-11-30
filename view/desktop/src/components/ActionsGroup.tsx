@@ -1,4 +1,4 @@
-import { cn, DropdownMenu as DM, Icon, Icons } from "@repo/ui";
+import { cn, DropdownMenu as DM, Icon, Icons } from "@repo/moss-ui";
 import { ComponentPropsWithoutRef, useState } from "react";
 
 interface ActionsGroupProps extends ComponentPropsWithoutRef<"div"> {
