@@ -1476,4 +1476,26 @@ mod tests {
             })
         );
     }
+
+    #[test]
+    fn test_rule_macro_with_val() {
+        let active_value = "active";
+        let rule = rule!((age > 18 && status == val!(active_value)) || is_admin);
+
+        let json_logic = serde_json::to_value(rule).unwrap();
+
+        let expected_json = json!({
+            "or": [
+                {
+                    "and": [
+                        { ">": [ { "var": "age" }, 18 ] },
+                        { "==": [ { "var": "status" }, "active" ] }
+                    ]
+                },
+                { "var": "is_admin" }
+            ]
+        });
+
+        assert_eq!(json_logic, expected_json);
+    }
 }

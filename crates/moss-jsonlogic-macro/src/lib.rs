@@ -14,6 +14,7 @@ pub fn rule(input: TokenStream) -> TokenStream {
 
 fn parse_expr_to_rule(expr: &Expr) -> syn::Result<proc_macro2::TokenStream> {
     match expr {
+        // Handle binary operations (e.g., a + b, x == y)
         Expr::Binary(expr_bin) => {
             let left = parse_expr_to_rule(&expr_bin.left)?;
             let right = parse_expr_to_rule(&expr_bin.right)?;
@@ -42,11 +43,13 @@ fn parse_expr_to_rule(expr: &Expr) -> syn::Result<proc_macro2::TokenStream> {
             };
 
             let tokens = match op {
+                // For logical AND and OR, use variadic operations
                 syn::BinOp::And(_) | syn::BinOp::Or(_) => {
                     quote! {
                         Rule::variadic(#operator, vec![#left, #right])
                     }
                 }
+                // For other binary operations
                 _ => {
                     quote! {
                         Rule::binary(#operator, #left, #right)
@@ -55,6 +58,7 @@ fn parse_expr_to_rule(expr: &Expr) -> syn::Result<proc_macro2::TokenStream> {
             };
             Ok(tokens)
         }
+        // Handle unary operations (e.g., !a)
         Expr::Unary(expr_unary) => {
             let operand = parse_expr_to_rule(&expr_unary.expr)?;
             let op = &expr_unary.op;
@@ -74,7 +78,9 @@ fn parse_expr_to_rule(expr: &Expr) -> syn::Result<proc_macro2::TokenStream> {
             };
             Ok(tokens)
         }
+        // Handle expressions in parentheses
         Expr::Paren(expr_paren) => parse_expr_to_rule(&expr_paren.expr),
+        // Handle literals (e.g., numbers, strings, booleans)
         Expr::Lit(expr_lit) => {
             let lit = &expr_lit.lit;
             match lit {
@@ -87,6 +93,32 @@ fn parse_expr_to_rule(expr: &Expr) -> syn::Result<proc_macro2::TokenStream> {
                 )),
             }
         }
+        // Handle the val!() macro to inject external variables
+        Expr::Macro(expr_macro) => {
+            if let Some(ident) = expr_macro.mac.path.get_ident() {
+                if ident == "val" {
+                    let tokens = &expr_macro.mac.tokens;
+                    // Remove parentheses from tokens
+                    let tokens_string = tokens.to_string();
+                    let tokens_trimmed = tokens_string.trim_matches(|c| c == '(' || c == ')');
+                    let tokens: proc_macro2::TokenStream = tokens_trimmed.parse().unwrap();
+                    Ok(quote! {
+                        Rule::from(#tokens)
+                    })
+                } else {
+                    Err(syn::Error::new_spanned(
+                        expr_macro,
+                        "Unsupported macro in rule macro",
+                    ))
+                }
+            } else {
+                Err(syn::Error::new_spanned(
+                    expr_macro,
+                    "Expected identifier in macro",
+                ))
+            }
+        }
+        // Handle variable references (e.g., age, status)
         Expr::Path(expr_path) => {
             let ident = expr_path
                 .path
@@ -97,6 +129,7 @@ fn parse_expr_to_rule(expr: &Expr) -> syn::Result<proc_macro2::TokenStream> {
                 Rule::var(#name)
             })
         }
+        // Handle field access (e.g., user.name)
         Expr::Field(expr_field) => {
             let base = parse_expr_to_string(&expr_field.base)?;
             let member = match &expr_field.member {
@@ -108,6 +141,7 @@ fn parse_expr_to_rule(expr: &Expr) -> syn::Result<proc_macro2::TokenStream> {
                 Rule::var(#full_name)
             })
         }
+        // Handle indexing (e.g., array[0])
         Expr::Index(expr_index) => {
             let base = parse_expr_to_string(&expr_index.expr)?;
             let index = parse_expr_to_string(&expr_index.index)?;
@@ -116,6 +150,7 @@ fn parse_expr_to_rule(expr: &Expr) -> syn::Result<proc_macro2::TokenStream> {
                 Rule::var(#full_name)
             })
         }
+        // Handle method calls (e.g., obj.method(arg))
         Expr::MethodCall(expr_method_call) => {
             let receiver = parse_expr_to_string(&expr_method_call.receiver)?;
             let method = expr_method_call.method.to_string();
@@ -129,6 +164,7 @@ fn parse_expr_to_rule(expr: &Expr) -> syn::Result<proc_macro2::TokenStream> {
                 Rule::custom(#method_call, vec![#(#args),*])
             })
         }
+        // Return an error for unsupported expressions
         _ => Err(syn::Error::new_spanned(
             expr,
             "Unsupported expression in rule macro",
