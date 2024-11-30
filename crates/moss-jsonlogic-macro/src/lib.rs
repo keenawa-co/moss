@@ -19,20 +19,44 @@ fn parse_expr_to_rule(expr: &Expr) -> syn::Result<proc_macro2::TokenStream> {
             let right = parse_expr_to_rule(&expr_bin.right)?;
             let op = &expr_bin.op;
 
-            let operator = match op {
-                syn::BinOp::Add(_) => quote! { Operator::Add },
-                syn::BinOp::Sub(_) => quote! { Operator::Subtract },
-                syn::BinOp::Mul(_) => quote! { Operator::Multiply },
-                syn::BinOp::Div(_) => quote! { Operator::Divide },
-                syn::BinOp::Rem(_) => quote! { Operator::Modulo },
-                syn::BinOp::Eq(_) => quote! { Operator::Equal },
-                syn::BinOp::Ne(_) => quote! { Operator::NotEqual },
-                syn::BinOp::Gt(_) => quote! { Operator::GreaterThan },
-                syn::BinOp::Lt(_) => quote! { Operator::LessThan },
-                syn::BinOp::Ge(_) => quote! { Operator::GreaterThanOrEqual },
-                syn::BinOp::Le(_) => quote! { Operator::LessThanOrEqual },
-                syn::BinOp::And(_) => quote! { Operator::And },
-                syn::BinOp::Or(_) => quote! { Operator::Or },
+            let tokens = match op {
+                syn::BinOp::Add(_) => {
+                    quote! { #left.add(#right).map_err(|e| e.to_string()).unwrap() }
+                }
+                syn::BinOp::Sub(_) => {
+                    quote! { #left.subtract(#right).map_err(|e| e.to_string()).unwrap() }
+                }
+                syn::BinOp::Mul(_) => {
+                    quote! { #left.multiply(#right).map_err(|e| e.to_string()).unwrap() }
+                }
+                syn::BinOp::Div(_) => {
+                    quote! { #left.divide(#right).map_err(|e| e.to_string()).unwrap() }
+                }
+                syn::BinOp::Rem(_) => {
+                    quote! { #left.modulo(#right).map_err(|e| e.to_string()).unwrap() }
+                }
+                syn::BinOp::Eq(_) => quote! { #left.eq(#right).map_err(|e| e.to_string()).unwrap()},
+                syn::BinOp::Ne(_) => {
+                    quote! { #left.ne(#right).map_err(|e| e.to_string()).unwrap() }
+                }
+                syn::BinOp::Gt(_) => {
+                    quote! { #left.gt(#right).map_err(|e| e.to_string()).unwrap() }
+                }
+                syn::BinOp::Lt(_) => {
+                    quote! { #left.lt(#right).map_err(|e| e.to_string()).unwrap() }
+                }
+                syn::BinOp::Ge(_) => {
+                    quote! { #left.gte(#right).map_err(|e| e.to_string()).unwrap() }
+                }
+                syn::BinOp::Le(_) => {
+                    quote! { #left.lte(#right).map_err(|e| e.to_string()).unwrap() }
+                }
+                syn::BinOp::And(_) => {
+                    quote! { #left.and(#right).map_err(|e| e.to_string()).unwrap() }
+                }
+                syn::BinOp::Or(_) => {
+                    quote! { #left.or(#right).map_err(|e| e.to_string()).unwrap() }
+                }
                 _ => {
                     return Err(syn::Error::new_spanned(
                         op,
@@ -40,37 +64,19 @@ fn parse_expr_to_rule(expr: &Expr) -> syn::Result<proc_macro2::TokenStream> {
                     ))
                 }
             };
-
-            let tokens = match op {
-                syn::BinOp::And(_) | syn::BinOp::Or(_) => {
-                    quote! {
-                        Rule::variadic(#operator, vec![#left, #right])
-                    }
-                }
-                _ => {
-                    quote! {
-                        Rule::binary(#operator, #left, #right)
-                    }
-                }
-            };
             Ok(tokens)
         }
         Expr::Unary(expr_unary) => {
             let operand = parse_expr_to_rule(&expr_unary.expr)?;
             let op = &expr_unary.op;
-
-            let operator = match op {
-                syn::UnOp::Not(_) => quote! { Operator::Not },
+            let tokens = match op {
+                syn::UnOp::Not(_) => quote! { #operand.not().map_err(|e| e.to_string()).unwrap() },
                 _ => {
                     return Err(syn::Error::new_spanned(
                         op,
                         "Unsupported unary operator in rule macro",
                     ))
                 }
-            };
-
-            let tokens = quote! {
-                Rule::unary(#operator, #operand)
             };
             Ok(tokens)
         }

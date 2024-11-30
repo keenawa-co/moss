@@ -1,8 +1,59 @@
+use crate::rule::TypeError::{IncompatibleType, InvalidType};
+use crate::rule::ValueError::ZeroDivision;
 use serde::ser::SerializeMap;
 use serde::{Deserialize, Serialize, Serializer};
-use serde_json::{json, Value};
+use serde_json::Value;
+use std::cmp::PartialEq;
 use std::fmt;
+use std::fmt::Display;
 use std::ops::{Add, BitAnd, BitOr, Div, Mul, Not, Sub};
+use thiserror::Error;
+
+#[derive(Debug, Error)]
+pub enum RuleError {
+    TypeError(TypeError),
+    ValueError(ValueError),
+}
+
+impl Display for RuleError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            RuleError::TypeError(e) => e.fmt(f),
+            RuleError::ValueError(e) => e.fmt(f),
+        }
+    }
+}
+
+#[derive(Debug, Error)]
+pub enum TypeError {
+    #[error("Operand '{operand:?}' have invalid type for operator '{operator}'")]
+    InvalidType { operator: Operator, operand: Rule },
+    #[error(
+        "Operand '{left:?}' has incompatible type with operand '{right:?}' for equality checks"
+    )]
+    IncompatibleType { left: Rule, right: Rule },
+}
+
+#[derive(Debug, Error)]
+pub enum ValueError {
+    #[error("Cannot divide by zero")]
+    ZeroDivision,
+}
+
+#[derive(Serialize, Deserialize, Debug, PartialEq, Clone)]
+enum ResultType {
+    Number,
+    String,
+    Boolean,
+    Array,
+    Object,
+    Variable,
+    Undefined,
+}
+
+trait RuleType {
+    fn get_type(&self) -> ResultType;
+}
 
 /// Represents the standard JSON Logic operators.
 ///
@@ -121,6 +172,40 @@ impl fmt::Display for Operator {
     }
 }
 
+impl RuleType for Operator {
+    fn get_type(&self) -> ResultType {
+        match self {
+            Operator::Equal => ResultType::Boolean,
+            Operator::NotEqual => ResultType::Boolean,
+            Operator::GreaterThan => ResultType::Boolean,
+            Operator::LessThan => ResultType::Boolean,
+            Operator::GreaterThanOrEqual => ResultType::Boolean,
+            Operator::LessThanOrEqual => ResultType::Boolean,
+            Operator::And => ResultType::Boolean,
+            Operator::Or => ResultType::Boolean,
+            Operator::Not => ResultType::Boolean,
+            Operator::Add => ResultType::Number,
+            Operator::Subtract => ResultType::Number,
+            Operator::Multiply => ResultType::Number,
+            Operator::Divide => ResultType::Number,
+            Operator::Modulo => ResultType::Number,
+            Operator::In => ResultType::Boolean,
+            Operator::Cat => ResultType::Undefined,
+            Operator::Map => ResultType::Variable,
+            Operator::Reduce => ResultType::Variable,
+            Operator::Filter => ResultType::Array,
+            Operator::All => ResultType::Boolean,
+            Operator::None => ResultType::Boolean,
+            Operator::Some => ResultType::Boolean,
+            Operator::Merge => ResultType::Array,
+            Operator::If => ResultType::Undefined,
+            Operator::Var => ResultType::Variable,
+            Operator::Missing => ResultType::Undefined,
+            Operator::MissingSome => ResultType::Undefined,
+        }
+    }
+}
+
 /// Represents a JSON Logic rule.
 ///
 /// The `Rule` enum is a comprehensive representation of all possible JSON Logic constructs,
@@ -226,6 +311,48 @@ pub enum Rule {
     },
 }
 
+impl RuleType for Rule {
+    fn get_type(&self) -> ResultType {
+        match self {
+            Rule::Constant(value) => match value {
+                Value::Null => ResultType::Undefined,
+                Value::Bool(_) => ResultType::Boolean,
+                Value::Number(_) => ResultType::Number,
+                Value::String(_) => ResultType::String,
+                Value::Array(_) => ResultType::Array,
+                Value::Object(_) => ResultType::Object,
+            },
+            Rule::Variable(_) => ResultType::Variable,
+            Rule::Unary { operator, .. } => operator.get_type(),
+            Rule::Binary { operator, .. } => operator.get_type(),
+            Rule::Variadic { operator, .. } => operator.get_type(),
+            Rule::Custom { .. } => ResultType::Variable,
+        }
+    }
+}
+
+impl Rule {
+    fn is_type_compatible_with(&self, other: &Rule) -> bool {
+        let self_type = self.get_type();
+        let other_type = other.get_type();
+        if self_type == other_type {
+            true
+        } else if self_type == ResultType::Variable || other_type == ResultType::Variable {
+            true
+        } else {
+            false
+        }
+    }
+
+    fn is_boolean_compatible(&self) -> bool {
+        self.get_type() == ResultType::Boolean || self.get_type() == ResultType::Variable
+    }
+
+    fn is_number_compatible(&self) -> bool {
+        self.get_type() == ResultType::Number || self.get_type() == ResultType::Variable
+    }
+}
+
 impl Rule {
     // ----------------------------------------------------------------------------
     // Constructor Methods
@@ -301,7 +428,7 @@ impl Rule {
     ///
     /// let rule = Rule::var("is_active").not();
     /// ```
-    pub fn unary(operator: Operator, operand: Self) -> Self {
+    fn unary(operator: Operator, operand: Self) -> Self {
         Rule::Unary {
             operator,
             operand: Box::new(operand),
@@ -325,7 +452,7 @@ impl Rule {
     ///
     /// let rule = Rule::var("age").gt(Rule::value(18));
     /// ```
-    pub fn binary(operator: Operator, left: Self, right: Self) -> Self {
+    fn binary(operator: Operator, left: Self, right: Self) -> Self {
         Rule::Binary {
             operator,
             left: Box::new(left),
@@ -350,7 +477,7 @@ impl Rule {
     ///
     /// let rule = Rule::var("is_admin").and(Rule::var("is_owner")).and(Rule::var("is_active"));
     /// ```
-    pub fn variadic(operator: Operator, operands: Vec<Self>) -> Self {
+    fn variadic(operator: Operator, operands: Vec<Self>) -> Self {
         Rule::Variadic { operator, operands }
     }
 
@@ -378,6 +505,82 @@ impl Rule {
     }
 
     // ----------------------------------------------------------------------------
+    // Validation Methods
+    //
+    // This section provides methods corresponding to specific operators, enabling
+    // the construction of logical, comparison, and arithmetic operations. These
+    // methods facilitate fluent and intuitive rule building through method chaining.
+    // ----------------------------------------------------------------------------
+    pub fn validate_boolean_operators(
+        operator: Operator,
+        operands: Vec<&Rule>,
+    ) -> Result<(), RuleError> {
+        let invalid_operands = operands
+            .iter()
+            .filter(|x| !x.is_boolean_compatible())
+            .collect::<Vec<_>>();
+        if invalid_operands.is_empty() {
+            Ok(())
+        } else {
+            Err(RuleError::TypeError(InvalidType {
+                operator,
+                operand: invalid_operands[0].to_owned().clone(),
+            }))
+        }
+    }
+
+    pub fn validate_equality_operators(left: &Rule, right: &Rule) -> Result<(), RuleError> {
+        if !left.is_type_compatible_with(right) {
+            return Err(RuleError::TypeError(IncompatibleType {
+                left: left.clone(),
+                right: right.clone(),
+            }));
+        }
+        Ok(())
+    }
+
+    pub fn validate_numeric_operators(
+        operator: Operator,
+        operands: Vec<&Rule>,
+    ) -> Result<(), RuleError> {
+        let invalid_operands = operands
+            .iter()
+            .filter(|x| !x.is_number_compatible())
+            .collect::<Vec<_>>();
+        if invalid_operands.is_empty() {
+            Ok(())
+        } else {
+            Err(RuleError::TypeError(InvalidType {
+                operator,
+                operand: invalid_operands[0].to_owned().clone(),
+            }))
+        }
+    }
+
+    pub fn validate_division(operator: Operator, right: &Rule) -> Result<(), RuleError> {
+        // For now we only check zero literal
+        // In the future, we can check expressions that evaluate to zero
+        if let Rule::Constant(divisor) = right.clone() {
+            if !divisor.is_number() {
+                return Err(RuleError::TypeError(InvalidType {
+                    operator,
+                    operand: right.clone(),
+                }));
+            }
+            let divisor = divisor.as_number().unwrap();
+            if divisor.is_f64() && divisor.as_f64().unwrap().abs() <= f64::EPSILON {
+                Err(RuleError::ValueError(ZeroDivision))
+            } else if divisor.is_i64() && divisor.as_i64().unwrap() == 0 {
+                Err(RuleError::ValueError(ZeroDivision))
+            } else {
+                Ok(())
+            }
+        } else {
+            Ok(())
+        }
+    }
+
+    // ----------------------------------------------------------------------------
     // Operator-Specific Methods
     //
     // This section provides methods corresponding to specific operators, enabling
@@ -396,8 +599,9 @@ impl Rule {
     ///
     /// let rule = Rule::var("is_active").not();
     /// ```
-    pub fn not(self) -> Self {
-        Rule::unary(Operator::Not, self)
+    pub fn not(self) -> Result<Self, RuleError> {
+        Self::validate_boolean_operators(Operator::Not, vec![&self])?;
+        Ok(Rule::unary(Operator::Not, self))
     }
 
     /// Logical AND operation.
@@ -413,19 +617,20 @@ impl Rule {
     ///
     /// let rule = Rule::var("is_admin").and(Rule::var("is_active"));
     /// ```
-    pub fn and(self, other: Self) -> Self {
+    pub fn and(self, other: Self) -> Result<Self, RuleError> {
+        Self::validate_boolean_operators(Operator::And, vec![&self, &other])?;
         match self {
             Rule::Variadic {
                 operator: Operator::And,
                 mut operands,
             } => {
                 operands.push(other);
-                Rule::Variadic {
+                Ok(Rule::Variadic {
                     operator: Operator::And,
                     operands,
-                }
+                })
             }
-            _ => Rule::variadic(Operator::And, vec![self, other]),
+            _ => Ok(Rule::variadic(Operator::And, vec![self, other])),
         }
     }
 
@@ -442,19 +647,20 @@ impl Rule {
     ///
     /// let rule = Rule::var("is_guest").or(Rule::var("is_banned"));
     /// ```
-    pub fn or(self, other: Self) -> Self {
+    pub fn or(self, other: Self) -> Result<Self, RuleError> {
+        Self::validate_boolean_operators(Operator::Or, vec![&self, &other])?;
         match self {
             Rule::Variadic {
                 operator: Operator::Or,
                 mut operands,
             } => {
                 operands.push(other);
-                Rule::Variadic {
+                Ok(Rule::Variadic {
                     operator: Operator::Or,
                     operands,
-                }
+                })
             }
-            _ => Rule::variadic(Operator::Or, vec![self, other]),
+            _ => Ok(Rule::variadic(Operator::Or, vec![self, other])),
         }
     }
 
@@ -469,8 +675,9 @@ impl Rule {
     ///
     /// let rule = Rule::var("role").eq(Rule::value("admin"));
     /// ```
-    pub fn eq(self, other: Self) -> Self {
-        Rule::binary(Operator::Equal, self, other)
+    pub fn eq(self, other: Self) -> Result<Self, RuleError> {
+        Self::validate_equality_operators(&self, &other)?;
+        Ok(Rule::binary(Operator::Equal, self, other))
     }
 
     /// Inequality comparison.
@@ -484,8 +691,9 @@ impl Rule {
     ///
     /// let rule = Rule::var("status").ne(Rule::value("inactive"));
     /// ```
-    pub fn ne(self, other: Self) -> Self {
-        Rule::binary(Operator::NotEqual, self, other)
+    pub fn ne(self, other: Self) -> Result<Self, RuleError> {
+        Self::validate_equality_operators(&self, &other)?;
+        Ok(Rule::binary(Operator::NotEqual, self, other))
     }
 
     /// Greater-than comparison.
@@ -499,8 +707,9 @@ impl Rule {
     ///
     /// let rule = Rule::var("score").gt(Rule::value(75));
     /// ```
-    pub fn gt(self, other: Self) -> Self {
-        Rule::binary(Operator::GreaterThan, self, other)
+    pub fn gt(self, other: Self) -> Result<Self, RuleError> {
+        Self::validate_numeric_operators(Operator::GreaterThan, vec![&self, &other])?;
+        Ok(Rule::binary(Operator::GreaterThan, self, other))
     }
 
     /// Less-than comparison.
@@ -514,8 +723,9 @@ impl Rule {
     ///
     /// let rule = Rule::var("age").lt(Rule::value(18));
     /// ```
-    pub fn lt(self, other: Self) -> Self {
-        Rule::binary(Operator::LessThan, self, other)
+    pub fn lt(self, other: Self) -> Result<Self, RuleError> {
+        Self::validate_numeric_operators(Operator::LessThan, vec![&self, &other])?;
+        Ok(Rule::binary(Operator::LessThan, self, other))
     }
 
     /// Greater-than-or-equal-to comparison.
@@ -529,8 +739,9 @@ impl Rule {
     ///
     /// let rule = Rule::var("experience").gte(Rule::value(5));
     /// ```
-    pub fn gte(self, other: Self) -> Self {
-        Rule::binary(Operator::GreaterThanOrEqual, self, other)
+    pub fn gte(self, other: Self) -> Result<Self, RuleError> {
+        Self::validate_numeric_operators(Operator::GreaterThanOrEqual, vec![&self, &other])?;
+        Ok(Rule::binary(Operator::GreaterThanOrEqual, self, other))
     }
 
     /// Less-than-or-equal-to comparison.
@@ -544,8 +755,9 @@ impl Rule {
     ///
     /// let rule = Rule::var("height").lte(Rule::value(180));
     /// ```
-    pub fn lte(self, other: Self) -> Self {
-        Rule::binary(Operator::LessThanOrEqual, self, other)
+    pub fn lte(self, other: Self) -> Result<Self, RuleError> {
+        Self::validate_numeric_operators(Operator::LessThanOrEqual, vec![&self, &other])?;
+        Ok(Rule::binary(Operator::LessThanOrEqual, self, other))
     }
 
     /// Addition operation.
@@ -561,19 +773,20 @@ impl Rule {
     ///
     /// let rule = Rule::var("quantity") + Rule::value(10);
     /// ```
-    pub fn add(self, other: Self) -> Self {
+    pub fn add(self, other: Self) -> Result<Self, RuleError> {
+        Self::validate_numeric_operators(Operator::Add, vec![&self, &other])?;
         match self {
             Rule::Variadic {
                 operator: Operator::Add,
                 mut operands,
             } => {
                 operands.push(other);
-                Rule::Variadic {
+                Ok(Rule::Variadic {
                     operator: Operator::Add,
                     operands,
-                }
+                })
             }
-            _ => Rule::variadic(Operator::Add, vec![self, other]),
+            _ => Ok(Rule::variadic(Operator::Add, vec![self, other])),
         }
     }
 
@@ -588,8 +801,9 @@ impl Rule {
     ///
     /// let rule = Rule::var("total") - Rule::value(20);
     /// ```
-    pub fn subtract(self, other: Self) -> Self {
-        Rule::binary(Operator::Subtract, self, other)
+    pub fn subtract(self, other: Self) -> Result<Self, RuleError> {
+        Self::validate_numeric_operators(Operator::Subtract, vec![&self, &other])?;
+        Ok(Rule::binary(Operator::Subtract, self, other))
     }
 
     /// Multiplication operation.
@@ -605,19 +819,20 @@ impl Rule {
     ///
     /// let rule = Rule::var("price") * Rule::value(2);
     /// ```
-    pub fn multiply(self, other: Self) -> Self {
+    pub fn multiply(self, other: Self) -> Result<Self, RuleError> {
+        Self::validate_numeric_operators(Operator::Multiply, vec![&self, &other])?;
         match self {
             Rule::Variadic {
                 operator: Operator::Multiply,
                 mut operands,
             } => {
                 operands.push(other);
-                Rule::Variadic {
+                Ok(Rule::Variadic {
                     operator: Operator::Multiply,
                     operands,
-                }
+                })
             }
-            _ => Rule::variadic(Operator::Multiply, vec![self, other]),
+            _ => Ok(Rule::variadic(Operator::Multiply, vec![self, other])),
         }
     }
 
@@ -632,8 +847,10 @@ impl Rule {
     ///
     /// let rule = Rule::var("total") / Rule::value(4);
     /// ```
-    pub fn divide(self, other: Self) -> Self {
-        Rule::binary(Operator::Divide, self, other)
+    pub fn divide(self, other: Self) -> Result<Self, RuleError> {
+        Self::validate_numeric_operators(Operator::Divide, vec![&self, &other])?;
+        Self::validate_division(Operator::Divide, &other)?;
+        Ok(Rule::binary(Operator::Divide, self, other))
     }
 
     /// Modulo operation.
@@ -647,8 +864,10 @@ impl Rule {
     ///
     /// let rule = Rule::var("number").modulo(Rule::value(3));
     /// ```
-    pub fn modulo(self, other: Self) -> Self {
-        Rule::binary(Operator::Modulo, self, other)
+    pub fn modulo(self, other: Self) -> Result<Self, RuleError> {
+        Self::validate_numeric_operators(Operator::Modulo, vec![&self, &other])?;
+        Self::validate_division(Operator::Modulo, &other)?;
+        Ok(Rule::binary(Operator::Modulo, self, other))
     }
 }
 
@@ -769,7 +988,7 @@ impl BitAnd for Rule {
     /// let rule = Rule::var("is_admin") & Rule::var("is_active");
     /// ```
     fn bitand(self, rhs: Rule) -> Rule {
-        self.and(rhs)
+        self.and(rhs).unwrap()
     }
 }
 
@@ -786,7 +1005,7 @@ impl BitOr for Rule {
     /// let rule = Rule::var("is_guest") | Rule::var("is_banned");
     /// ```
     fn bitor(self, rhs: Rule) -> Rule {
-        self.or(rhs)
+        self.or(rhs).unwrap()
     }
 }
 
@@ -803,7 +1022,7 @@ impl Add for Rule {
     /// let rule = Rule::var("quantity") + Rule::value(10);
     /// ```
     fn add(self, rhs: Rule) -> Rule {
-        self.add(rhs)
+        self.add(rhs).unwrap()
     }
 }
 
@@ -820,7 +1039,7 @@ impl Sub for Rule {
     /// let rule = Rule::var("total") - Rule::value(20);
     /// ```
     fn sub(self, rhs: Rule) -> Rule {
-        self.subtract(rhs)
+        self.subtract(rhs).unwrap()
     }
 }
 
@@ -837,7 +1056,7 @@ impl Mul for Rule {
     /// let rule = Rule::var("price") * Rule::value(2);
     /// ```
     fn mul(self, rhs: Rule) -> Rule {
-        self.multiply(rhs)
+        self.multiply(rhs).unwrap()
     }
 }
 
@@ -854,7 +1073,7 @@ impl Div for Rule {
     /// let rule = Rule::var("total") / Rule::value(4);
     /// ```
     fn div(self, rhs: Rule) -> Rule {
-        self.divide(rhs)
+        self.divide(rhs).unwrap()
     }
 }
 
@@ -871,11 +1090,12 @@ impl Not for Rule {
     /// let rule = !Rule::var("is_active");
     /// ```
     fn not(self) -> Rule {
-        self.not()
+        self.not().unwrap()
     }
 }
 
 #[cfg(test)]
+#[allow(unused_variables)]
 mod tests {
     use super::*;
     use moss_jsonlogic_macro::rule;
@@ -892,7 +1112,7 @@ mod tests {
         let const_ten = Rule::value(10);
 
         // Build rule: (x + y) > 10
-        let rule = (var_x + var_y).gt(const_ten);
+        let rule = (var_x + var_y).gt(const_ten).unwrap();
 
         // Serialize to JSON Logic
         let json_logic =
@@ -916,7 +1136,7 @@ mod tests {
         let const_active = Rule::from("active");
 
         // Build rule: !(status == "active")
-        let rule = !(var_status.eq(const_active));
+        let rule = !(var_status.eq(const_active).unwrap());
 
         // Serialize to JSON Logic
         let json_logic =
@@ -946,9 +1166,9 @@ mod tests {
         let const_twenty = Rule::from(20);
 
         // Build rules
-        let rule1 = var_x.gt(const_five); // x > 5
-        let rule2 = var_y.lt(const_ten); // y < 10
-        let rule3 = var_z.eq(const_twenty); // z == 20
+        let rule1 = var_x.gt(const_five).unwrap(); // x > 5
+        let rule2 = var_y.lt(const_ten).unwrap(); // y < 10
+        let rule3 = var_z.eq(const_twenty).unwrap(); // z == 20
 
         // Combine rules: (x > 5 AND y < 10) OR z == 20
         let combined_rule = (rule1 & rule2) | rule3;
@@ -1008,7 +1228,7 @@ mod tests {
         let const_threshold = Rule::from(100);
 
         // Build rule: (score + bonus) >= 100
-        let rule = (var_score + var_bonus).gte(const_threshold);
+        let rule = (var_score + var_bonus).gte(const_threshold).unwrap();
 
         // Serialize to JSON Logic
         let json_logic =
@@ -1037,7 +1257,7 @@ mod tests {
         let const_three = Rule::value(3);
 
         // Build rule: !(status == "locked" || attempts > 3)
-        let rule = !(var_status.eq(const_locked) | var_attempts.gt(const_three));
+        let rule = !(var_status.eq(const_locked).unwrap() | var_attempts.gt(const_three).unwrap());
 
         // Serialize to JSON Logic
         let json_logic =
@@ -1127,9 +1347,9 @@ mod tests {
         let const_three = Rule::value(3);
 
         let rule_sum = var_x + var_y; // x + y
-        let rule_gt = rule_sum.gt(const_ten); // (x + y) > 10
-        let rule_le = var_z.lte(const_five); // z <= 5
-        let rule_ne = var_w.ne(const_three); // w != 3
+        let rule_gt = rule_sum.gt(const_ten).unwrap(); // (x + y) > 10
+        let rule_le = var_z.lte(const_five).unwrap(); // z <= 5
+        let rule_ne = var_w.ne(const_three).unwrap(); // w != 3
         let rule_or = rule_le | rule_ne; // (z <= 5 OR w != 3)
         let combined_rule = rule_gt & rule_or; // (x + y) > 10 AND (z <= 5 OR w != 3)
 
@@ -1168,7 +1388,8 @@ mod tests {
         let const_max_attempts = Rule::from(3);
 
         // Build rule: !(status == "locked" || attempts > 3)
-        let rule = !(var_status.eq(const_locked) | var_attempts.gt(const_max_attempts));
+        let rule =
+            !(var_status.eq(const_locked).unwrap() | var_attempts.gt(const_max_attempts).unwrap());
 
         // Serialize to JSON Logic
         let json_logic =
@@ -1196,9 +1417,9 @@ mod tests {
         let var_b = Rule::var("b");
         let var_c = Rule::var("c");
 
-        let rule1 = var_a.eq(Rule::from(5));
-        let rule2 = var_b.gt(Rule::from(10));
-        let rule3 = var_c.lt(Rule::from(20));
+        let rule1 = var_a.eq(Rule::from(5)).unwrap();
+        let rule2 = var_b.gt(Rule::from(10)).unwrap();
+        let rule3 = var_c.lt(Rule::from(20)).unwrap();
 
         // Combine rules using logical operators
         let combined_rule = rule1 & (rule2 | rule3);
@@ -1237,7 +1458,13 @@ mod tests {
     fn test_rule_with_desired_api() {
         let rule = Rule::var("view")
             .eq(Rule::value("recents.view.id"))
-            .and(Rule::var("viewItem").eq(Rule::value("recents.item")));
+            .unwrap()
+            .and(
+                Rule::var("viewItem")
+                    .eq(Rule::value("recents.item"))
+                    .unwrap(),
+            )
+            .unwrap();
 
         let json_logic =
             serde_json::to_value(rule).expect("Failed to serialize the rule into JSON.");
@@ -1365,7 +1592,9 @@ mod tests {
     fn test_method_chaining() {
         let rule = Rule::var("age")
             .gte(Rule::value(18))
-            .and(Rule::var("status").eq(Rule::value("active")));
+            .unwrap()
+            .and(Rule::var("status").eq(Rule::value("active")).unwrap())
+            .unwrap();
 
         let json_logic =
             serde_json::to_value(rule).expect("Failed to serialize the rule into JSON.");
@@ -1394,7 +1623,9 @@ mod tests {
     fn test_rule_with_variables_and_values() {
         let rule = Rule::var("status")
             .ne(Rule::value("inactive"))
-            .and(Rule::var("age").gte(Rule::value(18)));
+            .unwrap()
+            .and(Rule::var("age").gte(Rule::value(18)).unwrap())
+            .unwrap();
 
         let json_logic =
             serde_json::to_value(rule).expect("Failed to serialize the rule into JSON.");
@@ -1420,12 +1651,43 @@ mod tests {
     }
 
     #[test]
-    fn test_rule_macro_simple() {
+    fn test_rule_macro_simple_unary() {
+        let rule = rule!(!flag);
+        assert_eq!(
+            serde_json::to_value(rule).expect("Failed to serialize the rule into JSON"),
+            json!({"!": {"var": "flag"}})
+        );
+    }
+
+    #[test]
+    fn test_rule_macro_simple_binary() {
         let rule = rule!(age > 18);
         assert_eq!(
             serde_json::to_value(rule).expect("Failed to serialize the rule into JSON."),
             json!({ ">": [{ "var": "age" }, 18] })
         );
+    }
+    // TODO: Flatten variadic operators
+    // +, -, && and ||
+    // (Without flattening)
+    // 1 + 2 + 3 => {
+    //     "+": [
+    //         {"+": [1, 2]},
+    //         3
+    //     ]
+    // }
+    // (With flattening)
+    // 1 + 2 + 3 => {
+    //     "+": [1, 2, 3]
+
+    #[test]
+    fn test_rule_macro_simple_variadic() {
+        let rule = rule!(a + b + c);
+        println!("{}", serde_json::to_string_pretty(&rule).unwrap());
+        assert_eq!(
+            serde_json::to_value(rule).expect("Failed to serialize the rule into JSON"),
+            json!({"+" : [{"var" : "a"}, {"var" : "b"}, {"var" : "c"}]})
+        )
     }
 
     #[test]
@@ -1475,5 +1737,134 @@ mod tests {
                 ]
             })
         );
+    }
+
+    /// --------------------
+    /// Validation test
+    /// --------------------
+
+    #[test]
+    #[should_panic]
+    fn test_invalid_type_not() {
+        let rule = rule!(!"1");
+    }
+
+    #[test]
+    #[should_panic]
+    fn test_invalid_type_and() {
+        let rule = rule!(1 && true);
+    }
+
+    #[test]
+    #[should_panic]
+    fn test_invalid_type_or() {
+        let rule = rule!("1" || true);
+    }
+
+    #[test]
+    #[should_panic]
+    fn test_incompatible_type_eq() {
+        let rule = rule!(1 == "1");
+    }
+
+    #[test]
+    #[should_panic]
+    fn test_incompatible_type_ne() {
+        let rule = rule!(true != "false");
+    }
+
+    #[test]
+    #[should_panic]
+    fn test_invalid_type_gt() {
+        let rule = rule!("42" > 0);
+    }
+
+    #[test]
+    #[should_panic]
+    fn test_invalid_type_lt() {
+        let rule = rule!(false < true);
+    }
+
+    #[test]
+    #[should_panic]
+    fn test_invalid_type_gte() {
+        let rule = rule!("42" >= 42);
+    }
+
+    #[test]
+    #[should_panic]
+    fn test_invalid_type_lte() {
+        let rule = rule!(42 <= "42");
+    }
+
+    #[test]
+    #[should_panic]
+    fn test_invalid_type_add() {
+        let rule = rule!(true + "true");
+    }
+
+    #[test]
+    #[should_panic]
+    fn test_invalid_type_subtract() {
+        let rule = rule!("1" - 1);
+    }
+
+    #[test]
+    #[should_panic]
+    fn test_invalid_type_multiply() {
+        let rule = rule!("1" * 2);
+    }
+
+    #[test]
+    #[should_panic]
+    fn test_invalid_type_divide() {
+        let rule = rule!("foo" / "bar");
+    }
+
+    #[test]
+    #[should_panic]
+    fn test_invalid_type_modulo() {
+        let rule = rule!("3" % "2");
+    }
+    #[test]
+    #[should_panic]
+    fn test_zero_division_divide() {
+        let rule = rule!(42 / 0);
+    }
+
+    #[test]
+    #[should_panic]
+    fn test_zero_division_modulo() {
+        let rule = rule!(42 % 0.0);
+    }
+
+    #[test]
+    #[should_panic]
+    fn test_invalid_type_compound1() {
+        let rule = rule!(1 + 2 / "3");
+    }
+
+    #[test]
+    #[should_panic]
+    fn test_invalid_type_compound2() {
+        let rule = rule!(x - true * false);
+    }
+
+    #[test]
+    #[should_panic]
+    fn test_invalid_type_compound3() {
+        let rule = rule!(x && !"true");
+    }
+
+    #[test]
+    #[should_panic]
+    fn test_invalid_type_compound4() {
+        let rule = rule!(42 > 0 < 1);
+    }
+
+    #[test]
+    #[should_panic]
+    fn test_invalid_type_compound5() {
+        let rule = rule!(3.14 < 159 - "26");
     }
 }
