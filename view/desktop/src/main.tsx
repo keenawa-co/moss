@@ -1,13 +1,16 @@
-import "reflect-metadata";
-import { type } from "@tauri-apps/plugin-os";
-import { getCurrentWebviewWindow } from "@tauri-apps/api/webviewWindow";
-import "@/assets/index.css";
-import "@repo/moss-ui/src/fonts.css";
 import { lazy, StrictMode, Suspense } from "react";
 import { createRoot } from "react-dom/client";
 import { Provider } from "react-redux";
-import { store } from "./store";
+
+import { getCurrentWebviewWindow } from "@tauri-apps/api/webviewWindow";
+import { type } from "@tauri-apps/plugin-os";
+
 import { PageLoader } from "./components/PageLoader";
+import { store } from "./store";
+
+import "reflect-metadata";
+import "@/assets/index.css";
+import "@repo/moss-ui/src/fonts.css";
 
 const sharedWorker = new SharedWorker("./shared-worker.js");
 
