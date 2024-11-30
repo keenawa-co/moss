@@ -21,6 +21,7 @@ use std::sync::Arc;
 use parking_lot::Mutex;
 use tauri::{AppHandle, Manager, RunEvent, WebviewWindow, WindowEvent};
 use tauri_plugin_cli::CliExt;
+use tauri_plugin_global_shortcut::{Code, GlobalShortcutExt, Modifiers, Shortcut, ShortcutState};
 use tauri_plugin_log::{fern::colors::ColoredLevelConfig, Target, TargetKind};
 use window::{create_window, CreateWindowInput};
 use workbench_desktop::window::{NativePlatformInfo, NativeWindowConfiguration};
@@ -112,6 +113,27 @@ pub fn run() {
                 app.handle().manage(app_state);
             }
 
+            let ctrl_n_shortcut = Shortcut::new(Some(Modifiers::CONTROL), Code::KeyN);
+
+            app.handle().plugin(
+                tauri_plugin_global_shortcut::Builder::new()
+                    .with_handler(move |app, shortcut, event| {
+                        println!("{:?}", shortcut);
+                        if shortcut == &ctrl_n_shortcut {
+                            match event.state() {
+                                ShortcutState::Pressed => {
+                                    tauri::async_runtime::spawn(cmd_window::create_new_window(
+                                        app.clone(),
+                                    ));
+                                }
+                                ShortcutState::Released => {}
+                            }
+                        }
+                    })
+                    .build(),
+            )?;
+            app.global_shortcut().register(ctrl_n_shortcut)?;
+
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
@@ -190,7 +212,6 @@ fn create_main_window(handle: &AppHandle, url: &str) -> WebviewWindow {
     };
     let webview_window = create_window(handle, config);
     webview_window.on_menu_event(move |window, event| menu::handle_event(window, &event));
-
     webview_window
 }
 

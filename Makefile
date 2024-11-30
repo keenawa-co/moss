@@ -3,16 +3,19 @@
 # Detect Operating System
 ifeq ($(OS),Windows_NT)
     DETECTED_OS := Windows
+    HOME_DIR := ${USERPROFILE}
 else
     DETECTED_OS := $(shell uname)
+    HOME_DIR := ${HOME}
 endif
 
-# Directories
+# App Directories
 DESKTOP_DIR := view/desktop
 STORYBOOK_DIR := view/storybook
 DOCS_DIR := view/docs
 WEB_DIR := view/web
 THEME_GENERATOR_DIR := tools/themegen
+THEME_INSTALLER_DIR := misc/themeinstall
 ICONS_DIR := tools/icongen
 
 DESKTOP_MODELS_DIR := internal/workbench/desktop/models
@@ -20,6 +23,10 @@ HTML_MODELS_DIR := crates/moss-html
 UIKIT_MODELS_DIR := crates/moss-uikit
 
 XTASK_DIR := tools/xtask
+
+# User Directories
+THEME_DIR := ${HOME_DIR}/.config/moss/themes
+
 # Executables
 PNPM := pnpm
 SURREAL := surreal
@@ -96,10 +103,19 @@ endif
 
 # Generation Commands
 
-## Generate Themes
+## Generate Theme JSONs
 .PHONY: gen-themes
 gen-themes:
 	@cd $(THEME_GENERATOR_DIR) && $(PNPM) start
+
+## Convert Theme JSONs to css
+.PHONY: install-themes
+install-themes:
+	$(CARGO) run --bin themeinstall -- --input ${THEME_DIR}\moss-dark.json --output $(THEME_DIR)
+	$(CARGO) run --bin themeinstall -- --input ${THEME_DIR}\moss-light.json --output $(THEME_DIR)
+	$(CARGO) run --bin themeinstall -- --input ${THEME_DIR}\moss-pink.json --output $(THEME_DIR)
+
+
 
 ## Generate Icons
 .PHONY: gen-icons

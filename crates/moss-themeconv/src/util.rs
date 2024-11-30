@@ -1,4 +1,5 @@
-use desktop_models::appearance::theming::{ColorDetail, ColorValue};
+use crate::model::*;
+use crate::DEFAULT_DIRECTION;
 use indexmap::IndexMap;
 
 pub(crate) fn convert_colors_to_css_variables(
@@ -8,7 +9,11 @@ pub(crate) fn convert_colors_to_css_variables(
     convert_category_to_css_variables(category, colors, |color_detail| match &color_detail.value {
         ColorValue::Solid(val) => val.clone(),
         ColorValue::Gradient(vals) => {
-            let direction = color_detail.direction.as_deref().unwrap_or("to right");
+            let direction = color_detail
+                .direction
+                .as_deref()
+                .filter(|s| !s.is_empty())
+                .unwrap_or(DEFAULT_DIRECTION);
 
             let gradient = vals
                 .iter()

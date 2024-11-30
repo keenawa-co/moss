@@ -1,6 +1,7 @@
-import { Theme } from "@repo/desktop-models";
 import { existsSync, mkdirSync, writeFileSync } from "fs";
 import * as os from "os";
+
+import { Theme } from "@repo/desktop-models";
 
 // FIXME: temporary solution
 const homeDirectory = os.homedir();
@@ -12,8 +13,8 @@ const defaultDarkTheme: Theme = {
   slug: "moss-dark",
   type: "dark",
   isDefault: false,
-  colors: {
-    "primary": { type: "solid", value: "rgba(255, 255, 255, 1)" }, // prettier-ignore
+  color: {
+    "primary": { "type": "solid", "value": "rgba(255, 255, 255, 1)" }, // prettier-ignore
     "sideBar.background": { type: "solid", value: "rgba(39, 39, 42, 1)" },
     "toolBar.background": { type: "solid", value: "rgba(30, 32, 33, 1)" },
     "page.background": { type: "solid", value: "rgba(22, 24, 25, 1)" },
@@ -31,8 +32,8 @@ const defaultLightTheme: Theme = {
   slug: "moss-light",
   type: "light",
   isDefault: true,
-  colors: {
-    "primary": { type: "solid", value: "rgba(0, 0, 0, 1)" }, // prettier-ignore
+  color: {
+    "primary": { "type": "solid", "value": "rgba(0, 0, 0, 1)" }, // prettier-ignore
     "sideBar.background": { type: "solid", value: "rgba(244, 244, 245, 1)" },
     "toolBar.background": { type: "solid", value: "rgba(224, 224, 224, 1)" },
     "page.background": { type: "solid", value: "rgba(255, 255, 255, 1)" },
@@ -52,8 +53,8 @@ const pinkTheme: Theme = {
   slug: "moss-pink",
   type: "light",
   isDefault: false,
-  colors: {
-    "primary": { type: "solid", value: "rgba(0, 0, 0, 1)" }, // prettier-ignore
+  color: {
+    "primary": { "type": "solid", "value": "rgba(0, 0, 0, 1)" }, // prettier-ignore
     "sideBar.background": { type: "solid", value: "rgba(234, 157, 242, 1)" },
     "toolBar.background": { type: "solid", value: "rgba(222, 125, 232, 1)" },
     "page.background": { type: "solid", value: "rgba(227, 54, 245, 1)" },
