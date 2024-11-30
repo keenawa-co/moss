@@ -1,7 +1,6 @@
-import { languageAtom, LanguageCodes } from "@/atoms/langAtom";
-import { LANGUAGES } from "@/constants";
 import { useAtom } from "jotai";
 import React from "react";
+import { languageAtom, LanguageCodes, LANGUAGES } from "@/atoms/langAtom";
 
 export const LanguageSelector = () => {
   const [language, setLanguage] = useAtom(languageAtom);
