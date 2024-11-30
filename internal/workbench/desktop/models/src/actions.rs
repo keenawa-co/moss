@@ -36,8 +36,11 @@ pub enum MenuItemVisibility {
 pub struct MenuGroup {
     #[ts(type = "string")]
     id: ReadOnlyStr,
+
+    #[ts(optional)]
     order: Option<i64>,
-    #[ts(type = "LocalizedString | null")]
+
+    #[ts(optional, type = "LocalizedString")]
     description: Option<LocalizedString>,
 }
 
@@ -65,12 +68,20 @@ impl MenuGroup {
 pub struct CommandAction {
     #[ts(type = "string")]
     pub id: ActionCommandId,
-    #[ts(type = "LocalizedString | null")]
+
+    #[ts(type = "LocalizedString")]
     pub title: LocalizedString,
+
+    #[ts(optional)]
     pub tooltip: Option<String>,
-    #[ts(type = "LocalizedString | null")]
+
+    #[ts(optional, type = "LocalizedString")]
     pub description: Option<LocalizedString>,
+
+    #[ts(optional)]
     pub icon: Option<String>,
+
+    #[ts(optional)]
     pub toggled: Option<CommandActionToggle>,
 }
 
@@ -80,9 +91,14 @@ pub struct CommandAction {
 pub struct CommandActionToggle {
     #[ts(type = "string")]
     pub condition: Rule,
+
+    #[ts(optional)]
     pub icon: Option<String>,
+
+    #[ts(optional)]
     pub tooltip: Option<String>,
-    #[ts(type = "LocalizedString | null")]
+
+    #[ts(optional, type = "LocalizedString")]
     pub title: Option<LocalizedString>,
 }
 
@@ -91,10 +107,16 @@ pub struct CommandActionToggle {
 #[ts(export, export_to = "actions.ts")]
 pub struct ActionMenuItem {
     pub command: CommandAction,
+
+    #[ts(optional)]
     pub group: Option<Rc<MenuGroup>>,
+
+    #[ts(optional)]
     pub order: Option<i64>,
+
     #[ts(optional, type = "object")]
     pub when: Option<Rule>,
+
     pub visibility: MenuItemVisibility,
 }
 
@@ -104,13 +126,21 @@ pub struct ActionMenuItem {
 pub struct SubmenuMenuItem {
     #[ts(type = "string")]
     pub submenu_id: ActionCommandId,
-    #[ts(type = "string | null")]
+
+    #[ts(optional, type = "string")]
     pub default_action_id: Option<ActionCommandId>,
-    #[ts(type = "LocalizedString | null")]
+
+    #[ts(optional, type = "LocalizedString")]
     pub title: Option<LocalizedString>,
+
+    #[ts(optional)]
     pub group: Option<Rc<MenuGroup>>,
+
+    #[ts(optional)]
     pub order: Option<i64>,
-    #[ts(type = "string | null")]
+
+    #[ts(optional, type = "string")]
     pub when: Option<Rule>,
+
     pub visibility: MenuItemVisibility,
 }
