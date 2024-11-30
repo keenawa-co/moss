@@ -1,3 +1,3 @@
-export * from "./Home";
-export * from "./Logs";
-export * from "./Settings";
+export * from "./HomePage";
+export * from "./LogsPage";
+export * from "./SettingsPage";
