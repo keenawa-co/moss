@@ -1,12 +1,14 @@
-import Accordion from "./Accordion";
-import SidebarHeader from "./SidebarHeader";
-import { useAppDispatch, RootState } from "@/store";
-import { setAccordions, setPreferredSizes } from "@/store/accordion/accordionSlice";
-import { useSelector } from "react-redux";
-import * as DesktopComponents from ".";
-import { useRef, useEffect } from "react";
-import { Resizable, ResizablePanel } from "./Resizable";
 import { AllotmentHandle } from "allotment";
+import { useEffect, useRef } from "react";
+import { useSelector } from "react-redux";
+
+import { RootState, useAppDispatch } from "@/store";
+import { setAccordions, setPreferredSizes } from "@/store/accordion/accordionSlice";
+
+import * as DesktopComponents from ".";
+import SidebarHeader from "../parts/SideBar/SidebarHeader";
+import Accordion from "./Accordion";
+import { Resizable, ResizablePanel } from "./Resizable";
 
 type DesktopComponentKeys = keyof typeof DesktopComponents;
 type OmittedComponents = Omit<

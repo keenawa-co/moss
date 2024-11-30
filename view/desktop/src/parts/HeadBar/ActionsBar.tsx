@@ -1,13 +1,14 @@
-import { RootState, useAppDispatch } from "@/store";
-import { toggleSidebarVisibility } from "@/store/sidebar/sidebarSlice";
-import { cn, Icon } from "@repo/moss-ui";
 import { HTMLProps, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { invokeIpc } from "@/lib/backend/tauri";
-import { MenuItem } from "@repo/desktop-models";
+
 import { ActionButton } from "@/components/Action/ActionButton";
 import { ActionsSubmenu } from "@/components/Action/ActionsSubmenu";
 import { ActionsGroup } from "@/components/ActionsGroup";
+import { invokeIpc } from "@/lib/backend/tauri";
+import { RootState, useAppDispatch } from "@/store";
+import { toggleSidebarVisibility } from "@/store/sidebar/sidebarSlice";
+import { MenuItem } from "@repo/desktop-models";
+import { cn, Icon } from "@repo/moss-ui";
 
 export const ActionsBar = ({ className, ...props }: HTMLProps<HTMLDivElement>) => {
   const dispatch = useAppDispatch();
@@ -33,7 +34,7 @@ export const ActionsBar = ({ className, ...props }: HTMLProps<HTMLDivElement>) =
   return (
     <div className={cn("flex items-center gap-3", className)} {...props}>
       <div className="flex items-center">
-        <button className="flex items-center gap-px transition-colors">
+        {/* <button className="flex items-center gap-px transition-colors">
           <div className="flex h-full items-center gap-1.5 rounded py-1.5 pl-2.5 pr-2 hover:bg-[#D3D3D3]">
             <Icon icon="HeadBarBranch" className="size-[18px] text-[#525252]" />
             <div className="flex items-center gap-0.5">
@@ -41,13 +42,18 @@ export const ActionsBar = ({ className, ...props }: HTMLProps<HTMLDivElement>) =
               <span className="rounded bg-[#C6C6C6] px-1 text-xs font-semibold text-[#525252]">#50</span>
             </div>
           </div>
+        </button> */}
 
-          <div className="flex cursor-default items-center gap-1 pr-2.5">
-            <Icon icon="HeadBarBranchSuccess" className="size-4 rounded" />
-            <Icon icon="HeadBarBranchRefresh" className="size-4 rounded text-[#525252]" />
-            <Icon icon="ArrowheadDown" className="size-4 rounded text-[#525252]" />
-          </div>
-        </button>
+        <ActionsSubmenu
+          visibility="classic"
+          defaultActionId={"qwe"}
+          title={["main", "main", "#50"]}
+          icon="HeadBarBranch"
+          submenuId="-1"
+          group={{ id: "main", order: BigInt(0), description: ["desc", "desc", "desc"] }}
+          order={BigInt(0)}
+          when=""
+        />
       </div>
 
       <div className="flex items-center">
@@ -96,15 +102,6 @@ export const ActionsBar = ({ className, ...props }: HTMLProps<HTMLDivElement>) =
             );
           }
         })}
-        {/* <ActionsGroup
-          icon={isSidebarVisible ? "HeadBarPrimarySideBarActive" : "HeadBarPrimarySideBar"}
-          onClick={() => dispatch(toggleSidebarVisibility({}))}
-          iconClassName="size-[18px]"
-          className="size-[30px] "
-        />
-        <ActionsGroup icon="HeadBarPanelActive" className="size-[30px] " iconClassName="size-[18px]" />
-        <ActionsGroup icon="HeadBarSecondarySideBar" className="size-[30px] " iconClassName="size-[18px]" />
-        <ActionsGroup icon="HeadBarCustomizeLayout" className="size-[30px] " iconClassName="size-[18px]" /> */}
       </div>
 
       <div className="flex items-center">
