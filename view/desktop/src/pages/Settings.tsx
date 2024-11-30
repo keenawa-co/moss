@@ -13,9 +13,8 @@ export const Settings = () => {
       </div>
       <div>
         <h3>{t("selectTheme")}</h3>
-        {/* <ThemeSelector /> */}
+        <ThemeSwitcher />
       </div>
-      <ThemeSwitcher />
     </main>
   );
 };
