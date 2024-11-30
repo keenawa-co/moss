@@ -9,7 +9,7 @@ crate-type = ["cdylib", "rlib"]
 [dependencies]
 moss_str.workspace = true
 moss_uikit.workspace = true
-
+moss_jsonlogic.workspace = true
 serde = { workspace = true, features = ["derive", "rc"] }
 ts-rs.workspace = true
 once_cell.workspace = true

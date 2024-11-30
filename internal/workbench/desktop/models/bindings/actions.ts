@@ -15,7 +15,7 @@ export type ActionMenuItem = {
   command: CommandAction;
   group: MenuGroup | null;
   order: bigint | null;
-  when: string | null;
+  when?: object;
   visibility: MenuItemVisibility;
 };
 
