@@ -7,10 +7,11 @@ import * as DesktopComponents from ".";
 import { useRef, useEffect } from "react";
 import { Resizable, ResizablePanel } from "./Resizable";
 import { AllotmentHandle } from "allotment";
+
 type DesktopComponentKeys = keyof typeof DesktopComponents;
 type OmittedComponents = Omit<
-  Record<DesktopComponentKeys, any>,
-  "RootLayout" | "SidebarLayout" | "ContentLayout" | "PropertiesLayout" | "Button" | "SidebarHeader"
+  Record<DesktopComponentKeys, unknown>,
+  "RootLayout" | "ContentLayout" | "PropertiesLayout" | "Button" | "SidebarHeader"
 >;
 type DesktopComponentsOmitted = keyof OmittedComponents;
 
@@ -53,7 +54,7 @@ const AccordionsList = () => {
             minSize={accordion.isOpen ? 100 : 35}
             maxSize={accordion.isOpen ? Infinity : 35}
           >
-            <Accordion {...accordion} index={index} handleClick={() => toggleAccordion(index)}>
+            <Accordion title={accordion.title} isOpen={accordion.isOpen} handleClick={() => toggleAccordion(index)}>
               {getDesktopComponentByName(accordion.content as DesktopComponentsOmitted)}
             </Accordion>
           </ResizablePanel>

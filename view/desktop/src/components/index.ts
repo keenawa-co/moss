@@ -1,4 +1,4 @@
-export * from "./layouts/AppLayout";
+export * from "./layouts/index";
 export * from "./Menu";
 export * from "./Button";
 export * from "./LanguageSelector";

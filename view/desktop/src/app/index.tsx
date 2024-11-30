@@ -1,5 +1,5 @@
 import "@/i18n";
-import { ContentLayout, LaunchPad, Menu } from "@/components";
+import { ContentLayout, LaunchPad, Menu, RootLayout } from "@/components";
 import { Suspense } from "react";
 import { useSelector } from "react-redux";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
@@ -8,7 +8,6 @@ import { PageLoader } from "../components/PageLoader";
 import { usePrepareWindow } from "@/hooks/usePrepareWindow";
 import { RootState } from "@/store";
 import Provider from "./Provider";
-import RootLayout from "../components/layouts/RootLayout";
 import { Home, Logs, Settings } from "@/pages";
 
 const App = () => {
