@@ -1,17 +1,14 @@
 import { useEffect, useState } from "react";
-import { useAppDispatch } from "../store";
-import { setLanguageFromLocalStorage } from "../store/languages/languagesSlice";
+import { initializeLanguage } from "@/atoms/langAtom";
 
 export const usePrepareWindow = () => {
-  const dispatch = useAppDispatch();
   const [isPreparing, setIsPreparing] = useState(true);
 
   useEffect(() => {
-    // Dispatch Redux actions
-    dispatch(setLanguageFromLocalStorage());
+    initializeLanguage();
 
     setIsPreparing(false);
-  }, [dispatch]);
+  }, []);
 
   return { isPreparing };
 };

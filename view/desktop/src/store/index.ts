@@ -1,12 +1,10 @@
 import { configureStore } from "@reduxjs/toolkit";
-import { languagesReducer } from "./languages";
 import { useDispatch } from "react-redux";
 import { accordionReducer } from "./accordion";
 import { sidebarReducer } from "./sidebar";
 
 export const store = configureStore({
   reducer: {
-    languages: languagesReducer,
     accordion: accordionReducer,
     sidebar: sidebarReducer,
   },
