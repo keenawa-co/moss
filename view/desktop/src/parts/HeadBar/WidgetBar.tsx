@@ -1,22 +1,23 @@
+import { HTMLProps, useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
+
+import { ActionsGroup } from "@/components/ActionsGroup";
 import {
+  closestCenter,
   DndContext,
   DragEndEvent,
   DragOverlay,
   DragStartEvent,
   MouseSensor,
   UniqueIdentifier,
-  closestCenter,
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
-import { SortableContext, arrayMove, horizontalListSortingStrategy } from "@dnd-kit/sortable";
-import { DropdownMenu as DM, Icon, cn } from "@repo/moss-ui";
+import { arrayMove, horizontalListSortingStrategy, SortableContext } from "@dnd-kit/sortable";
+import { cn, DropdownMenu as DM, Icon } from "@repo/moss-ui";
 import { OsType } from "@tauri-apps/plugin-os";
-import { HTMLProps, useEffect, useRef, useState } from "react";
-import { createPortal } from "react-dom";
 
-import { DNDSortableItemWrapper } from "./DNDWrapper";
-import { ActionsGroup } from "@/components/ActionsGroup";
+import { DNDSortableItemWrapper } from "../../components/DNDWrapper";
 
 interface WidgetBarProps extends HTMLProps<HTMLDivElement> {
   os: OsType;
