@@ -57,8 +57,7 @@ export const ActionsBar = ({ className, ...props }: HTMLProps<HTMLDivElement>) =
             "HeadBarPanelActive",
             "HeadBarSecondarySideBar",
             "HeadBarCustomizeLayout",
-          ];
-          console.log(item);
+          ] as const;
 
           if ("action" in item) {
             const command = item.action.command;

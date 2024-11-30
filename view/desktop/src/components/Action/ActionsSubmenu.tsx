@@ -21,6 +21,8 @@ export const ActionsSubmenu = ({
   iconClassName,
   visibility,
   title,
+  submenuId,
+  defaultActionId,
   ...props
 }: ActionsSubmenuProps) => {
   const [open, setOpen] = useState(false);

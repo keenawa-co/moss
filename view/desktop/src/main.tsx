@@ -21,7 +21,7 @@ sharedWorker.port.onmessage = (event) => {
 
 sharedWorker.port.start();
 
-export function callServiceMethod(methodName: string, args: any[] = []) {
+export function callServiceMethod(methodName: string, args: unknown[] = []) {
   sharedWorker.port.postMessage({
     action: "callMethod",
     data: {
