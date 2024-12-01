@@ -10,7 +10,7 @@
       "@repo/typescript-config": "workspace:*"
     },
     "dependencies": {
-      "typescript": "^5.5.4"
+      "typescript": "^5.7.2"
     }
   }
   
