@@ -164,7 +164,7 @@ fn test_macro() {
 /// # assert_async();
 /// ```
 ///
-/// This macro is a powerful tool in the Rust ecosystem for handling scopes, asynchronous code,
+/// This macro is a powerful tool for handling scopes, asynchronous code,
 /// and error propagation cleanly and effectively within various coding contexts.
 #[macro_export]
 macro_rules! maybe {

@@ -1116,7 +1116,7 @@ dependencies = [
  "log",
  "macos-trampoline",
  "mimalloc",
- "moss_base",
+ "moss_env",
  "moss_uikit",
  "objc",
  "once_cell",
@@ -2814,16 +2814,23 @@ dependencies = [
 ]
 
 [[package]]
-name = "moss_base"
-version = "0.0.0"
+name = "moss_async"
+version = "0.1.0"
 dependencies = [
  "async-trait",
- "hashbrown 0.15.0",
- "im",
- "radix_trie",
- "rustc-hash",
- "serde",
 ]
+
+[[package]]
+name = "moss_collection"
+version = "0.1.0"
+dependencies = [
+ "hashbrown 0.15.0",
+ "radix_trie",
+]
+
+[[package]]
+name = "moss_env"
+version = "0.1.0"
 
 [[package]]
 name = "moss_fs"
@@ -3648,7 +3655,7 @@ dependencies = [
  "async-trait",
  "hashbrown 0.15.0",
  "lazy-regex",
- "moss_base",
+ "moss_collection",
  "parking_lot",
  "platform_core",
  "platform_fs",
@@ -3673,7 +3680,7 @@ dependencies = [
  "futures",
  "hashbrown 0.15.0",
  "im",
- "moss_base",
+ "moss_env",
  "once_cell",
  "parking",
  "parking_lot",

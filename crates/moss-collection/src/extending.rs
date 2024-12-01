@@ -32,26 +32,26 @@ where
     }
 }
 
-// pub trait MaybeExtend<T> {
-//     fn maybe_extend<I>(&mut self, option: Option<I>) -> Option<()>
-//     where
-//         I: IntoIterator<Item = T>;
-// }
+pub trait MaybeExtend<T> {
+    fn maybe_extend<I>(&mut self, option: Option<I>) -> Option<()>
+    where
+        I: IntoIterator<Item = T>;
+}
 
-// impl<T> MaybeExtend<T> for hashbrown::HashSet<T>
-// where
-//     T: Eq + Hash,
-// {
-//     fn maybe_extend<I>(&mut self, option: Option<I>) -> Option<()>
-//     where
-//         I: IntoIterator<Item = T>,
-//     {
-//         if let Some(iterable) = option {
-//             self.extend(iterable);
+impl<T> MaybeExtend<T> for hashbrown::HashSet<T>
+where
+    T: Eq + Hash,
+{
+    fn maybe_extend<I>(&mut self, option: Option<I>) -> Option<()>
+    where
+        I: IntoIterator<Item = T>,
+    {
+        if let Some(iterable) = option {
+            self.extend(iterable);
 
-//             return Some(());
-//         }
+            return Some(());
+        }
 
-//         None
-//     }
-// }
+        None
+    }
+}

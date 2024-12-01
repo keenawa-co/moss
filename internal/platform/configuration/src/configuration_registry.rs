@@ -2,7 +2,7 @@ use std::{any::Any, sync::Arc};
 
 use hashbrown::{HashMap, HashSet};
 use lazy_regex::Regex as LazyRegex;
-use moss_base::collection::extend::MaybeExtend;
+use moss_collection::extending::MaybeExtend;
 use platform_core::context_v2::node::AnyNodeValue;
 // use platform_core::global::Global;
 use serde_json::Value;
