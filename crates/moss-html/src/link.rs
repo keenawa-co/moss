@@ -5,10 +5,15 @@ use moss_str::localized_string::LocalizedString;
 #[serde(rename_all = "camelCase")]
 #[ts(export, export_to = "link.ts")]
 pub struct HtmlLink {
-    href: String,           // The URL the link points to
+    href: String, // The URL the link points to
+
+    #[ts(optional)]
     target: Option<Target>, // Optional target attribute for specifying where to open the link
+
+    #[ts(optional)]
     rel: Option<Rel>, // Optional rel attribute for relationship between linked document and current document
-    #[ts(type = "LocalizedString | null")]
+
+    #[ts(optional, type = "LocalizedString")]
     text: Option<LocalizedString>, // The text displayed for the link
 }
 
