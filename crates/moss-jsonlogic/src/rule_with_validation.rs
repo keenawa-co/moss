@@ -1,26 +1,28 @@
-use crate::rule::{Operator, Rule};
+use crate::raw_rule::{Operator, RawRule};
 use serde::{Deserialize, Serialize, Serializer};
 use serde_json::Value;
-use std::fmt::{Debug, Display};
+use std::fmt::Debug;
 use std::ops::Not;
 use std::ops::{Add, BitAnd, BitOr, Div, Mul, Sub};
 use thiserror::Error;
 
-// TODO: update documentation
-
 #[derive(Debug, Error)]
 pub enum RuleError {
-    #[error("Operand '{operand:?}' have invalid type for operator '{operator}'")]
-    InvalidType { operator: Operator, operand: Rule },
+    #[error("Operand '{operand:?}' has invalid type for operator '{operator}'")]
+    InvalidType {
+        operator: Operator,
+        operand: RawRule,
+    },
     #[error(
         "Operand '{left:?}' has incompatible type with operand '{right:?}' for equality checks"
     )]
-    IncompatibleType { left: Rule, right: Rule },
+    IncompatibleType { left: RawRule, right: RawRule },
     #[error("Cannot divide by zero")]
     ZeroDivision,
 }
 
-#[derive(Serialize, Deserialize, Debug, PartialEq, Clone)]
+/// Represents the result type of a rule.
+#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Clone)]
 enum ResultType {
     Number,
     String,
@@ -31,6 +33,7 @@ enum ResultType {
     Undefined,
 }
 
+/// Trait to get the result type of a rule or operator.
 trait RuleType {
     fn get_type(&self) -> ResultType;
 }
@@ -38,51 +41,43 @@ trait RuleType {
 impl RuleType for Operator {
     fn get_type(&self) -> ResultType {
         match self {
-            Operator::Equal => ResultType::Boolean,
-            Operator::NotEqual => ResultType::Boolean,
-            Operator::GreaterThan => ResultType::Boolean,
-            Operator::LessThan => ResultType::Boolean,
-            Operator::GreaterThanOrEqual => ResultType::Boolean,
-            Operator::LessThanOrEqual => ResultType::Boolean,
-            Operator::And => ResultType::Boolean,
-            Operator::Or => ResultType::Boolean,
-            Operator::Not => ResultType::Boolean,
-            Operator::Add => ResultType::Number,
-            Operator::Subtract => ResultType::Number,
-            Operator::Multiply => ResultType::Number,
-            Operator::Divide => ResultType::Number,
-            Operator::Modulo => ResultType::Number,
-            Operator::In => ResultType::Boolean,
-            Operator::Cat => ResultType::Undefined,
-            Operator::Map => ResultType::Variable,
-            Operator::Reduce => ResultType::Variable,
-            Operator::Filter => ResultType::Array,
-            Operator::All => ResultType::Boolean,
-            Operator::None => ResultType::Boolean,
-            Operator::Some => ResultType::Boolean,
-            Operator::Merge => ResultType::Array,
-            Operator::If => ResultType::Undefined,
+            // Comparison Operators
+            Operator::Equal
+            | Operator::NotEqual
+            | Operator::GreaterThan
+            | Operator::LessThan
+            | Operator::GreaterThanOrEqual
+            | Operator::LessThanOrEqual
+            | Operator::In
+            | Operator::All
+            | Operator::None
+            | Operator::Some => ResultType::Boolean,
+
+            // Logical Operators
+            Operator::And | Operator::Or | Operator::Not => ResultType::Boolean,
+
+            // Arithmetic Operators
+            Operator::Add
+            | Operator::Subtract
+            | Operator::Multiply
+            | Operator::Divide
+            | Operator::Modulo => ResultType::Number,
+
+            // Array Operators
+            Operator::Cat | Operator::Merge => ResultType::Array,
+            Operator::Map | Operator::Reduce | Operator::Filter => ResultType::Array,
+
+            // Miscellaneous Operators
+            Operator::If | Operator::Missing | Operator::MissingSome => ResultType::Undefined,
             Operator::Var => ResultType::Variable,
-            Operator::Missing => ResultType::Undefined,
-            Operator::MissingSome => ResultType::Undefined,
         }
     }
 }
 
-pub struct RuleWithValidation {
-    raw_rule: Rule,
-}
-
-impl From<Rule> for RuleWithValidation {
-    fn from(raw_rule: Rule) -> Self {
-        RuleWithValidation { raw_rule }
-    }
-}
-
-impl RuleType for RuleWithValidation {
+impl RuleType for RawRule {
     fn get_type(&self) -> ResultType {
-        match &self.raw_rule {
-            Rule::Constant(value) => match value {
+        match self {
+            RawRule::Constant(value) => match value {
                 Value::Null => ResultType::Undefined,
                 Value::Bool(_) => ResultType::Boolean,
                 Value::Number(_) => ResultType::Number,
@@ -90,16 +85,223 @@ impl RuleType for RuleWithValidation {
                 Value::Array(_) => ResultType::Array,
                 Value::Object(_) => ResultType::Object,
             },
-            Rule::Variable(_) => ResultType::Variable,
-            Rule::Unary { operator, .. } => operator.get_type(),
-            Rule::Binary { operator, .. } => operator.get_type(),
-            Rule::Variadic { operator, .. } => operator.get_type(),
-            Rule::Custom { .. } => ResultType::Variable,
+            RawRule::Variable(_) => ResultType::Variable,
+            RawRule::Unary { operator, .. } => operator.get_type(),
+            RawRule::Binary { operator, .. } => operator.get_type(),
+            RawRule::Variadic { operator, .. } => operator.get_type(),
+            RawRule::Custom { .. } => ResultType::Variable, // Assume custom operators return variable type
         }
     }
 }
 
+/// Represents a JSON Logic rule with validation.
+///
+/// `RuleWithValidation` wraps a `RawRule` and ensures that the rule is valid
+/// according to JSON Logic specifications. It performs type checking and other
+/// validations to prevent the creation of invalid rules.
+#[derive(Debug, Clone)]
+pub struct RuleWithValidation {
+    raw_rule: RawRule,
+}
+
 impl RuleWithValidation {
+    /// Creates a new `RuleWithValidation` from a `RawRule`.
+    ///
+    /// This function validates the rule upon creation.
+    pub fn new(raw_rule: RawRule) -> Result<Self, RuleError> {
+        let rule_with_validation = RuleWithValidation { raw_rule };
+        rule_with_validation.validate()?;
+        Ok(rule_with_validation)
+    }
+
+    /// Validates the rule and its operands recursively.
+    ///
+    /// Ensures that all parts of the rule are valid, performing type checks and
+    /// specific operator validations.
+    fn validate(&self) -> Result<(), RuleError> {
+        match &self.raw_rule {
+            RawRule::Constant(_) | RawRule::Variable(_) => Ok(()),
+            RawRule::Unary { operator, operand } => {
+                let operand = RuleWithValidation {
+                    raw_rule: *operand.clone(),
+                };
+                operand.validate()?;
+                self.validate_unary_operator(operator, &operand)
+            }
+            RawRule::Binary {
+                operator,
+                left,
+                right,
+            } => {
+                let left = RuleWithValidation {
+                    raw_rule: *left.clone(),
+                };
+                let right = RuleWithValidation {
+                    raw_rule: *right.clone(),
+                };
+                left.validate()?;
+                right.validate()?;
+                self.validate_binary_operator(operator, &left, &right)
+            }
+            RawRule::Variadic { operator, operands } => {
+                for operand in operands {
+                    let operand = RuleWithValidation {
+                        raw_rule: operand.clone(),
+                    };
+                    operand.validate()?;
+                }
+                self.validate_variadic_operator(operator, operands)
+            }
+            RawRule::Custom { .. } => {
+                // Custom operators are not validated
+                Ok(())
+            }
+        }
+    }
+
+    /// Validates a unary operator.
+    ///
+    /// Performs type checking specific to unary operators.
+    fn validate_unary_operator(
+        &self,
+        operator: &Operator,
+        operand: &RuleWithValidation,
+    ) -> Result<(), RuleError> {
+        match operator {
+            Operator::Not => {
+                if operand.is_boolean_compatible() {
+                    Ok(())
+                } else {
+                    Err(RuleError::InvalidType {
+                        operator: operator.clone(),
+                        operand: operand.raw_rule.clone(),
+                    })
+                }
+            }
+            _ => Ok(()), // Other unary operators can be added here
+        }
+    }
+
+    /// Validates a binary operator.
+    ///
+    /// Performs type checking specific to binary operators.
+    fn validate_binary_operator(
+        &self,
+        operator: &Operator,
+        left: &RuleWithValidation,
+        right: &RuleWithValidation,
+    ) -> Result<(), RuleError> {
+        match operator {
+            Operator::Equal | Operator::NotEqual => {
+                if left.is_type_compatible_with(right) {
+                    Ok(())
+                } else {
+                    Err(RuleError::IncompatibleType {
+                        left: left.raw_rule.clone(),
+                        right: right.raw_rule.clone(),
+                    })
+                }
+            }
+            Operator::GreaterThan
+            | Operator::LessThan
+            | Operator::GreaterThanOrEqual
+            | Operator::LessThanOrEqual => {
+                if left.is_number_compatible() && right.is_number_compatible() {
+                    Ok(())
+                } else {
+                    Err(RuleError::InvalidType {
+                        operator: operator.clone(),
+                        operand: if !left.is_number_compatible() {
+                            left.raw_rule.clone()
+                        } else {
+                            right.raw_rule.clone()
+                        },
+                    })
+                }
+            }
+            Operator::Add
+            | Operator::Subtract
+            | Operator::Multiply
+            | Operator::Divide
+            | Operator::Modulo => {
+                if left.is_number_compatible() && right.is_number_compatible() {
+                    if *operator == Operator::Divide || *operator == Operator::Modulo {
+                        self.validate_division_by_zero(right)
+                    } else {
+                        Ok(())
+                    }
+                } else {
+                    Err(RuleError::InvalidType {
+                        operator: operator.clone(),
+                        operand: if !left.is_number_compatible() {
+                            left.raw_rule.clone()
+                        } else {
+                            right.raw_rule.clone()
+                        },
+                    })
+                }
+            }
+            _ => Ok(()), // Other binary operators can be added here
+        }
+    }
+
+    /// Validates a variadic operator.
+    ///
+    /// Performs type checking specific to variadic operators.
+    fn validate_variadic_operator(
+        &self,
+        operator: &Operator,
+        operands: &[RawRule],
+    ) -> Result<(), RuleError> {
+        match operator {
+            Operator::And | Operator::Or => {
+                for operand in operands {
+                    let operand = RuleWithValidation {
+                        raw_rule: operand.clone(),
+                    };
+                    if !operand.is_boolean_compatible() {
+                        return Err(RuleError::InvalidType {
+                            operator: operator.clone(),
+                            operand: operand.raw_rule.clone(),
+                        });
+                    }
+                }
+                Ok(())
+            }
+            Operator::Add | Operator::Multiply => {
+                for operand in operands {
+                    let operand = RuleWithValidation {
+                        raw_rule: operand.clone(),
+                    };
+                    if !operand.is_number_compatible() {
+                        return Err(RuleError::InvalidType {
+                            operator: operator.clone(),
+                            operand: operand.raw_rule.clone(),
+                        });
+                    }
+                }
+                Ok(())
+            }
+            _ => Ok(()), // Other variadic operators can be added here
+        }
+    }
+
+    /// Validates division by zero.
+    ///
+    /// Checks if the divisor is zero in division or modulo operations.
+    fn validate_division_by_zero(&self, right: &RuleWithValidation) -> Result<(), RuleError> {
+        if let RawRule::Constant(value) = &right.raw_rule {
+            if value.is_number() {
+                let number = value.as_f64().unwrap_or(0.0);
+                if number.abs() <= f64::EPSILON {
+                    return Err(RuleError::ZeroDivision);
+                }
+            }
+        }
+        Ok(())
+    }
+
+    /// Checks if the rule type is compatible with another rule's type.
     fn is_type_compatible_with(&self, other: &RuleWithValidation) -> bool {
         let self_type = self.get_type();
         let other_type = other.get_type();
@@ -112,180 +314,244 @@ impl RuleWithValidation {
         }
     }
 
+    /// Checks if the rule is compatible with boolean operations.
     fn is_boolean_compatible(&self) -> bool {
-        self.get_type() == ResultType::Boolean || self.get_type() == ResultType::Variable
+        let ty = self.get_type();
+        ty == ResultType::Boolean || ty == ResultType::Variable
     }
 
+    /// Checks if the rule is compatible with numeric operations.
     fn is_number_compatible(&self) -> bool {
-        self.get_type() == ResultType::Number || self.get_type() == ResultType::Variable
+        let ty = self.get_type();
+        ty == ResultType::Number || ty == ResultType::Variable
     }
 
-    pub fn validate_boolean_operators(
-        operator: Operator,
-        operands: Vec<&RuleWithValidation>,
-    ) -> Result<(), RuleError> {
-        let invalid_operands = operands
-            .iter()
-            .filter(|x| !x.is_boolean_compatible())
-            .collect::<Vec<_>>();
-        if invalid_operands.is_empty() {
-            Ok(())
-        } else {
-            Err(RuleError::InvalidType {
-                operator,
-                operand: invalid_operands[0].raw_rule.clone(),
-            })
-        }
-    }
+    // ----------------------------------------------------------------------------
+    // Constructor Methods
+    //
+    // These methods provide convenient ways to create new rules.
+    // ----------------------------------------------------------------------------
 
-    pub fn validate_equality_operators(
-        left: &RuleWithValidation,
-        right: &RuleWithValidation,
-    ) -> Result<(), RuleError> {
-        if !left.is_type_compatible_with(right) {
-            return Err(RuleError::IncompatibleType {
-                left: left.raw_rule.clone(),
-                right: right.raw_rule.clone(),
-            });
-        }
-        Ok(())
-    }
-
-    pub fn validate_numeric_operators(
-        operator: Operator,
-        operands: Vec<&RuleWithValidation>,
-    ) -> Result<(), RuleError> {
-        let invalid_operands = operands
-            .iter()
-            .filter(|x| !x.is_number_compatible())
-            .collect::<Vec<_>>();
-        if invalid_operands.is_empty() {
-            Ok(())
-        } else {
-            Err(RuleError::InvalidType {
-                operator,
-                operand: invalid_operands[0].raw_rule.clone(),
-            })
-        }
-    }
-
-    pub fn validate_division(
-        operator: Operator,
-        right: &RuleWithValidation,
-    ) -> Result<(), RuleError> {
-        // For now we only check zero literal
-        // In the future, we can check expressions that evaluate to zero
-        if let Rule::Constant(divisor) = right.raw_rule.clone() {
-            if !divisor.is_number() {
-                return Err(RuleError::InvalidType {
-                    operator,
-                    operand: right.raw_rule.clone(),
-                });
-            }
-            let divisor = divisor.as_number().unwrap();
-            if divisor.is_f64() && divisor.as_f64().unwrap().abs() <= f64::EPSILON {
-                Err(RuleError::ZeroDivision)
-            } else if divisor.is_i64() && divisor.as_i64().unwrap() == 0 {
-                Err(RuleError::ZeroDivision)
-            } else {
-                Ok(())
-            }
-        } else {
-            Ok(())
-        }
-    }
-
+    /// Creates a constant value rule.
     pub fn value<V: Into<Value>>(value: V) -> Self {
-        Rule::Constant(value.into()).into()
-    }
-
-    pub fn constant<V: Into<Value>>(value: V) -> Self {
-        Rule::Constant(value.into()).into()
-    }
-
-    pub fn var<S: Into<String>>(name: S) -> Self {
-        Rule::Variable(name.into()).into()
-    }
-
-    pub fn custom<S: Into<String>>(operator: S, operands: Vec<Self>) -> Self {
-        Rule::Custom {
-            operator: operator.into(),
-            operands: operands.into_iter().map(|x| x.raw_rule).collect(),
+        RuleWithValidation {
+            raw_rule: RawRule::value(value),
         }
-        .into()
     }
 
+    /// Creates a constant value rule (alias for `value`).
+    pub fn constant<V: Into<Value>>(value: V) -> Self {
+        RuleWithValidation {
+            raw_rule: RawRule::constant(value),
+        }
+    }
+
+    /// Creates a variable reference rule.
+    pub fn var<S: Into<String>>(name: S) -> Self {
+        RuleWithValidation {
+            raw_rule: RawRule::var(name),
+        }
+    }
+
+    /// Creates a custom operation rule.
+    pub fn custom<S: Into<String>>(operator: S, operands: Vec<Self>) -> Self {
+        RuleWithValidation {
+            raw_rule: RawRule::custom(operator, operands.into_iter().map(|r| r.raw_rule).collect()),
+        }
+    }
+
+    // ----------------------------------------------------------------------------
+    // Operator-Specific Methods
+    //
+    // These methods allow building complex rules using logical and arithmetic operators.
+    // ----------------------------------------------------------------------------
+
+    /// Applies the logical NOT operator.
     pub fn not(self) -> Result<Self, RuleError> {
-        Self::validate_boolean_operators(Operator::Not, vec![&self])?;
-        Ok(self.raw_rule.not().into())
+        let rule = RawRule::unary(Operator::Not, self.raw_rule);
+        RuleWithValidation::new(rule)
     }
 
+    /// Combines two rules with logical AND.
     pub fn and(self, other: Self) -> Result<Self, RuleError> {
-        Self::validate_boolean_operators(Operator::And, vec![&self, &other])?;
-        Ok(self.raw_rule.and(other.raw_rule).into())
+        let rule = match self.raw_rule {
+            RawRule::Variadic {
+                operator: Operator::And,
+                mut operands,
+            } => {
+                operands.push(other.raw_rule);
+                RawRule::Variadic {
+                    operator: Operator::And,
+                    operands,
+                }
+            }
+            _ => RawRule::variadic(Operator::And, vec![self.raw_rule, other.raw_rule]),
+        };
+        RuleWithValidation::new(rule)
     }
 
+    /// Combines two rules with logical OR.
     pub fn or(self, other: Self) -> Result<Self, RuleError> {
-        Self::validate_boolean_operators(Operator::Or, vec![&self, &other])?;
-        Ok(self.raw_rule.or(other.raw_rule).into())
+        let rule = match self.raw_rule {
+            RawRule::Variadic {
+                operator: Operator::Or,
+                mut operands,
+            } => {
+                operands.push(other.raw_rule);
+                RawRule::Variadic {
+                    operator: Operator::Or,
+                    operands,
+                }
+            }
+            _ => RawRule::variadic(Operator::Or, vec![self.raw_rule, other.raw_rule]),
+        };
+        RuleWithValidation::new(rule)
     }
 
+    /// Checks if two rules are equal.
     pub fn eq(self, other: Self) -> Result<Self, RuleError> {
-        Self::validate_equality_operators(&self, &other)?;
-        Ok(self.raw_rule.eq(other.raw_rule).into())
+        let rule = RawRule::binary(Operator::Equal, self.raw_rule, other.raw_rule);
+        RuleWithValidation::new(rule)
     }
 
+    /// Checks if two rules are not equal.
     pub fn ne(self, other: Self) -> Result<Self, RuleError> {
-        Self::validate_equality_operators(&self, &other)?;
-        Ok(self.raw_rule.ne(other.raw_rule).into())
+        let rule = RawRule::binary(Operator::NotEqual, self.raw_rule, other.raw_rule);
+        RuleWithValidation::new(rule)
     }
 
+    /// Checks if the first rule is greater than the second.
     pub fn gt(self, other: Self) -> Result<Self, RuleError> {
-        Self::validate_numeric_operators(Operator::GreaterThan, vec![&self, &other])?;
-        Ok(self.raw_rule.gt(other.raw_rule).into())
+        let rule = RawRule::binary(Operator::GreaterThan, self.raw_rule, other.raw_rule);
+        RuleWithValidation::new(rule)
     }
 
+    /// Checks if the first rule is less than the second.
     pub fn lt(self, other: Self) -> Result<Self, RuleError> {
-        Self::validate_numeric_operators(Operator::LessThan, vec![&self, &other])?;
-        Ok(self.raw_rule.lt(other.raw_rule).into())
+        let rule = RawRule::binary(Operator::LessThan, self.raw_rule, other.raw_rule);
+        RuleWithValidation::new(rule)
     }
 
+    /// Checks if the first rule is greater than or equal to the second.
     pub fn gte(self, other: Self) -> Result<Self, RuleError> {
-        Self::validate_numeric_operators(Operator::GreaterThanOrEqual, vec![&self, &other])?;
-        Ok(self.raw_rule.gte(other.raw_rule).into())
+        let rule = RawRule::binary(Operator::GreaterThanOrEqual, self.raw_rule, other.raw_rule);
+        RuleWithValidation::new(rule)
     }
 
+    /// Checks if the first rule is less than or equal to the second.
     pub fn lte(self, other: Self) -> Result<Self, RuleError> {
-        Self::validate_numeric_operators(Operator::LessThanOrEqual, vec![&self, &other])?;
-        Ok(self.raw_rule.lte(other.raw_rule).into())
+        let rule = RawRule::binary(Operator::LessThanOrEqual, self.raw_rule, other.raw_rule);
+        RuleWithValidation::new(rule)
     }
 
+    /// Adds two rules.
     pub fn add(self, other: Self) -> Result<Self, RuleError> {
-        Self::validate_numeric_operators(Operator::Add, vec![&self, &other])?;
-        Ok(self.raw_rule.add(other.raw_rule).into())
+        let rule = match self.raw_rule {
+            RawRule::Variadic {
+                operator: Operator::Add,
+                mut operands,
+            } => {
+                operands.push(other.raw_rule);
+                RawRule::Variadic {
+                    operator: Operator::Add,
+                    operands,
+                }
+            }
+            _ => RawRule::variadic(Operator::Add, vec![self.raw_rule, other.raw_rule]),
+        };
+        RuleWithValidation::new(rule)
     }
 
+    /// Subtracts the second rule from the first.
     pub fn subtract(self, other: Self) -> Result<Self, RuleError> {
-        Self::validate_numeric_operators(Operator::Subtract, vec![&self, &other])?;
-        Ok(self.raw_rule.subtract(other.raw_rule).into())
+        let rule = RawRule::binary(Operator::Subtract, self.raw_rule, other.raw_rule);
+        RuleWithValidation::new(rule)
     }
 
+    /// Multiplies two rules.
     pub fn multiply(self, other: Self) -> Result<Self, RuleError> {
-        Self::validate_numeric_operators(Operator::Multiply, vec![&self, &other])?;
-        Ok(self.raw_rule.multiply(other.raw_rule).into())
-    }
-    pub fn divide(self, other: Self) -> Result<Self, RuleError> {
-        Self::validate_numeric_operators(Operator::Divide, vec![&self, &other])?;
-        Self::validate_division(Operator::Divide, &other)?;
-        Ok(self.raw_rule.divide(other.raw_rule).into())
+        let rule = match self.raw_rule {
+            RawRule::Variadic {
+                operator: Operator::Multiply,
+                mut operands,
+            } => {
+                operands.push(other.raw_rule);
+                RawRule::Variadic {
+                    operator: Operator::Multiply,
+                    operands,
+                }
+            }
+            _ => RawRule::variadic(Operator::Multiply, vec![self.raw_rule, other.raw_rule]),
+        };
+        RuleWithValidation::new(rule)
     }
 
+    /// Divides the first rule by the second.
+    pub fn divide(self, other: Self) -> Result<Self, RuleError> {
+        let rule = RawRule::binary(Operator::Divide, self.raw_rule, other.raw_rule);
+        RuleWithValidation::new(rule)
+    }
+
+    /// Computes the remainder of the division of the first rule by the second.
     pub fn modulo(self, other: Self) -> Result<Self, RuleError> {
-        Self::validate_numeric_operators(Operator::Modulo, vec![&self, &other])?;
-        Self::validate_division(Operator::Modulo, &other)?;
-        Ok(self.raw_rule.modulo(other.raw_rule).into())
+        let rule = RawRule::binary(Operator::Modulo, self.raw_rule, other.raw_rule);
+        RuleWithValidation::new(rule)
     }
 }
+
+impl RuleType for RuleWithValidation {
+    fn get_type(&self) -> ResultType {
+        self.raw_rule.get_type()
+    }
+}
+
+// ----------------------------------------------------------------------------
+// Implementations of From traits
+//
+// These implementations allow for easy conversion from basic types to rules.
+// ----------------------------------------------------------------------------
+
+impl From<&str> for RuleWithValidation {
+    fn from(s: &str) -> Self {
+        RuleWithValidation::value(s)
+    }
+}
+
+impl From<String> for RuleWithValidation {
+    fn from(s: String) -> Self {
+        RuleWithValidation::value(s)
+    }
+}
+
+impl From<i64> for RuleWithValidation {
+    fn from(n: i64) -> Self {
+        RuleWithValidation::value(n)
+    }
+}
+
+impl From<f64> for RuleWithValidation {
+    fn from(n: f64) -> Self {
+        RuleWithValidation::value(n)
+    }
+}
+
+impl From<bool> for RuleWithValidation {
+    fn from(b: bool) -> Self {
+        RuleWithValidation::value(b)
+    }
+}
+
+impl From<Value> for RuleWithValidation {
+    fn from(value: Value) -> Self {
+        RuleWithValidation::value(value)
+    }
+}
+
+// ----------------------------------------------------------------------------
+// Implement Serialize
+//
+// This allows RuleWithValidation to be serialized using Serde.
+// ----------------------------------------------------------------------------
 
 impl Serialize for RuleWithValidation {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
@@ -296,93 +562,70 @@ impl Serialize for RuleWithValidation {
     }
 }
 
-impl From<&str> for RuleWithValidation {
-    fn from(s: &str) -> Self {
-        Rule::constant(s).into()
-    }
-}
-
-impl From<String> for RuleWithValidation {
-    fn from(s: String) -> Self {
-        Rule::constant(s).into()
-    }
-}
-
-impl From<i64> for RuleWithValidation {
-    fn from(n: i64) -> Self {
-        Rule::constant(n).into()
-    }
-}
-
-impl From<f64> for RuleWithValidation {
-    fn from(n: f64) -> Self {
-        Rule::constant(n).into()
-    }
-}
-
-impl From<bool> for RuleWithValidation {
-    fn from(b: bool) -> Self {
-        Rule::constant(b).into()
-    }
-}
-
-impl From<Value> for RuleWithValidation {
-    fn from(value: Value) -> Self {
-        Rule::constant(value).into()
-    }
-}
+// ----------------------------------------------------------------------------
+// Operator Overloading
+//
+// Enables the use of operators like +, -, *, /, &, |, ! on RuleWithValidation.
+// ----------------------------------------------------------------------------
 
 impl BitAnd for RuleWithValidation {
-    type Output = RuleWithValidation;
+    type Output = Self;
 
-    fn bitand(self, rhs: RuleWithValidation) -> RuleWithValidation {
-        self.and(rhs).map_err(|e| e.to_string()).unwrap()
+    fn bitand(self, rhs: Self) -> Self {
+        self.and(rhs)
+            .unwrap_or_else(|e| panic!("Rule error: {}", e))
     }
 }
 
 impl BitOr for RuleWithValidation {
-    type Output = RuleWithValidation;
+    type Output = Self;
 
-    fn bitor(self, rhs: RuleWithValidation) -> RuleWithValidation {
-        self.or(rhs).map_err(|e| e.to_string()).unwrap()
+    fn bitor(self, rhs: Self) -> Self {
+        self.or(rhs).unwrap_or_else(|e| panic!("Rule error: {}", e))
     }
 }
 
 impl Add for RuleWithValidation {
-    type Output = RuleWithValidation;
+    type Output = Self;
 
-    fn add(self, rhs: RuleWithValidation) -> RuleWithValidation {
-        self.add(rhs).map_err(|e| e.to_string()).unwrap()
+    fn add(self, rhs: Self) -> Self {
+        self.add(rhs)
+            .unwrap_or_else(|e| panic!("Rule error: {}", e))
     }
 }
 
 impl Sub for RuleWithValidation {
-    type Output = RuleWithValidation;
+    type Output = Self;
 
-    fn sub(self, rhs: RuleWithValidation) -> RuleWithValidation {
-        self.subtract(rhs).map_err(|e| e.to_string()).unwrap()
+    fn sub(self, rhs: Self) -> Self {
+        self.subtract(rhs)
+            .unwrap_or_else(|e| panic!("Rule error: {}", e))
     }
 }
 
 impl Mul for RuleWithValidation {
-    type Output = RuleWithValidation;
-    fn mul(self, rhs: RuleWithValidation) -> RuleWithValidation {
-        self.multiply(rhs).map_err(|e| e.to_string()).unwrap()
+    type Output = Self;
+
+    fn mul(self, rhs: Self) -> Self {
+        self.multiply(rhs)
+            .unwrap_or_else(|e| panic!("Rule error: {}", e))
     }
 }
 
 impl Div for RuleWithValidation {
-    type Output = RuleWithValidation;
-    fn div(self, rhs: RuleWithValidation) -> RuleWithValidation {
-        self.divide(rhs).map_err(|e| e.to_string()).unwrap()
+    type Output = Self;
+
+    fn div(self, rhs: Self) -> Self {
+        self.divide(rhs)
+            .unwrap_or_else(|e| panic!("Rule error: {}", e))
     }
 }
 
 impl Not for RuleWithValidation {
-    type Output = RuleWithValidation;
+    type Output = Self;
 
-    fn not(self) -> RuleWithValidation {
-        self.not().map_err(|e| e.to_string()).unwrap()
+    fn not(self) -> Self {
+        self.not().unwrap_or_else(|e| panic!("Rule error: {}", e))
     }
 }
 

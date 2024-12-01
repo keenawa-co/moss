@@ -1,6 +1,6 @@
 use std::rc::Rc;
 
-use moss_jsonlogic::rule::Rule;
+use moss_jsonlogic::raw_rule::RawRule;
 use moss_str::{localized_string::LocalizedString, ReadOnlyStr};
 use serde::Serialize;
 use ts_rs::TS;
@@ -90,7 +90,7 @@ pub struct CommandAction {
 #[ts(export, export_to = "actions.ts")]
 pub struct CommandActionToggle {
     #[ts(type = "string")]
-    pub condition: Rule,
+    pub condition: RawRule,
 
     #[ts(optional)]
     pub icon: Option<String>,
@@ -115,7 +115,7 @@ pub struct ActionMenuItem {
     pub order: Option<i64>,
 
     #[ts(optional, type = "object")]
-    pub when: Option<Rule>,
+    pub when: Option<RawRule>,
 
     pub visibility: MenuItemVisibility,
 }
@@ -140,7 +140,7 @@ pub struct SubmenuMenuItem {
     pub order: Option<i64>,
 
     #[ts(optional, type = "string")]
-    pub when: Option<Rule>,
+    pub when: Option<RawRule>,
 
     pub visibility: MenuItemVisibility,
 }

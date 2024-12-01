@@ -77,7 +77,7 @@ fn parse_expr_to_rule(expr: &Expr) -> syn::Result<proc_macro2::TokenStream> {
             let lit = &expr_lit.lit;
             match lit {
                 Lit::Int(_) | Lit::Float(_) | Lit::Str(_) | Lit::Bool(_) => {
-                    Ok(quote! { Rule::value(#lit) })
+                    Ok(quote! { RawRule::value(#lit) })
                 }
                 _ => Err(syn::Error::new_spanned(
                     lit,
@@ -94,7 +94,7 @@ fn parse_expr_to_rule(expr: &Expr) -> syn::Result<proc_macro2::TokenStream> {
                     let tokens_string = tokens.to_string();
                     let tokens_trimmed = tokens_string.trim_matches(|c| c == '(' || c == ')');
                     let tokens: proc_macro2::TokenStream = tokens_trimmed.parse().unwrap();
-                    Ok(quote! { Rule::from(#tokens) })
+                    Ok(quote! { RawRule::from(#tokens) })
                 } else {
                     Err(syn::Error::new_spanned(
                         expr_macro,
@@ -115,7 +115,7 @@ fn parse_expr_to_rule(expr: &Expr) -> syn::Result<proc_macro2::TokenStream> {
                 .get_ident()
                 .ok_or_else(|| syn::Error::new_spanned(expr_path, "Expected identifier"))?;
             let name = ident.to_string();
-            Ok(quote! { Rule::var(#name) })
+            Ok(quote! { RawRule::var(#name) })
         }
         // Handle field access (e.g., user.name)
         Expr::Field(expr_field) => {
@@ -125,14 +125,14 @@ fn parse_expr_to_rule(expr: &Expr) -> syn::Result<proc_macro2::TokenStream> {
                 Member::Unnamed(index) => index.index.to_string(),
             };
             let full_name = format!("{}.{}", base, member);
-            Ok(quote! { Rule::var(#full_name) })
+            Ok(quote! { RawRule::var(#full_name) })
         }
         // Handle indexing (e.g., array[0])
         Expr::Index(expr_index) => {
             let base = parse_expr_to_string(&expr_index.expr)?;
             let index = parse_expr_to_string(&expr_index.index)?;
             let full_name = format!("{}[{}]", base, index);
-            Ok(quote! { Rule::var(#full_name) })
+            Ok(quote! { RawRule::var(#full_name) })
         }
         // Handle method calls (e.g., obj.method(arg))
         Expr::MethodCall(expr_method_call) => {
@@ -144,7 +144,7 @@ fn parse_expr_to_rule(expr: &Expr) -> syn::Result<proc_macro2::TokenStream> {
                 .map(parse_expr_to_rule)
                 .collect::<Result<_, _>>()?;
             let method_call = format!("{}.{}", receiver, method);
-            Ok(quote! { Rule::custom(#method_call, vec![#(#args),*]) })
+            Ok(quote! { RawRule::custom(#method_call, vec![#(#args),*]) })
         }
         // Return an error for unsupported expressions
         _ => Err(syn::Error::new_spanned(

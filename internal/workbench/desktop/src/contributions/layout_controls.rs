@@ -5,7 +5,7 @@ use desktop_models::{
     },
     constants,
 };
-use moss_jsonlogic::rule::*;
+use moss_jsonlogic::raw_rule::*;
 use moss_jsonlogic_macro::rule;
 use moss_str::{localize, ReadOnlyStr};
 use std::rc::Rc;

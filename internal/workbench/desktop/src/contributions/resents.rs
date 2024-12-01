@@ -7,7 +7,7 @@ use desktop_models::{
     constants,
     view::TreeViewDescriptor,
 };
-use moss_jsonlogic::rule::*;
+use moss_jsonlogic::raw_rule::*;
 use moss_jsonlogic_macro::rule;
 use moss_str::{localize, ReadOnlyStr};
 use once_cell::sync::Lazy;
