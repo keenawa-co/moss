@@ -148,7 +148,6 @@ fn parse_expr_to_rule(expr: &Expr) -> syn::Result<proc_macro2::TokenStream> {
 
 fn parse_expr_to_string(expr: &Expr) -> syn::Result<String> {
     match expr {
-        // Handle variable references
         Expr::Path(expr_path) => {
             let ident = expr_path
                 .path
@@ -156,7 +155,6 @@ fn parse_expr_to_string(expr: &Expr) -> syn::Result<String> {
                 .ok_or_else(|| syn::Error::new_spanned(expr_path, "Expected identifier"))?;
             Ok(ident.to_string())
         }
-        // Handle field access
         Expr::Field(expr_field) => {
             let base = parse_expr_to_string(&expr_field.base)?;
             let member = match &expr_field.member {
@@ -165,13 +163,11 @@ fn parse_expr_to_string(expr: &Expr) -> syn::Result<String> {
             };
             Ok(format!("{}.{}", base, member))
         }
-        // Handle indexing
         Expr::Index(expr_index) => {
             let base = parse_expr_to_string(&expr_index.expr)?;
             let index = parse_expr_to_string(&expr_index.index)?;
             Ok(format!("{}[{}]", base, index))
         }
-        // Return an error for unsupported expressions
         _ => Err(syn::Error::new_spanned(
             expr,
             "Expected variable name in field access",
