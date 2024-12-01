@@ -1,11 +1,7 @@
-import { PayloadAction, Slice, createSelector, createSlice } from "@reduxjs/toolkit";
+import { PayloadAction, Slice, createSlice } from "@reduxjs/toolkit";
 import * as DesktopComponents from "../../components";
-import { RootState } from "..";
 type DesktopComponentKeys = keyof typeof DesktopComponents;
-type OmittedComponents = Omit<
-  Record<DesktopComponentKeys, any>,
-  "RootLayout" | "SidebarLayout" | "ContentLayout" | "PropertiesLayout"
->;
+type OmittedComponents = Record<DesktopComponentKeys, unknown>;
 type DesktopComponentsOmitted = keyof OmittedComponents;
 export interface IAccordion {
   id: number;

@@ -1,13 +1,13 @@
-import { Theme, Colors } from "@repo/desktop-models";
 import { existsSync, mkdirSync, writeFileSync } from "fs";
 import * as os from "os";
+
+import { Theme } from "@repo/desktop-models";
 
 // FIXME: temporary solution
 const homeDirectory = os.homedir();
 const themesDirectory = `${homeDirectory}/.config/moss/themes`;
 
 // Default
-// TODO: Change the Theme type to one generated from JSON Schema
 const defaultDarkTheme: Theme = {
   name: "Moss Dark Default",
   slug: "moss-dark",
@@ -78,29 +78,18 @@ function ensureDirectoryExists(directory: string): void {
 async function writeThemeFile(theme: Theme): Promise<void> {
   const fileName = `${themesDirectory}/${theme.slug}.json`;
 
-  const filteredColors = Object.fromEntries(
-    Object.entries(theme.color).filter(([key]) => key.includes(".") || !/[A-Z]/.test(key))
-  );
-
-  const filteredTheme = {
-    ...theme,
-    colors: filteredColors,
-  };
-
-  writeFileSync(fileName, JSON.stringify(filteredTheme, null, 2), {
+  writeFileSync(fileName, JSON.stringify(theme, null, 2), {
     flag: "w",
   });
 }
 
-async function generateThemeFiles(): Promise<void> {
+(async () => {
   try {
-    await ensureDirectoryExists(themesDirectory);
+    ensureDirectoryExists(themesDirectory);
     await Promise.all(themes.map(writeThemeFile));
     console.log("Theme files generated successfully.");
   } catch (error) {
     console.error("Error generating theme files:", error);
     process.exit(1);
   }
-}
-
-generateThemeFiles();
+})();

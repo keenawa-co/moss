@@ -1,16 +1,12 @@
-import { LANGUAGES } from "@/constants";
-import { RootState } from "@/store";
-import { setLanguage } from "@/store/languages/languagesSlice";
+import { useAtom } from "jotai";
 import React from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { languageAtom, LanguageCodes, LANGUAGES } from "@/atoms/langAtom";
 
 export const LanguageSelector = () => {
-  const dispatch = useDispatch();
-  const language = useSelector((state: RootState) => state.languages.code);
+  const [language, setLanguage] = useAtom(languageAtom);
 
   const onChangeLang = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    console.log("Language changed", e.target.value);
-    dispatch(setLanguage(e.target.value));
+    setLanguage(e.target.value as LanguageCodes);
   };
 
   return (

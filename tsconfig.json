@@ -11,6 +11,12 @@
       "path": "crates/moss-uikit"
     },
     {
+      "path": "packages/moss_lang"
+    },
+    {
+      "path": "packages/moss-ui"
+    },
+    {
       "path": "view/desktop"
     },
     {
@@ -21,15 +27,6 @@
     },
     {
       "path": "view/storybook"
-    },
-    {
-      "path": "view/shared/ui"
-    },
-    {
-      "path": "lib/moss_theme"
-    },
-    {
-      "path": "lib/moss_lang"
     },
     {
       "path": "tools/themegen"
