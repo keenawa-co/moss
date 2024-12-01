@@ -1,0 +1,36 @@
+name: Rust
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@v2.7.5
+        with:
+          workspaces: ".github/cache"
+
+      - name: Prerequisite Packages Cache
+        uses: awalsh128/cache-apt-pkgs-action@latest
+        with:
+          packages: libwebkit2gtk-4.0-dev libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
+
+      - name: Run Unit Tests
+        run: cargo -q test --lib
+        working-directory: ".github/cache"
+
+      - name: Run Doc Tests
+        if: always()
+        run: cargo -q test --doc
+        working-directory: ".github/cache"
+

@@ -1105,7 +1105,7 @@ mod tests {
     #[test]
     #[should_panic]
     fn test_invalid_type_compound4() {
-        let rule = rule_with_validation!(42 > 0 < 1);
+        let rule = rule_with_validation!(42 > 0 && 1);
     }
 
     #[test]
