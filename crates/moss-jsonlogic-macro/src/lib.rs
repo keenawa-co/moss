@@ -82,8 +82,6 @@ fn parse_expr_to_rule(expr: &Expr) -> syn::Result<proc_macro2::TokenStream> {
             if let Some(ident) = expr_macro.mac.path.get_ident() {
                 if ident == "val" {
                     let tokens = &expr_macro.mac.tokens;
-
-                    // Parse the inner expression within val!()
                     let inner_expr: Expr = syn::parse2(tokens.clone())?;
 
                     Ok(quote! {
