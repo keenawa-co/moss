@@ -1,6 +1,6 @@
 use serde::ser::SerializeMap;
 use serde::{Deserialize, Serialize, Serializer};
-use serde_json::{json, Value};
+use serde_json::Value;
 use std::fmt;
 use std::ops::{Add, BitAnd, BitOr, Div, Mul, Not, Sub};
 
@@ -120,7 +120,6 @@ impl fmt::Display for Operator {
         write!(f, "{}", op_str)
     }
 }
-
 /// Represents a JSON Logic rule.
 ///
 /// The `Rule` enum is a comprehensive representation of all possible JSON Logic constructs,
@@ -225,7 +224,6 @@ pub enum Rule {
         operands: Vec<Rule>,
     },
 }
-
 impl Rule {
     // ----------------------------------------------------------------------------
     // Constructor Methods
@@ -301,7 +299,7 @@ impl Rule {
     ///
     /// let rule = Rule::var("is_active").not();
     /// ```
-    pub fn unary(operator: Operator, operand: Self) -> Self {
+    fn unary(operator: Operator, operand: Self) -> Self {
         Rule::Unary {
             operator,
             operand: Box::new(operand),
@@ -325,7 +323,7 @@ impl Rule {
     ///
     /// let rule = Rule::var("age").gt(Rule::value(18));
     /// ```
-    pub fn binary(operator: Operator, left: Self, right: Self) -> Self {
+    fn binary(operator: Operator, left: Self, right: Self) -> Self {
         Rule::Binary {
             operator,
             left: Box::new(left),
@@ -350,7 +348,7 @@ impl Rule {
     ///
     /// let rule = Rule::var("is_admin").and(Rule::var("is_owner")).and(Rule::var("is_active"));
     /// ```
-    pub fn variadic(operator: Operator, operands: Vec<Self>) -> Self {
+    fn variadic(operator: Operator, operands: Vec<Self>) -> Self {
         Rule::Variadic { operator, operands }
     }
 
@@ -878,7 +876,7 @@ impl Not for Rule {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use moss_jsonlogic_macro::rule;
+    use moss_jsonlogic_macro::{rule, rule_with_validation};
     use serde_json::json;
 
     /// Tests arithmetic operations and their serialization.
@@ -1420,12 +1418,31 @@ mod tests {
     }
 
     #[test]
-    fn test_rule_macro_simple() {
+    fn test_rule_macro_simple_unary() {
+        let rule = rule!(!flag);
+        assert_eq!(
+            serde_json::to_value(rule).expect("Failed to serialize the rule into JSON"),
+            json!({"!": {"var": "flag"}})
+        );
+    }
+
+    #[test]
+    fn test_rule_macro_simple_binary() {
         let rule = rule!(age > 18);
         assert_eq!(
             serde_json::to_value(rule).expect("Failed to serialize the rule into JSON."),
             json!({ ">": [{ "var": "age" }, 18] })
         );
+    }
+
+    #[test]
+    fn test_rule_macro_simple_variadic() {
+        let rule = rule!(a + b + c);
+        println!("{}", serde_json::to_string_pretty(&rule).unwrap());
+        assert_eq!(
+            serde_json::to_value(rule).expect("Failed to serialize the rule into JSON"),
+            json!({"+" : [{"var" : "a"}, {"var" : "b"}, {"var" : "c"}]})
+        )
     }
 
     #[test]
