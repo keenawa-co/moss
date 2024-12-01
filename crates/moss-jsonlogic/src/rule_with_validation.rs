@@ -100,9 +100,6 @@ impl RuleType for RuleWithValidation {
 }
 
 impl RuleWithValidation {
-    // ----------------------------------------------------------------------------
-    // Role Methods
-    // ----------------------------------------------------------------------------
     fn is_type_compatible_with(&self, other: &RuleWithValidation) -> bool {
         let self_type = self.get_type();
         let other_type = other.get_type();
@@ -123,9 +120,6 @@ impl RuleWithValidation {
         self.get_type() == ResultType::Number || self.get_type() == ResultType::Variable
     }
 
-    // ----------------------------------------------------------------------------
-    // Validation Methods
-    // ----------------------------------------------------------------------------
     pub fn validate_boolean_operators(
         operator: Operator,
         operands: Vec<&RuleWithValidation>,
@@ -200,9 +194,7 @@ impl RuleWithValidation {
             Ok(())
         }
     }
-    // ----------------------------------------------------------------------------
-    // Constructor Methods
-    // ----------------------------------------------------------------------------
+
     pub fn value<V: Into<Value>>(value: V) -> Self {
         Rule::Constant(value.into()).into()
     }
@@ -222,10 +214,6 @@ impl RuleWithValidation {
         }
         .into()
     }
-
-    // ----------------------------------------------------------------------------
-    // Operator-Specific Methods
-    // ----------------------------------------------------------------------------
 
     pub fn not(self) -> Result<Self, RuleError> {
         Self::validate_boolean_operators(Operator::Not, vec![&self])?;
@@ -403,11 +391,6 @@ mod tests {
     use moss_jsonlogic_macro::rule_with_validation;
     use serde_json::json;
 
-    /// ----------------------------------------------------------------------------
-    /// Basic Tests
-    ///
-    /// Ensure that `RuleWithValidation` has consistent behaviors with `Rule`
-    /// ----------------------------------------------------------------------------
     #[test]
     fn test_arithmetic_operations() {
         let var_x = RuleWithValidation::var("x");
@@ -521,9 +504,6 @@ mod tests {
         assert_eq!(json_logic, expected_json);
     }
 
-    /// Tests the combination of logical and arithmetic operations with operator overloading.
-    ///
-    /// Constructs a rule that checks if `(x * y) + z <= 100`.
     #[test]
     fn test_combining_logical_and_arithmetic_operations() {
         let var_score = RuleWithValidation::var("score");
@@ -549,9 +529,6 @@ mod tests {
         assert_eq!(json_logic, expected_json);
     }
 
-    /// Tests complex nested rules involving logical NOT and operator overloading.
-    ///
-    /// Constructs a rule that represents `!(status == "locked" || attempts > 3)`.
     #[test]
     fn test_complex_nested_rules_with_not() {
         let var_status = RuleWithValidation::var("status");
@@ -581,9 +558,6 @@ mod tests {
         assert_eq!(json_logic, expected_json);
     }
 
-    /// Tests serialization of rules with multiple arithmetic operations.
-    ///
-    /// Constructs a rule that represents `(a * b) + (c / d) - e`.
     #[test]
     fn test_multiple_arithmetic_operations() {
         let var_a = RuleWithValidation::var("a");
@@ -614,9 +588,6 @@ mod tests {
         assert_eq!(json_logic, expected_json);
     }
 
-    /// Tests the use of custom operators in rule creation.
-    ///
-    /// Constructs a rule using a custom operator `"customOp"` with operands `input` and `42`.
     #[test]
     fn test_custom_operator() {
         let var_input = RuleWithValidation::var("input");
@@ -637,9 +608,6 @@ mod tests {
         assert_eq!(json_logic, expected_json);
     }
 
-    /// Tests the creation and serialization of a rule with multiple logical and arithmetic operations.
-    ///
-    /// Constructs a rule that checks if `(x + y) > 10 AND (z <= 5 OR w != 3)`.
     #[test]
     fn test_combined_logical_and_arithmetic_operations() {
         let var_x = RuleWithValidation::var("x");
@@ -713,9 +681,6 @@ mod tests {
         assert_eq!(json_logic, expected_json);
     }
 
-    /// Tests logical operations combined with operator overloading.
-    ///
-    /// Constructs a rule that checks if `a == 5` AND (`b > 10` OR `c < 20`).
     #[test]
     fn test_logical_operations() {
         let var_a = RuleWithValidation::var("a");
@@ -749,16 +714,6 @@ mod tests {
         assert_eq!(json_logic, expected_json);
     }
 
-    /// Tests the creation and serialization of a complex rule using the desired API.
-    ///
-    /// The rule constructed is:
-    /// ```
-    /// view == 'recents.view.id' && viewItem == 'recents.item'
-    /// ```
-    ///
-    /// # Assertions
-    ///
-    /// - Verifies that the serialized JSON Logic matches the expected structure.
     #[test]
     fn test_rule_with_desired_api() {
         let rule = RuleWithValidation::var("view")
@@ -794,9 +749,6 @@ mod tests {
         assert_eq!(json_logic, expected_json);
     }
 
-    /// Tests the use of operator overloading (`&`, `|`, `+`, `-`, `*`, `/`, `!`) in rule creation.
-    ///
-    /// This test covers logical AND, OR, NOT operations, as well as arithmetic operations.
     #[test]
     fn test_operator_overloading() {
         // Logical AND
@@ -890,9 +842,6 @@ mod tests {
         );
     }
 
-    /// Tests method chaining capabilities in rule creation.
-    ///
-    /// Constructs a rule that checks if `age >= 18` and `status == 'active'`.
     #[test]
     fn test_method_chaining() {
         let rule = RuleWithValidation::var("age")
@@ -1039,10 +988,6 @@ mod tests {
             })
         );
     }
-
-    // ----------------------------------------------------------------------------
-    // Validation Tests
-    // ----------------------------------------------------------------------------
 
     #[test]
     #[should_panic]
