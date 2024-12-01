@@ -2860,6 +2860,7 @@ dependencies = [
 name = "moss_jsonlogic"
 version = "0.1.0"
 dependencies = [
+ "anyhow",
  "arcstr",
  "moss_jsonlogic_macro",
  "moss_str",

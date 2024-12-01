@@ -11,4 +11,5 @@ moss_str.workspace = true
 thiserror.workspace = true
 
 [dev-dependencies]
+anyhow.workspace = true
 moss_jsonlogic_macro.workspace = true
