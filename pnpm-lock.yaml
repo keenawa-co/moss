@@ -432,8 +432,8 @@ importers:
         specifier: 3.4.0
         version: 3.4.0(acorn@8.14.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@docusaurus/tsconfig':
-        specifier: 3.4.0
-        version: 3.4.0
+        specifier: 3.6.3
+        version: 3.6.3
       '@docusaurus/types':
         specifier: 3.4.0
         version: 3.4.0(acorn@8.14.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -1552,8 +1552,8 @@ packages:
     resolution: {integrity: sha512-zSxCSpmQCCdQU5Q4CnX/ID8CSUUI3fvmq4hU/GNP/XoAWtXo9SAVnM3TzpU8Gb//H3WCsT8mJcTfyOk3d9ftNg==}
     engines: {node: '>=18.0'}
 
-  '@docusaurus/tsconfig@3.4.0':
-    resolution: {integrity: sha512-0qENiJ+TRaeTzcg4olrnh0BQ7eCxTgbYWBnWUeQDc84UYkt/T3pDNnm3SiQkqPb+YQ1qtYFlC0RriAElclo8Dg==}
+  '@docusaurus/tsconfig@3.6.3':
+    resolution: {integrity: sha512-1pT/rTrRpMV15E4tJH95W5PrjboMn5JkKF+Ys8cTjMegetiXjs0gPFOSDA5hdTlberKQLDO50xPjMJHondLuzA==}
 
   '@docusaurus/types@3.4.0':
     resolution: {integrity: sha512-4jcDO8kXi5Cf9TcyikB/yKmz14f2RZ2qTRerbHAsS+5InE9ZgSLBNLsewtFTcTOXSVcbU3FoGOzcNWAmU1TR0A==}
@@ -9524,7 +9524,7 @@ snapshots:
       fs-extra: 11.2.0
       tslib: 2.8.1
 
-  '@docusaurus/tsconfig@3.4.0': {}
+  '@docusaurus/tsconfig@3.6.3': {}
 
   '@docusaurus/types@3.4.0(acorn@8.14.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
