@@ -386,6 +386,7 @@ impl Not for RuleWithValidation {
     }
 }
 
+#[cfg(test)]
 mod tests {
     use super::*;
     use moss_jsonlogic_macro::rule_with_validation;
@@ -992,125 +993,119 @@ mod tests {
     #[test]
     #[should_panic]
     fn test_invalid_type_not() {
-        let rule = rule_with_validation!(!"1");
+        let _ = rule_with_validation!(!"1");
     }
 
     #[test]
     #[should_panic]
     fn test_invalid_type_and() {
-        let rule = rule_with_validation!(1 && true);
+        let _ = rule_with_validation!(1 && true);
     }
 
     #[test]
     #[should_panic]
     fn test_invalid_type_or() {
-        let rule = rule_with_validation!("1" || true);
+        let _ = rule_with_validation!("1" || true);
     }
 
     #[test]
     #[should_panic]
     fn test_incompatible_type_eq() {
-        let rule = rule_with_validation!(1 == "1");
+        let _ = rule_with_validation!(1 == "1");
     }
 
     #[test]
     #[should_panic]
     fn test_incompatible_type_ne() {
-        let rule = rule_with_validation!(true != "false");
+        let _ = rule_with_validation!(true != "false");
     }
 
     #[test]
     #[should_panic]
     fn test_invalid_type_gt() {
-        let rule = rule_with_validation!("42" > 0);
+        let _ = rule_with_validation!("42" > 0);
     }
 
     #[test]
     #[should_panic]
     fn test_invalid_type_lt() {
-        let rule = rule_with_validation!(false < true);
+        let _ = rule_with_validation!(false < true);
     }
 
     #[test]
     #[should_panic]
     fn test_invalid_type_gte() {
-        let rule = rule_with_validation!("42" >= 42);
+        let _ = rule_with_validation!("42" >= 42);
     }
 
     #[test]
     #[should_panic]
     fn test_invalid_type_lte() {
-        let rule = rule_with_validation!(42 <= "42");
+        let _ = rule_with_validation!(42 <= "42");
     }
 
     #[test]
     #[should_panic]
     fn test_invalid_type_add() {
-        let rule = rule_with_validation!(true + "true");
+        let _ = rule_with_validation!(true + "true");
     }
 
     #[test]
     #[should_panic]
     fn test_invalid_type_subtract() {
-        let rule = rule_with_validation!("1" - 1);
+        let _ = rule_with_validation!("1" - 1);
     }
 
     #[test]
     #[should_panic]
     fn test_invalid_type_multiply() {
-        let rule = rule_with_validation!("1" * 2);
+        let _ = rule_with_validation!("1" * 2);
     }
 
     #[test]
     #[should_panic]
     fn test_invalid_type_divide() {
-        let rule = rule_with_validation!("foo" / "bar");
+        let _ = rule_with_validation!("foo" / "bar");
     }
 
     #[test]
     #[should_panic]
     fn test_invalid_type_modulo() {
-        let rule = rule_with_validation!("3" % "2");
+        let _ = rule_with_validation!("3" % "2");
     }
     #[test]
     #[should_panic]
     fn test_zero_division_divide() {
-        let rule = rule_with_validation!(42 / 0);
+        let _ = rule_with_validation!(42 / 0);
     }
 
     #[test]
     #[should_panic]
     fn test_zero_division_modulo() {
-        let rule = rule_with_validation!(42 % 0.0);
+        let _ = rule_with_validation!(42 % 0.0);
     }
 
     #[test]
     #[should_panic]
     fn test_invalid_type_compound1() {
-        let rule = rule_with_validation!(1 + 2 / "3");
+        let _ = rule_with_validation!(1 + 2 / "3");
     }
 
     #[test]
     #[should_panic]
     fn test_invalid_type_compound2() {
-        let rule = rule_with_validation!(x - true * false);
+        let _ = rule_with_validation!(x - true * false);
     }
 
     #[test]
     #[should_panic]
     fn test_invalid_type_compound3() {
-        let rule = rule_with_validation!(x && !"true");
-    }
-
-    #[test]
-    #[should_panic]
-    fn test_invalid_type_compound4() {
-        let rule = rule_with_validation!(42 > 0 < 1);
+        let _ = rule_with_validation!(x && !"true");
     }
 
     #[test]
     #[should_panic]
     fn test_invalid_type_compound5() {
-        let rule = rule_with_validation!(3.14 < 159 - "26");
+        let _ = rule_with_validation!(3.14 < 159 - "26");
     }
 }

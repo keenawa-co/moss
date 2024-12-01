@@ -876,7 +876,7 @@ impl Not for Rule {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use moss_jsonlogic_macro::{rule, rule_with_validation};
+    use moss_jsonlogic_macro::rule;
     use serde_json::json;
 
     /// Tests arithmetic operations and their serialization.
