@@ -1,6 +1,6 @@
 import { MenuItemVisibility, SubmenuMenuItem } from "@repo/desktop-models";
 
-import { cn, Icon, Icons, DropdownMenu as DM } from "@repo/ui";
+import { cn, Icon, Icons, DropdownMenu as DM } from "@repo/moss-ui";
 import { ComponentPropsWithoutRef, useState } from "react";
 
 const buttonStyle =
@@ -21,6 +21,8 @@ export const ActionsSubmenu = ({
   iconClassName,
   visibility,
   title,
+  submenuId,
+  defaultActionId,
   ...props
 }: ActionsSubmenuProps) => {
   const [open, setOpen] = useState(false);

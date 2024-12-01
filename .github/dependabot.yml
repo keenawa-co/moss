@@ -10,6 +10,9 @@ updates:
     commit-message:
       prefix: ci
       include: scope
+    reviewers:
+      - g10z3r
+      - jevgenis33
 
   - package-ecosystem: cargo
     directory: "/"
@@ -21,3 +24,19 @@ updates:
     commit-message:
       prefix: build(rust)
       prefix-development: chore(rust)
+    reviewers:
+      - brutusyhy
+
+  - package-ecosystem: npm
+    directory: "/"
+    schedule:
+      interval: monthly
+    ignore:
+      - dependency-name: "*"
+        update-types: [ "version-update:semver-patch" ]
+    commit-message:
+      prefix: build(pnpm)
+      prefix-development: chore(pnpm)
+    reviewers:
+      - Enthceph
+      - jevgenis33
