@@ -70,18 +70,18 @@ impl RuleType for Operator {
 }
 
 pub struct RuleWithValidation {
-    rule: Rule,
+    raw_rule: Rule,
 }
 
 impl From<Rule> for RuleWithValidation {
-    fn from(rule: Rule) -> Self {
-        RuleWithValidation { rule }
+    fn from(raw_rule: Rule) -> Self {
+        RuleWithValidation { raw_rule }
     }
 }
 
 impl RuleType for RuleWithValidation {
     fn get_type(&self) -> ResultType {
-        match &self.rule {
+        match &self.raw_rule {
             Rule::Constant(value) => match value {
                 Value::Null => ResultType::Undefined,
                 Value::Bool(_) => ResultType::Boolean,
@@ -133,7 +133,7 @@ impl RuleWithValidation {
         } else {
             Err(RuleError::InvalidType {
                 operator,
-                operand: invalid_operands[0].rule.clone(),
+                operand: invalid_operands[0].raw_rule.clone(),
             })
         }
     }
@@ -144,8 +144,8 @@ impl RuleWithValidation {
     ) -> Result<(), RuleError> {
         if !left.is_type_compatible_with(right) {
             return Err(RuleError::IncompatibleType {
-                left: left.rule.clone(),
-                right: right.rule.clone(),
+                left: left.raw_rule.clone(),
+                right: right.raw_rule.clone(),
             });
         }
         Ok(())
@@ -164,7 +164,7 @@ impl RuleWithValidation {
         } else {
             Err(RuleError::InvalidType {
                 operator,
-                operand: invalid_operands[0].rule.clone(),
+                operand: invalid_operands[0].raw_rule.clone(),
             })
         }
     }
@@ -175,11 +175,11 @@ impl RuleWithValidation {
     ) -> Result<(), RuleError> {
         // For now we only check zero literal
         // In the future, we can check expressions that evaluate to zero
-        if let Rule::Constant(divisor) = right.rule.clone() {
+        if let Rule::Constant(divisor) = right.raw_rule.clone() {
             if !divisor.is_number() {
                 return Err(RuleError::InvalidType {
                     operator,
-                    operand: right.rule.clone(),
+                    operand: right.raw_rule.clone(),
                 });
             }
             let divisor = divisor.as_number().unwrap();
@@ -210,80 +210,80 @@ impl RuleWithValidation {
     pub fn custom<S: Into<String>>(operator: S, operands: Vec<Self>) -> Self {
         Rule::Custom {
             operator: operator.into(),
-            operands: operands.into_iter().map(|x| x.rule).collect(),
+            operands: operands.into_iter().map(|x| x.raw_rule).collect(),
         }
         .into()
     }
 
     pub fn not(self) -> Result<Self, RuleError> {
         Self::validate_boolean_operators(Operator::Not, vec![&self])?;
-        Ok(self.rule.not().into())
+        Ok(self.raw_rule.not().into())
     }
 
     pub fn and(self, other: Self) -> Result<Self, RuleError> {
         Self::validate_boolean_operators(Operator::And, vec![&self, &other])?;
-        Ok(self.rule.and(other.rule).into())
+        Ok(self.raw_rule.and(other.raw_rule).into())
     }
 
     pub fn or(self, other: Self) -> Result<Self, RuleError> {
         Self::validate_boolean_operators(Operator::Or, vec![&self, &other])?;
-        Ok(self.rule.or(other.rule).into())
+        Ok(self.raw_rule.or(other.raw_rule).into())
     }
 
     pub fn eq(self, other: Self) -> Result<Self, RuleError> {
         Self::validate_equality_operators(&self, &other)?;
-        Ok(self.rule.eq(other.rule).into())
+        Ok(self.raw_rule.eq(other.raw_rule).into())
     }
 
     pub fn ne(self, other: Self) -> Result<Self, RuleError> {
         Self::validate_equality_operators(&self, &other)?;
-        Ok(self.rule.ne(other.rule).into())
+        Ok(self.raw_rule.ne(other.raw_rule).into())
     }
 
     pub fn gt(self, other: Self) -> Result<Self, RuleError> {
         Self::validate_numeric_operators(Operator::GreaterThan, vec![&self, &other])?;
-        Ok(self.rule.gt(other.rule).into())
+        Ok(self.raw_rule.gt(other.raw_rule).into())
     }
 
     pub fn lt(self, other: Self) -> Result<Self, RuleError> {
         Self::validate_numeric_operators(Operator::LessThan, vec![&self, &other])?;
-        Ok(self.rule.lt(other.rule).into())
+        Ok(self.raw_rule.lt(other.raw_rule).into())
     }
 
     pub fn gte(self, other: Self) -> Result<Self, RuleError> {
         Self::validate_numeric_operators(Operator::GreaterThanOrEqual, vec![&self, &other])?;
-        Ok(self.rule.gte(other.rule).into())
+        Ok(self.raw_rule.gte(other.raw_rule).into())
     }
 
     pub fn lte(self, other: Self) -> Result<Self, RuleError> {
         Self::validate_numeric_operators(Operator::LessThanOrEqual, vec![&self, &other])?;
-        Ok(self.rule.lte(other.rule).into())
+        Ok(self.raw_rule.lte(other.raw_rule).into())
     }
 
     pub fn add(self, other: Self) -> Result<Self, RuleError> {
         Self::validate_numeric_operators(Operator::Add, vec![&self, &other])?;
-        Ok(self.rule.add(other.rule).into())
+        Ok(self.raw_rule.add(other.raw_rule).into())
     }
 
     pub fn subtract(self, other: Self) -> Result<Self, RuleError> {
         Self::validate_numeric_operators(Operator::Subtract, vec![&self, &other])?;
-        Ok(self.rule.subtract(other.rule).into())
+        Ok(self.raw_rule.subtract(other.raw_rule).into())
     }
 
     pub fn multiply(self, other: Self) -> Result<Self, RuleError> {
         Self::validate_numeric_operators(Operator::Multiply, vec![&self, &other])?;
-        Ok(self.rule.multiply(other.rule).into())
+        Ok(self.raw_rule.multiply(other.raw_rule).into())
     }
     pub fn divide(self, other: Self) -> Result<Self, RuleError> {
         Self::validate_numeric_operators(Operator::Divide, vec![&self, &other])?;
         Self::validate_division(Operator::Divide, &other)?;
-        Ok(self.rule.divide(other.rule).into())
+        Ok(self.raw_rule.divide(other.raw_rule).into())
     }
 
     pub fn modulo(self, other: Self) -> Result<Self, RuleError> {
         Self::validate_numeric_operators(Operator::Modulo, vec![&self, &other])?;
         Self::validate_division(Operator::Modulo, &other)?;
-        Ok(self.rule.modulo(other.rule).into())
+        Ok(self.raw_rule.modulo(other.raw_rule).into())
     }
 }
 
@@ -292,7 +292,7 @@ impl Serialize for RuleWithValidation {
     where
         S: Serializer,
     {
-        self.rule.serialize(serializer)
+        self.raw_rule.serialize(serializer)
     }
 }
 
