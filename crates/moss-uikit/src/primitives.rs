@@ -1,23 +1,24 @@
-#[derive(Serialize, Debug, Clone, Default, Eq, PartialEq, TS)]
-#[serde(rename_all = "camelCase")]
-#[ts(export, export_to = "primitives.ts")]
-pub struct Link {
-    pub title: Option<&'static str>,
-    pub href: &'static str,
-    pub description: Option<&'static str>,
-}
+use moss_html::link::HtmlLink;
+use moss_str::localized_string::LocalizedString;
 
-#[derive(Serialize, Debug, Clone, Default, Eq, PartialEq, TS)]
+#[derive(Serialize, Debug, Clone, TS)]
 #[serde(rename_all = "camelCase")]
 #[ts(export, export_to = "primitives.ts")]
 pub struct Tooltip {
-    pub header: &'static str,
-    pub text: Option<&'static str>,
+    #[ts(type = "LocalizedString")]
+    pub header: LocalizedString,
+
+    #[ts(optional, type = "LocalizedString")]
+    pub text: Option<LocalizedString>,
+
+    #[ts(optional)]
     pub shortcut: Option<&'static str>,
-    pub link: Option<Link>,
+
+    #[ts(optional)]
+    pub link: Option<HtmlLink>,
 }
 
-#[derive(Serialize, Debug, Clone, Default, Eq, PartialEq, TS)]
+#[derive(Serialize, Debug, Clone, TS)]
 #[serde(rename_all = "camelCase")]
 #[ts(export, export_to = "primitives.ts")]
 pub struct Icon {

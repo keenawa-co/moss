@@ -1,7 +1,7 @@
 use moss_str::localized_string::LocalizedString;
 
 /// Represents an HTML link (`<a>`) with attributes commonly used in web development.
-#[derive(Debug, Serialize, TS)]
+#[derive(Debug, Serialize, Clone, TS)]
 #[serde(rename_all = "camelCase")]
 #[ts(export, export_to = "link.ts")]
 pub struct HtmlLink {
@@ -57,7 +57,7 @@ impl HtmlLink {
 /// Represents possible values for the `target` attribute in an HTML link.
 ///
 /// The `target` attribute specifies where to open the linked document.
-#[derive(Debug, Serialize, TS)]
+#[derive(Debug, Serialize, Clone, TS)]
 #[serde(rename_all = "camelCase")]
 #[ts(export, export_to = "link.ts")]
 pub enum Target {
@@ -90,7 +90,7 @@ impl ToString for Target {
 ///
 /// The `rel` attribute specifies the relationship between the current document
 /// and the linked document.
-#[derive(Debug, Serialize, TS)]
+#[derive(Debug, Serialize, Clone, TS)]
 #[serde(rename_all = "camelCase")]
 #[ts(export, export_to = "link.ts")]
 pub enum Rel {
