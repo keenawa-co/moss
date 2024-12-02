@@ -43,6 +43,7 @@ macro_rules! localize {
 /// use moss_text::{localized_string::LocalizedString, localize};
 ///
 /// // Create a LocalizedString with key and origin only
+/// // FIXME: Dealing with BString None Option
 /// let greeting = LocalizedString::new("greeting.hello", "Hello, World!", None);
 ///
 /// // Create a LocalizedString with key, origin, and description
