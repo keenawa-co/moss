@@ -40,6 +40,53 @@ pub struct AppState {
     pub react_query_string: Mutex<String>,
 }
 
+#[derive(Serialize, Deserialize)]
+struct Locale {
+    code: String,
+    name: String,
+    direction: Option<String>, // "ltr" or "rtl"
+}
+
+#[tauri::command]
+fn get_locales() -> Vec<Locale> {
+    vec![
+        Locale {
+            code: "en".to_string(),
+            name: "English".to_string(),
+            direction: Some("ltr".to_string()),
+        },
+        Locale {
+            code: "de".to_string(),
+            name: "Deutsche".to_string(),
+            direction: Some("ltr".to_string()),
+        },
+        Locale {
+            code: "ru".to_string(),
+            name: "Русский".to_string(),
+            direction: Some("ltr".to_string()),
+        },
+    ]
+}
+
+#[tauri::command]
+fn get_translations(language: String, namespace: String) -> Result<serde_json::Value, String> {
+    let path = format!(
+        "/Users/g10z3r/Project/keenawa-co/moss/packages/moss_lang/locales/{language}/{namespace}.json"
+    );
+    dbg!(&path);
+
+    match std::fs::read_to_string(path) {
+        Ok(data) => {
+            let translations: serde_json::Value =
+                serde_json::from_str(&data).map_err(|err| err.to_string())?;
+
+            dbg!(&translations);
+            Ok(translations)
+        }
+        Err(err) => Err(err.to_string()),
+    }
+}
+
 pub fn run() {
     #[allow(unused_mut)]
     let mut builder = tauri::Builder::default()
@@ -137,6 +184,8 @@ pub fn run() {
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
+            get_locales,
+            get_translations,
             cmd_fs::read_theme_file,
             cmd_window::main_window_is_ready,
             cmd_window::create_new_window,

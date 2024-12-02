@@ -2,9 +2,8 @@ import { InvokeArgs, invoke as invokeTauri } from "@tauri-apps/api/core";
 import { listen as listenTauri } from "@tauri-apps/api/event";
 import type { EventCallback, EventName } from "@tauri-apps/api/event";
 
-export type IpcResult<T, E> = { status: "ok"; data: T } | { status: "error"; error: E };
-
 export type TauriIpcCommand =
+  | "get_translations"
   | "read_theme_file"
   | "fetch_all_themes"
   | "read_theme"
@@ -13,6 +12,8 @@ export type TauriIpcCommand =
   | "sidebar_get_all_activities"
   | "get_view_content"
   | "get_menu_items_by_namespace";
+
+export type IpcResult<T, E> = { status: "ok"; data: T } | { status: "error"; error: E };
 
 export const handleIpcError = (cmd: TauriIpcCommand, error: unknown) => {
   console.error(`Error in IPC command "${cmd}":`, error);
