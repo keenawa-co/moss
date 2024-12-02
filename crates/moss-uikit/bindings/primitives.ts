@@ -7,9 +7,8 @@
 // If you need to add or modify imports, please update the import_map in the script and
 // re-run `make gen-models` it to regenerate the file accordingly.
 
-import type { LocalizedString } from "@repo/moss-str";
-
-import type { HtmlLink } from "./link";
+import type { HtmlLink } from "@repo/moss-html";
+import type { LocalizedString } from "@repo/moss-text";
 
 export type Icon = { name: string };
 

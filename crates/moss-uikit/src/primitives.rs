@@ -1,5 +1,5 @@
 use moss_html::link::HtmlLink;
-use moss_str::localized_string::LocalizedString;
+use moss_text::localized_string::LocalizedString;
 
 #[derive(Serialize, Debug, Clone, TS)]
 #[serde(rename_all = "camelCase")]
@@ -14,7 +14,7 @@ pub struct Tooltip {
     #[ts(optional)]
     pub shortcut: Option<&'static str>,
 
-    #[ts(optional)]
+    #[ts(optional, type = "HtmlLink")]
     pub link: Option<HtmlLink>,
 }
 
