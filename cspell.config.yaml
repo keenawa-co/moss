@@ -1,0 +1,30 @@
+$schema: https://raw.githubusercontent.com/streetsidesoftware/cspell/main/cspell.schema.json
+version: '0.2'
+
+import:
+  - "@cspell/dict-typescript/cspell-ext.json"
+  - "@cspell/dict-rust/cspell-ext.json"
+
+dictionaryDefinitions:
+  - name: backend
+    path: ./misc/cspell/backend.txt
+  - name: frontend
+    path: ./misc/cspell/frontend.txt
+  # - name: typescript
+  #   path: ./node_modules/@cspell/dict-typescript/typescript.txt.gz
+  # - name: rust
+  #   path: ./node_modules/@cspell/dict-rust/rust.txt.gz
+  # - name: react
+  #   path: ./node_modules/@cspell/dict-react/react.txt.gz
+
+dictionaries:
+  - backend
+  - frontend
+  - typescript
+  - rust
+  # - react
+
+ignorePaths:
+  - pnpm-lock.yaml
+  - Makefile
+  - target
