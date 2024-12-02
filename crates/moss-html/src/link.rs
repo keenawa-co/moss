@@ -1,14 +1,19 @@
-use moss_str::localized_string::LocalizedString;
+use moss_text::localized_string::LocalizedString;
 
 /// Represents an HTML link (`<a>`) with attributes commonly used in web development.
-#[derive(Debug, Serialize, TS)]
+#[derive(Debug, Serialize, Clone, TS)]
 #[serde(rename_all = "camelCase")]
 #[ts(export, export_to = "link.ts")]
 pub struct HtmlLink {
-    href: String,           // The URL the link points to
+    href: String, // The URL the link points to
+
+    #[ts(optional)]
     target: Option<Target>, // Optional target attribute for specifying where to open the link
+
+    #[ts(optional)]
     rel: Option<Rel>, // Optional rel attribute for relationship between linked document and current document
-    #[ts(type = "LocalizedString | null")]
+
+    #[ts(optional, type = "LocalizedString")]
     text: Option<LocalizedString>, // The text displayed for the link
 }
 
@@ -22,7 +27,7 @@ impl HtmlLink {
     /// # Example
     /// ```
     /// use moss_html::link::HtmlLink;
-    /// use moss_str::{localized_string::LocalizedString, localize};
+    /// use moss_text::{localized_string::LocalizedString, localize};
     ///
     /// let link = HtmlLink::new("https://example.com", Some(localize!("welcome.message", "Welcome!")));
     /// ```
@@ -52,7 +57,7 @@ impl HtmlLink {
 /// Represents possible values for the `target` attribute in an HTML link.
 ///
 /// The `target` attribute specifies where to open the linked document.
-#[derive(Debug, Serialize, TS)]
+#[derive(Debug, Serialize, Clone, TS)]
 #[serde(rename_all = "camelCase")]
 #[ts(export, export_to = "link.ts")]
 pub enum Target {
@@ -85,7 +90,7 @@ impl ToString for Target {
 ///
 /// The `rel` attribute specifies the relationship between the current document
 /// and the linked document.
-#[derive(Debug, Serialize, TS)]
+#[derive(Debug, Serialize, Clone, TS)]
 #[serde(rename_all = "camelCase")]
 #[ts(export, export_to = "link.ts")]
 pub enum Rel {

@@ -3,14 +3,16 @@ resolver = "2"
 members = [
     "view/desktop/bin",
 
-    "crates/moss-base",
-    "crates/moss-str",
+    "crates/moss-text",
     "crates/moss-fs",
     "crates/moss-jsonlogic",
     "crates/moss-jsonlogic-macro",
     "crates/moss-uikit",
     "crates/moss-html",
     "crates/moss-themeconv",
+    "crates/moss-env",
+    "crates/moss-async",
+    "crates/moss-collection",
 
     "internal/platform/core",
     "internal/platform/fs",
@@ -46,12 +48,14 @@ opt-level = 3
 [workspace.dependencies]
 moss_uikit = { path = "crates/moss-uikit" }
 moss_html = { path = "crates/moss-html" }
-moss_base = { path = "crates/moss-base" }
-moss_str = { path = "crates/moss-str" }
+moss_text = { path = "crates/moss-text" }
 moss_fs = { path = "crates/moss-fs" }
 moss_themeconv = { path = "crates/moss-themeconv" }
 moss_jsonlogic = { path = "crates/moss-jsonlogic" }
 moss_jsonlogic_macro = { path = "crates/moss-jsonlogic-macro" }
+moss_env = { path = "crates/moss-env" }
+moss_async = { path = "crates/moss-async" }
+moss_collection = { path = "crates/moss-collection" }
 
 platform_core = { path = "internal/platform/core" }
 platform_utl = { path = "internal/platform/utl" }

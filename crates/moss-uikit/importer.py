@@ -15,7 +15,12 @@ auto_generated_comment = """\
 // re-run `make gen-models` it to regenerate the file accordingly.
 """
 
-import_map: Dict[str, Dict[str, Dict[str, any]]] = {}
+import_map: Dict[str, Dict[str, Dict[str, any]]] = {
+    "bindings/primitives.ts": {
+        "@repo/moss-text": {"types": ["LocalizedString"], "is_type_import": True},
+        "@repo/moss-html": {"types": ["HtmlLink"], "is_type_import": True},
+    },
+}
 
 
 def parse_existing_imports(content: str) -> Dict[str, Set[str]]:

@@ -7,35 +7,30 @@
 // If you need to add or modify imports, please update the import_map in the script and
 // re-run `make gen-models` it to regenerate the file accordingly.
 
-import type { LocalizedString } from "@repo/moss-str";
+import type { LocalizedString } from "@repo/moss-text";
 
 export type Action = string;
 
 export type ActionMenuItem = {
   command: CommandAction;
-  group: MenuGroup | null;
-  order: bigint | null;
-  when: string | null;
+  group?: MenuGroup;
+  order?: bigint;
+  when?: object;
   visibility: MenuItemVisibility;
 };
 
 export type CommandAction = {
   id: string;
-  title: LocalizedString | null;
-  tooltip: string | null;
-  description: LocalizedString | null;
-  icon: string | null;
-  toggled: CommandActionToggle | null;
+  title: LocalizedString;
+  tooltip?: string;
+  description?: LocalizedString;
+  icon?: string;
+  toggled?: CommandActionToggle;
 };
 
-export type CommandActionToggle = {
-  condition: string;
-  icon: string | null;
-  tooltip: string | null;
-  title: LocalizedString | null;
-};
+export type CommandActionToggle = { condition: string; icon?: string; tooltip?: string; title?: LocalizedString };
 
-export type MenuGroup = { id: string; order: bigint | null; description: LocalizedString | null };
+export type MenuGroup = { id: string; order?: bigint; description?: LocalizedString };
 
 export type MenuItem = { action: ActionMenuItem } | { submenu: SubmenuMenuItem };
 
@@ -43,10 +38,10 @@ export type MenuItemVisibility = "classic" | "hidden" | "compact";
 
 export type SubmenuMenuItem = {
   submenuId: string;
-  defaultActionId: string | null;
-  title: LocalizedString | null;
-  group: MenuGroup | null;
-  order: bigint | null;
-  when: string | null;
+  defaultActionId?: string;
+  title?: LocalizedString;
+  group?: MenuGroup;
+  order?: bigint;
+  when?: string;
   visibility: MenuItemVisibility;
 };

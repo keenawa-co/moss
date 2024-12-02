@@ -1,10 +1,9 @@
 use clap::Parser;
 use moss_themeconv::json_converter::JsonThemeConverter;
 use moss_themeconv::ThemeConverter;
-use serde_json::{from_reader, Value};
+use serde_json::Value;
 use std::fs;
-use std::fs::File;
-use std::io::{BufReader, Write};
+use std::io::Write;
 use std::path::PathBuf;
 
 #[derive(Parser, Debug)]

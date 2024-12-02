@@ -1,2 +1,2 @@
-pub mod rule;
-mod rule_with_validation;
+pub mod checked_rule;
+pub mod raw_rule;

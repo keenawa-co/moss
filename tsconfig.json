@@ -2,7 +2,7 @@
   "files": [],
   "references": [
     {
-      "path": "crates/moss-str"
+      "path": "crates/moss-text"
     },
     {
       "path": "crates/moss-html"

@@ -1130,7 +1130,7 @@ dependencies = [
  "log",
  "macos-trampoline",
  "mimalloc",
- "moss_base",
+ "moss_env",
  "moss_uikit",
  "objc",
  "once_cell",
@@ -1169,7 +1169,8 @@ dependencies = [
  "csscolorparser",
  "indexmap 2.7.0",
  "jsonschema",
- "moss_str",
+ "moss_jsonlogic",
+ "moss_text",
  "moss_uikit",
  "once_cell",
  "serde",
@@ -2828,16 +2829,23 @@ dependencies = [
 ]
 
 [[package]]
-name = "moss_base"
-version = "0.0.0"
+name = "moss_async"
+version = "0.1.0"
 dependencies = [
  "async-trait",
- "hashbrown 0.15.0",
- "im",
- "radix_trie",
- "rustc-hash",
- "serde",
 ]
+
+[[package]]
+name = "moss_collection"
+version = "0.1.0"
+dependencies = [
+ "hashbrown 0.15.0",
+ "radix_trie",
+]
+
+[[package]]
+name = "moss_env"
+version = "0.1.0"
 
 [[package]]
 name = "moss_fs"
@@ -2850,7 +2858,7 @@ dependencies = [
 name = "moss_html"
 version = "0.1.0"
 dependencies = [
- "moss_str",
+ "moss_text",
  "serde",
  "ts-rs",
 ]
@@ -2859,9 +2867,10 @@ dependencies = [
 name = "moss_jsonlogic"
 version = "0.1.0"
 dependencies = [
- "lazy_static",
+ "anyhow",
+ "arcstr",
  "moss_jsonlogic_macro",
- "moss_str",
+ "moss_text",
  "serde",
  "serde_json",
  "thiserror",
@@ -2877,7 +2886,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "moss_str"
+name = "moss_text"
 version = "0.1.0"
 dependencies = [
  "arcstr",
@@ -2900,6 +2909,8 @@ dependencies = [
 name = "moss_uikit"
 version = "0.1.0"
 dependencies = [
+ "moss_html",
+ "moss_text",
  "serde",
  "ts-rs",
 ]
@@ -3660,7 +3671,7 @@ dependencies = [
  "async-trait",
  "hashbrown 0.15.0",
  "lazy-regex",
- "moss_base",
+ "moss_collection",
  "parking_lot",
  "platform_core",
  "platform_fs",
@@ -3685,7 +3696,7 @@ dependencies = [
  "futures",
  "hashbrown 0.15.0",
  "im",
- "moss_base",
+ "moss_env",
  "once_cell",
  "parking",
  "parking_lot",
@@ -6496,7 +6507,9 @@ dependencies = [
  "hashbrown 0.15.0",
  "lazy_static",
  "moss_html",
- "moss_str",
+ "moss_jsonlogic",
+ "moss_jsonlogic_macro",
+ "moss_text",
  "moss_uikit",
  "once_cell",
  "parking_lot",

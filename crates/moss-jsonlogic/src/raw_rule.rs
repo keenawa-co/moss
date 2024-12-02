@@ -141,49 +141,49 @@ impl fmt::Display for Operator {
 /// ### Creating a Variable
 ///
 /// ```rust
-/// use moss_jsonlogic::rule::Rule;
+/// use moss_jsonlogic::rule::RawRule;
 ///
-/// let rule = Rule::var("age");
+/// let rule = RawRule::var("age");
 /// ```
 ///
 /// ### Creating a Constant
 ///
 /// ```rust
-/// use moss_jsonlogic::rule::Rule;
+/// use moss_jsonlogic::rule::RawRule;
 ///
-/// let rule = Rule::value(30);
+/// let rule = RawRule::value(30);
 /// ```
 ///
 /// ### Creating Multiple Constants
 ///
 /// ```rust
-/// use moss_jsonlogic::rule::Rule;
+/// use moss_jsonlogic::rule::RawRule;
 ///
-/// let rule = Rule::value("hello");
-/// let number_rule = Rule::value(42);
-/// let bool_rule = Rule::value(true);
+/// let rule = RawRule::value("hello");
+/// let number_rule = RawRule::value(42);
+/// let bool_rule = RawRule::value(true);
 /// ```
 ///
 /// ### Creating a Binary Operation
 ///
 /// ```rust
-/// use moss_jsonlogic::rule::Rule;
+/// use moss_jsonlogic::rule::RawRule;
 ///
-/// let rule = Rule::var("age").gt(Rule::value(18));
+/// let rule = RawRule::var("age").gt(RawRule::value(18));
 /// ```
 ///
 /// ### Combining Rules with Logical AND
 ///
 /// ```rust
-/// use moss_jsonlogic::rule::Rule;
+/// use moss_jsonlogic::rule::RawRule;
 ///
-/// let rule = Rule::var("age")
-///     .gt(Rule::value(18))
-///     .and(Rule::var("status").eq(Rule::value("active")));
+/// let rule = RawRule::var("age")
+///     .gt(RawRule::value(18))
+///     .and(RawRule::var("status").eq(RawRule::value("active")));
 /// ```
 #[derive(Debug, Clone, Deserialize)]
 #[serde(untagged)]
-pub enum Rule {
+pub enum RawRule {
     /// A constant value (number, string, boolean, null, array, or object).
     Constant(Value),
 
@@ -195,7 +195,7 @@ pub enum Rule {
         /// The operator for the unary operation.
         operator: Operator,
         /// The operand of the unary operation.
-        operand: Box<Rule>,
+        operand: Box<RawRule>,
     },
 
     /// A binary operation, e.g., {"==": [left, right]}.
@@ -203,9 +203,9 @@ pub enum Rule {
         /// The operator for the binary operation.
         operator: Operator,
         /// The left operand of the binary operation.
-        left: Box<Rule>,
+        left: Box<RawRule>,
         /// The right operand of the binary operation.
-        right: Box<Rule>,
+        right: Box<RawRule>,
     },
 
     /// A variadic operation, e.g., {"and": [op1, op2, ...]}.
@@ -213,7 +213,7 @@ pub enum Rule {
         /// The operator for the variadic operation.
         operator: Operator,
         /// The operands of the variadic operation.
-        operands: Vec<Rule>,
+        operands: Vec<RawRule>,
     },
 
     /// A custom operation with arbitrary structure.
@@ -221,10 +221,10 @@ pub enum Rule {
         /// The custom operator.
         operator: String,
         /// The operands for the custom operator.
-        operands: Vec<Rule>,
+        operands: Vec<RawRule>,
     },
 }
-impl Rule {
+impl RawRule {
     // ----------------------------------------------------------------------------
     // Constructor Methods
     //
@@ -236,56 +236,56 @@ impl Rule {
 
     /// Creates a constant value.
     ///
-    /// This method allows you to create a `Rule::Constant` from any type that can be
+    /// This method allows you to create a `RawRule::Constant` from any type that can be
     /// converted into a `serde_json::Value`. It supports multiple data types, including
     /// numbers, strings, booleans, nulls, arrays, and objects.
     ///
     /// # Examples
     ///
     /// ```rust
-    /// use moss_jsonlogic::rule::Rule;
+    /// use moss_jsonlogic::rule::RawRule;
     ///
-    /// let rule = Rule::value("hello");
-    /// let number_rule = Rule::value(42);
-    /// let bool_rule = Rule::value(true);
+    /// let rule = RawRule::value("hello");
+    /// let number_rule = RawRule::value(42);
+    /// let bool_rule = RawRule::value(true);
     /// ```
     pub fn value<V: Into<Value>>(value: V) -> Self {
-        Rule::Constant(value.into())
+        RawRule::Constant(value.into())
     }
 
     /// Creates a constant value.
     ///
-    /// Alias for `Rule::value`. This method is provided for convenience and clarity.
+    /// Alias for `RawRule::value`. This method is provided for convenience and clarity.
     ///
     /// # Examples
     ///
     /// ```rust
-    /// use moss_jsonlogic::rule::Rule;
+    /// use moss_jsonlogic::rule::RawRule;
     ///
-    /// let rule = Rule::constant("world");
+    /// let rule = RawRule::constant("world");
     /// ```
     pub fn constant<V: Into<Value>>(value: V) -> Self {
-        Rule::Constant(value.into())
+        RawRule::Constant(value.into())
     }
 
     /// Creates a variable reference.
     ///
-    /// This method creates a `Rule::Variable` which references a variable by its name.
+    /// This method creates a `RawRule::Variable` which references a variable by its name.
     ///
     /// # Examples
     ///
     /// ```rust
-    /// use moss_jsonlogic::rule::Rule;
+    /// use moss_jsonlogic::rule::RawRule;
     ///
-    /// let rule = Rule::var("user_age");
+    /// let rule = RawRule::var("user_age");
     /// ```
     pub fn var<S: Into<String>>(name: S) -> Self {
-        Rule::Variable(name.into())
+        RawRule::Variable(name.into())
     }
 
     /// Creates a unary operation.
     ///
-    /// This method constructs a `Rule::Unary` representing a unary operation such as logical NOT.
+    /// This method constructs a `RawRule::Unary` representing a unary operation such as logical NOT.
     ///
     /// # Parameters
     ///
@@ -295,12 +295,12 @@ impl Rule {
     /// # Examples
     ///
     /// ```rust
-    /// use moss_jsonlogic::rule::{Rule, Operator};
+    /// use moss_jsonlogic::rule::{RawRule, Operator};
     ///
-    /// let rule = Rule::var("is_active").not();
+    /// let rule = RawRule::var("is_active").not();
     /// ```
-    fn unary(operator: Operator, operand: Self) -> Self {
-        Rule::Unary {
+    pub(crate) fn unary(operator: Operator, operand: Self) -> Self {
+        RawRule::Unary {
             operator,
             operand: Box::new(operand),
         }
@@ -308,7 +308,7 @@ impl Rule {
 
     /// Creates a binary operation.
     ///
-    /// This method constructs a `Rule::Binary` representing a binary operation such as equality.
+    /// This method constructs a `RawRule::Binary` representing a binary operation such as equality.
     ///
     /// # Parameters
     ///
@@ -319,12 +319,12 @@ impl Rule {
     /// # Examples
     ///
     /// ```rust
-    /// use moss_jsonlogic::rule::{Rule, Operator};
+    /// use moss_jsonlogic::rule::{RawRule, Operator};
     ///
-    /// let rule = Rule::var("age").gt(Rule::value(18));
+    /// let rule = RawRule::var("age").gt(RawRule::value(18));
     /// ```
-    fn binary(operator: Operator, left: Self, right: Self) -> Self {
-        Rule::Binary {
+    pub(crate) fn binary(operator: Operator, left: Self, right: Self) -> Self {
+        RawRule::Binary {
             operator,
             left: Box::new(left),
             right: Box::new(right),
@@ -333,7 +333,7 @@ impl Rule {
 
     /// Creates a variadic operation.
     ///
-    /// This method constructs a `Rule::Variadic` representing operations that can take multiple operands,
+    /// This method constructs a `RawRule::Variadic` representing operations that can take multiple operands,
     /// such as logical AND or OR.
     ///
     /// # Parameters
@@ -344,17 +344,17 @@ impl Rule {
     /// # Examples
     ///
     /// ```rust
-    /// use moss_jsonlogic::rule::{Rule, Operator};
+    /// use moss_jsonlogic::rule::{RawRule, Operator};
     ///
-    /// let rule = Rule::var("is_admin").and(Rule::var("is_owner")).and(Rule::var("is_active"));
+    /// let rule = RawRule::var("is_admin").and(RawRule::var("is_owner")).and(RawRule::var("is_active"));
     /// ```
-    fn variadic(operator: Operator, operands: Vec<Self>) -> Self {
-        Rule::Variadic { operator, operands }
+    pub(crate) fn variadic(operator: Operator, operands: Vec<Self>) -> Self {
+        RawRule::Variadic { operator, operands }
     }
 
     /// Creates a custom operation.
     ///
-    /// This method constructs a `Rule::Custom` allowing for the use of custom operators beyond the standard set.
+    /// This method constructs a `RawRule::Custom` allowing for the use of custom operators beyond the standard set.
     ///
     /// # Parameters
     ///
@@ -364,12 +364,12 @@ impl Rule {
     /// # Examples
     ///
     /// ```rust
-    /// use moss_jsonlogic::rule::Rule;
+    /// use moss_jsonlogic::rule::RawRule;
     ///
-    /// let rule = Rule::custom("customOp", vec![Rule::var("input"), Rule::value(42)]);
+    /// let rule = RawRule::custom("customOp", vec![RawRule::var("input"), RawRule::value(42)]);
     /// ```
     pub fn custom<S: Into<String>>(operator: S, operands: Vec<Self>) -> Self {
-        Rule::Custom {
+        RawRule::Custom {
             operator: operator.into(),
             operands,
         }
@@ -390,12 +390,12 @@ impl Rule {
     /// # Examples
     ///
     /// ```rust
-    /// use moss_jsonlogic::rule::Rule;
+    /// use moss_jsonlogic::rule::RawRule;
     ///
-    /// let rule = Rule::var("is_active").not();
+    /// let rule = RawRule::var("is_active").not();
     /// ```
     pub fn not(self) -> Self {
-        Rule::unary(Operator::Not, self)
+        RawRule::unary(Operator::Not, self)
     }
 
     /// Logical AND operation.
@@ -407,23 +407,23 @@ impl Rule {
     /// # Examples
     ///
     /// ```rust
-    /// use moss_jsonlogic::rule::Rule;
+    /// use moss_jsonlogic::rule::RawRule;
     ///
-    /// let rule = Rule::var("is_admin").and(Rule::var("is_active"));
+    /// let rule = RawRule::var("is_admin").and(RawRule::var("is_active"));
     /// ```
     pub fn and(self, other: Self) -> Self {
         match self {
-            Rule::Variadic {
+            RawRule::Variadic {
                 operator: Operator::And,
                 mut operands,
             } => {
                 operands.push(other);
-                Rule::Variadic {
+                RawRule::Variadic {
                     operator: Operator::And,
                     operands,
                 }
             }
-            _ => Rule::variadic(Operator::And, vec![self, other]),
+            _ => RawRule::variadic(Operator::And, vec![self, other]),
         }
     }
 
@@ -436,23 +436,23 @@ impl Rule {
     /// # Examples
     ///
     /// ```rust
-    /// use moss_jsonlogic::rule::Rule;
+    /// use moss_jsonlogic::rule::RawRule;
     ///
-    /// let rule = Rule::var("is_guest").or(Rule::var("is_banned"));
+    /// let rule = RawRule::var("is_guest").or(RawRule::var("is_banned"));
     /// ```
     pub fn or(self, other: Self) -> Self {
         match self {
-            Rule::Variadic {
+            RawRule::Variadic {
                 operator: Operator::Or,
                 mut operands,
             } => {
                 operands.push(other);
-                Rule::Variadic {
+                RawRule::Variadic {
                     operator: Operator::Or,
                     operands,
                 }
             }
-            _ => Rule::variadic(Operator::Or, vec![self, other]),
+            _ => RawRule::variadic(Operator::Or, vec![self, other]),
         }
     }
 
@@ -463,12 +463,12 @@ impl Rule {
     /// # Examples
     ///
     /// ```rust
-    /// use moss_jsonlogic::rule::Rule;
+    /// use moss_jsonlogic::rule::RawRule;
     ///
-    /// let rule = Rule::var("role").eq(Rule::value("admin"));
+    /// let rule = RawRule::var("role").eq(RawRule::value("admin"));
     /// ```
     pub fn eq(self, other: Self) -> Self {
-        Rule::binary(Operator::Equal, self, other)
+        RawRule::binary(Operator::Equal, self, other)
     }
 
     /// Inequality comparison.
@@ -478,12 +478,12 @@ impl Rule {
     /// # Examples
     ///
     /// ```rust
-    /// use moss_jsonlogic::rule::Rule;
+    /// use moss_jsonlogic::rule::RawRule;
     ///
-    /// let rule = Rule::var("status").ne(Rule::value("inactive"));
+    /// let rule = RawRule::var("status").ne(RawRule::value("inactive"));
     /// ```
     pub fn ne(self, other: Self) -> Self {
-        Rule::binary(Operator::NotEqual, self, other)
+        RawRule::binary(Operator::NotEqual, self, other)
     }
 
     /// Greater-than comparison.
@@ -493,12 +493,12 @@ impl Rule {
     /// # Examples
     ///
     /// ```rust
-    /// use moss_jsonlogic::rule::Rule;
+    /// use moss_jsonlogic::rule::RawRule;
     ///
-    /// let rule = Rule::var("score").gt(Rule::value(75));
+    /// let rule = RawRule::var("score").gt(RawRule::value(75));
     /// ```
     pub fn gt(self, other: Self) -> Self {
-        Rule::binary(Operator::GreaterThan, self, other)
+        RawRule::binary(Operator::GreaterThan, self, other)
     }
 
     /// Less-than comparison.
@@ -508,12 +508,12 @@ impl Rule {
     /// # Examples
     ///
     /// ```rust
-    /// use moss_jsonlogic::rule::Rule;
+    /// use moss_jsonlogic::rule::RawRule;
     ///
-    /// let rule = Rule::var("age").lt(Rule::value(18));
+    /// let rule = RawRule::var("age").lt(RawRule::value(18));
     /// ```
     pub fn lt(self, other: Self) -> Self {
-        Rule::binary(Operator::LessThan, self, other)
+        RawRule::binary(Operator::LessThan, self, other)
     }
 
     /// Greater-than-or-equal-to comparison.
@@ -523,12 +523,12 @@ impl Rule {
     /// # Examples
     ///
     /// ```rust
-    /// use moss_jsonlogic::rule::Rule;
+    /// use moss_jsonlogic::rule::RawRule;
     ///
-    /// let rule = Rule::var("experience").gte(Rule::value(5));
+    /// let rule = RawRule::var("experience").gte(RawRule::value(5));
     /// ```
     pub fn gte(self, other: Self) -> Self {
-        Rule::binary(Operator::GreaterThanOrEqual, self, other)
+        RawRule::binary(Operator::GreaterThanOrEqual, self, other)
     }
 
     /// Less-than-or-equal-to comparison.
@@ -538,12 +538,12 @@ impl Rule {
     /// # Examples
     ///
     /// ```rust
-    /// use moss_jsonlogic::rule::Rule;
+    /// use moss_jsonlogic::rule::RawRule;
     ///
-    /// let rule = Rule::var("height").lte(Rule::value(180));
+    /// let rule = RawRule::var("height").lte(RawRule::value(180));
     /// ```
     pub fn lte(self, other: Self) -> Self {
-        Rule::binary(Operator::LessThanOrEqual, self, other)
+        RawRule::binary(Operator::LessThanOrEqual, self, other)
     }
 
     /// Addition operation.
@@ -555,23 +555,23 @@ impl Rule {
     /// # Examples
     ///
     /// ```rust
-    /// use moss_jsonlogic::rule::Rule;
+    /// use moss_jsonlogic::rule::RawRule;
     ///
-    /// let rule = Rule::var("quantity") + Rule::value(10);
+    /// let rule = RawRule::var("quantity") + RawRule::value(10);
     /// ```
     pub fn add(self, other: Self) -> Self {
         match self {
-            Rule::Variadic {
+            RawRule::Variadic {
                 operator: Operator::Add,
                 mut operands,
             } => {
                 operands.push(other);
-                Rule::Variadic {
+                RawRule::Variadic {
                     operator: Operator::Add,
                     operands,
                 }
             }
-            _ => Rule::variadic(Operator::Add, vec![self, other]),
+            _ => RawRule::variadic(Operator::Add, vec![self, other]),
         }
     }
 
@@ -582,12 +582,12 @@ impl Rule {
     /// # Examples
     ///
     /// ```rust
-    /// use moss_jsonlogic::rule::Rule;
+    /// use moss_jsonlogic::rule::RawRule;
     ///
-    /// let rule = Rule::var("total") - Rule::value(20);
+    /// let rule = RawRule::var("total") - RawRule::value(20);
     /// ```
     pub fn subtract(self, other: Self) -> Self {
-        Rule::binary(Operator::Subtract, self, other)
+        RawRule::binary(Operator::Subtract, self, other)
     }
 
     /// Multiplication operation.
@@ -599,23 +599,23 @@ impl Rule {
     /// # Examples
     ///
     /// ```rust
-    /// use moss_jsonlogic::rule::Rule;
+    /// use moss_jsonlogic::rule::RawRule;
     ///
-    /// let rule = Rule::var("price") * Rule::value(2);
+    /// let rule = RawRule::var("price") * RawRule::value(2);
     /// ```
     pub fn multiply(self, other: Self) -> Self {
         match self {
-            Rule::Variadic {
+            RawRule::Variadic {
                 operator: Operator::Multiply,
                 mut operands,
             } => {
                 operands.push(other);
-                Rule::Variadic {
+                RawRule::Variadic {
                     operator: Operator::Multiply,
                     operands,
                 }
             }
-            _ => Rule::variadic(Operator::Multiply, vec![self, other]),
+            _ => RawRule::variadic(Operator::Multiply, vec![self, other]),
         }
     }
 
@@ -626,12 +626,12 @@ impl Rule {
     /// # Examples
     ///
     /// ```rust
-    /// use moss_jsonlogic::rule::Rule;
+    /// use moss_jsonlogic::rule::RawRule;
     ///
-    /// let rule = Rule::var("total") / Rule::value(4);
+    /// let rule = RawRule::var("total") / RawRule::value(4);
     /// ```
     pub fn divide(self, other: Self) -> Self {
-        Rule::binary(Operator::Divide, self, other)
+        RawRule::binary(Operator::Divide, self, other)
     }
 
     /// Modulo operation.
@@ -641,16 +641,16 @@ impl Rule {
     /// # Examples
     ///
     /// ```rust
-    /// use moss_jsonlogic::rule::Rule;
+    /// use moss_jsonlogic::rule::RawRule;
     ///
-    /// let rule = Rule::var("number").modulo(Rule::value(3));
+    /// let rule = RawRule::var("number").modulo(RawRule::value(3));
     /// ```
     pub fn modulo(self, other: Self) -> Self {
-        Rule::binary(Operator::Modulo, self, other)
+        RawRule::binary(Operator::Modulo, self, other)
     }
 }
 
-impl Serialize for Rule {
+impl Serialize for RawRule {
     // Serialization enables the conversion of complex rule structures into a
     // JSON-compatible format for evaluation or transmission.
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
@@ -658,18 +658,18 @@ impl Serialize for Rule {
         S: Serializer,
     {
         match self {
-            Rule::Constant(value) => value.serialize(serializer),
-            Rule::Variable(name) => {
+            RawRule::Constant(value) => value.serialize(serializer),
+            RawRule::Variable(name) => {
                 let mut map = serializer.serialize_map(Some(1))?;
                 map.serialize_entry("var", name)?;
                 map.end()
             }
-            Rule::Unary { operator, operand } => {
+            RawRule::Unary { operator, operand } => {
                 let mut map = serializer.serialize_map(Some(1))?;
                 map.serialize_entry(&operator.to_string(), operand)?;
                 map.end()
             }
-            Rule::Binary {
+            RawRule::Binary {
                 operator,
                 left,
                 right,
@@ -678,14 +678,14 @@ impl Serialize for Rule {
                 map.serialize_entry(&operator.to_string(), &[left.as_ref(), right.as_ref()])?;
                 map.end()
             }
-            Rule::Variadic { operator, operands } => {
-                let operands_refs: Vec<&Rule> = operands.iter().collect();
+            RawRule::Variadic { operator, operands } => {
+                let operands_refs: Vec<&RawRule> = operands.iter().collect();
                 let mut map = serializer.serialize_map(Some(1))?;
                 map.serialize_entry(&operator.to_string(), &operands_refs)?;
                 map.end()
             }
-            Rule::Custom { operator, operands } => {
-                let operands_refs: Vec<&Rule> = operands.iter().collect();
+            RawRule::Custom { operator, operands } => {
+                let operands_refs: Vec<&RawRule> = operands.iter().collect();
                 let mut map = serializer.serialize_map(Some(1))?;
                 map.serialize_entry(operator, &operands_refs)?;
                 map.end()
@@ -697,52 +697,52 @@ impl Serialize for Rule {
 /// Implements the `From` trait to allow easy creation of `Rule` constants from various types.
 ///
 /// This implementation facilitates the conversion from primitive types and `serde_json::Value`
-/// directly into `Rule::Constant` variants, enhancing the ergonomics of rule construction.
+/// directly into `RawRule::Constant` variants, enhancing the ergonomics of rule construction.
 ///
 /// # Examples
 ///
 /// ```rust
-/// use moss_jsonlogic::rule::Rule;
+/// use moss_jsonlogic::rule::RawRule;
 /// use serde_json::json;
 ///
-/// let string_rule: Rule = "active".into();
-/// let number_rule: Rule = 42.into();
-/// let bool_rule: Rule = true.into();
-/// let json_rule: Rule = json!({"key": "value"}).into();
+/// let string_rule: RawRule = "active".into();
+/// let number_rule: RawRule = 42.into();
+/// let bool_rule: RawRule = true.into();
+/// let json_rule: RawRule = json!({"key": "value"}).into();
 /// ```
-impl From<&str> for Rule {
+impl From<&str> for RawRule {
     fn from(s: &str) -> Self {
-        Rule::constant(s)
+        RawRule::constant(s)
     }
 }
 
-impl From<String> for Rule {
+impl From<String> for RawRule {
     fn from(s: String) -> Self {
-        Rule::constant(s)
+        RawRule::constant(s)
     }
 }
 
-impl From<i64> for Rule {
+impl From<i64> for RawRule {
     fn from(n: i64) -> Self {
-        Rule::constant(n)
+        RawRule::constant(n)
     }
 }
 
-impl From<f64> for Rule {
+impl From<f64> for RawRule {
     fn from(n: f64) -> Self {
-        Rule::constant(n)
+        RawRule::constant(n)
     }
 }
 
-impl From<bool> for Rule {
+impl From<bool> for RawRule {
     fn from(b: bool) -> Self {
-        Rule::constant(b)
+        RawRule::constant(b)
     }
 }
 
-impl From<Value> for Rule {
+impl From<Value> for RawRule {
     fn from(value: Value) -> Self {
-        Rule::constant(value)
+        RawRule::constant(value)
     }
 }
 
@@ -754,121 +754,121 @@ impl From<Value> for Rule {
 // to construct complex JSON Logic rules in an intuitive and readable manner.
 // ----------------------------------------------------------------------------
 
-impl BitAnd for Rule {
-    type Output = Rule;
+impl BitAnd for RawRule {
+    type Output = RawRule;
 
     /// Enables the use of the `&` operator to perform logical AND operations between rules.
     ///
     /// # Examples
     ///
     /// ```rust
-    /// use moss_jsonlogic::rule::Rule;
+    /// use moss_jsonlogic::rule::RawRule;
     ///
-    /// let rule = Rule::var("is_admin") & Rule::var("is_active");
+    /// let rule = RawRule::var("is_admin") & RawRule::var("is_active");
     /// ```
-    fn bitand(self, rhs: Rule) -> Rule {
+    fn bitand(self, rhs: RawRule) -> RawRule {
         self.and(rhs)
     }
 }
 
-impl BitOr for Rule {
-    type Output = Rule;
+impl BitOr for RawRule {
+    type Output = RawRule;
 
     /// Enables the use of the `|` operator to perform logical OR operations between rules.
     ///
     /// # Examples
     ///
     /// ```rust
-    /// use moss_jsonlogic::rule::Rule;
+    /// use moss_jsonlogic::rule::RawRule;
     ///
-    /// let rule = Rule::var("is_guest") | Rule::var("is_banned");
+    /// let rule = RawRule::var("is_guest") | RawRule::var("is_banned");
     /// ```
-    fn bitor(self, rhs: Rule) -> Rule {
+    fn bitor(self, rhs: RawRule) -> RawRule {
         self.or(rhs)
     }
 }
 
-impl Add for Rule {
-    type Output = Rule;
+impl Add for RawRule {
+    type Output = RawRule;
 
     /// Enables the use of the `+` operator to perform addition operations between rules.
     ///
     /// # Examples
     ///
     /// ```rust
-    /// use moss_jsonlogic::rule::Rule;
+    /// use moss_jsonlogic::rule::RawRule;
     ///
-    /// let rule = Rule::var("quantity") + Rule::value(10);
+    /// let rule = RawRule::var("quantity") + RawRule::value(10);
     /// ```
-    fn add(self, rhs: Rule) -> Rule {
+    fn add(self, rhs: RawRule) -> RawRule {
         self.add(rhs)
     }
 }
 
-impl Sub for Rule {
-    type Output = Rule;
+impl Sub for RawRule {
+    type Output = RawRule;
 
     /// Enables the use of the `-` operator to perform subtraction operations between rules.
     ///
     /// # Examples
     ///
     /// ```rust
-    /// use moss_jsonlogic::rule::Rule;
+    /// use moss_jsonlogic::rule::RawRule;
     ///
-    /// let rule = Rule::var("total") - Rule::value(20);
+    /// let rule = RawRule::var("total") - RawRule::value(20);
     /// ```
-    fn sub(self, rhs: Rule) -> Rule {
+    fn sub(self, rhs: RawRule) -> RawRule {
         self.subtract(rhs)
     }
 }
 
-impl Mul for Rule {
-    type Output = Rule;
+impl Mul for RawRule {
+    type Output = RawRule;
 
     /// Enables the use of the `*` operator to perform multiplication operations between rules.
     ///
     /// # Examples
     ///
     /// ```rust
-    /// use moss_jsonlogic::rule::Rule;
+    /// use moss_jsonlogic::rule::RawRule;
     ///
-    /// let rule = Rule::var("price") * Rule::value(2);
+    /// let rule = RawRule::var("price") * RawRule::value(2);
     /// ```
-    fn mul(self, rhs: Rule) -> Rule {
+    fn mul(self, rhs: RawRule) -> RawRule {
         self.multiply(rhs)
     }
 }
 
-impl Div for Rule {
-    type Output = Rule;
+impl Div for RawRule {
+    type Output = RawRule;
 
     /// Enables the use of the `/` operator to perform division operations between rules.
     ///
     /// # Examples
     ///
     /// ```rust
-    /// use moss_jsonlogic::rule::Rule;
+    /// use moss_jsonlogic::rule::RawRule;
     ///
-    /// let rule = Rule::var("total") / Rule::value(4);
+    /// let rule = RawRule::var("total") / RawRule::value(4);
     /// ```
-    fn div(self, rhs: Rule) -> Rule {
+    fn div(self, rhs: RawRule) -> RawRule {
         self.divide(rhs)
     }
 }
 
-impl Not for Rule {
-    type Output = Rule;
+impl Not for RawRule {
+    type Output = RawRule;
 
     /// Enables the use of the `!` operator to perform logical NOT operations on rules.
     ///
     /// # Examples
     ///
     /// ```rust
-    /// use moss_jsonlogic::rule::Rule;
+    /// use moss_jsonlogic::rule::RawRule;
     ///
-    /// let rule = !Rule::var("is_active");
+    /// let rule = !RawRule::var("is_active");
     /// ```
-    fn not(self) -> Rule {
+    fn not(self) -> RawRule {
         self.not()
     }
 }
@@ -876,7 +876,7 @@ impl Not for Rule {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use moss_jsonlogic_macro::{rule, rule_with_validation};
+    use moss_jsonlogic_macro::rule;
     use serde_json::json;
 
     /// Tests arithmetic operations and their serialization.
@@ -884,10 +884,10 @@ mod tests {
     /// Constructs a rule that checks if the sum of `x` and `y` is greater than `10`.
     #[test]
     fn test_arithmetic_operations() {
-        let var_x = Rule::var("x");
-        let var_y = Rule::var("y");
+        let var_x = RawRule::var("x");
+        let var_y = RawRule::var("y");
 
-        let const_ten = Rule::value(10);
+        let const_ten = RawRule::value(10);
 
         // Build rule: (x + y) > 10
         let rule = (var_x + var_y).gt(const_ten);
@@ -909,9 +909,9 @@ mod tests {
 
     #[test]
     fn test_logical_not() {
-        let var_status = Rule::var("status");
+        let var_status = RawRule::var("status");
 
-        let const_active = Rule::from("active");
+        let const_active = RawRule::from("active");
 
         // Build rule: !(status == "active")
         let rule = !(var_status.eq(const_active));
@@ -935,13 +935,13 @@ mod tests {
 
     #[test]
     fn test_complex_nested_rules() {
-        let var_x = Rule::var("x");
-        let var_y = Rule::var("y");
-        let var_z = Rule::var("z");
+        let var_x = RawRule::var("x");
+        let var_y = RawRule::var("y");
+        let var_z = RawRule::var("z");
 
-        let const_five = Rule::from(5);
-        let const_ten = Rule::from(10);
-        let const_twenty = Rule::from(20);
+        let const_five = RawRule::from(5);
+        let const_ten = RawRule::from(10);
+        let const_twenty = RawRule::from(20);
 
         // Build rules
         let rule1 = var_x.gt(const_five); // x > 5
@@ -973,9 +973,9 @@ mod tests {
 
     #[test]
     fn test_chained_arithmetic_operations() {
-        let var_a = Rule::var("a");
-        let var_b = Rule::var("b");
-        let var_c = Rule::var("c");
+        let var_a = RawRule::var("a");
+        let var_b = RawRule::var("b");
+        let var_c = RawRule::var("c");
 
         // Build rule: (a * b) + c
         let arithmetic_rule = (var_a * var_b) + var_c;
@@ -1000,10 +1000,10 @@ mod tests {
     /// Constructs a rule that checks if `(x * y) + z <= 100`.
     #[test]
     fn test_combining_logical_and_arithmetic_operations() {
-        let var_score = Rule::var("score");
-        let var_bonus = Rule::var("bonus");
+        let var_score = RawRule::var("score");
+        let var_bonus = RawRule::var("bonus");
 
-        let const_threshold = Rule::from(100);
+        let const_threshold = RawRule::from(100);
 
         // Build rule: (score + bonus) >= 100
         let rule = (var_score + var_bonus).gte(const_threshold);
@@ -1028,11 +1028,11 @@ mod tests {
     /// Constructs a rule that represents `!(status == "locked" || attempts > 3)`.
     #[test]
     fn test_complex_nested_rules_with_not() {
-        let var_status = Rule::var("status");
-        let var_attempts = Rule::var("attempts");
+        let var_status = RawRule::var("status");
+        let var_attempts = RawRule::var("attempts");
 
-        let const_locked = Rule::value("locked");
-        let const_three = Rule::value(3);
+        let const_locked = RawRule::value("locked");
+        let const_three = RawRule::value(3);
 
         // Build rule: !(status == "locked" || attempts > 3)
         let rule = !(var_status.eq(const_locked) | var_attempts.gt(const_three));
@@ -1060,11 +1060,11 @@ mod tests {
     /// Constructs a rule that represents `(a * b) + (c / d) - e`.
     #[test]
     fn test_multiple_arithmetic_operations() {
-        let var_a = Rule::var("a");
-        let var_b = Rule::var("b");
-        let var_c = Rule::var("c");
-        let var_d = Rule::var("d");
-        let var_e = Rule::var("e");
+        let var_a = RawRule::var("a");
+        let var_b = RawRule::var("b");
+        let var_c = RawRule::var("c");
+        let var_d = RawRule::var("d");
+        let var_e = RawRule::var("e");
 
         // Build rule: (a * b) + (c / d) - e
         let rule = (var_a * var_b) + (var_c / var_d) - var_e;
@@ -1093,10 +1093,10 @@ mod tests {
     /// Constructs a rule using a custom operator `"customOp"` with operands `input` and `42`.
     #[test]
     fn test_custom_operator() {
-        let var_input = Rule::var("input");
+        let var_input = RawRule::var("input");
 
         // Build rule using a custom operator "customOp"
-        let custom_rule = Rule::custom("customOp", vec![var_input, Rule::from(42)]);
+        let custom_rule = RawRule::custom("customOp", vec![var_input, RawRule::from(42)]);
 
         let json_logic =
             serde_json::to_value(custom_rule).expect("Failed to serialize the rule into JSON.");
@@ -1115,14 +1115,14 @@ mod tests {
     /// Constructs a rule that checks if `(x + y) > 10 AND (z <= 5 OR w != 3)`.
     #[test]
     fn test_combined_logical_and_arithmetic_operations() {
-        let var_x = Rule::var("x");
-        let var_y = Rule::var("y");
-        let var_z = Rule::var("z");
-        let var_w = Rule::var("w");
+        let var_x = RawRule::var("x");
+        let var_y = RawRule::var("y");
+        let var_z = RawRule::var("z");
+        let var_w = RawRule::var("w");
 
-        let const_ten = Rule::value(10);
-        let const_five = Rule::value(5);
-        let const_three = Rule::value(3);
+        let const_ten = RawRule::value(10);
+        let const_five = RawRule::value(5);
+        let const_three = RawRule::value(3);
 
         let rule_sum = var_x + var_y; // x + y
         let rule_gt = rule_sum.gt(const_ten); // (x + y) > 10
@@ -1159,11 +1159,11 @@ mod tests {
 
     #[test]
     fn test_complex_rule_with_not_and_operator_overloading() {
-        let var_status = Rule::var("status");
-        let var_attempts = Rule::var("attempts");
+        let var_status = RawRule::var("status");
+        let var_attempts = RawRule::var("attempts");
 
-        let const_locked = Rule::from("locked");
-        let const_max_attempts = Rule::from(3);
+        let const_locked = RawRule::from("locked");
+        let const_max_attempts = RawRule::from(3);
 
         // Build rule: !(status == "locked" || attempts > 3)
         let rule = !(var_status.eq(const_locked) | var_attempts.gt(const_max_attempts));
@@ -1190,13 +1190,13 @@ mod tests {
     /// Constructs a rule that checks if `a == 5` AND (`b > 10` OR `c < 20`).
     #[test]
     fn test_logical_operations() {
-        let var_a = Rule::var("a");
-        let var_b = Rule::var("b");
-        let var_c = Rule::var("c");
+        let var_a = RawRule::var("a");
+        let var_b = RawRule::var("b");
+        let var_c = RawRule::var("c");
 
-        let rule1 = var_a.eq(Rule::from(5));
-        let rule2 = var_b.gt(Rule::from(10));
-        let rule3 = var_c.lt(Rule::from(20));
+        let rule1 = var_a.eq(RawRule::from(5));
+        let rule2 = var_b.gt(RawRule::from(10));
+        let rule3 = var_c.lt(RawRule::from(20));
 
         // Combine rules using logical operators
         let combined_rule = rule1 & (rule2 | rule3);
@@ -1233,9 +1233,9 @@ mod tests {
     /// - Verifies that the serialized JSON Logic matches the expected structure.
     #[test]
     fn test_rule_with_desired_api() {
-        let rule = Rule::var("view")
-            .eq(Rule::value("recents.view.id"))
-            .and(Rule::var("viewItem").eq(Rule::value("recents.item")));
+        let rule = RawRule::var("view")
+            .eq(RawRule::value("recents.view.id"))
+            .and(RawRule::var("viewItem").eq(RawRule::value("recents.item")));
 
         let json_logic =
             serde_json::to_value(rule).expect("Failed to serialize the rule into JSON.");
@@ -1266,7 +1266,7 @@ mod tests {
     #[test]
     fn test_operator_overloading() {
         // Logical AND
-        let rule_and = Rule::var("is_admin") & Rule::var("is_active");
+        let rule_and = RawRule::var("is_admin") & RawRule::var("is_active");
         let expected_and = json!({
             "and": [
                 { "var": "is_admin" },
@@ -1279,7 +1279,7 @@ mod tests {
         );
 
         // Logical OR
-        let rule_or = Rule::var("is_guest") | Rule::var("is_banned");
+        let rule_or = RawRule::var("is_guest") | RawRule::var("is_banned");
         let expected_or = json!({
             "or": [
                 { "var": "is_guest" },
@@ -1292,7 +1292,7 @@ mod tests {
         );
 
         // Logical NOT
-        let rule_not = !Rule::var("is_active");
+        let rule_not = !RawRule::var("is_active");
         let expected_not = json!({
             "!": {
                 "var": "is_active"
@@ -1304,7 +1304,7 @@ mod tests {
         );
 
         // Addition
-        let rule_add = Rule::var("quantity") + Rule::value(10);
+        let rule_add = RawRule::var("quantity") + RawRule::value(10);
         let expected_add = json!({
             "+": [
                 { "var": "quantity" },
@@ -1317,7 +1317,7 @@ mod tests {
         );
 
         // Subtraction
-        let rule_sub = Rule::var("total") - Rule::value(20);
+        let rule_sub = RawRule::var("total") - RawRule::value(20);
         let expected_sub = json!({
             "-": [
                 { "var": "total" },
@@ -1330,7 +1330,7 @@ mod tests {
         );
 
         // Multiplication
-        let rule_mul = Rule::var("price") * Rule::value(2);
+        let rule_mul = RawRule::var("price") * RawRule::value(2);
         let expected_mul = json!({
             "*": [
                 { "var": "price" },
@@ -1343,7 +1343,7 @@ mod tests {
         );
 
         // Division
-        let rule_div = Rule::var("total") / Rule::value(4);
+        let rule_div = RawRule::var("total") / RawRule::value(4);
         let expected_div = json!({
             "/": [
                 { "var": "total" },
@@ -1361,9 +1361,9 @@ mod tests {
     /// Constructs a rule that checks if `age >= 18` and `status == 'active'`.
     #[test]
     fn test_method_chaining() {
-        let rule = Rule::var("age")
-            .gte(Rule::value(18))
-            .and(Rule::var("status").eq(Rule::value("active")));
+        let rule = RawRule::var("age")
+            .gte(RawRule::value(18))
+            .and(RawRule::var("status").eq(RawRule::value("active")));
 
         let json_logic =
             serde_json::to_value(rule).expect("Failed to serialize the rule into JSON.");
@@ -1390,9 +1390,9 @@ mod tests {
 
     #[test]
     fn test_rule_with_variables_and_values() {
-        let rule = Rule::var("status")
-            .ne(Rule::value("inactive"))
-            .and(Rule::var("age").gte(Rule::value(18)));
+        let rule = RawRule::var("status")
+            .ne(RawRule::value("inactive"))
+            .and(RawRule::var("age").gte(RawRule::value(18)));
 
         let json_logic =
             serde_json::to_value(rule).expect("Failed to serialize the rule into JSON.");
@@ -1492,5 +1492,27 @@ mod tests {
                 ]
             })
         );
+    }
+
+    #[test]
+    fn test_rule_macro_with_val() {
+        let active_value = "active";
+        let rule = rule!((age > 18 && status == val!(active_value)) || is_admin);
+
+        let json_logic = serde_json::to_value(rule).unwrap();
+
+        let expected_json = json!({
+            "or": [
+                {
+                    "and": [
+                        { ">": [ { "var": "age" }, 18 ] },
+                        { "==": [ { "var": "status" }, "active" ] }
+                    ]
+                },
+                { "var": "is_admin" }
+            ]
+        });
+
+        assert_eq!(json_logic, expected_json);
     }
 }
