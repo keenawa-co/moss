@@ -7,7 +7,7 @@ use crate::{bstring::BStringForFrontend, ReadOnlyStr};
 /// # Example
 ///
 /// ```rust
-/// use moss_str::{localized_string::LocalizedString, localize};
+/// use moss_text::{localized_string::LocalizedString, localize};
 ///
 /// // Create a LocalizedString with only key and origin
 /// let greeting = localize!("greeting.hello", "Hello, World!");
@@ -22,7 +22,7 @@ macro_rules! localize {
         $crate::localized_string::LocalizedString::new(
             $key,
             $origin,
-            Option::<moss_str::bstring::BStringForFrontend>::None,
+            Option::<moss_text::bstring::BStringForFrontend>::None,
         )
     };
     // Pattern for three arguments: key, origin, and description

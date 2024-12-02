@@ -1,5 +1,5 @@
 {
-  "name": "@repo/moss-str",
+  "name": "@repo/moss-text",
   "exports": {
     ".": "./index.ts"
   },

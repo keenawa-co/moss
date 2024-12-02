@@ -3,7 +3,7 @@ use desktop_models::{
     view::{GroupId, TreeViewDescriptor, TreeViewGroup, TreeViewGroupLocation},
 };
 use hashbrown::HashMap;
-use moss_str::ReadOnlyStr;
+use moss_text::ReadOnlyStr;
 use parking_lot::RwLock;
 use std::fmt::Debug;
 use std::sync::Arc;

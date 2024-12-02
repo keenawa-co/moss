@@ -8,5 +8,8 @@ publish = false
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
+moss_text.workspace = true
+moss_html.workspace = true
+
 serde = { workspace = true, features = ["derive", "rc"] }
 ts-rs.workspace = true

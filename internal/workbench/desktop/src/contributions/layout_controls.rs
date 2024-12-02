@@ -7,7 +7,7 @@ use desktop_models::{
 };
 use moss_jsonlogic::raw_rule::*;
 use moss_jsonlogic_macro::rule;
-use moss_str::{localize, ReadOnlyStr};
+use moss_text::{localize, ReadOnlyStr};
 use std::rc::Rc;
 
 use crate::Contribution;
