@@ -1,4 +1,4 @@
-use moss_base::collection::{ImHashMap, ImHashSet};
+use {im::HashMap as ImHashMap, im::HashSet as ImHashSet};
 
 use super::node::NodeKey;
 

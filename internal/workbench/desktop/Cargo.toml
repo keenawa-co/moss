@@ -5,7 +5,7 @@ edition = "2021"
 
 
 [dependencies]
-moss_str.workspace = true
+moss_text.workspace = true
 moss_uikit.workspace = true
 moss_html.workspace = true
 moss_jsonlogic.workspace = true

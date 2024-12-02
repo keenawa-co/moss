@@ -2,7 +2,7 @@ use crate::Contribution;
 use anyhow::Result;
 use desktop_models::{constants, view::TreeViewDescriptor};
 use moss_html::link::HtmlLink;
-use moss_str::localize;
+use moss_text::localize;
 use once_cell::sync::Lazy;
 use std::sync::Arc;
 

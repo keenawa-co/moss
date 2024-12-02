@@ -1,7 +1,7 @@
 use std::rc::Rc;
 
 use moss_jsonlogic::raw_rule::RawRule;
-use moss_str::{localized_string::LocalizedString, ReadOnlyStr};
+use moss_text::{localized_string::LocalizedString, ReadOnlyStr};
 use serde::Serialize;
 use ts_rs::TS;
 
@@ -9,7 +9,7 @@ use ts_rs::TS;
 #[ts(export, export_to = "actions.ts")]
 pub struct Action(#[ts(type = "string")] ReadOnlyStr);
 
-pub type SubmenuRef = moss_str::ReadOnlyStr;
+pub type SubmenuRef = moss_text::ReadOnlyStr;
 pub type ActionCommandId = ReadOnlyStr;
 
 #[derive(Debug, Clone, Serialize, TS)]

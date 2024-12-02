@@ -7,7 +7,7 @@ edition = "2021"
 serde_json.workspace = true
 serde.workspace = true
 arcstr.workspace = true
-moss_str.workspace = true
+moss_text.workspace = true
 thiserror.workspace = true
 
 [dev-dependencies]
