@@ -17,9 +17,7 @@ pub async fn create_new_window(app_handle: AppHandle) {
 
 #[tauri::command(async)]
 pub async fn main_window_is_ready(current_window: WebviewWindow) -> Result<(), String> {
-    update_window_theme(&current_window).await;
     current_window.show().unwrap();
-
     current_window
         .emit(
             "channel1:eventA",

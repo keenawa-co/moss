@@ -14,30 +14,30 @@ const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
   const { data: themes } = useFetchThemes();
   const [currentTheme, setCurrentTheme] = useAtom(themeAtom);
 
-  const applyTheme = async (cssContent: string) => {
-    if (currentTheme) {
-      let styleTag = document.getElementById("theme-style") as HTMLStyleElement | null;
-
-      if (styleTag) {
-        styleTag.innerHTML = cssContent;
-      } else {
-        styleTag = document.createElement("style");
-        styleTag.id = "theme-style";
-        styleTag.innerHTML = cssContent;
-        document.head.appendChild(styleTag);
-      }
+  const applyTheme = (cssContent: string) => {
+    console.log("Applying Theme");
+    let styleTag = document.getElementById("theme-style") as HTMLStyleElement | null;
+    console.log(styleTag);
+    if (styleTag) {
+      styleTag.innerHTML = cssContent;
+    } else {
+      styleTag = document.createElement("style");
+      styleTag.id = "theme-style";
+      styleTag.innerHTML = cssContent;
+      document.head.appendChild(styleTag);
     }
   };
 
   useEffect(() => {
     const appWebview = getCurrentWebviewWindow();
     appWebview.listen<string>("select_theme", (event) => {
-      console.log("select_theme event");
       const selectedTheme = themes?.find((theme) => theme.id === event.payload) || null;
+      console.log("select_theme event:", selectedTheme);
       setCurrentTheme(selectedTheme);
     });
     appWebview.listen<string>("apply_theme", (event) => {
       console.log("apply_theme event");
+      console.log(event.payload);
       applyTheme(event.payload);
     });
   }, []);
