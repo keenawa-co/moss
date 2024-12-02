@@ -2,7 +2,7 @@
 
 import { RuleTester } from "@typescript-eslint/rule-tester";
 
-import rule from "./no-bg-with-arbitrary-value";
+import rule from "./tw-no-bg-with-arbitrary-value";
 
 const ruleTester = new RuleTester({
   languageOptions: {
@@ -16,7 +16,7 @@ const ruleTester = new RuleTester({
   },
 });
 
-ruleTester.run("no-bg-with-arbitrary-value", rule, {
+ruleTester.run("tw-no-bg-with-arbitrary-value", rule, {
   valid: [
     {
       name: "Valid selector in string",

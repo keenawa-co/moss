@@ -1,4 +1,4 @@
-import noBgRule from "./rules/no-bg-with-arbitrary-value.js";
+import noBgRule from "./rules/tw-no-bg-with-arbitrary-value.js";
 
 const plugin = {
   meta: {
@@ -6,7 +6,7 @@ const plugin = {
   },
   configs: {},
   rules: {
-    "no-bg-with-arbitrary-value": noBgRule,
+    "tw-no-bg-with-arbitrary-value": noBgRule,
   },
   processors: {},
 };

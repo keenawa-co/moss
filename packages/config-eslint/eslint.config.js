@@ -9,7 +9,7 @@ export default [
       mossLint: mossLintPlugin,
     },
     rules: {
-      "mossLint/no-bg-with-arbitrary-value": "error",
+      "mossLint/tw-no-bg-with-arbitrary-value": "error",
     },
   },
 ];

@@ -25,7 +25,7 @@ export default {
   meta: {
     type: "problem",
     docs: {
-      description: "Disallow bg- with arbitrary values in Tailwind CSS.",
+      description: "Disallow bg- with arbitrary values in Tailwind.",
       category: "Stylistic Issues",
       recommended: true,
     },
