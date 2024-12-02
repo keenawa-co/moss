@@ -280,11 +280,11 @@ importers:
         specifier: 0.0.0-insiders.565cd3e
         version: 0.0.0-insiders.565cd3e(postcss@8.4.49)
       '@tanstack/react-query':
-        specifier: ^5.61.3
-        version: 5.61.4(react@18.3.1)
+        specifier: ^5.62.0
+        version: 5.62.0(react@18.3.1)
       '@tanstack/react-query-devtools':
         specifier: ^5.62.0
-        version: 5.62.0(@tanstack/react-query@5.61.4(react@18.3.1))(react@18.3.1)
+        version: 5.62.0(@tanstack/react-query@5.62.0(react@18.3.1))(react@18.3.1)
       '@tauri-apps/api':
         specifier: ^2.1.1
         version: 2.1.1
@@ -3300,8 +3300,8 @@ packages:
     peerDependencies:
       tailwindcss: '>=3.0.0 || insiders || >=4.0.0-alpha.20'
 
-  '@tanstack/query-core@5.61.4':
-    resolution: {integrity: sha512-rsnemyhPvEG4ViZe0R2UQDM8NgQS/BNC5/Gf9RTs0TKN5thUhPUwnL2anWG4jxAGKFyDfvG7PXbx6MRq3hxi1w==}
+  '@tanstack/query-core@5.62.0':
+    resolution: {integrity: sha512-sx38bGrqF9bop92AXOvzDr0L9fWDas5zXdPglxa9cuqeVSWS7lY6OnVyl/oodfXjgOGRk79IfCpgVmxrbHuFHg==}
 
   '@tanstack/query-devtools@5.61.4':
     resolution: {integrity: sha512-21Tw+u8E3IJJj4A/Bct4H0uBaDTEu7zBrR79FeSyY+mS2gx5/m316oDtJiKkILc819VSTYt+sFzODoJNcpPqZQ==}
@@ -3312,8 +3312,8 @@ packages:
       '@tanstack/react-query': ^5.62.0
       react: ^18 || ^19
 
-  '@tanstack/react-query@5.61.4':
-    resolution: {integrity: sha512-Nh5+0V4fRVShSeDHFTVvzJrvwTdafIvqxyZUrad71kJWL7J+J5Wrd/xcHTWfSL1mR/9eoufd2roXOpL3F16ECA==}
+  '@tanstack/react-query@5.62.0':
+    resolution: {integrity: sha512-tj2ltjAn2a3fs+Dqonlvs6GyLQ/LKVJE2DVSYW+8pJ3P6/VCVGrfqv5UEchmlP7tLOvvtZcOuSyI2ooVlR5Yqw==}
     peerDependencies:
       react: ^18 || ^19
 
@@ -11929,19 +11929,19 @@ snapshots:
       postcss-selector-parser: 6.0.10
       tailwindcss: 3.4.15
 
-  '@tanstack/query-core@5.61.4': {}
+  '@tanstack/query-core@5.62.0': {}
 
   '@tanstack/query-devtools@5.61.4': {}
 
-  '@tanstack/react-query-devtools@5.62.0(@tanstack/react-query@5.61.4(react@18.3.1))(react@18.3.1)':
+  '@tanstack/react-query-devtools@5.62.0(@tanstack/react-query@5.62.0(react@18.3.1))(react@18.3.1)':
     dependencies:
       '@tanstack/query-devtools': 5.61.4
-      '@tanstack/react-query': 5.61.4(react@18.3.1)
+      '@tanstack/react-query': 5.62.0(react@18.3.1)
       react: 18.3.1
 
-  '@tanstack/react-query@5.61.4(react@18.3.1)':
+  '@tanstack/react-query@5.62.0(react@18.3.1)':
     dependencies:
-      '@tanstack/query-core': 5.61.4
+      '@tanstack/query-core': 5.62.0
       react: 18.3.1
 
   '@tauri-apps/api@2.1.1': {}
