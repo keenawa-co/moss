@@ -1,11 +1,10 @@
-// Config for testing custom rules
-
 import mossLintPlugin from "./moss-lint-plugin/index.js";
 
+// Config for testing custom rules
 /** @type {import('eslint').Linter.Config} */
 export default [
   {
-    files: ["*.js", "*.jsx"],
+    files: ["*.test.js", "*.test.jsx"],
     plugins: {
       mossLint: mossLintPlugin,
     },

@@ -1,14 +1,24 @@
 "use strict";
 
+import * as vitest from "vitest";
+
 import { RuleTester } from "@typescript-eslint/rule-tester";
+
 import rule from "./no-bg-with-arbitrary-value";
 
+RuleTester.afterAll = vitest.afterAll;
+RuleTester.it = vitest.it;
+RuleTester.itOnly = vitest.it.only;
+RuleTester.describe = vitest.describe;
+
 const ruleTester = new RuleTester({
-  parserOptions: {
-    ecmaVersion: "ESNext",
-    sourceType: "module",
-    ecmaFeatures: {
-      jsx: true,
+  languageOptions: {
+    parserOptions: {
+      ecmaVersion: "latest",
+      sourceType: "module",
+      ecmaFeatures: {
+        jsx: true,
+      },
     },
   },
 });
@@ -37,10 +47,12 @@ ruleTester.run("no-bg-with-arbitrary-value", rule, {
     {
       code: `<div className="bg-[--custom-bg]"></div>`,
       errors: [{ messageId: "replaceBg" }],
+      output: `<div className="background-[--custom-bg]"></div>`,
     },
     {
       code: `<div className="bg-[var(--custom-bg)]"></div>`,
       errors: [{ messageId: "replaceBg" }],
+      output: `<div className="background-[--custom-bg]"></div>`,
     },
     {
       code: `
@@ -50,6 +62,12 @@ ruleTester.run("no-bg-with-arbitrary-value", rule, {
         };
       `,
       errors: [{ messageId: "replaceBg" }],
+      output: `
+        const ComponentStyles = "background-[--custom-bg]";
+        const Component = () => {
+          return <div className={ComponentStyles}></div>;
+        };
+      `,
     },
     {
       code: `
@@ -57,15 +75,21 @@ ruleTester.run("no-bg-with-arbitrary-value", rule, {
         const Component = () => <div className={styles}></div>
       `,
       errors: [{ messageId: "replaceBg" }],
+      output: `
+        const styles = "text-500 background-[--custom-bg] border text-[--custom-color] text-[var(--custom-color)]"
+        const Component = () => <div className={styles}></div>
+      `,
     },
     //TemplateElement
     {
       code: "<div className={`bg-[--custom-bg]`}></div>",
       errors: [{ messageId: "replaceBg" }],
+      output: "<div className={`background-[--custom-bg]`}></div>",
     },
     {
       code: "<div className={`bg-[var(--custom-bg)]`}></div>",
       errors: [{ messageId: "replaceBg" }],
+      output: "<div className={`background-[--custom-bg]`}></div>",
     },
   ],
 });
