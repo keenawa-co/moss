@@ -1169,6 +1169,7 @@ dependencies = [
  "csscolorparser",
  "indexmap 2.7.0",
  "jsonschema",
+ "moss_jsonlogic",
  "moss_str",
  "moss_uikit",
  "once_cell",
@@ -2866,7 +2867,8 @@ dependencies = [
 name = "moss_jsonlogic"
 version = "0.1.0"
 dependencies = [
- "lazy_static",
+ "anyhow",
+ "arcstr",
  "moss_jsonlogic_macro",
  "moss_str",
  "serde",
@@ -6505,6 +6507,8 @@ dependencies = [
  "hashbrown 0.15.0",
  "lazy_static",
  "moss_html",
+ "moss_jsonlogic",
+ "moss_jsonlogic_macro",
  "moss_str",
  "moss_uikit",
  "once_cell",

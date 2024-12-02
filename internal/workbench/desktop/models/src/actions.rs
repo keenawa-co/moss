@@ -1,5 +1,6 @@
 use std::rc::Rc;
 
+use moss_jsonlogic::raw_rule::RawRule;
 use moss_str::{localized_string::LocalizedString, ReadOnlyStr};
 use serde::Serialize;
 use ts_rs::TS;
@@ -35,8 +36,11 @@ pub enum MenuItemVisibility {
 pub struct MenuGroup {
     #[ts(type = "string")]
     id: ReadOnlyStr,
+
+    #[ts(optional)]
     order: Option<i64>,
-    #[ts(type = "LocalizedString | null")]
+
+    #[ts(optional, type = "LocalizedString")]
     description: Option<LocalizedString>,
 }
 
@@ -64,12 +68,20 @@ impl MenuGroup {
 pub struct CommandAction {
     #[ts(type = "string")]
     pub id: ActionCommandId,
-    #[ts(type = "LocalizedString | null")]
+
+    #[ts(type = "LocalizedString")]
     pub title: LocalizedString,
+
+    #[ts(optional)]
     pub tooltip: Option<String>,
-    #[ts(type = "LocalizedString | null")]
+
+    #[ts(optional, type = "LocalizedString")]
     pub description: Option<LocalizedString>,
+
+    #[ts(optional)]
     pub icon: Option<String>,
+
+    #[ts(optional)]
     pub toggled: Option<CommandActionToggle>,
 }
 
@@ -78,10 +90,15 @@ pub struct CommandAction {
 #[ts(export, export_to = "actions.ts")]
 pub struct CommandActionToggle {
     #[ts(type = "string")]
-    pub condition: ReadOnlyStr,
+    pub condition: RawRule,
+
+    #[ts(optional)]
     pub icon: Option<String>,
+
+    #[ts(optional)]
     pub tooltip: Option<String>,
-    #[ts(type = "LocalizedString | null")]
+
+    #[ts(optional, type = "LocalizedString")]
     pub title: Option<LocalizedString>,
 }
 
@@ -90,10 +107,16 @@ pub struct CommandActionToggle {
 #[ts(export, export_to = "actions.ts")]
 pub struct ActionMenuItem {
     pub command: CommandAction,
+
+    #[ts(optional)]
     pub group: Option<Rc<MenuGroup>>,
+
+    #[ts(optional)]
     pub order: Option<i64>,
-    #[ts(type = "string | null")]
-    pub when: Option<ReadOnlyStr>,
+
+    #[ts(optional, type = "object")]
+    pub when: Option<RawRule>,
+
     pub visibility: MenuItemVisibility,
 }
 
@@ -103,13 +126,21 @@ pub struct ActionMenuItem {
 pub struct SubmenuMenuItem {
     #[ts(type = "string")]
     pub submenu_id: ActionCommandId,
-    #[ts(type = "string | null")]
+
+    #[ts(optional, type = "string")]
     pub default_action_id: Option<ActionCommandId>,
-    #[ts(type = "LocalizedString | null")]
+
+    #[ts(optional, type = "LocalizedString")]
     pub title: Option<LocalizedString>,
+
+    #[ts(optional)]
     pub group: Option<Rc<MenuGroup>>,
+
+    #[ts(optional)]
     pub order: Option<i64>,
-    #[ts(type = "string | null")]
-    pub when: Option<ReadOnlyStr>,
+
+    #[ts(optional, type = "string")]
+    pub when: Option<RawRule>,
+
     pub visibility: MenuItemVisibility,
 }
