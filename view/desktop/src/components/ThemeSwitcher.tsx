@@ -14,9 +14,10 @@ const ThemeSwitcher: React.FC = () => {
     const selectedTheme = themes?.find((theme) => theme.id === selectedThemeId);
 
     if (selectedTheme) {
-      mutateChangeTheme(selectedThemeId, {
+      mutateChangeTheme(selectedTheme, {
         onSuccess: () => {
           setCurrentTheme(selectedTheme);
+          console.log(selectedTheme);
         },
         onError: (error: Error) => {
           console.error("Error changing theme:", error);

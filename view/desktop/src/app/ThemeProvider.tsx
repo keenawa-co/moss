@@ -1,10 +1,10 @@
 import React, { useEffect } from "react";
 import { useAtom } from "jotai";
 import { useFetchThemes } from "@/hooks/useFetchThemes";
-import { useChangeTheme } from "@/hooks/useChangeTheme";
 import { themeAtom } from "@/atoms/themeAtom";
-import { readThemeFile } from "@/api/appearance";
-import { IpcResult } from "@/lib/backend/tauri";
+
+import { getCurrentWebviewWindow } from "@tauri-apps/api/webviewWindow";
+import { invoke } from "@tauri-apps/api/core";
 
 interface ThemeProviderProps {
   children: React.ReactNode;
@@ -12,52 +12,41 @@ interface ThemeProviderProps {
 
 const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
   const { data: themes } = useFetchThemes();
-  const { mutate: mutateChangeTheme } = useChangeTheme();
   const [currentTheme, setCurrentTheme] = useAtom(themeAtom);
 
-  const setTheme = (themeId: string) => {
-    mutateChangeTheme(themeId, {
-      onSuccess: () => {
-        const selectedTheme = themes?.find((theme) => theme.id === themeId) || null;
-        setCurrentTheme(selectedTheme);
-      },
-      onError: (error: Error) => {
-        console.error("Error while changing theme:", error);
-      },
-    });
+  const applyTheme = async (cssContent: string) => {
+    if (currentTheme) {
+      let styleTag = document.getElementById("theme-style") as HTMLStyleElement | null;
+
+      if (styleTag) {
+        styleTag.innerHTML = cssContent;
+      } else {
+        styleTag = document.createElement("style");
+        styleTag.id = "theme-style";
+        styleTag.innerHTML = cssContent;
+        document.head.appendChild(styleTag);
+      }
+    }
   };
 
   useEffect(() => {
-    const applyTheme = async () => {
-      if (currentTheme) {
-        const result: IpcResult<string, string> = await readThemeFile(currentTheme.source);
-
-        if (result.status === "ok") {
-          const cssContent = result.data;
-          let styleTag = document.getElementById("theme-style") as HTMLStyleElement | null;
-
-          if (styleTag) {
-            styleTag.innerHTML = cssContent;
-          } else {
-            styleTag = document.createElement("style");
-            styleTag.id = "theme-style";
-            styleTag.innerHTML = cssContent;
-            document.head.appendChild(styleTag);
-          }
-        } else {
-          console.error(`Error reading theme file for "${currentTheme.id}":`, result.error);
-        }
-      }
-    };
-
-    applyTheme();
-  }, [currentTheme]);
+    const appWebview = getCurrentWebviewWindow();
+    appWebview.listen<string>("select_theme", (event) => {
+      console.log("select_theme event");
+      const selectedTheme = themes?.find((theme) => theme.id === event.payload) || null;
+      setCurrentTheme(selectedTheme);
+    });
+    appWebview.listen<string>("apply_theme", (event) => {
+      console.log("apply_theme event");
+      applyTheme(event.payload);
+    });
+  }, []);
 
   useEffect(() => {
     if (!currentTheme && themes && themes.length > 0) {
-      setTheme(themes[0].id);
+      invoke("get_selected_theme");
     }
-  }, [currentTheme, themes]);
+  }, [themes]);
 
   return <>{children}</>;
 };

@@ -1,6 +1,7 @@
 use tauri::{AppHandle, Emitter, Manager, WebviewWindow};
 
 use crate::create_main_window;
+use crate::utl::update_window_theme;
 
 #[derive(Clone, Serialize)]
 struct EventAData {
@@ -14,8 +15,9 @@ pub async fn create_new_window(app_handle: AppHandle) {
     create_main_window(&app_handle, "/");
 }
 
-#[tauri::command]
-pub fn main_window_is_ready(current_window: WebviewWindow) {
+#[tauri::command(async)]
+pub async fn main_window_is_ready(current_window: WebviewWindow) -> Result<(), String> {
+    update_window_theme(&current_window).await;
     current_window.show().unwrap();
 
     current_window
@@ -26,4 +28,5 @@ pub fn main_window_is_ready(current_window: WebviewWindow) {
             },
         )
         .unwrap();
+    Ok(())
 }

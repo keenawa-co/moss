@@ -14,10 +14,12 @@ use platform_core::platform::cross::client::CrossPlatformClient;
 use platform_workspace::WorkspaceId;
 use rand::random;
 use std::env;
+use std::path::PathBuf;
 use std::rc::Rc;
 use std::sync::atomic::{AtomicUsize, Ordering};
 use std::sync::Arc;
 
+use desktop_models::appearance::theming::ThemeDescriptor;
 use parking_lot::Mutex;
 use tauri::{AppHandle, Manager, RunEvent, WebviewWindow, WindowEvent};
 use tauri_plugin_cli::CliExt;
@@ -37,7 +39,7 @@ pub struct AppState {
     pub workbench: Arc<Workbench>,
     pub platform_info: NativePlatformInfo,
     pub window_counter: AtomicUsize,
-    pub react_query_string: Mutex<String>,
+    pub selected_theme: Mutex<ThemeDescriptor>,
 }
 
 pub fn run() {
@@ -105,7 +107,14 @@ pub fn run() {
                 workbench: Arc::new(workbench),
                 platform_info,
                 window_counter: AtomicUsize::new(0),
-                react_query_string: Mutex::new(String::from("Hello, Tauri!")),
+                // TODO: Refactor hardcoded default
+                selected_theme: Mutex::new(ThemeDescriptor {
+                    id: "theme-light".to_string(),
+                    name: "Theme Light".to_string(),
+                    source: PathBuf::from("moss-light.css")
+                        .to_string_lossy()
+                        .to_string(),
+                }),
             };
 
             {
@@ -137,11 +146,10 @@ pub fn run() {
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
-            cmd_fs::read_theme_file,
             cmd_window::main_window_is_ready,
             cmd_window::create_new_window,
-            cmd_dummy::get_stored_string,
-            cmd_dummy::set_stored_string,
+            cmd_dummy::get_selected_theme,
+            cmd_dummy::set_selected_theme,
             cmd_dummy::fetch_all_themes,
             cmd_dummy::fetch_themes,
             cmd_dummy::read_theme,
