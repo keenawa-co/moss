@@ -2,19 +2,20 @@ name: Rust
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
 
 env:
   CARGO_TERM_COLOR: always
 
 jobs:
   test:
+    name: Test suite
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
-
       - name: Rust Cache
         uses: Swatinem/rust-cache@v2.7.5
         with:
@@ -33,4 +34,3 @@ jobs:
         if: always()
         run: cargo -q test --doc
         working-directory: ".github/cache"
-
