@@ -8,7 +8,7 @@ use tokio::task::JoinSet;
 use toml::Value;
 use tracing::{error, info, trace, warn};
 
-use crate::config::ConfigFile;
+use crate::config::{ConfigFile, RustWorkspaceAuditConfig};
 
 #[derive(Parser)]
 pub struct RustWorkspaceAuditCommandArgs {
@@ -55,7 +55,13 @@ pub async fn check_dependencies_job(
                     }
                 };
 
-                match handle_package_dependencies(cargo_toml, &config_file_clone, package).await {
+                match handle_package_dependencies(
+                    cargo_toml,
+                    &config_file_clone.rust_workspace_audit,
+                    package,
+                )
+                .await
+                {
                     Ok(()) => Ok(()),
                     Err(e) => Err(e),
                 }
@@ -68,40 +74,35 @@ pub async fn check_dependencies_job(
             Ok(Err(e)) => {
                 if fail_fast {
                     task_set.abort_all();
-                    return Err(anyhow!(e));
+                    return Err(e);
                 }
-                error!("Error when processing package: {}", e)
             }
             Err(e) => {
                 if fail_fast {
                     task_set.abort_all();
                     return Err(anyhow!("Task panicked: {}", e));
                 }
-                error!("Task panicked: {}", e)
             }
         }
     }
 
-    // for result in join_all(tasks).await {
-    //     match result {
-    //         Ok(Ok(())) => {}
-    //         Ok(Err(e)) => error!("Error processing package: {}", e),
-    //         Err(e) => error!("Task panicked: {}", e),
-    //     }
-    // }
+    info!("All Checks Passed");
 
     Ok(())
 }
 
 async fn handle_package_dependencies(
     cargo_toml: Value,
-    ignored_deps: &ConfigFile,
+    rwa_config: &RustWorkspaceAuditConfig,
     package: Package,
 ) -> Result<()> {
     if let Some(dependencies) = cargo_toml.get("dependencies").and_then(|d| d.as_table()) {
         for (dep_name, dep_value) in dependencies {
-            if let Some(ignored_list) = ignored_deps.rust_workspace_audit.ignore.get(&package.name)
-            {
+            if rwa_config.global_ignore.contains(&dep_name) {
+                trace!("ignoring {} dependency in '{}'", dep_name, package.name);
+                continue;
+            }
+            if let Some(ignored_list) = rwa_config.crate_ignore.get(&package.name) {
                 if ignored_list.contains(&dep_name) {
                     trace!("ignoring {} dependency in '{}'", dep_name, package.name);
                     continue;
