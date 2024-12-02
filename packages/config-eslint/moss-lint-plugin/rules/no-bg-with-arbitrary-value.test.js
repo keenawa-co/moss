@@ -1,15 +1,8 @@
 "use strict";
 
-import * as vitest from "vitest";
-
 import { RuleTester } from "@typescript-eslint/rule-tester";
 
 import rule from "./no-bg-with-arbitrary-value";
-
-RuleTester.afterAll = vitest.afterAll;
-RuleTester.it = vitest.it;
-RuleTester.itOnly = vitest.it.only;
-RuleTester.describe = vitest.describe;
 
 const ruleTester = new RuleTester({
   languageOptions: {
