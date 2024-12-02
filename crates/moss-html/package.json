@@ -8,7 +8,7 @@
     },
     "devDependencies": {
       "@repo/typescript-config": "workspace:*",
-      "@repo/moss-str": "workspace:*"
+      "@repo/moss-text": "workspace:*"
     },
     "dependencies": {
       "typescript": "^5.7.2"

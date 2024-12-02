@@ -17,7 +17,8 @@ auto_generated_comment = """\
 
 import_map: Dict[str, Dict[str, Dict[str, any]]] = {
     "bindings/primitives.ts": {
-        "@repo/moss-str": {"types": ["LocalizedString"], "is_type_import": True}
+        "@repo/moss-text": {"types": ["LocalizedString"], "is_type_import": True},
+        "@repo/moss-html": {"types": ["HtmlLink"], "is_type_import": True},
     },
 }
 

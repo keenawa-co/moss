@@ -1,4 +1,4 @@
-use moss_str::localized_string::LocalizedString;
+use moss_text::localized_string::LocalizedString;
 
 /// Represents an HTML link (`<a>`) with attributes commonly used in web development.
 #[derive(Debug, Serialize, Clone, TS)]
@@ -27,7 +27,7 @@ impl HtmlLink {
     /// # Example
     /// ```
     /// use moss_html::link::HtmlLink;
-    /// use moss_str::{localized_string::LocalizedString, localize};
+    /// use moss_text::{localized_string::LocalizedString, localize};
     ///
     /// let link = HtmlLink::new("https://example.com", Some(localize!("welcome.message", "Welcome!")));
     /// ```

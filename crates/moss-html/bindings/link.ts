@@ -7,7 +7,7 @@
 // If you need to add or modify imports, please update the import_map in the script and
 // re-run `make gen-models` it to regenerate the file accordingly.
 
-import type { LocalizedString } from "@repo/moss-str";
+import type { LocalizedString } from "@repo/moss-text";
 
 /**
  * Represents an HTML link (`<a>`) with attributes commonly used in web development.

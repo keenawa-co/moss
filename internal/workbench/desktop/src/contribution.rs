@@ -2,7 +2,7 @@ use desktop_models::{
     constants,
     view::{TreeViewGroup, TreeViewGroupLocation},
 };
-use moss_str::localize;
+use moss_text::localize;
 use platform_configuration::{
     configuration_registry::{
         ConfigurationNode, ConfigurationNodeType as Type,
