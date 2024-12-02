@@ -40,7 +40,7 @@ macro_rules! localize {
 /// # Example
 ///
 /// ```rust
-/// use my_crate::{LocalizedString, localize};
+/// use moss_text::{localized_string::LocalizedString, localize};
 ///
 /// // Create a LocalizedString with key and origin only
 /// let greeting = LocalizedString::new("greeting.hello", "Hello, World!", None);

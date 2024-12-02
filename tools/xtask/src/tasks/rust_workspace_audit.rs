@@ -3,9 +3,9 @@ use cargo_metadata::{Metadata, Package};
 use clap::Parser;
 use futures::future::join_all;
 use smol::fs;
-use std::{io, sync::Arc};
+use std::sync::Arc;
 use toml::Value;
-use tracing::{error, info, trace, warn};
+use tracing::{error, trace};
 
 use crate::config::ConfigFile;
 
