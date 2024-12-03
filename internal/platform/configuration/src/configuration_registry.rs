@@ -129,25 +129,30 @@ impl PropertyKey {
 /// Basic usage with no overrides:
 ///
 /// ```rust
+/// use platform_configuration::property_key;
 /// let key = property_key!(editor.fontSize);
-/// assert_eq!(key.override_for.is_empty(), true);
+/// assert_eq!(key.override_for.is_none(), true);
 /// assert_eq!(key.ident, "editor.fontSize");
 /// ```
 ///
 /// Usage with a single override:
 ///
 /// ```rust
+/// use platform_configuration::property_key;
 /// let key = property_key!([rust].editor.fontSize);
-/// assert!(key.override_for.contains("rust"));
+/// assert!(key.override_for.is_some());
+/// assert!(key.override_for.unwrap().contains("rust"));
 /// assert_eq!(key.ident, "editor.fontSize");
 /// ```
 ///
 /// Usage with multiple overrides:
 ///
 /// ```rust
+/// use platform_configuration::property_key;
 /// let key = property_key!([typescript][javascript].editor.fontSize);
-/// assert!(key.override_for.contains("typescript"));
-/// assert!(key.override_for.contains("javascript"));
+/// assert!(key.override_for.is_some());
+/// assert!(key.override_for.clone().unwrap().contains("typescript"));
+/// assert!(key.override_for.clone().unwrap().contains("javascript"));
 /// assert_eq!(key.ident, "editor.fontSize");
 /// ```
 #[macro_export]
