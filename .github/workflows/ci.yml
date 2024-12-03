@@ -34,3 +34,12 @@ jobs:
         if: always()
         run: cargo -q test --doc
         working-directory: ".github/cache"
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Rust Workspace Dependencies Audit
+        run: |
+          cd ${GITHUB_WORKSPACE}/tools/xtask 
+          cargo -q run -- --fail-fast rwa
