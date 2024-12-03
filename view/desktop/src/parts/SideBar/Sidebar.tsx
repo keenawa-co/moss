@@ -13,7 +13,7 @@ enum IconState {
 
 export const Sidebar = () => {
   return (
-    <aside className="mb-5.5 flex w-full flex-col overflow-auto bg-[var(--sidebar-background)]  p-0">
+    <aside className="mb-5.5 flex w-full flex-col overflow-auto p-0  background-[--sidebar-background]">
       <MenuItem className="bg-zinc-200 group mb-3.5 mt-13">
         <Icon icon="Search" className={twMerge("h-4.5 w-4.5 min-w-4", IconState.Default, IconState.Hover)} />
         <IconTitle className="text-xs text-[var(--color-primary)]" title={`"Search... ${Math.random().toFixed(3)}"`} />

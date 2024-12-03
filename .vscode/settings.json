@@ -55,6 +55,7 @@
     "surrealdb",
     "sysinfo",
     "tablename",
+    "tanstack",
     "tauri",
     "tgui",
     "themegen",
