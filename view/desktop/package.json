@@ -7,7 +7,7 @@
     "vite": "vite",
     "dev": "vite dev",
     "build": "tsc -b && vite build",
-    "lint": "eslint --fix",
+    "lint": "eslint",
     "preview": "vite preview",
     "interface": "i18next-resources-for-ts interface -i ./public/locales/de -o ./src/@types/resources.d.ts"
   },
