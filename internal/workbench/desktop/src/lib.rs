@@ -126,6 +126,25 @@ impl Workbench {
             font_service_atom
         })?;
 
+        let reg = RegistryManager::new();
+
+        let mut commands_registry_lock = reg.commands.write();
+
+        commands_registry_lock.register(1, |x: i32| x * 2);
+        commands_registry_lock.register(2, |s: String| s.len());
+        commands_registry_lock.register(3, |(a, b): (i32, i32)| a + b);
+
+        let result: i32 = commands_registry_lock.invoke(1, 21).unwrap();
+        println!("Result 1: {}", result);
+
+        let result: usize = commands_registry_lock
+            .invoke(2, String::from("Hello"))
+            .unwrap();
+        println!("Result 2: {}", result);
+
+        let result: i32 = commands_registry_lock.invoke(3, (10, 32)).unwrap();
+        println!("Result 3: {}", result);
+
         Ok(Self {
             workspace_id,
             registry: RegistryManager::new(),
