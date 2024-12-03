@@ -30,8 +30,11 @@ struct Args {
     command: CliCommand,
     #[clap(short, long, value_enum)]
     info_level: Option<InfoLevel>,
-    #[arg(short, long)]
+    #[clap(short, long)]
     file_path: Option<PathBuf>,
+    #[clap(long, action)]
+    /// Terminate the program once a rule violation is found
+    fail_fast: bool,
 }
 
 #[derive(clap::ValueEnum, Clone)]
@@ -50,6 +53,7 @@ enum CliCommand {
 #[tokio::main]
 async fn main() -> Result<()> {
     let args = Args::parse();
+    let fail_fast = args.fail_fast;
     let info_level = match args.info_level.unwrap_or(InfoLevel::INFO) {
         InfoLevel::WARN => Level::WARN,
         InfoLevel::INFO => Level::INFO,
@@ -84,7 +88,7 @@ async fn main() -> Result<()> {
         }
         CliCommand::Rwa(args) => {
             runner.spawn_job(tasks::rust_workspace_audit::check_dependencies_job(
-                args, metadata,
+                args, metadata, fail_fast,
             ));
             runner.run().await
         }
