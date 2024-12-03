@@ -5,7 +5,6 @@ rust_workspace_audit.global_ignore = [
     "syn",
     "quote",
     "proc-macro2",
-    "tauri-plugin-cli",
     "clap"
 ]
 
@@ -18,7 +17,8 @@ desktop = [
     "tauri-plugin-log",
     "tauri-plugin-global-shortcut",
     "tauri-plugin-clipboard-manager",
-    "tauri-plugin-window-state"
+    "tauri-plugin-window-state",
+    "tauri-plugin-cli",
 ]
 
 xtask = [
