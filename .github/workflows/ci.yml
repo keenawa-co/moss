@@ -62,7 +62,7 @@ jobs:
         run: pnpm install
 
       - name: Run vitest
-        run: pnpm vitest --project packages
+        run: pnpm run test --project packages
 
   vitest-desktop:
     runs-on: ubuntu-latest
@@ -82,4 +82,4 @@ jobs:
         run: pnpm install
 
       - name: Run vitest
-        run: pnpm vitest --project desktop
+        run: pnpm run test --project desktop
