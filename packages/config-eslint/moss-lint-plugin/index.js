@@ -4,7 +4,10 @@ const plugin = {
   meta: {
     name: "moss-lint-plugin",
   },
-  configs: {},
+  configs: {
+    tests: {},
+    recommended: {},
+  },
   rules: {
     "tw-no-bg-with-arbitrary-value": noBgRule,
   },

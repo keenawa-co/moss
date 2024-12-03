@@ -27,7 +27,7 @@ const defaultDarkTheme: Theme = {
   },
 };
 
-const defaultLightTheme: Theme = {
+export const defaultLightTheme: Theme = {
   name: "Moss Light Default",
   slug: "moss-light",
   type: "light",
