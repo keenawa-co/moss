@@ -6,7 +6,7 @@ use smol::fs;
 use std::{io, sync::Arc};
 use tokio::task::JoinSet;
 use toml::Value;
-use tracing::{error, info, trace, warn};
+use tracing::{error, trace};
 
 use crate::config::{ConfigFile, RustWorkspaceAuditConfig};
 

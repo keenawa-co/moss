@@ -11,7 +11,7 @@
 /// # Example
 ///
 /// ```rust
-/// use my_crate::quote;
+/// use moss_text::quote;
 ///
 /// let name = "Alice";
 /// let quoted_name = quote!(name);
