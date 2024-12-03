@@ -27,6 +27,9 @@ updates:
       prefix-development: chore(rust)
     reviewers:
       - brutusyhy
+    labels:
+      - dependencies
+      - rust
     open-pull-requests-limit: 10
 
   - package-ecosystem: npm
@@ -43,5 +46,6 @@ updates:
       - Enthceph
       - jevgenis33
     labels:
+      - dependencies
       - typescript
     open-pull-requests-limit: 10

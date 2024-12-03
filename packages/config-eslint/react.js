@@ -1,6 +1,7 @@
-import tseslint from "typescript-eslint";
 import reactHooksPlugin from "eslint-plugin-react-hooks";
 import reactRefreshPlugin from "eslint-plugin-react-refresh";
+import tseslint from "typescript-eslint";
+import mossLintPlugin from "./moss-lint-plugin/index.js";
 
 export default tseslint.config({
   extends: [tseslint.configs.recommended],
@@ -11,6 +12,7 @@ export default tseslint.config({
     "react-hooks": reactHooksPlugin,
     "react-refresh": reactRefreshPlugin,
     "@typescript-eslint": tseslint.plugin,
+    mossLint: mossLintPlugin,
   },
   rules: {
     "react-hooks/rules-of-hooks": "error",
@@ -19,5 +21,6 @@ export default tseslint.config({
     "@typescript-eslint/no-unused-vars": "warn",
     "@typescript-eslint/no-explicit-any": "error",
     "prefer-const": "warn",
+    "mossLint/no-bg-with-arbitrary-value": "error",
   },
 });

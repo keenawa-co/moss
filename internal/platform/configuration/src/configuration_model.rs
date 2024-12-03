@@ -64,6 +64,7 @@ impl ToString for AttributeName {
 /// Basic usage with no overrides:
 ///
 /// ```rust
+/// use platform_configuration::attribute_name;
 /// let attribute_name = attribute_name!(editor.fontSize);
 /// assert_eq!(attribute_name.override_ident, None);
 /// assert_eq!(attribute_name.name, Some("editor.fontSize".to_string()));
@@ -72,6 +73,7 @@ impl ToString for AttributeName {
 /// Usage with an override:
 ///
 /// ```rust
+/// use platform_configuration::attribute_name;
 /// let attribute_name = attribute_name!([rust].editor.fontSize);
 /// assert_eq!(attribute_name.override_ident, Some("rust".to_string()));
 /// assert_eq!(attribute_name.name, Some("editor.fontSize".to_string()));
@@ -80,6 +82,7 @@ impl ToString for AttributeName {
 /// Usage with an override only:
 ///
 /// ```rust
+/// use platform_configuration::attribute_name;
 /// let attribute_name = attribute_name!([rust]);
 /// assert_eq!(attribute_name.override_ident, Some("rust".to_string()));
 /// assert_eq!(attribute_name.name, None);

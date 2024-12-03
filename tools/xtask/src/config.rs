@@ -8,12 +8,13 @@ use std::path::Path;
 #[derive(Deserialize, Default)]
 pub struct ConfigFile {
     pub licenses: Vec<String>,
-    pub rust_workspace_audit: RustWorkspaceAuditBlock,
+    pub rust_workspace_audit: RustWorkspaceAuditConfig,
 }
 
 #[derive(Deserialize, Default)]
-pub struct RustWorkspaceAuditBlock {
-    pub ignore: HashMap<String, Vec<String>>,
+pub struct RustWorkspaceAuditConfig {
+    pub global_ignore: Vec<String>,
+    pub crate_ignore: HashMap<String, Vec<String>>,
 }
 
 impl ConfigFile {

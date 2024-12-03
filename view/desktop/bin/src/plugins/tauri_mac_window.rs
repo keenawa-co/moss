@@ -27,10 +27,10 @@ struct UnsafeWindowHandle(*mut std::ffi::c_void);
 unsafe impl Send for UnsafeWindowHandle {}
 unsafe impl Sync for UnsafeWindowHandle {}
 
+#[cfg(target_os = "macos")]
 pub fn init() -> TauriPlugin<Wry> {
     Builder::new("mac_window")
         .on_window_ready(|window| {
-            #[cfg(target_os = "macos")]
             {
                 let _ = setup_traffic_light_positioner(&window);
 

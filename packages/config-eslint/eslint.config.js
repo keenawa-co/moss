@@ -1,7 +1,15 @@
-// Empty config to prevent ESLint from outputting errors in the terminal output tab on initialization
+import mossLintPlugin from "./moss-lint-plugin/index.js";
+
+// Config for testing custom rules
 /** @type {import('eslint').Linter.Config} */
 export default [
   {
-    rules: {},
+    files: ["*.test.js", "*.test.jsx"],
+    plugins: {
+      mossLint: mossLintPlugin,
+    },
+    rules: {
+      "mossLint/tw-no-bg-with-arbitrary-value": "error",
+    },
   },
 ];
