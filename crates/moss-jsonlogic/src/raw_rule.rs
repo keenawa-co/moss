@@ -141,7 +141,7 @@ impl fmt::Display for Operator {
 /// ### Creating a Variable
 ///
 /// ```rust
-/// use moss_jsonlogic::rule::RawRule;
+/// use moss_jsonlogic::raw_rule::RawRule;
 ///
 /// let rule = RawRule::var("age");
 /// ```
@@ -149,7 +149,7 @@ impl fmt::Display for Operator {
 /// ### Creating a Constant
 ///
 /// ```rust
-/// use moss_jsonlogic::rule::RawRule;
+/// use moss_jsonlogic::raw_rule::RawRule;
 ///
 /// let rule = RawRule::value(30);
 /// ```
@@ -157,7 +157,7 @@ impl fmt::Display for Operator {
 /// ### Creating Multiple Constants
 ///
 /// ```rust
-/// use moss_jsonlogic::rule::RawRule;
+/// use moss_jsonlogic::raw_rule::RawRule;
 ///
 /// let rule = RawRule::value("hello");
 /// let number_rule = RawRule::value(42);
@@ -167,7 +167,7 @@ impl fmt::Display for Operator {
 /// ### Creating a Binary Operation
 ///
 /// ```rust
-/// use moss_jsonlogic::rule::RawRule;
+/// use moss_jsonlogic::raw_rule::RawRule;
 ///
 /// let rule = RawRule::var("age").gt(RawRule::value(18));
 /// ```
@@ -175,7 +175,7 @@ impl fmt::Display for Operator {
 /// ### Combining Rules with Logical AND
 ///
 /// ```rust
-/// use moss_jsonlogic::rule::RawRule;
+/// use moss_jsonlogic::raw_rule::RawRule;
 ///
 /// let rule = RawRule::var("age")
 ///     .gt(RawRule::value(18))
@@ -243,7 +243,7 @@ impl RawRule {
     /// # Examples
     ///
     /// ```rust
-    /// use moss_jsonlogic::rule::RawRule;
+    /// use moss_jsonlogic::raw_rule::RawRule;
     ///
     /// let rule = RawRule::value("hello");
     /// let number_rule = RawRule::value(42);
@@ -260,7 +260,7 @@ impl RawRule {
     /// # Examples
     ///
     /// ```rust
-    /// use moss_jsonlogic::rule::RawRule;
+    /// use moss_jsonlogic::raw_rule::RawRule;
     ///
     /// let rule = RawRule::constant("world");
     /// ```
@@ -275,7 +275,7 @@ impl RawRule {
     /// # Examples
     ///
     /// ```rust
-    /// use moss_jsonlogic::rule::RawRule;
+    /// use moss_jsonlogic::raw_rule::RawRule;
     ///
     /// let rule = RawRule::var("user_age");
     /// ```
@@ -295,7 +295,7 @@ impl RawRule {
     /// # Examples
     ///
     /// ```rust
-    /// use moss_jsonlogic::rule::{RawRule, Operator};
+    /// use moss_jsonlogic::raw_rule::{RawRule, Operator};
     ///
     /// let rule = RawRule::var("is_active").not();
     /// ```
@@ -319,7 +319,7 @@ impl RawRule {
     /// # Examples
     ///
     /// ```rust
-    /// use moss_jsonlogic::rule::{RawRule, Operator};
+    /// use moss_jsonlogic::raw_rule::{RawRule, Operator};
     ///
     /// let rule = RawRule::var("age").gt(RawRule::value(18));
     /// ```
@@ -344,7 +344,7 @@ impl RawRule {
     /// # Examples
     ///
     /// ```rust
-    /// use moss_jsonlogic::rule::{RawRule, Operator};
+    /// use moss_jsonlogic::raw_rule::{RawRule, Operator};
     ///
     /// let rule = RawRule::var("is_admin").and(RawRule::var("is_owner")).and(RawRule::var("is_active"));
     /// ```
@@ -364,7 +364,7 @@ impl RawRule {
     /// # Examples
     ///
     /// ```rust
-    /// use moss_jsonlogic::rule::RawRule;
+    /// use moss_jsonlogic::raw_rule::RawRule;
     ///
     /// let rule = RawRule::custom("customOp", vec![RawRule::var("input"), RawRule::value(42)]);
     /// ```
@@ -390,7 +390,7 @@ impl RawRule {
     /// # Examples
     ///
     /// ```rust
-    /// use moss_jsonlogic::rule::RawRule;
+    /// use moss_jsonlogic::raw_rule::RawRule;
     ///
     /// let rule = RawRule::var("is_active").not();
     /// ```
@@ -407,7 +407,7 @@ impl RawRule {
     /// # Examples
     ///
     /// ```rust
-    /// use moss_jsonlogic::rule::RawRule;
+    /// use moss_jsonlogic::raw_rule::RawRule;
     ///
     /// let rule = RawRule::var("is_admin").and(RawRule::var("is_active"));
     /// ```
@@ -436,7 +436,7 @@ impl RawRule {
     /// # Examples
     ///
     /// ```rust
-    /// use moss_jsonlogic::rule::RawRule;
+    /// use moss_jsonlogic::raw_rule::RawRule;
     ///
     /// let rule = RawRule::var("is_guest").or(RawRule::var("is_banned"));
     /// ```
@@ -463,7 +463,7 @@ impl RawRule {
     /// # Examples
     ///
     /// ```rust
-    /// use moss_jsonlogic::rule::RawRule;
+    /// use moss_jsonlogic::raw_rule::RawRule;
     ///
     /// let rule = RawRule::var("role").eq(RawRule::value("admin"));
     /// ```
@@ -478,7 +478,7 @@ impl RawRule {
     /// # Examples
     ///
     /// ```rust
-    /// use moss_jsonlogic::rule::RawRule;
+    /// use moss_jsonlogic::raw_rule::RawRule;
     ///
     /// let rule = RawRule::var("status").ne(RawRule::value("inactive"));
     /// ```
@@ -493,7 +493,7 @@ impl RawRule {
     /// # Examples
     ///
     /// ```rust
-    /// use moss_jsonlogic::rule::RawRule;
+    /// use moss_jsonlogic::raw_rule::RawRule;
     ///
     /// let rule = RawRule::var("score").gt(RawRule::value(75));
     /// ```
@@ -508,7 +508,7 @@ impl RawRule {
     /// # Examples
     ///
     /// ```rust
-    /// use moss_jsonlogic::rule::RawRule;
+    /// use moss_jsonlogic::raw_rule::RawRule;
     ///
     /// let rule = RawRule::var("age").lt(RawRule::value(18));
     /// ```
@@ -523,7 +523,7 @@ impl RawRule {
     /// # Examples
     ///
     /// ```rust
-    /// use moss_jsonlogic::rule::RawRule;
+    /// use moss_jsonlogic::raw_rule::RawRule;
     ///
     /// let rule = RawRule::var("experience").gte(RawRule::value(5));
     /// ```
@@ -538,7 +538,7 @@ impl RawRule {
     /// # Examples
     ///
     /// ```rust
-    /// use moss_jsonlogic::rule::RawRule;
+    /// use moss_jsonlogic::raw_rule::RawRule;
     ///
     /// let rule = RawRule::var("height").lte(RawRule::value(180));
     /// ```
@@ -555,7 +555,7 @@ impl RawRule {
     /// # Examples
     ///
     /// ```rust
-    /// use moss_jsonlogic::rule::RawRule;
+    /// use moss_jsonlogic::raw_rule::RawRule;
     ///
     /// let rule = RawRule::var("quantity") + RawRule::value(10);
     /// ```
@@ -582,7 +582,7 @@ impl RawRule {
     /// # Examples
     ///
     /// ```rust
-    /// use moss_jsonlogic::rule::RawRule;
+    /// use moss_jsonlogic::raw_rule::RawRule;
     ///
     /// let rule = RawRule::var("total") - RawRule::value(20);
     /// ```
@@ -599,7 +599,7 @@ impl RawRule {
     /// # Examples
     ///
     /// ```rust
-    /// use moss_jsonlogic::rule::RawRule;
+    /// use moss_jsonlogic::raw_rule::RawRule;
     ///
     /// let rule = RawRule::var("price") * RawRule::value(2);
     /// ```
@@ -626,7 +626,7 @@ impl RawRule {
     /// # Examples
     ///
     /// ```rust
-    /// use moss_jsonlogic::rule::RawRule;
+    /// use moss_jsonlogic::raw_rule::RawRule;
     ///
     /// let rule = RawRule::var("total") / RawRule::value(4);
     /// ```
@@ -641,7 +641,7 @@ impl RawRule {
     /// # Examples
     ///
     /// ```rust
-    /// use moss_jsonlogic::rule::RawRule;
+    /// use moss_jsonlogic::raw_rule::RawRule;
     ///
     /// let rule = RawRule::var("number").modulo(RawRule::value(3));
     /// ```
@@ -702,7 +702,7 @@ impl Serialize for RawRule {
 /// # Examples
 ///
 /// ```rust
-/// use moss_jsonlogic::rule::RawRule;
+/// use moss_jsonlogic::raw_rule::RawRule;
 /// use serde_json::json;
 ///
 /// let string_rule: RawRule = "active".into();
@@ -762,7 +762,7 @@ impl BitAnd for RawRule {
     /// # Examples
     ///
     /// ```rust
-    /// use moss_jsonlogic::rule::RawRule;
+    /// use moss_jsonlogic::raw_rule::RawRule;
     ///
     /// let rule = RawRule::var("is_admin") & RawRule::var("is_active");
     /// ```
@@ -779,7 +779,7 @@ impl BitOr for RawRule {
     /// # Examples
     ///
     /// ```rust
-    /// use moss_jsonlogic::rule::RawRule;
+    /// use moss_jsonlogic::raw_rule::RawRule;
     ///
     /// let rule = RawRule::var("is_guest") | RawRule::var("is_banned");
     /// ```
@@ -796,7 +796,7 @@ impl Add for RawRule {
     /// # Examples
     ///
     /// ```rust
-    /// use moss_jsonlogic::rule::RawRule;
+    /// use moss_jsonlogic::raw_rule::RawRule;
     ///
     /// let rule = RawRule::var("quantity") + RawRule::value(10);
     /// ```
@@ -813,7 +813,7 @@ impl Sub for RawRule {
     /// # Examples
     ///
     /// ```rust
-    /// use moss_jsonlogic::rule::RawRule;
+    /// use moss_jsonlogic::raw_rule::RawRule;
     ///
     /// let rule = RawRule::var("total") - RawRule::value(20);
     /// ```
@@ -830,7 +830,7 @@ impl Mul for RawRule {
     /// # Examples
     ///
     /// ```rust
-    /// use moss_jsonlogic::rule::RawRule;
+    /// use moss_jsonlogic::raw_rule::RawRule;
     ///
     /// let rule = RawRule::var("price") * RawRule::value(2);
     /// ```
@@ -847,7 +847,7 @@ impl Div for RawRule {
     /// # Examples
     ///
     /// ```rust
-    /// use moss_jsonlogic::rule::RawRule;
+    /// use moss_jsonlogic::raw_rule::RawRule;
     ///
     /// let rule = RawRule::var("total") / RawRule::value(4);
     /// ```
@@ -864,7 +864,7 @@ impl Not for RawRule {
     /// # Examples
     ///
     /// ```rust
-    /// use moss_jsonlogic::rule::RawRule;
+    /// use moss_jsonlogic::raw_rule::RawRule;
     ///
     /// let rule = !RawRule::var("is_active");
     /// ```

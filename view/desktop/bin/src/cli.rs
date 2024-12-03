@@ -18,7 +18,7 @@ impl ShellClient for SystemShellClient {
         let output = Command::new(command).args(args).output();
         match output {
             Ok(output) => Some(String::from_utf8_lossy(output.stdout.as_slice()).to_string()),
-            Err(error) => None,
+            Err(_) => None,
         }
     }
 }
@@ -32,7 +32,7 @@ impl ShellClient for TauriShellClient<'_> {
         let output = shell.command(command).args(args).output().await;
         match output {
             Ok(output) => Some(String::from_utf8_lossy(output.stdout.as_slice()).to_string()),
-            Err(error) => None,
+            Err(_) => None,
         }
     }
 }
