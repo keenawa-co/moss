@@ -3,11 +3,12 @@ use cargo_metadata::{Metadata, Package};
 use clap::Parser;
 use futures::future::join_all;
 use smol::fs;
-use std::sync::Arc;
+use std::{io, sync::Arc};
+use tokio::task::JoinSet;
 use toml::Value;
 use tracing::{error, trace};
 
-use crate::config::ConfigFile;
+use crate::config::{ConfigFile, RustWorkspaceAuditConfig};
 
 #[derive(Parser)]
 pub struct RustWorkspaceAuditCommandArgs {
@@ -18,16 +19,19 @@ pub struct RustWorkspaceAuditCommandArgs {
 pub async fn check_dependencies_job(
     args: RustWorkspaceAuditCommandArgs,
     metadata: Metadata,
+    fail_fast: bool,
 ) -> Result<()> {
+    let mut task_set = JoinSet::new();
+
     let config_file = Arc::new(ConfigFile::load(&args.config_file_path).await?);
-    let tasks = metadata
+    metadata
         .packages
         .into_iter()
         .filter(|p| metadata.workspace_members.contains(&p.id))
-        .map(|package| {
+        .for_each(|package| {
             let config_file_clone = Arc::clone(&config_file);
 
-            tokio::task::spawn(async move {
+            task_set.spawn(async move {
                 trace!("analyzing '{}'...", package.name);
                 let cargo_toml_content = match fs::read_to_string(&package.manifest_path).await {
                     Ok(content) => content,
@@ -51,33 +55,54 @@ pub async fn check_dependencies_job(
                     }
                 };
 
-                handle_package_dependencies(cargo_toml, &config_file_clone, package).await;
+                match handle_package_dependencies(
+                    cargo_toml,
+                    &config_file_clone.rust_workspace_audit,
+                    package,
+                )
+                .await
+                {
+                    Ok(()) => Ok(()),
+                    Err(e) => Err(e),
+                }
+            });
+        });
 
-                Ok(())
-            })
-        })
-        .collect::<Vec<_>>();
-
-    for result in join_all(tasks).await {
+    while let Some(result) = task_set.join_next().await {
         match result {
             Ok(Ok(())) => {}
-            Ok(Err(e)) => error!("Error processing package: {}", e),
-            Err(e) => error!("Task panicked: {}", e),
+            Ok(Err(e)) => {
+                if fail_fast {
+                    task_set.abort_all();
+                    return Err(e);
+                }
+            }
+            Err(e) => {
+                if fail_fast {
+                    task_set.abort_all();
+                    return Err(anyhow!("Task panicked: {}", e));
+                }
+            }
         }
     }
+
+    info!("All Checks Passed");
 
     Ok(())
 }
 
 async fn handle_package_dependencies(
     cargo_toml: Value,
-    ignored_deps: &ConfigFile,
+    rwa_config: &RustWorkspaceAuditConfig,
     package: Package,
-) {
+) -> Result<()> {
     if let Some(dependencies) = cargo_toml.get("dependencies").and_then(|d| d.as_table()) {
         for (dep_name, dep_value) in dependencies {
-            if let Some(ignored_list) = ignored_deps.rust_workspace_audit.ignore.get(&package.name)
-            {
+            if rwa_config.global_ignore.contains(&dep_name) {
+                trace!("ignoring {} dependency in '{}'", dep_name, package.name);
+                continue;
+            }
+            if let Some(ignored_list) = rwa_config.crate_ignore.get(&package.name) {
                 if ignored_list.contains(&dep_name) {
                     trace!("ignoring {} dependency in '{}'", dep_name, package.name);
                     continue;
@@ -95,7 +120,13 @@ async fn handle_package_dependencies(
                     "crate '{}' has non-workspace dependency: {}",
                     package.name, dep_name
                 );
+                return Err(anyhow!(
+                    "crate '{}' has non-workspace dependency: {}",
+                    package.name,
+                    dep_name
+                ));
             }
         }
     }
+    Ok(())
 }
