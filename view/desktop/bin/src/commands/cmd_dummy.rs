@@ -1,29 +1,9 @@
+use anyhow::Result;
+use desktop_models::appearance::theming::ThemeDescriptor;
 use std::path::PathBuf;
 
-use anyhow::Result;
-use desktop_models::appearance::theming::{Theme, ThemeDescriptor};
-use tauri::State;
-
-use crate::utl::get_themes_dir;
-use crate::AppState;
-
-#[tauri::command(async)]
-pub async fn fetch_all_themes() -> Result<Vec<String>, String> {
-    let mut valid_themes: Vec<String> = vec![];
-    let themes_dir = get_themes_dir()?;
-    let dir_iter = std::fs::read_dir(themes_dir).map_err(|e| e.to_string())?;
-    for entry in dir_iter {
-        let entry = entry.map_err(|e| e.to_string())?;
-        let file_name = entry.file_name().to_str().unwrap().to_owned();
-        if !file_name.ends_with(".json") {
-            continue;
-        }
-        valid_themes.push(file_name.strip_suffix(".json").unwrap().to_string());
-    }
-
-    Ok(valid_themes)
-}
-
+// FIXME: This is a temporary solution until we have a registry of installed
+// plugins and the ability to check which theme packs are installed.
 #[tauri::command(async)]
 pub async fn fetch_themes() -> Result<Vec<ThemeDescriptor>, String> {
     Ok(vec![
@@ -47,27 +27,53 @@ pub async fn fetch_themes() -> Result<Vec<ThemeDescriptor>, String> {
     ])
 }
 
-#[tauri::command(async)]
-pub async fn read_theme(theme_name: String) -> Result<Theme, String> {
-    let theme_file_path = get_themes_dir()?.join(format!("{theme_name}.json"));
+#[derive(Serialize, Deserialize)]
+pub struct Locale {
+    code: String,
+    name: String,
+    direction: Option<String>, // "ltr" or "rtl"
+}
 
-    let content = std::fs::read_to_string(theme_file_path).map_err(|e| e.to_string())?;
-    match serde_json::from_str::<Theme>(&content) {
-        Ok(theme) => Ok(theme),
-        Err(e) => Err(e.to_string()),
+// FIXME: This is a temporary solution until we have a registry of installed
+// plugins and the ability to check which language packs are installed.
+#[tauri::command]
+pub fn get_locales() -> Vec<Locale> {
+    vec![
+        Locale {
+            code: "en".to_string(),
+            name: "English".to_string(),
+            direction: Some("ltr".to_string()),
+        },
+        Locale {
+            code: "de".to_string(),
+            name: "Deutsche".to_string(),
+            direction: Some("ltr".to_string()),
+        },
+        Locale {
+            code: "ru".to_string(),
+            name: "Русский".to_string(),
+            direction: Some("ltr".to_string()),
+        },
+    ]
+}
+
+#[tauri::command]
+pub fn get_translations(language: String, namespace: String) -> Result<serde_json::Value, String> {
+    let path = crate::utl::get_home_dir()?
+        .join(".config")
+        .join("moss")
+        .join("locales")
+        .join(language)
+        .join(format!("{namespace}.json"));
+
+    match std::fs::read_to_string(path) {
+        Ok(data) => {
+            let translations: serde_json::Value =
+                serde_json::from_str(&data).map_err(|err| err.to_string())?;
+
+            dbg!(&translations);
+            Ok(translations)
+        }
+        Err(err) => Err(err.to_string()),
     }
-}
-
-#[tauri::command]
-pub fn get_stored_string(state: State<'_, AppState>) -> String {
-    dbg!("read");
-    let stored_string = state.react_query_string.lock();
-    stored_string.clone()
-}
-
-#[tauri::command]
-pub fn set_stored_string(new_string: String, state: State<'_, AppState>) {
-    dbg!("write");
-    let mut stored_string = state.react_query_string.lock();
-    *stored_string = new_string;
 }
