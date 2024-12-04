@@ -2,6 +2,8 @@ use anyhow::Result;
 use desktop_models::appearance::theming::ThemeDescriptor;
 use std::path::PathBuf;
 
+// FIXME: This is a temporary solution until we have a registry of installed
+// plugins and the ability to check which theme packs are installed.
 #[tauri::command(async)]
 pub async fn fetch_themes() -> Result<Vec<ThemeDescriptor>, String> {
     Ok(vec![
@@ -32,6 +34,8 @@ pub struct Locale {
     direction: Option<String>, // "ltr" or "rtl"
 }
 
+// FIXME: This is a temporary solution until we have a registry of installed
+// plugins and the ability to check which language packs are installed.
 #[tauri::command]
 pub fn get_locales() -> Vec<Locale> {
     vec![
