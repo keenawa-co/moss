@@ -78,7 +78,7 @@ indexmap = "2.7.0"
 arcstr = "1.2.0"
 bstr = "1.11.0"
 ts-rs = "10.1"
-thiserror = "1.0"
+thiserror = "2.0"
 tauri = { version = "2.0.6", features = ["devtools"] }
 libc = "0.2.155"
 fnv = "1.0.7"
