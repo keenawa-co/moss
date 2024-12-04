@@ -55,7 +55,7 @@
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "deepmerge": "^4.3.1",
-    "lucide-react": "^0.418.0",
+    "lucide-react": "^0.463.0",
     "tailwindcss-animate": "^1.0.7"
   }
 }
