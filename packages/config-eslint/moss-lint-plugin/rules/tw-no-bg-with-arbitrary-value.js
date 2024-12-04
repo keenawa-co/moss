@@ -1,6 +1,6 @@
 const PATTERN = /(group-)?bg-\[(--[\w-]*|var\(.*?\))\]/;
 
-const hasArbitraryValue = (str) => {
+const hasBgWithArbitraryValue = (str) => {
   return PATTERN.test(str);
 };
 
@@ -23,6 +23,7 @@ const fixArbitraryValue = (str) => {
 /** @type {import('eslint').Rule.RuleModule} **/
 export default {
   meta: {
+    name: "tw-no-bg-with-arbitrary-value",
     type: "problem",
     docs: {
       description: "Disallow bg- with arbitrary values in Tailwind.",
@@ -34,11 +35,12 @@ export default {
     messages: {
       replaceBg: `Use 'background-' selector instead of 'bg-' for background arbitrary values.\nTailwind maps the 'bg-' prefix to css 'background-color', which is unsuitable for gradients or complex custom properties.`,
     },
+    defaultOptions: [],
   },
   create(context) {
     return {
       Literal(node) {
-        if (node.value && typeof node.value === "string" && hasArbitraryValue(node.value)) {
+        if (node.value && typeof node.value === "string" && hasBgWithArbitraryValue(node.value)) {
           context.report({
             node,
             messageId: "replaceBg",
@@ -51,7 +53,7 @@ export default {
         }
       },
       TemplateElement(node) {
-        if (node.value && typeof node.value.raw === "string" && hasArbitraryValue(node.value.raw)) {
+        if (node.value && typeof node.value.raw === "string" && hasBgWithArbitraryValue(node.value.raw)) {
           fixArbitraryValue(node.value.raw);
           context.report({
             node,
