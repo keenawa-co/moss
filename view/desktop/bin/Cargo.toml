@@ -51,8 +51,8 @@ hashbrown = { workspace = true, features = ["serde"] }
 
 tauri = { workspace = true, features = ["macos-private-api"] }
 strum = { workspace = true, features = ["derive"] }
+tauri-plugin-os.workspace = true
 tauri-plugin-shell = "2.0.2"
-tauri-plugin-os = "2.0.1"
 tauri-plugin-log = { version = "2.0.1", features = ["colored"] }
 tauri-plugin-window-state = "2.0.1"
 tauri-plugin-clipboard-manager = "2.0.1"

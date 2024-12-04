@@ -1,7 +1,7 @@
 use once_cell::sync::OnceCell;
 use std::{path::PathBuf, rc::Rc};
-use sysinfo::System;
 use tauri::AppHandle;
+use tauri_plugin_os;
 use typography::Font;
 
 /// A color in the `sRGB` color space.
@@ -210,13 +210,20 @@ pub struct NativePlatformInfo {
 
 impl NativePlatformInfo {
     pub fn new() -> Self {
-        let mut sys = System::new_all();
-        sys.refresh_all();
-
+        let os = if tauri_plugin_os::family().is_empty() {
+            "unknown".to_string()
+        } else {
+            tauri_plugin_os::family().to_string()
+        };
+        let version = tauri_plugin_os::version().to_string();
+        let hostname = tauri_plugin_os::hostname();
+        println!("Os: {}", os);
+        println!("Version: {}", version);
+        println!("Hostname: {}", hostname);
         Self {
-            os: System::name().unwrap_or_else(|| "unknown".to_string()),
-            version: System::os_version().unwrap_or_else(|| "unknown".to_string()),
-            hostname: System::host_name().unwrap_or_else(|| "unknown".to_string()),
+            os,
+            version,
+            hostname,
         }
     }
 }
