@@ -108,19 +108,14 @@ use std::rc::Rc;
 /// Marker structure for type erasure.
 struct Abstract(());
 
-/// Represents a saved command with type information erased to `Abstract`.
 struct Command {
-    /// Pointer to the stored function.
     func_ptr: NonNull<Abstract>,
-    /// Function to invoke the stored function.
     invoke_fn: unsafe fn(
         NonNull<Abstract>, // func_ptr
         *mut (),           // args_ptr
         *mut (),           // result_ptr
     ),
-    /// Function to release the stored function.
     drop_fn: unsafe fn(NonNull<Abstract>),
-    /// Prevents implementation of `Send` and `Sync`.
     _not_send_sync: PhantomData<Rc<()>>,
 }
 
@@ -133,7 +128,7 @@ impl Drop for Command {
 }
 
 pub struct CommandRegistry {
-    commands: HashMap<u32, Command>,
+    commands: HashMap<ReadOnlyStr, Command>,
 }
 
 impl CommandRegistry {
@@ -144,18 +139,16 @@ impl CommandRegistry {
     }
 
     /// Registers a new command with a unique identifier.
-    pub fn register<F, Args, Ret>(&mut self, id: u32, func: F)
+    pub fn register<F, Args, Ret>(&mut self, id: ReadOnlyStr, func: F)
     where
         F: Fn(Args) -> Ret + 'static,
         Args: 'static,
         Ret: 'static,
     {
-        // Wrap the function in a `Box` and obtain a raw pointer.
-        let boxed_func = Box::new(func);
+        let boxed_func = Box::new(func); // wrap in a `Box` and obtain a raw pointer
         let func_ptr =
             unsafe { NonNull::new_unchecked(Box::into_raw(boxed_func) as *mut Abstract) };
 
-        // Unsafe function to invoke the stored function.
         unsafe fn invoke_fn<F, Args, Ret>(
             func_ptr: NonNull<Abstract>,
             args_ptr: *mut (),
@@ -166,16 +159,12 @@ impl CommandRegistry {
             Ret: 'static,
         {
             let func = &*(func_ptr.as_ptr() as *const F);
-            // Restore arguments and free memory.
-            let args_box = Box::from_raw(args_ptr as *mut Args);
+            let args_box = Box::from_raw(args_ptr as *mut Args); // restore arguments and free memory
             let args = *args_box;
-            // Invoke the function.
             let result = func(args);
-            // Store the result.
             std::ptr::write(result_ptr as *mut Ret, result);
         }
 
-        // Unsafe function to release the stored function.
         unsafe fn drop_fn<F>(func_ptr: NonNull<Abstract>) {
             let _ = Box::from_raw(func_ptr.as_ptr() as *mut F);
         }
@@ -191,26 +180,20 @@ impl CommandRegistry {
     }
 
     /// Invokes a registered command with the given identifier and arguments.
-    pub fn invoke<Args, Ret>(&self, id: u32, args: Args) -> Result<Ret, &'static str>
+    pub fn invoke<Args, Ret>(&self, id: &ReadOnlyStr, args: Args) -> Result<Ret, &'static str>
     where
         Args: 'static,
         Ret: 'static,
     {
-        let command = self.commands.get(&id).ok_or("Command not found")?;
-
-        // Wrap the arguments and obtain a raw pointer.
+        let command = self.commands.get(id).ok_or("Command not found")?;
         let boxed_args = Box::new(args);
         let args_ptr = Box::into_raw(boxed_args) as *mut ();
-
-        // Allocate space for the result.
         let mut result = std::mem::MaybeUninit::<Ret>::uninit();
 
-        // Invoke the function.
         unsafe {
             (command.invoke_fn)(command.func_ptr, args_ptr, result.as_mut_ptr() as *mut ());
         }
 
-        // Restore the result.
         let result = unsafe { result.assume_init() };
 
         Ok(result)
