@@ -9,8 +9,8 @@ i18next
   .init({
     lng: "en",
     fallbackLng: "en",
-    ns: ["ns1"],
-    defaultNS: "ns1",
+    ns: ["ns1"], // FIXME: must be "core"
+    defaultNS: "ns1", // FIXME: must be "core"
     interpolation: {
       escapeValue: false,
     },

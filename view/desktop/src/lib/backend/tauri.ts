@@ -5,8 +5,6 @@ import type { EventCallback, EventName } from "@tauri-apps/api/event";
 export type TauriIpcCommand =
   | "get_translations"
   | "read_theme_file"
-  | "fetch_all_themes"
-  | "read_theme"
   | "main_window_is_ready"
   | "create_new_window"
   | "sidebar_get_all_activities"
