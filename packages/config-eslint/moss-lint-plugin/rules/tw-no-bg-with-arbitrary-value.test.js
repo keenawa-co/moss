@@ -71,7 +71,7 @@ ruleTester.run("tw-no-bg-with-arbitrary-value", rule, {
       output: `<div className="background-[--custom-bg]"></div>`,
     },
     {
-      name: "Invalid selector in string",
+      name: "Invalid selector in string with var()",
       code: `<div className="bg-[var(--custom-bg)]"></div>`,
       errors: [{ messageId: "replaceBg" }],
       output: `<div className="background-[--custom-bg]"></div>`,
