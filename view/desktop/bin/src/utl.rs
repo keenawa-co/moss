@@ -36,3 +36,7 @@ pub fn create_service_registry(
 pub fn get_home_dir() -> Result<PathBuf, String> {
     dirs::home_dir().ok_or("Home directory not found!".to_string())
 }
+
+pub fn get_themes_dir() -> Result<PathBuf, String> {
+    Ok(get_home_dir()?.join(".config").join("moss").join("themes"))
+}
