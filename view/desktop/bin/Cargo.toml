@@ -10,7 +10,7 @@ rust-version = "1.70"
 
 [lib]
 name = "desktop_app_lib"
-crate-type = ["lib", "cdylib", "staticlib"]
+#crate-type = ["rlib", "cdylib", "staticlib"]
 
 [build-dependencies]
 tauri-build = { version = "2.0.2", features = [] }
