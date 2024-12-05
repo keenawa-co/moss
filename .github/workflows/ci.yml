@@ -43,8 +43,29 @@ jobs:
       - uses: actions/checkout@v4
       - name: Audit Rust Workspace Dependencies
         run: |
-          cd ${GITHUB_WORKSPACE}/tools/xtask 
+          cd ${GITHUB_WORKSPACE}/tools/xtask
           cargo -q run -- --fail-fast rwa
+
+  lint-packages-and-views:
+    name: Lint Packages and Views
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: "package.json"
+          cache: "pnpm"
+
+      - name: Install Dependencies
+        run: pnpm install
+
+      - name: Run turbo lint for Packages and Views
+        run: pnpm lint -- -- --quiet
 
   vitest-package-tests:
     name: Vitest Packages Tests
