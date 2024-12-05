@@ -1,29 +1,12 @@
-import { promises as fsPromises } from "fs";
-import * as os from "os";
-
-// FIXME: temporary solution copied from themegen
-const homeDirectory = os.homedir();
-const themesDirectory = `${homeDirectory}/.config/moss/themes/moss-light.json`;
+// FIXME: temporary solution with test.json file
+import themeInterface from "../test.json" with { type: "json" };
 
 const colorKeysToCssValues = (colors) => {
   const keys = Object.keys(colors);
-  return keys.map((key) => "--" + key.toLowerCase().replaceAll(".", "-"));
+  return keys.map((color) => "--color-" + color.replaceAll(".", "-"));
 };
 
-let VALID_TOKENS = [];
-
-const loadValidTokens = async () => {
-  try {
-    const data = await fsPromises.readFile(themesDirectory, "utf8");
-
-    VALID_TOKENS = colorKeysToCssValues(JSON.parse(data).color);
-  } catch (err) {
-    console.error("Error reading color tokens for eslint rule 'validate-token-names':", err);
-  }
-};
-
-await loadValidTokens();
-
+const VALID_TOKENS = colorKeysToCssValues(themeInterface.colors);
 const SELECTOR_WITH_ARBITRARY_VALUE = /(?:group-)?\w+-\[(?:var\((--[\w-]+)\)|(--[\w-]+))\]/g;
 const ARBITRARY_VALUE = /\[(?:var\((--[\w-]+)\)|(--[\w-]+))\]/;
 
