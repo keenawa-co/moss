@@ -65,7 +65,7 @@ jobs:
         run: pnpm install
 
       - name: Run turbo lint for Packages and Views
-        run: pnpm run lint -- -- --quiet
+        run: pnpm run lint -- --quiet
 
   vitest-package-tests:
     name: Vitest Packages Tests
