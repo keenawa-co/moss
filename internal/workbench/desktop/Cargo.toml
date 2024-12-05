@@ -3,6 +3,8 @@ name = "workbench_desktop"
 version = "0.1.0"
 edition = "2021"
 
+[features]
+compression = ["tauri/compression"]
 
 [dependencies]
 moss_text.workspace = true

@@ -87,7 +87,8 @@ arcstr = "1.2.0"
 bstr = "1.11.0"
 ts-rs = "10.1"
 thiserror = "2.0"
-tauri = { version = "2.0.6", features = ["devtools"] }
+# Disabled default: compression, common-controls-v6
+tauri = { version = "2.0.6", default-features = false, features = ["wry", "objc-exception", "devtools", "macos-private-api"] }
 libc = "0.2.155"
 fnv = "1.0.7"
 anyhow = "1.0"
@@ -136,3 +137,4 @@ csscolorparser = "0.7.0"
 jsonschema = {version= "0.26.1", default-features = false}
 
 tauri-plugin-os = "2.0.1"
+
