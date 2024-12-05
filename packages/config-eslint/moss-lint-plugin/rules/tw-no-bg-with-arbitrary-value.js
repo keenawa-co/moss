@@ -1,67 +1,96 @@
-const PATTERN = /(group-)?bg-\[(--[\w-]*|var\(.*?\))\]/;
-
-const hasArbitraryValue = (str) => {
-  return PATTERN.test(str);
-};
-
-const calcErrorLoc = (str, loc) => {
-  const res = PATTERN.exec(str);
-
-  const start = res.index;
-  const len = res[0].length;
-
-  return {
-    start: { column: loc.start.column + start + 1, line: loc.start.line },
-    end: { column: loc.start.column + start + len + 1, line: loc.end.line },
-  };
-};
+const ANY_TW_BG_WITH_ARBITRARY_VALUE = /\b[\w|\-:]*bg-\[(?:var\((--[\w-]+)\)|(--[\w-]+))\]/g;
 
 const fixArbitraryValue = (str) => {
-  return str.replace(PATTERN, (match) => match.replace("bg-[", "background-[").replace("var(", "").replace(")", ""));
+  return str.replace("bg-[", "background-[").replace("var(", "").replace(")", "");
+};
+
+const getAllInvalidTokens = (str, loc) => {
+  const invalidTokens = [];
+  let arr;
+
+  while ((arr = ANY_TW_BG_WITH_ARBITRARY_VALUE.exec(str)) !== null) {
+    const className = arr[0];
+    const name = arr[1] || arr[2];
+
+    const startColumn = loc.start.column + str.indexOf(className) + 1;
+    const endColumn = startColumn + className.length;
+
+    invalidTokens.push({
+      name,
+      value: className,
+      loc: {
+        start: {
+          line: loc.start.line,
+          column: startColumn,
+        },
+        end: {
+          line: loc.end.line,
+          column: endColumn,
+        },
+      },
+    });
+  }
+
+  return invalidTokens;
 };
 
 /** @type {import('eslint').Rule.RuleModule} **/
 export default {
   meta: {
+    name: "tw-no-bg-with-arbitrary-value",
     type: "problem",
     docs: {
       description: "Disallow bg- with arbitrary values in Tailwind.",
-      category: "Stylistic Issues",
+      category: "Invalid syntax",
       recommended: true,
     },
     fixable: "code",
     hasSuggestions: true,
-    schema: [],
     messages: {
-      replaceBg: `Use 'background-' selector instead of 'bg-' for background arbitrary values.\nTailwind maps the 'bg-' prefix to css 'background-color', which is unsuitable for gradients or complex custom properties.`,
+      replaceBg:
+        " Use 'background-' selector instead of 'bg-' for background arbitrary values.\nTailwind maps the 'bg-' prefix to css 'background-color', which is unsuitable for gradients or complex custom properties.",
     },
+    defaultOptions: [],
   },
   create(context) {
     return {
       Literal(node) {
-        if (node.value && typeof node.value === "string" && hasArbitraryValue(node.value)) {
-          context.report({
-            node,
-            messageId: "replaceBg",
-            loc: calcErrorLoc(node.value, node.loc),
-            fix(fixer) {
-              const fixedValue = fixArbitraryValue(node.value);
-              return fixer.replaceText(node, `"${fixedValue}"`);
-            },
+        if (typeof node.value === "string") {
+          const invalidTokens = getAllInvalidTokens(node.value, node.loc);
+
+          invalidTokens.forEach((token) => {
+            context.report({
+              node,
+              messageId: "replaceBg",
+              loc: token.loc,
+              fix(fixer) {
+                const startOffset = node.range[0] + token.loc.start.column - node.loc.start.column;
+                const endOffset = startOffset + token.value.length;
+
+                const fixedValue = fixArbitraryValue(token.value);
+                return fixer.replaceTextRange([startOffset, endOffset], fixedValue);
+              },
+            });
           });
         }
       },
       TemplateElement(node) {
-        if (node.value && typeof node.value.raw === "string" && hasArbitraryValue(node.value.raw)) {
-          fixArbitraryValue(node.value.raw);
-          context.report({
-            node,
-            messageId: "replaceBg",
-            loc: calcErrorLoc(node.value.raw, node.loc),
-            fix(fixer) {
-              const fixedValue = fixArbitraryValue(node.value.raw);
-              return fixer.replaceText(node, `\`${fixedValue}\``);
-            },
+        if (typeof node.value.raw === "string") {
+          const invalidTokens = getAllInvalidTokens(node.value.raw, node.loc);
+
+          invalidTokens.forEach((token) => {
+            context.report({
+              node,
+              messageId: "replaceBg",
+              loc: token.loc,
+              fix(fixer) {
+                const startOffset = node.range[0] + token.loc.start.column - node.loc.start.column;
+                const endOffset = startOffset + token.value.length;
+
+                const fixedValue = fixArbitraryValue(token.value);
+                return fixer.replaceTextRange([startOffset, endOffset], fixedValue);
+              },
+            });
           });
         }
       },

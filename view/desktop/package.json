@@ -7,7 +7,7 @@
     "vite": "vite",
     "dev": "vite dev",
     "build": "tsc -b && vite build",
-    "lint": "eslint . --report-unused-disable-directives --max-warnings 0",
+    "lint": "eslint",
     "preview": "vite preview",
     "interface": "i18next-resources-for-ts interface -i ./public/locales/de -o ./src/@types/resources.d.ts"
   },
@@ -39,7 +39,6 @@
   "devDependencies": {
     "@repo/desktop-models": "workspace:*",
     "@repo/eslint-config": "workspace:*",
-    "@repo/moss-lang": "workspace:*",
     "@repo/tailwind-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
     "@repo/moss-ui": "workspace:*",

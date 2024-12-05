@@ -1,5 +1,3 @@
-"use strict";
-
 import { RuleTester } from "@typescript-eslint/rule-tester";
 
 import rule from "./tw-no-bg-with-arbitrary-value";
@@ -35,6 +33,14 @@ ruleTester.run("tw-no-bg-with-arbitrary-value", rule, {
       code: `<div className="group-background-[var(--custom-bg)]"></div>`,
     },
     {
+      name: "Valid selector in string with hover:",
+      code: `<div className="hover:background-[--custom-bg]"></div>`,
+    },
+    {
+      name: "Valid selector in string with hover: and var()",
+      code: `<div className="hover:background-[var(--custom-bg)]"></div>`,
+    },
+    {
       name: "Valid selector in a string outside of className",
       code: `
         const styles = "background-[--custom-bg]"
@@ -65,10 +71,22 @@ ruleTester.run("tw-no-bg-with-arbitrary-value", rule, {
       output: `<div className="background-[--custom-bg]"></div>`,
     },
     {
-      name: "Invalid selector in string",
+      name: "Invalid selector in string with var()",
       code: `<div className="bg-[var(--custom-bg)]"></div>`,
       errors: [{ messageId: "replaceBg" }],
       output: `<div className="background-[--custom-bg]"></div>`,
+    },
+    {
+      name: "Valid selector in string with hover:",
+      code: `<div className="hover:bg-[--custom-bg]"></div>`,
+      errors: [{ messageId: "replaceBg" }],
+      output: `<div className="hover:background-[--custom-bg]"></div>`,
+    },
+    {
+      name: "Valid selector in string with hover: and var()",
+      code: `<div className="hover:bg-[var(--custom-bg)]"></div>`,
+      errors: [{ messageId: "replaceBg" }],
+      output: `<div className="hover:background-[--custom-bg]"></div>`,
     },
     {
       name: "Invalid selector in a string outside of className",
