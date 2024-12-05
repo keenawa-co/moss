@@ -5,9 +5,22 @@ import tseslint from "typescript-eslint";
 import mossLintPlugin from "../moss-lint-plugin/index.js";
 
 export default tseslint.config(...tseslint.configs.recommended, {
-  ignores: ["node_modules/", "dist/", ".gitignore", ".prettierignore", "target/", ".turbo/", ".vscode/", "*.stories.*"],
+  ignores: [
+    "node_modules/",
+    "dist/",
+    ".gitignore",
+    ".prettierignore",
+    "target/",
+    ".turbo/",
+    ".vscode/",
+    "*.stories.*",
+    "**/*.test.*",
+    "**/*.spec.*",
+  ],
   languageOptions: {},
   settings: {},
+  files: ["**/*.{ts,tsx,js,jsx}"],
+
   plugins: {
     "react-hooks": reactHooksPlugin,
     "react-refresh": reactRefreshPlugin,
