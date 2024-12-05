@@ -132,7 +132,7 @@ rand = "0.8.5"
 log = "0.4.21"
 quote = "1.0"
 static_str_ops = "0.1.2"
-homedir = "0.3.4"
+dirs = "5.0.1"
 csscolorparser = "0.7.0"
 jsonschema = {version= "0.26.1", default-features = false}
 
