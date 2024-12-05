@@ -2,7 +2,7 @@
 # cargo-features = ["profile-rustflags"]
 
 [workspace]
-resolver = "2"
+resolver = "1"
 members = [
     "view/desktop/bin",
 
