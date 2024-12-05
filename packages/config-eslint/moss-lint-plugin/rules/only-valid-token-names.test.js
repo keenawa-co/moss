@@ -18,7 +18,7 @@ ruleTester.run("only-valid-token-names", rule, {
   valid: [
     {
       name: "Valid selector in string",
-      code: `<div className="bg-[--sidebar-background]"></div>`,
+      code: `<div className="bg-[--color-sideBar-background]"></div>`,
     },
   ],
   invalid: [
