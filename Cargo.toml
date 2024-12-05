@@ -39,7 +39,7 @@ members = [
 [profile.dev]
 # Uncomment for future compilation profiling
 # rustflags = ["-Zself-profile=profiles/clean"]
-
+# rustflags = ["-Ztime-passes"]
 
 [profile.release]
 codegen-units = 1 # Compile crates one after another so the compiler can optimize better

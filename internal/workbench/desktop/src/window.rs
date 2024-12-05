@@ -217,9 +217,6 @@ impl NativePlatformInfo {
         };
         let version = tauri_plugin_os::version().to_string();
         let hostname = tauri_plugin_os::hostname();
-        println!("Os: {}", os);
-        println!("Version: {}", version);
-        println!("Hostname: {}", hostname);
         Self {
             os,
             version,
