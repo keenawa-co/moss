@@ -10,8 +10,8 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  test:
-    name: Test suite
+  rust-test-suite:
+    name: Rust Tests
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -30,16 +30,60 @@ jobs:
         run: cargo -q test --lib
         working-directory: ".github/cache"
 
-      - name: Run Doc Tests
+      - name: Run Documentation Tests
         if: always()
         run: cargo -q test --doc
         working-directory: ".github/cache"
-  audit:
+
+  rust-dependency-audit:
+    name: Rust Dependency Audit
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
-      - name: Rust Workspace Dependencies Audit
+      - name: Audit Rust Workspace Dependencies
         run: |
           cd ${GITHUB_WORKSPACE}/tools/xtask 
           cargo -q run -- --fail-fast rwa
+
+  vitest-package-tests:
+    name: Vitest Packages Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: "package.json"
+          cache: "pnpm"
+
+      - name: Install Dependencies
+        run: pnpm install
+
+      - name: Run Vitest for Packages
+        run: pnpm run test --project packages
+
+  vitest-desktop-tests:
+    name: Vitest Desktop Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: "package.json"
+          cache: "pnpm"
+
+      - name: Install Dependencies
+        run: pnpm install
+
+      - name: Run Vitest for Desktop
+        run: pnpm run test --project desktop
