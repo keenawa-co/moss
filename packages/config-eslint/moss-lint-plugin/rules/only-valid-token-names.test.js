@@ -21,6 +21,10 @@ ruleTester.run("only-valid-token-names", rule, {
       code: `<div className="background-[--color-primary]"></div>`,
     },
     {
+      name: "Valid token in selector",
+      code: `<div className="text-[--color-primary]"></div>`,
+    },
+    {
       name: "Valid token selector in template string ",
       code: `<div className={\`background-[--color-primary]\`}></div>`,
     },
