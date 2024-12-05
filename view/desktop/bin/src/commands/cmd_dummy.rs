@@ -71,7 +71,6 @@ pub fn get_translations(language: String, namespace: String) -> Result<serde_jso
             let translations: serde_json::Value =
                 serde_json::from_str(&data).map_err(|err| err.to_string())?;
 
-            dbg!(&translations);
             Ok(translations)
         }
         Err(err) => Err(err.to_string()),
