@@ -11,9 +11,6 @@
       "path": "crates/moss-uikit"
     },
     {
-      "path": "packages/moss_lang"
-    },
-    {
       "path": "packages/moss-ui"
     },
     {

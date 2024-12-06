@@ -1,6 +1,6 @@
 import { atomWithStorage } from "jotai/utils";
 
-import i18n from "@/i18n";
+import i18n from "@/app/i18n";
 
 // FIXME remove all the hardcoded values
 export const LANGUAGES = [

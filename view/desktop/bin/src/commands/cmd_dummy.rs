@@ -2,10 +2,9 @@ use std::path::PathBuf;
 
 use anyhow::Result;
 use desktop_models::appearance::theming::{Theme, ThemeDescriptor};
-use smol::fs;
-use tauri::{AppHandle, Emitter, EventTarget, State, WebviewWindow};
+use tauri::State;
 
-use crate::utl::{get_themes_dir, read_theme_css, update_all_window_theme, update_window_theme};
+use crate::utl::get_themes_dir;
 use crate::AppState;
 
 #[tauri::command(async)]
@@ -59,27 +58,16 @@ pub async fn read_theme(theme_name: String) -> Result<Theme, String> {
     }
 }
 
-#[tauri::command(async)]
-pub async fn get_selected_theme(
-    current_window: WebviewWindow,
-    state: State<'_, AppState>,
-) -> Result<(), String> {
+#[tauri::command]
+pub fn get_stored_string(state: State<'_, AppState>) -> String {
     dbg!("read");
-    update_window_theme(&current_window).await;
-    Ok(())
+    let stored_string = state.react_query_string.lock();
+    stored_string.clone()
 }
 
-#[tauri::command(async)]
-pub async fn set_selected_theme(
-    app_handle: AppHandle,
-    selected_theme: ThemeDescriptor,
-    state: State<'_, AppState>,
-) -> Result<(), String> {
+#[tauri::command]
+pub fn set_stored_string(new_string: String, state: State<'_, AppState>) {
     dbg!("write");
-    {
-        let mut stored_theme = state.selected_theme.lock();
-        *stored_theme = selected_theme.clone();
-    }
-    update_all_window_theme(app_handle).await;
-    Ok(())
+    let mut stored_string = state.react_query_string.lock();
+    *stored_string = new_string;
 }

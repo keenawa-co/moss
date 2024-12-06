@@ -1,3 +1,3 @@
-import reactLintConfig from "@repo/eslint-config/react.js";
+import lintConfig from "@repo/eslint-config/eslint.config.js";
 
-export default [...reactLintConfig];
+export default [...lintConfig];

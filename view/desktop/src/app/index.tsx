@@ -1,14 +1,17 @@
-import "@/i18n";
-import { ContentLayout, LaunchPad, Menu, RootLayout } from "@/components";
+import "@/app/i18n";
+
 import { Suspense } from "react";
 import { useSelector } from "react-redux";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import { Resizable, ResizablePanel } from "../components/Resizable";
-import { PageLoader } from "../components/PageLoader";
+
+import { ContentLayout, LaunchPad, Menu, RootLayout } from "@/components";
 import { usePrepareWindow } from "@/hooks/usePrepareWindow";
-import { RootState } from "@/store";
-import Provider from "./Provider";
 import { Home, Logs, Settings } from "@/pages";
+import { RootState } from "@/store";
+
+import { PageLoader } from "../components/PageLoader";
+import { Resizable, ResizablePanel } from "../components/Resizable";
+import Provider from "./Provider";
 
 const App = () => {
   const { isPreparing } = usePrepareWindow();
