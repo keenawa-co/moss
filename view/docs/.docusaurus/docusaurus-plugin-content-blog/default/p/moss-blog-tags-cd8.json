@@ -1,0 +1,18 @@
+{
+  "tags": [
+    {
+      "label": "Facebook",
+      "permalink": "/moss/blog/tags/facebook",
+      "description": "Facebook tag description",
+      "count": 1
+    },
+    { "label": "Hello", "permalink": "/moss/blog/tags/hello", "description": "Hello tag description", "count": 2 },
+    {
+      "label": "Docusaurus",
+      "permalink": "/moss/blog/tags/docusaurus",
+      "description": "Docusaurus tag description",
+      "count": 4
+    },
+    { "label": "Hola", "permalink": "/moss/blog/tags/hola", "description": "Hola tag description", "count": 1 }
+  ]
+}

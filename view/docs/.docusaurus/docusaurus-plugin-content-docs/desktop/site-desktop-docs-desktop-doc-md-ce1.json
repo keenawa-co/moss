@@ -1,0 +1,26 @@
+{
+  "id": "desktop-doc",
+  "title": "desktop doc",
+  "description": "Here's an example document.",
+  "source": "@site/../desktop/docs/desktop-doc.md",
+  "sourceDirName": ".",
+  "slug": "/desktop-doc",
+  "permalink": "/moss/desktop/desktop-doc",
+  "draft": false,
+  "unlisted": false,
+  "tags": [],
+  "version": "current",
+  "sidebarPosition": 2,
+  "frontMatter": {
+    "sidebar_position": 2
+  },
+  "sidebar": "tutorialSidebar",
+  "previous": {
+    "title": "desktop index(must have)",
+    "permalink": "/moss/desktop/"
+  },
+  "next": {
+    "title": "exmaple",
+    "permalink": "/moss/desktop/folder-structure-example/exmaple"
+  }
+}

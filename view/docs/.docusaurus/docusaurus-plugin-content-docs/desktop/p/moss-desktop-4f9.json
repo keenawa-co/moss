@@ -1,0 +1,78 @@
+{
+  "version": {
+    "pluginId": "desktop",
+    "version": "current",
+    "label": "Next",
+    "banner": null,
+    "badge": false,
+    "noIndex": false,
+    "className": "docs-version-current",
+    "isLast": true,
+    "docsSidebars": {
+      "tutorialSidebar": [
+        {
+          "type": "link",
+          "label": "desktop index(must have)",
+          "href": "/moss/desktop/",
+          "docId": "index",
+          "unlisted": false
+        },
+        {
+          "type": "link",
+          "label": "desktop doc",
+          "href": "/moss/desktop/desktop-doc",
+          "docId": "desktop-doc",
+          "unlisted": false
+        },
+        {
+          "type": "category",
+          "label": "Folder example",
+          "collapsible": true,
+          "collapsed": true,
+          "items": [
+            {
+              "type": "link",
+              "label": "exmaple",
+              "href": "/moss/desktop/folder-structure-example/exmaple",
+              "docId": "folder-structure-example/exmaple",
+              "unlisted": false
+            }
+          ]
+        },
+        {
+          "type": "link",
+          "label": "random_md_file",
+          "href": "/moss/desktop/random_md_file",
+          "docId": "random_md_file",
+          "unlisted": false
+        }
+      ]
+    },
+    "docs": {
+      "desktop-doc": {
+        "id": "desktop-doc",
+        "title": "desktop doc",
+        "description": "Here's an example document.",
+        "sidebar": "tutorialSidebar"
+      },
+      "folder-structure-example/exmaple": {
+        "id": "folder-structure-example/exmaple",
+        "title": "exmaple",
+        "description": "something about folders",
+        "sidebar": "tutorialSidebar"
+      },
+      "index": {
+        "id": "index",
+        "title": "desktop index(must have)",
+        "description": "without index.md docusaurus won't see any docs",
+        "sidebar": "tutorialSidebar"
+      },
+      "random_md_file": {
+        "id": "random_md_file",
+        "title": "random_md_file",
+        "description": "random md file just to check if caching works123",
+        "sidebar": "tutorialSidebar"
+      }
+    }
+  }
+}

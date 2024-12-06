@@ -1,0 +1,13 @@
+{
+  "categoryGeneratedIndex": {
+    "title": "Tokens",
+    "description": "High-level platform overview",
+    "slug": "/category/tokens",
+    "permalink": "/moss/design-system/category/tokens",
+    "sidebar": "tutorialSidebar",
+    "navigation": {
+      "previous": { "title": "Overview", "permalink": "/moss/design-system/" },
+      "next": { "title": "Use in code", "permalink": "/moss/design-system/overview/use-in-code" }
+    }
+  }
+}

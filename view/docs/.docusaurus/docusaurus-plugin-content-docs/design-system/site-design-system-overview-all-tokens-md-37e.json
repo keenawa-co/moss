@@ -1,0 +1,22 @@
+{
+  "id": "overview/all-tokens",
+  "title": "All tokens",
+  "description": "",
+  "source": "@site/design-system/overview/all-tokens.md",
+  "sourceDirName": "overview",
+  "slug": "/overview/all-tokens",
+  "permalink": "/moss/design-system/overview/all-tokens",
+  "draft": false,
+  "unlisted": false,
+  "tags": [],
+  "version": "current",
+  "sidebarPosition": 3,
+  "frontMatter": {
+    "sidebar_position": 3
+  },
+  "sidebar": "tutorialSidebar",
+  "previous": {
+    "title": "Use in design",
+    "permalink": "/moss/design-system/overview/use-in-design"
+  }
+}

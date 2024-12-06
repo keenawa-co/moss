@@ -1,0 +1,19 @@
+{
+  "id": "web_doc",
+  "title": "web docs",
+  "description": "",
+  "source": "@site/../web/docs/web_doc.md",
+  "sourceDirName": ".",
+  "slug": "/web_doc",
+  "permalink": "/moss/web/web_doc",
+  "draft": false,
+  "unlisted": false,
+  "tags": [],
+  "version": "current",
+  "frontMatter": {},
+  "sidebar": "tutorialSidebar",
+  "previous": {
+    "title": "web index(must have)",
+    "permalink": "/moss/web/"
+  }
+}

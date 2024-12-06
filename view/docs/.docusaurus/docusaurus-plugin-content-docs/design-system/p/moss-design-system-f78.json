@@ -1,0 +1,73 @@
+{
+  "version": {
+    "pluginId": "design-system",
+    "version": "current",
+    "label": "Next",
+    "banner": null,
+    "badge": false,
+    "noIndex": false,
+    "className": "docs-version-current",
+    "isLast": true,
+    "docsSidebars": {
+      "tutorialSidebar": [
+        { "type": "link", "label": "Overview", "href": "/moss/design-system/", "docId": "index", "unlisted": false },
+        {
+          "type": "category",
+          "label": "Tokens",
+          "collapsible": true,
+          "collapsed": true,
+          "items": [
+            {
+              "type": "link",
+              "label": "Use in code",
+              "href": "/moss/design-system/overview/use-in-code",
+              "docId": "overview/use-in-code",
+              "unlisted": false
+            },
+            {
+              "type": "link",
+              "label": "Use in design",
+              "href": "/moss/design-system/overview/use-in-design",
+              "docId": "overview/use-in-design",
+              "unlisted": false
+            },
+            {
+              "type": "link",
+              "label": "All tokens",
+              "href": "/moss/design-system/overview/all-tokens",
+              "docId": "overview/all-tokens",
+              "unlisted": false
+            }
+          ],
+          "href": "/moss/design-system/category/tokens"
+        }
+      ]
+    },
+    "docs": {
+      "index": {
+        "id": "index",
+        "title": "Overview",
+        "description": "Community docs are located in view/docs/design-system",
+        "sidebar": "tutorialSidebar"
+      },
+      "overview/all-tokens": {
+        "id": "overview/all-tokens",
+        "title": "All tokens",
+        "description": "",
+        "sidebar": "tutorialSidebar"
+      },
+      "overview/use-in-code": {
+        "id": "overview/use-in-code",
+        "title": "Use in code",
+        "description": "",
+        "sidebar": "tutorialSidebar"
+      },
+      "overview/use-in-design": {
+        "id": "overview/use-in-design",
+        "title": "Use in design",
+        "description": "",
+        "sidebar": "tutorialSidebar"
+      }
+    }
+  }
+}
