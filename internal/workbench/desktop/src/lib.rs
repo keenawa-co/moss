@@ -136,9 +136,13 @@ impl Workbench {
 
         // TODO: @brutusyhy remove this in your PR  with themes suncronisation
         // Example:
-        // let command_1_id = ReadOnlyStr::from("1");
-        // let command_2_id = ReadOnlyStr::from("2");
-        // let command_3_id = ReadOnlyStr::from("3");
+        let command_1_id = ReadOnlyStr::from("1");
+        let command_2_id = ReadOnlyStr::from("2");
+        let command_3_id = ReadOnlyStr::from("3");
+
+        commands_registry_lock.register(command_1_id.clone(), |(a, b): (i32, String)| {
+            // function body
+        });
 
         // commands_registry_lock.register(command_1_id.clone(), |x: i32| x * 2);
         // commands_registry_lock.register(command_2_id.clone(), |s: String| s.len());

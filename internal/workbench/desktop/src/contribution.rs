@@ -10,7 +10,7 @@ use platform_configuration::{
     },
     property_key,
 };
-use tauri::AppHandle;
+use tauri::{AppHandle, Manager};
 
 use crate::Contribution;
 
