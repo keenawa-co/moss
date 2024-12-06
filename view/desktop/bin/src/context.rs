@@ -12,13 +12,13 @@ struct MockType;
 
 /// The main storage and control object for a application.
 pub struct Context {
-    appearance: Appearance,
-    locale: Locale,
-    cache: MockType,
-    menus: MockType,
-    views: MockType,
-    data: MockType,
-    signals: MockType,
-    event_queue: MockType, // ?
-    listeners: MockType,
+    // appearance: Appearance,
+    // locale: Locale,
+    // cache: MockType,
+    // menus: MockType,
+    // views: MockType,
+    // data: MockType,
+    // signals: MockType,
+    // event_queue: MockType, // ?
+    // listeners: MockType,
 }

@@ -88,7 +88,12 @@ bstr = "1.11.0"
 ts-rs = "10.1"
 thiserror = "2.0"
 # Disabled default: compression, common-controls-v6
-tauri = { version = "2.0.6", default-features = false, features = ["wry", "objc-exception", "devtools", "macos-private-api"] }
+tauri = { version = "2.0.6", default-features = false, features = [
+    "wry",
+    "objc-exception",
+    "devtools",
+    "macos-private-api",
+] }
 libc = "0.2.155"
 fnv = "1.0.7"
 anyhow = "1.0"
@@ -134,7 +139,6 @@ quote = "1.0"
 static_str_ops = "0.1.2"
 dirs = "5.0.1"
 csscolorparser = "0.7.0"
-jsonschema = {version= "0.26.1", default-features = false}
+jsonschema = { version = "0.26.1", default-features = false }
 
 tauri-plugin-os = "2.0.1"
-
