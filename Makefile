@@ -221,3 +221,9 @@ check-unused-deps:
 tidy: gen-license workspace-audit check-unused-deps
 	$(MAKE) clean
 
+# Create a release build
+.PHONY: build
+
+build:
+	# Enable compression feature for reducing binary size
+	$(CARGO) build --bin desktop --features compression
