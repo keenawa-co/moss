@@ -15,7 +15,6 @@ const config: StorybookConfig = {
     "../../../packages/moss-ui/src/**/*.stories.@(js|jsx|mjs|ts|tsx)",
     "../../desktop/src/components/**/*.stories.@(js|jsx|mjs|ts|tsx)",
     "../../web/src/**/*.stories.@(js|jsx|mjs|ts|tsx)",
-    "../../docs/src/**/*.stories.@(js|jsx|mjs|ts|tsx)",
   ],
   staticDirs: ["../public"],
   addons: [
