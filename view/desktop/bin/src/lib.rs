@@ -1,4 +1,5 @@
 mod commands;
+mod context;
 mod mem;
 mod menu;
 mod plugins;
@@ -9,6 +10,7 @@ mod cli;
 pub mod constants;
 
 use commands::*;
+use context::Context;
 use platform_core::context_v2::ContextCell;
 use platform_core::platform::cross::client::CrossPlatformClient;
 use platform_workspace::WorkspaceId;
@@ -86,6 +88,7 @@ pub fn run() {
 
     builder
         .setup(|app| {
+            let context = Context {};
             let platform_info = NativePlatformInfo::new();
             let home_dir = crate::utl::get_home_dir()?;
 
@@ -109,6 +112,7 @@ pub fn run() {
             };
 
             {
+                app.handle().manage(context);
                 app.handle().manage(ctx);
                 app.handle().manage(app_state);
             }
