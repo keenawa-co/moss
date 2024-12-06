@@ -3,6 +3,8 @@ name = "workbench_desktop"
 version = "0.1.0"
 edition = "2021"
 
+[features]
+compression = ["tauri/compression"]
 
 [dependencies]
 moss_text.workspace = true
@@ -16,7 +18,6 @@ static_str_ops.workspace = true
 thiserror.workspace = true
 serde = { workspace = true, features = ["derive"] }
 serde_json.workspace = true
-sysinfo.workspace = true
 anyhow.workspace = true
 hashbrown.workspace = true
 lazy_static.workspace = true
@@ -36,3 +37,5 @@ platform_user_profile.workspace = true
 workbench_service_configuration_tao.workspace = true
 workbench_service_user_profile_tao.workspace = true
 workbench_service_environment_tao.workspace = true
+
+tauri-plugin-os.workspace = true
