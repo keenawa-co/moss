@@ -1,5 +1,8 @@
+# Uncomment for future compilation profiling
+# cargo-features = ["profile-rustflags"]
+
 [workspace]
-resolver = "2"
+resolver = "1"
 members = [
     "view/desktop/bin",
 
@@ -32,6 +35,11 @@ members = [
     "tools/xtask",
     "misc/themeinstall",
 ]
+
+[profile.dev]
+# Uncomment for future compilation profiling
+# rustflags = ["-Zself-profile=profiles/clean"]
+# rustflags = ["-Ztime-passes"]
 
 [profile.release]
 codegen-units = 1 # Compile crates one after another so the compiler can optimize better
@@ -79,7 +87,8 @@ arcstr = "1.2.0"
 bstr = "1.11.0"
 ts-rs = "10.1"
 thiserror = "2.0"
-tauri = { version = "2.0.6", features = ["devtools"] }
+# Disabled default: compression, common-controls-v6
+tauri = { version = "2.0.6", default-features = false, features = ["wry", "objc-exception", "devtools", "macos-private-api"] }
 libc = "0.2.155"
 fnv = "1.0.7"
 anyhow = "1.0"
@@ -93,7 +102,6 @@ strum = "0.26"
 strum_macros = "0.26"
 lazy-regex = "3.3.0"
 dunce = "1.0.5"
-sysinfo = "0.31.2"
 tokio = "1"
 smol = "2.0.0"
 futures = "0.3"
@@ -124,6 +132,9 @@ rand = "0.8.5"
 log = "0.4.21"
 quote = "1.0"
 static_str_ops = "0.1.2"
-homedir = "0.3.4"
+dirs = "5.0.1"
 csscolorparser = "0.7.0"
-jsonschema = "0.26.1"
+jsonschema = {version= "0.26.1", default-features = false}
+
+tauri-plugin-os = "2.0.1"
+

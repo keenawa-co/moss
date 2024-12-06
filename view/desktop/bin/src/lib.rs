@@ -62,7 +62,7 @@ pub fn run() {
                 })
                 .build(),
         )
-        .plugin(tauri_plugin_clipboard_manager::init())
+        // .plugin(tauri_plugin_clipboard_manager::init())
         .plugin(
             tauri_plugin_window_state::Builder::default()
                 .with_denylist(&["ignored"])

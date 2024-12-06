@@ -10,10 +10,13 @@ rust-version = "1.70"
 
 [lib]
 name = "desktop_app_lib"
-crate-type = ["lib", "cdylib", "staticlib"]
+#crate-type = ["rlib", "cdylib", "staticlib"]
 
 [build-dependencies]
 tauri-build = { version = "2.0.2", features = [] }
+
+[features]
+compression = ["tauri/compression"]
 
 [dependencies]
 moss_env.workspace = true
@@ -37,7 +40,7 @@ parking_lot.workspace = true
 tracing.workspace = true
 flume.workspace = true
 async-task.workspace = true
-homedir.workspace = true
+dirs.workspace = true
 log.workspace = true
 rand.workspace = true
 fern.workspace = true
@@ -49,13 +52,13 @@ serde_json.workspace = true
 serde = { workspace = true, features = ["derive"] }
 hashbrown = { workspace = true, features = ["serde"] }
 
-tauri = { workspace = true, features = ["macos-private-api"] }
+tauri.workspace = true
 strum = { workspace = true, features = ["derive"] }
+tauri-plugin-os.workspace = true
 tauri-plugin-shell = "2.0.2"
-tauri-plugin-os = "2.0.1"
 tauri-plugin-log = { version = "2.0.1", features = ["colored"] }
 tauri-plugin-window-state = "2.0.1"
-tauri-plugin-clipboard-manager = "2.0.1"
+# tauri-plugin-clipboard-manager = "2.0.1"
 tauri-plugin-fs = "2.1.0"
 tauri-plugin-cli = "2.0.1"
 tauri-plugin-global-shortcut = "2"
