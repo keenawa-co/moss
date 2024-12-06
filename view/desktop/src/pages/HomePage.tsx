@@ -1,10 +1,43 @@
-import { useTranslation } from "react-i18next";
 import React, { useEffect, useState } from "react";
-import { listen } from "@tauri-apps/api/event";
-import { Tooltip, Icon } from "@repo/moss-ui";
+import { useTranslation } from "react-i18next";
+
 import { invokeIpc } from "@/lib/backend/tauri";
+import { Icon, Tooltip } from "@repo/moss-ui";
+import { listen } from "@tauri-apps/api/event";
 
 export type DescribeActivityOutput = { tooltip: string; order: number };
+
+export const Home: React.FC = () => {
+  const { t } = useTranslation(["ns1", "ns2"]);
+
+  const handleNewWindowButton = async () => {
+    const response = await invokeIpc("create_new_window");
+    console.log(response);
+  };
+
+  return (
+    <div>
+      <h1 className="text-[var(--color-primary)]">{t("title")}</h1>
+
+      <button className="bg-green-500 px-3" onClick={handleNewWindowButton}>
+        New Window
+      </button>
+
+      <div>
+        <Tooltip label="Test" className="text-[var(--color-primary)]">
+          <Icon icon="Code" />
+        </Tooltip>
+      </div>
+      <SessionComponent />
+      <div></div>
+
+      <div className="flex">
+        <Icon icon="Accessibility" className="text-6xl hover:*:fill-green-500" />
+        <Icon icon="NewProject" className="text-red-700 text-6xl hover:fill-green-500" />
+      </div>
+    </div>
+  );
+};
 
 const SessionComponent = () => {
   const { t } = useTranslation(["ns1", "ns2"]);
@@ -38,46 +71,5 @@ const SessionComponent = () => {
       <span className="bg-secondary text-[var(--color-primary)]">{t("description.part1", { ns: "ns2" })}</span>
       {data !== null && <p>Received data: {data}</p>}
     </>
-  );
-};
-
-export const Home: React.FC = () => {
-  const { t } = useTranslation(["ns1", "ns2"]);
-
-  const handleNewWindowButton = async () => {
-    const response = await invokeIpc("create_new_window");
-    console.log(response);
-  };
-
-  return (
-    <div>
-      <h1 className="text-[var(--color-primary)]">{t("title")}</h1>
-
-      <button className="bg-green-500 px-3" onClick={handleNewWindowButton}>
-        New Window
-      </button>
-
-      <div>
-        <Tooltip label="Test" className="text-[var(--color-primary)]">
-          <Icon icon="Code" />
-        </Tooltip>
-      </div>
-      <SessionComponent />
-      <div></div>
-
-      <div className="flex">
-        <Icon icon="Accessibility" className="text-6xl hover:*:fill-green-500" />
-        <Icon icon="NewProject" className="text-red-700 text-6xl hover:fill-green-500" />
-      </div>
-      {/*
-      <div className="w-96 bg-red-600">
-        {new Array(77).fill(0).map((_, index) => (
-          <div key={index}>
-            {index} - {Math.random()}
-          </div>
-        ))}
-        <div> last element</div>
-      </div> */}
-    </div>
   );
 };

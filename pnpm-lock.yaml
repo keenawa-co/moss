@@ -208,19 +208,6 @@ importers:
         specifier: ^5.7.2
         version: 5.7.2
 
-  packages/moss_lang:
-    dependencies:
-      i18next-resources-for-ts:
-        specifier: ^1.5.0
-        version: 1.5.0
-      typescript:
-        specifier: ^5.7.2
-        version: 5.7.2
-    devDependencies:
-      '@repo/typescript-config':
-        specifier: workspace:*
-        version: link:../config-typescript
-
   tools/icongen:
     dependencies:
       react:
@@ -346,9 +333,6 @@ importers:
       '@repo/eslint-config':
         specifier: workspace:*
         version: link:../../packages/config-eslint
-      '@repo/moss-lang':
-        specifier: workspace:*
-        version: link:../../packages/moss_lang
       '@repo/moss-ui':
         specifier: workspace:*
         version: link:../../packages/moss-ui
@@ -12325,11 +12309,6 @@ snapshots:
       '@typescript-eslint/visitor-keys': 8.16.0
 
   '@typescript-eslint/scope-manager@8.17.0':
-    dependencies:
-      '@typescript-eslint/types': 8.17.0
-      '@typescript-eslint/visitor-keys': 8.17.0
-
-  '@typescript-eslint/type-utils@8.16.0(eslint@9.16.0(jiti@1.21.6))(typescript@5.7.2)':
     dependencies:
       '@typescript-eslint/types': 8.17.0
       '@typescript-eslint/visitor-keys': 8.17.0

@@ -3,7 +3,7 @@ import * as os from "os";
 
 import { Theme } from "@repo/desktop-models";
 
-// FIXME: temporary solution
+// FIXME: temporary solution. Also should be fixed in packages/config-eslint/moss-lint-plugin/rules/validate-token-names.js
 const homeDirectory = os.homedir();
 const themesDirectory = `${homeDirectory}/.config/moss/themes`;
 

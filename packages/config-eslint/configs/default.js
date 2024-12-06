@@ -1,13 +1,26 @@
 import reactHooksPlugin from "eslint-plugin-react-hooks";
 import reactRefreshPlugin from "eslint-plugin-react-refresh";
 import tseslint from "typescript-eslint";
-import mossLintPlugin from "./moss-lint-plugin/index.js";
 
-export default tseslint.config({
-  extends: [tseslint.configs.recommended],
-  ignores: ["node_modules/", "dist/", ".gitignore", ".prettierignore", "target/", ".turbo/", ".vscode/", "*.stories.*"],
+import mossLintPlugin from "../moss-lint-plugin/index.js";
+
+export default tseslint.config(...tseslint.configs.recommended, {
+  ignores: [
+    "node_modules/",
+    "dist/",
+    ".gitignore",
+    ".prettierignore",
+    "target/",
+    ".turbo/",
+    ".vscode/",
+    "*.stories.*",
+    "**/*.test.*",
+    "**/*.spec.*",
+  ],
   languageOptions: {},
   settings: {},
+  files: ["**/*.{ts,tsx,js,jsx}"],
+
   plugins: {
     "react-hooks": reactHooksPlugin,
     "react-refresh": reactRefreshPlugin,
@@ -21,6 +34,7 @@ export default tseslint.config({
     "@typescript-eslint/no-unused-vars": "warn",
     "@typescript-eslint/no-explicit-any": "error",
     "prefer-const": "warn",
-    "mossLint/no-bg-with-arbitrary-value": "error",
+    "mossLint/tw-no-bg-with-arbitrary-value": "error",
+    "mossLint/only-valid-token-names": "error",
   },
 });

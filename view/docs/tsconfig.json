@@ -1,9 +1,0 @@
-{
-  "extends": "@repo/typescript-config/base.json",
-  "compilerOptions": {
-    "jsx": "react-native",
-    "plugins": []
-  },
-  "include": ["**/*.ts", "**/*.tsx"],
-  "exclude": ["node_modules"]
-}

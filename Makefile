@@ -12,7 +12,6 @@ endif
 # App Directories
 DESKTOP_DIR := view/desktop
 STORYBOOK_DIR := view/storybook
-DOCS_DIR := view/docs
 WEB_DIR := view/web
 THEME_GENERATOR_DIR := tools/themegen
 THEME_INSTALLER_DIR := misc/themeinstall
@@ -58,11 +57,6 @@ run-desktop-web:
 .PHONY: run-storybook
 run-storybook:
 	@cd $(STORYBOOK_DIR) && $(PNPM) dev
-
-## Run Documentation
-.PHONY: run-docs
-run-docs:
-	@cd $(DOCS_DIR) && $(PNPM) dev
 
 ## Run Web Application
 .PHONY: run-web
@@ -170,8 +164,6 @@ clean-pnpm:
 	@cd $(DESKTOP_DIR) && $(PNPM) prune
 	@echo Cleaning Storybook Directory Cache...
 	@cd $(STORYBOOK_DIR) && $(PNPM) prune
-	@echo Cleaning Docs Directory Cache...
-	@cd $(DOCS_DIR) && $(PNPM) prune
 	@echo Cleaning Web Directory Cache...
 	@cd $(WEB_DIR) && $(PNPM) prune
 	@echo Cleaning Theme Generator Directory Cache...
@@ -221,3 +213,9 @@ check-unused-deps:
 tidy: gen-license workspace-audit check-unused-deps
 	$(MAKE) clean
 
+# Create a release build
+.PHONY: build
+
+build:
+	# Enable compression feature for reducing binary size
+	$(CARGO) build --bin desktop --features compression
