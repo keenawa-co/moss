@@ -11,19 +11,19 @@ env:
 
 jobs:
   rust-workflows:
-    name: Rust Task - ${{ matrix.task }}
+    name: Rust Workflows - ${{ matrix.task.name }}
     runs-on: ubuntu-latest
     strategy:
       matrix:
         task:
-          - name: unit-tests
-          - command: cargo -q test --lib
-
-          - name: doc-tests
-          - command: cargo -q test --doc
-
-          - name: dependency-audit
-          - command: cargo -q run -- --fail-fast rwa
+          - name: Unit Tests
+            command: cargo -q test --lib
+          - name: Docs Tests
+            command: cargo -q test --doc
+          - name: Workspace Audit
+            command: |
+              cd tools/xtask
+              cargo -q run -- --fail-fast rwa
     timeout-minutes: 15
     steps:
       - name: Checkout Code
@@ -47,7 +47,7 @@ jobs:
       - name: Install Dependencies (if needed)
         run: sudo apt-get update && sudo apt-get install -y libwebkit2gtk-4.0-dev libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
 
-      - name: Execute Task - ${{ matrix.task.name }}
+      - name: Execute Rust Task - ${{ matrix.task.name }}
         run: ${{ matrix.task.command }}
         working-directory: ".github/cache"
 
