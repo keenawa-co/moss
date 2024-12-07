@@ -1,0 +1,7 @@
+makefile:
+  - changed-files:
+      any-glob-to-any-file: - "Makefile"
+
+documentation:
+  - changed-files:
+      - any-glob-to-any-file: "**/*.md"
