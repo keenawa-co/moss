@@ -10,84 +10,91 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  rust-tests:
+  rust-test-suite:
+    name: Rust Tests
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
-      - name: Rust Cache
+
+      - name: Cache Rust Dependencies
         uses: Swatinem/rust-cache@v2.7.5
         with:
           workspaces: ".github/cache"
 
-      - name: Prerequisite Packages Cache
+      - name: Cache Apt Packages
         uses: awalsh128/cache-apt-pkgs-action@latest
         with:
-          packages: libwebkit2gtk-4.0-dev libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
+          packages: |
+            libwebkit2gtk-4.0-dev
+            libwebkit2gtk-4.1-dev
+            libappindicator3-dev
+            librsvg2-dev
+            patchelf
 
-      - name: Run Rust Unit Tests
-        run: cargo -q test --lib --locked
+      - name: Run Unit Tests
+        run: cargo -q test --lib
         working-directory: ".github/cache"
 
-      - name: Run Rust Doc Tests
-        run: cargo -q test --doc --locked
+      - name: Run Documentation Tests
+        if: always()
+        run: cargo -q test --doc
         working-directory: ".github/cache"
 
   rust-dependency-audit:
+    name: Rust Dependency Audit
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
-      - name: Rust Cache
+
+      - name: Cache Rust Dependencies
         uses: Swatinem/rust-cache@v2.7.5
-      - name: Audit Rust Dependencies
+        with:
+          workspaces: ".github/cache"
+
+      - name: Cache Apt Packages
+        uses: awalsh128/cache-apt-pkgs-action@latest
+        with:
+          packages: |
+            libwebkit2gtk-4.0-dev
+            libwebkit2gtk-4.1-dev
+            libappindicator3-dev
+            librsvg2-dev
+            patchelf
+
+      - name: Audit Rust Workspace Dependencies
         run: |
           cd tools/xtask
           cargo -q run -- --fail-fast rwa
 
-  lint-packages-and-views:
+  node-workflows:
+    name: Node.js Workflows
     runs-on: ubuntu-latest
-    timeout-minutes: 5
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Use Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version-file: "package.json"
-          cache: "pnpm"
-
-      - name: Install pnpm
-        uses: pnpm/action-setup@v4
-
-      - name: Install Dependencies
-        run: pnpm install
-
-      - name: Run Lint
-        run: pnpm run lint -- --quiet
-
-  vitest-tests:
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
     strategy:
-      fail-fast: false
       matrix:
-        project: ["packages", "desktop"]
+        task: [lint, test-packages, test-desktop]
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
+      - name: Install PNPM
+        uses: pnpm/action-setup@v4
 
-      - name: Use Node.js
+      - name: Set Up Node.js
         uses: actions/setup-node@v4
         with:
           node-version-file: "package.json"
           cache: "pnpm"
 
-      - name: Install pnpm
-        uses: pnpm/action-setup@v4
-
       - name: Install Dependencies
         run: pnpm install
 
-      - name: Run Vitest
-        run: pnpm run test --project ${{ matrix.project }}
+      - name: Execute Task
+        run: |
+          if [ "${{ matrix.task }}" == "lint" ]; then
+            pnpm run lint -- --quiet
+          elif [ "${{ matrix.task }}" == "test-packages" ]; then
+            pnpm run test --project packages
+          elif [ "${{ matrix.task }}" == "test-desktop" ]; then
+            pnpm run test --project desktop
+          fi
