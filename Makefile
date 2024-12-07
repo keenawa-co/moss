@@ -102,13 +102,18 @@ endif
 gen-themes:
 	@cd $(THEME_GENERATOR_DIR) && $(PNPM) start
 
-## Convert Theme JSONs to css
+
+## Convert Theme JSONs to CSS
 .PHONY: install-themes
 install-themes:
-	$(CARGO) run --bin themeinstall -- --input ${THEME_DIR}\moss-dark.json --output $(THEME_DIR)
-	$(CARGO) run --bin themeinstall -- --input ${THEME_DIR}\moss-light.json --output $(THEME_DIR)
-	$(CARGO) run --bin themeinstall -- --input ${THEME_DIR}\moss-pink.json --output $(THEME_DIR)
+	@if [ ! -f $(THEME_INSTALLER_DIR)/target/debug/themeinstall ]; then \
+		echo "Building themeinstall binary..."; \
+		cd $(THEME_INSTALLER_DIR) && cargo build --bin themeinstall --target-dir ./target; \
+	fi
 
+	@for theme in moss-dark moss-light moss-pink; do \
+		$(THEME_INSTALLER_DIR)/target/debug/themeinstall --input $(THEME_DIR)/$$theme.json --output $(THEME_DIR); \
+	done
 
 
 ## Generate Icons
