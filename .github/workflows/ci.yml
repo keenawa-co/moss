@@ -69,16 +69,21 @@ jobs:
           cargo -q run -- --fail-fast rwa
 
   node-workflows:
-    name: Node.js Workflows
+    name: Node.js Workflows - ${{ matrix.task }}
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        task: [lint, test-packages, test-desktop]
+        task:
+          - name: lint
+            command: pnpm run lint -- --quiet
+          - name: test-packages
+            command: pnpm run test --project packages
+          - name: test-desktop
+            command: pnpm run test --project desktop
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v4
-      - name: Install PNPM
-        uses: pnpm/action-setup@v4
+      - name: Checkout Code
+        uses: actions/checkout@v4
 
       - name: Set Up Node.js
         uses: actions/setup-node@v4
@@ -86,15 +91,11 @@ jobs:
           node-version-file: "package.json"
           cache: "pnpm"
 
+      - name: Install PNPM
+        uses: pnpm/action-setup@v4
+
       - name: Install Dependencies
         run: pnpm install
 
-      - name: Execute Task
-        run: |
-          if [ "${{ matrix.task }}" == "lint" ]; then
-            pnpm run lint -- --quiet
-          elif [ "${{ matrix.task }}" == "test-packages" ]; then
-            pnpm run test --project packages
-          elif [ "${{ matrix.task }}" == "test-desktop" ]; then
-            pnpm run test --project desktop
-          fi
+      - name: Execute Task - ${{ matrix.task.name }}
+        run: ${{ matrix.task.command }}
