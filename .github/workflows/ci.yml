@@ -10,8 +10,7 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  rust-test-suite:
-    name: Rust Tests
+  rust-tests:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -26,34 +25,32 @@ jobs:
         with:
           packages: libwebkit2gtk-4.0-dev libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
 
-      - name: Run Unit Tests
-        run: cargo -q test --lib
+      - name: Run Rust Unit Tests
+        run: cargo -q test --lib --locked
         working-directory: ".github/cache"
 
-      - name: Run Documentation Tests
-        if: always()
-        run: cargo -q test --doc
+      - name: Run Rust Doc Tests
+        run: cargo -q test --doc --locked
         working-directory: ".github/cache"
 
   rust-dependency-audit:
-    name: Rust Dependency Audit
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
-      - name: Audit Rust Workspace Dependencies
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@v2.7.5
+      - name: Audit Rust Dependencies
         run: |
-          cd ${GITHUB_WORKSPACE}/tools/xtask
+          cd tools/xtask
           cargo -q run -- --fail-fast rwa
 
   lint-packages-and-views:
-    name: Lint Packages and Views
     runs-on: ubuntu-latest
     timeout-minutes: 5
+
     steps:
       - uses: actions/checkout@v4
-      - name: Install pnpm
-        uses: pnpm/action-setup@v4
 
       - name: Use Node.js
         uses: actions/setup-node@v4
@@ -61,20 +58,24 @@ jobs:
           node-version-file: "package.json"
           cache: "pnpm"
 
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+
       - name: Install Dependencies
         run: pnpm install
 
-      - name: Run turbo lint for Packages and Views
+      - name: Run Lint
         run: pnpm run lint -- --quiet
 
-  vitest-package-tests:
-    name: Vitest Packages Tests
+  vitest-tests:
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        project: ["packages", "desktop"]
     steps:
       - uses: actions/checkout@v4
-      - name: Install pnpm
-        uses: pnpm/action-setup@v4
 
       - name: Use Node.js
         uses: actions/setup-node@v4
@@ -82,29 +83,11 @@ jobs:
           node-version-file: "package.json"
           cache: "pnpm"
 
-      - name: Install Dependencies
-        run: pnpm install
-
-      - name: Run Vitest for Packages
-        run: pnpm run test --project packages
-
-  vitest-desktop-tests:
-    name: Vitest Desktop Tests
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    steps:
-      - uses: actions/checkout@v4
       - name: Install pnpm
         uses: pnpm/action-setup@v4
 
-      - name: Use Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version-file: "package.json"
-          cache: "pnpm"
-
       - name: Install Dependencies
         run: pnpm install
 
-      - name: Run Vitest for Desktop
-        run: pnpm run test --project desktop
+      - name: Run Vitest
+        run: pnpm run test --project ${{ matrix.project }}
