@@ -1,5 +1,4 @@
-on:
-  pull_request
+on: pull_request
 
 jobs:
   changelog:
@@ -34,4 +33,3 @@ jobs:
           git add CHANGELOG.md
           git commit -m "Update changelog"
           git push https://${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git ${{ github.head_ref }}
-

@@ -32,7 +32,7 @@ export type CommandActionToggle = { condition: string; icon?: string; tooltip?: 
 
 export type MenuGroup = { id: string; order?: bigint; description?: LocalizedString };
 
-export type MenuItem = { action: ActionMenuItem } | { submenu: SubmenuMenuItem };
+export type MenuItem = { "action": ActionMenuItem } | { "submenu": SubmenuMenuItem };
 
 export type MenuItemVisibility = "classic" | "hidden" | "compact";
 

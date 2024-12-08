@@ -10,73 +10,65 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  rust-test-suite:
-    name: Rust Tests
+  rust-workflows:
+    name: Rust Workflows - ${{ matrix.task.name }}
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        task:
+          - name: Unit Tests
+            command: cargo -q test --lib
+          - name: Docs Tests
+            command: cargo -q test --doc
+          - name: Workspace Audit
+            command: |
+              cd ${GITHUB_WORKSPACE}/tools/xtask
+              cargo -q run -- --fail-fast rwa
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v4
-      - name: Rust Cache
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Cache Rust Dependencies
         uses: Swatinem/rust-cache@v2.7.5
         with:
           workspaces: ".github/cache"
 
-      - name: Prerequisite Packages Cache
+      - name: Cache Apt Packages
         uses: awalsh128/cache-apt-pkgs-action@latest
         with:
-          packages: libwebkit2gtk-4.0-dev libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
+          packages: |
+            libwebkit2gtk-4.0-dev
+            libwebkit2gtk-4.1-dev
+            libappindicator3-dev
+            librsvg2-dev
+            patchelf
 
-      - name: Run Unit Tests
-        run: cargo -q test --lib
+      - name: Execute Rust Task - ${{ matrix.task.name }}
+        run: ${{ matrix.task.command }}
         working-directory: ".github/cache"
 
-      - name: Run Documentation Tests
-        if: always()
-        run: cargo -q test --doc
-        working-directory: ".github/cache"
-
-  rust-dependency-audit:
-    name: Rust Dependency Audit
+  node-workflows:
+    name: Node.js Workflows - ${{ matrix.task.name }}
     runs-on: ubuntu-latest
-    timeout-minutes: 5
-    steps:
-      - uses: actions/checkout@v4
-      - name: Audit Rust Workspace Dependencies
-        run: |
-          cd ${GITHUB_WORKSPACE}/tools/xtask
-          cargo -q run -- --fail-fast rwa
-
-  lint-packages-and-views:
-    name: Lint Packages and Views
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    steps:
-      - uses: actions/checkout@v4
-      - name: Install pnpm
-        uses: pnpm/action-setup@v4
-
-      - name: Use Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version-file: "package.json"
-          cache: "pnpm"
-
-      - name: Install Dependencies
-        run: pnpm install
-
-      - name: Run turbo lint for Packages and Views
-        run: pnpm run lint -- --quiet
-
-  vitest-package-tests:
-    name: Vitest Packages Tests
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        task:
+          - name: Lint
+            command: pnpm run lint -- --quiet
+          - name: Test Packages
+            command: pnpm run test --project packages
+          - name: Test Desktop
+            command: pnpm run test --project desktop
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v4
-      - name: Install pnpm
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Install PNPM
         uses: pnpm/action-setup@v4
 
-      - name: Use Node.js
+      - name: Set Up Node.js
         uses: actions/setup-node@v4
         with:
           node-version-file: "package.json"
@@ -85,26 +77,5 @@ jobs:
       - name: Install Dependencies
         run: pnpm install
 
-      - name: Run Vitest for Packages
-        run: pnpm run test --project packages
-
-  vitest-desktop-tests:
-    name: Vitest Desktop Tests
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    steps:
-      - uses: actions/checkout@v4
-      - name: Install pnpm
-        uses: pnpm/action-setup@v4
-
-      - name: Use Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version-file: "package.json"
-          cache: "pnpm"
-
-      - name: Install Dependencies
-        run: pnpm install
-
-      - name: Run Vitest for Desktop
-        run: pnpm run test --project desktop
+      - name: Execute Task - ${{ matrix.task.name }}
+        run: ${{ matrix.task.command }}

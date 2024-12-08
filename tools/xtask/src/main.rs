@@ -9,7 +9,6 @@ use smol::fs;
 use std::fs::File;
 use std::path::PathBuf;
 use tasks::TaskRunner;
-use tracing::instrument::WithSubscriber;
 use tracing::Level;
 use tracing_appender::rolling::{RollingFileAppender, Rotation};
 use tracing_subscriber::fmt::writer::MakeWriterExt;

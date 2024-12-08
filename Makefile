@@ -21,6 +21,8 @@ DESKTOP_MODELS_DIR := internal/workbench/desktop/models
 HTML_MODELS_DIR := crates/moss-html
 UIKIT_MODELS_DIR := crates/moss-uikit
 
+THEME_SCHEMA_DIR :=  crates/moss-theme
+
 XTASK_DIR := tools/xtask
 
 # User Directories
@@ -31,6 +33,7 @@ PNPM := pnpm
 SURREAL := surreal
 CARGO := cargo
 RUSTUP := rustup
+TSP := tsp
 
 # Database settings
 DATABASE_FILE := file:rocksdb
@@ -102,14 +105,26 @@ endif
 gen-themes:
 	@cd $(THEME_GENERATOR_DIR) && $(PNPM) start
 
-## Convert Theme JSONs to css
+
+## Convert Theme JSONs to CSS
 .PHONY: install-themes
 install-themes:
-	$(CARGO) run --bin themeinstall -- --input ${THEME_DIR}\moss-dark.json --output $(THEME_DIR)
-	$(CARGO) run --bin themeinstall -- --input ${THEME_DIR}\moss-light.json --output $(THEME_DIR)
-	$(CARGO) run --bin themeinstall -- --input ${THEME_DIR}\moss-pink.json --output $(THEME_DIR)
+	@if [ ! -f $(THEME_INSTALLER_DIR)/target/debug/themeinstall ]; then \
+		echo "Building themeinstall binary..."; \
+		cd $(THEME_INSTALLER_DIR) && cargo build --bin themeinstall --target-dir ./target; \
+	fi
 
+	@for theme in moss-dark moss-light moss-pink; do \
+		$(THEME_INSTALLER_DIR)/target/debug/themeinstall \
+			 --schema ./@typespec/json-schema/Theme.json \
+			 --input $(THEME_DIR)/$$theme.json \
+			 --output $(THEME_DIR); \
+	done
 
+## Compile Theme JSON Schema
+.PHONY: compile-themes-schema
+compile-themes-schema:
+	@cd $(THEME_SCHEMA_DIR) && $(TSP) compile . --option "@typespec/json-schema.file-type=json"
 
 ## Generate Icons
 .PHONY: gen-icons
@@ -136,7 +151,13 @@ gen-desktop-models:
 
 ## Generate All Models
 .PHONY: gen-models
-gen-models: gen-html-models gen-uikit-models gen-desktop-models
+gen-models: \
+	gen-html-models \
+	gen-uikit-models \
+	gen-desktop-models \
+
+.PHONY: compile-schemas
+compile-schemas: compile-themes-schema
 
 # Utility Commands
 

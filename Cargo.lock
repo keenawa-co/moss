@@ -2711,6 +2711,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "moss_jsonschema"
+version = "0.1.0"
+dependencies = [
+ "serde_json",
+]
+
+[[package]]
 name = "moss_text"
 version = "0.1.0"
 dependencies = [
@@ -2726,6 +2733,7 @@ dependencies = [
  "anyhow",
  "desktop_models",
  "indexmap 2.7.0",
+ "jsonschema",
  "serde",
  "serde_json",
 ]

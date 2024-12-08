@@ -1,4 +1,4 @@
-use tauri::{AppHandle, Emitter, Manager, WebviewWindow};
+use tauri::{AppHandle, Emitter, WebviewWindow};
 
 use crate::create_main_window;
 

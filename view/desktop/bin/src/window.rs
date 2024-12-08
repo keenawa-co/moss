@@ -1,5 +1,5 @@
 use log::{info, warn};
-use tauri::{AppHandle, Manager, WebviewUrl, WebviewWindow, WindowEvent};
+use tauri::{AppHandle, WebviewUrl, WebviewWindow};
 
 use crate::{menu, MIN_WINDOW_HEIGHT, MIN_WINDOW_WIDTH};
 

@@ -1,9 +1,15 @@
-import { cn, Icon, Icons } from "@repo/moss-ui";
 import type { ComponentPropsWithoutRef } from "react";
+
+import { cn, Icon, Icons } from "@repo/moss-ui";
 
 const StatusBar = ({ className }: ComponentPropsWithoutRef<"div">) => {
   return (
-    <footer className={cn("flex h-[26px] w-screen justify-between bg-[#0F62FE] pr-[26px]", className)}>
+    <footer
+      className={cn(
+        "flex h-[26px] w-screen justify-between pr-[26px] background-[--color-statusBar-background]",
+        className
+      )}
+    >
       <div className="flex h-full">
         <StatusBarButton icon="StatusBarMacButton" className="bg-[#054ADA] px-[9px] py-[5px]" iconClassName="size-4" />
 
@@ -58,7 +64,7 @@ const StatusBarButton = ({ icon, iconClassName, label, className }: StatusBarBut
         className
       )}
     >
-      {icon && <Icon className={cn(" size-[18px]", iconClassName)} icon={icon} />}
+      {icon && <Icon className={cn("size-[18px]", iconClassName)} icon={icon} />}
       {label && <span className="text-sm">{label}</span>}
     </button>
   );

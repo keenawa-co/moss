@@ -120,5 +120,9 @@
       "mode": "auto"
     }
   ],
+  "editor.formatOnSave": true,
+  "[typespec]": {
+    "editor.formatOnSave": false
+  },
   "tailwindCSS.rootFontSize": 16,
 }
