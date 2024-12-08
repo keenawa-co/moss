@@ -1,0 +1,3 @@
+output-dir: "{cwd}/../../"
+emit:
+  - "@typespec/json-schema"
