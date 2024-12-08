@@ -35,6 +35,8 @@ members = [
 
     "tools/xtask",
     "misc/themeinstall",
+    "crates/moss-typebridge",
+    "crates/moss-typebridge-macro",
 ]
 
 [profile.dev]
@@ -62,9 +64,14 @@ moss_fs = { path = "crates/moss-fs" }
 moss_themeconv = { path = "crates/moss-themeconv" }
 moss_jsonlogic = { path = "crates/moss-jsonlogic" }
 moss_jsonlogic_macro = { path = "crates/moss-jsonlogic-macro" }
+
+moss_typebridge = { path = "crates/moss-typebridge" }
+moss_typebridge_macro = { path = "crates/moss-typebridge-macro"}
+
 moss_env = { path = "crates/moss-env" }
 moss_async = { path = "crates/moss-async" }
 moss_collection = { path = "crates/moss-collection" }
+
 
 platform_core = { path = "internal/platform/core" }
 platform_utl = { path = "internal/platform/utl" }
