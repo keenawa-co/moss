@@ -24,9 +24,9 @@ impl ThemeConverter for JsonThemeConverter {
         let theme_value = serde_json::from_str(&content)
             .context("Failed to deserialize JSON content into Value.")?;
 
-        self.validator.validate(theme_value)?;
+        self.validator.validate(&theme_value)?;
 
-        let theme: Theme = serde_json::from_str(&content)
+        let theme: Theme = serde_json::from_value(theme_value)
             .context("Failed to deserialize JSON content into Theme structure.")?;
 
         if theme.colors.is_empty() {
@@ -61,7 +61,7 @@ mod tests {
     }
 
     impl Validator for MockThemeValidator {
-        fn validate(&self, _theme_value: serde_json::Value) -> Result<()> {
+        fn validate(&self, _theme_value: &serde_json::Value) -> Result<()> {
             if self.theme_is_valid {
                 return Ok(());
             } else {

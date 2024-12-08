@@ -14,5 +14,5 @@ pub trait ThemeConverter {
 }
 
 pub trait Validator {
-    fn validate(&self, theme_value: Value) -> Result<()>;
+    fn validate(&self, theme_value: &Value) -> Result<()>;
 }

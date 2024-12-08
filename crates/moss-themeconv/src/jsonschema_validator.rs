@@ -14,8 +14,8 @@ impl JsonSchemaValidator {
 }
 
 impl Validator for JsonSchemaValidator {
-    fn validate(&self, theme_value: Value) -> anyhow::Result<()> {
-        if !jsonschema::is_valid(&self.schema, &theme_value) {
+    fn validate(&self, theme_value: &Value) -> anyhow::Result<()> {
+        if !jsonschema::is_valid(&self.schema, theme_value) {
             return Err(anyhow!("Schema validation failed"));
         }
 
