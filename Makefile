@@ -21,6 +21,8 @@ DESKTOP_MODELS_DIR := internal/workbench/desktop/models
 HTML_MODELS_DIR := crates/moss-html
 UIKIT_MODELS_DIR := crates/moss-uikit
 
+THEME_SCHEMA_DIR :=  crates/moss-theme
+
 XTASK_DIR := tools/xtask
 
 # User Directories
@@ -31,6 +33,7 @@ PNPM := pnpm
 SURREAL := surreal
 CARGO := cargo
 RUSTUP := rustup
+TSP := tsp
 
 # Database settings
 DATABASE_FILE := file:rocksdb
@@ -115,6 +118,10 @@ install-themes:
 		$(THEME_INSTALLER_DIR)/target/debug/themeinstall --input $(THEME_DIR)/$$theme.json --output $(THEME_DIR); \
 	done
 
+## Compile Theme JSON Schema
+.PHONY: compile-themes-schema
+compile-themes-schema:
+	@cd $(THEME_SCHEMA_DIR) && $(TSP) compile . --option "@typespec/json-schema.file-type=json"
 
 ## Generate Icons
 .PHONY: gen-icons
@@ -141,7 +148,13 @@ gen-desktop-models:
 
 ## Generate All Models
 .PHONY: gen-models
-gen-models: gen-html-models gen-uikit-models gen-desktop-models
+gen-models: \
+	gen-html-models \
+	gen-uikit-models \
+	gen-desktop-models \
+
+.PHONY: compile-schemas
+compile-schemas: compile-themes-schema
 
 # Utility Commands
 

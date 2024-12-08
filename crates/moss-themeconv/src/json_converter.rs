@@ -3,6 +3,8 @@ use desktop_models::appearance::theming::Theme;
 
 use crate::{util::convert_colors_to_css_variables, ThemeConverter};
 
+static THEME_SCHEMA: &str = include_str!("../../../@typespec/json-schema/Theme.json");
+
 #[cfg(feature = "json")]
 pub struct JsonThemeConverter;
 
@@ -16,8 +18,14 @@ impl JsonThemeConverter {
 #[cfg(feature = "json")]
 impl ThemeConverter for JsonThemeConverter {
     fn convert_to_css(&self, content: String) -> Result<String> {
-        let theme: Theme = serde_json::from_str(&content).context("JSON deserialization failed")?;
+        let schema: serde_json::Value = serde_json::from_str(THEME_SCHEMA)?;
+        let theme: serde_json::Value =
+            serde_json::from_str(&content).context("JSON deserialization failed")?;
 
+        let compiled_schema = jsonschema::is_valid(&schema, &theme);
+
+        let theme: Theme = serde_json::from_str(&content).context("JSON deserialization failed")?;
+        dbg!(&theme.name, compiled_schema);
         let mut css_sections = Vec::new();
 
         if !theme.colors.is_empty() {

@@ -16,6 +16,7 @@ members = [
     "crates/moss-env",
     "crates/moss-async",
     "crates/moss-collection",
+    "crates/moss-theme",
 
     "internal/platform/core",
     "internal/platform/fs",
@@ -88,7 +89,12 @@ bstr = "1.11.0"
 ts-rs = "10.1"
 thiserror = "2.0"
 # Disabled default: compression, common-controls-v6
-tauri = { version = "2.0.6", default-features = false, features = ["wry", "objc-exception", "devtools", "macos-private-api"] }
+tauri = { version = "2.0.6", default-features = false, features = [
+    "wry",
+    "objc-exception",
+    "devtools",
+    "macos-private-api",
+] }
 libc = "0.2.155"
 fnv = "1.0.7"
 anyhow = "1.0"
@@ -123,6 +129,8 @@ waker-fn = "1.2.0"
 im = "15.1.0"
 smallvec = "1.13.2"
 dyn-clone = "1.0.17"
+schemars = "=1.0.0-alpha.17"
+
 
 hecs = "0.10.5"
 hecs-hierarchy = "0.12.1"
@@ -134,7 +142,6 @@ quote = "1.0"
 static_str_ops = "0.1.2"
 dirs = "5.0.1"
 csscolorparser = "0.7.0"
-jsonschema = {version= "0.26.1", default-features = false}
+jsonschema = { version = "0.26.1", default-features = false }
 
 tauri-plugin-os = "2.0.1"
-
