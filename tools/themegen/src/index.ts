@@ -13,7 +13,7 @@ const defaultDarkTheme: Theme = {
   slug: "moss-dark",
   type: "dark",
   isDefault: false,
-  color: {
+  colors: {
     "primary": { "type": "solid", "value": "rgba(255, 255, 255, 1)" }, // prettier-ignore
     "sideBar.background": { type: "solid", value: "rgba(39, 39, 42, 1)" },
     "toolBar.background": { type: "solid", value: "rgba(30, 32, 33, 1)" },
@@ -32,7 +32,7 @@ const defaultLightTheme: Theme = {
   slug: "moss-light",
   type: "light",
   isDefault: true,
-  color: {
+  colors: {
     "primary": { "type": "solid", "value": "rgba(0, 0, 0, 1)" }, // prettier-ignore
     "sideBar.background": { type: "solid", value: "rgba(244, 244, 245, 1)" },
     "toolBar.background": { type: "solid", value: "rgba(224, 224, 224, 1)" },
@@ -53,7 +53,7 @@ const pinkTheme: Theme = {
   slug: "moss-pink",
   type: "light",
   isDefault: false,
-  color: {
+  colors: {
     "primary": { "type": "solid", "value": "rgba(0, 0, 0, 1)" }, // prettier-ignore
     "sideBar.background": { type: "solid", value: "rgba(234, 157, 242, 1)" },
     "toolBar.background": { type: "solid", value: "rgba(222, 125, 232, 1)" },
