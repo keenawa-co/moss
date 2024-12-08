@@ -121,6 +121,26 @@ install-themes:
 			 --output $(THEME_DIR); \
 	done
 
+
+## Windows does not support for loop in makefile, unfortunately
+.PHONY: install-themes-windows
+install-themes-windows:
+	$(CARGO) run --bin themeinstall -- \
+		 --schema ./@typespec/json-schema/Theme.json \
+		 --input $(THEME_DIR)/moss-dark.json \
+		 --output $(THEME_DIR) \
+
+	$(CARGO) run --bin themeinstall -- \
+		 --schema ./@typespec/json-schema/Theme.json \
+		 --input $(THEME_DIR)/moss-light.json \
+		 --output $(THEME_DIR) \
+
+	$(CARGO) run --bin themeinstall -- \
+		 --schema ./@typespec/json-schema/Theme.json \
+		 --input $(THEME_DIR)/moss-pink.json \
+		 --output $(THEME_DIR) \
+
+
 ## Compile Theme JSON Schema
 .PHONY: compile-themes-schema
 compile-themes-schema:
