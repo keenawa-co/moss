@@ -1,9 +1,8 @@
 use anyhow::Result;
 use cargo_metadata::{Metadata, Package};
 use clap::Parser;
-use futures::future::join_all;
 use smol::fs;
-use std::{io, sync::Arc};
+use std::sync::Arc;
 use tokio::task::JoinSet;
 use toml::Value;
 use tracing::{error, trace};
