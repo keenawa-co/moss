@@ -8,7 +8,6 @@ import { type } from "@tauri-apps/plugin-os";
 import { PageLoader } from "./components/PageLoader";
 import { store } from "./store";
 
-import "reflect-metadata";
 import "@/assets/index.css";
 import "@repo/moss-ui/src/fonts.css";
 

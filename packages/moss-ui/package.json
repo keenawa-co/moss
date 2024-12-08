@@ -22,26 +22,18 @@
     "dev": " tailwindcss  -i ./src/styles.css -o ./dist/index.css --watch",
     "type-check": "tsc --noEmit"
   },
-  "peerDependencies": {
-    "react": "^18.2.0"
-  },
   "devDependencies": {
-    "@radix-ui/react-dropdown-menu": "^2.1.1",
-    "@radix-ui/react-tooltip": "^1.1.2",
+    "@repo/desktop-models": "workspace:*",
     "@repo/eslint-config": "workspace:*",
+    "@repo/icongen": "workspace:*",
     "@repo/tailwind-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
-    "@repo/icongen": "workspace:*",
-    "@repo/desktop-models": "workspace:*",
     "@storybook/react": "^8.1.11",
-    "@storybook/test": "^8.1.11",
-    "@types/react": "^18.2.61",
-    "autoprefixer": "^10.4.18",
-    "tailwind-merge": "^2.4.0",
-    "tailwindcss": "^3.4.1",
-    "typescript": "^5.7.2"
+    "@storybook/test": "^8.1.11"
   },
   "dependencies": {
+    "@radix-ui/react-dropdown-menu": "^2.1.1",
+    "@radix-ui/react-tooltip": "^1.1.2",
     "@radix-ui/primitive": "^1.1.0",
     "@radix-ui/react-compose-refs": "^1.1.0",
     "@radix-ui/react-context": "^1.1.1",
@@ -55,7 +47,6 @@
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "deepmerge": "^4.3.1",
-    "lucide-react": "^0.463.0",
     "tailwindcss-animate": "^1.0.7"
   }
 }
