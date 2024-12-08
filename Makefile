@@ -115,7 +115,10 @@ install-themes:
 	fi
 
 	@for theme in moss-dark moss-light moss-pink; do \
-		$(THEME_INSTALLER_DIR)/target/debug/themeinstall --input $(THEME_DIR)/$$theme.json --output $(THEME_DIR); \
+		$(THEME_INSTALLER_DIR)/target/debug/themeinstall \
+			 --schema ./@typespec/json-schema/Theme.json \
+			 --input $(THEME_DIR)/$$theme.json \
+			 --output $(THEME_DIR); \
 	done
 
 ## Compile Theme JSON Schema
