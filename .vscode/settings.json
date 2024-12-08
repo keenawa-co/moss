@@ -51,14 +51,16 @@
     "specta",
     "sqlx",
     "subident",
+    "suncronisation",
     "surql",
     "surrealdb",
-    "sysinfo",
     "tablename",
+    "tanstack",
     "tauri",
     "tgui",
     "themegen",
     "thiserror",
+    "tseslint",
     "Turborepo",
     "Uncapitalize",
     "unlisten",
@@ -118,5 +120,9 @@
       "mode": "auto"
     }
   ],
+  "editor.formatOnSave": true,
+  "[typespec]": {
+    "editor.formatOnSave": false
+  },
   "tailwindCSS.rootFontSize": 16,
 }

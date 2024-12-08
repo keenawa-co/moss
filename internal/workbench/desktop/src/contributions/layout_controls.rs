@@ -5,7 +5,9 @@ use desktop_models::{
     },
     constants,
 };
-use moss_str::{localize, ReadOnlyStr};
+use moss_jsonlogic::raw_rule::*;
+use moss_jsonlogic_macro::rule;
+use moss_text::{localize, ReadOnlyStr};
 use std::rc::Rc;
 
 use crate::Contribution;
@@ -34,7 +36,7 @@ impl Contribution for LayoutControlsContribution {
                         description: None,
                         icon: None,
                         toggled: Some(CommandActionToggle {
-                            condition: "undefined".into(),
+                            condition: rule!(togglePrimarySidebar == true),
                             icon: None,
                             tooltip: None,
                             title: None,
@@ -62,7 +64,7 @@ impl Contribution for LayoutControlsContribution {
                         description: None,
                         icon: None,
                         toggled: Some(CommandActionToggle {
-                            condition: "undefined".into(),
+                            condition: rule!(toggleSecondarySidebar == true),
                             icon: None,
                             tooltip: None,
                             title: None,
@@ -84,7 +86,7 @@ impl Contribution for LayoutControlsContribution {
                         description: None,
                         icon: None,
                         toggled: Some(CommandActionToggle {
-                            condition: "undefined".into(),
+                            condition: rule!(togglePanel == true),
                             icon: None,
                             tooltip: None,
                             title: None,

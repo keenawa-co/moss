@@ -7,7 +7,9 @@ use desktop_models::{
     constants,
     view::TreeViewDescriptor,
 };
-use moss_str::{localize, ReadOnlyStr};
+use moss_jsonlogic::raw_rule::*;
+use moss_jsonlogic_macro::rule;
+use moss_text::{localize, ReadOnlyStr};
 use once_cell::sync::Lazy;
 use quote::quote;
 use static_str_ops::static_format;
@@ -77,7 +79,7 @@ impl Contribution for RecentsContribution {
 
         // View Title Context
 
-        let recents_context = static_format!("view == '{recents_view_id}'");
+        let recents_rule = rule!(view == val!(recents_view_id));
 
         #[rustfmt::skip]
         let (
@@ -106,7 +108,7 @@ impl Contribution for RecentsContribution {
                     },
                     group: Some(Rc::clone(&view_title_context_menu_group_this)),
                     order: Some(1),
-                    when: Some(recents_context.into()),
+                    when: Some(recents_rule.clone()),
                     visibility: MenuItemVisibility::Classic,
                 }),
             ),
@@ -123,16 +125,15 @@ impl Contribution for RecentsContribution {
                     },
                     group: Some(Rc::clone(&view_title_context_menu_group_views)),
                     order: Some(1),
-                    when: Some(recents_context.into()),
+                    when: Some(recents_rule),
                     visibility: MenuItemVisibility::Classic,
                 }),
             ),
         ]);
 
-        let recents_item_context =
-            static_format!("view == '{recents_view_id}' && viewItem == 'recents.item'");
-
         // View Item
+
+        let recents_item_rule = rule!(view == val!(recents_view_id) && viewItem == "recents.item");
 
         menus_registry_lock.append_menu_items(vec![
             (
@@ -148,7 +149,7 @@ impl Contribution for RecentsContribution {
                     },
                     group: Some(Rc::clone(&view_title_context_menu_group_inline)),
                     order: Some(1),
-                    when: Some(recents_item_context.into()),
+                    when: Some(recents_item_rule.clone()),
                     visibility: MenuItemVisibility::Classic,
                 }),
             ),
@@ -165,7 +166,7 @@ impl Contribution for RecentsContribution {
                     },
                     group: Some(Rc::clone(&view_title_context_menu_group_inline)),
                     order: Some(2),
-                    when: Some(recents_item_context.into()),
+                    when: Some(recents_item_rule.clone()),
                     visibility: MenuItemVisibility::Classic,
                 }),
             ),
@@ -188,7 +189,7 @@ impl Contribution for RecentsContribution {
                     },
                     group: None,
                     order: Some(1),
-                    when: Some(recents_item_context.into()),
+                    when: Some(recents_item_rule.clone()),
                     visibility: MenuItemVisibility::Classic,
                 }),
             ),
@@ -205,7 +206,7 @@ impl Contribution for RecentsContribution {
                     },
                     group: None,
                     order: None,
-                    when: Some(recents_item_context.into()),
+                    when: Some(recents_item_rule.clone()),
                     visibility: MenuItemVisibility::Classic,
                 }),
             ),
@@ -238,7 +239,7 @@ impl Contribution for RecentsContribution {
                     },
                     group: Some(Rc::clone(&view_item_context_menu_group_navigation)),
                     order: Some(1),
-                    when: Some(recents_item_context.into()),
+                    when: Some(recents_item_rule.clone()),
                     visibility: MenuItemVisibility::Classic,
                 }),
             ),
@@ -255,7 +256,7 @@ impl Contribution for RecentsContribution {
                     },
                     group: Some(Rc::clone(&view_item_context_menu_group_navigation)),
                     order: Some(2),
-                    when: Some(recents_item_context.into()),
+                    when: Some(recents_item_rule.clone()),
                     visibility: MenuItemVisibility::Classic,
                 }),
             ),
@@ -269,7 +270,7 @@ impl Contribution for RecentsContribution {
                 title: Some(localize!("recents.openWithProfile", "Open with Profile")),
                 group: Some(Rc::clone(&view_item_context_menu_group_navigation)),
                 order: Some(3),
-                when: Some(recents_item_context.into()),
+                when: Some(recents_item_rule.clone()),
                 visibility: MenuItemVisibility::Classic,
             }),
         )]);
@@ -288,7 +289,7 @@ impl Contribution for RecentsContribution {
                     },
                     group: Some(Rc::clone(&view_item_context_menu_group_preview)),
                     order: Some(1),
-                    when: Some(recents_item_context.into()),
+                    when: Some(recents_item_rule.clone()),
                     visibility: MenuItemVisibility::Classic,
                 }),
             ),
@@ -305,7 +306,7 @@ impl Contribution for RecentsContribution {
                     },
                     group: Some(Rc::clone(&view_item_context_menu_group_remove)),
                     order: Some(1),
-                    when: Some(recents_item_context.into()),
+                    when: Some(recents_item_rule.clone()),
                     visibility: MenuItemVisibility::Classic,
                 }),
             ),

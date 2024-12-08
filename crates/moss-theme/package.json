@@ -1,0 +1,15 @@
+{
+  "name": "moss-theme",
+  "version": "0.1.0",
+  "type": "module",
+  "peerDependencies": {
+    "@typespec/compiler": "latest"
+  },
+  "devDependencies": {
+    "@typespec/compiler": "latest"
+  },
+  "private": true,
+  "dependencies": {
+    "@typespec/json-schema": "^0.62.0"
+  }
+}

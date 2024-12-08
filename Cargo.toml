@@ -1,16 +1,22 @@
+# Uncomment for future compilation profiling
+# cargo-features = ["profile-rustflags"]
+
 [workspace]
-resolver = "2"
+resolver = "1"
 members = [
     "view/desktop/bin",
 
-    "crates/moss-base",
-    "crates/moss-str",
+    "crates/moss-text",
     "crates/moss-fs",
     "crates/moss-jsonlogic",
     "crates/moss-jsonlogic-macro",
     "crates/moss-uikit",
     "crates/moss-html",
     "crates/moss-themeconv",
+    "crates/moss-env",
+    "crates/moss-async",
+    "crates/moss-collection",
+    "crates/moss-theme",
 
     "internal/platform/core",
     "internal/platform/fs",
@@ -33,6 +39,11 @@ members = [
     "crates/moss-typebridge-macro",
 ]
 
+[profile.dev]
+# Uncomment for future compilation profiling
+# rustflags = ["-Zself-profile=profiles/clean"]
+# rustflags = ["-Ztime-passes"]
+
 [profile.release]
 codegen-units = 1 # Compile crates one after another so the compiler can optimize better
 lto = true        # Enables link to optimizations
@@ -48,14 +59,19 @@ opt-level = 3
 [workspace.dependencies]
 moss_uikit = { path = "crates/moss-uikit" }
 moss_html = { path = "crates/moss-html" }
-moss_base = { path = "crates/moss-base" }
-moss_str = { path = "crates/moss-str" }
+moss_text = { path = "crates/moss-text" }
 moss_fs = { path = "crates/moss-fs" }
 moss_themeconv = { path = "crates/moss-themeconv" }
 moss_jsonlogic = { path = "crates/moss-jsonlogic" }
 moss_jsonlogic_macro = { path = "crates/moss-jsonlogic-macro" }
+
 moss_typebridge = { path = "crates/moss-typebridge" }
 moss_typebridge_macro = { path = "crates/moss-typebridge-macro"}
+
+moss_env = { path = "crates/moss-env" }
+moss_async = { path = "crates/moss-async" }
+moss_collection = { path = "crates/moss-collection" }
+
 
 platform_core = { path = "internal/platform/core" }
 platform_utl = { path = "internal/platform/utl" }
@@ -74,12 +90,18 @@ workbench_service_configuration_tao = { path = "internal/workbench/service/confi
 workbench_service_user_profile_tao = { path = "internal/workbench/service/user_profile/tao" }
 workbench_service_environment_tao = { path = "internal/workbench/service/environment/tao" }
 
-indexmap = "2.6.0"
+indexmap = "2.7.0"
 arcstr = "1.2.0"
-bstr = "1.10.0"
-ts-rs = "10.0"
-thiserror = "1.0"
-tauri = { version = "2.0.6", features = ["devtools"] }
+bstr = "1.11.0"
+ts-rs = "10.1"
+thiserror = "2.0"
+# Disabled default: compression, common-controls-v6
+tauri = { version = "2.0.6", default-features = false, features = [
+    "wry",
+    "objc-exception",
+    "devtools",
+    "macos-private-api",
+] }
 libc = "0.2.155"
 fnv = "1.0.7"
 anyhow = "1.0"
@@ -93,7 +115,6 @@ strum = "0.26"
 strum_macros = "0.26"
 lazy-regex = "3.3.0"
 dunce = "1.0.5"
-sysinfo = "0.31.2"
 tokio = "1"
 smol = "2.0.0"
 futures = "0.3"
@@ -109,7 +130,7 @@ tracing = "0.1"
 tracing-subscriber = "0.3.18"
 tracing-appender = "0.2.3"
 slotmap = "1.0.7"
-rustc-hash = "2.0.0"
+rustc-hash = "2.1.0"
 parking = "2.2.1"
 waker-fn = "1.2.0"
 im = "15.1.0"
@@ -124,6 +145,8 @@ rand = "0.8.5"
 log = "0.4.21"
 quote = "1.0"
 static_str_ops = "0.1.2"
-homedir = "0.3.4"
+dirs = "5.0.1"
 csscolorparser = "0.7.0"
-jsonschema = "0.26.1"
+jsonschema = { version = "0.26.1", default-features = false }
+
+tauri-plugin-os = "2.0.1"

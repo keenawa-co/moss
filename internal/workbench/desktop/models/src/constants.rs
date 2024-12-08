@@ -1,4 +1,4 @@
-use moss_str::{read_only_str, ReadOnlyStr};
+use moss_text::{read_only_str, ReadOnlyStr};
 
 #[rustfmt::skip]
 pub mod menu {

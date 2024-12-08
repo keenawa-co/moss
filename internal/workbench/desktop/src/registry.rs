@@ -1,12 +1,13 @@
+use anyhow::Result;
 use desktop_models::{
     actions::MenuItem,
     view::{GroupId, TreeViewDescriptor, TreeViewGroup, TreeViewGroupLocation},
 };
 use hashbrown::HashMap;
-use moss_str::ReadOnlyStr;
+use moss_text::ReadOnlyStr;
 use parking_lot::RwLock;
-use std::fmt::Debug;
 use std::sync::Arc;
+use std::{any::TypeId, fmt::Debug};
 
 pub struct MenuRegistry {
     menus: HashMap<ReadOnlyStr, Vec<MenuItem>>,
@@ -100,16 +101,121 @@ impl ViewsRegistry {
     }
 }
 
+use std::marker::PhantomData;
+use std::ptr::NonNull;
+use std::rc::Rc;
+
+/// Marker structure for type erasure.
+struct Abstract(());
+
+struct Command {
+    func_ptr: NonNull<Abstract>,
+    invoke_fn: unsafe fn(
+        NonNull<Abstract>, // func_ptr
+        *mut (),           // args_ptr
+        *mut (),           // result_ptr
+    ),
+    drop_fn: unsafe fn(NonNull<Abstract>),
+    _not_send_sync: PhantomData<Rc<()>>,
+}
+
+impl Drop for Command {
+    fn drop(&mut self) {
+        unsafe {
+            (self.drop_fn)(self.func_ptr);
+        }
+    }
+}
+
+pub struct CommandRegistry {
+    commands: HashMap<ReadOnlyStr, Command>,
+}
+
+impl CommandRegistry {
+    fn new() -> Self {
+        CommandRegistry {
+            commands: HashMap::new(),
+        }
+    }
+
+    /// Registers a new command with a unique identifier.
+    pub fn register<F, Args, Ret>(&mut self, id: ReadOnlyStr, func: F)
+    where
+        F: Fn(Args) -> Ret + 'static,
+        Args: 'static,
+        Ret: 'static,
+    {
+        let boxed_func = Box::new(func); // wrap in a `Box` and obtain a raw pointer
+        let func_ptr =
+            unsafe { NonNull::new_unchecked(Box::into_raw(boxed_func) as *mut Abstract) };
+
+        unsafe fn invoke_fn<F, Args, Ret>(
+            func_ptr: NonNull<Abstract>,
+            args_ptr: *mut (),
+            result_ptr: *mut (),
+        ) where
+            F: Fn(Args) -> Ret,
+            Args: 'static,
+            Ret: 'static,
+        {
+            let func = &*(func_ptr.as_ptr() as *const F);
+            let args_box = Box::from_raw(args_ptr as *mut Args); // restore arguments and free memory
+            let args = *args_box;
+            let result = func(args);
+            std::ptr::write(result_ptr as *mut Ret, result);
+        }
+
+        unsafe fn drop_fn<F>(func_ptr: NonNull<Abstract>) {
+            let _ = Box::from_raw(func_ptr.as_ptr() as *mut F);
+        }
+
+        let command = Command {
+            func_ptr,
+            invoke_fn: invoke_fn::<F, Args, Ret>,
+            drop_fn: drop_fn::<F>,
+            _not_send_sync: PhantomData,
+        };
+
+        self.commands.insert(id, command);
+    }
+
+    /// Invokes a registered command with the given identifier and arguments.
+    pub fn invoke<Args, Ret>(&self, id: &ReadOnlyStr, args: Args) -> Result<Ret, &'static str>
+    where
+        Args: 'static,
+        Ret: 'static,
+    {
+        let command = self.commands.get(id).ok_or("Command not found")?;
+        let boxed_args = Box::new(args);
+        let args_ptr = Box::into_raw(boxed_args) as *mut ();
+        let mut result = std::mem::MaybeUninit::<Ret>::uninit();
+
+        unsafe {
+            (command.invoke_fn)(command.func_ptr, args_ptr, result.as_mut_ptr() as *mut ());
+        }
+
+        let result = unsafe { result.assume_init() };
+
+        Ok(result)
+    }
+}
+
 pub struct RegistryManager {
     pub views: Arc<RwLock<ViewsRegistry>>,
     pub menus: Arc<RwLock<MenuRegistry>>,
+    pub commands: Arc<RwLock<CommandRegistry>>,
 }
 
 impl RegistryManager {
     pub fn new() -> Self {
         let views = Arc::new(RwLock::new(ViewsRegistry::new()));
         let menus = Arc::new(RwLock::new(MenuRegistry::new()));
+        let commands = Arc::new(RwLock::new(CommandRegistry::new()));
 
-        Self { views, menus }
+        Self {
+            views,
+            menus,
+            commands,
+        }
     }
 }

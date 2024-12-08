@@ -12,7 +12,6 @@ endif
 # App Directories
 DESKTOP_DIR := view/desktop
 STORYBOOK_DIR := view/storybook
-DOCS_DIR := view/docs
 WEB_DIR := view/web
 THEME_GENERATOR_DIR := tools/themegen
 THEME_INSTALLER_DIR := misc/themeinstall
@@ -21,6 +20,8 @@ ICONS_DIR := tools/icongen
 DESKTOP_MODELS_DIR := internal/workbench/desktop/models
 HTML_MODELS_DIR := crates/moss-html
 UIKIT_MODELS_DIR := crates/moss-uikit
+
+THEME_SCHEMA_DIR :=  crates/moss-theme
 
 XTASK_DIR := tools/xtask
 
@@ -32,6 +33,7 @@ PNPM := pnpm
 SURREAL := surreal
 CARGO := cargo
 RUSTUP := rustup
+TSP := tsp
 
 # Database settings
 DATABASE_FILE := file:rocksdb
@@ -58,11 +60,6 @@ run-desktop-web:
 .PHONY: run-storybook
 run-storybook:
 	@cd $(STORYBOOK_DIR) && $(PNPM) dev
-
-## Run Documentation
-.PHONY: run-docs
-run-docs:
-	@cd $(DOCS_DIR) && $(PNPM) dev
 
 ## Run Web Application
 .PHONY: run-web
@@ -108,14 +105,26 @@ endif
 gen-themes:
 	@cd $(THEME_GENERATOR_DIR) && $(PNPM) start
 
-## Convert Theme JSONs to css
+
+## Convert Theme JSONs to CSS
 .PHONY: install-themes
 install-themes:
-	$(CARGO) run --bin themeinstall -- --input ${THEME_DIR}\moss-dark.json --output $(THEME_DIR)
-	$(CARGO) run --bin themeinstall -- --input ${THEME_DIR}\moss-light.json --output $(THEME_DIR)
-	$(CARGO) run --bin themeinstall -- --input ${THEME_DIR}\moss-pink.json --output $(THEME_DIR)
+	@if [ ! -f $(THEME_INSTALLER_DIR)/target/debug/themeinstall ]; then \
+		echo "Building themeinstall binary..."; \
+		cd $(THEME_INSTALLER_DIR) && cargo build --bin themeinstall --target-dir ./target; \
+	fi
 
+	@for theme in moss-dark moss-light moss-pink; do \
+		$(THEME_INSTALLER_DIR)/target/debug/themeinstall \
+			 --schema ./@typespec/json-schema/Theme.json \
+			 --input $(THEME_DIR)/$$theme.json \
+			 --output $(THEME_DIR); \
+	done
 
+## Compile Theme JSON Schema
+.PHONY: compile-themes-schema
+compile-themes-schema:
+	@cd $(THEME_SCHEMA_DIR) && $(TSP) compile . --option "@typespec/json-schema.file-type=json"
 
 ## Generate Icons
 .PHONY: gen-icons
@@ -142,7 +151,13 @@ gen-desktop-models:
 
 ## Generate All Models
 .PHONY: gen-models
-gen-models: gen-html-models gen-uikit-models gen-desktop-models
+gen-models: \
+	gen-html-models \
+	gen-uikit-models \
+	gen-desktop-models \
+
+.PHONY: compile-schemas
+compile-schemas: compile-themes-schema
 
 # Utility Commands
 
@@ -155,8 +170,8 @@ loc:
 .PHONY: cleanup-git
 cleanup-git:
 ifeq ($(DETECTED_OS),Windows)
-	# TODO: make this work on Windows
-	# @for /F "tokens=*" %i in ('git branch --merged ^| findstr /V "master main dev"') do git branch -d %i
+	@echo TODO: make cleanup-git this work on Windows
+# @for /F "tokens=*" %i in ('git branch --merged ^| findstr /V "master main dev"') do git branch -d %i
 else
 	@git branch --merged | grep -Ev "(^\*|master|main|dev)" | xargs git branch -d
 endif
@@ -165,35 +180,51 @@ endif
 # pnpm does not support recursive prune
 .PHONY: clean-pnpm
 clean-pnpm:
+	@echo Cleaning PNPM cache...
+	@echo Cleaning Desktop Directory Cache...
 	@cd $(DESKTOP_DIR) && $(PNPM) prune
+	@echo Cleaning Storybook Directory Cache...
 	@cd $(STORYBOOK_DIR) && $(PNPM) prune
-	@cd $(DOCS_DIR) && $(PNPM) prune
+	@echo Cleaning Web Directory Cache...
 	@cd $(WEB_DIR) && $(PNPM) prune
+	@echo Cleaning Theme Generator Directory Cache...
 	@cd $(THEME_GENERATOR_DIR) && $(PNPM) prune
+	@echo Cleaning Icons Directory Cache...
 	@cd $(ICONS_DIR) && $(PNPM) prune
+	@echo Cleaning Desktop Models Directory Cache...
 	@cd $(DESKTOP_MODELS_DIR) && $(PNPM) prune
-	@cd $(SHARED_MODELS_DIR) && $(PNPM) prune
+	@echo Cleaning PNPM Store Cache...
 	$(PNPM) store prune
+
+# Clean cargo cache
+.PHONY: clean-cargo
+clean-cargo:
+	$(CARGO) clean
 
 # Clean up various artifacts across the project
 .PHONY: clean
-clean: cleanup-git clean-pnpm
+clean: cleanup-git clean-pnpm clean-cargo
 
 # Generate license with xtask
 .PHONY: gen-license
 gen-license:
+	@echo Generating Workspace Licenses...
 	@cd $(XTASK_DIR) && $(CARGO) run license
 
 # Audit workspace dependency
 .PHONY: workspace-audit
 workspace-audit:
+	@echo Checking Non-workspace Dependencies...
 	@cd $(XTASK_DIR) && $(CARGO) run rwa
 
 # Check unused dependency
 .PHONY: check-unused-deps
 check-unused-deps:
+	@echo Installing cargo-udeps...
 	$(CARGO) --quiet install cargo-udeps --locked
+	@echo Installing Nightly Toolchain...
 	$(RUSTUP) --quiet toolchain install nightly
+	@echo Checking Unused Dependencies...
 	$(CARGO) +nightly udeps --quiet
 
 # Runs a series of maintenance tasks to keep the project organized and up-to-date.
@@ -203,3 +234,9 @@ check-unused-deps:
 tidy: gen-license workspace-audit check-unused-deps
 	$(MAKE) clean
 
+# Create a release build
+.PHONY: build
+
+build:
+	# Enable compression feature for reducing binary size
+	$(CARGO) build --bin desktop --features compression

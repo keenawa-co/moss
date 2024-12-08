@@ -7,11 +7,13 @@ edition = "2021"
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
-moss_str.workspace = true
+moss_text.workspace = true
 moss_uikit.workspace = true
+moss_jsonlogic.workspace = true
 
+indexmap = { workspace = true, features = ["serde"] }
 serde = { workspace = true, features = ["derive", "rc"] }
-ts-rs.workspace = true
+ts-rs = { workspace = true, features = ["indexmap-impl", "serde-json-impl"] }
 once_cell.workspace = true
 csscolorparser.workspace = true
 serde_json.workspace = true

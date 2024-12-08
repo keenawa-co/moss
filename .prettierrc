@@ -8,7 +8,16 @@
   "bracketSpacing": true,
   "endOfLine": "lf",
   "plugins": [
-    "prettier-plugin-tailwindcss"
+    "prettier-plugin-tailwindcss",
+    "@ianvs/prettier-plugin-sort-imports",
+    "@typespec/prettier-plugin-typespec"
   ],
-  "tailwindConfig": "./view/shared/config-tailwind/tailwind.config.ts"
+  "tailwindConfig": "packages/config-tailwind/tailwind.config.ts",
+
+  "importOrder": ["^[a-z]", "", "^@/(.*)$", "^@(.*)/(.*)$", "", "^[./]", "", "^.*\\.(css)$"],
+  "importOrderParserPlugins": ["typescript", "jsx", "tsx"],
+  "importOrderSeparation": true,
+  "importOrderSortSpecifiers": true,
+  "quoteProps": "preserve",
+  "overrides": [{ "files": "*.tsp", "options": { "parser": "typespec" } }]
 }

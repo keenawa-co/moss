@@ -2,7 +2,7 @@
   "files": [],
   "references": [
     {
-      "path": "crates/moss-str"
+      "path": "crates/moss-text"
     },
     {
       "path": "crates/moss-html"
@@ -11,25 +11,16 @@
       "path": "crates/moss-uikit"
     },
     {
-      "path": "view/desktop"
+      "path": "packages/moss-ui"
     },
     {
-      "path": "view/docs"
+      "path": "view/desktop"
     },
     {
       "path": "view/web"
     },
     {
       "path": "view/storybook"
-    },
-    {
-      "path": "view/shared/ui"
-    },
-    {
-      "path": "lib/moss_theme"
-    },
-    {
-      "path": "lib/moss_lang"
     },
     {
       "path": "tools/themegen"

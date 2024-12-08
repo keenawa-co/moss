@@ -1,6 +1,7 @@
-use crate::model::*;
-use crate::DEFAULT_DIRECTION;
+use desktop_models::appearance::theming::*;
 use indexmap::IndexMap;
+
+const DEFAULT_DIRECTION: &str = "to right";
 
 pub(crate) fn convert_colors_to_css_variables(
     category: &str,

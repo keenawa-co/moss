@@ -1,8 +1,8 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { invoke } from "@tauri-apps/api/core";
 
-const changeTheme = async (newString: string): Promise<void> => {
-  await invoke("set_stored_string", { newString });
+const changeTheme = async (_newString: string): Promise<void> => {
+  // FIXME: replace this when we have the Appearance object on the backend.
+  // await invoke("set_stored_string", { newString });
 };
 
 export const useChangeTheme = () => {
