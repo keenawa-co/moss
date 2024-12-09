@@ -36,7 +36,7 @@ members = [
     "tools/xtask",
     "misc/themeinstall",
     "crates/moss-typebridge",
-    "crates/moss-typebridge-macro",
+    "crates/moss-typebridge-macro", "crates/moss-store",
 ]
 
 [profile.dev]
