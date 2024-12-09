@@ -33,8 +33,8 @@ const App = () => {
         <ResizablePanel>
           <Resizable
             vertical
-            onVisibleChange={(_index, value) => {
-              if (_index === 1) setIsTerminalVisible(value);
+            onVisibleChange={(index, value) => {
+              if (index === 1) setIsTerminalVisible(value);
             }}
           >
             <ResizablePanel>
