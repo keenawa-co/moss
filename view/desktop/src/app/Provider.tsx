@@ -1,7 +1,9 @@
+import { Provider as JotaiProvider } from "jotai";
 import React, { ReactNode } from "react";
+
 import { QueryCache, QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-import { Provider as JotaiProvider } from "jotai";
+
 import ThemeProvider from "./ThemeProvider";
 
 const ENABLE_REACT_QUERY_DEVTOOLS = true;
@@ -22,7 +24,7 @@ const queryClient = new QueryClient({
       networkMode: "always",
       refetchOnWindowFocus: true,
       refetchOnReconnect: false,
-      refetchOnMount: false, // Don't refetch when a hook mounts
+      refetchOnMount: false,
     },
   },
 });

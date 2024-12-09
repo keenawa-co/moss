@@ -28,12 +28,19 @@ export const Home: React.FC = () => {
           <Icon icon="Code" />
         </Tooltip>
       </div>
+
       <SessionComponent />
-      <div></div>
 
       <div className="flex">
         <Icon icon="Accessibility" className="text-6xl hover:*:fill-green-500" />
         <Icon icon="NewProject" className="text-red-700 text-6xl hover:fill-green-500" />
+      </div>
+
+      <div className="mt-5">
+        <div>List of 50 elements:</div>
+        {Array.from({ length: 50 }).map((_, i) => (
+          <div key={i}>{i + 1 === 50 ? "last element" : i + 1}</div>
+        ))}
       </div>
     </div>
   );
