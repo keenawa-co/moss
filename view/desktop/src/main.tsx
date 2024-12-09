@@ -11,6 +11,8 @@ import { store } from "./store";
 import "@/assets/index.css";
 import "@repo/moss-ui/src/fonts.css";
 
+import GeneralProvider from "./app/Provider";
+
 const sharedWorker = new SharedWorker("./shared-worker.js");
 
 sharedWorker.port.onmessage = (event) => {
@@ -45,9 +47,11 @@ if (rootElement) {
   createRoot(rootElement).render(
     <StrictMode>
       <Provider store={store}>
-        <Suspense fallback={<PageLoader />}>
-          <App />
-        </Suspense>
+        <GeneralProvider>
+          <Suspense fallback={<PageLoader />}>
+            <App />
+          </Suspense>
+        </GeneralProvider>
       </Provider>
     </StrictMode>
   );

@@ -31,7 +31,14 @@ export default tseslint.config(...tseslint.configs.recommended, {
     "react-hooks/rules-of-hooks": "error",
     "react-hooks/exhaustive-deps": "warn",
     "react-refresh/only-export-components": ["warn", { allowConstantExport: true }],
-    "@typescript-eslint/no-unused-vars": "warn",
+    "@typescript-eslint/no-unused-vars": [
+      "warn",
+      {
+        "argsIgnorePattern": "^_",
+        "varsIgnorePattern": "^_",
+        "caughtErrorsIgnorePattern": "^_",
+      },
+    ],
     "@typescript-eslint/no-explicit-any": "error",
     "prefer-const": "warn",
     "mossLint/tw-no-bg-with-arbitrary-value": "error",

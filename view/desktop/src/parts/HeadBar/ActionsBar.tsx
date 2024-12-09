@@ -1,6 +1,8 @@
+import { useAtom } from "jotai";
 import { HTMLProps, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 
+import { terminalVisibilityAtom } from "@/atoms/layoutAtom";
 import { ActionButton } from "@/components/Action/ActionButton";
 import { ActionsSubmenu } from "@/components/Action/ActionsSubmenu";
 import { ActionsGroup } from "@/components/ActionsGroup";
@@ -13,6 +15,8 @@ import { cn, Icon } from "@repo/moss-ui";
 export const ActionsBar = ({ className, ...props }: HTMLProps<HTMLDivElement>) => {
   const dispatch = useAppDispatch();
   const isSidebarVisible = useSelector((state: RootState) => state.sidebar.sidebarVisible);
+  const [isTerminalVisible, setIsTerminalVisible] = useAtom(terminalVisibilityAtom);
+
   const [activities, setActivities] = useState<MenuItem[]>([]);
 
   useEffect(() => {
@@ -34,16 +38,6 @@ export const ActionsBar = ({ className, ...props }: HTMLProps<HTMLDivElement>) =
   return (
     <div className={cn("flex items-center gap-3", className)} {...props}>
       <div className="flex items-center">
-        {/* <button className="flex items-center gap-px transition-colors">
-          <div className="flex h-full items-center gap-1.5 rounded py-1.5 pl-2.5 pr-2 hover:bg-[#D3D3D3]">
-            <Icon icon="HeadBarBranch" className="size-[18px] text-[#525252]" />
-            <div className="flex items-center gap-0.5">
-              <span className="leading-4 text-[#161616]">main</span>
-              <span className="rounded bg-[#C6C6C6] px-1 text-xs font-semibold text-[#525252]">#50</span>
-            </div>
-          </div>
-        </button> */}
-
         <ActionsSubmenu
           visibility="classic"
           defaultActionId={"qwe"}
@@ -80,6 +74,20 @@ export const ActionsBar = ({ className, ...props }: HTMLProps<HTMLDivElement>) =
                 />
               );
             }
+
+            if (index === 1) {
+              return (
+                <ActionButton
+                  key={command.id}
+                  iconClassName="size-[18px]"
+                  {...command}
+                  icon={isTerminalVisible ? "HeadBarPanelActive" : "HeadBarPanel"}
+                  onClick={() => setIsTerminalVisible(!isTerminalVisible)}
+                  visibility={item.action.visibility}
+                />
+              );
+            }
+            // isTerminalVisible, setIsTerminalVisible
             return (
               <ActionButton
                 key={command.id}
@@ -105,9 +113,9 @@ export const ActionsBar = ({ className, ...props }: HTMLProps<HTMLDivElement>) =
       </div>
 
       <div className="flex items-center">
-        <ActionsGroup icon="HeadBarAccount" className="size-[30px] " iconClassName="size-[18px]" />
-        <ActionsGroup icon="HeadBarNotifications" className="size-[30px] " iconClassName="size-[18px]" />
-        <ActionsGroup icon="HeadBarWrench" className="size-[30px] " iconClassName="size-[18px]" />
+        <ActionsGroup icon="HeadBarAccount" className="size-[30px]" iconClassName="size-[18px]" />
+        <ActionsGroup icon="HeadBarNotifications" className="size-[30px]" iconClassName="size-[18px]" />
+        <ActionsGroup icon="HeadBarWrench" className="size-[30px]" iconClassName="size-[18px]" />
       </div>
     </div>
   );
