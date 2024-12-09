@@ -109,22 +109,8 @@ gen-themes:
 ## Convert Theme JSONs to CSS
 .PHONY: install-themes
 install-themes:
-	@if [ ! -f $(THEME_INSTALLER_DIR)/target/debug/themeinstall ]; then \
-		echo "Building themeinstall binary..."; \
-		cd $(THEME_INSTALLER_DIR) && cargo build --bin themeinstall --target-dir ./target; \
-	fi
-
-	@for theme in moss-dark moss-light moss-pink; do \
-		$(THEME_INSTALLER_DIR)/target/debug/themeinstall \
-			 --schema ./@typespec/json-schema/Theme.json \
-			 --input $(THEME_DIR)/$$theme.json \
-			 --output $(THEME_DIR); \
-	done
-
-
+ifeq ($(DETECTED_OS),Windows)
 ## Windows does not support for loop in makefile, unfortunately
-.PHONY: install-themes-windows
-install-themes-windows:
 	$(CARGO) run --bin themeinstall -- \
 		 --schema ./@typespec/json-schema/Theme.json \
 		 --input $(THEME_DIR)/moss-dark.json \
@@ -139,6 +125,20 @@ install-themes-windows:
 		 --schema ./@typespec/json-schema/Theme.json \
 		 --input $(THEME_DIR)/moss-pink.json \
 		 --output $(THEME_DIR) \
+
+else
+	@if [ ! -f $(THEME_INSTALLER_DIR)/target/debug/themeinstall ]; then \
+		echo "Building themeinstall binary..."; \
+		cd $(THEME_INSTALLER_DIR) && cargo build --bin themeinstall --target-dir ./target; \
+	fi
+
+	@for theme in moss-dark moss-light moss-pink; do \
+		$(THEME_INSTALLER_DIR)/target/debug/themeinstall \
+			 --schema ./@typespec/json-schema/Theme.json \
+			 --input $(THEME_DIR)/$$theme.json \
+			 --output $(THEME_DIR); \
+	done
+endif
 
 
 ## Compile Theme JSON Schema
