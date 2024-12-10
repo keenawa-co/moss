@@ -10,30 +10,27 @@ import { Resizable, ResizablePanel } from "../Resizable";
 import { ContentLayout } from "./ContentLayout";
 
 export const AppLayout = () => {
-  const primarySideBar = useLayoutStore((state) => state.primarySideBar);
-  const bottomPane = useLayoutStore((state) => state.bottomPane);
+  const primarySideBarVisibility = useLayoutStore((state) => state.primarySideBar.visibility);
+  const setPrimarySideBarWidth = useLayoutStore((state) => state.primarySideBar.setWidth);
+
+  const bottomPaneVisibility = useLayoutStore((state) => state.bottomPane.visibility);
+  const setBottomPaneHeight = useLayoutStore((state) => state.bottomPane.setHeight);
 
   return (
     <Resizable
       proportionalLayout={false}
       onDragEnd={(sizes) => {
-        primarySideBar.setWidth(sizes[0]);
+        setPrimarySideBarWidth(sizes[0]);
       }}
     >
-      <ResizablePanel
-        minSize={100}
-        preferredSize={255}
-        snap
-        visible={primarySideBar.visibility}
-        className="select-none"
-      >
+      <ResizablePanel minSize={100} preferredSize={255} snap visible={primarySideBarVisibility} className="select-none">
         <LaunchPad />
       </ResizablePanel>
       <ResizablePanel>
         <Resizable
           vertical
           onDragEnd={(sizes) => {
-            bottomPane.setHeight(sizes[1]);
+            setBottomPaneHeight(sizes[1]);
           }}
         >
           <ResizablePanel>
@@ -50,7 +47,7 @@ export const AppLayout = () => {
               </Suspense>
             </ContentLayout>
           </ResizablePanel>
-          <ResizablePanel preferredSize={144} snap minSize={100} maxSize={500} visible={bottomPane.visibility}>
+          <ResizablePanel preferredSize={144} snap minSize={100} maxSize={500} visible={bottomPaneVisibility}>
             <div className="h-full overflow-auto">
               <div>
                 <div>List of 50 elements:</div>
