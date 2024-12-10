@@ -109,6 +109,24 @@ gen-themes:
 ## Convert Theme JSONs to CSS
 .PHONY: install-themes
 install-themes:
+ifeq ($(DETECTED_OS),Windows)
+## Windows does not support for loop in makefile, unfortunately
+	$(CARGO) run --bin themeinstall -- \
+		 --schema ./@typespec/json-schema/Theme.json \
+		 --input $(THEME_DIR)/moss-dark.json \
+		 --output $(THEME_DIR) \
+
+	$(CARGO) run --bin themeinstall -- \
+		 --schema ./@typespec/json-schema/Theme.json \
+		 --input $(THEME_DIR)/moss-light.json \
+		 --output $(THEME_DIR) \
+
+	$(CARGO) run --bin themeinstall -- \
+		 --schema ./@typespec/json-schema/Theme.json \
+		 --input $(THEME_DIR)/moss-pink.json \
+		 --output $(THEME_DIR) \
+
+else
 	@if [ ! -f $(THEME_INSTALLER_DIR)/target/debug/themeinstall ]; then \
 		echo "Building themeinstall binary..."; \
 		cd $(THEME_INSTALLER_DIR) && cargo build --bin themeinstall --target-dir ./target; \
@@ -120,6 +138,8 @@ install-themes:
 			 --input $(THEME_DIR)/$$theme.json \
 			 --output $(THEME_DIR); \
 	done
+endif
+
 
 ## Compile Theme JSON Schema
 .PHONY: compile-themes-schema
