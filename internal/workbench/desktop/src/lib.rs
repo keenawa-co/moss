@@ -1,3 +1,4 @@
+pub mod context;
 pub mod contribution;
 pub mod parts;
 pub mod registry;

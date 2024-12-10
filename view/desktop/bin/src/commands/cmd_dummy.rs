@@ -59,7 +59,8 @@ pub fn get_locales() -> Vec<Locale> {
 
 #[tauri::command]
 pub fn get_translations(language: String, namespace: String) -> Result<serde_json::Value, String> {
-    let path = crate::utl::get_home_dir()?
+    let path = crate::utl::get_home_dir()
+        .map_err(|err| err.to_string())?
         .join(".config")
         .join("moss")
         .join("locales")

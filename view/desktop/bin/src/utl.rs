@@ -1,7 +1,7 @@
 use std::path::PathBuf;
 use std::sync::Arc;
 
-use anyhow::Result;
+use anyhow::{Context as _, Result};
 use platform_formation::service_registry::ServiceRegistry;
 use platform_fs::disk::file_system_service::DiskFileSystemService;
 use workbench_desktop::window::NativeWindowConfiguration;
@@ -33,10 +33,10 @@ pub fn create_service_registry(
     Ok(service_registry)
 }
 
-pub fn get_home_dir() -> Result<PathBuf, String> {
-    dirs::home_dir().ok_or("Home directory not found!".to_string())
+pub fn get_home_dir() -> Result<PathBuf> {
+    dirs::home_dir().context("Home directory not found!")
 }
 
-pub fn get_themes_dir() -> Result<PathBuf, String> {
+pub fn get_themes_dir() -> Result<PathBuf> {
     Ok(get_home_dir()?.join(".config").join("moss").join("themes"))
 }
