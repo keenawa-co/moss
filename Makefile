@@ -124,6 +124,7 @@ install-themes:
 ## Compile Theme JSON Schema
 .PHONY: compile-themes-schema
 compile-themes-schema:
+	npm install -g @typespec/compiler
 	@cd $(THEME_SCHEMA_DIR) && $(TSP) compile . --option "@typespec/json-schema.file-type=json"
 
 ## Generate Icons

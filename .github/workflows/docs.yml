@@ -1,0 +1,39 @@
+name: Documentation
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  push-JSON-schema:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install PNPM
+        uses: pnpm/action-setup@v4
+      - name: Set Up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: "package.json"
+          cache: "pnpm"
+      - name: Install Dependencies
+        run: pnpm install
+      - name: Compile Theme JSON Schema
+        run: make compile-themes-schema
+      - name: Push directory to another repository
+        uses: cpina/github-action-push-to-another-repository@v1.7.2
+        env:
+          SSH_DEPLOY_KEY: ${{ secrets.SSH_DEPLOY_KEY }}
+        with:
+          # Source directory from the origin directory
+          source-directory: "@typespec/json-schema"
+          # Name of the destination username/organization
+          destination-github-username: "keenawa-co"
+          # Destination repository
+          destination-repository-name: "moss-studio-docs"
+          # Email for the git commit
+          user-email: github-actions[bot]@users.noreply.github.com
+          target-directory: "json-schema"
+          commit-message: "Update Theme JSON Schema"
