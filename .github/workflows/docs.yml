@@ -35,5 +35,5 @@ jobs:
           destination-repository-name: "moss-studio-docs"
           # Email for the git commit
           user-email: github-actions[bot]@users.noreply.github.com
-          target-directory: "json-schema"
+          target-directory: "assets/schemas"
           commit-message: "Update Theme JSON Schema"
