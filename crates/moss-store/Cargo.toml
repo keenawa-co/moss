@@ -3,5 +3,9 @@ name = "moss-store"
 version = "0.1.0"
 edition = "2021"
 
+
+
 [dependencies]
 cached = {version =  "0.54.0", default-features = false }
+rand = "0.9.0-beta.1"
+tracing-mutex = "0.3.0"
