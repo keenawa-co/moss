@@ -39,7 +39,7 @@ export const Home: React.FC = () => {
       <div className="mt-5">
         <div>List of 50 elements:</div>
         {Array.from({ length: 50 }).map((_, i) => (
-          <div key={i}>{i + 1 === 50 ? "last element" : i + 1}</div>
+          <div key={i}>{i + 1 === 50 ? "last element" : `${i + 1}: ${Math.random().toFixed(2)}`}</div>
         ))}
       </div>
     </div>

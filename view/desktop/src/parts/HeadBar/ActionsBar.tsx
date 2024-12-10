@@ -1,23 +1,18 @@
-import { useAtom } from "jotai";
 import { HTMLProps, useEffect, useState } from "react";
-import { useSelector } from "react-redux";
 
-import { terminalVisibilityAtom } from "@/atoms/layoutAtom";
 import { ActionButton } from "@/components/Action/ActionButton";
 import { ActionsSubmenu } from "@/components/Action/ActionsSubmenu";
 import { ActionsGroup } from "@/components/ActionsGroup";
 import { invokeIpc } from "@/lib/backend/tauri";
-import { RootState, useAppDispatch } from "@/store";
-import { toggleSidebarVisibility } from "@/store/sidebar/sidebarSlice";
+import { useLayoutStore } from "@/store/layoutStore";
 import { MenuItem } from "@repo/desktop-models";
-import { cn, Icon } from "@repo/moss-ui";
+import { cn } from "@repo/moss-ui";
 
 export const ActionsBar = ({ className, ...props }: HTMLProps<HTMLDivElement>) => {
-  const dispatch = useAppDispatch();
-  const isSidebarVisible = useSelector((state: RootState) => state.sidebar.sidebarVisible);
-  const [isTerminalVisible, setIsTerminalVisible] = useAtom(terminalVisibilityAtom);
-
   const [activities, setActivities] = useState<MenuItem[]>([]);
+
+  const primarySideBar = useLayoutStore((state) => state.primarySideBar);
+  const bottomPane = useLayoutStore((state) => state.bottomPane);
 
   useEffect(() => {
     const getAllActivities = async () => {
@@ -68,8 +63,8 @@ export const ActionsBar = ({ className, ...props }: HTMLProps<HTMLDivElement>) =
                   key={command.id}
                   iconClassName="size-[18px]"
                   {...command}
-                  icon={isSidebarVisible ? "HeadBarPrimarySideBarActive" : "HeadBarPrimarySideBar"}
-                  onClick={() => dispatch(toggleSidebarVisibility({}))}
+                  icon={primarySideBar.visibility ? "HeadBarPrimarySideBarActive" : "HeadBarPrimarySideBar"}
+                  onClick={() => primarySideBar.setVisibility(!primarySideBar.visibility)}
                   visibility={item.action.visibility}
                 />
               );
@@ -81,8 +76,8 @@ export const ActionsBar = ({ className, ...props }: HTMLProps<HTMLDivElement>) =
                   key={command.id}
                   iconClassName="size-[18px]"
                   {...command}
-                  icon={isTerminalVisible ? "HeadBarPanelActive" : "HeadBarPanel"}
-                  onClick={() => setIsTerminalVisible(!isTerminalVisible)}
+                  icon={bottomPane.visibility ? "HeadBarPanelActive" : "HeadBarPanel"}
+                  onClick={() => bottomPane.setVisibility(!bottomPane.visibility)}
                   visibility={item.action.visibility}
                 />
               );
