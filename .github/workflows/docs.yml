@@ -3,8 +3,12 @@ name: Documentation
 on:
   push:
     branches: ["main"]
+    paths:
+      - "@typespec/**"
   pull_request:
     branches: ["main"]
+    paths:
+      - "@typespec/**"
 
 jobs:
   push-JSON-schema:
