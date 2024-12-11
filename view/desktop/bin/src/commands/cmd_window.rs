@@ -43,9 +43,6 @@ pub fn execute_command(
     command_id: ReadOnlyStr,
     args: HashMap<String, Value>,
 ) -> Result<Value, String> {
-    dbg!(&command_id);
-    dbg!(&args);
-
     if let Some(command_handler) = app_state.get_command(&command_id) {
         command_handler(CommandContext::new(app_handle, window, args), &app_state)
     } else {
@@ -56,6 +53,7 @@ pub fn execute_command(
     }
 }
 
+// FIXME: Temporary placement of this function here. It will be moved later.
 pub fn set_color_theme(ctx: CommandContext, app_state: &AppState) -> Result<Value, String> {
     let theme_descriptor_arg = ctx.get_arg::<ThemeDescriptor>("themeDescriptor")?;
 
