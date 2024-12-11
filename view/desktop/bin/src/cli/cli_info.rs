@@ -1,12 +1,13 @@
-use tauri::{webview_version, AppHandle};
+use crate::cli;
+use crate::cli::{ShellClient, SystemShellClient, APP_CONFIG};
+use std::sync::LazyLock;
+use tauri::webview_version;
+use tauri_plugin_os::{family, version};
 
-use crate::cli::{ShellClient, TauriShellClient};
-use crate::AppState;
-
-pub async fn info_handler(app_state: &AppState, app_handle: &AppHandle) {
-    let shell_client = TauriShellClient { app_handle };
+pub async fn info_handler() {
+    let shell_client = SystemShellClient {};
     println!("Environment");
-    println!("\t- OS: {}", get_os_info(app_state).await);
+    println!("\t- OS: {}", get_os_info().await);
     println!("\t- Webview: {}", get_webview_version().await);
     println!("\t- rustc: {}", get_rustc_version(&shell_client).await);
     println!("\t- cargo: {}", get_cargo_version(&shell_client).await);
@@ -23,7 +24,7 @@ pub async fn info_handler(app_state: &AppState, app_handle: &AppHandle) {
     println!("\t- tauri [Rust]: {}", get_tauri_version().await);
 
     println!("App");
-    println!("\t- Moss: {}", get_moss_version(app_handle).await);
+    println!("\t- Moss: {}", get_moss_version().await);
 }
 async fn component_version(shell_client: &impl ShellClient, component: &str, arg: &str) -> String {
     let shell_output = shell_client.exec(component, vec![arg]).await;
@@ -34,10 +35,15 @@ async fn component_version(shell_client: &impl ShellClient, component: &str, arg
     }
 }
 
-async fn get_os_info(app_state: &AppState) -> String {
+async fn get_os_info() -> String {
     format!(
         "{} {}",
-        app_state.platform_info.os, app_state.platform_info.version
+        if family().is_empty() {
+            "unknown"
+        } else {
+            family()
+        },
+        version()
     )
 }
 
@@ -80,6 +86,9 @@ async fn get_tauri_version() -> String {
     tauri::VERSION.to_string()
 }
 
-async fn get_moss_version(app_handle: &AppHandle) -> String {
-    app_handle.config().clone().version.unwrap()
+async fn get_moss_version() -> String {
+    LazyLock::force(&APP_CONFIG)
+        .version
+        .clone()
+        .unwrap_or("Unknown".to_string())
 }

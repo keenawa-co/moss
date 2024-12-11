@@ -1,6 +1,6 @@
-// Prevents additional console window on Windows in release, DO NOT REMOVE!!
-#![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
-
+use clap::Parser;
+use desktop_app_lib::cli;
+use desktop_app_lib::cli::MossArgs;
 use desktop_app_lib::constants::{RUNTIME_MAX_BLOCKING_THREADS, RUNTIME_STACK_SIZE};
 
 fn main() {
@@ -11,7 +11,19 @@ fn main() {
         .build()
         .unwrap()
         .block_on(async {
-            tauri::async_runtime::set(tokio::runtime::Handle::current());
-            desktop_app_lib::run();
+            if std::env::args().len() > 1 {
+                cli::cli_handler().await;
+            } else {
+                // TODO: Find an elegant alternative to prevent console window for GUI
+                #[cfg(all(target_os = "windows", not(debug_assertions)))]
+                {
+                    unsafe {
+                        // Detaching console on Windows for release build
+                        winapi::um::wincon::FreeConsole();
+                    }
+                }
+                tauri::async_runtime::set(tokio::runtime::Handle::current());
+                desktop_app_lib::run();
+            }
         })
 }
