@@ -11,7 +11,13 @@ interface DNDItemWrapperProps extends Omit<ComponentPropsWithoutRef<"div">, "id"
   draggingClassName?: string;
 }
 
-export const TestDNDWrapper = ({ id, idleClassName, draggingClassName, children, ...props }: DNDItemWrapperProps) => {
+export const SortableDNDWrapper = ({
+  id,
+  idleClassName,
+  draggingClassName,
+  children,
+  ...props
+}: DNDItemWrapperProps) => {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id,
   });

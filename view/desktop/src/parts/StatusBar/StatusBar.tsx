@@ -15,7 +15,7 @@ import {
 import { arrayMove, horizontalListSortingStrategy, SortableContext } from "@dnd-kit/sortable";
 import { cn, Icon, Icons } from "@repo/moss-ui";
 
-import { TestDNDWrapper } from "./TestDNDWrapper";
+import { SortableDNDWrapper } from "./SortableDNDWrapper";
 
 interface Item {
   id: UniqueIdentifier;
@@ -93,13 +93,13 @@ const StatusBar = ({ className }: ComponentPropsWithoutRef<"div">) => {
             <SortableContext items={DNDList} strategy={horizontalListSortingStrategy}>
               {DNDList.map((item) => {
                 return (
-                  <TestDNDWrapper
+                  <SortableDNDWrapper
                     key={item.id}
                     id={item.id}
                     draggingClassName="z-50 cursor-grabbing opacity-50 shadow-2xl"
                   >
                     <StatusBarButton key={item.id} icon={item.icon} label={item.label} />
-                  </TestDNDWrapper>
+                  </SortableDNDWrapper>
                 );
               })}
             </SortableContext>
