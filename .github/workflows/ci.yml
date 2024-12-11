@@ -23,6 +23,7 @@ jobs:
             command: cargo -q test --doc
           - name: Workspace Audit
             command: |
+              set -e
               cd ${GITHUB_WORKSPACE}/tools/xtask
               cargo -q run -- --fail-fast rwa
     timeout-minutes: 15
