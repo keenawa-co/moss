@@ -1,11 +1,11 @@
 github_actions:
   - changed-files:
-      - any-glob-to-any-file: '.github/*'
+      - any-glob-to-any-file: '.github/**'
 
 
 jsonschema:
   - changed-files:
-      - any-glob-to-any-file: '@typespec/*'
+      - any-glob-to-any-file: '@typespec/**'
 
 makefile:
   - changed-files:
