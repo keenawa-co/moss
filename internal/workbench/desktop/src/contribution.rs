@@ -101,14 +101,6 @@ impl Contribution for WorkbenchContribution {
     fn contribute(registry: &mut crate::RegistryManager) -> anyhow::Result<()> {
         let mut views_registry_lock = registry.views.write();
 
-        // FIXME: we will move this contributions to a more suitable place in the future
-        let mut commands_registry_lock = registry.commands.write();
-
-        commands_registry_lock.register(
-            ReadOnlyStr::from("workbench.command.changeTheme"),
-            handle_change_theme_command,
-        );
-
         views_registry_lock.append_view_group(
             TreeViewGroupLocation::PrimaryBar,
             TreeViewGroup {
@@ -120,8 +112,4 @@ impl Contribution for WorkbenchContribution {
 
         Ok(())
     }
-}
-
-fn handle_change_theme_command(_app_handle: AppHandle) {
-    // TODO: send event to all windows
 }

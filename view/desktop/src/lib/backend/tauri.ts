@@ -3,8 +3,9 @@ import { listen as listenTauri } from "@tauri-apps/api/event";
 import type { EventCallback, EventName } from "@tauri-apps/api/event";
 
 export type TauriIpcCommand =
+  | "execute_command"
   | "get_translations"
-  | "read_theme_file"
+  | "get_color_theme"
   | "main_window_is_ready"
   | "create_new_window"
   | "sidebar_get_all_activities"

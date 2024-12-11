@@ -1,14 +1,8 @@
 use desktop_models::actions::MenuItem;
 use tauri::State;
 use workbench_desktop::contributions::resents::{RecentsViewContent, RecentsViewModel};
-use workbench_desktop::window::NativePlatformInfo;
 
 use crate::AppState;
-
-#[tauri::command]
-pub fn native_platform_info(state: State<'_, AppState>) -> NativePlatformInfo {
-    state.platform_info.clone()
-}
 
 #[tauri::command]
 pub fn get_view_content(state: State<'_, AppState>) -> Result<RecentsViewContent, String> {
@@ -32,5 +26,3 @@ pub fn get_menu_items_by_namespace(
 ) -> Option<Vec<MenuItem>> {
     state.workbench.get_menu_items_by_namespace(namespace)
 }
-
-// get_menu_items_by_many_namespaces
