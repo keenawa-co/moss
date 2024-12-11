@@ -1,4 +1,3 @@
-pub mod context;
 pub mod contribution;
 pub mod parts;
 pub mod registry;
@@ -126,37 +125,6 @@ impl Workbench {
 
             font_service_atom
         })?;
-
-        let reg = RegistryManager::new();
-
-        let mut commands_registry_lock: parking_lot::lock_api::RwLockWriteGuard<
-            '_,
-            parking_lot::RawRwLock,
-            registry::CommandRegistry,
-        > = reg.commands.write();
-
-        // TODO: @brutusyhy remove this in your PR  with themes suncronisation
-        // Example:
-        // let command_1_id = ReadOnlyStr::from("1");
-        // let command_2_id = ReadOnlyStr::from("2");
-        // let command_3_id = ReadOnlyStr::from("3");
-
-        // commands_registry_lock.register(command_1_id.clone(), |x: i32| x * 2);
-        // commands_registry_lock.register(command_2_id.clone(), |s: String| s.len());
-        // commands_registry_lock.register(command_3_id.clone(), |(a, b): (i32, i32)| a + b);
-
-        // let result: i32 = commands_registry_lock.invoke(&command_1_id, 21).unwrap();
-        // println!("Result 1: {}", result);
-
-        // let result: usize = commands_registry_lock
-        //     .invoke(&command_2_id, String::from("Hello"))
-        //     .unwrap();
-        // println!("Result 2: {}", result);
-
-        // let result: i32 = commands_registry_lock
-        //     .invoke(&command_3_id, (10, 32))
-        //     .unwrap();
-        // println!("Result 3: {}", result);
 
         Ok(Self {
             workspace_id,

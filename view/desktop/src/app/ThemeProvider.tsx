@@ -1,9 +1,9 @@
 import { useAtom } from "jotai";
 import React, { useCallback, useEffect } from "react";
 
-import { readThemeFile } from "@/api/appearance";
+import { getColorTheme } from "@/api/appearance";
 import { themeAtom } from "@/atoms/themeAtom";
-import { useFetchThemes } from "@/hooks/useFetchThemes";
+import { useGetColorThemes } from "@/hooks/useGetColorThemes";
 import { IpcResult } from "@/lib/backend/tauri";
 import { ThemeDescriptor } from "@repo/desktop-models";
 import { listen, UnlistenFn } from "@tauri-apps/api/event";
@@ -13,7 +13,7 @@ interface ThemeProviderProps {
 }
 
 const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
-  const { data: themes, isLoading: themesLoading, error: themesError } = useFetchThemes();
+  const { data: themes, isLoading: themesLoading, error: themesError } = useGetColorThemes();
   const [currentTheme, setCurrentTheme] = useAtom(themeAtom);
 
   const applyThemeCSS = useCallback(async (theme: ThemeDescriptor | null) => {
@@ -23,7 +23,7 @@ const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
     }
 
     try {
-      const result: IpcResult<string, string> = await readThemeFile(theme.source);
+      const result: IpcResult<string, string> = await getColorTheme(theme.source);
 
       if (result.status === "ok") {
         const cssContent = result.data;

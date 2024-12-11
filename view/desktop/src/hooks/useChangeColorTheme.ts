@@ -3,11 +3,11 @@ import { ThemeDescriptor } from "@repo/desktop-models";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 const changeTheme = async (themeDescriptor: ThemeDescriptor): Promise<void> => {
-  // FIXME: replace this when we have the Appearance object on the backend.
-  // await invoke("handle_signal", { newString });
-
-  await invokeIpc<unknown, string>("set_color_theme", {
-    themeDescriptor: themeDescriptor,
+  await invokeIpc<unknown, string>("execute_command", {
+    commandId: "workbench.changeColorTheme",
+    args: {
+      themeDescriptor: themeDescriptor,
+    },
   });
 };
 

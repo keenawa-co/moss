@@ -2,26 +2,27 @@ mod commands;
 mod mem;
 mod menu;
 mod plugins;
+mod state;
 mod utl;
 mod window;
 
 mod cli;
 pub mod constants;
 
-use anyhow::{anyhow, Result};
+use cmd_window::set_color_theme;
 use commands::*;
+use dashmap::DashMap;
 use desktop_models::appearance::theming::ThemeDescriptor;
+use parking_lot::RwLock;
 use platform_core::context_v2::ContextCell;
 use platform_core::platform::cross::client::CrossPlatformClient;
 use platform_workspace::WorkspaceId;
 use rand::random;
+use state::{AppState, Appearance, CommandHandler};
 use std::env;
 use std::rc::Rc;
 use std::sync::atomic::{AtomicUsize, Ordering};
 use std::sync::Arc;
-use workbench_desktop::context::{handle_change_theme, Context};
-
-use parking_lot::{Mutex, RwLock};
 use tauri::{AppHandle, Manager, RunEvent, WebviewWindow, WindowEvent};
 use tauri_plugin_cli::CliExt;
 use tauri_plugin_global_shortcut::{Code, GlobalShortcutExt, Modifiers, Shortcut, ShortcutState};
@@ -35,26 +36,6 @@ use crate::plugins as moss_plugins;
 
 #[macro_use]
 extern crate serde;
-
-pub struct Appearance {
-    theme_descriptor: RwLock<ThemeDescriptor>,
-}
-
-impl Appearance {
-    pub fn set_theme_descriptor(&self, new_theme_descriptor: ThemeDescriptor) {
-        let mut theme_descriptor_lock = self.theme_descriptor.write();
-        *theme_descriptor_lock = new_theme_descriptor;
-    }
-}
-
-pub struct AppState {
-    pub appearance: Appearance,
-    pub window_counter: AtomicUsize,
-
-    pub workbench: Arc<Workbench>,
-    pub platform_info: NativePlatformInfo,
-    pub react_query_string: Mutex<String>,
-}
 
 pub fn run() {
     #[allow(unused_mut)]
@@ -126,17 +107,16 @@ pub fn run() {
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
-            cmd_dummy::get_locales,
-            cmd_dummy::get_translations,
-            cmd_fs::read_theme_file,
+            cmd_window::get_locales,
+            cmd_window::get_translations,
+            cmd_window::get_themes,
             cmd_window::main_window_is_ready,
             cmd_window::create_new_window,
-            cmd_window::handle_signal,
-            cmd_dummy::fetch_themes,
-            cmd_base::native_platform_info,
+            cmd_window::execute_command,
             cmd_base::get_view_content,
             cmd_base::get_menu_items_by_namespace,
-            cmd_window::set_color_theme,
+            cmd_window::execute_command,
+            cmd_window::get_color_theme,
         ])
         .on_window_event(|window, event| match event {
             #[cfg(target_os = "macos")]
@@ -201,8 +181,15 @@ fn create_main_window(app_handle: &AppHandle, url: &str) -> WebviewWindow {
 
     // ----------------------------------------------------------------------
 
+    let commands = DashMap::new();
+    commands.insert(
+        "workbench.changeColorTheme".into(),
+        Arc::new(set_color_theme) as CommandHandler,
+    );
+
     let window_number = 0;
     let app_state = AppState {
+        commands,
         appearance: Appearance {
             theme_descriptor: RwLock::new(ThemeDescriptor {
                 id: "theme-light".to_string(),
@@ -212,12 +199,10 @@ fn create_main_window(app_handle: &AppHandle, url: &str) -> WebviewWindow {
         },
         workbench: Arc::new(workbench),
         platform_info,
-        window_counter: AtomicUsize::new(window_number),
-        react_query_string: Mutex::new(String::from("Hello, Tauri!")),
+        next_window_id: AtomicUsize::new(window_number),
     };
 
     {
-        app_handle.manage(ctx); // TODO: Get rid of this
         app_handle.manage(app_state);
     }
 
@@ -240,7 +225,7 @@ fn create_main_window(app_handle: &AppHandle, url: &str) -> WebviewWindow {
 fn create_child_window(handle: &AppHandle, url: &str) -> WebviewWindow {
     let window_number = handle
         .state::<AppState>()
-        .window_counter
+        .next_window_id
         .fetch_add(1, Ordering::SeqCst);
 
     let label = format!("{MAIN_WINDOW_PREFIX}{}", window_number + 1);
