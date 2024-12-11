@@ -136,6 +136,7 @@ waker-fn = "1.2.0"
 im = "15.1.0"
 smallvec = "1.13.2"
 dyn-clone = "1.0.17"
+clap = {version = "4.5.23", features = ["derive"]}
 
 hecs = "0.10.5"
 hecs-hierarchy = "0.12.1"

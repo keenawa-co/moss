@@ -1,11 +1,12 @@
 mod commands;
+
 mod mem;
 mod menu;
 mod plugins;
 mod utl;
 mod window;
 
-mod cli;
+pub mod cli;
 pub mod constants;
 
 use commands::*;
@@ -20,7 +21,6 @@ use std::sync::Arc;
 
 use parking_lot::Mutex;
 use tauri::{AppHandle, Manager, RunEvent, WebviewWindow, WindowEvent};
-use tauri_plugin_cli::CliExt;
 use tauri_plugin_global_shortcut::{Code, GlobalShortcutExt, Modifiers, Shortcut, ShortcutState};
 use tauri_plugin_log::{fern::colors::ColoredLevelConfig, Target, TargetKind};
 use window::{create_window, CreateWindowInput};
@@ -43,7 +43,6 @@ pub struct AppState {
 pub fn run() {
     #[allow(unused_mut)]
     let mut builder = tauri::Builder::default()
-        .plugin(tauri_plugin_cli::init())
         .plugin(
             tauri_plugin_log::Builder::default()
                 .targets([
@@ -75,7 +74,6 @@ pub fn run() {
                 })
                 .build(),
         )
-        .plugin(tauri_plugin_shell::init())
         .plugin(tauri_plugin_os::init())
         .plugin(tauri_plugin_fs::init());
 
@@ -163,23 +161,7 @@ pub fn run() {
         .expect("failed to run")
         .run(|app_handle, event| match event {
             RunEvent::Ready => {
-                // Setting up CLI
-                match app_handle.cli().matches() {
-                    Ok(matches) => {
-                        let subcommand = matches.subcommand;
-                        if subcommand.is_none() {
-                            let _ = create_main_window(app_handle, "/");
-
-                            // let _ = create_main_window(app_handle, "/");
-                        } else {
-                            tauri::async_runtime::spawn(crate::cli::cli_handler(
-                                subcommand.unwrap(),
-                                app_handle.clone(),
-                            ));
-                        }
-                    }
-                    Err(_) => {}
-                };
+                let _ = create_main_window(app_handle, "/");
             }
 
             #[cfg(target_os = "macos")]

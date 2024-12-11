@@ -8,7 +8,7 @@ publish = false
 toml = "0.8.19"
 cargo_metadata = "0.19"
 pathdiff = "0.2"
-clap = { version = "4.4", features = ["derive"] }
+clap.workspace = true
 
 anyhow.workspace = true
 tracing.workspace = true

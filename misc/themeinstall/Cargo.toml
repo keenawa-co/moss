@@ -5,5 +5,5 @@ edition = "2021"
 
 [dependencies]
 moss_themeconv.workspace = true
-clap = { version = "4.5.21", features = ["derive"] }
+clap.workspace = true
 serde_json.workspace = true
