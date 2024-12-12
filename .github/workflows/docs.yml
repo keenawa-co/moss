@@ -15,13 +15,9 @@ jobs:
         env:
           SSH_DEPLOY_KEY: ${{ secrets.SSH_DEPLOY_KEY }}
         with:
-          # Source directory from the origin directory
           source-directory: "@typespec/json-schema"
-          # Name of the destination username/organization
           destination-github-username: "keenawa-co"
-          # Destination repository
           destination-repository-name: "moss-studio-docs"
-          # Email for the git commit
           user-email: github-actions[bot]@users.noreply.github.com
           target-directory: "assets/schemas"
           commit-message: "Update Theme JSON Schema"
