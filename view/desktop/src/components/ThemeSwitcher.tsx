@@ -1,12 +1,13 @@
-import React from "react";
 import { useAtom } from "jotai";
+import React from "react";
+
 import { themeAtom } from "../atoms/themeAtom";
-import { useFetchThemes } from "../hooks/useFetchThemes";
-import { useChangeTheme } from "../hooks/useChangeTheme";
+import { useChangeTheme } from "../hooks/useChangeColorTheme";
+import { useGetColorThemes } from "../hooks/useGetColorThemes";
 
 const ThemeSwitcher: React.FC = () => {
   const [currentTheme, setCurrentTheme] = useAtom(themeAtom);
-  const { data: themes, isLoading, error } = useFetchThemes();
+  const { data: themes, isLoading, error } = useGetColorThemes();
   const { mutate: mutateChangeTheme } = useChangeTheme();
 
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -14,7 +15,7 @@ const ThemeSwitcher: React.FC = () => {
     const selectedTheme = themes?.find((theme) => theme.id === selectedThemeId);
 
     if (selectedTheme) {
-      mutateChangeTheme(selectedThemeId, {
+      mutateChangeTheme(selectedTheme, {
         onSuccess: () => {
           setCurrentTheme(selectedTheme);
         },

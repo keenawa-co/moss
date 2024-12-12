@@ -26,6 +26,7 @@ once_cell.workspace = true
 slotmap.workspace = true
 derive_more.workspace = true
 parking_lot.workspace = true
+dashmap.workspace = true
 
 platform_core.workspace = true
 platform_fs.workspace = true

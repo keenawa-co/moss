@@ -14,6 +14,7 @@ jobs:
     name: Rust Workflows - ${{ matrix.task.name }}
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: true
       matrix:
         task:
           - name: Unit Tests
@@ -22,6 +23,7 @@ jobs:
             command: cargo -q test --doc
           - name: Workspace Audit
             command: |
+              set -e
               cd ${GITHUB_WORKSPACE}/tools/xtask
               cargo -q run -- --fail-fast rwa
     timeout-minutes: 15
@@ -52,6 +54,7 @@ jobs:
     name: Node.js Workflows - ${{ matrix.task.name }}
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: true
       matrix:
         task:
           - name: Lint
