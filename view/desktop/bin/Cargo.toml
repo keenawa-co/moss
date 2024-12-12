@@ -20,6 +20,7 @@ compression = ["tauri/compression"]
 
 [dependencies]
 moss_env.workspace = true
+moss_text.workspace = true
 desktop_models.workspace = true
 moss_uikit.workspace = true
 
@@ -45,22 +46,22 @@ log.workspace = true
 rand.workspace = true
 fern.workspace = true
 smol.workspace = true
+clap.workspace = true
+dashmap.workspace = true
 
 # surrealdb = { workspace = true, features = ["kv-rocksdb"] }
 tokio = { workspace = true, features = ["full", "macros", "signal"] }
 serde_json.workspace = true
 serde = { workspace = true, features = ["derive"] }
+strum = { workspace = true, features = ["derive"] }
 hashbrown = { workspace = true, features = ["serde"] }
 
 tauri.workspace = true
-strum = { workspace = true, features = ["derive"] }
-tauri-plugin-os.workspace = true
-tauri-plugin-shell = "2.0.2"
+
 tauri-plugin-log = { version = "2.0.1", features = ["colored"] }
 tauri-plugin-window-state = "2.0.1"
 # tauri-plugin-clipboard-manager = "2.0.1"
 tauri-plugin-fs = "2.1.0"
-tauri-plugin-cli = "2.0.1"
 tauri-plugin-global-shortcut = "2"
 
 [target.'cfg(any(target_os = "linux", target_os = "macos"))'.dependencies]

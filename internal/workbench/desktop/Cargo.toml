@@ -13,6 +13,7 @@ moss_html.workspace = true
 moss_jsonlogic.workspace = true
 moss_jsonlogic_macro.workspace = true
 desktop_models.workspace = true
+
 quote.workspace = true
 static_str_ops.workspace = true
 thiserror.workspace = true
@@ -26,6 +27,9 @@ once_cell.workspace = true
 slotmap.workspace = true
 derive_more.workspace = true
 parking_lot.workspace = true
+dashmap.workspace = true
+os_info.workspace = true
+gethostname.workspace = true
 
 platform_core.workspace = true
 platform_fs.workspace = true
@@ -38,4 +42,4 @@ workbench_service_configuration_tao.workspace = true
 workbench_service_user_profile_tao.workspace = true
 workbench_service_environment_tao.workspace = true
 
-tauri-plugin-os.workspace = true
+

@@ -57,9 +57,9 @@ export const WidgetBar = ({ os, className, ...props }: WidgetBarProps) => {
   const DNDListRef = useRef<HTMLDivElement>(null);
   const overflownListRef = useRef<HTMLDivElement>(null);
 
-  function handleDragStart(event: DragStartEvent) {
+  const handleDragStart = (event: DragStartEvent) => {
     setDraggedId(event.active.id);
-  }
+  };
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;

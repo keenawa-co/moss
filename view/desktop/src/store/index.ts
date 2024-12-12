@@ -1,12 +1,12 @@
-import { configureStore } from "@reduxjs/toolkit";
 import { useDispatch } from "react-redux";
+
+import { configureStore } from "@reduxjs/toolkit";
+
 import { accordionReducer } from "./accordion";
-import { sidebarReducer } from "./sidebar";
 
 export const store = configureStore({
   reducer: {
     accordion: accordionReducer,
-    sidebar: sidebarReducer,
   },
 });
 

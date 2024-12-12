@@ -1,4 +1,4 @@
-export * from "./layouts/index";
+export * from "../layouts/index";
 export * from "./Menu";
 export * from "../../../../packages/moss-ui/src/Button";
 export * from "./LanguageSelector";

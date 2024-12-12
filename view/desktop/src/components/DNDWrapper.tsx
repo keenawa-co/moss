@@ -1,8 +1,9 @@
 import { ComponentPropsWithoutRef } from "react";
+
+import { UniqueIdentifier } from "@dnd-kit/core";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { cn } from "@repo/moss-ui";
-import { UniqueIdentifier } from "@dnd-kit/core";
 
 interface DNDItemWrapperProps extends Omit<ComponentPropsWithoutRef<"div">, "id"> {
   id: UniqueIdentifier;

@@ -5,6 +5,9 @@
 resolver = "1"
 members = [
     "view/desktop/bin",
+    "cli",
+    "tools/xtask",
+    "misc/themeinstall",
 
     "crates/moss-text",
     "crates/moss-fs",
@@ -17,6 +20,8 @@ members = [
     "crates/moss-async",
     "crates/moss-collection",
     "crates/moss-theme",
+    "crates/moss-typebridge",
+    "crates/moss-typebridge-macro",
 
     "internal/platform/core",
     "internal/platform/fs",
@@ -33,10 +38,6 @@ members = [
     "internal/workbench/service/user_profile/tao",
     "internal/workbench/service/environment/tao",
 
-    "tools/xtask",
-    "misc/themeinstall",
-    "crates/moss-typebridge",
-    "crates/moss-typebridge-macro", "crates/moss-store",
 ]
 
 [profile.dev]
@@ -66,7 +67,7 @@ moss_jsonlogic = { path = "crates/moss-jsonlogic" }
 moss_jsonlogic_macro = { path = "crates/moss-jsonlogic-macro" }
 
 moss_typebridge = { path = "crates/moss-typebridge" }
-moss_typebridge_macro = { path = "crates/moss-typebridge-macro"}
+moss_typebridge_macro = { path = "crates/moss-typebridge-macro" }
 
 moss_env = { path = "crates/moss-env" }
 moss_async = { path = "crates/moss-async" }
@@ -90,6 +91,7 @@ workbench_service_configuration_tao = { path = "internal/workbench/service/confi
 workbench_service_user_profile_tao = { path = "internal/workbench/service/user_profile/tao" }
 workbench_service_environment_tao = { path = "internal/workbench/service/environment/tao" }
 
+dashmap = "6.1.0"
 indexmap = "2.7.0"
 arcstr = "1.2.0"
 bstr = "1.11.0"
@@ -136,6 +138,7 @@ waker-fn = "1.2.0"
 im = "15.1.0"
 smallvec = "1.13.2"
 dyn-clone = "1.0.17"
+clap = {version = "4.5.23", features = ["derive"]}
 
 hecs = "0.10.5"
 hecs-hierarchy = "0.12.1"
@@ -149,4 +152,5 @@ dirs = "5.0.1"
 csscolorparser = "0.7.0"
 jsonschema = { version = "0.26.1", default-features = false }
 
-tauri-plugin-os = "2.0.1"
+os_info = {version = "3.9.0", default-features = false}
+gethostname = "0.5.0"
