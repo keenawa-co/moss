@@ -40,16 +40,13 @@ pub fn execute_command(
     app_handle: AppHandle,
     app_state: State<'_, AppState>,
     window: Window,
-    command_id: ReadOnlyStr,
+    cmd: ReadOnlyStr,
     args: HashMap<String, Value>,
 ) -> Result<Value, String> {
-    if let Some(command_handler) = app_state.get_command(&command_id) {
+    if let Some(command_handler) = app_state.get_command(&cmd) {
         command_handler(CommandContext::new(app_handle, window, args), &app_state)
     } else {
-        Err(format!(
-            "command with id {} is not found",
-            quote!(command_id)
-        ))
+        Err(format!("command with id {} is not found", quote!(cmd)))
     }
 }
 

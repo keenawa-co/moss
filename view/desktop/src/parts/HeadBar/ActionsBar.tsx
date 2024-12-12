@@ -3,7 +3,7 @@ import { HTMLProps, useEffect, useState } from "react";
 import { ActionButton } from "@/components/Action/ActionButton";
 import { ActionsSubmenu } from "@/components/Action/ActionsSubmenu";
 import { ActionsGroup } from "@/components/ActionsGroup";
-import { invokeIpc } from "@/lib/backend/tauri";
+import { invokeTauriIpc } from "@/lib/backend/tauri";
 import { useLayoutStore } from "@/store/layout";
 import { MenuItem } from "@repo/desktop-models";
 import { cn } from "@repo/moss-ui";
@@ -17,7 +17,7 @@ export const ActionsBar = ({ className, ...props }: HTMLProps<HTMLDivElement>) =
   useEffect(() => {
     const getAllActivities = async () => {
       try {
-        const res = await invokeIpc<MenuItem[], Error>("get_menu_items_by_namespace", { namespace: "headItem" }); // this here should be a type
+        const res = await invokeTauriIpc<MenuItem[], Error>("get_menu_items_by_namespace", { namespace: "headItem" }); // this here should be a type
 
         if (res.status === "ok") {
           setActivities(res.data);
