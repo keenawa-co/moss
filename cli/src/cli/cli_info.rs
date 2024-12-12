@@ -1,8 +1,5 @@
-use crate::cli;
-use crate::cli::{ShellClient, SystemShellClient, APP_CONFIG};
-use std::sync::LazyLock;
-use tauri::webview_version;
-use tauri_plugin_os::{family, version};
+use crate::cli::{ShellClient, SystemShellClient};
+use os_info;
 
 pub async fn info_handler() {
     let shell_client = SystemShellClient {};
@@ -36,19 +33,13 @@ async fn component_version(shell_client: &impl ShellClient, component: &str, arg
 }
 
 async fn get_os_info() -> String {
-    format!(
-        "{} {}",
-        if family().is_empty() {
-            "unknown"
-        } else {
-            family()
-        },
-        version()
-    )
+    let info = os_info::get();
+    format!("{} {}", info.os_type(), info.version(),)
 }
 
 async fn get_webview_version() -> String {
-    format!("{}", webview_version().unwrap_or("Not Found".to_string()))
+    // TODO: Use global env variables in the future
+    "Unknown webview version".to_string()
 }
 
 async fn get_rustc_version(shell_client: &impl ShellClient) -> String {
@@ -83,12 +74,11 @@ async fn get_pnpm_version(shell_client: &impl ShellClient) -> String {
 }
 
 async fn get_tauri_version() -> String {
-    tauri::VERSION.to_string()
+    // TODO: Use global env variables in the future
+    "2.0.6".to_string()
 }
 
 async fn get_moss_version() -> String {
-    LazyLock::force(&APP_CONFIG)
-        .version
-        .clone()
-        .unwrap_or("Unknown".to_string())
+    // TODO: Use global env variables in the future
+    "0.1.0".to_string()
 }

@@ -1,24 +1,19 @@
 pub mod cli_info;
 
-use clap::{Parser, Subcommand};
-use std::process::Command;
-use std::sync::LazyLock;
-use tauri::{AppHandle, Config, Manager};
-
 use crate::cli::cli_info::info_handler;
-use crate::AppState;
+use clap::{arg, Parser, Subcommand};
+use std::process::Command;
 
-pub(crate) static APP_CONFIG: LazyLock<Config> =
-    LazyLock::new(|| serde_json::from_str(include_str!("../tauri.conf.json")).unwrap_or_default());
 #[derive(Parser, Debug)]
 #[clap(version)]
-pub struct MossArgs {
+pub struct Cli {
     #[command(subcommand)]
-    pub command: Option<CliCommand>,
+    pub command: Commands,
 }
 
 #[derive(Subcommand, Debug)]
-pub enum CliCommand {
+pub enum Commands {
+    /// Display various environment information about the moss app
     Info,
 }
 
@@ -38,11 +33,10 @@ impl ShellClient for SystemShellClient {
 }
 
 pub async fn cli_handler() {
-    let args = MossArgs::parse();
-    let command = args.command.unwrap();
-    match command {
-        CliCommand::Info => {
-            cli_info::info_handler().await;
+    let args = Cli::parse();
+    match args.command {
+        Commands::Info => {
+            info_handler().await;
         }
     }
 }

@@ -1,13 +1,11 @@
 mod commands;
+pub mod constants;
 mod mem;
 mod menu;
 mod plugins;
 mod state;
 mod utl;
 mod window;
-
-pub mod cli;
-pub mod constants;
 
 use cmd_window::set_color_theme;
 use commands::*;
@@ -70,7 +68,6 @@ pub fn run() {
                 })
                 .build(),
         )
-        .plugin(tauri_plugin_os::init())
         .plugin(tauri_plugin_fs::init());
 
     #[cfg(target_os = "macos")]

@@ -5,6 +5,9 @@
 resolver = "1"
 members = [
     "view/desktop/bin",
+    "cli",
+    "tools/xtask",
+    "misc/themeinstall",
 
     "crates/moss-text",
     "crates/moss-fs",
@@ -17,6 +20,8 @@ members = [
     "crates/moss-async",
     "crates/moss-collection",
     "crates/moss-theme",
+    "crates/moss-typebridge",
+    "crates/moss-typebridge-macro",
 
     "internal/platform/core",
     "internal/platform/fs",
@@ -33,10 +38,6 @@ members = [
     "internal/workbench/service/user_profile/tao",
     "internal/workbench/service/environment/tao",
 
-    "tools/xtask",
-    "misc/themeinstall",
-    "crates/moss-typebridge",
-    "crates/moss-typebridge-macro",
 ]
 
 [profile.dev]
@@ -151,4 +152,5 @@ dirs = "5.0.1"
 csscolorparser = "0.7.0"
 jsonschema = { version = "0.26.1", default-features = false }
 
-tauri-plugin-os = "2.0.1"
+os_info = {version = "3.9.0", default-features = false}
+gethostname = "0.5.0"

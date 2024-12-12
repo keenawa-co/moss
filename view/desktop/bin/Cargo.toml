@@ -58,14 +58,11 @@ hashbrown = { workspace = true, features = ["serde"] }
 
 tauri.workspace = true
 
-tauri-plugin-os.workspace = true
-tauri-plugin-shell = "2.0.2"
 tauri-plugin-log = { version = "2.0.1", features = ["colored"] }
 tauri-plugin-window-state = "2.0.1"
 # tauri-plugin-clipboard-manager = "2.0.1"
 tauri-plugin-fs = "2.1.0"
 tauri-plugin-global-shortcut = "2"
-winapi = { version = "0.3.9", features = ["wincon"] }
 
 [target.'cfg(any(target_os = "linux", target_os = "macos"))'.dependencies]
 mimalloc = { version = "0.1.39", default-features = false }
@@ -74,6 +71,3 @@ mimalloc = { version = "0.1.39", default-features = false }
 objc = "0.2.7"
 cocoa = "0.26.0"
 macos-trampoline = { path = "./lib/macos" }
-
-[target.'cfg(target_os = "windows")'.dependencies]
-winapi = {version = "0.3.9", features = ["wincon"]}
