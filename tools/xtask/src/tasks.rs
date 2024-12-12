@@ -3,7 +3,7 @@ pub mod rust_workspace_audit;
 
 use anyhow::Result;
 use futures::future::join_all;
-use std::{future::Future, mem};
+use std::{future::Future, mem, process};
 use tokio::task::JoinHandle;
 
 pub struct TaskRunner {
@@ -20,8 +20,14 @@ impl TaskRunner {
         for result in join_all(jobs).await {
             match result {
                 Ok(Ok(())) => {}
-                Ok(Err(e)) => error!("Error processing package: {e}"),
-                Err(e) => error!("Task panicked: {e}"),
+                Ok(Err(e)) => {
+                    error!("{}", e);
+                    process::exit(1);
+                }
+                Err(e) => {
+                    error!("{}", e);
+                    process::exit(1);
+                }
             }
         }
 
