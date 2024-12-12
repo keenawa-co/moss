@@ -1,9 +1,9 @@
-import { useAtom } from "jotai";
 import React from "react";
-import { languageAtom, LanguageCodes, LANGUAGES } from "@/atoms/langAtom";
+
+import { LanguageCodes, LANGUAGES, useLanguageStore } from "@/store/language";
 
 export const LanguageSelector = () => {
-  const [language, setLanguage] = useAtom(languageAtom);
+  const { language, setLanguage } = useLanguageStore();
 
   const onChangeLang = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setLanguage(e.target.value as LanguageCodes);

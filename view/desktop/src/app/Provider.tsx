@@ -1,4 +1,3 @@
-import { Provider as JotaiProvider } from "jotai";
 import React, { ReactNode } from "react";
 
 import { QueryCache, QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -33,9 +32,7 @@ const Provider: React.FC<ProviderProps> = ({ children }) => {
   return (
     <QueryClientProvider client={queryClient}>
       {ENABLE_REACT_QUERY_DEVTOOLS && <ReactQueryDevtools initialIsOpen={false} buttonPosition="bottom-left" />}
-      <JotaiProvider>
-        <ThemeProvider>{children}</ThemeProvider>
-      </JotaiProvider>
+      <ThemeProvider>{children}</ThemeProvider>
     </QueryClientProvider>
   );
 };
