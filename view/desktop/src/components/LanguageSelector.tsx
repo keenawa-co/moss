@@ -1,19 +1,23 @@
 import React from "react";
 
-import { LanguageCodes, LANGUAGES, useLanguageStore } from "@/store/language";
+import { LanguageCode, useLanguageStore } from "@/store/language";
 
 export const LanguageSelector = () => {
-  const { language, setLanguage } = useLanguageStore();
+  const { currentLanguage, setLanguage, languages } = useLanguageStore();
 
-  const onChangeLang = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setLanguage(e.target.value as LanguageCodes);
+  const onChangeLanguage = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setLanguage(e.target.value as LanguageCode["code"]);
   };
 
   return (
-    <select className="bg-purple-300 text-[rgba(var(--color-primary))]" value={language} onChange={onChangeLang}>
-      {LANGUAGES.map(({ code, label }) => (
+    <select
+      className="bg-purple-300 text-[rgba(var(--color-primary))]"
+      value={currentLanguage}
+      onChange={onChangeLanguage}
+    >
+      {languages.map(({ code, name }) => (
         <option key={code} value={code}>
-          {label}
+          {name}
         </option>
       ))}
     </select>
