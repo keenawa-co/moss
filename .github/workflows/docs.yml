@@ -1,0 +1,23 @@
+name: Documentation
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - "@typespec/**"
+
+jobs:
+  push-JSON-schema:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Push directory to another repository
+        uses: cpina/github-action-push-to-another-repository@v1.7.2
+        env:
+          SSH_DEPLOY_KEY: ${{ secrets.SSH_DEPLOY_KEY }}
+        with:
+          source-directory: "@typespec/json-schema"
+          destination-github-username: "keenawa-co"
+          destination-repository-name: "moss-studio-docs"
+          user-email: github-actions[bot]@users.noreply.github.com
+          target-directory: "assets/schemas"
+          commit-message: "Update Theme JSON Schema"
