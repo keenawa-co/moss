@@ -7,6 +7,9 @@ mod state;
 mod utl;
 mod window;
 
+use crate::commands::cmd_window::set_language_pack;
+use crate::constants::*;
+use crate::plugins as moss_plugins;
 use cmd_window::set_color_theme;
 use commands::*;
 use dashmap::DashMap;
@@ -24,12 +27,10 @@ use std::sync::Arc;
 use tauri::{AppHandle, Manager, RunEvent, WebviewWindow, WindowEvent};
 use tauri_plugin_global_shortcut::{Code, GlobalShortcutExt, Modifiers, Shortcut, ShortcutState};
 use tauri_plugin_log::{fern::colors::ColoredLevelConfig, Target, TargetKind};
+use tauri_plugin_os;
 use window::{create_window, CreateWindowInput};
 use workbench_desktop::window::{NativePlatformInfo, NativeWindowConfiguration};
 use workbench_desktop::Workbench;
-
-use crate::constants::*;
-use crate::plugins as moss_plugins;
 
 #[macro_use]
 extern crate serde;
@@ -68,8 +69,8 @@ pub fn run() {
                 })
                 .build(),
         )
-        .plugin(tauri_plugin_fs::init());
-
+        .plugin(tauri_plugin_fs::init())
+        .plugin(tauri_plugin_os::init());
     #[cfg(target_os = "macos")]
     {
         builder = builder.plugin(moss_plugins::tauri_mac_window::init());
