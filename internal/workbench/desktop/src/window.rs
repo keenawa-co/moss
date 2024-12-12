@@ -1,7 +1,7 @@
+use gethostname::gethostname;
 use once_cell::sync::OnceCell;
 use std::{path::PathBuf, rc::Rc};
 use tauri::AppHandle;
-use tauri_plugin_os;
 use typography::Font;
 
 /// A color in the `sRGB` color space.
@@ -210,17 +210,11 @@ pub struct NativePlatformInfo {
 
 impl NativePlatformInfo {
     pub fn new() -> Self {
-        let os = if tauri_plugin_os::family().is_empty() {
-            "unknown".to_string()
-        } else {
-            tauri_plugin_os::family().to_string()
-        };
-        let version = tauri_plugin_os::version().to_string();
-        let hostname = tauri_plugin_os::hostname();
+        let info = os_info::get();
         Self {
-            os,
-            version,
-            hostname,
+            os: info.os_type().to_string(),
+            version: info.version().to_string(),
+            hostname: gethostname().into_string().unwrap(),
         }
     }
 }
