@@ -3,7 +3,7 @@ import { create } from "zustand";
 import i18n from "@/app/i18n";
 import getLocales from "@/lib/backend/locales";
 
-export interface LanguageCode {
+export interface LanguagePack {
   code: string;
   name: string;
   direction: string;
@@ -12,38 +12,38 @@ export interface LanguageCode {
 const LOCALSTORAGE_KEY = "language";
 
 interface LanguageStore {
-  currentLanguage: LanguageCode["code"];
-  languages: LanguageCode[];
-  setLanguage: (newLanguage: LanguageCode["code"]) => void;
+  currentLanguageCode: LanguagePack["code"];
+  languagePacks: LanguagePack[];
+  setLanguageCode: (newLanguage: LanguagePack["code"]) => void;
   initializeLanguage: () => void;
   initializeLanguages: () => void;
 }
 
 export const useLanguageStore = create<LanguageStore>((set, get) => ({
-  currentLanguage: (localStorage.getItem(LOCALSTORAGE_KEY) as LanguageCode["code"]) || "en",
-  languages: [],
-  setLanguage: (newLanguage) => {
-    const { languages } = get();
+  currentLanguageCode: (localStorage.getItem(LOCALSTORAGE_KEY) as LanguagePack["code"]) || "en",
+  languagePacks: [],
+  setLanguageCode: (newLanguage) => {
+    const { languagePacks } = get();
 
-    const isValidLanguage = languages.some(({ code }) => code === newLanguage);
-    const validLanguage = isValidLanguage ? newLanguage : "en";
+    const isValidLanguage = languagePacks.some(({ code }) => code === newLanguage);
+    const validLanguageCode = isValidLanguage ? newLanguage : "en";
 
-    localStorage.setItem(LOCALSTORAGE_KEY, validLanguage);
-    i18n.changeLanguage(validLanguage);
-    set({ currentLanguage: validLanguage });
+    localStorage.setItem(LOCALSTORAGE_KEY, validLanguageCode);
+    i18n.changeLanguage(validLanguageCode);
+    set({ currentLanguageCode: validLanguageCode });
   },
   initializeLanguage: async () => {
-    const { languages } = get();
+    const { languagePacks } = get();
 
-    const storedLanguage = localStorage.getItem(LOCALSTORAGE_KEY) as LanguageCode["code"];
+    const storedLanguageCode = localStorage.getItem(LOCALSTORAGE_KEY) as LanguagePack["code"];
 
-    if (storedLanguage && languages.some(({ code }) => code === storedLanguage)) {
-      i18n.changeLanguage(storedLanguage);
-      set({ currentLanguage: storedLanguage });
+    if (storedLanguageCode && languagePacks.some(({ code }) => code === storedLanguageCode)) {
+      i18n.changeLanguage(storedLanguageCode);
+      set({ currentLanguageCode: storedLanguageCode });
     } else {
       localStorage.setItem(LOCALSTORAGE_KEY, "en");
       i18n.changeLanguage("en");
-      set({ currentLanguage: "en" });
+      set({ currentLanguageCode: "en" });
     }
   },
   initializeLanguages: async () => {
@@ -51,7 +51,7 @@ export const useLanguageStore = create<LanguageStore>((set, get) => ({
       const locales = await getLocales();
 
       if (locales.status === "ok") {
-        set({ languages: locales.data });
+        set({ languagePacks: locales.data });
       }
     } catch (error) {
       console.error("Error fetching locales:", error);
