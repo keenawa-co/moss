@@ -3,7 +3,7 @@ pub mod rust_workspace_audit;
 
 use anyhow::Result;
 use futures::future::join_all;
-use std::{future::Future, mem, process};
+use std::{future::Future, mem};
 use tokio::task::JoinHandle;
 
 pub struct TaskRunner {
@@ -21,12 +21,10 @@ impl TaskRunner {
             match result {
                 Ok(Ok(())) => {}
                 Ok(Err(e)) => {
-                    error!("{}", e);
-                    process::exit(1);
+                    return Err(e);
                 }
                 Err(e) => {
-                    error!("{}", e);
-                    process::exit(1);
+                    return Err(e.into());
                 }
             }
         }
