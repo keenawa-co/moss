@@ -2,8 +2,8 @@ import { ComponentProps } from "react";
 
 import { cn } from "@repo/moss-ui";
 
-import { HeadBar } from "../../parts/HeadBar/HeadBar";
-import StatusBar from "../../parts/StatusBar/StatusBar";
+import { HeadBar } from "../parts/HeadBar/HeadBar";
+import StatusBar from "../parts/StatusBar/StatusBar";
 
 export const RootLayout = ({ children, className, ...props }: ComponentProps<"main">) => {
   return (
