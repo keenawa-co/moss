@@ -67,27 +67,32 @@ pub async fn check_dependencies_job(
             });
         });
 
+    let mut failure_count = 0;
     while let Some(result) = task_set.join_next().await {
         match result {
             Ok(Ok(())) => {}
             Ok(Err(e)) => {
+                failure_count += 1;
                 if fail_fast {
                     task_set.abort_all();
-                    return Err(e);
+                    return Err(anyhow!("Failing Fast"));
                 }
             }
             Err(e) => {
+                failure_count += 1;
                 if fail_fast {
                     task_set.abort_all();
-                    return Err(anyhow!("Task panicked: {}", e));
+                    return Err(anyhow!("Failing Fast"));
                 }
             }
         }
     }
-
-    info!("All Checks Passed");
-
-    Ok(())
+    if failure_count > 0 {
+        Err(anyhow!("{} Checks Failed", failure_count))
+    } else {
+        info!("All Checks Passed");
+        Ok(())
+    }
 }
 
 async fn handle_package_dependencies(

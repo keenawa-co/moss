@@ -20,8 +20,12 @@ impl TaskRunner {
         for result in join_all(jobs).await {
             match result {
                 Ok(Ok(())) => {}
-                Ok(Err(e)) => error!("Error processing package: {e}"),
-                Err(e) => error!("Task panicked: {e}"),
+                Ok(Err(e)) => {
+                    return Err(e);
+                }
+                Err(e) => {
+                    return Err(e.into());
+                }
             }
         }
 
