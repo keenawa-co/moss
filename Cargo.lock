@@ -1086,6 +1086,7 @@ dependencies = [
  "tauri-plugin-window-state",
  "tokio",
  "tracing",
+ "ts-rs",
  "workbench_desktop",
  "workbench_service_configuration_tao",
  "workbench_service_environment_tao",

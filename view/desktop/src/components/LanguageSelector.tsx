@@ -1,23 +1,37 @@
 import React from "react";
 
-import { LanguageCode, useLanguageStore } from "@/store/language";
+import { useLanguageStore } from "@/store/language";
+import { useChangeLanguagePack } from "@/hooks/useChangeLanguagePack.ts";
 
 export const LanguageSelector = () => {
-  const { currentLanguage, setLanguage, languages } = useLanguageStore();
+  const { currentLanguageCode, setLanguageCode, languagePacks } = useLanguageStore();
+  const { mutate: mutateChangeLanguagePack } = useChangeLanguagePack();
 
-  const onChangeLanguage = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setLanguage(e.target.value as LanguageCode["code"]);
+  const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedLanguageCode = e.target.value;
+    const selectedLanguagePack = languagePacks?.find((languagePack) => languagePack.code === selectedLanguageCode);
+
+    if (selectedLanguagePack) {
+      mutateChangeLanguagePack(selectedLanguagePack, {
+        onSuccess: () => {
+          setLanguageCode(selectedLanguageCode);
+        },
+        onError: (error: Error) => {
+          console.error("Error changing locale:", error);
+        },
+      });
+    }
   };
 
   return (
     <select
       className="bg-purple-300 text-[rgba(var(--color-primary))]"
-      value={currentLanguage}
-      onChange={onChangeLanguage}
+      value={currentLanguageCode || "en"}
+      onChange={handleChange}
     >
-      {languages.map(({ code, name }) => (
-        <option key={code} value={code}>
-          {name}
+      {languagePacks?.map((languagePack) => (
+        <option key={languagePack.code} value={languagePack.code}>
+          {languagePack.name}
         </option>
       ))}
     </select>

@@ -9,6 +9,9 @@ mod window;
 mod cli;
 pub mod constants;
 
+use crate::commands::cmd_window::set_language_pack;
+use crate::constants::*;
+use crate::plugins as moss_plugins;
 use cmd_window::set_color_theme;
 use commands::*;
 use dashmap::DashMap;
@@ -30,9 +33,6 @@ use tauri_plugin_log::{fern::colors::ColoredLevelConfig, Target, TargetKind};
 use window::{create_window, CreateWindowInput};
 use workbench_desktop::window::{NativePlatformInfo, NativeWindowConfiguration};
 use workbench_desktop::Workbench;
-
-use crate::constants::*;
-use crate::plugins as moss_plugins;
 
 #[macro_use]
 extern crate serde;
@@ -187,6 +187,11 @@ fn create_main_window(app_handle: &AppHandle, url: &str) -> WebviewWindow {
         Arc::new(set_color_theme) as CommandHandler,
     );
 
+    commands.insert(
+        "workbench.changeLanguagePack".into(),
+        Arc::new(set_language_pack) as CommandHandler,
+    );
+
     let window_number = 0;
     let app_state = AppState {
         commands,
@@ -197,6 +202,7 @@ fn create_main_window(app_handle: &AppHandle, url: &str) -> WebviewWindow {
                 source: "moss-light.css".to_string(),
             }),
         },
+        language_code: RwLock::new("en".to_string()),
         workbench: Arc::new(workbench),
         platform_info,
         next_window_id: AtomicUsize::new(window_number),

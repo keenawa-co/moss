@@ -1,7 +1,3 @@
-import { I } from "vitest/dist/chunks/reporters.D7Jzd9GS.js";
-
-import { getLocales } from "@/lib/backend/tauri";
-import { LanguageCode } from "@/store/language";
 import { InvokeArgs, invoke as invokeTauri } from "@tauri-apps/api/core";
 import { listen as listenTauri } from "@tauri-apps/api/event";
 import type { EventCallback, EventName } from "@tauri-apps/api/event";
