@@ -1,8 +1,8 @@
 import "@/app/i18n";
 
 import { RootLayout } from "@/components";
-import { AppLayout } from "@/components/layouts/AppLayout";
 import { usePrepareWindow } from "@/hooks/usePrepareWindow";
+import { AppLayout } from "@/layouts/AppLayout";
 
 import { PageLoader } from "../components/PageLoader";
 import Provider from "./Provider";

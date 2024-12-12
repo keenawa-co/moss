@@ -2,11 +2,11 @@ import { Suspense } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 
 import { Home, Logs, Settings } from "@/pages";
-import { useLayoutStore } from "@/store/layoutStore";
+import { useLayoutStore } from "@/store/layout";
 
-import { LaunchPad } from "../LaunchPad";
-import { Menu } from "../Menu";
-import { Resizable, ResizablePanel } from "../Resizable";
+import { LaunchPad } from "../components/LaunchPad";
+import { Menu } from "../components/Menu";
+import { Resizable, ResizablePanel } from "../components/Resizable";
 import { ContentLayout } from "./ContentLayout";
 
 export const AppLayout = () => {

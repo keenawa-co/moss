@@ -1,3 +1,7 @@
+import { I } from "vitest/dist/chunks/reporters.D7Jzd9GS.js";
+
+import { getLocales } from "@/lib/backend/tauri";
+import { LanguageCode } from "@/store/language";
 import { InvokeArgs, invoke as invokeTauri } from "@tauri-apps/api/core";
 import { listen as listenTauri } from "@tauri-apps/api/event";
 import type { EventCallback, EventName } from "@tauri-apps/api/event";
@@ -10,7 +14,8 @@ export type TauriIpcCommand =
   | "create_new_window"
   | "sidebar_get_all_activities"
   | "get_view_content"
-  | "get_menu_items_by_namespace";
+  | "get_menu_items_by_namespace"
+  | "get_locales";
 
 export type IpcResult<T, E> = { status: "ok"; data: T } | { status: "error"; error: E };
 

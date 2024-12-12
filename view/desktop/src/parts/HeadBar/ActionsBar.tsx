@@ -4,7 +4,7 @@ import { ActionButton } from "@/components/Action/ActionButton";
 import { ActionsSubmenu } from "@/components/Action/ActionsSubmenu";
 import { ActionsGroup } from "@/components/ActionsGroup";
 import { invokeIpc } from "@/lib/backend/tauri";
-import { useLayoutStore } from "@/store/layoutStore";
+import { useLayoutStore } from "@/store/layout";
 import { MenuItem } from "@repo/desktop-models";
 import { cn } from "@repo/moss-ui";
 

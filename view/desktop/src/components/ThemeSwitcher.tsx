@@ -1,12 +1,13 @@
-import { useAtom } from "jotai";
 import React from "react";
 
-import { themeAtom } from "../atoms/themeAtom";
+import { useThemeStore } from "@/store/theme";
+
 import { useChangeTheme } from "../hooks/useChangeColorTheme";
 import { useGetColorThemes } from "../hooks/useGetColorThemes";
 
 const ThemeSwitcher: React.FC = () => {
-  const [currentTheme, setCurrentTheme] = useAtom(themeAtom);
+  const { currentTheme, setCurrentTheme } = useThemeStore();
+
   const { data: themes, isLoading, error } = useGetColorThemes();
   const { mutate: mutateChangeTheme } = useChangeTheme();
 
