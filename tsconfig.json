@@ -36,6 +36,9 @@
     },
     {
       "path": "internal/workbench/desktop/models"
+    },
+    {
+      "path": "misc/cspell"
     }
   ]
 }

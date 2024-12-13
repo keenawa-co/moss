@@ -70,17 +70,11 @@ importers:
         specifier: workspace:*
         version: link:../../../../packages/config-typescript
 
-  misc:
+  misc/cspell:
     dependencies:
-      '@cspell/dict-de-de':
-        specifier: ^4.0.3
-        version: 4.0.3
       '@cspell/dict-lorem-ipsum':
         specifier: ^4.0.3
         version: 4.0.3
-      '@cspell/dict-ru_ru':
-        specifier: ^2.2.4
-        version: 2.2.4
       '@cspell/dict-rust':
         specifier: ^4.0.10
         version: 4.0.10
@@ -1390,14 +1384,8 @@ packages:
     resolution: {integrity: sha512-ooWCrlZP11i8GImSjTHYHLkvFDP48nS4+204nGb1RiX/WXYHmJA2III9/e2DWVabCESdW7hBAEzHRqUn9OUVvQ==}
     engines: {node: '>=0.1.90'}
 
-  '@cspell/dict-de-de@4.0.3':
-    resolution: {integrity: sha512-HxoPd3ra/gHVeUKq9NMCX5gOHpaL9lyhHQi/2CXBrSE7yrB5cusrPoKFh+xYGI1hG8rrrPLLDKF+vbB66YR4/A==}
-
   '@cspell/dict-lorem-ipsum@4.0.3':
     resolution: {integrity: sha512-WFpDi/PDYHXft6p0eCXuYnn7mzMEQLVeqpO+wHSUd+kz5ADusZ4cpslAA4wUZJstF1/1kMCQCZM6HLZic9bT8A==}
-
-  '@cspell/dict-ru_ru@2.2.4':
-    resolution: {integrity: sha512-Ub5Y318ZAaFJDAPgeImcLg8ksfthGhxMHsyHGkn9Uf3g9AZUlYsabs1HwgLmh9NtqDNjMlF52S9R11GFDdaWIw==}
 
   '@cspell/dict-rust@4.0.10':
     resolution: {integrity: sha512-6o5C8566VGTTctgcwfF3Iy7314W0oMlFFSQOadQ0OEdJ9Z9ERX/PDimrzP3LGuOrvhtEFoK8pj+BLnunNwRNrw==}
@@ -9406,11 +9394,7 @@ snapshots:
   '@colors/colors@1.5.0':
     optional: true
 
-  '@cspell/dict-de-de@4.0.3': {}
-
   '@cspell/dict-lorem-ipsum@4.0.3': {}
-
-  '@cspell/dict-ru_ru@2.2.4': {}
 
   '@cspell/dict-rust@4.0.10': {}
 
