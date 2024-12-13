@@ -31,8 +31,6 @@
     "core:webview:default",
     "core:webview:allow-internal-toggle-devtools",
 
-    "shell:allow-open",
-
     "fs:default",
     {
       "identifier": "fs:allow-home-read-recursive",

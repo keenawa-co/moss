@@ -8,7 +8,6 @@ export const usePrepareWindow = () => {
 
   useEffect(() => {
     initializeLanguage();
-
     setIsPreparing(false);
   }, [initializeLanguage]);
 

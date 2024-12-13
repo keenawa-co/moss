@@ -5,9 +5,8 @@ use moss_text::{quote, ReadOnlyStr};
 use serde_json::Value;
 use std::path::PathBuf;
 
-use tauri::{AppHandle, Emitter, EventTarget, Manager, State, WebviewWindow, Window};
-
 use crate::{create_child_window, state::CommandContext, AppState};
+use tauri::{AppHandle, Emitter, EventTarget, Manager, State, WebviewWindow, Window};
 
 #[derive(Clone, Serialize)]
 struct EventAData {
@@ -75,6 +74,28 @@ pub fn set_color_theme(ctx: CommandContext, app_state: &AppState) -> Result<Valu
     Ok(Value::Null)
 }
 
+pub fn set_language_pack(ctx: CommandContext, app_state: &AppState) -> Result<Value, String> {
+    let language_code_arg = ctx.get_arg::<String>("code")?;
+
+    app_state.set_language_code(language_code_arg.clone());
+
+    for (label, _) in ctx.app_handle.webview_windows() {
+        if ctx.window.label() == &label {
+            continue;
+        }
+
+        ctx.app_handle
+            .emit_to(
+                EventTarget::webview_window(label),
+                "core://language-pack-changed",
+                language_code_arg.clone(),
+            )
+            .unwrap();
+    }
+
+    Ok(Value::Null)
+}
+
 #[tauri::command(async)]
 pub async fn get_color_theme(path: String) -> Result<String, String> {
     let path = crate::utl::get_themes_dir()
@@ -115,11 +136,12 @@ pub async fn get_themes() -> Result<Vec<ThemeDescriptor>, String> {
     ])
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct Locale {
-    code: String,
-    name: String,
-    direction: Option<String>, // "ltr" or "rtl"
+    pub code: String,
+    pub name: String,
+    pub direction: Option<String>, // "ltr" or "rtl"
 }
 
 // FIXME: This is a temporary solution until we have a registry of installed

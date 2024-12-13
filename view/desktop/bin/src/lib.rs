@@ -1,4 +1,5 @@
 mod commands;
+pub mod constants;
 mod mem;
 mod menu;
 mod plugins;
@@ -6,9 +7,9 @@ mod state;
 mod utl;
 mod window;
 
-mod cli;
-pub mod constants;
-
+use crate::commands::cmd_window::set_language_pack;
+use crate::constants::*;
+use crate::plugins as moss_plugins;
 use cmd_window::set_color_theme;
 use commands::*;
 use dashmap::DashMap;
@@ -24,15 +25,12 @@ use std::rc::Rc;
 use std::sync::atomic::{AtomicUsize, Ordering};
 use std::sync::Arc;
 use tauri::{AppHandle, Manager, RunEvent, WebviewWindow, WindowEvent};
-use tauri_plugin_cli::CliExt;
 use tauri_plugin_global_shortcut::{Code, GlobalShortcutExt, Modifiers, Shortcut, ShortcutState};
 use tauri_plugin_log::{fern::colors::ColoredLevelConfig, Target, TargetKind};
+use tauri_plugin_os;
 use window::{create_window, CreateWindowInput};
 use workbench_desktop::window::{NativePlatformInfo, NativeWindowConfiguration};
 use workbench_desktop::Workbench;
-
-use crate::constants::*;
-use crate::plugins as moss_plugins;
 
 #[macro_use]
 extern crate serde;
@@ -40,7 +38,6 @@ extern crate serde;
 pub fn run() {
     #[allow(unused_mut)]
     let mut builder = tauri::Builder::default()
-        .plugin(tauri_plugin_cli::init())
         .plugin(
             tauri_plugin_log::Builder::default()
                 .targets([
@@ -72,10 +69,8 @@ pub fn run() {
                 })
                 .build(),
         )
-        .plugin(tauri_plugin_shell::init())
-        .plugin(tauri_plugin_os::init())
-        .plugin(tauri_plugin_fs::init());
-
+        .plugin(tauri_plugin_fs::init())
+        .plugin(tauri_plugin_os::init());
     #[cfg(target_os = "macos")]
     {
         builder = builder.plugin(moss_plugins::tauri_mac_window::init());
@@ -134,21 +129,7 @@ pub fn run() {
         .expect("failed to run")
         .run(|app_handle, event| match event {
             RunEvent::Ready => {
-                // Setting up CLI
-                match app_handle.cli().matches() {
-                    Ok(matches) => {
-                        let subcommand = matches.subcommand;
-                        if subcommand.is_none() {
-                            let _ = create_main_window(app_handle, "/");
-                        } else {
-                            tauri::async_runtime::spawn(crate::cli::cli_handler(
-                                subcommand.unwrap(),
-                                app_handle.clone(),
-                            ));
-                        }
-                    }
-                    Err(_) => {}
-                };
+                let _ = create_main_window(app_handle, "/");
             }
 
             #[cfg(target_os = "macos")]
@@ -187,6 +168,11 @@ fn create_main_window(app_handle: &AppHandle, url: &str) -> WebviewWindow {
         Arc::new(set_color_theme) as CommandHandler,
     );
 
+    commands.insert(
+        "workbench.changeLanguagePack".into(),
+        Arc::new(set_language_pack) as CommandHandler,
+    );
+
     let window_number = 0;
     let app_state = AppState {
         commands,
@@ -197,6 +183,7 @@ fn create_main_window(app_handle: &AppHandle, url: &str) -> WebviewWindow {
                 source: "moss-light.css".to_string(),
             }),
         },
+        language_code: RwLock::new("en".to_string()),
         workbench: Arc::new(workbench),
         platform_info,
         next_window_id: AtomicUsize::new(window_number),

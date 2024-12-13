@@ -1,3 +1,4 @@
+use crate::commands::cmd_window::Locale;
 use anyhow::Result;
 use dashmap::DashMap;
 use desktop_models::appearance::theming::ThemeDescriptor;
@@ -11,7 +12,6 @@ use std::sync::Arc;
 use tauri::{AppHandle, Window};
 use workbench_desktop::window::NativePlatformInfo;
 use workbench_desktop::Workbench;
-
 // NOTE: Temporary solution. Will be moved to crates/moss-desktop.
 
 pub struct Appearance {
@@ -58,10 +58,9 @@ pub type CommandHandler =
 
 pub struct AppState {
     pub appearance: Appearance,
+    pub language_code: RwLock<String>,
     pub next_window_id: AtomicUsize,
-
     pub commands: DashMap<ReadOnlyStr, CommandHandler>,
-
     pub workbench: Arc<Workbench>,
     pub platform_info: NativePlatformInfo,
 }
@@ -69,5 +68,10 @@ pub struct AppState {
 impl AppState {
     pub fn get_command(&self, id: &ReadOnlyStr) -> Option<CommandHandler> {
         self.commands.get(id).map(|cmd| Arc::clone(&cmd))
+    }
+
+    pub fn set_language_code(&self, language_code: String) {
+        let mut language_code_lock = self.language_code.write();
+        *language_code_lock = language_code;
     }
 }
