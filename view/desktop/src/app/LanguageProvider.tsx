@@ -1,6 +1,7 @@
 import { useCallback, useEffect } from "react";
 
-import { LanguagePack, useLanguageStore } from "@/store/language";
+import { useLanguageStore } from "@/store/language";
+import { LocaleDescriptor } from "@repo/desktop-models";
 import { listen, UnlistenFn } from "@tauri-apps/api/event";
 
 const LanguageProvider = ({ children }: { children: React.ReactNode }) => {
@@ -11,7 +12,7 @@ const LanguageProvider = ({ children }: { children: React.ReactNode }) => {
   }, [initializeLanguages]);
 
   const setLanguagePackWithoutSync = useCallback(
-    (language: LanguagePack) => {
+    (language: LocaleDescriptor) => {
       const selectedLanguage = languagePacks?.find((languagePack) => language.code === languagePack.code) || null;
       if (selectedLanguage) {
         setLanguageCode(selectedLanguage.code);
@@ -25,8 +26,9 @@ const LanguageProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     let unlisten: UnlistenFn;
 
-    const handleLanguagePackChanged = (event: { payload: LanguagePack }) => {
-      const newLanguagePack: LanguagePack = event.payload;
+    const handleLanguagePackChanged = (event: { payload: LocaleDescriptor }) => {
+      console.log(event);
+      const newLanguagePack: LocaleDescriptor = event.payload;
 
       if (newLanguagePack.code !== currentLanguageCode) {
         setLanguagePackWithoutSync(newLanguagePack);

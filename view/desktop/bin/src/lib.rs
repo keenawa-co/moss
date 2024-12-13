@@ -14,6 +14,7 @@ use cmd_window::set_color_theme;
 use commands::*;
 use dashmap::DashMap;
 use desktop_models::appearance::theming::ThemeDescriptor;
+use desktop_models::window::LocaleDescriptor;
 use parking_lot::RwLock;
 use platform_core::context_v2::ContextCell;
 use platform_core::platform::cross::client::CrossPlatformClient;
@@ -183,7 +184,11 @@ fn create_main_window(app_handle: &AppHandle, url: &str) -> WebviewWindow {
                 source: "moss-light.css".to_string(),
             }),
         },
-        language_code: RwLock::new("en".to_string()),
+        locale: RwLock::new(LocaleDescriptor {
+            code: "en".to_string(),
+            name: "English".to_string(),
+            direction: Some("ltr".to_string()),
+        }),
         workbench: Arc::new(workbench),
         platform_info,
         next_window_id: AtomicUsize::new(window_number),

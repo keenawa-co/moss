@@ -1,9 +1,9 @@
-import { LanguagePack } from "@/store/language";
+import { LocaleDescriptor } from "@repo/desktop-models";
 
 import { invokeTauriIpc, IpcResult } from "./tauri";
 
-const getLocales = async (): Promise<IpcResult<LanguagePack[], string>> => {
-  return await invokeTauriIpc<LanguagePack[], string>("get_locales");
+const getLocales = async (): Promise<IpcResult<LocaleDescriptor[], string>> => {
+  return await invokeTauriIpc<LocaleDescriptor[], string>("get_locales");
 };
 
 export default getLocales;

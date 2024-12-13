@@ -1,5 +1,5 @@
 use anyhow::Result;
-use desktop_models::appearance::theming::ThemeDescriptor;
+use desktop_models::{appearance::theming::ThemeDescriptor, window::LocaleDescriptor};
 use hashbrown::HashMap;
 use moss_text::{quote, ReadOnlyStr};
 use serde_json::Value;
@@ -74,10 +74,11 @@ pub fn set_color_theme(ctx: CommandContext, app_state: &AppState) -> Result<Valu
     Ok(Value::Null)
 }
 
+// FIXME: Temporary placement of this function here. It will be moved later.
 pub fn set_language_pack(ctx: CommandContext, app_state: &AppState) -> Result<Value, String> {
-    let language_code_arg = ctx.get_arg::<String>("code")?;
+    let locale_descriptor_arg = ctx.get_arg::<LocaleDescriptor>("localeDescriptor")?;
 
-    app_state.set_language_code(language_code_arg.clone());
+    app_state.set_current_locale(locale_descriptor_arg.clone());
 
     for (label, _) in ctx.app_handle.webview_windows() {
         if ctx.window.label() == &label {
@@ -88,7 +89,7 @@ pub fn set_language_pack(ctx: CommandContext, app_state: &AppState) -> Result<Va
             .emit_to(
                 EventTarget::webview_window(label),
                 "core://language-pack-changed",
-                language_code_arg.clone(),
+                locale_descriptor_arg.clone(),
             )
             .unwrap();
     }
@@ -136,30 +137,22 @@ pub async fn get_themes() -> Result<Vec<ThemeDescriptor>, String> {
     ])
 }
 
-#[derive(Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Locale {
-    pub code: String,
-    pub name: String,
-    pub direction: Option<String>, // "ltr" or "rtl"
-}
-
 // FIXME: This is a temporary solution until we have a registry of installed
 // plugins and the ability to check which language packs are installed.
 #[tauri::command]
-pub fn get_locales() -> Vec<Locale> {
+pub fn get_locales() -> Vec<LocaleDescriptor> {
     vec![
-        Locale {
+        LocaleDescriptor {
             code: "en".to_string(),
             name: "English".to_string(),
             direction: Some("ltr".to_string()),
         },
-        Locale {
+        LocaleDescriptor {
             code: "de".to_string(),
             name: "Deutsche".to_string(),
             direction: Some("ltr".to_string()),
         },
-        Locale {
+        LocaleDescriptor {
             code: "ru".to_string(),
             name: "Русский".to_string(),
             direction: Some("ltr".to_string()),

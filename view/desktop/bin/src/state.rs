@@ -1,7 +1,7 @@
-use crate::commands::cmd_window::Locale;
 use anyhow::Result;
 use dashmap::DashMap;
 use desktop_models::appearance::theming::ThemeDescriptor;
+use desktop_models::window::LocaleDescriptor;
 use hashbrown::HashMap;
 use moss_text::ReadOnlyStr;
 use parking_lot::RwLock;
@@ -58,7 +58,7 @@ pub type CommandHandler =
 
 pub struct AppState {
     pub appearance: Appearance,
-    pub language_code: RwLock<String>,
+    pub locale: RwLock<LocaleDescriptor>,
     pub next_window_id: AtomicUsize,
     pub commands: DashMap<ReadOnlyStr, CommandHandler>,
     pub workbench: Arc<Workbench>,
@@ -70,8 +70,8 @@ impl AppState {
         self.commands.get(id).map(|cmd| Arc::clone(&cmd))
     }
 
-    pub fn set_language_code(&self, language_code: String) {
-        let mut language_code_lock = self.language_code.write();
-        *language_code_lock = language_code;
+    pub fn set_current_locale(&self, locale_descriptor: LocaleDescriptor) {
+        let mut locale_lock = self.locale.write();
+        *locale_lock = locale_descriptor;
     }
 }

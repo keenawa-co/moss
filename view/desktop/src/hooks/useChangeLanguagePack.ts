@@ -1,20 +1,17 @@
-import { invokeIpc } from "@/lib/backend/tauri.ts";
+import { invokeMossCommand } from "@/lib/backend/platfrom";
+import { LocaleDescriptor } from "@repo/desktop-models";
 import { useMutation } from "@tanstack/react-query";
-import { LanguagePack } from "@/store/language";
 
-const changeLanguagePack = async (languagePack: LanguagePack): Promise<void> => {
-  await invokeIpc<unknown, string>("execute_command", {
-    commandId: "workbench.changeLanguagePack",
-    args: {
-      code: languagePack.code,
-    },
+const changeLanguagePack = async (localeDescriptor: LocaleDescriptor): Promise<void> => {
+  await invokeMossCommand("workbench.changeLanguagePack", {
+    localeDescriptor,
   });
 };
 
 export const useChangeLanguagePack = () => {
   // const queryClient = useQueryClient();
 
-  return useMutation<void, Error, LanguagePack>({
+  return useMutation<void, Error, LocaleDescriptor>({
     mutationKey: ["changeLanguagePack"],
     mutationFn: changeLanguagePack,
     onSuccess: () => {},

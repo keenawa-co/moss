@@ -52,7 +52,6 @@ const SessionComponent = () => {
 
   const getAllActivities = async () => {
     try {
-      // console.log((await invokeIpc("get_view_content")) as object);
       console.log((await invokeTauriIpc("get_menu_items_by_namespace", { namespace: "headItem" })) as object);
     } catch (err) {
       console.error("Failed to get workbench state:", err);
