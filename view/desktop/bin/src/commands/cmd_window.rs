@@ -50,12 +50,10 @@ pub fn execute_command(
 }
 
 // FIXME: Temporary placement of this function here. It will be moved later.
-pub fn set_color_theme(ctx: CommandContext, app_state: &AppState) -> Result<Value, String> {
+pub fn change_color_theme(ctx: CommandContext, app_state: &AppState) -> Result<Value, String> {
     let theme_descriptor_arg = ctx.get_arg::<ThemeDescriptor>("themeDescriptor")?;
 
-    app_state
-        .appearance
-        .set_theme_descriptor(theme_descriptor_arg.clone());
+    app_state.change_color_theme(theme_descriptor_arg.clone());
 
     for (label, _) in ctx.app_handle.webview_windows() {
         if ctx.window.label() == &label {
@@ -75,10 +73,10 @@ pub fn set_color_theme(ctx: CommandContext, app_state: &AppState) -> Result<Valu
 }
 
 // FIXME: Temporary placement of this function here. It will be moved later.
-pub fn set_language_pack(ctx: CommandContext, app_state: &AppState) -> Result<Value, String> {
+pub fn change_language_pack(ctx: CommandContext, app_state: &AppState) -> Result<Value, String> {
     let locale_descriptor_arg = ctx.get_arg::<LocaleDescriptor>("localeDescriptor")?;
 
-    app_state.set_current_locale(locale_descriptor_arg.clone());
+    app_state.change_language_pack(locale_descriptor_arg.clone());
 
     for (label, _) in ctx.app_handle.webview_windows() {
         if ctx.window.label() == &label {

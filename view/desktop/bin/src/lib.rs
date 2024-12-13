@@ -7,10 +7,10 @@ mod state;
 mod utl;
 mod window;
 
-use crate::commands::cmd_window::set_language_pack;
+use crate::commands::cmd_window::change_language_pack;
 use crate::constants::*;
 use crate::plugins as moss_plugins;
-use cmd_window::set_color_theme;
+use cmd_window::change_color_theme;
 use commands::*;
 use dashmap::DashMap;
 use desktop_models::appearance::theming::ThemeDescriptor;
@@ -166,19 +166,19 @@ fn create_main_window(app_handle: &AppHandle, url: &str) -> WebviewWindow {
     let commands = DashMap::new();
     commands.insert(
         "workbench.changeColorTheme".into(),
-        Arc::new(set_color_theme) as CommandHandler,
+        Arc::new(change_color_theme) as CommandHandler,
     );
 
     commands.insert(
         "workbench.changeLanguagePack".into(),
-        Arc::new(set_language_pack) as CommandHandler,
+        Arc::new(change_language_pack) as CommandHandler,
     );
 
     let window_number = 0;
     let app_state = AppState {
         commands,
         appearance: Appearance {
-            theme_descriptor: RwLock::new(ThemeDescriptor {
+            theme: RwLock::new(ThemeDescriptor {
                 id: "theme-light".to_string(),
                 name: "Theme Light".to_string(),
                 source: "moss-light.css".to_string(),
@@ -190,7 +190,6 @@ fn create_main_window(app_handle: &AppHandle, url: &str) -> WebviewWindow {
             direction: Some("ltr".to_string()),
         }),
         workbench: Arc::new(workbench),
-        platform_info,
         next_window_id: AtomicUsize::new(window_number),
     };
 

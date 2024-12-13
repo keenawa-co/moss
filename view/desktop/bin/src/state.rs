@@ -10,19 +10,12 @@ use serde_json::Value;
 use std::sync::atomic::AtomicUsize;
 use std::sync::Arc;
 use tauri::{AppHandle, Window};
-use workbench_desktop::window::NativePlatformInfo;
 use workbench_desktop::Workbench;
+
 // NOTE: Temporary solution. Will be moved to crates/moss-desktop.
 
 pub struct Appearance {
-    pub theme_descriptor: RwLock<ThemeDescriptor>,
-}
-
-impl Appearance {
-    pub fn set_theme_descriptor(&self, new_theme_descriptor: ThemeDescriptor) {
-        let mut theme_descriptor_lock = self.theme_descriptor.write();
-        *theme_descriptor_lock = new_theme_descriptor;
-    }
+    pub theme: RwLock<ThemeDescriptor>,
 }
 
 pub struct CommandContext {
@@ -62,7 +55,6 @@ pub struct AppState {
     pub next_window_id: AtomicUsize,
     pub commands: DashMap<ReadOnlyStr, CommandHandler>,
     pub workbench: Arc<Workbench>,
-    pub platform_info: NativePlatformInfo,
 }
 
 impl AppState {
@@ -70,8 +62,13 @@ impl AppState {
         self.commands.get(id).map(|cmd| Arc::clone(&cmd))
     }
 
-    pub fn set_current_locale(&self, locale_descriptor: LocaleDescriptor) {
+    pub fn change_language_pack(&self, locale_descriptor: LocaleDescriptor) {
         let mut locale_lock = self.locale.write();
         *locale_lock = locale_descriptor;
+    }
+
+    pub fn change_color_theme(&self, new_theme_descriptor: ThemeDescriptor) {
+        let mut theme_descriptor_lock = self.appearance.theme.write();
+        *theme_descriptor_lock = new_theme_descriptor;
     }
 }
