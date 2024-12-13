@@ -5,10 +5,16 @@ use std::fmt::Debug;
 use std::time::{Duration, Instant};
 use tracing_mutex::stdsync::Mutex;
 
+// Cache: Serialized objects
+// get_raw() -> Value, get<T>()
+
+// Slotmap: prevent double calculating hash
+// quick_cache
+
 const CACHE_CAPACITY: usize = 1024;
 #[derive(Debug)]
 struct CacheItem {
-    pub data: Box<dyn Any + Send + Sync>,
+    pub data: Box<dyn Any + Send + Sync>, // Arc, WeakRef, internal/platform/core/src/context_v2/node.rs
     pub expiration_time: Instant,
 }
 

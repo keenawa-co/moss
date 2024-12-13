@@ -22,6 +22,7 @@ members = [
     "crates/moss-theme",
     "crates/moss-typebridge",
     "crates/moss-typebridge-macro",
+    "crates/moss-store",
 
     "internal/platform/core",
     "internal/platform/fs",
