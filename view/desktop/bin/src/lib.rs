@@ -1,24 +1,23 @@
 mod commands;
-pub mod constants;
+mod constants;
 mod mem;
 mod menu;
 mod plugins;
 mod utl;
 mod window;
 
-use commands::*;
-use rand::random;
+pub use constants::*;
 
 use moss_desktop::state::AppState;
+use rand::random;
 use std::env;
-use std::sync::atomic::Ordering;
 use tauri::{AppHandle, Manager, RunEvent, WebviewWindow, WindowEvent};
 use tauri_plugin_global_shortcut::{Code, GlobalShortcutExt, Modifiers, Shortcut, ShortcutState};
 use tauri_plugin_log::{fern::colors::ColoredLevelConfig, Target, TargetKind};
 use tauri_plugin_os;
 use window::{create_window, CreateWindowInput};
 
-use crate::constants::*;
+use crate::commands::*;
 use crate::plugins as moss_plugins;
 
 #[macro_use]
@@ -45,7 +44,6 @@ pub fn run() {
                 })
                 .build(),
         )
-        // .plugin(tauri_plugin_clipboard_manager::init())
         .plugin(
             tauri_plugin_window_state::Builder::default()
                 .with_denylist(&["ignored"])
@@ -153,15 +151,10 @@ fn create_main_window(app_handle: &AppHandle, url: &str) -> WebviewWindow {
 }
 
 fn create_child_window(handle: &AppHandle, url: &str) -> WebviewWindow {
-    let window_number = handle
-        .state::<AppState>()
-        .next_window_id
-        .fetch_add(1, Ordering::SeqCst);
-
-    let label = format!("{MAIN_WINDOW_PREFIX}{}", window_number + 1);
+    let next_window_id = handle.state::<AppState>().inc_next_window_id() + 1;
     let config = CreateWindowInput {
         url,
-        label: label.as_str(),
+        label: &format!("{MAIN_WINDOW_PREFIX}{}", next_window_id),
         title: "Moss Studio",
         inner_size: (DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT),
         position: (

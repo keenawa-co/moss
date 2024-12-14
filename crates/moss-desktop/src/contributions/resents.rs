@@ -16,7 +16,7 @@ use moss_text::{localize, ReadOnlyStr};
 use once_cell::sync::Lazy;
 use quote::quote;
 use serde::Serialize;
-use std::{rc::Rc, sync::Arc};
+use std::sync::Arc;
 
 use super::Contribution;
 

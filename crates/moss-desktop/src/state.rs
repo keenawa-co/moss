@@ -5,25 +5,18 @@ use moss_text::ReadOnlyStr;
 use parking_lot::RwLock;
 use serde::de::DeserializeOwned;
 use serde_json::Value;
-use std::fmt::Debug;
-use std::sync::atomic::AtomicUsize;
-use std::sync::Arc;
+use std::{fmt::Debug, sync::atomic::AtomicUsize, sync::Arc};
 use tauri::{AppHandle, Emitter, EventTarget, Manager, Window};
 
 use crate::contributions::Contribution;
-use crate::models::view::*;
-use crate::models::window::LocaleDescriptor;
-use crate::models::{actions::MenuItem, appearance::theming::ThemeDescriptor};
-
-// NOTE: Temporary solution. Will be moved to crates/moss-desktop.
-
-pub struct Appearance {
-    pub theme: RwLock<ThemeDescriptor>,
-}
+use crate::models::{
+    actions::MenuItem, appearance::theming::ThemeDescriptor, view::*, window::LocaleDescriptor,
+};
 
 pub struct CommandContext {
     pub app_handle: AppHandle,
     pub window: Window,
+
     args: HashMap<String, Value>,
 }
 
@@ -85,13 +78,6 @@ impl ViewsRegistry {
         self.views.entry(id).or_insert_with(Vec::new).extend(batch);
     }
 
-    pub(crate) fn get_view_descriptors_by_group_id(
-        &self,
-        id: &ReadOnlyStr,
-    ) -> Option<&Vec<TreeViewDescriptor>> {
-        self.views.get(id)
-    }
-
     pub fn get_view_model<T: Send + Sync + Debug + 'static>(
         &self,
         group_id: impl Into<ReadOnlyStr>,
@@ -102,13 +88,6 @@ impl ViewsRegistry {
             .iter()
             .find(|item| item.id == view_id)
             .and_then(|item| Arc::downcast::<T>(Arc::clone(&item.model)).ok())
-    }
-
-    pub(crate) fn get_groups_by_location(
-        &self,
-        location: &TreeViewGroupLocation,
-    ) -> Option<&Vec<TreeViewGroup>> {
-        self.groups.get(location)
     }
 }
 
@@ -144,10 +123,14 @@ impl MenuRegistry {
     }
 }
 
-pub struct AppState {
-    pub next_window_id: AtomicUsize,
-    pub appearance: Appearance,
+pub struct Preferences {
+    pub theme: RwLock<ThemeDescriptor>,
     pub locale: RwLock<LocaleDescriptor>,
+}
+
+pub struct AppState {
+    next_window_id: AtomicUsize,
+    pub preferences: Preferences,
     pub commands: DashMap<ReadOnlyStr, CommandHandler>,
     pub views: Arc<RwLock<ViewsRegistry>>,
     pub menus: Arc<RwLock<MenuRegistry>>,
@@ -155,6 +138,7 @@ pub struct AppState {
 
 impl AppState {
     pub fn new() -> Self {
+        // FIXME: Temporary solution, these data should be added to the registry, not registered here.
         let commands = DashMap::new();
         commands.insert(
             "workbench.changeColorTheme".into(),
@@ -168,23 +152,24 @@ impl AppState {
 
         let mut state = Self {
             next_window_id: AtomicUsize::new(0),
-            appearance: Appearance {
+            preferences: Preferences {
                 theme: RwLock::new(ThemeDescriptor {
                     id: "theme-light".to_string(),
                     name: "Theme Light".to_string(),
                     source: "moss-light.css".to_string(),
                 }),
+                locale: RwLock::new(LocaleDescriptor {
+                    code: "en".to_string(),
+                    name: "English".to_string(),
+                    direction: Some("ltr".to_string()),
+                }),
             },
-            locale: RwLock::new(LocaleDescriptor {
-                code: "en".to_string(),
-                name: "English".to_string(),
-                direction: Some("ltr".to_string()),
-            }),
             commands,
             views: Arc::new(RwLock::new(ViewsRegistry::new())),
             menus: Arc::new(RwLock::new(MenuRegistry::new())),
         };
 
+        // FIXME: Temporary solution, these data should be added to the registry, not registered here.
         crate::contributions::workbench::WorkbenchContribution::contribute(&mut state).unwrap();
         crate::contributions::resents::RecentsContribution::contribute(&mut state).unwrap();
         crate::contributions::links::LinksContribution::contribute(&mut state).unwrap();
@@ -194,18 +179,23 @@ impl AppState {
         state
     }
 
+    pub fn inc_next_window_id(&self) -> usize {
+        self.next_window_id
+            .fetch_add(1, std::sync::atomic::Ordering::SeqCst)
+    }
+
     pub fn get_command(&self, id: &ReadOnlyStr) -> Option<CommandHandler> {
         self.commands.get(id).map(|cmd| Arc::clone(&cmd))
     }
 
     pub fn change_language_pack(&self, locale_descriptor: LocaleDescriptor) {
-        let mut locale_lock = self.locale.write();
+        let mut locale_lock = self.preferences.locale.write();
         *locale_lock = locale_descriptor;
     }
 
-    pub fn change_color_theme(&self, new_theme_descriptor: ThemeDescriptor) {
-        let mut theme_descriptor_lock = self.appearance.theme.write();
-        *theme_descriptor_lock = new_theme_descriptor;
+    pub fn change_color_theme(&self, theme_descriptor: ThemeDescriptor) {
+        let mut theme_descriptor_lock = self.preferences.theme.write();
+        *theme_descriptor_lock = theme_descriptor;
     }
 }
 
