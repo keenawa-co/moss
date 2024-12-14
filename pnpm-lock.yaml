@@ -135,19 +135,6 @@ importers:
         specifier: workspace:*
         version: link:../../packages/config-typescript
 
-  internal/workbench/desktop/models:
-    dependencies:
-      typescript:
-        specifier: ^5.7.2
-        version: 5.7.2
-    devDependencies:
-      '@repo/moss-text':
-        specifier: workspace:*
-        version: link:../../../../crates/moss-text
-      '@repo/typescript-config':
-        specifier: workspace:*
-        version: link:../../../../packages/config-typescript
-
   misc/cspell:
     dependencies:
       '@cspell/dict-lorem-ipsum':
@@ -1114,7 +1101,6 @@ packages:
 
   '@cspell/dict-typescript@3.1.11':
     resolution: {integrity: sha512-FwvK5sKbwrVpdw0e9+1lVTl8FPoHYvfHRuQRQz2Ql5XkC0gwPPkpoyD1zYImjIyZRoYXk3yp9j8ss4iz7A7zoQ==}
-
 
   '@dnd-kit/accessibility@3.1.1':
     resolution: {integrity: sha512-2P+YgaXF+gRsIihwwY1gCsQSYnu9Zyj2py8kY5fFvUM1qm2WA2u639R6YNVfU4GWr+ZM5mqEsfHZZLoRONbemw==}
