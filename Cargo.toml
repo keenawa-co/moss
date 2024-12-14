@@ -24,14 +24,14 @@ members = [
     "crates/moss-typebridge-macro",
     "crates/moss-desktop",
 
-    "internal/platform/core",
-    "internal/platform/fs",
-    "internal/platform/formation",
-    "internal/platform/configuration",
-    "internal/platform/user_profile",
-    "internal/platform/environment",
-    "internal/platform/utl",
-    "internal/platform/workspace",
+    # "internal/platform/core",
+    # "internal/platform/fs",
+    # "internal/platform/formation",
+    # "internal/platform/configuration",
+    # "internal/platform/user_profile",
+    # "internal/platform/environment",
+    # "internal/platform/utl",
+    # "internal/platform/workspace",
 
     # "internal/workbench/desktop/models",
     # "internal/workbench/service/configuration/common",
@@ -74,14 +74,14 @@ moss_collection = { path = "crates/moss-collection" }
 moss_desktop = { path = "crates/moss-desktop" }
 
 
-platform_core = { path = "internal/platform/core" }
-platform_utl = { path = "internal/platform/utl" }
-platform_configuration = { path = "internal/platform/configuration" }
-platform_formation = { path = "internal/platform/formation" }
-platform_user_profile = { path = "internal/platform/user_profile" }
-platform_environment = { path = "internal/platform/environment" }
-platform_workspace = { path = "internal/platform/workspace" }
-platform_fs = { path = "internal/platform/fs" }
+# platform_core = { path = "internal/platform/core" }
+# platform_utl = { path = "internal/platform/utl" }
+# platform_configuration = { path = "internal/platform/configuration" }
+# platform_formation = { path = "internal/platform/formation" }
+# platform_user_profile = { path = "internal/platform/user_profile" }
+# platform_environment = { path = "internal/platform/environment" }
+# platform_workspace = { path = "internal/platform/workspace" }
+# platform_fs = { path = "internal/platform/fs" }
 
 # desktop_models = { path = "internal/workbench/desktop/models" }
 
