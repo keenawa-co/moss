@@ -5,8 +5,18 @@ use std::any::{type_name, Any};
 use std::fmt::Debug;
 use std::sync::Arc;
 use std::time::{Duration, Instant};
+use thiserror::Error;
 
 type DynType = Arc<dyn Any + Send + Sync>;
+
+#[derive(Debug, Error)]
+pub enum MossCacheError {
+    #[error("The value of key '{key}' does not have type '{type_name}'")]
+    TypeMismatch { key: String, type_name: String },
+
+    #[error("The key '{key}' does not exist")]
+    NonexistentKey { key: String },
+}
 
 #[derive(Clone, Debug)]
 struct MossCacheItem {
@@ -15,11 +25,17 @@ struct MossCacheItem {
 }
 
 impl MossCacheItem {
-    pub fn get<T>(&self) -> Option<Arc<T>>
+    pub(crate) fn get<T>(&self, key: &str) -> Result<Arc<T>, MossCacheError>
     where
         T: Any + Send + Sync,
     {
-        self.item.clone().downcast::<T>().ok()
+        match self.item.clone().downcast::<T>() {
+            Ok(result) => Ok(result),
+            Err(_) => Err(MossCacheError::TypeMismatch {
+                key: key.to_string(),
+                type_name: type_name::<T>().to_string(),
+            }),
+        }
     }
 }
 
@@ -59,13 +75,13 @@ pub struct MossCacheBuilder {
 }
 
 impl MossCacheBuilder {
-    fn new(max_capacity: u64) -> MossCacheBuilder {
+    pub fn new(max_capacity: u64) -> MossCacheBuilder {
         MossCacheBuilder {
             cache_builder: CacheBuilder::new(max_capacity).expire_after(CustomExpiry {}),
         }
     }
 
-    fn build(self) -> MossCache {
+    pub fn build(self) -> MossCache {
         MossCache {
             cache: self.cache_builder.build(),
             retrievers: DashMap::new(),
@@ -97,37 +113,44 @@ impl MossCache {
         self.cache.remove(key);
     }
 
-    pub fn get<T>(&self, key: &str) -> Option<Arc<T>>
+    pub fn get<T>(&self, key: &str) -> Result<Arc<T>, MossCacheError>
     where
         T: Any + Send + Sync,
     {
         /// Attempt to first get the value of the key; if not, it will first update the cache value
         /// using the registered update function
         match self.cache.get(key) {
-            Some(cache_item) => Some(cache_item.get::<T>().expect(&format!(
-                "The value of key '{}' does not have type '{}'",
-                key,
-                type_name::<T>()
-            ))),
-
+            Some(cache_item) => cache_item.get::<T>(key),
             None => {
-                let retriever = self.retrievers.get(key)?.value().clone();
+                let retriever = self
+                    .retrievers
+                    .get(key)
+                    .ok_or(MossCacheError::NonexistentKey {
+                        key: key.to_string(),
+                    })?
+                    .value()
+                    .clone();
                 self.cache
                     .get_with(key.to_string(), move || retriever())
-                    .get::<T>()
+                    .get::<T>(key)
             }
         }
     }
 
-    pub fn take<T>(&self, key: &str) -> Option<T>
+    pub fn take<T>(&self, key: &str) -> Result<T, MossCacheError>
     where
         T: Any + Clone + Send + Sync,
     {
         /// Removes the stored value for key and get the raw T value
         /// To get T from Arc<T>, T must be Clone
-        let cache_item = self.cache.remove(key)?;
+        let cache_item = self
+            .cache
+            .remove(key)
+            .ok_or(MossCacheError::NonexistentKey {
+                key: key.to_string(),
+            })?;
         cache_item
-            .get::<T>()
+            .get::<T>(key)
             .map(|arc_t| Arc::<T>::unwrap_or_clone(arc_t))
     }
 
@@ -144,7 +167,7 @@ impl MossCache {
         self.retrievers.insert(key.to_string(), retriever.clone());
         self.cache
             .get_with(key.to_string(), move || retriever())
-            .get::<T>()
+            .get::<T>(key)
             .unwrap()
     }
 
@@ -195,7 +218,7 @@ mod test {
     fn test_cache_get_incorrect_type() {
         let cache = MossCacheBuilder::new(1024).build();
         cache.insert("i32", 32i32, Duration::from_millis(1000));
-        cache.get::<String>("i32");
+        cache.get::<String>("i32").unwrap();
     }
 
     #[test]
