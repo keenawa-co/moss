@@ -1,3 +1,6 @@
+//import "~dockview/dist/styles/dockview.css";
+
+import { DockviewReact, DockviewReadyEvent, IDockviewPanelProps } from "dockview";
 import { Suspense } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 
@@ -9,12 +12,32 @@ import { Menu } from "../components/Menu";
 import { Resizable, ResizablePanel } from "../components/Resizable";
 import { ContentLayout } from "./ContentLayout";
 
+import "../../node_modules/dockview/dist/styles/dockview.css";
+
+const components = {
+  default: (props: IDockviewPanelProps) => {
+    return <div>{props.api.title}</div>;
+  },
+};
+
 export const AppLayout = () => {
   const primarySideBarVisibility = useLayoutStore((state) => state.primarySideBar.visibility);
   const setPrimarySideBarWidth = useLayoutStore((state) => state.primarySideBar.setWidth);
 
   const bottomPaneVisibility = useLayoutStore((state) => state.bottomPane.visibility);
   const setBottomPaneHeight = useLayoutStore((state) => state.bottomPane.setHeight);
+
+  const onReady = (event: DockviewReadyEvent) => {
+    event.api.addPanel({
+      id: "panel_1",
+      component: "default",
+    });
+
+    event.api.addPanel({
+      id: "panel_2",
+      component: "default",
+    });
+  };
 
   return (
     <Resizable
@@ -23,6 +46,7 @@ export const AppLayout = () => {
         setPrimarySideBarWidth(sizes[0]);
       }}
     >
+      <DockviewReact className="dockview-theme-dark" onReady={onReady} components={components} />
       <ResizablePanel minSize={100} preferredSize={255} snap visible={primarySideBarVisibility} className="select-none">
         <LaunchPad />
       </ResizablePanel>
