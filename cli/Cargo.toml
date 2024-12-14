@@ -1,0 +1,9 @@
+[package]
+name = "moss-cli"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+clap.workspace = true
+tokio = {workspace = true, features = ["rt-multi-thread", "macros"]}
+os_info.workspace = true

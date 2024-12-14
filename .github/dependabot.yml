@@ -13,6 +13,7 @@ updates:
     reviewers:
       - g10z3r
       - jevgenis33
+    open-pull-requests-limit: 5
 
   - package-ecosystem: cargo
     directory: "/"
@@ -26,6 +27,10 @@ updates:
       prefix-development: chore(rust)
     reviewers:
       - brutusyhy
+    labels:
+      - dependencies
+      - rust
+    open-pull-requests-limit: 10
 
   - package-ecosystem: npm
     directory: "/"
@@ -41,4 +46,6 @@ updates:
       - Enthceph
       - jevgenis33
     labels:
+      - dependencies
       - typescript
+    open-pull-requests-limit: 10

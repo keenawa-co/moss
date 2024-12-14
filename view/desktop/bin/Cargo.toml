@@ -10,25 +10,29 @@ rust-version = "1.70"
 
 [lib]
 name = "desktop_app_lib"
-crate-type = ["lib", "cdylib", "staticlib"]
+#crate-type = ["rlib", "cdylib", "staticlib"]
 
 [build-dependencies]
 tauri-build = { version = "2.0.2", features = [] }
 
+[features]
+compression = ["tauri/compression"]
+
 [dependencies]
-moss_base.workspace = true
-desktop_models.workspace = true
+moss_env.workspace = true
+moss_text.workspace = true
+moss_desktop.workspace = true
 moss_uikit.workspace = true
 
-platform_core.workspace = true
-platform_workspace.workspace = true
-platform_configuration.workspace = true
-platform_formation.workspace = true
-platform_fs.workspace = true
+# platform_core.workspace = true
+# platform_workspace.workspace = true
+# platform_configuration.workspace = true
+# platform_formation.workspace = true
+# platform_fs.workspace = true
 
-workbench_desktop.workspace = true
-workbench_service_configuration_tao.workspace = true
-workbench_service_environment_tao.workspace = true
+# workbench_desktop.workspace = true
+# workbench_service_configuration_tao.workspace = true
+# workbench_service_environment_tao.workspace = true
 
 futures.workspace = true
 anyhow.workspace = true
@@ -37,28 +41,29 @@ parking_lot.workspace = true
 tracing.workspace = true
 flume.workspace = true
 async-task.workspace = true
-homedir.workspace = true
+dirs.workspace = true
 log.workspace = true
 rand.workspace = true
 fern.workspace = true
 smol.workspace = true
+clap.workspace = true
+dashmap.workspace = true
 
 # surrealdb = { workspace = true, features = ["kv-rocksdb"] }
 tokio = { workspace = true, features = ["full", "macros", "signal"] }
 serde_json.workspace = true
 serde = { workspace = true, features = ["derive"] }
+strum = { workspace = true, features = ["derive"] }
 hashbrown = { workspace = true, features = ["serde"] }
 
-tauri = { workspace = true, features = ["macos-private-api"] }
-strum = { workspace = true, features = ["derive"] }
-tauri-plugin-shell = "2.0.2"
-tauri-plugin-os = "2.0.1"
+tauri.workspace = true
+
 tauri-plugin-log = { version = "2.0.1", features = ["colored"] }
 tauri-plugin-window-state = "2.0.1"
-tauri-plugin-clipboard-manager = "2.0.1"
-tauri-plugin-fs = "2.0.0-rc.0"
-tauri-plugin-cli = "2.0.1"
+# tauri-plugin-clipboard-manager = "2.0.1"
+tauri-plugin-fs = "2.1.0"
 tauri-plugin-global-shortcut = "2"
+tauri-plugin-os = "2.2.0"
 
 [target.'cfg(any(target_os = "linux", target_os = "macos"))'.dependencies]
 mimalloc = { version = "0.1.39", default-features = false }
@@ -67,6 +72,3 @@ mimalloc = { version = "0.1.39", default-features = false }
 objc = "0.2.7"
 cocoa = "0.26.0"
 macos-trampoline = { path = "./lib/macos" }
-
-
-

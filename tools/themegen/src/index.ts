@@ -1,71 +1,15 @@
 import { existsSync, mkdirSync, writeFileSync } from "fs";
 import * as os from "os";
 
-import { Theme } from "@repo/desktop-models";
+import { Theme } from "@repo/moss-desktop";
 
-// FIXME: temporary solution
+import { defaultDarkTheme } from "./themes/moss-dark.ts";
+import { defaultLightTheme } from "./themes/moss-light.ts";
+import { pinkTheme } from "./themes/moss-pink.ts";
+
+// FIXME: temporary solution. Also should be fixed in packages/config-eslint/moss-lint-plugin/rules/validate-token-names.js
 const homeDirectory = os.homedir();
 const themesDirectory = `${homeDirectory}/.config/moss/themes`;
-
-// Default
-const defaultDarkTheme: Theme = {
-  name: "Moss Dark Default",
-  slug: "moss-dark",
-  type: "dark",
-  isDefault: false,
-  color: {
-    "primary": { "type": "solid", "value": "rgba(255, 255, 255, 1)" }, // prettier-ignore
-    "sideBar.background": { type: "solid", value: "rgba(39, 39, 42, 1)" },
-    "toolBar.background": { type: "solid", value: "rgba(30, 32, 33, 1)" },
-    "page.background": { type: "solid", value: "rgba(22, 24, 25, 1)" },
-    "statusBar.background": { type: "solid", value: "rgba(0, 122, 205, 1)" },
-    "windowsCloseButton.background": { type: "solid", value: "rgba(196, 43, 28, 1)" },
-    "windowControlsLinux.background": { type: "solid", value: "rgba(55, 55, 55, 1)" },
-    "windowControlsLinux.text": { type: "solid", value: "rgba(255, 255, 255, 1)" },
-    "windowControlsLinux.hoverBackground": { type: "solid", value: "rgba(66, 66, 66, 1)" },
-    "windowControlsLinux.activeBackground": { type: "solid", value: "rgba(86, 86, 86, 1)" },
-  },
-};
-
-const defaultLightTheme: Theme = {
-  name: "Moss Light Default",
-  slug: "moss-light",
-  type: "light",
-  isDefault: true,
-  color: {
-    "primary": { "type": "solid", "value": "rgba(0, 0, 0, 1)" }, // prettier-ignore
-    "sideBar.background": { type: "solid", value: "rgba(244, 244, 245, 1)" },
-    "toolBar.background": { type: "solid", value: "rgba(224, 224, 224, 1)" },
-    "page.background": { type: "solid", value: "rgba(255, 255, 255, 1)" },
-    "statusBar.background": { type: "solid", value: "rgba(0, 122, 205, 1)" },
-    "windowsCloseButton.background": { type: "solid", value: "rgba(196, 43, 28, 1)" },
-    "windowControlsLinux.background": { type: "solid", value: "rgba(218, 218, 218, 1)" },
-    "windowControlsLinux.text": { type: "solid", value: "rgba(61, 61, 61, 1)" },
-    "windowControlsLinux.hoverBackground": { type: "solid", value: "rgba(209, 209, 209, 1)" },
-    "windowControlsLinux.activeBackground": { type: "solid", value: "rgba(191, 191, 191, 1)" },
-  },
-};
-
-// Other
-
-const pinkTheme: Theme = {
-  name: "Moss Pink",
-  slug: "moss-pink",
-  type: "light",
-  isDefault: false,
-  color: {
-    "primary": { "type": "solid", "value": "rgba(0, 0, 0, 1)" }, // prettier-ignore
-    "sideBar.background": { type: "solid", value: "rgba(234, 157, 242, 1)" },
-    "toolBar.background": { type: "solid", value: "rgba(222, 125, 232, 1)" },
-    "page.background": { type: "solid", value: "rgba(227, 54, 245, 1)" },
-    "statusBar.background": { type: "solid", value: "rgba(63, 11, 69, 1)" },
-    "windowsCloseButton.background": { type: "solid", value: "rgba(196, 43, 28, 1)" },
-    "windowControlsLinux.background": { type: "solid", value: "rgba(218, 218, 218, 1)" },
-    "windowControlsLinux.text": { type: "solid", value: "rgba(61, 61, 61, 1)" },
-    "windowControlsLinux.hoverBackground": { type: "solid", value: "rgba(209, 209, 209, 1)" },
-    "windowControlsLinux.activeBackground": { type: "solid", value: "rgba(191, 191, 191, 1)" },
-  },
-};
 
 const themes: Theme[] = [defaultDarkTheme, defaultLightTheme, pinkTheme];
 

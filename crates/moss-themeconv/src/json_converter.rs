@@ -1,57 +1,74 @@
 use anyhow::{Context as _, Result};
-use desktop_models::appearance::theming::Theme;
+use moss_desktop::models::appearance::theming::Theme;
+use std::sync::Arc;
 
-use crate::{util::convert_colors_to_css_variables, ThemeConverter};
+use crate::{util::convert_colors_to_css_variables, ThemeConverter, Validator};
+
+const COLOR_VARIABLE_PREFIX: &str = "color";
 
 #[cfg(feature = "json")]
-pub struct JsonThemeConverter;
+pub struct JsonThemeConverter {
+    validator: Arc<dyn Validator>,
+}
 
 #[cfg(feature = "json")]
 impl JsonThemeConverter {
-    pub fn new() -> Self {
-        Self
+    pub fn new(schema: Arc<dyn Validator>) -> Self {
+        Self { validator: schema }
     }
 }
 
 #[cfg(feature = "json")]
 impl ThemeConverter for JsonThemeConverter {
     fn convert_to_css(&self, content: String) -> Result<String> {
-        let theme: Theme = serde_json::from_str(&content).context("JSON deserialization failed")?;
+        let theme_value = serde_json::from_str(&content)
+            .context("Failed to deserialize JSON content into Value.")?;
 
-        let mut css_sections = Vec::new();
+        self.validator.validate(&theme_value)?;
 
-        if !theme.colors.is_empty() {
-            let color_vars = convert_colors_to_css_variables("color", &theme.colors);
-            let mut color_css = String::with_capacity(color_vars.len() * 40); // Estimate capacity
-            for (var, val) in &color_vars {
-                color_css.push_str(&format!("  {}: {};\n", var, val));
-            }
-            css_sections.push(color_css);
+        let theme: Theme = serde_json::from_value(theme_value)
+            .context("Failed to deserialize JSON content into Theme structure.")?;
+
+        if theme.colors.is_empty() {
+            return Ok(String::from(":root {}\n"));
         }
 
-        let mut result = String::with_capacity(css_sections.len() * 100); // Estimate capacity
-        result.push_str(":root {\n");
-        for (i, section) in css_sections.iter().enumerate() {
-            result.push_str(section);
-            if i < css_sections.len() - 1 {
-                result.push_str("\n");
-            }
-        }
-        result.push_str("}\n");
+        let color_vars = convert_colors_to_css_variables(COLOR_VARIABLE_PREFIX, &theme.colors);
 
-        Ok(result)
+        let mut css_content = String::with_capacity(color_vars.len() * 50 + 10); // Оценка емкости
+        css_content.push_str(":root {\n");
+        for (var, val) in &color_vars {
+            css_content.push_str(&format!("  {}: {};\n", var, val));
+        }
+        css_content.push_str("}\n");
+
+        Ok(css_content)
     }
 }
 
 #[cfg(test)]
 mod tests {
     use anyhow::Result;
-    use desktop_models::appearance::theming::{ColorType, ThemeType};
     use indexmap::IndexMap;
-
-    use desktop_models::appearance::theming::{ColorDetail, ColorPosition, ColorValue};
+    use moss_desktop::models::appearance::theming::{
+        ColorDetail, ColorPosition, ColorType, ColorValue, ThemeType,
+    };
 
     use super::*;
+
+    struct MockThemeValidator {
+        theme_is_valid: bool,
+    }
+
+    impl Validator for MockThemeValidator {
+        fn validate(&self, _theme_value: &serde_json::Value) -> Result<()> {
+            if self.theme_is_valid {
+                return Ok(());
+            } else {
+                return Err(anyhow!("Schema validation failed"));
+            }
+        }
+    }
 
     #[test]
     fn test_missing_color_type() -> Result<()> {
@@ -60,16 +77,19 @@ mod tests {
         "name": "Incomplete Theme",
         "slug": "incomplete-theme",
         "type": "light",
-        "isDefault": true,
-        "color": {
+        "colors": {
             "primary": {
                 "value": "rgba(0,0,0,1)"
             }
         }
     }
     "#;
-        let service = JsonThemeConverter::new();
-        let result = service.convert_to_css(json.to_string());
+
+        let validator = MockThemeValidator {
+            theme_is_valid: true,
+        };
+        let converter = JsonThemeConverter::new(Arc::new(validator));
+        let result = converter.convert_to_css(json.to_string());
         assert!(result.is_err());
         Ok(())
     }
@@ -133,8 +153,11 @@ mod tests {
             colors: color_map,
         };
 
-        let service = JsonThemeConverter::new();
-        let css = service.convert_to_css(serde_json::to_string(&theme)?)?;
+        let validator = MockThemeValidator {
+            theme_is_valid: true,
+        };
+        let converter = JsonThemeConverter::new(Arc::new(validator));
+        let css = converter.convert_to_css(serde_json::to_string(&theme)?)?;
 
         let expected_css = "\
 :root {
@@ -178,8 +201,11 @@ mod tests {
             colors: color_map,
         };
 
-        let service = JsonThemeConverter::new();
-        let css = service.convert_to_css(serde_json::to_string(&theme)?)?;
+        let validator = MockThemeValidator {
+            theme_is_valid: true,
+        };
+        let converter = JsonThemeConverter::new(Arc::new(validator));
+        let css = converter.convert_to_css(serde_json::to_string(&theme)?)?;
 
         let expected_css = "\
 :root {
@@ -213,8 +239,11 @@ mod tests {
             colors: color_map,
         };
 
-        let service = JsonThemeConverter::new();
-        let css = service.convert_to_css(serde_json::to_string(&theme)?)?;
+        let validator = MockThemeValidator {
+            theme_is_valid: true,
+        };
+        let converter = JsonThemeConverter::new(Arc::new(validator));
+        let css = converter.convert_to_css(serde_json::to_string(&theme)?)?;
 
         let expected_css = "\
 :root {
@@ -239,12 +268,14 @@ mod tests {
             colors: color_map,
         };
 
-        let service = JsonThemeConverter::new();
-        let css = service.convert_to_css(serde_json::to_string(&theme)?)?;
+        let validator = MockThemeValidator {
+            theme_is_valid: true,
+        };
+        let converter = JsonThemeConverter::new(Arc::new(validator));
+        let css = converter.convert_to_css(serde_json::to_string(&theme)?)?;
 
         let expected_css = "\
-:root {
-}
+:root {}
 ";
 
         assert_eq!(css, expected_css);

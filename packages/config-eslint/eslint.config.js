@@ -1,7 +1,4 @@
-// Empty config to prevent ESLint from outputting errors in the terminal output tab on initialization
+import defaultConfig from "./configs/default.js";
+
 /** @type {import('eslint').Linter.Config} */
-export default [
-  {
-    rules: {},
-  },
-];
+export default [...defaultConfig];

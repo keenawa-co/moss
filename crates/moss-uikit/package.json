@@ -7,7 +7,9 @@
       "test": "echo \"Error: no test specified\" && exit 1"
     },
     "devDependencies": {
-      "@repo/typescript-config": "workspace:*"
+      "@repo/typescript-config": "workspace:*",
+      "@repo/moss-text": "workspace:*",
+      "@repo/moss-html": "workspace:*"
     },
     "dependencies": {
       "typescript": "^5.7.2"

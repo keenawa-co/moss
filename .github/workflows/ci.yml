@@ -1,0 +1,84 @@
+name: CI
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  rust-workflows:
+    name: Rust Workflows - ${{ matrix.task.name }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: true
+      matrix:
+        task:
+          - name: Unit Tests
+            command: cargo -q test --lib
+          - name: Docs Tests
+            command: cargo -q test --doc
+          - name: Workspace Audit
+            command: |
+              set -e
+              cd ${GITHUB_WORKSPACE}/tools/xtask
+              cargo -q run -- --fail-fast rwa
+    timeout-minutes: 15
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Cache Rust Dependencies
+        uses: Swatinem/rust-cache@v2.7.5
+        with:
+          workspaces: ".github/cache"
+
+      - name: Cache Apt Packages
+        uses: awalsh128/cache-apt-pkgs-action@latest
+        with:
+          packages: |
+            libwebkit2gtk-4.0-dev
+            libwebkit2gtk-4.1-dev
+            libappindicator3-dev
+            librsvg2-dev
+            patchelf
+
+      - name: Execute Rust Task - ${{ matrix.task.name }}
+        run: ${{ matrix.task.command }}
+        working-directory: ".github/cache"
+
+  node-workflows:
+    name: Node.js Workflows - ${{ matrix.task.name }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: true
+      matrix:
+        task:
+          - name: Lint
+            command: pnpm run lint -- --quiet
+          - name: Test Packages
+            command: pnpm run test --project packages
+          - name: Test Desktop
+            command: pnpm run test --project desktop
+    timeout-minutes: 15
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Install PNPM
+        uses: pnpm/action-setup@v4
+
+      - name: Set Up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: "package.json"
+          cache: "pnpm"
+
+      - name: Install Dependencies
+        run: pnpm install
+
+      - name: Execute Task - ${{ matrix.task.name }}
+        run: ${{ matrix.task.command }}

@@ -1,6 +1,5 @@
 use log::{info, warn};
-use rand::random;
-use tauri::{AppHandle, Manager, WebviewUrl, WebviewWindow, WindowEvent};
+use tauri::{AppHandle, WebviewUrl, WebviewWindow};
 
 use crate::{menu, MIN_WINDOW_HEIGHT, MIN_WINDOW_WIDTH};
 
@@ -63,37 +62,4 @@ pub fn create_window(app_handle: &AppHandle, input: CreateWindowInput<'_>) -> We
     }
 
     webview_window
-}
-// We will reserve this function for future use (Settings window, for example)
-pub async fn create_child_window(
-    parent_label: &str,
-    url: &str,
-    label: &str,
-    title: &str,
-    inner_size: (f64, f64),
-    app_handle: AppHandle,
-) -> Result<(), String> {
-    let config = CreateWindowInput {
-        url,
-        label,
-        title,
-        inner_size,
-        position: (
-            100.0 + random::<f64>() * 20.0,
-            100.0 + random::<f64>() * 20.0,
-        ),
-    };
-    let child_window = create_window(&app_handle, config);
-
-    if let Some(parent_window) = app_handle.get_webview_window(parent_label) {
-        child_window.on_window_event(move |e| match e {
-            // When the child window is destroyed, bring up the parent window
-            WindowEvent::Destroyed => {
-                parent_window.set_focus().unwrap();
-            }
-            _ => {}
-        });
-    }
-
-    Ok(())
 }

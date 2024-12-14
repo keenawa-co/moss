@@ -2,7 +2,7 @@
   "files": [],
   "references": [
     {
-      "path": "crates/moss-str"
+      "path": "crates/moss-text"
     },
     {
       "path": "crates/moss-html"
@@ -11,16 +11,13 @@
       "path": "crates/moss-uikit"
     },
     {
-      "path": "packages/moss_lang"
+      "path": "crates/moss-desktop"
     },
     {
       "path": "packages/moss-ui"
     },
     {
       "path": "view/desktop"
-    },
-    {
-      "path": "view/docs"
     },
     {
       "path": "view/web"
@@ -33,9 +30,6 @@
     },
     {
       "path": "tools/icongen"
-    },
-    {
-      "path": "internal/workbench/desktop/models"
     },
     {
       "path": "misc/cspell"

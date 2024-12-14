@@ -1,35 +1,34 @@
+# Uncomment for future compilation profiling
+# cargo-features = ["profile-rustflags"]
+
 [workspace]
-resolver = "2"
+resolver = "1"
 members = [
     "view/desktop/bin",
+    "cli",
+    "tools/xtask",
+    "misc/themeinstall",
 
-    "crates/moss-base",
-    "crates/moss-str",
+    "crates/moss-text",
     "crates/moss-fs",
     "crates/moss-jsonlogic",
     "crates/moss-jsonlogic-macro",
     "crates/moss-uikit",
     "crates/moss-html",
     "crates/moss-themeconv",
-
-    "internal/platform/core",
-    "internal/platform/fs",
-    "internal/platform/formation",
-    "internal/platform/configuration",
-    "internal/platform/user_profile",
-    "internal/platform/environment",
-    "internal/platform/utl",
-    "internal/platform/workspace",
-
-    "internal/workbench/desktop/models",
-    "internal/workbench/service/configuration/common",
-    "internal/workbench/service/configuration/tao",
-    "internal/workbench/service/user_profile/tao",
-    "internal/workbench/service/environment/tao",
-
-    "tools/xtask",
-    "misc/themeinstall",
+    "crates/moss-env",
+    "crates/moss-async",
+    "crates/moss-collection",
+    "crates/moss-theme",
+    "crates/moss-typebridge",
+    "crates/moss-typebridge-macro",
+    "crates/moss-desktop",
 ]
+
+[profile.dev]
+# Uncomment for future compilation profiling
+# rustflags = ["-Zself-profile=profiles/clean"]
+# rustflags = ["-Ztime-passes"]
 
 [profile.release]
 codegen-units = 1 # Compile crates one after another so the compiler can optimize better
@@ -46,36 +45,31 @@ opt-level = 3
 [workspace.dependencies]
 moss_uikit = { path = "crates/moss-uikit" }
 moss_html = { path = "crates/moss-html" }
-moss_base = { path = "crates/moss-base" }
-moss_str = { path = "crates/moss-str" }
+moss_text = { path = "crates/moss-text" }
 moss_fs = { path = "crates/moss-fs" }
 moss_themeconv = { path = "crates/moss-themeconv" }
 moss_jsonlogic = { path = "crates/moss-jsonlogic" }
 moss_jsonlogic_macro = { path = "crates/moss-jsonlogic-macro" }
+moss_typebridge = { path = "crates/moss-typebridge" }
+moss_typebridge_macro = { path = "crates/moss-typebridge-macro" }
+moss_env = { path = "crates/moss-env" }
+moss_async = { path = "crates/moss-async" }
+moss_collection = { path = "crates/moss-collection" }
+moss_desktop = { path = "crates/moss-desktop" }
 
-platform_core = { path = "internal/platform/core" }
-platform_utl = { path = "internal/platform/utl" }
-platform_configuration = { path = "internal/platform/configuration" }
-platform_formation = { path = "internal/platform/formation" }
-platform_user_profile = { path = "internal/platform/user_profile" }
-platform_environment = { path = "internal/platform/environment" }
-platform_workspace = { path = "internal/platform/workspace" }
-platform_fs = { path = "internal/platform/fs" }
-
-desktop_models = { path = "internal/workbench/desktop/models" }
-
-workbench_desktop = { path = "internal/workbench/desktop" }
-workbench_service_configuration_common = { path = "internal/workbench/service/configuration/common" }
-workbench_service_configuration_tao = { path = "internal/workbench/service/configuration/tao" }
-workbench_service_user_profile_tao = { path = "internal/workbench/service/user_profile/tao" }
-workbench_service_environment_tao = { path = "internal/workbench/service/environment/tao" }
-
+dashmap = "6.1.0"
 indexmap = "2.7.0"
 arcstr = "1.2.0"
 bstr = "1.11.0"
-ts-rs = "10.0"
-thiserror = "1.0"
-tauri = { version = "2.0.6", features = ["devtools"] }
+ts-rs = "10.1"
+thiserror = "2.0"
+# Disabled default: compression, common-controls-v6
+tauri = { version = "2.0.6", default-features = false, features = [
+    "wry",
+    "objc-exception",
+    "devtools",
+    "macos-private-api",
+] }
 libc = "0.2.155"
 fnv = "1.0.7"
 anyhow = "1.0"
@@ -89,7 +83,6 @@ strum = "0.26"
 strum_macros = "0.26"
 lazy-regex = "3.3.0"
 dunce = "1.0.5"
-sysinfo = "0.31.2"
 tokio = "1"
 smol = "2.0.0"
 futures = "0.3"
@@ -111,6 +104,7 @@ waker-fn = "1.2.0"
 im = "15.1.0"
 smallvec = "1.13.2"
 dyn-clone = "1.0.17"
+clap = { version = "4.5.23", features = ["derive"] }
 
 hecs = "0.10.5"
 hecs-hierarchy = "0.12.1"
@@ -119,7 +113,9 @@ fern = "0.7.0"
 rand = "0.8.5"
 log = "0.4.21"
 quote = "1.0"
-static_str_ops = "0.1.2"
-homedir = "0.3.4"
+dirs = "5.0.1"
 csscolorparser = "0.7.0"
-jsonschema = "0.26.1"
+jsonschema = { version = "0.26.1", default-features = false }
+
+os_info = { version = "3.9.0", default-features = false }
+gethostname = "0.5.0"

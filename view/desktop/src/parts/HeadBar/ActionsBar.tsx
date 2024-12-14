@@ -1,24 +1,23 @@
 import { HTMLProps, useEffect, useState } from "react";
-import { useSelector } from "react-redux";
 
 import { ActionButton } from "@/components/Action/ActionButton";
 import { ActionsSubmenu } from "@/components/Action/ActionsSubmenu";
 import { ActionsGroup } from "@/components/ActionsGroup";
-import { invokeIpc } from "@/lib/backend/tauri";
-import { RootState, useAppDispatch } from "@/store";
-import { toggleSidebarVisibility } from "@/store/sidebar/sidebarSlice";
-import { MenuItem } from "@repo/desktop-models";
-import { cn, Icon } from "@repo/moss-ui";
+import { invokeTauriIpc } from "@/lib/backend/tauri";
+import { useLayoutStore } from "@/store/layout";
+import { MenuItem } from "@repo/moss-desktop";
+import { cn } from "@repo/moss-ui";
 
 export const ActionsBar = ({ className, ...props }: HTMLProps<HTMLDivElement>) => {
-  const dispatch = useAppDispatch();
-  const isSidebarVisible = useSelector((state: RootState) => state.sidebar.sidebarVisible);
   const [activities, setActivities] = useState<MenuItem[]>([]);
+
+  const primarySideBar = useLayoutStore((state) => state.primarySideBar);
+  const bottomPane = useLayoutStore((state) => state.bottomPane);
 
   useEffect(() => {
     const getAllActivities = async () => {
       try {
-        const res = await invokeIpc<MenuItem[], Error>("get_menu_items_by_namespace", { namespace: "headItem" }); // this here should be a type
+        const res = await invokeTauriIpc<MenuItem[], Error>("get_menu_items_by_namespace", { namespace: "headItem" }); // this here should be a type
 
         if (res.status === "ok") {
           setActivities(res.data);
@@ -34,16 +33,6 @@ export const ActionsBar = ({ className, ...props }: HTMLProps<HTMLDivElement>) =
   return (
     <div className={cn("flex items-center gap-3", className)} {...props}>
       <div className="flex items-center">
-        {/* <button className="flex items-center gap-px transition-colors">
-          <div className="flex h-full items-center gap-1.5 rounded py-1.5 pl-2.5 pr-2 hover:bg-[#D3D3D3]">
-            <Icon icon="HeadBarBranch" className="size-[18px] text-[#525252]" />
-            <div className="flex items-center gap-0.5">
-              <span className="leading-4 text-[#161616]">main</span>
-              <span className="rounded bg-[#C6C6C6] px-1 text-xs font-semibold text-[#525252]">#50</span>
-            </div>
-          </div>
-        </button> */}
-
         <ActionsSubmenu
           visibility="classic"
           defaultActionId={"qwe"}
@@ -74,12 +63,26 @@ export const ActionsBar = ({ className, ...props }: HTMLProps<HTMLDivElement>) =
                   key={command.id}
                   iconClassName="size-[18px]"
                   {...command}
-                  icon={isSidebarVisible ? "HeadBarPrimarySideBarActive" : "HeadBarPrimarySideBar"}
-                  onClick={() => dispatch(toggleSidebarVisibility({}))}
+                  icon={primarySideBar.visibility ? "HeadBarPrimarySideBarActive" : "HeadBarPrimarySideBar"}
+                  onClick={() => primarySideBar.setVisibility(!primarySideBar.visibility)}
                   visibility={item.action.visibility}
                 />
               );
             }
+
+            if (index === 1) {
+              return (
+                <ActionButton
+                  key={command.id}
+                  iconClassName="size-[18px]"
+                  {...command}
+                  icon={bottomPane.visibility ? "HeadBarPanelActive" : "HeadBarPanel"}
+                  onClick={() => bottomPane.setVisibility(!bottomPane.visibility)}
+                  visibility={item.action.visibility}
+                />
+              );
+            }
+            // isTerminalVisible, setIsTerminalVisible
             return (
               <ActionButton
                 key={command.id}
@@ -105,9 +108,9 @@ export const ActionsBar = ({ className, ...props }: HTMLProps<HTMLDivElement>) =
       </div>
 
       <div className="flex items-center">
-        <ActionsGroup icon="HeadBarAccount" className="size-[30px] " iconClassName="size-[18px]" />
-        <ActionsGroup icon="HeadBarNotifications" className="size-[30px] " iconClassName="size-[18px]" />
-        <ActionsGroup icon="HeadBarWrench" className="size-[30px] " iconClassName="size-[18px]" />
+        <ActionsGroup icon="HeadBarAccount" className="size-[30px]" iconClassName="size-[18px]" />
+        <ActionsGroup icon="HeadBarNotifications" className="size-[30px]" iconClassName="size-[18px]" />
+        <ActionsGroup icon="HeadBarWrench" className="size-[30px]" iconClassName="size-[18px]" />
       </div>
     </div>
   );

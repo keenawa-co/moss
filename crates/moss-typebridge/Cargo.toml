@@ -1,0 +1,9 @@
+[package]
+name = "moss_typebridge"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[dependencies]
+serde.workspace = true
+moss_typebridge_macro.workspace = true

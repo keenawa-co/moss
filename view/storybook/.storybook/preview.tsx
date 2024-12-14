@@ -1,10 +1,14 @@
+import React from "react";
+
 import { INITIAL_VIEWPORTS } from "@storybook/addon-viewport";
 import type { Preview } from "@storybook/react";
-import React from "react";
+
 import "@repo/moss-ui/src/styles.css";
+
+import { Theme } from "@repo/moss-desktop";
 import { staticColors } from "@repo/moss-ui";
+
 import * as themeFiles from "./themes";
-import { Theme } from "@repo/desktop-models";
 
 // TODO: remove old storybook theme integration
 const themes: Map<string, Theme> = new Map();

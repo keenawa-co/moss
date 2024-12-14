@@ -8,9 +8,10 @@ import { type } from "@tauri-apps/plugin-os";
 import { PageLoader } from "./components/PageLoader";
 import { store } from "./store";
 
-import "reflect-metadata";
 import "@/assets/index.css";
 import "@repo/moss-ui/src/fonts.css";
+
+import GeneralProvider from "./app/Provider";
 
 const sharedWorker = new SharedWorker("./shared-worker.js");
 
@@ -46,9 +47,11 @@ if (rootElement) {
   createRoot(rootElement).render(
     <StrictMode>
       <Provider store={store}>
-        <Suspense fallback={<PageLoader />}>
-          <App />
-        </Suspense>
+        <GeneralProvider>
+          <Suspense fallback={<PageLoader />}>
+            <App />
+          </Suspense>
+        </GeneralProvider>
       </Provider>
     </StrictMode>
   );
