@@ -9,7 +9,7 @@ use serde_json::Value;
 use std::path::PathBuf;
 
 use crate::{create_child_window, AppState};
-use tauri::{AppHandle, Emitter, EventTarget, Manager, State, WebviewWindow, Window};
+use tauri::{AppHandle, Emitter, State, WebviewWindow, Window};
 
 #[derive(Clone, Serialize)]
 struct EventAData {
@@ -51,52 +51,6 @@ pub fn execute_command(
         Err(format!("command with id {} is not found", quote!(cmd)))
     }
 }
-
-// FIXME: Temporary placement of this function here. It will be moved later.
-// pub fn change_color_theme(ctx: CommandContext, app_state: &AppState) -> Result<Value, String> {
-//     let theme_descriptor_arg = ctx.get_arg::<ThemeDescriptor>("themeDescriptor")?;
-
-//     app_state.change_color_theme(theme_descriptor_arg.clone());
-
-//     for (label, _) in ctx.app_handle.webview_windows() {
-//         if ctx.window.label() == &label {
-//             continue;
-//         }
-
-//         ctx.app_handle
-//             .emit_to(
-//                 EventTarget::webview_window(label),
-//                 "core://color-theme-changed",
-//                 theme_descriptor_arg.clone(),
-//             )
-//             .unwrap();
-//     }
-
-//     Ok(Value::Null)
-// }
-
-// FIXME: Temporary placement of this function here. It will be moved later.
-// pub fn change_language_pack(ctx: CommandContext, app_state: &AppState) -> Result<Value, String> {
-//     let locale_descriptor_arg = ctx.get_arg::<LocaleDescriptor>("localeDescriptor")?;
-
-//     app_state.change_language_pack(locale_descriptor_arg.clone());
-
-//     for (label, _) in ctx.app_handle.webview_windows() {
-//         if ctx.window.label() == &label {
-//             continue;
-//         }
-
-//         ctx.app_handle
-//             .emit_to(
-//                 EventTarget::webview_window(label),
-//                 "core://language-pack-changed",
-//                 locale_descriptor_arg.clone(),
-//             )
-//             .unwrap();
-//     }
-
-//     Ok(Value::Null)
-// }
 
 #[tauri::command(async)]
 pub async fn get_color_theme(path: String) -> Result<String, String> {

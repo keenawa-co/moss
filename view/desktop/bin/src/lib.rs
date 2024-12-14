@@ -3,7 +3,6 @@ pub mod constants;
 mod mem;
 mod menu;
 mod plugins;
-mod state;
 mod utl;
 mod window;
 
@@ -133,60 +132,6 @@ pub fn run() {
 }
 
 fn create_main_window(app_handle: &AppHandle, url: &str) -> WebviewWindow {
-    // ------------ Get rid of this mess as soon as possible ------------
-    // let platform_info = NativePlatformInfo::new();
-    // let home_dir = crate::utl::get_home_dir().expect("failed to get $HOME dir");
-
-    // let service_group = utl::create_service_registry(NativeWindowConfiguration {
-    //     home_dir,
-    //     full_screen: false,
-    //     platform_info: platform_info.clone(),
-    // })
-    // .unwrap();
-    // let platform_client = Rc::new(CrossPlatformClient::new());
-    // let ctx_cell = ContextCell::new(platform_client.clone());
-    // let mut ctx = ctx_cell.borrow().to_async();
-
-    // let mut workbench = Workbench::new(&mut ctx, service_group, WorkspaceId::Empty).unwrap();
-    // workbench.initialize(&mut ctx).unwrap();
-
-    // ----------------------------------------------------------------------
-
-    // let commands = DashMap::new();
-    // commands.insert(
-    //     "workbench.changeColorTheme".into(),
-    //     Arc::new(change_color_theme) as CommandHandler,
-    // );
-
-    // commands.insert(
-    //     "workbench.changeLanguagePack".into(),
-    //     Arc::new(change_language_pack) as CommandHandler,
-    // );
-
-    // let views = ViewsRegistry::new();
-
-    // let menus = MenuRegistry::new();
-
-    // let window_number = 0;
-    // let app_state = AppState {
-    //     next_window_id: AtomicUsize::new(window_number),
-    //     appearance: Appearance {
-    //         theme: RwLock::new(ThemeDescriptor {
-    //             id: "theme-light".to_string(),
-    //             name: "Theme Light".to_string(),
-    //             source: "moss-light.css".to_string(),
-    //         }),
-    //     },
-    //     locale: RwLock::new(LocaleDescriptor {
-    //         code: "en".to_string(),
-    //         name: "English".to_string(),
-    //         direction: Some("ltr".to_string()),
-    //     }),
-    //     commands,
-    //     views: Arc::new(RwLock::new(views)),
-    //     menus: Arc::new(RwLock::new(menus)),
-    // };
-
     {
         app_handle.manage(AppState::new());
     }
