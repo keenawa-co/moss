@@ -8,22 +8,25 @@ export interface LayoutState {
     visibility: boolean;
     setWidth: (newWidth: number) => void;
     setVisibility: (visibility: boolean) => void;
+    getWidth: () => number;
   };
   secondarySideBar: {
     width: number;
     visibility: boolean;
     setWidth: (newWidth: number) => void;
     setVisibility: (visibility: boolean) => void;
+    getWidth: () => number;
   };
   bottomPane: {
     height: number;
     visibility: boolean;
     setHeight: (newHeight: number) => void;
     setVisibility: (visibility: boolean) => void;
+    getHeight: () => number;
   };
 }
 
-export const useLayoutStore = create<LayoutState>()((set) => ({
+export const useLayoutStore = create<LayoutState>()((set, get) => ({
   alignment: "center",
   setAlignment: (newAlignment: LayoutState["alignment"]) => set({ alignment: newAlignment }),
   primarySideBar: {
@@ -44,6 +47,9 @@ export const useLayoutStore = create<LayoutState>()((set) => ({
           visibility,
         },
       })),
+    getWidth: () => {
+      return get().primarySideBar.width;
+    },
   },
   secondarySideBar: {
     width: 255,
@@ -63,10 +69,13 @@ export const useLayoutStore = create<LayoutState>()((set) => ({
           visibility,
         },
       })),
+    getWidth: () => {
+      return get().secondarySideBar.width;
+    },
   },
   bottomPane: {
     height: 333,
-    visibility: false,
+    visibility: true,
     setHeight: (newHeight) =>
       set((state) => ({
         bottomPane: {
@@ -82,5 +91,8 @@ export const useLayoutStore = create<LayoutState>()((set) => ({
           visibility,
         },
       })),
+    getHeight: () => {
+      return get().bottomPane.height;
+    },
   },
 }));
