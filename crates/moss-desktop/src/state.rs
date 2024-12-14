@@ -14,14 +14,14 @@ use crate::models::{
 };
 
 #[derive(Debug)]
-pub struct ViewsRegistry {
+pub struct ViewsRegistryOld {
     groups: HashMap<TreeViewGroupLocation, Vec<TreeViewGroup>>,
     views: HashMap<GroupId, Vec<TreeViewDescriptor>>,
 }
 
-impl ViewsRegistry {
+impl ViewsRegistryOld {
     pub fn new() -> Self {
-        ViewsRegistry {
+        ViewsRegistryOld {
             groups: HashMap::new(),
             views: HashMap::new(),
         }
@@ -59,11 +59,11 @@ impl ViewsRegistry {
     }
 }
 
-pub struct MenuRegistry {
+pub struct MenuRegistryOld {
     menus: HashMap<ReadOnlyStr, Vec<MenuItem>>,
 }
 
-impl MenuRegistry {
+impl MenuRegistryOld {
     pub fn new() -> Self {
         Self {
             menus: HashMap::new(),
@@ -100,8 +100,8 @@ pub struct AppState {
     next_window_id: AtomicUsize,
     pub preferences: Preferences,
     pub commands: DashMap<ReadOnlyStr, CommandHandler>,
-    pub views: Arc<RwLock<ViewsRegistry>>,
-    pub menus: Arc<RwLock<MenuRegistry>>,
+    pub views: Arc<RwLock<ViewsRegistryOld>>,
+    pub menus: Arc<RwLock<MenuRegistryOld>>,
 }
 
 impl AppState {
@@ -133,8 +133,8 @@ impl AppState {
                 }),
             },
             commands,
-            views: Arc::new(RwLock::new(ViewsRegistry::new())),
-            menus: Arc::new(RwLock::new(MenuRegistry::new())),
+            views: Arc::new(RwLock::new(ViewsRegistryOld::new())),
+            menus: Arc::new(RwLock::new(MenuRegistryOld::new())),
         };
 
         // FIXME: Temporary solution, these data should be added to the registry, not registered here.
