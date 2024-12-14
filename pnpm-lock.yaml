@@ -135,18 +135,17 @@ importers:
         specifier: workspace:*
         version: link:../../packages/config-typescript
 
-  internal/workbench/desktop/models:
+  misc/cspell:
     dependencies:
-      typescript:
-        specifier: ^5.7.2
-        version: 5.7.2
-    devDependencies:
-      '@repo/moss-text':
-        specifier: workspace:*
-        version: link:../../../../crates/moss-text
-      '@repo/typescript-config':
-        specifier: workspace:*
-        version: link:../../../../packages/config-typescript
+      '@cspell/dict-lorem-ipsum':
+        specifier: ^4.0.3
+        version: 4.0.3
+      '@cspell/dict-rust':
+        specifier: ^4.0.10
+        version: 4.0.10
+      '@cspell/dict-typescript':
+        specifier: ^3.1.11
+        version: 3.1.11
 
   packages/config-eslint:
     devDependencies:
@@ -1093,6 +1092,15 @@ packages:
     engines: {node: '>=16.0.0', yarn: '>=1.22.18'}
     peerDependencies:
       storybook: ^8.2.0 || ^8.3.0-0 || ^8.4.0-0 || ^8.5.0-0 || ^8.6.0-0
+
+  '@cspell/dict-lorem-ipsum@4.0.3':
+    resolution: {integrity: sha512-WFpDi/PDYHXft6p0eCXuYnn7mzMEQLVeqpO+wHSUd+kz5ADusZ4cpslAA4wUZJstF1/1kMCQCZM6HLZic9bT8A==}
+
+  '@cspell/dict-rust@4.0.10':
+    resolution: {integrity: sha512-6o5C8566VGTTctgcwfF3Iy7314W0oMlFFSQOadQ0OEdJ9Z9ERX/PDimrzP3LGuOrvhtEFoK8pj+BLnunNwRNrw==}
+
+  '@cspell/dict-typescript@3.1.11':
+    resolution: {integrity: sha512-FwvK5sKbwrVpdw0e9+1lVTl8FPoHYvfHRuQRQz2Ql5XkC0gwPPkpoyD1zYImjIyZRoYXk3yp9j8ss4iz7A7zoQ==}
 
   '@dnd-kit/accessibility@3.1.1':
     resolution: {integrity: sha512-2P+YgaXF+gRsIihwwY1gCsQSYnu9Zyj2py8kY5fFvUM1qm2WA2u639R6YNVfU4GWr+ZM5mqEsfHZZLoRONbemw==}
@@ -6083,6 +6091,12 @@ snapshots:
       - '@chromatic-com/cypress'
       - '@chromatic-com/playwright'
       - react
+
+  '@cspell/dict-lorem-ipsum@4.0.3': {}
+
+  '@cspell/dict-rust@4.0.10': {}
+
+  '@cspell/dict-typescript@3.1.11': {}
 
   '@dnd-kit/accessibility@3.1.1(react@18.3.1)':
     dependencies:
