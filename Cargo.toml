@@ -22,7 +22,7 @@ members = [
     "crates/moss-theme",
     "crates/moss-typebridge",
     "crates/moss-typebridge-macro",
-    "crates/moss-store",
+    "crates/moss-cache",
 
     "internal/platform/core",
     "internal/platform/fs",
@@ -155,3 +155,5 @@ jsonschema = { version = "0.26.1", default-features = false }
 
 os_info = {version = "3.9.0", default-features = false}
 gethostname = "0.5.0"
+
+moka = {version = "0.12.8", features = ["sync"]}

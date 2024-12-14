@@ -2676,20 +2676,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "moss-cache"
+version = "0.1.0"
+dependencies = [
+ "dashmap",
+ "moka",
+ "parking_lot",
+]
+
+[[package]]
 name = "moss-cli"
 version = "0.1.0"
 dependencies = [
  "clap",
  "os_info",
  "tokio",
-]
-
-[[package]]
-name = "moss-store"
-version = "0.1.0"
-dependencies = [
- "dashmap",
- "moka",
 ]
 
 [[package]]

@@ -1,0 +1,9 @@
+[package]
+name = "moss-cache"
+version = "0.1.0"
+edition = "2021"
+
+
+[dependencies]
+moka.workspace = true
+dashmap.workspace = true

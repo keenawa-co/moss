@@ -1,9 +1,9 @@
 use cached::{Cached, CanExpire, ExpiringValueCache};
+use parking_lot::Mutex;
 use std::any::Any;
 use std::collections::HashMap;
 use std::fmt::Debug;
 use std::time::{Duration, Instant};
-use tracing_mutex::stdsync::Mutex;
 
 // Cache: Serialized objects
 // get_raw() -> Value, get<T>()
