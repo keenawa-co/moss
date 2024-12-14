@@ -11,8 +11,7 @@ import { cn } from "@repo/moss-ui";
 export const ActionsBar = ({ className, ...props }: HTMLProps<HTMLDivElement>) => {
   const [activities, setActivities] = useState<MenuItem[]>([]);
 
-  const primarySideBar = useLayoutStore((state) => state.primarySideBar);
-  const bottomPane = useLayoutStore((state) => state.bottomPane);
+  const { primarySideBar, secondarySideBar, bottomPane, setAlignment, alignment } = useLayoutStore((state) => state);
 
   useEffect(() => {
     const getAllActivities = async () => {
@@ -82,6 +81,18 @@ export const ActionsBar = ({ className, ...props }: HTMLProps<HTMLDivElement>) =
                 />
               );
             }
+            if (index === 2) {
+              return (
+                <ActionButton
+                  key={command.id}
+                  iconClassName="size-[18px]"
+                  {...command}
+                  icon={secondarySideBar.visibility ? "HeadBarSecondarySideBarActive" : "HeadBarSecondarySideBar"}
+                  onClick={() => secondarySideBar.setVisibility(!secondarySideBar.visibility)}
+                  visibility={item.action.visibility}
+                />
+              );
+            }
             // isTerminalVisible, setIsTerminalVisible
             return (
               <ActionButton
@@ -101,7 +112,36 @@ export const ActionsBar = ({ className, ...props }: HTMLProps<HTMLDivElement>) =
                 iconClassName="size-[18px]"
                 {...item.submenu}
                 icon="HeadBarCustomizeLayout"
-              />
+              >
+                <ul className="flex flex-col gap-1">
+                  <li
+                    className={cn("cursor-pointer px-2 hover:bg-green-100", { "bg-green-300": alignment === "center" })}
+                    onClick={() => setAlignment("center")}
+                  >
+                    Center
+                  </li>
+                  <li
+                    className={cn("cursor-pointer px-2 hover:bg-green-100", {
+                      "bg-green-300": alignment === "justify",
+                    })}
+                    onClick={() => setAlignment("justify")}
+                  >
+                    Justify
+                  </li>
+                  <li
+                    className={cn("cursor-pointer px-2 hover:bg-green-100", { "bg-green-300": alignment === "left" })}
+                    onClick={() => setAlignment("left")}
+                  >
+                    Left
+                  </li>
+                  <li
+                    className={cn("cursor-pointer px-2 hover:bg-green-100", { "bg-green-300": alignment === "right" })}
+                    onClick={() => setAlignment("right")}
+                  >
+                    Right
+                  </li>
+                </ul>
+              </ActionsSubmenu>
             );
           }
         })}

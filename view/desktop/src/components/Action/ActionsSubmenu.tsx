@@ -1,7 +1,7 @@
-import { MenuItemVisibility, SubmenuMenuItem } from "@repo/desktop-models";
-
-import { cn, Icon, Icons, DropdownMenu as DM } from "@repo/moss-ui";
 import { ComponentPropsWithoutRef, useState } from "react";
+
+import { MenuItemVisibility, SubmenuMenuItem } from "@repo/desktop-models";
+import { cn, DropdownMenu as DM, Icon, Icons } from "@repo/moss-ui";
 
 const buttonStyle =
   "hover:border-[#c5c5c5] hover:bg-[#D3D3D3] box-border transition group flex rounded border border-transparent";
@@ -37,7 +37,7 @@ export const ActionsSubmenu = ({
     >
       <DM.Root open={open}>
         <DM.Trigger
-          className={cn(triggerStyle, "self-stretch  px-1 py-1", {
+          className={cn(triggerStyle, "self-stretch px-1 py-1", {
             "bg-[#D3D3D3]": open,
           })}
           onClick={() => setOpen((prev) => !prev)}
@@ -48,7 +48,7 @@ export const ActionsSubmenu = ({
         </DM.Trigger>
 
         <DM.Content className="z-50 flex flex-col" onPointerDownOutside={() => setOpen(false)}>
-          {[1, 2, 3]?.map((id) => <button key={id}>Action {id}</button>)}
+          {props.children}
         </DM.Content>
       </DM.Root>
     </div>

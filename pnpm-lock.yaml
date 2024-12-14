@@ -100,11 +100,11 @@ importers:
     dependencies:
       '@typespec/json-schema':
         specifier: ^0.62.0
-        version: 0.62.0(@typespec/compiler@0.62.0)
+        version: 0.62.0(@typespec/compiler@0.63.0)
     devDependencies:
       '@typespec/compiler':
         specifier: latest
-        version: 0.62.0
+        version: 0.63.0
 
   crates/moss-uikit:
     dependencies:
@@ -2767,8 +2767,8 @@ packages:
     resolution: {integrity: sha512-1Hm7THLpO6ww5QU6H/Qp+AusUUl+z/CAm3cNZZ0jQvon9yicgO7Rwd+/WWRpMKLYV6p2UvdbR27c86rzCPpreg==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
 
-  '@typespec/compiler@0.62.0':
-    resolution: {integrity: sha512-RfKJ/rF2Wjxu7dl74oJE8yEfSkeL7NopFlyJ4dW1JQXpRN2IOJYPxas12qZA6H9ZEIB8rBjyrHNxJSQbvn/UDQ==}
+  '@typespec/compiler@0.63.0':
+    resolution: {integrity: sha512-cC3YniwbFghn1fASX3r1IgNjMrwaY4gmzznkHT4f/NxE+HK4XoXWn4EG7287QgVMCaHUykzJCIfW9k7kIleW5A==}
     engines: {node: '>=18.0.0'}
     hasBin: true
 
@@ -7622,7 +7622,7 @@ snapshots:
       '@typescript-eslint/types': 8.17.0
       eslint-visitor-keys: 4.2.0
 
-  '@typespec/compiler@0.62.0':
+  '@typespec/compiler@0.63.0':
     dependencies:
       '@babel/code-frame': 7.25.9
       ajv: 8.17.1
@@ -7639,9 +7639,9 @@ snapshots:
       yaml: 2.5.1
       yargs: 17.7.2
 
-  '@typespec/json-schema@0.62.0(@typespec/compiler@0.62.0)':
+  '@typespec/json-schema@0.62.0(@typespec/compiler@0.63.0)':
     dependencies:
-      '@typespec/compiler': 0.62.0
+      '@typespec/compiler': 0.63.0
       yaml: 2.5.1
 
   '@typespec/prettier-plugin-typespec@0.62.0':
