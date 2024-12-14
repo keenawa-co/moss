@@ -1,26 +1,29 @@
-use moss_desktop::models::{
-    actions::{
-        ActionMenuItem, CommandAction, CommandActionToggle, MenuGroup, MenuItem,
-        MenuItemVisibility, SubmenuMenuItem, SubmenuRef,
+use crate::{
+    models::{
+        actions::{
+            ActionMenuItem, CommandAction, CommandActionToggle, MenuGroup, MenuItem,
+            MenuItemVisibility, SubmenuMenuItem, SubmenuRef,
+        },
+        constants,
     },
-    constants,
+    state::AppState,
 };
 use moss_jsonlogic::raw_rule::*;
 use moss_jsonlogic_macro::rule;
 use moss_text::{localize, ReadOnlyStr};
-use std::rc::Rc;
+use std::{rc::Rc, sync::Arc};
 
-use crate::Contribution;
+use super::Contribution;
 
 pub struct LayoutControlsContribution;
 impl Contribution for LayoutControlsContribution {
-    fn contribute(registry: &mut crate::RegistryManager) -> anyhow::Result<()> {
+    fn contribute(registry: &mut AppState) -> anyhow::Result<()> {
         /* ---------- Menus contributions ---------- */
 
         let mut menus_registry_lock = registry.menus.write();
 
         let head_item_menu_group_layout_controls =
-            Rc::new(MenuGroup::new_unordered("layoutControls"));
+            Arc::new(MenuGroup::new_unordered("layoutControls"));
 
         menus_registry_lock.append_menu_items(vec![
             (
@@ -42,7 +45,7 @@ impl Contribution for LayoutControlsContribution {
                             title: None,
                         }),
                     },
-                    group: Some(Rc::clone(&head_item_menu_group_layout_controls)),
+                    group: Some(Arc::clone(&head_item_menu_group_layout_controls)),
                     order: None,
                     when: None,
                     visibility: MenuItemVisibility::Compact,
@@ -70,7 +73,7 @@ impl Contribution for LayoutControlsContribution {
                             title: None,
                         }),
                     },
-                    group: Some(Rc::clone(&head_item_menu_group_layout_controls)),
+                    group: Some(Arc::clone(&head_item_menu_group_layout_controls)),
                     order: None,
                     when: None,
                     visibility: MenuItemVisibility::Compact,
@@ -92,7 +95,7 @@ impl Contribution for LayoutControlsContribution {
                             title: None,
                         }),
                     },
-                    group: Some(Rc::clone(&head_item_menu_group_layout_controls)),
+                    group: Some(Arc::clone(&head_item_menu_group_layout_controls)),
                     order: None,
                     when: None,
                     visibility: MenuItemVisibility::Compact,
@@ -113,7 +116,7 @@ impl Contribution for LayoutControlsContribution {
                     "layoutControls.customizeLayout",
                     "Customize Layout"
                 )),
-                group: Some(Rc::clone(&head_item_menu_group_layout_controls)),
+                group: Some(Arc::clone(&head_item_menu_group_layout_controls)),
                 order: None,
                 when: None,
                 visibility: MenuItemVisibility::Compact,
@@ -129,10 +132,10 @@ impl Contribution for LayoutControlsContribution {
             _customize_layout_group_primary_sidebar_position, // TODO: add the corresponding menu items that will utilize this group.
             _customize_layout_group_panel_modes, // TODO: add the corresponding menu items that will utilize this group.
         ) = {
-            let visibility = Rc::new(MenuGroup::new_ordered(0, "visibility"));
-            let panel_alignment = Rc::new(MenuGroup::new_ordered(0, "panelAlignment"));
-            let primary_sidebar_position = Rc::new(MenuGroup::new_ordered(0, "primarySideBarPosition"));
-            let modes = Rc::new(MenuGroup::new_ordered(0, "modes"));
+            let visibility = Arc::new(MenuGroup::new_ordered(0, "visibility"));
+            let panel_alignment = Arc::new(MenuGroup::new_ordered(0, "panelAlignment"));
+            let primary_sidebar_position = Arc::new(MenuGroup::new_ordered(0, "primarySideBarPosition"));
+            let modes = Arc::new(MenuGroup::new_ordered(0, "modes"));
 
             (visibility, panel_alignment, primary_sidebar_position, modes)
         };
@@ -154,7 +157,7 @@ impl Contribution for LayoutControlsContribution {
                             icon: None,
                         }),
                     },
-                    group: Some(Rc::clone(&customize_layout_group_visibility)),
+                    group: Some(Arc::clone(&customize_layout_group_visibility)),
                     order: None,
                     when: None,
                     visibility: MenuItemVisibility::Classic,
@@ -179,7 +182,7 @@ impl Contribution for LayoutControlsContribution {
                             icon: None,
                         }),
                     },
-                    group: Some(Rc::clone(&customize_layout_group_visibility)),
+                    group: Some(Arc::clone(&customize_layout_group_visibility)),
                     order: None,
                     when: None,
                     visibility: MenuItemVisibility::Classic,

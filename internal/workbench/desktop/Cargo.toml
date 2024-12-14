@@ -12,10 +12,9 @@ moss_uikit.workspace = true
 moss_html.workspace = true
 moss_jsonlogic.workspace = true
 moss_jsonlogic_macro.workspace = true
-desktop_models.workspace = true
+moss_desktop.workspace = true
 
 quote.workspace = true
-static_str_ops.workspace = true
 thiserror.workspace = true
 serde = { workspace = true, features = ["derive"] }
 serde_json.workspace = true
@@ -41,5 +40,3 @@ platform_user_profile.workspace = true
 workbench_service_configuration_tao.workspace = true
 workbench_service_user_profile_tao.workspace = true
 workbench_service_environment_tao.workspace = true
-
-

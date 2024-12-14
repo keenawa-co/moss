@@ -7,31 +7,20 @@ mod state;
 mod utl;
 mod window;
 
-use crate::commands::cmd_window::change_language_pack;
-use crate::constants::*;
-use crate::plugins as moss_plugins;
-use cmd_window::change_color_theme;
 use commands::*;
-use dashmap::DashMap;
-use desktop_models::appearance::theming::ThemeDescriptor;
-use desktop_models::window::LocaleDescriptor;
-use parking_lot::RwLock;
-use platform_core::context_v2::ContextCell;
-use platform_core::platform::cross::client::CrossPlatformClient;
-use platform_workspace::WorkspaceId;
 use rand::random;
-use state::{AppState, Appearance, CommandHandler};
+
+use moss_desktop::state::AppState;
 use std::env;
-use std::rc::Rc;
-use std::sync::atomic::{AtomicUsize, Ordering};
-use std::sync::Arc;
+use std::sync::atomic::Ordering;
 use tauri::{AppHandle, Manager, RunEvent, WebviewWindow, WindowEvent};
 use tauri_plugin_global_shortcut::{Code, GlobalShortcutExt, Modifiers, Shortcut, ShortcutState};
 use tauri_plugin_log::{fern::colors::ColoredLevelConfig, Target, TargetKind};
 use tauri_plugin_os;
 use window::{create_window, CreateWindowInput};
-use workbench_desktop::window::{NativePlatformInfo, NativeWindowConfiguration};
-use workbench_desktop::Workbench;
+
+use crate::constants::*;
+use crate::plugins as moss_plugins;
 
 #[macro_use]
 extern crate serde;
@@ -145,59 +134,64 @@ pub fn run() {
 
 fn create_main_window(app_handle: &AppHandle, url: &str) -> WebviewWindow {
     // ------------ Get rid of this mess as soon as possible ------------
-    let platform_info = NativePlatformInfo::new();
-    let home_dir = crate::utl::get_home_dir().expect("failed to get $HOME dir");
+    // let platform_info = NativePlatformInfo::new();
+    // let home_dir = crate::utl::get_home_dir().expect("failed to get $HOME dir");
 
-    let service_group = utl::create_service_registry(NativeWindowConfiguration {
-        home_dir,
-        full_screen: false,
-        platform_info: platform_info.clone(),
-    })
-    .unwrap();
-    let platform_client = Rc::new(CrossPlatformClient::new());
-    let ctx_cell = ContextCell::new(platform_client.clone());
-    let mut ctx = ctx_cell.borrow().to_async();
+    // let service_group = utl::create_service_registry(NativeWindowConfiguration {
+    //     home_dir,
+    //     full_screen: false,
+    //     platform_info: platform_info.clone(),
+    // })
+    // .unwrap();
+    // let platform_client = Rc::new(CrossPlatformClient::new());
+    // let ctx_cell = ContextCell::new(platform_client.clone());
+    // let mut ctx = ctx_cell.borrow().to_async();
 
-    let mut workbench = Workbench::new(&mut ctx, service_group, WorkspaceId::Empty).unwrap();
-    workbench.initialize(&mut ctx).unwrap();
+    // let mut workbench = Workbench::new(&mut ctx, service_group, WorkspaceId::Empty).unwrap();
+    // workbench.initialize(&mut ctx).unwrap();
 
     // ----------------------------------------------------------------------
 
-    let commands = DashMap::new();
-    commands.insert(
-        "workbench.changeColorTheme".into(),
-        Arc::new(change_color_theme) as CommandHandler,
-    );
+    // let commands = DashMap::new();
+    // commands.insert(
+    //     "workbench.changeColorTheme".into(),
+    //     Arc::new(change_color_theme) as CommandHandler,
+    // );
 
-    commands.insert(
-        "workbench.changeLanguagePack".into(),
-        Arc::new(change_language_pack) as CommandHandler,
-    );
+    // commands.insert(
+    //     "workbench.changeLanguagePack".into(),
+    //     Arc::new(change_language_pack) as CommandHandler,
+    // );
 
-    let window_number = 0;
-    let app_state = AppState {
-        commands,
-        appearance: Appearance {
-            theme: RwLock::new(ThemeDescriptor {
-                id: "theme-light".to_string(),
-                name: "Theme Light".to_string(),
-                source: "moss-light.css".to_string(),
-            }),
-        },
-        locale: RwLock::new(LocaleDescriptor {
-            code: "en".to_string(),
-            name: "English".to_string(),
-            direction: Some("ltr".to_string()),
-        }),
-        workbench: Arc::new(workbench),
-        next_window_id: AtomicUsize::new(window_number),
-    };
+    // let views = ViewsRegistry::new();
+
+    // let menus = MenuRegistry::new();
+
+    // let window_number = 0;
+    // let app_state = AppState {
+    //     next_window_id: AtomicUsize::new(window_number),
+    //     appearance: Appearance {
+    //         theme: RwLock::new(ThemeDescriptor {
+    //             id: "theme-light".to_string(),
+    //             name: "Theme Light".to_string(),
+    //             source: "moss-light.css".to_string(),
+    //         }),
+    //     },
+    //     locale: RwLock::new(LocaleDescriptor {
+    //         code: "en".to_string(),
+    //         name: "English".to_string(),
+    //         direction: Some("ltr".to_string()),
+    //     }),
+    //     commands,
+    //     views: Arc::new(RwLock::new(views)),
+    //     menus: Arc::new(RwLock::new(menus)),
+    // };
 
     {
-        app_handle.manage(app_state);
+        app_handle.manage(AppState::new());
     }
 
-    let label = format!("{MAIN_WINDOW_PREFIX}{}", window_number);
+    let label = format!("{MAIN_WINDOW_PREFIX}{}", 0);
     let config = CreateWindowInput {
         url,
         label: label.as_str(),

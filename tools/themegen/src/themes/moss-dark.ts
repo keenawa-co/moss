@@ -1,5 +1,6 @@
 // Default
-import { Theme } from "@repo/desktop-models";
+import { Theme } from "@repo/moss-desktop";
+
 import { rgba } from "../color.ts";
 
 export const defaultDarkTheme: Theme = {

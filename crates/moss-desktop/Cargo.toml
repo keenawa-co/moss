@@ -1,0 +1,28 @@
+[package]
+name = "moss_desktop"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+moss_text.workspace = true
+moss_uikit.workspace = true
+moss_jsonlogic.workspace = true
+moss_jsonlogic_macro.workspace = true
+moss_html.workspace = true
+
+indexmap = { workspace = true, features = ["serde"] }
+serde = { workspace = true, features = ["derive", "rc"] }
+ts-rs = { workspace = true, features = ["indexmap-impl", "serde-json-impl"] }
+once_cell.workspace = true
+csscolorparser.workspace = true
+serde_json.workspace = true
+jsonschema.workspace = true
+tauri.workspace = true
+parking_lot.workspace = true
+dashmap.workspace = true
+anyhow.workspace = true
+hashbrown.workspace = true
+quote.workspace = true

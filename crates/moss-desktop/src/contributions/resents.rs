@@ -1,20 +1,24 @@
-use anyhow::Result;
-use moss_desktop::models::{
-    actions::{
-        ActionMenuItem, CommandAction, MenuGroup, MenuItem, MenuItemVisibility, SubmenuMenuItem,
-        SubmenuRef,
+use crate::{
+    models::{
+        actions::{
+            ActionMenuItem, CommandAction, MenuGroup, MenuItem, MenuItemVisibility,
+            SubmenuMenuItem, SubmenuRef,
+        },
+        constants,
+        view::TreeViewDescriptor,
     },
-    constants,
-    view::TreeViewDescriptor,
+    state::AppState,
 };
+use anyhow::Result;
 use moss_jsonlogic::raw_rule::*;
 use moss_jsonlogic_macro::rule;
 use moss_text::{localize, ReadOnlyStr};
 use once_cell::sync::Lazy;
 use quote::quote;
+use serde::Serialize;
 use std::{rc::Rc, sync::Arc};
 
-use crate::Contribution;
+use super::Contribution;
 
 #[derive(Debug, Serialize)]
 pub struct RecentsViewTreeItem {
@@ -53,7 +57,7 @@ impl RecentsViewModel {
 
 pub(crate) struct RecentsContribution;
 impl Contribution for RecentsContribution {
-    fn contribute(registry: &mut crate::RegistryManager) -> anyhow::Result<()> {
+    fn contribute(registry: &mut AppState) -> anyhow::Result<()> {
         let mut views_registry_lock = registry.views.write();
 
         let recents_view_id = "workbench.view.recentsView";
@@ -86,9 +90,9 @@ impl Contribution for RecentsContribution {
             view_title_context_menu_group_views,
             view_title_context_menu_group_inline,
         ) = {
-            let this = Rc::new(MenuGroup::new_ordered(0, constants::menu::MENU_GROUP_ID_THIS));
-            let views = Rc::new(MenuGroup::new_ordered(1, constants::menu::MENU_GROUP_ID_VIEWS));
-            let inline = Rc::new(MenuGroup::new_ordered(2, constants::menu::MENU_GROUP_ID_INLINE));
+            let this = Arc::new(MenuGroup::new_ordered(0, constants::menu::MENU_GROUP_ID_THIS));
+            let views = Arc::new(MenuGroup::new_ordered(1, constants::menu::MENU_GROUP_ID_VIEWS));
+            let inline = Arc::new(MenuGroup::new_ordered(2, constants::menu::MENU_GROUP_ID_INLINE));
 
             (this, views, inline)
         };
@@ -105,7 +109,7 @@ impl Contribution for RecentsContribution {
                         icon: None,
                         toggled: None,
                     },
-                    group: Some(Rc::clone(&view_title_context_menu_group_this)),
+                    group: Some(Arc::clone(&view_title_context_menu_group_this)),
                     order: Some(1),
                     when: Some(recents_rule.clone()),
                     visibility: MenuItemVisibility::Classic,
@@ -122,7 +126,7 @@ impl Contribution for RecentsContribution {
                         icon: None,
                         toggled: None,
                     },
-                    group: Some(Rc::clone(&view_title_context_menu_group_views)),
+                    group: Some(Arc::clone(&view_title_context_menu_group_views)),
                     order: Some(1),
                     when: Some(recents_rule),
                     visibility: MenuItemVisibility::Classic,
@@ -146,7 +150,7 @@ impl Contribution for RecentsContribution {
                         icon: None,
                         toggled: None,
                     },
-                    group: Some(Rc::clone(&view_title_context_menu_group_inline)),
+                    group: Some(Arc::clone(&view_title_context_menu_group_inline)),
                     order: Some(1),
                     when: Some(recents_item_rule.clone()),
                     visibility: MenuItemVisibility::Classic,
@@ -163,7 +167,7 @@ impl Contribution for RecentsContribution {
                         icon: None,
                         toggled: None,
                     },
-                    group: Some(Rc::clone(&view_title_context_menu_group_inline)),
+                    group: Some(Arc::clone(&view_title_context_menu_group_inline)),
                     order: Some(2),
                     when: Some(recents_item_rule.clone()),
                     visibility: MenuItemVisibility::Classic,
@@ -217,9 +221,9 @@ impl Contribution for RecentsContribution {
             view_item_context_menu_group_preview,
             view_item_context_menu_group_remove,
         ) = {
-            let navigation = Rc::new(MenuGroup::new_ordered(0, constants::menu::MENU_GROUP_ID_NAVIGATION));
-            let preview = Rc::new(MenuGroup::new_ordered(1, constants::menu::MENU_GROUP_ID_PREVIEW));
-            let remove = Rc::new(MenuGroup::new_ordered(2, constants::menu::MENU_GROUP_ID_REMOVE));
+            let navigation = Arc::new(MenuGroup::new_ordered(0, constants::menu::MENU_GROUP_ID_NAVIGATION));
+            let preview = Arc::new(MenuGroup::new_ordered(1, constants::menu::MENU_GROUP_ID_PREVIEW));
+            let remove = Arc::new(MenuGroup::new_ordered(2, constants::menu::MENU_GROUP_ID_REMOVE));
 
             (navigation, preview, remove)
         };
@@ -236,7 +240,7 @@ impl Contribution for RecentsContribution {
                         icon: None,
                         toggled: None,
                     },
-                    group: Some(Rc::clone(&view_item_context_menu_group_navigation)),
+                    group: Some(Arc::clone(&view_item_context_menu_group_navigation)),
                     order: Some(1),
                     when: Some(recents_item_rule.clone()),
                     visibility: MenuItemVisibility::Classic,
@@ -253,7 +257,7 @@ impl Contribution for RecentsContribution {
                         icon: None,
                         toggled: None,
                     },
-                    group: Some(Rc::clone(&view_item_context_menu_group_navigation)),
+                    group: Some(Arc::clone(&view_item_context_menu_group_navigation)),
                     order: Some(2),
                     when: Some(recents_item_rule.clone()),
                     visibility: MenuItemVisibility::Classic,
@@ -267,7 +271,7 @@ impl Contribution for RecentsContribution {
                 submenu_id: open_with_profile_menu_id,
                 default_action_id: None,
                 title: Some(localize!("recents.openWithProfile", "Open with Profile")),
-                group: Some(Rc::clone(&view_item_context_menu_group_navigation)),
+                group: Some(Arc::clone(&view_item_context_menu_group_navigation)),
                 order: Some(3),
                 when: Some(recents_item_rule.clone()),
                 visibility: MenuItemVisibility::Classic,
@@ -286,7 +290,7 @@ impl Contribution for RecentsContribution {
                         icon: None,
                         toggled: None,
                     },
-                    group: Some(Rc::clone(&view_item_context_menu_group_preview)),
+                    group: Some(Arc::clone(&view_item_context_menu_group_preview)),
                     order: Some(1),
                     when: Some(recents_item_rule.clone()),
                     visibility: MenuItemVisibility::Classic,
@@ -303,7 +307,7 @@ impl Contribution for RecentsContribution {
                         icon: None,
                         toggled: None,
                     },
-                    group: Some(Rc::clone(&view_item_context_menu_group_remove)),
+                    group: Some(Arc::clone(&view_item_context_menu_group_remove)),
                     order: Some(1),
                     when: Some(recents_item_rule.clone()),
                     visibility: MenuItemVisibility::Classic,

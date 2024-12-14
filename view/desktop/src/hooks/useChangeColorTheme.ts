@@ -1,5 +1,5 @@
 import { invokeMossCommand } from "@/lib/backend/platfrom";
-import { ThemeDescriptor } from "@repo/desktop-models";
+import { ThemeDescriptor } from "@repo/moss-desktop";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 const changeTheme = async (themeDescriptor: ThemeDescriptor): Promise<void> => {

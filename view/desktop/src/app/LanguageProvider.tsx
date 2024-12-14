@@ -1,7 +1,7 @@
 import { useCallback, useEffect } from "react";
 
 import { useLanguageStore } from "@/store/language";
-import { LocaleDescriptor } from "@repo/desktop-models";
+import { LocaleDescriptor } from "@repo/moss-desktop";
 import { listen, UnlistenFn } from "@tauri-apps/api/event";
 
 const LanguageProvider = ({ children }: { children: React.ReactNode }) => {

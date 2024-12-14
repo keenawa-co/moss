@@ -1,4 +1,4 @@
-import { LocaleDescriptor } from "@repo/desktop-models";
+import { LocaleDescriptor } from "@repo/moss-desktop";
 
 import { invokeTauriIpc, IpcResult } from "./tauri";
 

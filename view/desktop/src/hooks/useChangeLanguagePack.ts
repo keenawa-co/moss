@@ -1,5 +1,5 @@
 import { invokeMossCommand } from "@/lib/backend/platfrom";
-import { LocaleDescriptor } from "@repo/desktop-models";
+import { LocaleDescriptor } from "@repo/moss-desktop";
 import { useMutation } from "@tanstack/react-query";
 
 const changeLanguagePack = async (localeDescriptor: LocaleDescriptor): Promise<void> => {

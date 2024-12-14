@@ -1,7 +1,8 @@
 import { existsSync, mkdirSync, writeFileSync } from "fs";
 import * as os from "os";
 
-import { Theme } from "@repo/desktop-models";
+import { Theme } from "@repo/moss-desktop";
+
 import { defaultDarkTheme } from "./themes/moss-dark.ts";
 import { defaultLightTheme } from "./themes/moss-light.ts";
 import { pinkTheme } from "./themes/moss-pink.ts";

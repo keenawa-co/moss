@@ -22,7 +22,7 @@ use contributions::{
     layout_controls::LayoutControlsContribution, links::LinksContribution,
     resents::RecentsContribution,
 };
-use desktop_models::actions::MenuItem;
+use moss_desktop::models::actions::MenuItem;
 use moss_text::ReadOnlyStr;
 use once_cell::unsync::OnceCell;
 use platform_configuration::{

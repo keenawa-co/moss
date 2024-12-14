@@ -1051,7 +1051,6 @@ dependencies = [
  "clap",
  "cocoa",
  "dashmap",
- "desktop_models",
  "dirs",
  "fern",
  "flume",
@@ -1060,17 +1059,13 @@ dependencies = [
  "log",
  "macos-trampoline",
  "mimalloc",
+ "moss_desktop",
  "moss_env",
  "moss_text",
  "moss_uikit",
  "objc",
  "once_cell",
  "parking_lot",
- "platform_configuration",
- "platform_core",
- "platform_formation",
- "platform_fs",
- "platform_workspace",
  "rand 0.8.5",
  "serde",
  "serde_json",
@@ -1085,25 +1080,6 @@ dependencies = [
  "tauri-plugin-window-state",
  "tokio",
  "tracing",
- "workbench_desktop",
- "workbench_service_configuration_tao",
- "workbench_service_environment_tao",
-]
-
-[[package]]
-name = "desktop_models"
-version = "0.1.0"
-dependencies = [
- "csscolorparser",
- "indexmap 2.7.0",
- "jsonschema",
- "moss_jsonlogic",
- "moss_text",
- "moss_uikit",
- "once_cell",
- "serde",
- "serde_json",
- "ts-rs",
 ]
 
 [[package]]
@@ -1685,18 +1661,6 @@ checksum = "85649ca51fd72272d7821adaf274ad91c288277713d9c18820d8499a7ff69e9a"
 dependencies = [
  "typenum",
  "version_check",
-]
-
-[[package]]
-name = "gensym"
-version = "0.1.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "913dce4c5f06c2ea40fc178c06f777ac89fc6b1383e90c254fafb1abe4ba3c82"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn 2.0.90",
- "uuid",
 ]
 
 [[package]]
@@ -2671,6 +2635,30 @@ dependencies = [
 ]
 
 [[package]]
+name = "moss_desktop"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "csscolorparser",
+ "dashmap",
+ "hashbrown 0.15.0",
+ "indexmap 2.7.0",
+ "jsonschema",
+ "moss_html",
+ "moss_jsonlogic",
+ "moss_jsonlogic_macro",
+ "moss_text",
+ "moss_uikit",
+ "once_cell",
+ "parking_lot",
+ "quote",
+ "serde",
+ "serde_json",
+ "tauri",
+ "ts-rs",
+]
+
+[[package]]
 name = "moss_env"
 version = "0.1.0"
 
@@ -2733,9 +2721,9 @@ name = "moss_themeconv"
 version = "0.1.0"
 dependencies = [
  "anyhow",
- "desktop_models",
  "indexmap 2.7.0",
  "jsonschema",
+ "moss_desktop",
  "serde",
  "serde_json",
 ]
@@ -4469,16 +4457,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a8f112729512f8e442d81f95a8a7ddf2b7c6b8a1a6f509a95864142b30cab2d3"
 
 [[package]]
-name = "static_str_ops"
-version = "0.1.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "eef2389280bc4d03836302f127e5e784c63cd183e24fe35cf73dc7f3b13a47d4"
-dependencies = [
- "gensym",
- "lazy_static",
-]
-
-[[package]]
 name = "string_cache"
 version = "0.8.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -6133,83 +6111,6 @@ checksum = "a277a57398d4bfa075df44f501a17cfdf8542d224f0d36095a2adc7aee4ef0a5"
 dependencies = [
  "cfg-if",
  "windows-sys 0.48.0",
-]
-
-[[package]]
-name = "workbench_desktop"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "dashmap",
- "derive_more",
- "desktop_models",
- "gethostname",
- "hashbrown 0.15.0",
- "lazy_static",
- "moss_html",
- "moss_jsonlogic",
- "moss_jsonlogic_macro",
- "moss_text",
- "moss_uikit",
- "once_cell",
- "os_info",
- "parking_lot",
- "platform_configuration",
- "platform_core",
- "platform_formation",
- "platform_fs",
- "platform_user_profile",
- "platform_workspace",
- "quote",
- "serde",
- "serde_json",
- "slotmap",
- "static_str_ops",
- "tauri",
- "thiserror 2.0.3",
- "workbench_service_configuration_tao",
- "workbench_service_environment_tao",
- "workbench_service_user_profile_tao",
-]
-
-[[package]]
-name = "workbench_service_configuration_common"
-version = "0.1.0"
-dependencies = [
- "platform_configuration",
- "serde_json",
-]
-
-[[package]]
-name = "workbench_service_configuration_tao"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "async-trait",
- "platform_configuration",
- "platform_core",
- "platform_fs",
- "platform_workspace",
- "serde_json",
- "workbench_service_configuration_common",
-]
-
-[[package]]
-name = "workbench_service_environment_tao"
-version = "0.1.0"
-dependencies = [
- "platform_environment",
-]
-
-[[package]]
-name = "workbench_service_user_profile_tao"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "arc-swap",
- "async-trait",
- "platform_fs",
- "platform_user_profile",
 ]
 
 [[package]]

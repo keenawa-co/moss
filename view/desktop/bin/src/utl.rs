@@ -1,37 +1,34 @@
-use std::path::PathBuf;
-use std::sync::Arc;
-
 use anyhow::{Context as _, Result};
-use platform_formation::service_registry::ServiceRegistry;
-use platform_fs::disk::file_system_service::DiskFileSystemService;
-use workbench_desktop::window::NativeWindowConfiguration;
-use workbench_service_environment_tao::environment_service::NativeEnvironmentService;
+use std::path::PathBuf;
 
-pub struct MockStorageService {}
+// use platform_formation::service_registry::ServiceRegistry;
+// use platform_fs::disk::file_system_service::DiskFileSystemService;
 
-impl MockStorageService {
-    fn new() -> Self {
-        Self {}
-    }
-}
+// pub struct MockStorageService {}
 
-pub fn create_service_registry(
-    native_window_configuration: NativeWindowConfiguration,
-) -> Result<ServiceRegistry> {
-    let mut service_registry = ServiceRegistry::new();
+// impl MockStorageService {
+//     fn new() -> Self {
+//         Self {}
+//     }
+// }
 
-    let mock_storage_service = MockStorageService::new();
+// pub fn create_service_registry(
+//     native_window_configuration: NativeWindowConfiguration,
+// ) -> Result<ServiceRegistry> {
+//     let mut service_registry = ServiceRegistry::new();
 
-    let fs_service = DiskFileSystemService::new();
-    let environment_service =
-        NativeEnvironmentService::new(native_window_configuration.home_dir.clone());
+//     let mock_storage_service = MockStorageService::new();
 
-    service_registry.insert(mock_storage_service);
-    service_registry.insert(environment_service);
-    service_registry.insert(Arc::new(fs_service));
+//     let fs_service = DiskFileSystemService::new();
+//     let environment_service =
+//         NativeEnvironmentService::new(native_window_configuration.home_dir.clone());
 
-    Ok(service_registry)
-}
+//     service_registry.insert(mock_storage_service);
+//     service_registry.insert(environment_service);
+//     service_registry.insert(Arc::new(fs_service));
+
+//     Ok(service_registry)
+// }
 
 pub fn get_home_dir() -> Result<PathBuf> {
     dirs::home_dir().context("Home directory not found!")

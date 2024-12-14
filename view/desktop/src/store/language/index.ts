@@ -2,7 +2,7 @@ import { create } from "zustand";
 
 import i18n from "@/app/i18n";
 import getLocales from "@/lib/backend/locales";
-import { LocaleDescriptor } from "@repo/desktop-models";
+import { LocaleDescriptor } from "@repo/moss-desktop";
 
 const LOCALSTORAGE_KEY = "language";
 

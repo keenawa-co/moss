@@ -1,8 +1,8 @@
-use desktop_models::{
+use hashbrown::HashMap;
+use moss_desktop::models::{
     actions::MenuItem,
     view::{GroupId, TreeViewDescriptor, TreeViewGroup, TreeViewGroupLocation},
 };
-use hashbrown::HashMap;
 use moss_text::ReadOnlyStr;
 use parking_lot::RwLock;
 use std::fmt::Debug;

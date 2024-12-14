@@ -5,7 +5,7 @@ import { ActionsSubmenu } from "@/components/Action/ActionsSubmenu";
 import { ActionsGroup } from "@/components/ActionsGroup";
 import { invokeTauriIpc } from "@/lib/backend/tauri";
 import { useLayoutStore } from "@/store/layout";
-import { MenuItem } from "@repo/desktop-models";
+import { MenuItem } from "@repo/moss-desktop";
 import { cn } from "@repo/moss-ui";
 
 export const ActionsBar = ({ className, ...props }: HTMLProps<HTMLDivElement>) => {

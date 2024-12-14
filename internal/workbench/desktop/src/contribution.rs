@@ -1,4 +1,4 @@
-use desktop_models::{
+use moss_desktop::models::{
     constants,
     view::{TreeViewGroup, TreeViewGroupLocation},
 };

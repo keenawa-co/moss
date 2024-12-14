@@ -1,10 +1,15 @@
-use crate::Contribution;
+use crate::{
+    models::{constants, view::TreeViewDescriptor},
+    state::AppState,
+};
 use anyhow::Result;
-use moss_desktop::models::{constants, view::TreeViewDescriptor};
 use moss_html::link::HtmlLink;
 use moss_text::localize;
 use once_cell::sync::Lazy;
+use serde::Serialize;
 use std::sync::Arc;
+
+use super::Contribution;
 
 #[derive(Debug, Serialize)]
 pub struct LinksViewContent(Vec<HtmlLink>);
@@ -26,7 +31,7 @@ impl LinksView {
 
 pub(crate) struct LinksContribution;
 impl Contribution for LinksContribution {
-    fn contribute(registry: &mut crate::RegistryManager) -> anyhow::Result<()> {
+    fn contribute(registry: &mut AppState) -> anyhow::Result<()> {
         let mut views_registry_lock = registry.views.write();
         views_registry_lock.register_views(
             constants::view::VIEW_GROUP_ID_LAUNCHPAD,
