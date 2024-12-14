@@ -3,47 +3,15 @@ use dashmap::DashMap;
 use hashbrown::HashMap;
 use moss_text::ReadOnlyStr;
 use parking_lot::RwLock;
-use serde::de::DeserializeOwned;
 use serde_json::Value;
 use std::{fmt::Debug, sync::atomic::AtomicUsize, sync::Arc};
-use tauri::{AppHandle, Emitter, EventTarget, Manager, Window};
+use tauri::{Emitter, EventTarget, Manager};
 
+use crate::command::{CommandContext, CommandHandler};
 use crate::contributions::Contribution;
 use crate::models::{
     actions::MenuItem, appearance::theming::ThemeDescriptor, view::*, window::LocaleDescriptor,
 };
-
-pub struct CommandContext {
-    pub app_handle: AppHandle,
-    pub window: Window,
-
-    args: HashMap<String, Value>,
-}
-
-impl CommandContext {
-    pub fn new(app_handle: AppHandle, window: Window, args: HashMap<String, Value>) -> Self {
-        Self {
-            app_handle,
-            window,
-            args,
-        }
-    }
-
-    pub fn get_arg<T>(&self, key: &str) -> Result<T, String>
-    where
-        T: DeserializeOwned,
-    {
-        let value = self
-            .args
-            .get(key)
-            .ok_or_else(|| format!("Argument '{}' is not found", key))?;
-        serde_json::from_value(value.clone())
-            .map_err(|e| format!("Deserialization error for key'{}': {}", key, e))
-    }
-}
-
-pub type CommandHandler =
-    Arc<dyn Fn(CommandContext, &AppState) -> Result<Value, String> + Send + Sync>;
 
 #[derive(Debug)]
 pub struct ViewsRegistry {
@@ -201,7 +169,7 @@ impl AppState {
 
 // FIXME: Temporary placement of this function here. It will be moved later.
 pub fn change_color_theme(ctx: CommandContext, app_state: &AppState) -> Result<Value, String> {
-    let theme_descriptor_arg = ctx.get_arg::<ThemeDescriptor>("themeDescriptor")?;
+    let theme_descriptor_arg = ctx.take_arg::<ThemeDescriptor>("themeDescriptor")?;
 
     app_state.change_color_theme(theme_descriptor_arg.clone());
 
@@ -224,7 +192,7 @@ pub fn change_color_theme(ctx: CommandContext, app_state: &AppState) -> Result<V
 
 // FIXME: Temporary placement of this function here. It will be moved later.
 pub fn change_language_pack(ctx: CommandContext, app_state: &AppState) -> Result<Value, String> {
-    let locale_descriptor_arg = ctx.get_arg::<LocaleDescriptor>("localeDescriptor")?;
+    let locale_descriptor_arg = ctx.take_arg::<LocaleDescriptor>("localeDescriptor")?;
 
     app_state.change_language_pack(locale_descriptor_arg.clone());
 

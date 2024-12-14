@@ -26,3 +26,4 @@ dashmap.workspace = true
 anyhow.workspace = true
 hashbrown.workspace = true
 quote.workspace = true
+thiserror.workspace = true

@@ -1,8 +1,8 @@
 use anyhow::Result;
 use hashbrown::HashMap;
 use moss_desktop::{
+    command::CommandContext,
     models::{appearance::theming::ThemeDescriptor, window::LocaleDescriptor},
-    state::CommandContext,
 };
 use moss_text::{quote, ReadOnlyStr};
 use serde_json::Value;

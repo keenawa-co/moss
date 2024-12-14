@@ -11,7 +11,7 @@ use crate::{
 use moss_jsonlogic::raw_rule::*;
 use moss_jsonlogic_macro::rule;
 use moss_text::{localize, ReadOnlyStr};
-use std::{rc::Rc, sync::Arc};
+use std::sync::Arc;
 
 use super::Contribution;
 
