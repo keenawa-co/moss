@@ -1,9 +1,9 @@
-import { LanguagePack } from "@/store/language";
+import { LocaleDescriptor } from "@repo/moss-desktop";
 
-import { invokeIpc, IpcResult } from "./tauri";
+import { invokeTauriIpc, IpcResult } from "./tauri";
 
-const getLocales = async (): Promise<IpcResult<LanguagePack[], string>> => {
-  return await invokeIpc<LanguagePack[], string>("get_locales");
+const getLocales = async (): Promise<IpcResult<LocaleDescriptor[], string>> => {
+  return await invokeTauriIpc<LocaleDescriptor[], string>("get_locales");
 };
 
 export default getLocales;

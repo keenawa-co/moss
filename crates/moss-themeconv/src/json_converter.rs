@@ -1,5 +1,5 @@
 use anyhow::{Context as _, Result};
-use desktop_models::appearance::theming::Theme;
+use moss_desktop::models::appearance::theming::Theme;
 use std::sync::Arc;
 
 use crate::{util::convert_colors_to_css_variables, ThemeConverter, Validator};
@@ -49,10 +49,10 @@ impl ThemeConverter for JsonThemeConverter {
 #[cfg(test)]
 mod tests {
     use anyhow::Result;
-    use desktop_models::appearance::theming::{
+    use indexmap::IndexMap;
+    use moss_desktop::models::appearance::theming::{
         ColorDetail, ColorPosition, ColorType, ColorValue, ThemeType,
     };
-    use indexmap::IndexMap;
 
     use super::*;
 

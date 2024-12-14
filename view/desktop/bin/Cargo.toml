@@ -21,18 +21,18 @@ compression = ["tauri/compression"]
 [dependencies]
 moss_env.workspace = true
 moss_text.workspace = true
-desktop_models.workspace = true
+moss_desktop.workspace = true
 moss_uikit.workspace = true
 
-platform_core.workspace = true
-platform_workspace.workspace = true
-platform_configuration.workspace = true
-platform_formation.workspace = true
-platform_fs.workspace = true
+# platform_core.workspace = true
+# platform_workspace.workspace = true
+# platform_configuration.workspace = true
+# platform_formation.workspace = true
+# platform_fs.workspace = true
 
-workbench_desktop.workspace = true
-workbench_service_configuration_tao.workspace = true
-workbench_service_environment_tao.workspace = true
+# workbench_desktop.workspace = true
+# workbench_service_configuration_tao.workspace = true
+# workbench_service_environment_tao.workspace = true
 
 futures.workspace = true
 anyhow.workspace = true

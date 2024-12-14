@@ -1,13 +1,10 @@
-import { invokeIpc } from "@/lib/backend/tauri";
-import { ThemeDescriptor } from "@repo/desktop-models";
+import { invokeMossCommand } from "@/lib/backend/platfrom";
+import { ThemeDescriptor } from "@repo/moss-desktop";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 const changeTheme = async (themeDescriptor: ThemeDescriptor): Promise<void> => {
-  await invokeIpc<unknown, string>("execute_command", {
-    commandId: "workbench.changeColorTheme",
-    args: {
-      themeDescriptor: themeDescriptor,
-    },
+  await invokeMossCommand("workbench.changeColorTheme", {
+    themeDescriptor,
   });
 };
 

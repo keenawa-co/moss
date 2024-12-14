@@ -11,6 +11,9 @@
       "path": "crates/moss-uikit"
     },
     {
+      "path": "crates/moss-desktop"
+    },
+    {
       "path": "packages/moss-ui"
     },
     {
@@ -27,9 +30,6 @@
     },
     {
       "path": "tools/icongen"
-    },
-    {
-      "path": "internal/workbench/desktop/models"
     }
   ]
 }

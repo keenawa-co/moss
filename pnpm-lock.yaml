@@ -73,6 +73,19 @@ importers:
         specifier: ^2.1.7
         version: 2.1.7(@types/node@22.10.1)(terser@5.36.0)
 
+  crates/moss-desktop:
+    dependencies:
+      typescript:
+        specifier: ^5.7.2
+        version: 5.7.2
+    devDependencies:
+      '@repo/moss-text':
+        specifier: workspace:*
+        version: link:../moss-text
+      '@repo/typescript-config':
+        specifier: workspace:*
+        version: link:../../packages/config-typescript
+
   crates/moss-html:
     dependencies:
       typescript:
@@ -218,15 +231,15 @@ importers:
         specifier: ^1.0.7
         version: 1.0.7(tailwindcss@3.4.15)
     devDependencies:
-      '@repo/desktop-models':
-        specifier: workspace:*
-        version: link:../../internal/workbench/desktop/models
       '@repo/eslint-config':
         specifier: workspace:*
         version: link:../config-eslint
       '@repo/icongen':
         specifier: workspace:*
         version: link:../../tools/icongen
+      '@repo/moss-desktop':
+        specifier: workspace:*
+        version: link:../../crates/moss-desktop
       '@repo/tailwind-config':
         specifier: workspace:*
         version: link:../config-tailwind
@@ -274,9 +287,9 @@ importers:
         specifier: ^5.7.2
         version: 5.7.2
     devDependencies:
-      '@repo/desktop-models':
+      '@repo/moss-desktop':
         specifier: workspace:*
-        version: link:../../internal/workbench/desktop/models
+        version: link:../../crates/moss-desktop
       '@repo/typescript-config':
         specifier: workspace:*
         version: link:../../packages/config-typescript
@@ -338,12 +351,12 @@ importers:
         specifier: ^5.0.2
         version: 5.0.2(@types/react@18.3.12)(immer@10.1.1)(react@18.3.1)(use-sync-external-store@1.2.2(react@18.3.1))
     devDependencies:
-      '@repo/desktop-models':
-        specifier: workspace:*
-        version: link:../../internal/workbench/desktop/models
       '@repo/eslint-config':
         specifier: workspace:*
         version: link:../../packages/config-eslint
+      '@repo/moss-desktop':
+        specifier: workspace:*
+        version: link:../../crates/moss-desktop
       '@repo/tailwind-config':
         specifier: workspace:*
         version: link:../../packages/config-tailwind
@@ -352,7 +365,7 @@ importers:
         version: link:../../packages/config-typescript
       '@tailwindcss/typography':
         specifier: ^0.5.15
-        version: 0.5.15
+        version: 0.5.15(tailwindcss@3.4.15)
       '@tauri-apps/cli':
         specifier: ^2.1.0
         version: 2.1.0
@@ -381,12 +394,12 @@ importers:
       '@chromatic-com/storybook':
         specifier: 3.2.2
         version: 3.2.2(react@18.3.1)(storybook@8.4.4(prettier@3.4.1))
-      '@repo/desktop-models':
-        specifier: workspace:*
-        version: link:../../internal/workbench/desktop/models
       '@repo/eslint-config':
         specifier: workspace:*
         version: link:../../packages/config-eslint
+      '@repo/moss-desktop':
+        specifier: workspace:*
+        version: link:../../crates/moss-desktop
       '@repo/moss-ui':
         specifier: workspace:*
         version: link:../../packages/moss-ui
@@ -7285,12 +7298,13 @@ snapshots:
     dependencies:
       tslib: 2.8.1
 
-  '@tailwindcss/typography@0.5.15':
+  '@tailwindcss/typography@0.5.15(tailwindcss@3.4.15)':
     dependencies:
       lodash.castarray: 4.4.0
       lodash.isplainobject: 4.0.6
       lodash.merge: 4.6.2
       postcss-selector-parser: 6.0.10
+      tailwindcss: 3.4.15
 
   '@tanstack/query-core@5.62.0': {}
 
