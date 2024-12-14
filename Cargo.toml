@@ -23,22 +23,6 @@ members = [
     "crates/moss-typebridge",
     "crates/moss-typebridge-macro",
     "crates/moss-desktop",
-
-    # "internal/platform/core",
-    # "internal/platform/fs",
-    # "internal/platform/formation",
-    # "internal/platform/configuration",
-    # "internal/platform/user_profile",
-    # "internal/platform/environment",
-    # "internal/platform/utl",
-    # "internal/platform/workspace",
-
-    # "internal/workbench/desktop/models",
-    # "internal/workbench/service/configuration/common",
-    # "internal/workbench/service/configuration/tao",
-    # "internal/workbench/service/user_profile/tao",
-    # "internal/workbench/service/environment/tao",
-
 ]
 
 [profile.dev]
@@ -72,24 +56,6 @@ moss_env = { path = "crates/moss-env" }
 moss_async = { path = "crates/moss-async" }
 moss_collection = { path = "crates/moss-collection" }
 moss_desktop = { path = "crates/moss-desktop" }
-
-
-# platform_core = { path = "internal/platform/core" }
-# platform_utl = { path = "internal/platform/utl" }
-# platform_configuration = { path = "internal/platform/configuration" }
-# platform_formation = { path = "internal/platform/formation" }
-# platform_user_profile = { path = "internal/platform/user_profile" }
-# platform_environment = { path = "internal/platform/environment" }
-# platform_workspace = { path = "internal/platform/workspace" }
-# platform_fs = { path = "internal/platform/fs" }
-
-# desktop_models = { path = "internal/workbench/desktop/models" }
-
-# workbench_desktop = { path = "internal/workbench/desktop" }
-# workbench_service_configuration_common = { path = "internal/workbench/service/configuration/common" }
-# workbench_service_configuration_tao = { path = "internal/workbench/service/configuration/tao" }
-# workbench_service_user_profile_tao = { path = "internal/workbench/service/user_profile/tao" }
-# workbench_service_environment_tao = { path = "internal/workbench/service/environment/tao" }
 
 dashmap = "6.1.0"
 indexmap = "2.7.0"
