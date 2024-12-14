@@ -30,9 +30,6 @@
     },
     {
       "path": "tools/icongen"
-    },
-    {
-      "path": "misc/cspell"
     }
   ]
 }
