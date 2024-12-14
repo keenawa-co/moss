@@ -11,10 +11,10 @@
       "path": "crates/moss-uikit"
     },
     {
-      "path": "packages/moss-ui"
+      "path": "crates/moss-desktop"
     },
     {
-      "path": "packages/moss-desktop"
+      "path": "packages/moss-ui"
     },
     {
       "path": "view/desktop"
