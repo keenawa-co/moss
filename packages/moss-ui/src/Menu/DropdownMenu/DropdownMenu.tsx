@@ -1,15 +1,17 @@
 import * as React from "react";
+import { forwardRef } from "react";
+
 import { composeEventHandlers } from "@radix-ui/primitive";
 import { composeRefs } from "@radix-ui/react-compose-refs";
 import { createContextScope } from "@radix-ui/react-context";
-import { useControllableState } from "@radix-ui/react-use-controllable-state";
-import { Primitive } from "@radix-ui/react-primitive";
+import type { Scope } from "@radix-ui/react-context";
+import { useId } from "@radix-ui/react-id";
 import * as MenuPrimitive from "@radix-ui/react-menu";
 import { createMenuScope } from "@radix-ui/react-menu";
-import { useId } from "@radix-ui/react-id";
+import { Primitive } from "@radix-ui/react-primitive";
+import { useControllableState } from "@radix-ui/react-use-controllable-state";
+
 import * as CustomPrimitive from "../index";
-import type { Scope } from "@radix-ui/react-context";
-import { forwardRef } from "react";
 
 type Direction = "ltr" | "rtl";
 
@@ -245,16 +247,11 @@ const DropdownMenuCheckboxItem = forwardRef<CustomPrimitive.CheckboxItemElement,
  * DropdownMenuRadioGroup
  * -----------------------------------------------------------------------------------------------*/
 
-type DropdownMenuRadioGroupElement = React.ElementRef<typeof MenuPrimitive.RadioGroup>;
-type MenuRadioGroupProps = React.ComponentPropsWithoutRef<typeof MenuPrimitive.RadioGroup>;
-// eslint-disable-next-line
-interface DropdownMenuRadioGroupProps extends MenuRadioGroupProps {}
-
-const DropdownMenuRadioGroup = React.forwardRef<DropdownMenuRadioGroupElement, DropdownMenuRadioGroupProps>(
-  (props: ScopedProps<DropdownMenuRadioGroupProps>, forwardedRef) => {
+const DropdownMenuRadioGroup = forwardRef<CustomPrimitive.RadioGroupElement, CustomPrimitive.RadioGroupProps>(
+  (props: ScopedProps<CustomPrimitive.RadioGroupProps>, forwardedRef) => {
     const { __scopeDropdownMenu, ...radioGroupProps } = props;
     const menuScope = useMenuScope(__scopeDropdownMenu);
-    return <MenuPrimitive.RadioGroup {...menuScope} {...radioGroupProps} ref={forwardedRef} />;
+    return <CustomPrimitive.RadioGroup {...menuScope} {...radioGroupProps} ref={forwardedRef} />;
   }
 );
 
@@ -262,16 +259,11 @@ const DropdownMenuRadioGroup = React.forwardRef<DropdownMenuRadioGroupElement, D
  * DropdownMenuRadioItem
  * -----------------------------------------------------------------------------------------------*/
 
-type DropdownMenuRadioItemElement = React.ElementRef<typeof MenuPrimitive.RadioItem>;
-type MenuRadioItemProps = React.ComponentPropsWithoutRef<typeof MenuPrimitive.RadioItem>;
-// eslint-disable-next-line
-interface DropdownMenuRadioItemProps extends MenuRadioItemProps {}
-
-const DropdownMenuRadioItem = React.forwardRef<DropdownMenuRadioItemElement, DropdownMenuRadioItemProps>(
-  (props: ScopedProps<DropdownMenuRadioItemProps>, forwardedRef) => {
+const DropdownMenuRadioItem = forwardRef<CustomPrimitive.RadioItemElement, CustomPrimitive.RadioItemProps>(
+  (props: ScopedProps<CustomPrimitive.RadioItemProps>, forwardedRef) => {
     const { __scopeDropdownMenu, ...radioItemProps } = props;
     const menuScope = useMenuScope(__scopeDropdownMenu);
-    return <MenuPrimitive.RadioItem {...menuScope} {...radioItemProps} ref={forwardedRef} />;
+    return <CustomPrimitive.RadioItem {...menuScope} {...radioItemProps} ref={forwardedRef} />;
   }
 );
 
