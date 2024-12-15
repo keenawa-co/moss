@@ -6,7 +6,7 @@ import { ActionsGroup } from "@/components/ActionsGroup";
 import { invokeIpc } from "@/lib/backend/tauri";
 import { useLayoutStore } from "@/store/layout";
 import { MenuItem } from "@repo/desktop-models";
-import { cn } from "@repo/moss-ui";
+import { cn, DropdownMenu as DM, Icon, Icons } from "@repo/moss-ui";
 
 export const ActionsBar = ({ className, ...props }: HTMLProps<HTMLDivElement>) => {
   const [activities, setActivities] = useState<MenuItem[]>([]);
@@ -46,13 +46,6 @@ export const ActionsBar = ({ className, ...props }: HTMLProps<HTMLDivElement>) =
 
       <div className="flex items-center">
         {activities.map((item, index) => {
-          const icons = [
-            "HeadBarPrimarySideBar",
-            "HeadBarPanelActive",
-            "HeadBarSecondarySideBar",
-            "HeadBarCustomizeLayout",
-          ] as const;
-
           if ("action" in item) {
             const command = item.action.command;
 
@@ -93,16 +86,6 @@ export const ActionsBar = ({ className, ...props }: HTMLProps<HTMLDivElement>) =
                 />
               );
             }
-            // isTerminalVisible, setIsTerminalVisible
-            return (
-              <ActionButton
-                key={command.id}
-                iconClassName="size-[18px]"
-                {...command}
-                icon={icons[index]}
-                visibility="compact"
-              />
-            );
           }
 
           if ("submenu" in item) {
@@ -113,34 +96,15 @@ export const ActionsBar = ({ className, ...props }: HTMLProps<HTMLDivElement>) =
                 {...item.submenu}
                 icon="HeadBarCustomizeLayout"
               >
-                <ul className="flex flex-col gap-1">
-                  <li
-                    className={cn("cursor-pointer px-2 hover:bg-green-100", { "bg-green-300": alignment === "center" })}
-                    onClick={() => setAlignment("center")}
-                  >
-                    Center
-                  </li>
-                  <li
-                    className={cn("cursor-pointer px-2 hover:bg-green-100", {
-                      "bg-green-300": alignment === "justify",
-                    })}
-                    onClick={() => setAlignment("justify")}
-                  >
-                    Justify
-                  </li>
-                  <li
-                    className={cn("cursor-pointer px-2 hover:bg-green-100", { "bg-green-300": alignment === "left" })}
-                    onClick={() => setAlignment("left")}
-                  >
-                    Left
-                  </li>
-                  <li
-                    className={cn("cursor-pointer px-2 hover:bg-green-100", { "bg-green-300": alignment === "right" })}
-                    onClick={() => setAlignment("right")}
-                  >
-                    Right
-                  </li>
-                </ul>
+                <DM.RadioGroup
+                  value={alignment}
+                  onValueChange={(value) => setAlignment(value as "center" | "justify" | "left" | "right")}
+                >
+                  <DM.RadioItem value="center" label="Center" checked={alignment === "center"} />
+                  <DM.RadioItem value="justify" label="Justify" checked={alignment === "justify"} />
+                  <DM.RadioItem value="left" label="Left" checked={alignment === "left"} />
+                  <DM.RadioItem value="right" label="Right" checked={alignment === "right"} />
+                </DM.RadioGroup>
               </ActionsSubmenu>
             );
           }
