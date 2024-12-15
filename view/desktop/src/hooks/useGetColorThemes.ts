@@ -1,10 +1,9 @@
-import { ThemeDescriptor } from "@repo/desktop-models";
+import { ThemeDescriptor } from "@repo/moss-desktop";
 import { useQuery } from "@tanstack/react-query";
 import { invoke } from "@tauri-apps/api/core";
 
 const getColorThemes = async (): Promise<ThemeDescriptor[]> => {
-  const result = await invoke<ThemeDescriptor[]>("get_themes");
-  return result;
+  return await invoke<ThemeDescriptor[]>("get_themes");
 };
 
 export const useGetColorThemes = () => {

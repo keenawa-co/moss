@@ -30,7 +30,7 @@
     "zustand": "^5.0.2"
   },
   "devDependencies": {
-    "@repo/desktop-models": "workspace:*",
+    "@repo/moss-desktop": "workspace:*",
     "@repo/eslint-config": "workspace:*",
     "@repo/tailwind-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",

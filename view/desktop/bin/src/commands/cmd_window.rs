@@ -1,13 +1,15 @@
 use anyhow::Result;
-use desktop_models::appearance::theming::ThemeDescriptor;
 use hashbrown::HashMap;
+use moss_desktop::{
+    command::CommandContext,
+    models::{appearance::theming::ThemeDescriptor, window::LocaleDescriptor},
+};
 use moss_text::{quote, ReadOnlyStr};
 use serde_json::Value;
 use std::path::PathBuf;
 
-use tauri::{AppHandle, Emitter, EventTarget, Manager, State, WebviewWindow, Window};
-
-use crate::{create_child_window, state::CommandContext, AppState};
+use crate::{create_child_window, AppState};
+use tauri::{AppHandle, Emitter, State, WebviewWindow, Window};
 
 #[derive(Clone, Serialize)]
 struct EventAData {
@@ -40,42 +42,14 @@ pub fn execute_command(
     app_handle: AppHandle,
     app_state: State<'_, AppState>,
     window: Window,
-    command_id: ReadOnlyStr,
+    cmd: ReadOnlyStr,
     args: HashMap<String, Value>,
 ) -> Result<Value, String> {
-    if let Some(command_handler) = app_state.get_command(&command_id) {
+    if let Some(command_handler) = app_state.get_command(&cmd) {
         command_handler(CommandContext::new(app_handle, window, args), &app_state)
     } else {
-        Err(format!(
-            "command with id {} is not found",
-            quote!(command_id)
-        ))
+        Err(format!("command with id {} is not found", quote!(cmd)))
     }
-}
-
-// FIXME: Temporary placement of this function here. It will be moved later.
-pub fn set_color_theme(ctx: CommandContext, app_state: &AppState) -> Result<Value, String> {
-    let theme_descriptor_arg = ctx.get_arg::<ThemeDescriptor>("themeDescriptor")?;
-
-    app_state
-        .appearance
-        .set_theme_descriptor(theme_descriptor_arg.clone());
-
-    for (label, _) in ctx.app_handle.webview_windows() {
-        if ctx.window.label() == &label {
-            continue;
-        }
-
-        ctx.app_handle
-            .emit_to(
-                EventTarget::webview_window(label),
-                "core://color-theme-changed",
-                theme_descriptor_arg.clone(),
-            )
-            .unwrap();
-    }
-
-    Ok(Value::Null)
 }
 
 #[tauri::command(async)]
@@ -118,29 +92,22 @@ pub async fn get_themes() -> Result<Vec<ThemeDescriptor>, String> {
     ])
 }
 
-#[derive(Serialize, Deserialize)]
-pub struct Locale {
-    code: String,
-    name: String,
-    direction: Option<String>, // "ltr" or "rtl"
-}
-
 // FIXME: This is a temporary solution until we have a registry of installed
 // plugins and the ability to check which language packs are installed.
 #[tauri::command]
-pub fn get_locales() -> Vec<Locale> {
+pub fn get_locales() -> Vec<LocaleDescriptor> {
     vec![
-        Locale {
+        LocaleDescriptor {
             code: "en".to_string(),
             name: "English".to_string(),
             direction: Some("ltr".to_string()),
         },
-        Locale {
+        LocaleDescriptor {
             code: "de".to_string(),
             name: "Deutsche".to_string(),
             direction: Some("ltr".to_string()),
         },
-        Locale {
+        LocaleDescriptor {
             code: "ru".to_string(),
             name: "Русский".to_string(),
             direction: Some("ltr".to_string()),

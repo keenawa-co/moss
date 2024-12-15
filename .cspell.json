@@ -1,0 +1,21 @@
+{
+  "$schema": "https://raw.githubusercontent.com/streetsidesoftware/cspell/main/cspell.schema.json",
+  "version": "0.2",
+  "import": [
+    "@cspell/dict-typescript/cspell-ext.json",
+    "@cspell/dict-rust/cspell-ext.json",
+    "@cspell/dict-lorem-ipsum/cspell-ext.json"
+  ],
+  "dictionaryDefinitions": [
+    {
+      "name": "backend",
+      "path": "./misc/cspell/backend.txt"
+    },
+    {
+      "name": "frontend",
+      "path": "./misc/cspell/frontend.txt"
+    }
+  ],
+  "dictionaries": ["backend", "frontend", "typescript", "react", "lorem-ipsum"],
+  "ignorePaths": ["pnpm-lock.yaml", "Makefile", "target", "view/desktop/rocksdb"]
+}

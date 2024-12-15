@@ -1,37 +1,23 @@
 mod commands;
+mod constants;
 mod mem;
 mod menu;
 mod plugins;
-mod state;
 mod utl;
 mod window;
 
-mod cli;
-pub mod constants;
+pub use constants::*;
 
-use cmd_window::set_color_theme;
-use commands::*;
-use dashmap::DashMap;
-use desktop_models::appearance::theming::ThemeDescriptor;
-use parking_lot::RwLock;
-use platform_core::context_v2::ContextCell;
-use platform_core::platform::cross::client::CrossPlatformClient;
-use platform_workspace::WorkspaceId;
+use moss_desktop::state::AppState;
 use rand::random;
-use state::{AppState, Appearance, CommandHandler};
 use std::env;
-use std::rc::Rc;
-use std::sync::atomic::{AtomicUsize, Ordering};
-use std::sync::Arc;
 use tauri::{AppHandle, Manager, RunEvent, WebviewWindow, WindowEvent};
-use tauri_plugin_cli::CliExt;
 use tauri_plugin_global_shortcut::{Code, GlobalShortcutExt, Modifiers, Shortcut, ShortcutState};
 use tauri_plugin_log::{fern::colors::ColoredLevelConfig, Target, TargetKind};
+use tauri_plugin_os;
 use window::{create_window, CreateWindowInput};
-use workbench_desktop::window::{NativePlatformInfo, NativeWindowConfiguration};
-use workbench_desktop::Workbench;
 
-use crate::constants::*;
+use crate::commands::*;
 use crate::plugins as moss_plugins;
 
 #[macro_use]
@@ -40,7 +26,6 @@ extern crate serde;
 pub fn run() {
     #[allow(unused_mut)]
     let mut builder = tauri::Builder::default()
-        .plugin(tauri_plugin_cli::init())
         .plugin(
             tauri_plugin_log::Builder::default()
                 .targets([
@@ -59,7 +44,6 @@ pub fn run() {
                 })
                 .build(),
         )
-        // .plugin(tauri_plugin_clipboard_manager::init())
         .plugin(
             tauri_plugin_window_state::Builder::default()
                 .with_denylist(&["ignored"])
@@ -72,10 +56,8 @@ pub fn run() {
                 })
                 .build(),
         )
-        .plugin(tauri_plugin_shell::init())
-        .plugin(tauri_plugin_os::init())
-        .plugin(tauri_plugin_fs::init());
-
+        .plugin(tauri_plugin_fs::init())
+        .plugin(tauri_plugin_os::init());
     #[cfg(target_os = "macos")]
     {
         builder = builder.plugin(moss_plugins::tauri_mac_window::init());
@@ -134,21 +116,7 @@ pub fn run() {
         .expect("failed to run")
         .run(|app_handle, event| match event {
             RunEvent::Ready => {
-                // Setting up CLI
-                match app_handle.cli().matches() {
-                    Ok(matches) => {
-                        let subcommand = matches.subcommand;
-                        if subcommand.is_none() {
-                            let _ = create_main_window(app_handle, "/");
-                        } else {
-                            tauri::async_runtime::spawn(crate::cli::cli_handler(
-                                subcommand.unwrap(),
-                                app_handle.clone(),
-                            ));
-                        }
-                    }
-                    Err(_) => {}
-                };
+                let _ = create_main_window(app_handle, "/");
             }
 
             #[cfg(target_os = "macos")]
@@ -162,51 +130,11 @@ pub fn run() {
 }
 
 fn create_main_window(app_handle: &AppHandle, url: &str) -> WebviewWindow {
-    // ------------ Get rid of this mess as soon as possible ------------
-    let platform_info = NativePlatformInfo::new();
-    let home_dir = crate::utl::get_home_dir().expect("failed to get $HOME dir");
-
-    let service_group = utl::create_service_registry(NativeWindowConfiguration {
-        home_dir,
-        full_screen: false,
-        platform_info: platform_info.clone(),
-    })
-    .unwrap();
-    let platform_client = Rc::new(CrossPlatformClient::new());
-    let ctx_cell = ContextCell::new(platform_client.clone());
-    let mut ctx = ctx_cell.borrow().to_async();
-
-    let mut workbench = Workbench::new(&mut ctx, service_group, WorkspaceId::Empty).unwrap();
-    workbench.initialize(&mut ctx).unwrap();
-
-    // ----------------------------------------------------------------------
-
-    let commands = DashMap::new();
-    commands.insert(
-        "workbench.changeColorTheme".into(),
-        Arc::new(set_color_theme) as CommandHandler,
-    );
-
-    let window_number = 0;
-    let app_state = AppState {
-        commands,
-        appearance: Appearance {
-            theme_descriptor: RwLock::new(ThemeDescriptor {
-                id: "theme-light".to_string(),
-                name: "Theme Light".to_string(),
-                source: "moss-light.css".to_string(),
-            }),
-        },
-        workbench: Arc::new(workbench),
-        platform_info,
-        next_window_id: AtomicUsize::new(window_number),
-    };
-
     {
-        app_handle.manage(app_state);
+        app_handle.manage(AppState::new());
     }
 
-    let label = format!("{MAIN_WINDOW_PREFIX}{}", window_number);
+    let label = format!("{MAIN_WINDOW_PREFIX}{}", 0);
     let config = CreateWindowInput {
         url,
         label: label.as_str(),
@@ -223,15 +151,10 @@ fn create_main_window(app_handle: &AppHandle, url: &str) -> WebviewWindow {
 }
 
 fn create_child_window(handle: &AppHandle, url: &str) -> WebviewWindow {
-    let window_number = handle
-        .state::<AppState>()
-        .next_window_id
-        .fetch_add(1, Ordering::SeqCst);
-
-    let label = format!("{MAIN_WINDOW_PREFIX}{}", window_number + 1);
+    let next_window_id = handle.state::<AppState>().inc_next_window_id() + 1;
     let config = CreateWindowInput {
         url,
-        label: label.as_str(),
+        label: &format!("{MAIN_WINDOW_PREFIX}{}", next_window_id),
         title: "Moss Studio",
         inner_size: (DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT),
         position: (

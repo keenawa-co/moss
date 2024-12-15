@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import { invokeIpc } from "@/lib/backend/tauri";
+import { invokeTauriIpc } from "@/lib/backend/tauri";
 import { Icon, Tooltip } from "@repo/moss-ui";
 import { listen } from "@tauri-apps/api/event";
 
@@ -11,7 +11,7 @@ export const Home: React.FC = () => {
   const { t } = useTranslation(["ns1", "ns2"]);
 
   const handleNewWindowButton = async () => {
-    const response = await invokeIpc("create_new_window");
+    const response = await invokeTauriIpc("create_new_window");
     console.log(response);
   };
 
@@ -52,8 +52,7 @@ const SessionComponent = () => {
 
   const getAllActivities = async () => {
     try {
-      // console.log((await invokeIpc("get_view_content")) as object);
-      console.log((await invokeIpc("get_menu_items_by_namespace", { namespace: "headItem" })) as object);
+      console.log((await invokeTauriIpc("get_menu_items_by_namespace", { namespace: "headItem" })) as object);
     } catch (err) {
       console.error("Failed to get workbench state:", err);
     }

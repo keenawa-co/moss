@@ -1,6 +1,6 @@
 import { create } from "zustand";
 
-import { ThemeDescriptor } from "@repo/desktop-models";
+import { ThemeDescriptor } from "@repo/moss-desktop";
 
 export interface ThemeStore {
   currentTheme: ThemeDescriptor | null;
