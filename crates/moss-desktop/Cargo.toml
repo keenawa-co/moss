@@ -7,11 +7,14 @@ edition = "2021"
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
+linkme = "0.3"
+
 moss_text.workspace = true
 moss_uikit.workspace = true
 moss_jsonlogic.workspace = true
 moss_jsonlogic_macro.workspace = true
 moss_html.workspace = true
+moss_desktop_macro.workspace = true
 
 indexmap = { workspace = true, features = ["serde"] }
 serde = { workspace = true, features = ["derive", "rc"] }

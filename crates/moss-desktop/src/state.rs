@@ -1,17 +1,53 @@
 use anyhow::Result;
 use dashmap::DashMap;
 use hashbrown::HashMap;
+use linkme::distributed_slice;
 use moss_text::ReadOnlyStr;
 use parking_lot::RwLock;
 use serde_json::Value;
 use std::{fmt::Debug, sync::atomic::AtomicUsize, sync::Arc};
 use tauri::{Emitter, EventTarget, Manager};
 
-use crate::command::{CommandContext, CommandHandler};
-use crate::contributions::Contribution;
+use crate::command::{CommandContext, CommandDecl, CommandHandler};
+use crate::contributions::ContributionOld;
 use crate::models::{
     actions::MenuItem, appearance::theming::ThemeDescriptor, view::*, window::LocaleDescriptor,
 };
+
+#[macro_export]
+macro_rules! contribution_point {
+    (
+        $name:expr, {
+            $(commands: [ $($cmd:expr),* $(,)? ])?
+            $(, menus: [ $($menu:expr),* $(,)? ])?
+            $(,)?
+        }
+    ) => {
+        #[linkme::distributed_slice($crate::state::CONTRIBUTIONS)]
+        static __CONTRIBUTION__: once_cell::sync::Lazy<$crate::state::Contribution> = once_cell::sync::Lazy::new(|| {
+            $crate::state::Contribution {
+                name: $name,
+                commands: &[
+                    $(
+                        $(
+                            $cmd,
+                        )*
+                    )?
+                ],
+                menus: vec![
+                    $(
+                        $(
+                            $menu,
+                        )*
+                    )?
+                ],
+            }
+        });
+    };
+}
+
+#[distributed_slice]
+pub static CONTRIBUTIONS: [once_cell::sync::Lazy<Contribution>] = [..];
 
 #[derive(Debug)]
 pub struct ViewsRegistryOld {
@@ -91,6 +127,17 @@ impl MenuRegistryOld {
     }
 }
 
+pub struct MenuDecl {
+    pub name: &'static str,
+    pub items: Vec<MenuItem>,
+}
+
+pub struct Contribution {
+    pub name: &'static str,
+    pub commands: &'static [CommandDecl],
+    pub menus: Vec<MenuDecl>,
+}
+
 pub struct Preferences {
     pub theme: RwLock<ThemeDescriptor>,
     pub locale: RwLock<LocaleDescriptor>,
@@ -106,17 +153,16 @@ pub struct AppState {
 
 impl AppState {
     pub fn new() -> Self {
-        // FIXME: Temporary solution, these data should be added to the registry, not registered here.
         let commands = DashMap::new();
-        commands.insert(
-            "workbench.changeColorTheme".into(),
-            Arc::new(change_color_theme) as CommandHandler,
-        );
 
-        commands.insert(
-            "workbench.changeLanguagePack".into(),
-            Arc::new(change_language_pack) as CommandHandler,
-        );
+        for contrib in CONTRIBUTIONS {
+            for command in contrib.commands {
+                commands.insert(
+                    ReadOnlyStr::from(command.key),
+                    Arc::new(command.handler) as CommandHandler,
+                );
+            }
+        }
 
         let mut state = Self {
             next_window_id: AtomicUsize::new(0),

@@ -6,6 +6,6 @@ pub mod links;
 pub mod resents;
 pub mod workbench;
 
-pub trait Contribution {
+pub trait ContributionOld {
     fn contribute(app_state: &mut AppState) -> Result<()>;
 }

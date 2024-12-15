@@ -1,4 +1,5 @@
 use crate::{
+    contribution_point,
     models::{
         actions::{
             ActionMenuItem, CommandAction, CommandActionToggle, MenuGroup, MenuItem,
@@ -6,24 +7,56 @@ use crate::{
         },
         constants,
     },
-    state::AppState,
+    state::{AppState, MenuDecl},
 };
 use moss_jsonlogic::raw_rule::*;
 use moss_jsonlogic_macro::rule;
 use moss_text::{localize, ReadOnlyStr};
 use std::sync::Arc;
 
-use super::Contribution;
+contribution_point!("my_contribution", {
+    commands: [],
+    menus: [
+        MenuDecl {
+            name: "main_menu",
+            items: vec![
+                MenuItem::Action(ActionMenuItem {
+                    command: CommandAction {
+                        id: "workbench.action.toggleSecondarySidebar".into(),
+                        title: localize!(
+                            "layoutControls.togglePrimarySideBar",
+                            "Toggle Primary Side Bar"
+                        ),
+                        tooltip: None,
+                        description: None,
+                        icon: None,
+                        toggled: Some(CommandActionToggle {
+                            condition: rule!(toggleSecondarySidebar == true),
+                            icon: None,
+                            tooltip: None,
+                            title: None,
+                        }),
+                    },
+                    group: Some(Arc::new(MenuGroup::unordered("layoutControls"))),
+                    order: None,
+                    when: None,
+                    visibility: MenuItemVisibility::Compact,
+                })
+            ],
+        },
+    ],
+});
+
+use super::ContributionOld;
 
 pub struct LayoutControlsContribution;
-impl Contribution for LayoutControlsContribution {
+impl ContributionOld for LayoutControlsContribution {
     fn contribute(registry: &mut AppState) -> anyhow::Result<()> {
         /* ---------- Menus contributions ---------- */
 
         let mut menus_registry_lock = registry.menus.write();
 
-        let head_item_menu_group_layout_controls =
-            Arc::new(MenuGroup::new_unordered("layoutControls"));
+        let head_item_menu_group_layout_controls = Arc::new(MenuGroup::unordered("layoutControls"));
 
         menus_registry_lock.append_menu_items(vec![
             (
@@ -132,10 +165,10 @@ impl Contribution for LayoutControlsContribution {
             _customize_layout_group_primary_sidebar_position, // TODO: add the corresponding menu items that will utilize this group.
             _customize_layout_group_panel_modes, // TODO: add the corresponding menu items that will utilize this group.
         ) = {
-            let visibility = Arc::new(MenuGroup::new_ordered(0, "visibility"));
-            let panel_alignment = Arc::new(MenuGroup::new_ordered(0, "panelAlignment"));
-            let primary_sidebar_position = Arc::new(MenuGroup::new_ordered(0, "primarySideBarPosition"));
-            let modes = Arc::new(MenuGroup::new_ordered(0, "modes"));
+            let visibility = Arc::new(MenuGroup::ordered(0, "visibility"));
+            let panel_alignment = Arc::new(MenuGroup::ordered(0, "panelAlignment"));
+            let primary_sidebar_position = Arc::new(MenuGroup::ordered(0, "primarySideBarPosition"));
+            let modes = Arc::new(MenuGroup::ordered(0, "modes"));
 
             (visibility, panel_alignment, primary_sidebar_position, modes)
         };

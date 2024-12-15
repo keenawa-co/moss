@@ -45,7 +45,7 @@ pub struct MenuGroup {
 }
 
 impl MenuGroup {
-    pub fn new_ordered(order: i64, id: impl Into<ReadOnlyStr>) -> Self {
+    pub fn ordered(order: i64, id: impl Into<ReadOnlyStr>) -> Self {
         Self {
             id: id.into(),
             order: Some(order),
@@ -53,7 +53,7 @@ impl MenuGroup {
         }
     }
 
-    pub fn new_unordered(id: impl Into<ReadOnlyStr>) -> Self {
+    pub fn unordered(id: impl Into<ReadOnlyStr>) -> Self {
         Self {
             id: id.into(),
             order: None,

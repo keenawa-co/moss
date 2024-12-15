@@ -9,7 +9,7 @@ use once_cell::sync::Lazy;
 use serde::Serialize;
 use std::sync::Arc;
 
-use super::Contribution;
+use super::ContributionOld;
 
 #[derive(Debug, Serialize)]
 pub struct LinksViewContent(Vec<HtmlLink>);
@@ -30,7 +30,7 @@ impl LinksView {
 }
 
 pub(crate) struct LinksContribution;
-impl Contribution for LinksContribution {
+impl ContributionOld for LinksContribution {
     fn contribute(registry: &mut AppState) -> anyhow::Result<()> {
         let mut views_registry_lock = registry.views.write();
         views_registry_lock.register_views(

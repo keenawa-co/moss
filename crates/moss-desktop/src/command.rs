@@ -1,12 +1,13 @@
 use anyhow::Result;
 use hashbrown::HashMap;
+use moss_text::ReadOnlyStr;
 use serde::de::DeserializeOwned;
 use serde_json::Value;
 use std::{cell::RefCell, sync::Arc};
 use tauri::{AppHandle, Window};
 use thiserror::Error;
 
-use crate::state::AppState;
+use crate::state::{change_color_theme, AppState};
 
 #[derive(Error, Debug)]
 pub enum CommandContextError {
@@ -78,3 +79,8 @@ impl CommandContext {
 
 pub type CommandHandler =
     Arc<dyn Fn(CommandContext, &AppState) -> Result<Value, String> + Send + Sync>;
+
+pub struct CommandDecl {
+    pub key: &'static str,
+    pub handler: fn(CommandContext, &AppState) -> Result<serde_json::Value, String>,
+}

@@ -18,7 +18,7 @@ use quote::quote;
 use serde::Serialize;
 use std::sync::Arc;
 
-use super::Contribution;
+use super::ContributionOld;
 
 #[derive(Debug, Serialize)]
 pub struct RecentsViewTreeItem {
@@ -56,7 +56,7 @@ impl RecentsViewModel {
 }
 
 pub(crate) struct RecentsContribution;
-impl Contribution for RecentsContribution {
+impl ContributionOld for RecentsContribution {
     fn contribute(registry: &mut AppState) -> anyhow::Result<()> {
         let mut views_registry_lock = registry.views.write();
 
@@ -90,9 +90,9 @@ impl Contribution for RecentsContribution {
             view_title_context_menu_group_views,
             view_title_context_menu_group_inline,
         ) = {
-            let this = Arc::new(MenuGroup::new_ordered(0, constants::menu::MENU_GROUP_ID_THIS));
-            let views = Arc::new(MenuGroup::new_ordered(1, constants::menu::MENU_GROUP_ID_VIEWS));
-            let inline = Arc::new(MenuGroup::new_ordered(2, constants::menu::MENU_GROUP_ID_INLINE));
+            let this = Arc::new(MenuGroup::ordered(0, constants::menu::MENU_GROUP_ID_THIS));
+            let views = Arc::new(MenuGroup::ordered(1, constants::menu::MENU_GROUP_ID_VIEWS));
+            let inline = Arc::new(MenuGroup::ordered(2, constants::menu::MENU_GROUP_ID_INLINE));
 
             (this, views, inline)
         };
@@ -221,9 +221,9 @@ impl Contribution for RecentsContribution {
             view_item_context_menu_group_preview,
             view_item_context_menu_group_remove,
         ) = {
-            let navigation = Arc::new(MenuGroup::new_ordered(0, constants::menu::MENU_GROUP_ID_NAVIGATION));
-            let preview = Arc::new(MenuGroup::new_ordered(1, constants::menu::MENU_GROUP_ID_PREVIEW));
-            let remove = Arc::new(MenuGroup::new_ordered(2, constants::menu::MENU_GROUP_ID_REMOVE));
+            let navigation = Arc::new(MenuGroup::ordered(0, constants::menu::MENU_GROUP_ID_NAVIGATION));
+            let preview = Arc::new(MenuGroup::ordered(1, constants::menu::MENU_GROUP_ID_PREVIEW));
+            let remove = Arc::new(MenuGroup::ordered(2, constants::menu::MENU_GROUP_ID_REMOVE));
 
             (navigation, preview, remove)
         };

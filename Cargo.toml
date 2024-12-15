@@ -23,6 +23,7 @@ members = [
     "crates/moss-typebridge",
     "crates/moss-typebridge-macro",
     "crates/moss-desktop",
+    "crates/moss-desktop-macro",
 ]
 
 [profile.dev]
@@ -56,6 +57,7 @@ moss_env = { path = "crates/moss-env" }
 moss_async = { path = "crates/moss-async" }
 moss_collection = { path = "crates/moss-collection" }
 moss_desktop = { path = "crates/moss-desktop" }
+moss_desktop_macro = { path = "crates/moss-desktop-macro" }
 
 dashmap = "6.1.0"
 indexmap = "2.7.0"
