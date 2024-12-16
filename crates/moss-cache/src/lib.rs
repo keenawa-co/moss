@@ -28,7 +28,7 @@ impl DynType {
         }
     }
 
-    fn get<T: Any + Send + Sync>(&self, key: &str) -> Result<Arc<T>, CacheError> {
+    fn get_concrete<T: Any + Send + Sync>(&self, key: &str) -> Result<Arc<T>, CacheError> {
         match self.content.clone().downcast::<T>() {
             Ok(result) => Ok(result),
             Err(_) => Err(CacheError::TypeMismatch {
@@ -39,13 +39,9 @@ impl DynType {
     }
 }
 
-trait CacheItem {
-    fn new(item: DynType, ttl: Duration) -> Self;
-    fn get<T: Any + Send + Sync>(&self, key: &str) -> Result<Arc<T>, CacheError>;
-}
-
 trait CacheBackend {
-    fn insert<T: Any + Send + Sync>(&self, key: &str, val: T, ttl: Duration);
+    fn new(max_capacity: u64, ttl: Duration) -> Self;
+    fn insert<T: Any + Send + Sync>(&self, key: &str, val: T);
     fn get<T: Any + Send + Sync>(&self, key: &str) -> Result<Arc<T>, CacheError>;
     fn delete(&self, key: &str);
     fn contains(&self, key: &str) -> bool;
@@ -83,22 +79,6 @@ impl Retrievers {
             }),
         }
     }
-}
-
-pub trait CacheFrontend<P: CacheBackend> {
-    fn new(max_capacity: u64) -> Self;
-    fn register<T: Any + Send + Sync>(
-        &self,
-        key: &str,
-        ttl: Duration,
-        updater: impl Fn() -> T + 'static,
-    ) -> Arc<T>;
-    fn deregister(&self, key: &str) -> Result<(), CacheError>;
-    fn insert<T: Any + Send + Sync>(&self, key: &str, val: T, ttl: Duration);
-    fn get<T: Any + Send + Sync>(&self, key: &str) -> Result<Arc<T>, CacheError>;
-    fn delete(&self, key: &str);
-    fn take<T: Any + Clone + Send + Sync>(&self, key: &str) -> Result<T, CacheError>;
-    fn contains(&self, key: &str) -> bool;
 }
 
 pub struct MossCache<P: CacheBackend> {
