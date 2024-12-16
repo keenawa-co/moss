@@ -1,10 +1,3 @@
-import { composeEventHandlers } from "@radix-ui/primitive";
-import { createContextScope } from "@radix-ui/react-context";
-import * as MenuPrimitive from "@radix-ui/react-menu";
-import { createMenuScope } from "@radix-ui/react-menu";
-import { Primitive } from "@radix-ui/react-primitive";
-import { useCallbackRef } from "@radix-ui/react-use-callback-ref";
-import { useControllableState } from "@radix-ui/react-use-controllable-state";
 import React, {
   ComponentPropsWithoutRef,
   ElementRef,
@@ -17,6 +10,15 @@ import React, {
   useRef,
   useState,
 } from "react";
+
+import { composeEventHandlers } from "@radix-ui/primitive";
+import { createContextScope } from "@radix-ui/react-context";
+import * as MenuPrimitive from "@radix-ui/react-menu";
+import { createMenuScope } from "@radix-ui/react-menu";
+import { Primitive } from "@radix-ui/react-primitive";
+import { useCallbackRef } from "@radix-ui/react-use-callback-ref";
+import { useControllableState } from "@radix-ui/react-use-controllable-state";
+
 import * as CustomPrimitive from "../index";
 import { ScopedProps } from "../types";
 
@@ -233,6 +235,30 @@ const ContextMenuCheckboxItem = forwardRef<CustomPrimitive.CheckboxItemElement, 
 );
 
 /* -------------------------------------------------------------------------------------------------
+ * ContextMenuRadioGroup
+ * -----------------------------------------------------------------------------------------------*/
+
+const ContextMenuRadioGroup = forwardRef<CustomPrimitive.RadioGroupElement, CustomPrimitive.RadioGroupProps>(
+  (props, forwardedRef) => {
+    const { __scopeContextMenu, ...radioGroupProps } = props;
+    const menuScope = useMenuScope(__scopeContextMenu);
+    return <CustomPrimitive.RadioGroup {...menuScope} {...radioGroupProps} ref={forwardedRef} />;
+  }
+);
+
+/* -------------------------------------------------------------------------------------------------
+ * ContextMenuRadioItem
+ * -----------------------------------------------------------------------------------------------*/
+
+const ContextMenuRadioItem = forwardRef<CustomPrimitive.RadioItemElement, CustomPrimitive.RadioItemProps>(
+  (props, forwardedRef) => {
+    const { __scopeContextMenu, ...radioGroupProps } = props;
+    const menuScope = useMenuScope(__scopeContextMenu);
+    return <CustomPrimitive.RadioItem {...menuScope} {...radioGroupProps} ref={forwardedRef} />;
+  }
+);
+
+/* -------------------------------------------------------------------------------------------------
  * ContextMenuSub
  * -----------------------------------------------------------------------------------------------*/
 
@@ -300,6 +326,8 @@ const Content = ContextMenuContent;
 const Item = ContextMenuItem;
 const Separator = CustomPrimitive.Separator;
 const CheckboxItem = ContextMenuCheckboxItem;
+const RadioGroup = ContextMenuRadioGroup;
+const RadioItem = ContextMenuRadioItem;
 const Sub = ContextMenuSub;
 const SubTrigger = ContextMenuSubTrigger;
 const SubContent = ContextMenuSubContent;
@@ -308,6 +336,8 @@ export {
   CheckboxItem,
   Content,
   createContextMenuScope,
+  RadioGroup,
+  RadioItem,
   Portal,
   Root,
   Separator,

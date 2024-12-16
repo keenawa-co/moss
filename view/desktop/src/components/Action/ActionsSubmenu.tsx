@@ -48,7 +48,7 @@ export const ActionsSubmenu = ({
         </DM.Trigger>
 
         <DM.Content className="z-50 flex flex-col" onPointerDownOutside={() => setOpen(false)}>
-          {[1, 2, 3]?.map((id) => <button key={id}>Action {id}</button>)}
+          {props.children}
         </DM.Content>
       </DM.Root>
     </div>
