@@ -1,5 +1,6 @@
 import { create } from "zustand";
 
+//TODO this type should be imported from backend in the future
 export type LayoutAlignment = "center" | "justify" | "left" | "right";
 
 export interface LayoutState {
