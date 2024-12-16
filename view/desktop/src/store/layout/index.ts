@@ -1,7 +1,9 @@
 import { create } from "zustand";
 
+export type LayoutAlignment = "center" | "justify" | "left" | "right";
+
 export interface LayoutState {
-  alignment: "center" | "justify" | "left" | "right";
+  alignment: LayoutAlignment;
   setAlignment: (alignment: LayoutState["alignment"]) => void;
   primarySideBar: {
     width: number;

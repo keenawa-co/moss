@@ -4,7 +4,7 @@ import { ActionButton } from "@/components/Action/ActionButton";
 import { ActionsSubmenu } from "@/components/Action/ActionsSubmenu";
 import { ActionsGroup } from "@/components/ActionsGroup";
 import { invokeTauriIpc } from "@/lib/backend/tauri";
-import { useLayoutStore } from "@/store/layout";
+import { LayoutAlignment, useLayoutStore } from "@/store/layout";
 import { MenuItem } from "@repo/moss-desktop";
 import { cn, DropdownMenu } from "@repo/moss-ui";
 
@@ -98,7 +98,7 @@ export const ActionsBar = ({ className, ...props }: HTMLProps<HTMLDivElement>) =
               >
                 <DropdownMenu.RadioGroup
                   value={alignment}
-                  onValueChange={(value) => setAlignment(value as "center" | "justify" | "left" | "right")}
+                  onValueChange={(value) => setAlignment(value as LayoutAlignment)}
                 >
                   <DropdownMenu.RadioItem value="center" label="Center" checked={alignment === "center"} />
                   <DropdownMenu.RadioItem value="justify" label="Justify" checked={alignment === "justify"} />
