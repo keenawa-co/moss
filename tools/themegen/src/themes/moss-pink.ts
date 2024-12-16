@@ -1,4 +1,5 @@
-import { Theme } from "@repo/desktop-models";
+import { Theme } from "@repo/moss-desktop";
+
 import { linearGradient, rgba } from "../color.ts";
 
 export const pinkTheme: Theme = {

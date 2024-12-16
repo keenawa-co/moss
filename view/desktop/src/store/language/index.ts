@@ -2,25 +2,20 @@ import { create } from "zustand";
 
 import i18n from "@/app/i18n";
 import getLocales from "@/lib/backend/locales";
-
-export interface LanguagePack {
-  code: string;
-  name: string;
-  direction: string;
-}
+import { LocaleDescriptor } from "@repo/moss-desktop";
 
 const LOCALSTORAGE_KEY = "language";
 
 interface LanguageStore {
-  currentLanguageCode: LanguagePack["code"];
-  languagePacks: LanguagePack[];
-  setLanguageCode: (newLanguage: LanguagePack["code"]) => void;
+  currentLanguageCode: LocaleDescriptor["code"];
+  languagePacks: LocaleDescriptor[];
+  setLanguageCode: (newLanguage: LocaleDescriptor["code"]) => void;
   initializeLanguage: () => void;
   initializeLanguages: () => void;
 }
 
 export const useLanguageStore = create<LanguageStore>((set, get) => ({
-  currentLanguageCode: (localStorage.getItem(LOCALSTORAGE_KEY) as LanguagePack["code"]) || "en",
+  currentLanguageCode: (localStorage.getItem(LOCALSTORAGE_KEY) as LocaleDescriptor["code"]) || "en",
   languagePacks: [],
   setLanguageCode: (newLanguage) => {
     const { languagePacks } = get();
@@ -35,7 +30,7 @@ export const useLanguageStore = create<LanguageStore>((set, get) => ({
   initializeLanguage: async () => {
     const { languagePacks } = get();
 
-    const storedLanguageCode = localStorage.getItem(LOCALSTORAGE_KEY) as LanguagePack["code"];
+    const storedLanguageCode = localStorage.getItem(LOCALSTORAGE_KEY) as LocaleDescriptor["code"];
 
     if (storedLanguageCode && languagePacks.some(({ code }) => code === storedLanguageCode)) {
       i18n.changeLanguage(storedLanguageCode);

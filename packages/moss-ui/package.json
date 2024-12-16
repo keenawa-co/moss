@@ -23,7 +23,7 @@
     "type-check": "tsc --noEmit"
   },
   "devDependencies": {
-    "@repo/desktop-models": "workspace:*",
+    "@repo/moss-desktop": "workspace:*",
     "@repo/eslint-config": "workspace:*",
     "@repo/icongen": "workspace:*",
     "@repo/tailwind-config": "workspace:*",

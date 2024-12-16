@@ -5,7 +5,7 @@
   },
   "devDependencies": {
     "@repo/typescript-config": "workspace:*",
-    "@repo/desktop-models": "workspace:*",
+    "@repo/moss-desktop": "workspace:*",
     "@types/node": "^22.10.1",
     "vite-node": "^2.1.1"
   },

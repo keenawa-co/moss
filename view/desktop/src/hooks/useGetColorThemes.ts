@@ -1,4 +1,4 @@
-import { ThemeDescriptor } from "@repo/desktop-models";
+import { ThemeDescriptor } from "@repo/moss-desktop";
 import { useQuery } from "@tanstack/react-query";
 import { invoke } from "@tauri-apps/api/core";
 

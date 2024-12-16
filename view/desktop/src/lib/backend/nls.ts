@@ -1,13 +1,13 @@
 import { BackendModule, ReadCallback } from "i18next";
 
-import { invokeIpc, IpcResult } from "./tauri";
+import { invokeTauriIpc, IpcResult } from "./tauri";
 
 interface I18nDictionary {
   [key: string]: string;
 }
 
 const getTranslations = (language: string, namespace: string): Promise<IpcResult<Record<string, string>, string>> => {
-  return invokeIpc<I18nDictionary, string>("get_translations", { language, namespace });
+  return invokeTauriIpc<I18nDictionary, string>("get_translations", { language, namespace });
 };
 
 const I18nTauriBackend: BackendModule = {

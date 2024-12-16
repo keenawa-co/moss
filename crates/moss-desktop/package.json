@@ -1,0 +1,17 @@
+ {
+    "name": "@repo/moss-desktop",
+    "exports": {
+      ".": "./index.ts"
+    },
+    "scripts": {
+      "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "devDependencies": {
+      "@repo/typescript-config": "workspace:*",
+      "@repo/moss-text": "workspace:*"
+    },
+    "dependencies": {
+      "typescript": "^5.7.2"
+    }
+  }
+  
