@@ -6,7 +6,7 @@ import { ActionsGroup } from "@/components/ActionsGroup";
 import { invokeTauriIpc } from "@/lib/backend/tauri";
 import { useLayoutStore } from "@/store/layout";
 import { MenuItem } from "@repo/moss-desktop";
-import { cn, DropdownMenu as DM } from "@repo/moss-ui";
+import { cn, DropdownMenu } from "@repo/moss-ui";
 
 export const ActionsBar = ({ className, ...props }: HTMLProps<HTMLDivElement>) => {
   const [activities, setActivities] = useState<MenuItem[]>([]);
@@ -96,15 +96,15 @@ export const ActionsBar = ({ className, ...props }: HTMLProps<HTMLDivElement>) =
                 {...item.submenu}
                 icon="HeadBarCustomizeLayout"
               >
-                <DM.RadioGroup
+                <DropdownMenu.RadioGroup
                   value={alignment}
                   onValueChange={(value) => setAlignment(value as "center" | "justify" | "left" | "right")}
                 >
-                  <DM.RadioItem value="center" label="Center" checked={alignment === "center"} />
-                  <DM.RadioItem value="justify" label="Justify" checked={alignment === "justify"} />
-                  <DM.RadioItem value="left" label="Left" checked={alignment === "left"} />
-                  <DM.RadioItem value="right" label="Right" checked={alignment === "right"} />
-                </DM.RadioGroup>
+                  <DropdownMenu.RadioItem value="center" label="Center" checked={alignment === "center"} />
+                  <DropdownMenu.RadioItem value="justify" label="Justify" checked={alignment === "justify"} />
+                  <DropdownMenu.RadioItem value="left" label="Left" checked={alignment === "left"} />
+                  <DropdownMenu.RadioItem value="right" label="Right" checked={alignment === "right"} />
+                </DropdownMenu.RadioGroup>
               </ActionsSubmenu>
             );
           }
