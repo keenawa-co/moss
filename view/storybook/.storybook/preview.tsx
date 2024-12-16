@@ -1,71 +1,66 @@
 import React from "react";
 
-import { INITIAL_VIEWPORTS } from "@storybook/addon-viewport";
 import type { Preview } from "@storybook/react";
 
 import "@repo/moss-ui/src/styles.css";
 
-import { Theme } from "@repo/moss-desktop";
-import { staticColors } from "@repo/moss-ui";
-
 import * as themeFiles from "./themes";
 
-// TODO: remove old storybook theme integration
-const themes: Map<string, Theme> = new Map();
-for (const themeName in themeFiles) {
-  const theme = themeFiles[themeName];
-  // themes.set(theme.name, Convert.toTheme(JSON.stringify(theme)));
+interface Theme {
+  "name": string;
+  "slug": string;
+  "type": string;
+  "isDefault": boolean;
+  "colors": Record<
+    string,
+    {
+      "type": string;
+      "value": string;
+    }
+  >;
 }
+
+const applyTheme = (theme: Theme) => {
+  const root = document.documentElement;
+  const colors = theme.colors;
+
+  Object.entries(colors).forEach(([key, color]) => {
+    // @ts-expect-error this shouldn't be an error and seems to be a problem with config, but tsconfig seems fine
+    root.style.setProperty(`--color-${key}`.replaceAll(".", "-"), color.value);
+  });
+};
 
 const preview: Preview = {
   globalTypes: {
     theme: {
       name: "Theme",
       description: "Global theme for components",
-      defaultValue: Array.from(themes.entries()).find(([_, theme]) => theme.isDefault === true)?.[0] || "moss-light",
+      defaultValue: "moss-light",
       toolbar: {
         icon: "circlehollow",
-        items: Array.from(themes.keys()).map((themeName) => ({
-          value: themeName,
-          title: themeName,
-        })),
-        dynamicTitle: true,
+        items: [
+          { value: "light", title: "Moss Light" },
+          { value: "dark", title: "Moss Dark" },
+        ],
+        showName: true,
       },
     },
   },
   parameters: {
-    actions: { argTypesRegex: "^on[A-Z].*" },
-    controls: {
-      matchers: {
-        color: /(background|color)$/i,
-        date: /Date$/i,
-      },
-    },
-
-    backgrounds: {
-      default: "lightish",
-      values: [
-        { name: "light", value: "white" },
-        { name: "lightish", value: staticColors.stone["50"] },
-        { name: "dark", value: staticColors.space["700"] },
-        { name: "blue", value: staticColors.ocean["400"] },
-      ],
-    },
-    viewport: {
-      viewports: INITIAL_VIEWPORTS,
-    },
+    layout: "fullscreen",
   },
   decorators: [
     (Story, context) => {
       const theme = context.args.theme ?? context.globals.theme;
-      console.warn("-------------------->", theme);
-      return (
-        // FIXME: remove old storybook theme implementation
-        // <ThemeProvider themeOverrides={themes.get(theme)} updateOnChange>
-        //   <Story />
-        // </ThemeProvider>
 
-        <></>
+      console.warn("-------------------->", theme);
+
+      applyTheme(themeFiles[theme]);
+
+      return (
+        <div style={{ backgroundColor: "var(--color-page-background)" }}>
+          <Story />
+        </div>
       );
     },
   ],
