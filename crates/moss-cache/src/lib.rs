@@ -10,7 +10,7 @@ use thiserror::Error;
 
 #[derive(Debug, Error)]
 pub enum CacheError {
-    #[error("The value of key '{key}' does not have type '{type_name}'")]
+    #[error("The value of key '{key}' has the type name of '{type_name}'")]
     TypeMismatch { key: String, type_name: String },
 
     #[error("The key '{key}' does not exist")]
@@ -20,12 +20,17 @@ pub enum CacheError {
 #[derive(Clone, Debug)]
 struct DynType {
     content: Arc<dyn Any + Send + Sync>,
+    type_name: String,
 }
 
 impl DynType {
-    fn new(content: impl Any + Send + Sync) -> Self {
+    fn new<T>(content: T) -> Self
+    where
+        T: Any + Send + Sync,
+    {
         Self {
             content: Arc::new(content),
+            type_name: type_name::<T>().to_string(),
         }
     }
 
@@ -34,7 +39,7 @@ impl DynType {
             Ok(result) => Ok(result),
             Err(_) => Err(CacheError::TypeMismatch {
                 key: key.to_string(),
-                type_name: type_name::<T>().to_string(),
+                type_name: self.type_name.clone(),
             }),
         }
     }
@@ -201,6 +206,23 @@ mod test {
     }
 
     type MockCache = Cache<MockBackend>;
+
+    #[test]
+    fn test_cache_type_mismatch_error_message() {
+        let cache = MockCache::new(1024, Duration::from_millis(1000));
+        cache.insert("i32", 32i32);
+        let result = cache.get::<String>("i32");
+        assert!(result.is_err());
+        if let Err(err) = result {
+            assert_eq!(
+                err.to_string(),
+                format!(
+                    "The value of key '{}' has the type name of '{}'",
+                    "i32", "i32"
+                )
+            );
+        }
+    }
 
     #[test]
     fn test_cache_insert_single_type() {
