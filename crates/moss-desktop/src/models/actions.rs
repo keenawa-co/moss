@@ -109,7 +109,7 @@ pub struct ActionMenuItem {
     pub command: CommandAction,
 
     #[ts(optional)]
-    pub group: Option<Arc<MenuGroup>>,
+    pub group: Option<MenuGroup>,
 
     #[ts(optional)]
     pub order: Option<i64>,
@@ -134,7 +134,7 @@ pub struct SubmenuMenuItem {
     pub title: Option<LocalizedString>,
 
     #[ts(optional)]
-    pub group: Option<Arc<MenuGroup>>,
+    pub group: Option<MenuGroup>,
 
     #[ts(optional)]
     pub order: Option<i64>,

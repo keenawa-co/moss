@@ -95,7 +95,6 @@ pub fn run() {
             cmd_window::main_window_is_ready,
             cmd_window::create_new_window,
             cmd_window::execute_command,
-            cmd_base::get_view_content,
             cmd_base::get_menu_items_by_namespace,
             cmd_window::execute_command,
             cmd_window::get_color_theme,
