@@ -6,10 +6,7 @@ edition = "2021"
 [dependencies]
 serde_json.workspace = true
 serde.workspace = true
-arcstr.workspace = true
-moss_text.workspace = true
 thiserror.workspace = true
 
 [dev-dependencies]
-anyhow.workspace = true
 moss_jsonlogic_macro.workspace = true
