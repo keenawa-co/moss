@@ -5,7 +5,7 @@ import { useThemeStore } from "@/store/theme";
 import { useChangeTheme } from "../hooks/useChangeColorTheme";
 import { useGetColorThemes } from "../hooks/useGetColorThemes";
 
-const ThemeSwitcher: React.FC = () => {
+const ThemeSwitcher = () => {
   const { currentTheme, setCurrentTheme } = useThemeStore();
 
   const { data: themes, isLoading, error } = useGetColorThemes();

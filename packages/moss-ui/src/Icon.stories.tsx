@@ -1,7 +1,9 @@
-import type { Meta, StoryObj } from "@storybook/react";
-import { Icon, Icons } from "./Icon";
-import * as icons from "@repo/icongen";
 import { useState } from "react";
+
+import * as icons from "@repo/icongen";
+import type { Meta, StoryObj } from "@storybook/react";
+
+import { Icon, Icons } from "./Icon";
 import { cn } from "./utils/utils";
 
 const iconOptions = Object.keys(icons) as Icons[];
@@ -109,7 +111,7 @@ const GalleryComponent = () => {
   const [theme, setTheme] = useState<"light" | "dark">("light");
 
   return (
-    <div className={cn("h-screen overflow-auto px-4 pb-12  pt-4", theme === "light" ? "" : "bg-[#161819] text-white")}>
+    <div className={cn("h-screen overflow-auto px-4 pb-12 pt-4", theme === "light" ? "" : "bg-[#161819] text-white")}>
       <div className="flex gap-6">
         <div className="flex w-full flex-col gap-6">
           <input

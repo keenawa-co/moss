@@ -1,18 +1,48 @@
 {
+  "name": "Moss Pink",
   "slug": "moss-pink",
-  "name": "moss-pink",
-  "type": "pink",
+  "type": "light",
   "isDefault": false,
   "colors": {
-    "primary": "0, 0, 0, 1",
-    "sideBar.background": "234, 157, 242, 1",
-    "toolBar.background": "222, 125, 232, 1",
-    "page.background": "227, 54, 245, 1",
-    "statusBar.background": "63, 11, 69, 1",
-    "windowsCloseButton.background": "196, 43, 28, 1",
-    "windowControlsLinux.background": "218, 218, 218, 1",
-    "windowControlsLinux.text": "61, 61, 61, 1",
-    "windowControlsLinux.hoverBackground": "209, 209, 209, 1",
-    "windowControlsLinux.activeBackground": "191, 191, 191, 1"
+    "primary": {
+      "type": "solid",
+      "value": "rgba(0, 0, 0, 1)"
+    },
+    "sideBar.background": {
+      "type": "solid",
+      "value": "rgba(234, 157, 242, 1)"
+    },
+    "toolBar.background": {
+      "type": "solid",
+      "value": "rgba(222, 125, 232, 1)"
+    },
+    "page.background": {
+      "type": "solid",
+      "value": "rgba(227, 54, 245, 1)"
+    },
+    "statusBar.background": {
+      "type": "gradient",
+      "value": "linear-gradient(90deg, rgba(255, 0, 0, 1) 0%, rgba(224, 0, 41, 1) 16%, rgba(190, 0, 87, 1) 34%, rgba(155, 0, 133, 1) 51%, rgba(63, 0, 255, 1) 100%)"
+    },
+    "windowsCloseButton.background": {
+      "type": "solid",
+      "value": "rgba(196, 43, 28, 1)"
+    },
+    "windowControlsLinux.background": {
+      "type": "solid",
+      "value": "rgba(218, 218, 218, 1)"
+    },
+    "windowControlsLinux.text": {
+      "type": "solid",
+      "value": "rgba(61, 61, 61, 1)"
+    },
+    "windowControlsLinux.hoverBackground": {
+      "type": "solid",
+      "value": "rgba(209, 209, 209, 1)"
+    },
+    "windowControlsLinux.activeBackground": {
+      "type": "solid",
+      "value": "rgba(191, 191, 191, 1)"
+    }
   }
 }
