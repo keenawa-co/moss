@@ -1,17 +1,9 @@
-use anyhow::Result;
 use dashmap::DashMap;
-use hashbrown::HashMap;
-use linkme::distributed_slice;
 use moss_text::ReadOnlyStr;
-use parking_lot::{Mutex, RwLock};
-use serde_json::Value;
-use std::{fmt::Debug, sync::atomic::AtomicUsize, sync::Arc};
-use tauri::{Emitter, EventTarget, Manager};
+use std::sync::Arc;
 
-use crate::command::{CommandContext, CommandDecl, CommandHandler};
-use crate::models::{
-    actions::MenuItem, appearance::theming::ThemeDescriptor, view::*, window::LocaleDescriptor,
-};
+use crate::command::CommandHandler;
+use crate::models::{actions::MenuItem, view::*};
 
 pub struct ContributionCollection {
     pub commands: DashMap<ReadOnlyStr, CommandHandler>,

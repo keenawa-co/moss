@@ -1,45 +1,13 @@
-use anyhow::Result;
 use dashmap::DashMap;
-use hashbrown::HashMap;
-use linkme::distributed_slice;
 use moss_text::ReadOnlyStr;
-use parking_lot::{Mutex, RwLock};
-use serde_json::Value;
-use std::{fmt::Debug, sync::atomic::AtomicUsize, sync::Arc};
-use tauri::{Emitter, EventTarget, Manager};
+use parking_lot::RwLock;
+use std::{sync::atomic::AtomicUsize, sync::Arc};
 
-use crate::command::{CommandContext, CommandDecl, CommandHandler};
-use crate::contribution_collector::{ContributionCollection, ContributionCollector};
+use crate::command::CommandHandler;
+use crate::contribution_collector::ContributionCollector;
 use crate::models::{
     actions::MenuItem, appearance::theming::ThemeDescriptor, view::*, window::LocaleDescriptor,
 };
-
-// #[derive(Debug)]
-// pub struct MenuDecl {
-//     pub namespace: ReadOnlyStr,
-//     pub items: Vec<MenuItem>,
-// }
-
-// #[derive(Debug)]
-// pub struct TreeViewGroupDecl {
-//     pub location: TreeViewGroupLocation,
-//     pub items: Vec<TreeViewGroup>,
-// }
-
-// #[derive(Debug)]
-// pub struct TreeViewDecl {
-//     pub group_id: &'static str,
-//     pub items: Vec<TreeViewDescriptor>,
-// }
-
-// #[derive(Debug)]
-// pub struct Contribution {
-//     pub source: &'static str,
-//     pub commands: Mutex<Vec<CommandDecl>>,
-//     pub menus: Mutex<Vec<MenuDecl>>,
-//     pub tree_view_groups: Mutex<Vec<TreeViewGroupDecl>>,
-//     pub tree_views: Mutex<Vec<TreeViewDecl>>,
-// }
 
 pub struct Preferences {
     pub theme: RwLock<ThemeDescriptor>,

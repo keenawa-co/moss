@@ -1,24 +1,4 @@
-use crate::{
-    models::{
-        actions::{
-            ActionMenuItem, CommandAction, MenuGroup, MenuItem, MenuItemVisibility,
-            SubmenuMenuItem, SubmenuRef,
-        },
-        constants,
-        view::TreeViewDescriptor,
-    },
-    state::AppState,
-};
-use anyhow::Result;
-use moss_jsonlogic::raw_rule::*;
-use moss_jsonlogic_macro::rule;
-use moss_text::{localize, ReadOnlyStr};
-use once_cell::sync::Lazy;
-use quote::quote;
 use serde::Serialize;
-use std::sync::Arc;
-
-use super::ContributionOld;
 
 #[derive(Debug, Serialize)]
 pub struct RecentsViewTreeItem {
@@ -32,6 +12,7 @@ pub struct RecentsViewContent {
     pub html: String,
 }
 
+// FIXME: Add when this will be used
 // #[derive(Debug, Serialize)]
 // pub struct RecentsViewModel {}
 

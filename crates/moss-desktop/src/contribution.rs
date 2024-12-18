@@ -1,17 +1,10 @@
-use anyhow::Result;
-use dashmap::DashMap;
-use hashbrown::HashMap;
 use linkme::distributed_slice;
 use moss_text::ReadOnlyStr;
-use parking_lot::{Mutex, RwLock};
-use serde_json::Value;
-use std::{fmt::Debug, sync::atomic::AtomicUsize, sync::Arc};
-use tauri::{Emitter, EventTarget, Manager};
+use parking_lot::Mutex;
+use std::fmt::Debug;
 
-use crate::command::{CommandContext, CommandDecl, CommandHandler};
-use crate::models::{
-    actions::MenuItem, appearance::theming::ThemeDescriptor, view::*, window::LocaleDescriptor,
-};
+use crate::command::CommandDecl;
+use crate::models::{actions::MenuItem, view::*};
 
 #[distributed_slice]
 pub(crate) static CONTRIBUTIONS: [once_cell::sync::Lazy<Contribution>] = [..];
@@ -83,6 +76,7 @@ pub struct TreeViewDecl {
 
 #[derive(Debug)]
 pub struct Contribution {
+    #[allow(dead_code)]
     pub source: &'static str,
     pub commands: Mutex<Vec<CommandDecl>>,
     pub menus: Mutex<Vec<MenuDecl>>,

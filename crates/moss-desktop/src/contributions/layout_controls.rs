@@ -14,7 +14,7 @@ use crate::{
     },
 };
 
-contribution_point!(TEST2, {
+contribution_point!(LAYOUT_CONTROLS, {
     commands: [],
     tree_view_groups: [],
     tree_views: [],
