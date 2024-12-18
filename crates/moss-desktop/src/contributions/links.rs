@@ -1,40 +1,8 @@
-use crate::{
-    contribution_point,
-    models::{constants, view::TreeViewDescriptor},
-    state::{AppState, TreeViewDecl},
-};
-use anyhow::Result;
 use moss_html::link::HtmlLink;
-use moss_text::localize;
-use once_cell::sync::Lazy;
 use serde::Serialize;
-use std::sync::Arc;
-
-use super::ContributionOld;
 
 #[derive(Debug, Serialize)]
 pub struct LinksViewContent(Vec<HtmlLink>);
-
-// contribution_point!(TESR_2, {
-//     commands: [],
-//     tree_view_groups: [],
-//     tree_views: [
-//         TreeViewDecl {
-//             group_id: "",
-//             items: vec![
-//                 TreeViewDescriptor {
-//                     id: "workbench.view.linksView".to_string(),
-//                     name: localize!("links.view.name", "Links"),
-//                     order: 2,
-//                     hide_by_default: false,
-//                     can_toggle_visibility: true,
-//                     collapsed: false,
-//                     // model: Lazy::new(|| Arc::new(LinksView {})),
-//                 },
-//             ]
-//         }
-//     ]
-// });
 
 // pub struct LinksView;
 

@@ -2613,7 +2613,6 @@ dependencies = [
  "indexmap 2.7.0",
  "jsonschema",
  "linkme",
- "moss_desktop_macro",
  "moss_html",
  "moss_jsonlogic",
  "moss_jsonlogic_macro",
@@ -2628,16 +2627,6 @@ dependencies = [
  "tauri",
  "thiserror 2.0.3",
  "ts-rs",
-]
-
-[[package]]
-name = "moss_desktop_macro"
-version = "0.1.0"
-dependencies = [
- "linkme",
- "proc-macro2",
- "quote",
- "syn 1.0.109",
 ]
 
 [[package]]
