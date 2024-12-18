@@ -18,4 +18,3 @@ smol.workspace = true
 tokio = { workspace = true, features = ["full"] }
 futures.workspace = true
 serde = { workspace = true, features = ["derive"] }
-parking_lot.workspace = true
