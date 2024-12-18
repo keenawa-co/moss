@@ -35,7 +35,7 @@ const preview: Preview = {
     theme: {
       name: "Theme",
       description: "Global theme for components",
-      defaultValue: "moss-light",
+      defaultValue: "light",
       toolbar: {
         icon: "circlehollow",
         items: [
