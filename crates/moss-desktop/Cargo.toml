@@ -8,6 +8,7 @@ crate-type = ["cdylib", "rlib"]
 
 [dependencies]
 linkme = "0.3"
+# linkme = { version = "0.3", features = ["used_linker"] }
 paste = "1.0.15"
 
 moss_text.workspace = true

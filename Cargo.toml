@@ -27,6 +27,8 @@ members = [
 ]
 
 [profile.dev]
+lto = "thin" # Need this for linkme crate to work
+
 # Uncomment for future compilation profiling
 # rustflags = ["-Zself-profile=profiles/clean"]
 # rustflags = ["-Ztime-passes"]

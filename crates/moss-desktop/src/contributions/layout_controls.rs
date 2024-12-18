@@ -14,14 +14,14 @@ use crate::{
     state::{AppState, MenuDecl},
 };
 
-contribution_point!(TEST1, {
+contribution_point!(TEST3, {
     commands: [
         crate::command::CommandDecl {
-            key: "workbench.changeColorTheme",
+            key: "workbench.changeColorTheme_2",
             handler: crate::contributions::workbench::change_color_theme,
         },
         crate::command::CommandDecl {
-            key: "workbench.changeLanguagePack",
+            key: "workbench.changeLanguagePack_2",
             handler: crate::contributions::workbench::change_language_pack,
         },
     ],
@@ -39,142 +39,142 @@ contribution_point!(TEST1, {
     ]
 });
 
-contribution_point!(TEST2, {
-    commands: [],
-    tree_view_groups: [],
-    tree_views: [],
-    menus: [
-        MenuDecl {
-            namespace: constants::menu::MENU_NAMESPACE_ID_HEAD_ITEM,
-            items: vec![
-                MenuItem::Action(ActionMenuItem {
-                    command: CommandAction {
-                        id: "workbench.action.toggleSecondarySidebar".into(),
-                        title: localize!(
-                            "layoutControls.togglePrimarySideBar",
-                            "Toggle Primary Side Bar"
-                        ),
-                        tooltip: None,
-                        description: None,
-                        icon: None,
-                        toggled: Some(CommandActionToggle {
-                            condition: rule!(toggleSecondarySidebar == true),
-                            icon: None,
-                            tooltip: None,
-                            title: None,
-                        }),
-                    },
-                    group: Some(MenuGroup::unordered("layoutControls")),
-                    order: None,
-                    when: None,
-                    visibility: MenuItemVisibility::Compact,
-                }),
-                MenuItem::Action(ActionMenuItem {
-                    command: CommandAction {
-                        id: "workbench.action.toggleSecondarySidebar".into(),
-                        title: localize!(
-                            "layoutControls.togglePrimarySideBar",
-                            "Toggle Primary Side Bar"
-                        ),
-                        tooltip: None,
-                        description: None,
-                        icon: None,
-                        toggled: Some(CommandActionToggle {
-                            condition: rule!(toggleSecondarySidebar == true),
-                            icon: None,
-                            tooltip: None,
-                            title: None,
-                        }),
-                    },
-                    group: Some(MenuGroup::unordered("layoutControls")),
-                    order: None,
-                    when: None,
-                    visibility: MenuItemVisibility::Compact,
-                }),
-                MenuItem::Action(ActionMenuItem {
-                    command: CommandAction {
-                        id: "workbench.action.togglePanel".into(),
-                        title: localize!("layoutControls.togglePanel", "Toggle Panel"),
-                        tooltip: None,
-                        description: None,
-                        icon: None,
-                        toggled: Some(CommandActionToggle {
-                            condition: rule!(togglePanel == true),
-                            icon: None,
-                            tooltip: None,
-                            title: None,
-                        }),
-                    },
-                    group: Some(MenuGroup::unordered("layoutControls")),
-                    order: None,
-                    when: None,
-                    visibility: MenuItemVisibility::Compact,
-                }),
-                //
-                // Customize Layout
-                //
-                MenuItem::Submenu(SubmenuMenuItem {
-                    submenu_id: ReadOnlyStr::from("layoutControls.customizeLayout"),
-                    default_action_id: None,
-                    title: Some(localize!(
-                        "layoutControls.customizeLayout",
-                        "Customize Layout"
-                    )),
-                    group: Some(MenuGroup::unordered("layoutControls")),
-                    order: None,
-                    when: None,
-                    visibility: MenuItemVisibility::Compact,
-                }),
-            ],
-        },
-        MenuDecl {
-            namespace: ReadOnlyStr::from("layoutControls.customizeLayout"), // TODO: ref
-            items: vec![
-                MenuItem::Action(ActionMenuItem {
-                    command: CommandAction {
-                        id: "workbench.action.activityBarVisibility".into(),
-                        title: localize!("customizeLayout.activityBarVisibility", "Activity Bar"),
-                        tooltip: None,
-                        description: None,
-                        icon: None,
-                        toggled: Some(CommandActionToggle {
-                            condition: "undefined".into(),
-                            title: None,
-                            tooltip: None,
-                            icon: None,
-                        }),
-                    },
-                    group: Some(MenuGroup::ordered(0, "visibility")),
-                    order: None,
-                    when: None,
-                    visibility: MenuItemVisibility::Classic,
-                }),
-                MenuItem::Action(ActionMenuItem {
-                    command: CommandAction {
-                        id: "workbench.action.primarySideBarVisibility".into(),
-                        title: localize!(
-                            "customizeLayout.primarySideBarVisibility",
-                            "Primary Side Bar"
-                        ),
-                        tooltip: None,
-                        description: None,
-                        icon: None,
-                        toggled: Some(CommandActionToggle {
-                            condition: "undefined".into(),
-                            title: None,
-                            tooltip: None,
-                            icon: None,
-                        }),
-                    },
-                    group: Some(MenuGroup::ordered(0, "visibility")),
-                    order: None,
-                    when: None,
-                    visibility: MenuItemVisibility::Classic,
-                }),
-            ],
-        },
-    ],
-});
+// contribution_point!(TEST2, {
+//     commands: [],
+//     tree_view_groups: [],
+//     tree_views: [],
+//     menus: [
+//         MenuDecl {
+//             namespace: constants::menu::MENU_NAMESPACE_ID_HEAD_ITEM,
+//             items: vec![
+//                 MenuItem::Action(ActionMenuItem {
+//                     command: CommandAction {
+//                         id: "workbench.action.toggleSecondarySidebar".into(),
+//                         title: localize!(
+//                             "layoutControls.togglePrimarySideBar",
+//                             "Toggle Primary Side Bar"
+//                         ),
+//                         tooltip: None,
+//                         description: None,
+//                         icon: None,
+//                         toggled: Some(CommandActionToggle {
+//                             condition: rule!(toggleSecondarySidebar == true),
+//                             icon: None,
+//                             tooltip: None,
+//                             title: None,
+//                         }),
+//                     },
+//                     group: Some(MenuGroup::unordered("layoutControls")),
+//                     order: None,
+//                     when: None,
+//                     visibility: MenuItemVisibility::Compact,
+//                 }),
+//                 MenuItem::Action(ActionMenuItem {
+//                     command: CommandAction {
+//                         id: "workbench.action.toggleSecondarySidebar".into(),
+//                         title: localize!(
+//                             "layoutControls.togglePrimarySideBar",
+//                             "Toggle Primary Side Bar"
+//                         ),
+//                         tooltip: None,
+//                         description: None,
+//                         icon: None,
+//                         toggled: Some(CommandActionToggle {
+//                             condition: rule!(toggleSecondarySidebar == true),
+//                             icon: None,
+//                             tooltip: None,
+//                             title: None,
+//                         }),
+//                     },
+//                     group: Some(MenuGroup::unordered("layoutControls")),
+//                     order: None,
+//                     when: None,
+//                     visibility: MenuItemVisibility::Compact,
+//                 }),
+//                 MenuItem::Action(ActionMenuItem {
+//                     command: CommandAction {
+//                         id: "workbench.action.togglePanel".into(),
+//                         title: localize!("layoutControls.togglePanel", "Toggle Panel"),
+//                         tooltip: None,
+//                         description: None,
+//                         icon: None,
+//                         toggled: Some(CommandActionToggle {
+//                             condition: rule!(togglePanel == true),
+//                             icon: None,
+//                             tooltip: None,
+//                             title: None,
+//                         }),
+//                     },
+//                     group: Some(MenuGroup::unordered("layoutControls")),
+//                     order: None,
+//                     when: None,
+//                     visibility: MenuItemVisibility::Compact,
+//                 }),
+//                 //
+//                 // Customize Layout
+//                 //
+//                 MenuItem::Submenu(SubmenuMenuItem {
+//                     submenu_id: ReadOnlyStr::from("layoutControls.customizeLayout"),
+//                     default_action_id: None,
+//                     title: Some(localize!(
+//                         "layoutControls.customizeLayout",
+//                         "Customize Layout"
+//                     )),
+//                     group: Some(MenuGroup::unordered("layoutControls")),
+//                     order: None,
+//                     when: None,
+//                     visibility: MenuItemVisibility::Compact,
+//                 }),
+//             ],
+//         },
+//         MenuDecl {
+//             namespace: ReadOnlyStr::from("layoutControls.customizeLayout"), // TODO: ref
+//             items: vec![
+//                 MenuItem::Action(ActionMenuItem {
+//                     command: CommandAction {
+//                         id: "workbench.action.activityBarVisibility".into(),
+//                         title: localize!("customizeLayout.activityBarVisibility", "Activity Bar"),
+//                         tooltip: None,
+//                         description: None,
+//                         icon: None,
+//                         toggled: Some(CommandActionToggle {
+//                             condition: "undefined".into(),
+//                             title: None,
+//                             tooltip: None,
+//                             icon: None,
+//                         }),
+//                     },
+//                     group: Some(MenuGroup::ordered(0, "visibility")),
+//                     order: None,
+//                     when: None,
+//                     visibility: MenuItemVisibility::Classic,
+//                 }),
+//                 MenuItem::Action(ActionMenuItem {
+//                     command: CommandAction {
+//                         id: "workbench.action.primarySideBarVisibility".into(),
+//                         title: localize!(
+//                             "customizeLayout.primarySideBarVisibility",
+//                             "Primary Side Bar"
+//                         ),
+//                         tooltip: None,
+//                         description: None,
+//                         icon: None,
+//                         toggled: Some(CommandActionToggle {
+//                             condition: "undefined".into(),
+//                             title: None,
+//                             tooltip: None,
+//                             icon: None,
+//                         }),
+//                     },
+//                     group: Some(MenuGroup::ordered(0, "visibility")),
+//                     order: None,
+//                     when: None,
+//                     visibility: MenuItemVisibility::Classic,
+//                 }),
+//             ],
+//         },
+//     ],
+// });
 
 // use super::ContributionOld;
 
