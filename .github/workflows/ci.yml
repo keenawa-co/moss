@@ -59,12 +59,16 @@ jobs:
         task:
           - name: Lint
             command: pnpm run lint -- --quiet
-          - name: Install Playwright Browsers
+          - name: Install Playwright Browserx
             command: npx playwright install chromium --with-deps
           - name: Test Packages
             command: pnpm run test --project packages
+          - name: Test Packages Stories
+            command: pnpm run test --project packages-stories
           - name: Test Desktop
             command: pnpm run test --project desktop
+          - name: Test Desktop Stories
+            command: pnpm run test --project desktop-stories
     timeout-minutes: 15
     steps:
       - name: Checkout Code
