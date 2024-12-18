@@ -5,6 +5,8 @@ import { invokeIpc } from "@/lib/backend/tauri";
 import { Icon, Tooltip } from "@repo/moss-ui";
 import { listen } from "@tauri-apps/api/event";
 
+import BoardExample from "./dnd";
+
 export type DescribeActivityOutput = { tooltip: string; order: number };
 
 export const Home: React.FC = () => {
@@ -35,6 +37,8 @@ export const Home: React.FC = () => {
         <Icon icon="Accessibility" className="text-6xl hover:*:fill-green-500" />
         <Icon icon="NewProject" className="text-red-700 text-6xl hover:fill-green-500" />
       </div>
+
+      <BoardExample />
 
       <div className="mt-5">
         <div>List of 50 elements:</div>
