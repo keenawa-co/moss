@@ -20,9 +20,7 @@ indexmap = { workspace = true, features = ["serde"] }
 serde = { workspace = true, features = ["derive", "rc"] }
 ts-rs = { workspace = true, features = ["indexmap-impl", "serde-json-impl"] }
 once_cell.workspace = true
-csscolorparser.workspace = true
 serde_json.workspace = true
-jsonschema.workspace = true
 tauri.workspace = true
 parking_lot.workspace = true
 dashmap.workspace = true

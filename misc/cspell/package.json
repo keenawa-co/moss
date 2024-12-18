@@ -1,0 +1,12 @@
+{
+  "name": "cspell",
+  "private": true,
+  "scripts": {
+    "tests": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "@cspell/dict-lorem-ipsum": "^4.0.3",
+    "@cspell/dict-rust": "^4.0.10",
+    "@cspell/dict-typescript": "^3.1.11"
+  }
+}

@@ -4,15 +4,14 @@ import { ActionButton } from "@/components/Action/ActionButton";
 import { ActionsSubmenu } from "@/components/Action/ActionsSubmenu";
 import { ActionsGroup } from "@/components/ActionsGroup";
 import { invokeTauriIpc } from "@/lib/backend/tauri";
-import { useLayoutStore } from "@/store/layout";
+import { LayoutAlignment, useLayoutStore } from "@/store/layout";
 import { MenuItem } from "@repo/moss-desktop";
-import { cn } from "@repo/moss-ui";
+import { cn, DropdownMenu } from "@repo/moss-ui";
 
 export const ActionsBar = ({ className, ...props }: HTMLProps<HTMLDivElement>) => {
   const [activities, setActivities] = useState<MenuItem[]>([]);
 
-  const primarySideBar = useLayoutStore((state) => state.primarySideBar);
-  const bottomPane = useLayoutStore((state) => state.bottomPane);
+  const { primarySideBar, secondarySideBar, bottomPane, setAlignment, alignment } = useLayoutStore((state) => state);
 
   useEffect(() => {
     const getAllActivities = async () => {
@@ -47,13 +46,6 @@ export const ActionsBar = ({ className, ...props }: HTMLProps<HTMLDivElement>) =
 
       <div className="flex items-center">
         {activities.map((item, index) => {
-          const icons = [
-            "HeadBarPrimarySideBar",
-            "HeadBarPanelActive",
-            "HeadBarSecondarySideBar",
-            "HeadBarCustomizeLayout",
-          ] as const;
-
           if ("action" in item) {
             const command = item.action.command;
 
@@ -82,16 +74,18 @@ export const ActionsBar = ({ className, ...props }: HTMLProps<HTMLDivElement>) =
                 />
               );
             }
-            // isTerminalVisible, setIsTerminalVisible
-            return (
-              <ActionButton
-                key={command.id}
-                iconClassName="size-[18px]"
-                {...command}
-                icon={icons[index]}
-                visibility="compact"
-              />
-            );
+            if (index === 2) {
+              return (
+                <ActionButton
+                  key={command.id}
+                  iconClassName="size-[18px]"
+                  {...command}
+                  icon={secondarySideBar.visibility ? "HeadBarSecondarySideBarActive" : "HeadBarSecondarySideBar"}
+                  onClick={() => secondarySideBar.setVisibility(!secondarySideBar.visibility)}
+                  visibility={item.action.visibility}
+                />
+              );
+            }
           }
 
           if ("submenu" in item) {
@@ -101,7 +95,17 @@ export const ActionsBar = ({ className, ...props }: HTMLProps<HTMLDivElement>) =
                 iconClassName="size-[18px]"
                 {...item.submenu}
                 icon="HeadBarCustomizeLayout"
-              />
+              >
+                <DropdownMenu.RadioGroup
+                  value={alignment}
+                  onValueChange={(value) => setAlignment(value as LayoutAlignment)}
+                >
+                  <DropdownMenu.RadioItem value="center" label="Center" checked={alignment === "center"} />
+                  <DropdownMenu.RadioItem value="justify" label="Justify" checked={alignment === "justify"} />
+                  <DropdownMenu.RadioItem value="left" label="Left" checked={alignment === "left"} />
+                  <DropdownMenu.RadioItem value="right" label="Right" checked={alignment === "right"} />
+                </DropdownMenu.RadioGroup>
+              </ActionsSubmenu>
             );
           }
         })}

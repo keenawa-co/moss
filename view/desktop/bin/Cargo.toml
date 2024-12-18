@@ -34,20 +34,13 @@ moss_uikit.workspace = true
 # workbench_service_configuration_tao.workspace = true
 # workbench_service_environment_tao.workspace = true
 
-futures.workspace = true
 anyhow.workspace = true
 once_cell.workspace = true
-parking_lot.workspace = true
-tracing.workspace = true
-flume.workspace = true
-async-task.workspace = true
 dirs.workspace = true
 log.workspace = true
 rand.workspace = true
 fern.workspace = true
 smol.workspace = true
-clap.workspace = true
-dashmap.workspace = true
 
 # surrealdb = { workspace = true, features = ["kv-rocksdb"] }
 tokio = { workspace = true, features = ["full", "macros", "signal"] }
