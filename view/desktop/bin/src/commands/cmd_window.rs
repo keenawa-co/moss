@@ -1,7 +1,7 @@
 use anyhow::Result;
 use hashbrown::HashMap;
 use moss_desktop::{
-    command::CommandContext,
+    command::{CommandContext, CommandDecl},
     models::{appearance::theming::ThemeDescriptor, window::LocaleDescriptor},
 };
 use moss_text::{quote, ReadOnlyStr};

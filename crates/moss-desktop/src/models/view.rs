@@ -20,7 +20,7 @@ pub struct TreeViewDescriptor {
     pub hide_by_default: bool,
     pub can_toggle_visibility: bool,
     pub collapsed: bool,
-    pub model: Lazy<Arc<dyn Any + Send + Sync>>,
+    // pub model: Lazy<Arc<dyn Any + Send + Sync>>,
 }
 
 #[derive(Serialize, Debug, Clone)]

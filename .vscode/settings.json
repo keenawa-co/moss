@@ -23,6 +23,7 @@
     "Keyable",
     "keymap",
     "libc",
+    "linkme",
     "lucide",
     "mimalloc",
     "mossland",

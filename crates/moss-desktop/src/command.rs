@@ -78,3 +78,9 @@ impl CommandContext {
 
 pub type CommandHandler =
     Arc<dyn Fn(CommandContext, &AppState) -> Result<Value, String> + Send + Sync>;
+
+#[derive(Debug)]
+pub struct CommandDecl {
+    pub key: &'static str,
+    pub handler: fn(CommandContext, &AppState) -> Result<serde_json::Value, String>,
+}
