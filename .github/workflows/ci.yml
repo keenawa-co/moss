@@ -59,6 +59,8 @@ jobs:
         task:
           - name: Lint
             command: pnpm run lint -- --quiet
+          - name: Install Playwright Browsers
+            command: npx playwright install chromium --with-deps
           - name: Test Packages
             command: pnpm run test --project packages
           - name: Test Desktop
