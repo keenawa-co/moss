@@ -88,5 +88,8 @@ jobs:
       - name: Install Playwright Browserx
         run: npx playwright install chromium --with-deps
 
+      - name: Build Icons
+        run: make gen-icons
+
       - name: Execute Task - ${{ matrix.task.name }}
         run: ${{ matrix.task.command }}
