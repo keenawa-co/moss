@@ -17,29 +17,29 @@ jobs:
       rust_test: ${{ steps.check-modified-files.rust_test }}
     steps:
       - uses: actions/checkout@v4
-      - name: Analyze Modified Files
-        id: check
-        run: |
-          if git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '\.ts\|\.tsx|\.js|\.jsx|package\.json'; then
-            echo "node_test=true" >> $GITHUB_ENV
-          else
-            echo "node_test=false" >> $GITHUB_ENV
-          fi
+      - name: Get all changed Rust files
+        id: rust
+        uses: tj-actions/changed-files@v45
+        with:
+          files: |
+            **.rs
+            Cargo.toml
+      - name: Get all changed NodeJS files
+        id: node
+        uses: tj-actions/changed-files@v45
+        with:
+          files: |
+            **.ts
+            **.tsx
+            **.js
+            **.jsx
+            package.json
 
-          # Check for Rust changes
-          if git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '\.rs|Cargo\.toml'; then
-            echo "rust_test=true" >> $GITHUB_ENV
-          else
-            echo "rust_test=false" >> $GITHUB_ENV
-          fi
-
-          echo "::set-output name=node_test::$node_test"
-          echo "::set-output name=rust_test::$rust_test"
 
   rust-workflows:
     name: Rust Workflows - ${{ matrix.task.name }}
     needs: check-modified-files
-    if: ${{ needs.check-modified-files.outputs.rust_test == 'true' }}
+    if: ${{ needs.check-modified-files.outputs.rust == 'true' }}
 
     runs-on: ubuntu-latest
 
@@ -83,7 +83,7 @@ jobs:
   node-workflows:
     name: Node.js Workflows - ${{ matrix.task.name }}
     needs: check-modified-files
-    if: ${{ needs.check-modified-files.outputs.node_test == 'true' }}
+    if: ${{ needs.check-modified-files.outputs.node == 'true' }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: true
