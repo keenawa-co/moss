@@ -10,9 +10,38 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
+  check-modified-files:
+    runs-on: ubuntu-latest
+    outputs:
+      node_test: ${{ steps.check-modified-files.node_test }}
+      rust_test: ${{ steps.check-modified-files.rust_test }}
+    steps:
+      - name: Analyze Modified Files
+        id: check
+        run: |
+          if git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '\.ts\|\.tsx|\.js|\.jsx|package\.json'; then
+            echo "node_test=true" >> $GITHUB_ENV
+          else
+            echo "node_test=false" >> $GITHUB_ENV
+          fi
+
+          # Check for Rust changes
+          if git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '\.rs|Cargo\.toml'; then
+            echo "rust_test=true" >> $GITHUB_ENV
+          else
+            echo "rust_test=false" >> $GITHUB_ENV
+          fi
+
+          echo "::set-output name=node_test::$node_test"
+          echo "::set-output name=rust_test::$rust_test"
+
   rust-workflows:
     name: Rust Workflows - ${{ matrix.task.name }}
+    needs: check-modified-files
+    if: ${{ needs.check-modified-files.outputs.rust_test == 'true' }}
+
     runs-on: ubuntu-latest
+
     strategy:
       fail-fast: true
       matrix:
@@ -52,6 +81,8 @@ jobs:
 
   node-workflows:
     name: Node.js Workflows - ${{ matrix.task.name }}
+    needs: check-modified-files
+    if: ${{ needs.check-modified-files.outputs.node_test == 'true' }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: true
