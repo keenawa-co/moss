@@ -1,5 +1,6 @@
 use anyhow::Result;
 use hashbrown::HashMap;
+use moss_text::ReadOnlyStr;
 use serde::de::DeserializeOwned;
 use serde_json::Value;
 use std::{cell::RefCell, sync::Arc};
@@ -81,6 +82,6 @@ pub type CommandHandler =
 
 #[derive(Debug)]
 pub struct CommandDecl {
-    pub key: &'static str,
-    pub handler: fn(CommandContext, &AppState) -> Result<serde_json::Value, String>,
+    pub name: ReadOnlyStr,
+    pub callback: fn(CommandContext, &AppState) -> Result<serde_json::Value, String>,
 }

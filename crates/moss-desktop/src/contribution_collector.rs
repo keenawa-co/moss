@@ -27,10 +27,7 @@ impl ContributionCollector {
 
         for contrib in crate::contribution::CONTRIBUTIONS {
             for decl in std::mem::take(&mut *contrib.commands.lock()) {
-                commands.insert(
-                    ReadOnlyStr::from(decl.key),
-                    Arc::new(decl.handler) as CommandHandler,
-                );
+                commands.insert(decl.name, Arc::new(decl.callback) as CommandHandler);
             }
 
             for decl in std::mem::take(&mut *contrib.menus.lock()) {

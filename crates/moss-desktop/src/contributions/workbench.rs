@@ -1,4 +1,4 @@
-use moss_text::localize;
+use moss_text::{localize, read_only_str};
 use serde_json::Value;
 use tauri::{Emitter, EventTarget, Manager};
 
@@ -10,15 +10,15 @@ use crate::{
     state::AppState,
 };
 
-contribution_point!(TEST1, {
+contribution_point!(WORKBENCH, {
     commands: [
         CommandDecl {
-            key: "workbench.changeColorTheme",
-            handler: change_color_theme,
+            name: read_only_str!("workbench.changeColorTheme"),
+            callback: change_color_theme,
         },
         CommandDecl {
-            key: "workbench.changeLanguagePack",
-            handler: change_language_pack,
+            name: read_only_str!("workbench.changeLanguagePack"),
+            callback: change_language_pack,
         },
     ],
     tree_view_groups: [

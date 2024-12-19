@@ -1,8 +1,5 @@
-use moss_html::link::HtmlLink;
-use serde::Serialize;
-
-#[derive(Debug, Serialize)]
-pub struct LinksViewContent(Vec<HtmlLink>);
+// #[derive(Debug, Serialize)]
+// pub struct LinksViewContent(Vec<HtmlLink>);
 
 // pub struct LinksView;
 
