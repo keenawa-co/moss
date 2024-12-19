@@ -4,18 +4,21 @@ use std::any::Any;
 use std::sync::Arc;
 use std::time::Duration;
 
-struct MokaBackend {
+pub struct MokaBackend {
     cache: MokaCache<String, DynType>,
 }
 
-impl CacheBackend for MokaBackend {
-    fn new(max_capacity: u64, ttl: Duration) -> Self {
+impl MokaBackend {
+    pub fn new(max_capacity: u64, ttl: Duration) -> Self {
         Self {
             cache: MokaCacheBuilder::new(max_capacity)
                 .time_to_live(ttl)
                 .build(),
         }
     }
+}
+
+impl CacheBackend for MokaBackend {
     fn insert<T: Any + Send + Sync>(&self, key: &str, val: T) {
         self.cache.insert(key.to_string(), DynType::new(val));
     }
