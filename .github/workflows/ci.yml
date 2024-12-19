@@ -10,9 +10,39 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
+  check-modified-files:
+    runs-on: ubuntu-latest
+    outputs:
+      node: ${{ steps.node.outputs.any_changed }}
+      rust: ${{ steps.rust.outputs.any_changed }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Get all changed Rust files
+        id: rust
+        uses: tj-actions/changed-files@v45
+        with:
+          files: |
+            **.rs
+            Cargo.toml
+      - name: Get all changed NodeJS files
+        id: node
+        uses: tj-actions/changed-files@v45
+        with:
+          files: |
+            **.ts
+            **.tsx
+            **.js
+            **.jsx
+            package.json
+
+
   rust-workflows:
     name: Rust Workflows - ${{ matrix.task.name }}
+    needs: check-modified-files
+    if: ${{ needs.check-modified-files.outputs.rust == 'true' }}
+
     runs-on: ubuntu-latest
+
     strategy:
       fail-fast: true
       matrix:
@@ -52,6 +82,8 @@ jobs:
 
   node-workflows:
     name: Node.js Workflows - ${{ matrix.task.name }}
+    needs: check-modified-files
+    if: ${{ needs.check-modified-files.outputs.node == 'true' }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: true
