@@ -16,6 +16,7 @@ jobs:
       node_test: ${{ steps.check-modified-files.node_test }}
       rust_test: ${{ steps.check-modified-files.rust_test }}
     steps:
+      - uses: actions/checkout@v4
       - name: Analyze Modified Files
         id: check
         run: |
