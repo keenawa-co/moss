@@ -13,8 +13,8 @@ jobs:
   check-modified-files:
     runs-on: ubuntu-latest
     outputs:
-      node: ${{ steps.node.any_changed == 'true' }}
-      rust: ${{ steps.rust.any_changed == 'true' }}
+      node: ${{ steps.node.outputs.any_changed }}
+      rust: ${{ steps.rust.outputs.any_changed }}
     steps:
       - uses: actions/checkout@v4
       - name: Get all changed Rust files
