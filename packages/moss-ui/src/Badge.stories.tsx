@@ -1,4 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react";
+import { expect, userEvent, within } from "@storybook/test";
+
 import { Badge } from "./Badge";
 
 const meta: Meta<typeof Badge> = {
@@ -26,36 +28,15 @@ const meta: Meta<typeof Badge> = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const AllVariants: Story = {
-  args: {},
-  render: (args) => {
-    return (
-      <div className="flex w-full flex-col gap-6 p-16">
-        <h2 className="text-3xl font-semibold">All variants</h2>
-
-        <table className="w-64">
-          <tr>
-            <th align="left">Full</th>
-            <th align="left">Compact</th>
-          </tr>
-
-          <tr>
-            <td align="left">
-              <Badge {...args} value="Text" />
-            </td>
-            <td align="left">
-              <Badge {...args} style="compact" />
-            </td>
-          </tr>
-        </table>
-      </div>
-    );
-  },
-};
-
 export const Default: Story = {
+  tags: ["stable"],
   args: {
     value: "Text",
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    expect(canvas.getByText("Text")).toBeInTheDocument();
   },
 };
 
