@@ -7,6 +7,9 @@ edition = "2021"
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
+linkme.workspace = true
+paste.workspace = true
+
 moss_text.workspace = true
 moss_uikit.workspace = true
 moss_jsonlogic.workspace = true

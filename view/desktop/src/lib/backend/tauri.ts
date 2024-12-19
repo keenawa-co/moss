@@ -10,7 +10,6 @@ export type TauriIpcCommand =
   | "main_window_is_ready"
   | "create_new_window"
   | "sidebar_get_all_activities"
-  | "get_view_content"
   | "get_menu_items_by_namespace"
   | "get_locales";
 
