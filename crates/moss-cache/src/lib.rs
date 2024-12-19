@@ -3,10 +3,9 @@ pub mod backend;
 use dashmap::DashMap;
 use std::any::{type_name, Any};
 use std::sync::Arc;
-use std::time::{Duration, Instant};
+use thiserror::Error;
 
 use crate::backend::CacheBackend;
-use thiserror::Error;
 
 #[derive(Debug, Error)]
 pub enum CacheError {
@@ -79,24 +78,26 @@ impl Retrievers {
     }
 }
 
-pub struct Cache<P: CacheBackend> {
-    provider: P,
+pub struct Cache<B: CacheBackend> {
+    backend: B,
     retrievers: Retrievers,
 }
 
-impl<P> Cache<P>
-where
-    P: CacheBackend,
-{
-    pub fn new(max_capacity: u64, ttl: Duration) -> Self {
+impl<B: CacheBackend> Cache<B> {
+    pub fn new(backend: B) -> Self {
         Self {
-            provider: P::new(max_capacity, ttl),
+            backend,
             retrievers: Retrievers {
                 funcs: DashMap::new(),
             },
         }
     }
+}
 
+impl<B> Cache<B>
+where
+    B: CacheBackend,
+{
     pub fn register<T: Any + Send + Sync>(
         &self,
         key: &str,
@@ -108,21 +109,21 @@ where
             Arc::new(move || DynType::new(updater()))
         };
         self.retrievers.register(key, retriever);
-        self.provider.insert(key, initial_val);
-        self.provider.get::<T>(key).unwrap()
+        self.backend.insert(key, initial_val);
+        self.backend.get::<T>(key).unwrap()
     }
 
     pub fn deregister(&self, key: &str) -> Result<(), CacheError> {
-        self.provider.delete(key);
+        self.backend.delete(key);
         self.retrievers.deregister(key)
     }
 
     pub fn insert<T: Any + Send + Sync>(&self, key: &str, val: T) {
-        self.provider.insert(key, val);
+        self.backend.insert(key, val);
     }
 
     pub fn get<T: Any + Send + Sync>(&self, key: &str) -> Result<Arc<T>, CacheError> {
-        match self.provider.get::<T>(key) {
+        match self.backend.get::<T>(key) {
             Ok(val) => Ok(val),
             Err(CacheError::TypeMismatch { key, type_name }) => {
                 Err(CacheError::TypeMismatch { key, type_name })
@@ -130,14 +131,14 @@ where
             Err(CacheError::NonexistentKey { .. }) => {
                 let new_arc_value = self.retrievers.get(key)?().content.downcast::<T>().unwrap();
                 let new_value = Arc::into_inner(new_arc_value).unwrap();
-                self.provider.insert(key, new_value);
-                self.provider.get(key)
+                self.backend.insert(key, new_value);
+                self.backend.get(key)
             }
         }
     }
 
     pub fn delete(&self, key: &str) {
-        self.provider.delete(key);
+        self.backend.delete(key);
     }
 
     pub fn take<T: Any + Clone + Send + Sync>(&self, key: &str) -> Result<T, CacheError> {
@@ -148,28 +149,35 @@ where
     }
 
     pub fn contains(&self, key: &str) -> bool {
-        self.provider.contains(key)
+        self.backend.contains(key)
     }
 }
 
+#[cfg(test)]
 mod test {
     use super::*;
-    use std::thread;
+    use std::{
+        thread,
+        time::{Duration, Instant},
+    };
 
     struct MockBackend {
         cache: DashMap<String, DynType>,
         entry_timestamp: DashMap<String, Instant>,
         ttl: Duration,
     }
-    impl CacheBackend for MockBackend {
-        fn new(max_capacity: u64, ttl: Duration) -> Self {
+
+    impl MockBackend {
+        fn new(ttl: Duration) -> Self {
             Self {
                 cache: DashMap::new(),
                 entry_timestamp: DashMap::new(),
                 ttl,
             }
         }
+    }
 
+    impl CacheBackend for MockBackend {
         fn insert<T: Any + Send + Sync>(&self, key: &str, val: T) {
             self.cache.insert(key.to_string(), DynType::new(val));
             self.entry_timestamp.insert(key.to_string(), Instant::now());
@@ -209,7 +217,8 @@ mod test {
 
     #[test]
     fn test_cache_type_mismatch_error_message() {
-        let cache = MockCache::new(1024, Duration::from_millis(1000));
+        let mock_backend = MockBackend::new(Duration::from_millis(1000));
+        let cache = MockCache::new(mock_backend);
         cache.insert("i32", 32i32);
         let result = cache.get::<String>("i32");
         assert!(result.is_err());
@@ -226,14 +235,16 @@ mod test {
 
     #[test]
     fn test_cache_insert_single_type() {
-        let cache = MockCache::new(1024, Duration::from_millis(1000));
+        let mock_backend = MockBackend::new(Duration::from_millis(1000));
+        let cache = MockCache::new(mock_backend);
         cache.insert("i32", 32i32);
         assert_eq!(*cache.get::<i32>("i32").unwrap(), 32i32);
     }
 
     #[test]
     fn test_cache_insert_multiple_types() {
-        let cache = MockCache::new(1024, Duration::from_millis(1000));
+        let mock_backend = MockBackend::new(Duration::from_millis(1000));
+        let cache = MockCache::new(mock_backend);
         cache.insert("String", String::from("Hello, world!"));
         assert_eq!(
             *cache.get::<String>("String").unwrap(),
@@ -249,7 +260,8 @@ mod test {
 
     #[test]
     fn test_cache_delete_existing_keys() {
-        let cache = MockCache::new(1024, Duration::from_millis(1000));
+        let mock_backend = MockBackend::new(Duration::from_millis(1000));
+        let cache = MockCache::new(mock_backend);
         cache.insert("i32", 32i32);
         assert!(cache.contains("i32"));
         cache.delete("i32");
@@ -258,7 +270,8 @@ mod test {
 
     #[test]
     fn test_cache_delete_nonexistent() {
-        let cache = MockCache::new(1024, Duration::from_millis(1000));
+        let mock_backend = MockBackend::new(Duration::from_millis(1000));
+        let cache = MockCache::new(mock_backend);
         assert!(!cache.contains("nonexistent"));
         cache.delete("nonexistent");
         assert!(!cache.contains("nonexistent"));
@@ -266,7 +279,8 @@ mod test {
 
     #[test]
     fn test_cache_get_with_correct_type_and_key() {
-        let cache = MockCache::new(1024, Duration::from_millis(1000));
+        let mock_backend = MockBackend::new(Duration::from_millis(1000));
+        let cache = MockCache::new(mock_backend);
         cache.insert("i32", 32i32);
         assert_eq!(*cache.get::<i32>("i32").unwrap(), 32);
         assert!(cache.contains("i32"));
@@ -274,7 +288,8 @@ mod test {
 
     #[test]
     fn test_cache_get_with_incorrect_type() {
-        let cache = MockCache::new(1024, Duration::from_millis(1000));
+        let mock_backend = MockBackend::new(Duration::from_millis(1000));
+        let cache = MockCache::new(mock_backend);
         cache.insert("i32", 32i32);
         assert!(matches!(
             cache.get::<String>("i32"),
@@ -284,7 +299,8 @@ mod test {
 
     #[test]
     fn test_cache_get_with_nonexistent_key() {
-        let cache = MockCache::new(1024, Duration::from_millis(1000));
+        let mock_backend = MockBackend::new(Duration::from_millis(1000));
+        let cache = MockCache::new(mock_backend);
         assert!(matches!(
             cache.get::<i32>("i32"),
             Err(CacheError::NonexistentKey { .. })
@@ -293,7 +309,8 @@ mod test {
 
     #[test]
     fn test_cache_take_existent_value() {
-        let cache = MockCache::new(1024, Duration::from_millis(1000));
+        let mock_backend = MockBackend::new(Duration::from_millis(1000));
+        let cache = MockCache::new(mock_backend);
         cache.insert("i32", 32i32);
         let i: i32 = cache.take::<i32>("i32").unwrap();
         assert_eq!(i, 32);
@@ -302,7 +319,8 @@ mod test {
 
     #[test]
     fn test_cache_take_with_incorrect_type() {
-        let cache = MockCache::new(1024, Duration::from_millis(1000));
+        let mock_backend = MockBackend::new(Duration::from_millis(1000));
+        let cache = MockCache::new(mock_backend);
         cache.insert("i32", 32i32);
         assert!(matches!(
             cache.take::<String>("i32"),
@@ -312,7 +330,8 @@ mod test {
 
     #[test]
     fn test_cache_take_with_nonexistent_key() {
-        let cache = MockCache::new(1024, Duration::from_millis(1000));
+        let mock_backend = MockBackend::new(Duration::from_millis(1000));
+        let cache = MockCache::new(mock_backend);
         assert!(matches!(
             cache.take::<i32>("i32"),
             Err(CacheError::NonexistentKey { .. })
@@ -321,7 +340,8 @@ mod test {
 
     #[test]
     fn test_cache_expire_beyond_ttl() {
-        let cache = MockCache::new(1024, Duration::from_millis(500));
+        let mock_backend = MockBackend::new(Duration::from_millis(500));
+        let cache = MockCache::new(mock_backend);
         cache.insert::<i32>("i32", 32i32);
         assert!(cache.contains("i32"));
         thread::sleep(Duration::from_millis(1000));
@@ -330,14 +350,16 @@ mod test {
 
     #[test]
     fn test_cache_register_initialize_value() {
-        let cache = MockCache::new(1024, Duration::from_millis(500));
+        let mock_backend = MockBackend::new(Duration::from_millis(500));
+        let cache = MockCache::new(mock_backend);
         cache.register::<i32>("i32", || 32);
         assert_eq!(*cache.get::<i32>("i32").unwrap(), 32);
     }
 
     #[test]
     fn test_cache_register_update_expired_value() {
-        let cache = MockCache::new(1024, Duration::from_millis(500));
+        let mock_backend = MockBackend::new(Duration::from_millis(500));
+        let cache = MockCache::new(mock_backend);
         cache.register::<i32>("i32", || 32);
         thread::sleep(Duration::from_millis(1000));
         assert!(!cache.contains("i32"));
