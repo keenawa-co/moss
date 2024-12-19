@@ -63,7 +63,10 @@ jobs:
           - name: Test Packages
             command: pnpm run test --project packages
           - name: Test Packages Stories
-            command: pnpm run test --project packages-stories
+            command: |
+              cd tools/icongen
+              pnpm run build
+              pnpm run test --project packages-stories
           - name: Test Desktop
             command: pnpm run test --project desktop
           - name: Test Desktop Stories
