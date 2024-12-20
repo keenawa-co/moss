@@ -2,7 +2,7 @@ use anyhow::Result;
 use hashbrown::HashMap;
 use moss_desktop::{
     command::CommandContext,
-    models::{appearance::theming::ThemeDescriptor, window::LocaleDescriptor},
+    models::application::{AppStateOutput, LocaleDescriptor, PreferencesOutput, ThemeDescriptor},
     services::theme_service::{GetColorThemeOptions, ThemeService},
 };
 use moss_text::{quote, ReadOnlyStr};
@@ -63,6 +63,16 @@ pub async fn get_color_theme(
         .get_color_theme(&path, opts)
         .await
         .map_err(|err| err.to_string())
+}
+
+#[tauri::command(async)]
+pub fn get_state(app_state: State<'_, AppState>) -> Result<AppStateOutput, String> {
+    Ok(AppStateOutput {
+        preferences: PreferencesOutput {
+            theme: app_state.preferences.theme.read().clone(),
+            locale: app_state.preferences.locale.read().clone(),
+        },
+    })
 }
 
 // FIXME: This is a temporary solution until we have a registry of installed

@@ -23,9 +23,7 @@ const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
     }
 
     try {
-      const result: IpcResult<string, string> = await getColorTheme(theme.source, {
-        enableCache: true,
-      });
+      const result: IpcResult<string, string> = await getColorTheme(theme.source);
 
       if (result.status === "ok") {
         const cssContent = result.data;

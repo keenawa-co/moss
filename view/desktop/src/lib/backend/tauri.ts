@@ -11,7 +11,8 @@ export type TauriIpcCommand =
   | "create_new_window"
   | "sidebar_get_all_activities"
   | "get_menu_items_by_namespace"
-  | "get_locales";
+  | "get_locales"
+  | "get_state";
 
 export type IpcResult<T, E> = { status: "ok"; data: T } | { status: "error"; error: E };
 

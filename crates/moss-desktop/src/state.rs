@@ -7,9 +7,8 @@ use std::{sync::atomic::AtomicUsize, sync::Arc};
 
 use crate::command::CommandHandler;
 use crate::contribution_collector::ContributionCollector;
-use crate::models::{
-    actions::MenuItem, appearance::theming::ThemeDescriptor, view::*, window::LocaleDescriptor,
-};
+use crate::models::application::{LocaleDescriptor, ThemeDescriptor};
+use crate::models::{actions::MenuItem, view::*};
 
 const STATE_CACHE_TTL: Duration = Duration::from_secs(60 * 5);
 const STATE_MAX_CAPACITY: u64 = 100;
