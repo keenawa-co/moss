@@ -14,10 +14,12 @@ if __name__ == '__main__':
 
     output_code = \
         f"""
+use once_cell::sync::Lazy;
 use serde_json::{{json, Value}};
         
-pub const SCHEMA_{Path(schema_file.name).stem.upper()}: Value = json!({schema}
-);
+pub static SCHEMA_{Path(schema_file.name).stem.upper()}: Lazy<Value> = Lazy::new(|| json!(
+{schema}
+));
 """
 
     output_file.write(output_code)

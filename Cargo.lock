@@ -2640,6 +2640,7 @@ dependencies = [
 name = "moss_jsonschema"
 version = "0.1.0"
 dependencies = [
+ "once_cell",
  "serde",
  "serde_json",
 ]
