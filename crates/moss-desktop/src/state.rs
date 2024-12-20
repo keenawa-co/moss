@@ -1,6 +1,8 @@
 use dashmap::DashMap;
+use moss_cache::{backend::moka::MokaBackend, Cache};
 use moss_text::ReadOnlyStr;
 use parking_lot::RwLock;
+use std::time::Duration;
 use std::{sync::atomic::AtomicUsize, sync::Arc};
 
 use crate::command::CommandHandler;
@@ -9,6 +11,9 @@ use crate::models::{
     actions::MenuItem, appearance::theming::ThemeDescriptor, view::*, window::LocaleDescriptor,
 };
 
+const STATE_CACHE_TTL: Duration = Duration::from_secs(60 * 5);
+const STATE_MAX_CAPACITY: u64 = 100;
+
 pub struct Preferences {
     pub theme: RwLock<ThemeDescriptor>,
     pub locale: RwLock<LocaleDescriptor>,
@@ -16,6 +21,7 @@ pub struct Preferences {
 
 pub struct AppState {
     next_window_id: AtomicUsize,
+    pub cache: Arc<Cache<MokaBackend>>,
     pub preferences: Preferences,
     pub commands: DashMap<ReadOnlyStr, CommandHandler>,
     pub menus: DashMap<ReadOnlyStr, Vec<MenuItem>>,
@@ -28,9 +34,11 @@ impl AppState {
         // FIXME: This should be abstracted in the future.
         let contribution_collector = ContributionCollector::new();
         let contribution_collection = contribution_collector.collect();
+        let cache = Cache::new(MokaBackend::new(STATE_MAX_CAPACITY, STATE_CACHE_TTL));
 
         let state = Self {
             next_window_id: AtomicUsize::new(0),
+            cache: Arc::new(cache),
             preferences: Preferences {
                 theme: RwLock::new(ThemeDescriptor {
                     id: "theme-light".to_string(),

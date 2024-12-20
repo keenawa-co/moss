@@ -23,7 +23,9 @@ const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
     }
 
     try {
-      const result: IpcResult<string, string> = await getColorTheme(theme.source);
+      const result: IpcResult<string, string> = await getColorTheme(theme.source, {
+        enableCache: true,
+      });
 
       if (result.status === "ok") {
         const cssContent = result.data;
@@ -45,7 +47,7 @@ const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
     }
   }, []);
 
-  const setThemeWithoutSync = useCallback(
+  const setTheme = useCallback(
     (themeDescriptor: ThemeDescriptor) => {
       const selectedTheme = themes?.find((theme) => theme.id === themeDescriptor.id) || null;
       if (selectedTheme) {
@@ -63,9 +65,9 @@ const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
 
   useEffect(() => {
     if (!currentTheme && themes && themes.length > 0 && !themesLoading) {
-      setThemeWithoutSync(themes[0]);
+      setTheme(themes[0]);
     }
-  }, [currentTheme, themes, setThemeWithoutSync, themesLoading]);
+  }, [currentTheme, themes, setTheme, themesLoading]);
 
   useEffect(() => {
     let unlisten: UnlistenFn;
@@ -74,7 +76,7 @@ const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
       const newThemeDescriptor: ThemeDescriptor = event.payload;
 
       if (newThemeDescriptor.id !== currentTheme?.id) {
-        setThemeWithoutSync(newThemeDescriptor);
+        setTheme(newThemeDescriptor);
       }
     };
 
@@ -93,7 +95,7 @@ const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
         unlisten();
       }
     };
-  }, [currentTheme, setThemeWithoutSync]);
+  }, [currentTheme, setTheme]);
 
   useEffect(() => {
     if (themesError) {

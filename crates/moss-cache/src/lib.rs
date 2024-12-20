@@ -10,7 +10,10 @@ use crate::backend::CacheBackend;
 #[derive(Debug, Error)]
 pub enum CacheError {
     #[error("The value of key '{key}' has the type name of '{type_name}'")]
-    TypeMismatch { key: String, type_name: String },
+    TypeMismatch {
+        key: String,
+        type_name: &'static str,
+    },
 
     #[error("The key '{key}' does not exist")]
     NonexistentKey { key: String },
@@ -19,7 +22,7 @@ pub enum CacheError {
 #[derive(Clone, Debug)]
 struct DynType {
     content: Arc<dyn Any + Send + Sync>,
-    type_name: String,
+    type_name: &'static str,
 }
 
 impl DynType {
@@ -29,7 +32,7 @@ impl DynType {
     {
         Self {
             content: Arc::new(content),
-            type_name: type_name::<T>().to_string(),
+            type_name: type_name::<T>(),
         }
     }
 
@@ -38,14 +41,16 @@ impl DynType {
             Ok(result) => Ok(result),
             Err(_) => Err(CacheError::TypeMismatch {
                 key: key.to_string(),
-                type_name: self.type_name.clone(),
+                type_name: self.type_name,
             }),
         }
     }
 }
 
+type RetrieverCallback = Arc<dyn Fn() -> DynType + Send + Sync>;
+
 struct Retrievers {
-    funcs: DashMap<String, Arc<dyn Fn() -> DynType>>,
+    funcs: DashMap<String, RetrieverCallback>,
 }
 
 impl Retrievers {
@@ -55,7 +60,7 @@ impl Retrievers {
         }
     }
 
-    fn register(&self, key: &str, updater: Arc<dyn Fn() -> DynType>) {
+    fn register(&self, key: &str, updater: RetrieverCallback) {
         self.funcs.insert(key.to_string(), updater);
     }
 
@@ -68,13 +73,13 @@ impl Retrievers {
         }
     }
 
-    fn get(&self, key: &str) -> Result<Arc<dyn Fn() -> DynType>, CacheError> {
-        match self.funcs.get(key) {
-            Some(func) => Ok(func.value().clone()),
-            None => Err(CacheError::NonexistentKey {
+    fn get(&self, key: &str) -> Result<RetrieverCallback, CacheError> {
+        self.funcs
+            .get(key)
+            .map(|f| f.value().clone())
+            .ok_or_else(|| CacheError::NonexistentKey {
                 key: key.to_string(),
-            }),
-        }
+            })
     }
 }
 
@@ -87,9 +92,7 @@ impl<B: CacheBackend> Cache<B> {
     pub fn new(backend: B) -> Self {
         Self {
             backend,
-            retrievers: Retrievers {
-                funcs: DashMap::new(),
-            },
+            retrievers: Retrievers::new(),
         }
     }
 }
@@ -101,7 +104,7 @@ where
     pub fn register<T: Any + Send + Sync>(
         &self,
         key: &str,
-        updater: impl Fn() -> T + 'static,
+        updater: impl Fn() -> T + Send + Sync + 'static,
     ) -> Arc<T> {
         let initial_val = updater();
         let retriever = {
@@ -110,7 +113,9 @@ where
         };
         self.retrievers.register(key, retriever);
         self.backend.insert(key, initial_val);
-        self.backend.get::<T>(key).unwrap()
+        self.backend
+            .get::<T>(key)
+            .expect("Just inserted value must be retrievable")
     }
 
     pub fn deregister(&self, key: &str) -> Result<(), CacheError> {
@@ -118,21 +123,37 @@ where
         self.retrievers.deregister(key)
     }
 
-    pub fn insert<T: Any + Send + Sync>(&self, key: &str, val: T) {
+    pub fn insert<T>(&self, key: &str, val: T)
+    where
+        T: Any + Send + Sync + Clone,
+    {
         self.backend.insert(key, val);
     }
 
-    pub fn get<T: Any + Send + Sync>(&self, key: &str) -> Result<Arc<T>, CacheError> {
+    pub fn get<T>(&self, key: &str) -> Result<Arc<T>, CacheError>
+    where
+        T: Any + Send + Sync + Clone,
+    {
         match self.backend.get::<T>(key) {
             Ok(val) => Ok(val),
             Err(CacheError::TypeMismatch { key, type_name }) => {
                 Err(CacheError::TypeMismatch { key, type_name })
             }
-            Err(CacheError::NonexistentKey { .. }) => {
-                let new_arc_value = self.retrievers.get(key)?().content.downcast::<T>().unwrap();
-                let new_value = Arc::into_inner(new_arc_value).unwrap();
-                self.backend.insert(key, new_value);
-                self.backend.get(key)
+            Err(CacheError::NonexistentKey { key: _ }) => {
+                // The value is missing in the backend, try to retrieve it using the retriever
+                let retriever = self.retrievers.get(key)?;
+                let new_val_dyn = retriever();
+
+                // Here we are confident that if the retriever returns a DynType, it is the correct type we expect.
+                let new_val = new_val_dyn
+                    .get_concrete::<T>(key)
+                    .expect("The retriever must return the correct type");
+                let extracted = match Arc::try_unwrap(new_val) {
+                    Ok(val) => val,
+                    Err(arc_val) => (*arc_val).clone(),
+                };
+                self.backend.insert(key, extracted);
+                self.backend.get::<T>(key)
             }
         }
     }
@@ -141,11 +162,16 @@ where
         self.backend.delete(key);
     }
 
-    pub fn take<T: Any + Clone + Send + Sync>(&self, key: &str) -> Result<T, CacheError> {
+    pub fn take<T>(&self, key: &str) -> Result<T, CacheError>
+    where
+        T: Any + Send + Sync + Clone,
+    {
         let cached_item = self.get::<T>(key)?;
         self.delete(key);
-        let cached_content = Arc::<T>::unwrap_or_clone(cached_item);
-        Ok(cached_content)
+        match Arc::try_unwrap(cached_item) {
+            Ok(val) => Ok(val),
+            Err(arc_val) => Ok((*arc_val).clone()),
+        }
     }
 
     pub fn contains(&self, key: &str) -> bool {

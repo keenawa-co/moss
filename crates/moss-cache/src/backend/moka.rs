@@ -1,8 +1,9 @@
-use crate::{Cache, CacheBackend, CacheError, DynType};
 use moka::sync::{Cache as MokaCache, CacheBuilder as MokaCacheBuilder};
 use std::any::Any;
 use std::sync::Arc;
 use std::time::Duration;
+
+use crate::{CacheBackend, CacheError, DynType};
 
 pub struct MokaBackend {
     cache: MokaCache<String, DynType>,
@@ -38,5 +39,3 @@ impl CacheBackend for MokaBackend {
         self.cache.contains_key(key)
     }
 }
-
-pub type MokaSyncCache = Cache<MokaBackend>;

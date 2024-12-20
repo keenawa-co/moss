@@ -43,7 +43,7 @@ contribution_point!(LAYOUT_CONTROLS, {
                 }),
                 MenuItem::Action(ActionMenuItem {
                     command: CommandAction {
-                        id: read_only_str!("workbench.action.toggleSecondarySidebar"),
+                        id: read_only_str!("workbench.action.togglePrimarySideBar"),
                         title: localize!(
                             "layoutControls.togglePrimarySideBar",
                             "Toggle Primary Side Bar"
