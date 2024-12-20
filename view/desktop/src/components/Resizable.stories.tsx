@@ -1,7 +1,13 @@
 import { Meta, StoryObj } from "@storybook/react";
+
 import { Resizable, ResizablePanel } from "./Resizable";
+
 import "allotment/dist/style.css";
+
 import { useState } from "react";
+
+import { expect, userEvent, within } from "@storybook/test";
+
 import { cn } from "../../../../packages/moss-ui/src";
 
 const meta: Meta = {
@@ -38,6 +44,7 @@ export const Default: Story = {
 };
 
 export const Vertical: Story = {
+  tags: ["stable"],
   render: () => {
     return (
       <Resizable vertical>
@@ -45,6 +52,11 @@ export const Vertical: Story = {
         <ResizablePanel className="grid place-items-center">Two</ResizablePanel>
       </Resizable>
     );
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    expect(canvas.getByText("One")).toBeInTheDocument();
   },
 };
 
@@ -108,7 +120,7 @@ export const ControlsStory = () => {
 
   return (
     <>
-      <div className="flex gap-2 p-4 ">
+      <div className="flex gap-2 p-4">
         <button
           className={cn(`rounded border p-2 duration-0`, { "border-sky-500 bg-sky-500 text-white": oneVisible })}
           onClick={() => setOneVisible(!oneVisible)}
