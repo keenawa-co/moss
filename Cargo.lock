@@ -1049,6 +1049,7 @@ dependencies = [
  "log",
  "macos-trampoline",
  "mimalloc",
+ "moss_cache",
  "moss_desktop",
  "moss_env",
  "moss_text",
@@ -2540,15 +2541,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "moss-cache"
-version = "0.1.0"
-dependencies = [
- "dashmap",
- "moka",
- "thiserror 2.0.8",
-]
-
-[[package]]
 name = "moss-cli"
 version = "0.1.0"
 dependencies = [
@@ -2565,6 +2557,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "moss_cache"
+version = "0.1.0"
+dependencies = [
+ "dashmap",
+ "moka",
+ "thiserror 2.0.8",
+]
+
+[[package]]
 name = "moss_collection"
 version = "0.1.0"
 dependencies = [
@@ -2578,9 +2579,12 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "dashmap",
+ "dirs",
  "hashbrown 0.15.2",
  "indexmap 2.7.0",
  "linkme",
+ "log",
+ "moss_cache",
  "moss_html",
  "moss_jsonlogic",
  "moss_jsonlogic_macro",
@@ -2592,6 +2596,7 @@ dependencies = [
  "quote",
  "serde",
  "serde_json",
+ "smol",
  "tauri",
  "thiserror 2.0.8",
  "ts-rs",
@@ -2637,10 +2642,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "moss_jsonschema"
-version = "0.1.0"
-
-[[package]]
 name = "moss_text"
 version = "0.1.0"
 dependencies = [
@@ -2648,6 +2649,10 @@ dependencies = [
  "bstr",
  "serde",
 ]
+
+[[package]]
+name = "moss_theme"
+version = "0.1.0"
 
 [[package]]
 name = "moss_themeconv"

@@ -7,15 +7,14 @@ edition = "2021"
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
-linkme.workspace = true
-paste.workspace = true
-
 moss_text.workspace = true
 moss_uikit.workspace = true
 moss_jsonlogic.workspace = true
 moss_jsonlogic_macro.workspace = true
 moss_html.workspace = true
+moss_cache.workspace = true
 
+smol.workspace = true
 indexmap = { workspace = true, features = ["serde"] }
 serde = { workspace = true, features = ["derive", "rc"] }
 ts-rs = { workspace = true, features = ["indexmap-impl", "serde-json-impl"] }
@@ -28,3 +27,7 @@ anyhow.workspace = true
 hashbrown.workspace = true
 quote.workspace = true
 thiserror.workspace = true
+linkme.workspace = true
+paste.workspace = true
+dirs.workspace = true
+log.workspace = true
