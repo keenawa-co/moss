@@ -23,13 +23,13 @@ pub struct LocaleDescriptor {
     pub name: String,
     /// The text direction of the locale, if specified ("ltr" for left-to-right, "rtl" for right-to-left).
     #[ts(optional)]
-    pub direction: Option<String>, // "ltr" or "rtl"
+    pub direction: Option<String>,
 }
 
 #[derive(Debug, Deserialize, Serialize, Clone, TS)]
 #[serde(rename_all = "camelCase")]
 #[ts(export, export_to = "application.ts")]
-pub struct PreferencesOutput {
+pub struct PreferencesInfo {
     /// The selected theme for the application.
     pub theme: ThemeDescriptor,
     /// The selected locale for the application.
@@ -39,7 +39,7 @@ pub struct PreferencesOutput {
 #[derive(Debug, Deserialize, Serialize, Clone, TS)]
 #[serde(rename_all = "camelCase")]
 #[ts(export, export_to = "application.ts")]
-pub struct AppStateOutput {
+pub struct AppStateInfo {
     /// The user preferences for the application.
-    pub preferences: PreferencesOutput,
+    pub preferences: PreferencesInfo,
 }

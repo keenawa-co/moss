@@ -2,7 +2,7 @@ use anyhow::Result;
 use hashbrown::HashMap;
 use moss_desktop::{
     command::CommandContext,
-    models::application::{AppStateOutput, LocaleDescriptor, PreferencesOutput, ThemeDescriptor},
+    models::application::{AppStateInfo, LocaleDescriptor, PreferencesInfo, ThemeDescriptor},
     services::theme_service::{GetColorThemeOptions, ThemeService},
 };
 use moss_text::{quote, ReadOnlyStr};
@@ -66,9 +66,9 @@ pub async fn get_color_theme(
 }
 
 #[tauri::command(async)]
-pub fn get_state(app_state: State<'_, AppState>) -> Result<AppStateOutput, String> {
-    Ok(AppStateOutput {
-        preferences: PreferencesOutput {
+pub fn get_state(app_state: State<'_, AppState>) -> Result<AppStateInfo, String> {
+    Ok(AppStateInfo {
+        preferences: PreferencesInfo {
             theme: app_state.preferences.theme.read().clone(),
             locale: app_state.preferences.locale.read().clone(),
         },
