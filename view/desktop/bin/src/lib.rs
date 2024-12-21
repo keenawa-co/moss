@@ -8,9 +8,11 @@ mod window;
 
 pub use constants::*;
 
+use moss_desktop::services::theme_service::ThemeService;
 use moss_desktop::state::AppState;
 use rand::random;
 use std::env;
+use std::sync::Arc;
 use tauri::{AppHandle, Manager, RunEvent, WebviewWindow, WindowEvent};
 use tauri_plugin_global_shortcut::{Code, GlobalShortcutExt, Modifiers, Shortcut, ShortcutState};
 use tauri_plugin_log::{fern::colors::ColoredLevelConfig, Target, TargetKind};
@@ -95,7 +97,6 @@ pub fn run() {
             cmd_window::main_window_is_ready,
             cmd_window::create_new_window,
             cmd_window::execute_command,
-            cmd_base::get_view_content,
             cmd_base::get_menu_items_by_namespace,
             cmd_window::execute_command,
             cmd_window::get_color_theme,
@@ -130,8 +131,12 @@ pub fn run() {
 }
 
 fn create_main_window(app_handle: &AppHandle, url: &str) -> WebviewWindow {
+    let state = AppState::new();
+    let theme_service = ThemeService::new(app_handle.clone(), Arc::clone(&state.cache));
+
     {
-        app_handle.manage(AppState::new());
+        app_handle.manage(theme_service);
+        app_handle.manage(state);
     }
 
     let label = format!("{MAIN_WINDOW_PREFIX}{}", 0);
@@ -150,8 +155,8 @@ fn create_main_window(app_handle: &AppHandle, url: &str) -> WebviewWindow {
     webview_window
 }
 
-fn create_child_window(handle: &AppHandle, url: &str) -> WebviewWindow {
-    let next_window_id = handle.state::<AppState>().inc_next_window_id() + 1;
+fn create_child_window(app_handle: &AppHandle, url: &str) -> WebviewWindow {
+    let next_window_id = app_handle.state::<AppState>().inc_next_window_id() + 1;
     let config = CreateWindowInput {
         url,
         label: &format!("{MAIN_WINDOW_PREFIX}{}", next_window_id),
@@ -162,7 +167,7 @@ fn create_child_window(handle: &AppHandle, url: &str) -> WebviewWindow {
             100.0 + random::<f64>() * 20.0,
         ),
     };
-    let webview_window = create_window(handle, config);
+    let webview_window = create_window(app_handle, config);
     webview_window.on_menu_event(move |window, event| menu::handle_event(window, &event));
     webview_window
 }

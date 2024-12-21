@@ -15,21 +15,8 @@ pub mod theming {
         Dark,
     }
 
-    /// Descriptor for a theme, containing metadata such as ID, name, and source.
-    #[derive(Deserialize, Serialize, Debug, Clone, Eq, PartialEq, TS)]
-    #[serde(rename_all = "camelCase")]
-    #[ts(export, export_to = "appearance.ts")]
-    pub struct ThemeDescriptor {
-        /// Unique identifier of the theme.
-        pub id: String,
-        /// Display name of the theme.
-        pub name: String,
-        /// Source of the theme (e.g., file path or URL).
-        pub source: String,
-    }
-
     /// Represents a color position in a gradient.
-    #[derive(Debug, Deserialize, Serialize, PartialEq, Clone, TS)]
+    #[derive(Debug, Deserialize, Serialize, Clone, TS)]
     #[ts(export, export_to = "appearance.ts")]
     pub struct ColorPosition {
         /// Color value.

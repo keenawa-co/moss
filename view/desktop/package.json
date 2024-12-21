@@ -9,7 +9,8 @@
     "build": "tsc -b && vite build",
     "lint": "eslint",
     "preview": "vite preview",
-    "interface": "i18next-resources-for-ts interface -i ./public/locales/de -o ./src/@types/resources.d.ts"
+    "interface": "i18next-resources-for-ts interface -i ./public/locales/de -o ./src/@types/resources.d.ts",
+    "test": "vitest"
   },
   "dependencies": {
     "@atlaskit/pragmatic-drag-and-drop": "^1.4.0",
@@ -37,6 +38,7 @@
     "@repo/moss-desktop": "workspace:*",
     "@repo/tailwind-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
+    "@storybook/react": "^8.4.7",
     "@tailwindcss/typography": "^0.5.15",
     "@tauri-apps/cli": "^2.1.0",
     "clsx": "^2.1.1",

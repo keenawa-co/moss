@@ -10,13 +10,13 @@
     "preview": "vite preview",
     "storybook": "storybook dev -p 6006",
     "sb": "pnpm storybook dev",
-    "build-storybook": "storybook build"
+    "build-storybook": "storybook build",
+    "test": "vitest"
   },
   "dependencies": {
     "vite-tsconfig-paths": "^5.1.4"
   },
   "devDependencies": {
-    "@tauri-apps/api": "^2.1.1",
     "@chromatic-com/storybook": "3.2.2",
     "@repo/eslint-config": "workspace:*",
     "@repo/moss-desktop": "workspace:*",
@@ -32,9 +32,11 @@
     "@storybook/addon-themes": "^8.4.7",
     "@storybook/addon-viewport": "^8.4.7",
     "@storybook/blocks": "^8.4.7",
+    "@storybook/experimental-addon-test": "^8.4.7",
     "@storybook/react": "^8.4.7",
     "@storybook/react-vite": "^8.4.7",
     "@storybook/test": "^8.4.7",
+    "@tauri-apps/api": "^2.1.1",
     "eslint-plugin-storybook": "^0.11.1",
     "storybook": "^8.4.7"
   }
