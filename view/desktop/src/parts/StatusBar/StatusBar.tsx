@@ -1,4 +1,3 @@
-import { D } from "node_modules/@tanstack/react-query-devtools/build/modern/ReactQueryDevtools-Cn7cKi7o";
 import { useEffect, useRef, useState, type ComponentPropsWithoutRef } from "react";
 import { createPortal } from "react-dom";
 
