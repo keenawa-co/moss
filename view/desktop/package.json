@@ -12,6 +12,9 @@
     "interface": "i18next-resources-for-ts interface -i ./public/locales/de -o ./src/@types/resources.d.ts"
   },
   "dependencies": {
+    "@atlaskit/pragmatic-drag-and-drop": "^1.4.0",
+    "@atlaskit/pragmatic-drag-and-drop-hitbox": "^1.0.3",
+    "@atlaskit/pragmatic-drag-and-drop-react-drop-indicator": "^1.1.3",
     "@dnd-kit/core": "^6.2.0",
     "@dnd-kit/sortable": "^9.0.0",
     "@dnd-kit/utilities": "^3.2.2",
@@ -30,8 +33,8 @@
     "zustand": "^5.0.2"
   },
   "devDependencies": {
-    "@repo/moss-desktop": "workspace:*",
     "@repo/eslint-config": "workspace:*",
+    "@repo/moss-desktop": "workspace:*",
     "@repo/tailwind-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
     "@tailwindcss/typography": "^0.5.15",
