@@ -6,7 +6,11 @@ use crate::{
     command::{CommandContext, CommandDecl},
     contribution::TreeViewGroupDecl,
     contribution_point,
-    models::{appearance::theming::ThemeDescriptor, constants, view::*, window::LocaleDescriptor},
+    models::{
+        application::{LocaleDescriptor, ThemeDescriptor},
+        constants,
+        view::*,
+    },
     state::AppState,
 };
 

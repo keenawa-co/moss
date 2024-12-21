@@ -58,6 +58,7 @@ moss_env = { path = "crates/moss-env" }
 moss_async = { path = "crates/moss-async" }
 moss_collection = { path = "crates/moss-collection" }
 moss_desktop = { path = "crates/moss-desktop" }
+moss_cache = { path = "crates/moss-cache" }
 
 linkme = "0.3"
 paste = "1.0.15"
@@ -100,10 +101,7 @@ dirs = "5.0.1"
 jsonschema = { version = "0.26.1", default-features = false }
 
 
-
-os_info = {version = "3.9.0", default-features = false}
+os_info = { version = "3.9.0", default-features = false }
 gethostname = "0.5.0"
 
-moka = {version = "0.12.8", features = ["sync"]}
-
-
+moka = { version = "0.12.8", features = ["sync"] }

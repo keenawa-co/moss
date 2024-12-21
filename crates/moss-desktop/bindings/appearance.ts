@@ -69,24 +69,6 @@ export type Theme = {
 };
 
 /**
- * Descriptor for a theme, containing metadata such as ID, name, and source.
- */
-export type ThemeDescriptor = {
-  /**
-   * Unique identifier of the theme.
-   */
-  id: string;
-  /**
-   * Display name of the theme.
-   */
-  name: string;
-  /**
-   * Source of the theme (e.g., file path or URL).
-   */
-  source: string;
-};
-
-/**
  * Represents the type of a theme, either light or dark.
  */
 export type ThemeType = "light" | "dark";

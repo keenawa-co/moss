@@ -1,5 +1,5 @@
 [package]
-name = "moss_jsonschema"
+name = "moss_theme"
 version = "0.1.0"
 edition = "2021"
 
@@ -7,3 +7,4 @@ edition = "2021"
 serde.workspace = true
 serde_json.workspace = true
 once_cell.workspace = true
+

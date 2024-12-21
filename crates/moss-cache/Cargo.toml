@@ -1,5 +1,5 @@
 [package]
-name = "moss-cache"
+name = "moss_cache"
 version = "0.1.0"
 edition = "2021"
 
