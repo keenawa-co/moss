@@ -3,8 +3,7 @@
   "version": "0.0.0",
   "type": "module",
   "exports": {
-    ".": "./src/index.ts",
-    "./styles/dockview.css": "./styles/dockview.css"
+    ".": "./src/index.ts"
   },
   "description": "Zero dependency layout manager supporting tabs, grids and splitviews",
   "keywords": [
@@ -37,7 +36,6 @@
     "url": "https://github.com/mathuo/dockview.git"
   },
   "license": "MIT",
-  "author": "https://github.com/mathuo",
   "main": "./dist/cjs/index.js",
   "module": "./dist/esm/index.js",
   "types": "./dist/cjs/index.d.ts",
@@ -58,5 +56,8 @@
     "test": "cross-env ../../node_modules/.bin/jest --selectProjects dockview-core",
     "dev": "cross-env ../../node_modules/.bin/jest --selectProjects dockview-core",
     "test:cov": "cross-env ../../node_modules/.bin/jest --selectProjects dockview-core --coverage"
-  }
+  },
+  "devDependencies": {
+      "@repo/typescript-config": "workspace:*"
+    }
 }

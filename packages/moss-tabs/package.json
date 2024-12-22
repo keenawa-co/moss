@@ -37,7 +37,6 @@
     "url": "https://github.com/mathuo/dockview.git"
   },
   "license": "MIT",
-  "author": "https://github.com/mathuo",
   "main": "./dist/cjs/index.js",
   "module": "./dist/esm/index.js",
   "types": "./dist/cjs/index.d.ts",
@@ -58,8 +57,9 @@
     "test": "cross-env ../../node_modules/.bin/jest --selectProjects dockview",
     "test:cov": "cross-env ../../node_modules/.bin/jest --selectProjects dockview --coverage"
   },
-  "dependencies": {
-    "@repo/moss-tabs-core": "workspace:*"
+  "devDependencies": {
+    "@repo/moss-tabs-core": "workspace:*",
+    "@repo/typescript-config": "workspace:*"
   },
   "peerDependencies": {
     "react": "^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0"

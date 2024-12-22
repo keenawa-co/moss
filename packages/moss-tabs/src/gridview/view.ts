@@ -1,4 +1,11 @@
-import { GridviewApi, GridviewPanel, GridviewInitParameters, IFrameworkPart, GridviewComponent } from "dockview-core";
+import {
+  GridviewApi,
+  GridviewComponent,
+  GridviewInitParameters,
+  GridviewPanel,
+  IFrameworkPart,
+} from "@repo/moss-tabs-core";
+
 import { ReactPart, ReactPortalStore } from "../react";
 import { IGridviewPanelProps } from "./gridview";
 

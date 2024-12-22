@@ -1,8 +1,11 @@
 import React from "react";
-import { GridviewPanelApi, Orientation, GridviewApi, createGridview } from "dockview-core";
-import { ReactGridPanelView } from "./view";
+
+import { createGridview, GridviewApi, GridviewPanelApi, Orientation } from "@repo/moss-tabs-core";
+
 import { usePortalsLifecycle } from "../react";
 import { PanelParameters } from "../types";
+import { ReactGridPanelView } from "./view";
+
 export interface GridviewReadyEvent {
   api: GridviewApi;
 }

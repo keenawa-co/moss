@@ -1,6 +1,7 @@
-import React from "react";
-import ReactDOM from "react-dom";
-import { DockviewDisposable, IFrameworkPart, DockviewIDisposable, Parameters } from "dockview-core";
+import * as React from "react";
+import * as ReactDOM from "react-dom";
+
+import { DockviewDisposable, DockviewIDisposable, IFrameworkPart, Parameters } from "@repo/moss-tabs-core";
 
 export interface ReactPortalStore {
   addPortal: (portal: React.ReactPortal) => DockviewIDisposable;

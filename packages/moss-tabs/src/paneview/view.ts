@@ -1,5 +1,7 @@
 import React from "react";
-import { PanelUpdateEvent, IPaneBodyPart, PanePanelComponentInitParameter } from "dockview-core";
+
+import { IPaneBodyPart, PanelUpdateEvent, PanePanelComponentInitParameter } from "@repo/moss-tabs-core";
+
 import { ReactPart, ReactPortalStore } from "../react";
 import { IPaneviewPanelProps } from "./paneview";
 

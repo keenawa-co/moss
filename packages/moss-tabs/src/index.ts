@@ -1,4 +1,4 @@
-export * from "dockview-core";
+export * from "@repo/moss-tabs-core";
 
 export * from "./dockview/dockview";
 export * from "./dockview/defaultTab";
