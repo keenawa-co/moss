@@ -9,3 +9,4 @@ export * from "../parts/SideBar/SidebarGeneral";
 export * from "../parts/SideBar/SidebarLinks";
 export * from "./LaunchPad";
 export * from "./Resizable";
+export * from "./DropIndicator";
