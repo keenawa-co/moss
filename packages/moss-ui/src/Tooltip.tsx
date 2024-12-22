@@ -1,7 +1,9 @@
 import * as React from "react";
+
 import * as TooltipPrimitive from "@radix-ui/react-tooltip";
-import { cn } from "./utils/utils";
+
 import { Link } from "./Link";
+import { cn } from "./utils";
 
 // api-reference https://www.radix-ui.com/primitives/docs/components/tooltip#api-reference
 

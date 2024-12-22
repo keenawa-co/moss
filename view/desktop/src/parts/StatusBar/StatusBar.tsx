@@ -1,31 +1,30 @@
-import { forwardRef, useState, type ComponentPropsWithoutRef } from "react";
+import { useEffect, useRef, useState, type ComponentPropsWithoutRef } from "react";
 import { createPortal } from "react-dom";
 
+import { swapListById } from "@/utils";
 import {
-  closestCenter,
-  DndContext,
-  DragEndEvent,
-  DragOverlay,
-  DragStartEvent,
-  MouseSensor,
-  UniqueIdentifier,
-  useSensor,
-  useSensors,
-} from "@dnd-kit/core";
-import { arrayMove, horizontalListSortingStrategy, SortableContext } from "@dnd-kit/sortable";
+  attachClosestEdge,
+  extractClosestEdge,
+  type Edge,
+} from "@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge";
+import { combine } from "@atlaskit/pragmatic-drag-and-drop/combine";
+import {
+  draggable,
+  dropTargetForElements,
+  monitorForElements,
+} from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
+import { setCustomNativeDragPreview } from "@atlaskit/pragmatic-drag-and-drop/element/set-custom-native-drag-preview";
 import { cn, Icon, Icons } from "@repo/moss-ui";
 
-import { SortableDNDWrapper } from "./SortableDNDWrapper";
+import { DropIndicator } from "../../components/DropIndicator";
 
 interface Item {
-  id: UniqueIdentifier;
+  id: number;
   icon: "StatusBarTerminal" | "StatusBarCommit" | "StatusBarSearch";
   label: string;
 }
 
 const StatusBar = ({ className }: ComponentPropsWithoutRef<"div">) => {
-  const [draggedItem, setDraggedItem] = useState<Item | null>(null);
-
   const [DNDList, setDNDList] = useState<Item[]>([
     {
       id: 1,
@@ -44,34 +43,23 @@ const StatusBar = ({ className }: ComponentPropsWithoutRef<"div">) => {
     },
   ]);
 
-  const handleDragStart = (event: DragStartEvent) => {
-    setDraggedItem(DNDList.find((i) => i.id === event.active.id)!);
-  };
+  useEffect(() => {
+    return monitorForElements({
+      onDrop({ location, source }) {
+        const target = location.current.dropTargets[0];
+        if (!target) return;
 
-  const handleDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event;
+        const sourceData = source.data;
+        const targetData = target.data;
+        if (!sourceData || !targetData) return;
 
-    setDraggedItem(null);
+        const updatedItems = swapListById(sourceData.id as number, targetData.id as number, DNDList);
+        if (!updatedItems) return;
 
-    if (!over) return;
-
-    if (active.id !== over.id) {
-      setDNDList((items) => {
-        const oldIndex = items.findIndex((i) => i.id === active.id);
-        const newIndex = items.findIndex((i) => i.id === over.id);
-
-        return arrayMove(items, oldIndex, newIndex);
-      });
-    }
-  };
-
-  const sensors = useSensors(
-    useSensor(MouseSensor, {
-      activationConstraint: {
-        distance: 1,
+        setDNDList(updatedItems);
       },
-    })
-  );
+    });
+  }, [DNDList]);
 
   return (
     <footer
@@ -84,28 +72,9 @@ const StatusBar = ({ className }: ComponentPropsWithoutRef<"div">) => {
         <StatusBarButton icon="StatusBarMacButton" className="bg-[#054ADA] px-[9px] py-[5px]" iconClassName="size-4" />
 
         <div className="flex h-full gap-1">
-          <DndContext
-            sensors={sensors}
-            collisionDetection={closestCenter}
-            onDragEnd={handleDragEnd}
-            onDragStart={handleDragStart}
-          >
-            <SortableContext items={DNDList} strategy={horizontalListSortingStrategy}>
-              {DNDList.map((item) => {
-                return (
-                  <SortableDNDWrapper
-                    key={item.id}
-                    id={item.id}
-                    draggingClassName="z-50 cursor-grabbing opacity-50 shadow-2xl"
-                  >
-                    <StatusBarButton key={item.id} icon={item.icon} label={item.label} />
-                  </SortableDNDWrapper>
-                );
-              })}
-            </SortableContext>
-
-            {draggedItem && <DraggedComponent item={draggedItem} />}
-          </DndContext>
+          {DNDList.map((item) => (
+            <StatusBarButton key={item.id} {...item} isDraggable />
+          ))}
         </div>
       </div>
 
@@ -132,46 +101,108 @@ const StatusBar = ({ className }: ComponentPropsWithoutRef<"div">) => {
   );
 };
 
-export default StatusBar;
-
-interface StatusBarButtonProps extends ComponentPropsWithoutRef<"button"> {
+interface StatusBarButtonProps extends Omit<ComponentPropsWithoutRef<"button">, "id"> {
   icon?: Icons;
   label?: string;
   className?: string;
   iconClassName?: string;
+
+  id?: number;
+  isDraggable?: boolean;
 }
 
 const StatusCircle = ({ className }: { className?: string }) => {
   return <div className={cn("flex items-center justify-center rounded-full", className)} />;
 };
 
-const StatusBarButton = forwardRef<HTMLButtonElement, StatusBarButtonProps>(
-  ({ icon, iconClassName, label, className, ...props }, ref) => {
-    return (
-      <button
-        ref={ref}
-        {...props}
-        className={cn(
-          "group flex h-full items-center gap-1 px-2 text-white transition hover:bg-[rgb(39,114,255)]",
-          className
-        )}
-      >
-        {icon && <Icon className={cn("size-[18px]", iconClassName)} icon={icon} />}
-        {label && <span className="text-sm">{label}</span>}
-      </button>
-    );
-  }
-);
+const StatusBarButton = ({
+  icon,
+  iconClassName,
+  label,
+  className,
+  id,
+  isDraggable,
+  ...props
+}: StatusBarButtonProps) => {
+  const ref = useRef<HTMLButtonElement | null>(null);
 
-const DraggedComponent = ({ item }: { item: Item }) => {
-  return createPortal(
-    <DragOverlay>
-      <StatusBarButton
-        icon={item.icon as Icons}
-        label={item.label}
-        className="cursor-grabbing bg-[rgb(39,114,255)] text-white shadow-lg transition hover:opacity-100 focus:opacity-100"
-      />
-    </DragOverlay>,
-    document.body
+  const [preview, setPreview] = useState<HTMLElement | null>(null);
+  const [closestEdge, setClosestEdge] = useState<Edge | null>(null);
+
+  useEffect(() => {
+    const element = ref.current;
+
+    if (!element || !isDraggable) return;
+
+    return combine(
+      draggable({
+        element: element,
+        getInitialData: () => ({ id, icon, label }),
+        onDrop: () => {
+          setPreview(null);
+        },
+        onGenerateDragPreview({ nativeSetDragImage }) {
+          setCustomNativeDragPreview({
+            nativeSetDragImage,
+            render({ container }) {
+              setPreview((prev) => (prev === container ? prev : container));
+            },
+          });
+        },
+      }),
+      dropTargetForElements({
+        element,
+        onDrop: () => {
+          setClosestEdge(null);
+        },
+        getData({ input }) {
+          return attachClosestEdge(
+            { id, label, icon },
+            {
+              element,
+              input,
+              allowedEdges: ["right", "left"],
+            }
+          );
+        },
+        getIsSticky() {
+          return true;
+        },
+        onDragEnter({ self }) {
+          const closestEdge = extractClosestEdge(self.data);
+          setClosestEdge(closestEdge);
+        },
+        onDrag({ self }) {
+          const closestEdge = extractClosestEdge(self.data);
+
+          setClosestEdge((current) => {
+            if (current === closestEdge) return current;
+
+            return closestEdge;
+          });
+        },
+        onDragLeave() {
+          setClosestEdge(null);
+        },
+      })
+    );
+  }, [id, label, isDraggable, icon]);
+
+  return (
+    <button
+      ref={ref}
+      {...props}
+      className={cn(
+        "group relative flex h-full items-center gap-1 px-2 text-white transition hover:bg-[rgb(39,114,255)]",
+        className
+      )}
+    >
+      {icon && <Icon className={cn("size-[18px]", iconClassName)} icon={icon} />}
+      {label && <span className="text-sm">{label}</span>}
+      {closestEdge ? <DropIndicator edge={closestEdge} gap={4} /> : null}
+      {preview && createPortal(<StatusBarButton icon={icon} label={label} className="bg-sky-500" />, preview)}
+    </button>
   );
 };
+
+export default StatusBar;

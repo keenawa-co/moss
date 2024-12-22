@@ -20,8 +20,6 @@ members = [
     "crates/moss-async",
     "crates/moss-collection",
     "crates/moss-theme",
-    "crates/moss-typebridge",
-    "crates/moss-typebridge-macro",
     "crates/moss-cache",
     "crates/moss-addon",
 ]
@@ -53,8 +51,6 @@ moss_fs = { path = "crates/moss-fs" }
 moss_themeconv = { path = "crates/moss-themeconv" }
 moss_jsonlogic = { path = "crates/moss-jsonlogic" }
 moss_jsonlogic_macro = { path = "crates/moss-jsonlogic-macro" }
-moss_typebridge = { path = "crates/moss-typebridge" }
-moss_typebridge_macro = { path = "crates/moss-typebridge-macro" }
 moss_env = { path = "crates/moss-env" }
 moss_async = { path = "crates/moss-async" }
 moss_collection = { path = "crates/moss-collection" }

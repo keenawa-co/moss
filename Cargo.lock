@@ -2667,6 +2667,11 @@ dependencies = [
 [[package]]
 name = "moss_theme"
 version = "0.1.0"
+dependencies = [
+ "once_cell",
+ "serde",
+ "serde_json",
+]
 
 [[package]]
 name = "moss_themeconv"
@@ -2678,22 +2683,6 @@ dependencies = [
  "moss_desktop",
  "serde",
  "serde_json",
-]
-
-[[package]]
-name = "moss_typebridge"
-version = "0.1.0"
-dependencies = [
- "moss_typebridge_macro",
- "serde",
-]
-
-[[package]]
-name = "moss_typebridge_macro"
-version = "0.1.0"
-dependencies = [
- "quote",
- "syn 2.0.90",
 ]
 
 [[package]]

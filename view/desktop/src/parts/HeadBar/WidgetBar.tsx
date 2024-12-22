@@ -1,23 +1,10 @@
 import { HTMLProps, useEffect, useRef, useState } from "react";
-import { createPortal } from "react-dom";
 
 import { ActionsGroup } from "@/components/ActionsGroup";
-import {
-  closestCenter,
-  DndContext,
-  DragEndEvent,
-  DragOverlay,
-  DragStartEvent,
-  MouseSensor,
-  UniqueIdentifier,
-  useSensor,
-  useSensors,
-} from "@dnd-kit/core";
-import { arrayMove, horizontalListSortingStrategy, SortableContext } from "@dnd-kit/sortable";
+import { swapListByIndex } from "@/utils";
+import { monitorForElements } from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
 import { cn, DropdownMenu as DM, Icon } from "@repo/moss-ui";
 import { OsType } from "@tauri-apps/plugin-os";
-
-import { DNDSortableItemWrapper } from "../../components/DNDWrapper";
 
 interface WidgetBarProps extends HTMLProps<HTMLDivElement> {
   os: OsType;
@@ -49,42 +36,34 @@ const widgetsList = [
 ];
 
 export const WidgetBar = ({ os, className, ...props }: WidgetBarProps) => {
-  const [draggedId, setDraggedId] = useState<UniqueIdentifier | null>(null);
-
-  const [DNDList, setDNDList] = useState<number[]>([]);
-  const [overflownList, setOverflownList] = useState<number[]>(widgetsList.map((item) => item.id));
-
   const DNDListRef = useRef<HTMLDivElement>(null);
-  const overflownListRef = useRef<HTMLDivElement>(null);
+  const [DNDList, setDNDList] = useState<number[]>([]);
 
-  const handleDragStart = (event: DragStartEvent) => {
-    setDraggedId(event.active.id);
-  };
+  useEffect(() => {
+    return monitorForElements({
+      onDrop({ location, source }) {
+        const target = location.current.dropTargets[0];
+        if (!target) return;
 
-  const handleDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event;
+        const sourceData = source.data;
+        const targetData = target.data;
+        if (!sourceData || !targetData) return;
 
-    setDraggedId(null);
+        const sourceIndex = DNDList.indexOf(sourceData.id as number);
+        const targetIndex = DNDList.indexOf(targetData.id as number);
 
-    if (!over) return;
+        const updatedItems = swapListByIndex(sourceIndex, targetIndex, DNDList);
+        if (!updatedItems) return;
 
-    if (active.id !== over.id) {
-      setDNDList((items) => {
-        const oldIndex = items.indexOf(active.id as number);
-        const newIndex = items.indexOf(over.id as number);
-
-        return arrayMove(items, oldIndex, newIndex);
-      });
-    }
-  };
-
-  const sensors = useSensors(
-    useSensor(MouseSensor, {
-      activationConstraint: {
-        distance: 1,
+        setDNDList(updatedItems);
       },
-    })
-  );
+    });
+  }, [DNDList]);
+
+  // overflownList
+
+  const overflownListRef = useRef<HTMLDivElement>(null);
+  const [overflownList, setOverflownList] = useState<number[]>(widgetsList.map((item) => item.id));
 
   const handleVisibleList = (entries: IntersectionObserverEntry[]) => {
     entries.forEach((entry) => {
@@ -185,46 +164,26 @@ export const WidgetBar = ({ os, className, ...props }: WidgetBarProps) => {
 
         <div className="flex w-full items-center justify-start gap-1">
           {DNDList.length === 0 && <OverflownMenu />}
-          <div className="sortable flex w-full items-center" ref={DNDListRef}>
-            <DndContext
-              sensors={sensors}
-              collisionDetection={closestCenter}
-              onDragEnd={handleDragEnd}
-              onDragStart={handleDragStart}
-            >
-              <SortableContext items={DNDList} strategy={horizontalListSortingStrategy}>
-                {DNDList.map((id, index) => {
-                  const item = widgetsList.find((item) => item.id === id)!;
-                  const shouldShowSelect =
-                    overflownList.length > 0 && DNDList.length !== 0 && index + 1 === DNDList.length;
+          <div className="flex w-full items-center" ref={DNDListRef}>
+            {DNDList.map((id, index) => {
+              const item = widgetsList.find((item) => item.id === id)!;
+              const shouldShowSelect = overflownList.length > 0 && DNDList.length !== 0 && index + 1 === DNDList.length;
 
-                  return (
-                    <span
-                      className="flex items-center gap-2"
-                      data-overflowable={true}
-                      data-itemid={item.id}
-                      key={item.id}
-                    >
-                      <DNDSortableItemWrapper
-                        id={item.id}
-                        draggingClassName="z-50 cursor-grabbing opacity-50 shadow-2xl"
-                      >
-                        <ActionsGroup
-                          icon={item.icon}
-                          label={item.label}
-                          actions={item.actions}
-                          defaultAction={item.defaultAction}
-                        />
-                      </DNDSortableItemWrapper>
+              return (
+                <span className="flex items-center gap-2" data-overflowable={true} data-itemid={item.id} key={item.id}>
+                  <ActionsGroup
+                    icon={item.icon}
+                    label={item.label}
+                    actions={item.actions}
+                    defaultAction={item.defaultAction}
+                    isDraggable
+                    id={item.id}
+                  />
 
-                      {shouldShowSelect && <OverflownMenu />}
-                    </span>
-                  );
-                })}
-              </SortableContext>
-
-              {draggedId && <DraggedComponent draggedId={draggedId} />}
-            </DndContext>
+                  {shouldShowSelect && <OverflownMenu />}
+                </span>
+              );
+            })}
           </div>
           <div className="overflown invisible flex" ref={overflownListRef}>
             {overflownList.map((id) => {
@@ -245,26 +204,5 @@ export const WidgetBar = ({ os, className, ...props }: WidgetBarProps) => {
         </div>
       </div>
     </div>
-  );
-};
-
-const DraggedComponent = ({ draggedId }: { draggedId: UniqueIdentifier | null }) => {
-  if (!draggedId) return null;
-
-  const item = widgetsList.find((item) => item.id === draggedId);
-
-  if (!item) return null;
-
-  return createPortal(
-    <DragOverlay>
-      <ActionsGroup
-        icon={item.icon!}
-        label={item.label}
-        actions={item.actions!}
-        defaultAction={item.defaultAction}
-        className="cursor-grabbing rounded border !border-[#c5c5c5] bg-[#D3D3D3] shadow-lg"
-      />
-    </DragOverlay>,
-    document.body
   );
 };
