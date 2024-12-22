@@ -1,0 +1,10 @@
+[addon]
+id = "theme-defaults"
+name = "Moss Default Themes"
+categories = ["Themes"]
+
+[contributes]
+themes = [
+  { label = "Moss Dark Default", path = "./foo/bar.json" },
+  { label = "Moss Light Default", path = "./foo/bar.json" },
+]

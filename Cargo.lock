@@ -2550,6 +2550,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "moss_addon"
+version = "0.1.0"
+dependencies = [
+ "serde",
+]
+
+[[package]]
 name = "moss_async"
 version = "0.1.0"
 dependencies = [
@@ -2580,6 +2587,7 @@ dependencies = [
  "anyhow",
  "dashmap",
  "dirs",
+ "fnv",
  "hashbrown 0.15.2",
  "indexmap 2.7.0",
  "linkme",
@@ -2599,6 +2607,7 @@ dependencies = [
  "smol",
  "tauri",
  "thiserror 2.0.8",
+ "tokio",
  "ts-rs",
 ]
 

@@ -16,6 +16,7 @@ moss_cache.workspace = true
 
 smol.workspace = true
 indexmap = { workspace = true, features = ["serde"] }
+tokio = { workspace = true, features = ["full"] }
 serde = { workspace = true, features = ["derive", "rc"] }
 ts-rs = { workspace = true, features = ["indexmap-impl", "serde-json-impl"] }
 once_cell.workspace = true
@@ -31,3 +32,4 @@ linkme.workspace = true
 paste.workspace = true
 dirs.workspace = true
 log.workspace = true
+fnv.workspace = true

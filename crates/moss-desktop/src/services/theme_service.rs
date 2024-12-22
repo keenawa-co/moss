@@ -40,6 +40,7 @@ impl ThemeService {
             };
 
             if options.enable_cache {
+                // FIXME:
                 self.app_cache.insert(CK_COLOR_THEME, content.clone());
                 trace!("Color theme '{}' was successfully cached", source);
             };

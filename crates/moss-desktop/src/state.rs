@@ -10,7 +10,7 @@ use crate::contribution_collector::ContributionCollector;
 use crate::models::application::{LocaleDescriptor, ThemeDescriptor};
 use crate::models::{actions::MenuItem, view::*};
 
-const STATE_CACHE_TTL: Duration = Duration::from_secs(60 * 5);
+const STATE_CACHE_TTL: Duration = Duration::from_secs(60 * 3);
 const STATE_MAX_CAPACITY: u64 = 100;
 
 pub struct Preferences {
@@ -22,6 +22,7 @@ pub struct AppState {
     next_window_id: AtomicUsize,
     pub cache: Arc<Cache<MokaBackend>>,
     pub preferences: Preferences,
+    pub themes: RwLock<Vec<ThemeDescriptor>>,
     pub commands: DashMap<ReadOnlyStr, CommandHandler>,
     pub menus: DashMap<ReadOnlyStr, Vec<MenuItem>>,
     pub tree_view_groups: DashMap<TreeViewGroupLocation, Vec<TreeViewGroup>>,
@@ -50,6 +51,7 @@ impl AppState {
                     direction: Some("ltr".to_string()),
                 }),
             },
+            themes: RwLock::new(Vec::new()),
             commands: contribution_collection.commands,
             menus: contribution_collection.menus,
             tree_view_groups: contribution_collection.tree_view_groups,

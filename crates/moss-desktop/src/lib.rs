@@ -1,3 +1,4 @@
+pub mod addon_registry;
 pub mod command;
 pub mod contributions;
 pub mod menus;
