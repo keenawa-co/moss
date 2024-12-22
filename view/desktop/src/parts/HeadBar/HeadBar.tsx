@@ -1,9 +1,9 @@
 import { cn } from "@repo/moss-ui";
 import { type } from "@tauri-apps/plugin-os";
 
+import { ActionsBar } from "./ActionsBar";
 import { Controls } from "./Controls/Controls";
 import { WidgetBar } from "./WidgetBar";
-import { ActionsBar } from "./ActionsBar";
 
 export const HeadBar = () => {
   const os = type();
@@ -27,9 +27,18 @@ export const HeadBar = () => {
           "pr-[12px]": os === "macos",
           "px-[16px]": os === "windows" || os === "linux",
         })}
+        style={{
+          overflowClipMargin: 4,
+        }}
         data-tauri-drag-region
       >
-        <WidgetBar os={os} className="min-w-0 overflow-clip" />
+        <WidgetBar
+          os={os}
+          className="min-w-0 overflow-clip"
+          style={{
+            overflowClipMargin: 4,
+          }}
+        />
         <ActionsBar className="z-50" />
       </div>
 
