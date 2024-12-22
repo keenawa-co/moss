@@ -1,3 +1,4 @@
+import { DockviewReact, DockviewReadyEvent, IDockviewPanelProps } from "dockview";
 import { Suspense } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 
@@ -8,6 +9,26 @@ import { LaunchPad } from "../components/LaunchPad";
 import { Menu } from "../components/Menu";
 import { Resizable, ResizablePanel } from "../components/Resizable";
 import { ContentLayout } from "./ContentLayout";
+
+import "../../node_modules/dockview/dist/styles/dockview.css";
+
+const components = {
+  default: (props: IDockviewPanelProps) => {
+    return <div>{props.api.title}</div>;
+  },
+};
+
+const onReady = (event: DockviewReadyEvent) => {
+  event.api.addPanel({
+    id: "panel_1",
+    component: "default",
+  });
+
+  event.api.addPanel({
+    id: "panel_2",
+    component: "default",
+  });
+};
 
 export const AppLayout = () => {
   const alignment = useLayoutStore((state) => state.alignment);
@@ -109,6 +130,7 @@ const CenterLayout = ({ ...props }: ResizableLayoutProps) => {
         props.secondarySideBarSetWidth(secondarySideBarWidth);
       }}
     >
+      <DockviewReact className="dockview-theme-dark" onReady={onReady} components={components} />
       <ResizablePanel
         minSize={100}
         preferredSize={props.primarySideBarGetWidth()}
