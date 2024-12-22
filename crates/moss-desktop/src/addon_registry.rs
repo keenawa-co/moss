@@ -1,18 +1,9 @@
-use anyhow::Result;
-use async_trait::async_trait;
 use fnv::FnvHashMap;
 use hashbrown::HashMap;
 use moss_text::ReadOnlyStr;
-use parking_lot::{Mutex, RwLock};
-use smallvec::SmallVec;
+use parking_lot::RwLock;
 use std::fmt::Debug;
-use std::{
-    any::{Any, TypeId},
-    path::PathBuf,
-    sync::Arc,
-};
-use tauri::{AppHandle, Listener};
-use tokio::sync::mpsc::{UnboundedReceiver, UnboundedSender};
+use std::path::PathBuf;
 
 #[derive(Eq, Hash, PartialEq)]
 pub enum ActivationEvent {

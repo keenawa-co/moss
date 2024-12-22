@@ -19,8 +19,8 @@ use rand::random;
 use smallvec::smallvec;
 use std::env;
 use std::path::PathBuf;
-use std::sync::Arc;
-use tauri::{AppHandle, Manager, RunEvent, WebviewWindow, WindowEvent};
+use tauri::plugin::TauriPlugin;
+use tauri::{AppHandle, Manager, RunEvent, Runtime, WebviewWindow, WindowEvent, Wry};
 use tauri_plugin_global_shortcut::{Code, GlobalShortcutExt, Modifiers, Shortcut, ShortcutState};
 use tauri_plugin_log::{fern::colors::ColoredLevelConfig, Target, TargetKind};
 use tauri_plugin_os;
@@ -32,50 +32,57 @@ use crate::plugins as moss_plugins;
 #[macro_use]
 extern crate serde;
 
+fn tauri_plugin_log<R: Runtime>() -> TauriPlugin<R> {
+    tauri_plugin_log::Builder::default()
+        .targets([
+            Target::new(TargetKind::Stdout),
+            Target::new(TargetKind::LogDir { file_name: None }),
+            Target::new(TargetKind::Webview),
+        ])
+        .level_for("tao", log::LevelFilter::Info)
+        .level_for("plugin_runtime", log::LevelFilter::Info)
+        .level_for("tracing", log::LevelFilter::Warn)
+        .with_colors(ColoredLevelConfig::default())
+        .level(if is_dev() {
+            log::LevelFilter::Trace
+        } else {
+            log::LevelFilter::Info
+        })
+        .build()
+}
+
+fn tauri_plugin_window_state<R: Runtime>() -> TauriPlugin<R> {
+    tauri_plugin_window_state::Builder::default()
+        .with_denylist(&["ignored"])
+        .map_label(|label| {
+            if label.starts_with(OTHER_WINDOW_PREFIX) {
+                "ignored"
+            } else {
+                label
+            }
+        })
+        .build()
+}
+
+fn app_formation() -> TauriPlugin<Wry> {
+    app_formation::Builder::new()
+        .with_service(
+            AddonService::new(builtin_addons_dir(), installed_addons_dir()),
+            smallvec![ActivationPoint::OnStartUp],
+        )
+        .with_service(ThemeService::new(), smallvec![ActivationPoint::OnStartUp])
+        .build()
+}
+
 pub fn run() {
     #[allow(unused_mut)]
     let mut builder = tauri::Builder::default()
-        .plugin(
-            tauri_plugin_log::Builder::default()
-                .targets([
-                    Target::new(TargetKind::Stdout),
-                    Target::new(TargetKind::LogDir { file_name: None }),
-                    Target::new(TargetKind::Webview),
-                ])
-                .level_for("tao", log::LevelFilter::Info)
-                .level_for("plugin_runtime", log::LevelFilter::Info)
-                .level_for("tracing", log::LevelFilter::Warn)
-                .with_colors(ColoredLevelConfig::default())
-                .level(if is_dev() {
-                    log::LevelFilter::Trace
-                } else {
-                    log::LevelFilter::Info
-                })
-                .build(),
-        )
-        .plugin(
-            tauri_plugin_window_state::Builder::default()
-                .with_denylist(&["ignored"])
-                .map_label(|label| {
-                    if label.starts_with(OTHER_WINDOW_PREFIX) {
-                        "ignored"
-                    } else {
-                        label
-                    }
-                })
-                .build(),
-        )
+        .plugin(tauri_plugin_log())
+        .plugin(tauri_plugin_window_state())
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_os::init())
-        .plugin(
-            app_formation::Builder::new()
-                .with_service(
-                    AddonService::new(builtin_addons_dir(), installed_addons_dir()),
-                    smallvec![ActivationPoint::OnStartUp],
-                )
-                .with_service(ThemeService::new(), smallvec![ActivationPoint::OnStartUp])
-                .build(),
-        );
+        .plugin(app_formation());
+
     #[cfg(target_os = "macos")]
     {
         builder = builder.plugin(moss_plugins::tauri_mac_window::init());
@@ -83,6 +90,13 @@ pub fn run() {
 
     builder
         .setup(|app| {
+            let service_manager = app.app_handle().state::<ServiceManager>();
+            service_manager
+                .emit(ServiceManagerEvent::Lifecycle(LifecycleEvent::Activation(
+                    ActivationPoint::OnStartUp,
+                )))
+                .unwrap();
+
             let ctrl_n_shortcut = Shortcut::new(Some(Modifiers::CONTROL), Code::KeyN);
 
             app.handle().plugin(
