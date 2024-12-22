@@ -1,5 +1,6 @@
 use anyhow::Result;
 use hashbrown::HashMap;
+use moss_text::ReadOnlyStr;
 use serde::de::DeserializeOwned;
 use serde_json::Value;
 use std::{cell::RefCell, sync::Arc};
@@ -78,3 +79,9 @@ impl CommandContext {
 
 pub type CommandHandler =
     Arc<dyn Fn(CommandContext, &AppState) -> Result<Value, String> + Send + Sync>;
+
+#[derive(Debug)]
+pub struct CommandDecl {
+    pub name: ReadOnlyStr,
+    pub callback: fn(CommandContext, &AppState) -> Result<serde_json::Value, String>,
+}

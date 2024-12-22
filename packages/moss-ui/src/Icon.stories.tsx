@@ -4,7 +4,7 @@ import * as icons from "@repo/icongen";
 import type { Meta, StoryObj } from "@storybook/react";
 
 import { Icon, Icons } from "./Icon";
-import { cn } from "./utils/utils";
+import { cn } from "./utils";
 
 const iconOptions = Object.keys(icons) as Icons[];
 

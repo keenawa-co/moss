@@ -2,7 +2,8 @@ use anyhow::Result;
 use hashbrown::HashMap;
 use moss_desktop::{
     command::CommandContext,
-    models::{appearance::theming::ThemeDescriptor, window::LocaleDescriptor},
+    models::application::{AppStateInfo, LocaleDescriptor, PreferencesInfo, ThemeDescriptor},
+    services::theme_service::{GetColorThemeOptions, ThemeService},
 };
 use moss_text::{quote, ReadOnlyStr};
 use serde_json::Value;
@@ -53,18 +54,25 @@ pub fn execute_command(
 }
 
 #[tauri::command(async)]
-pub async fn get_color_theme(path: String) -> Result<String, String> {
-    let path = crate::utl::get_themes_dir()
-        .map_err(|err| err.to_string())?
-        .join(path);
+pub async fn get_color_theme(
+    theme_service: State<'_, ThemeService>,
+    path: String,
+    opts: Option<GetColorThemeOptions>,
+) -> Result<String, String> {
+    theme_service
+        .get_color_theme(&path, opts)
+        .await
+        .map_err(|err| err.to_string())
+}
 
-    if path.exists() && path.is_file() {
-        Ok(smol::fs::read_to_string(path)
-            .await
-            .map_err(|err| err.to_string())?)
-    } else {
-        Err("File not found or inaccessible".to_string())
-    }
+#[tauri::command(async)]
+pub fn get_state(app_state: State<'_, AppState>) -> Result<AppStateInfo, String> {
+    Ok(AppStateInfo {
+        preferences: PreferencesInfo {
+            theme: app_state.preferences.theme.read().clone(),
+            locale: app_state.preferences.locale.read().clone(),
+        },
+    })
 }
 
 // FIXME: This is a temporary solution until we have a registry of installed

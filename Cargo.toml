@@ -20,12 +20,12 @@ members = [
     "crates/moss-async",
     "crates/moss-collection",
     "crates/moss-theme",
-    "crates/moss-typebridge",
-    "crates/moss-typebridge-macro",
     "crates/moss-cache",
 ]
 
 [profile.dev]
+lto = "thin" # Need this for linkme crate to work
+
 # Uncomment for future compilation profiling
 # rustflags = ["-Zself-profile=profiles/clean"]
 # rustflags = ["-Ztime-passes"]
@@ -50,13 +50,14 @@ moss_fs = { path = "crates/moss-fs" }
 moss_themeconv = { path = "crates/moss-themeconv" }
 moss_jsonlogic = { path = "crates/moss-jsonlogic" }
 moss_jsonlogic_macro = { path = "crates/moss-jsonlogic-macro" }
-moss_typebridge = { path = "crates/moss-typebridge" }
-moss_typebridge_macro = { path = "crates/moss-typebridge-macro" }
 moss_env = { path = "crates/moss-env" }
 moss_async = { path = "crates/moss-async" }
 moss_collection = { path = "crates/moss-collection" }
 moss_desktop = { path = "crates/moss-desktop" }
+moss_cache = { path = "crates/moss-cache" }
 
+linkme = "0.3"
+paste = "1.0.15"
 dashmap = "6.1.0"
 indexmap = "2.7.0"
 arcstr = "1.2.0"
@@ -96,10 +97,7 @@ dirs = "5.0.1"
 jsonschema = { version = "0.26.1", default-features = false }
 
 
-
-os_info = {version = "3.9.0", default-features = false}
+os_info = { version = "3.9.0", default-features = false }
 gethostname = "0.5.0"
 
-moka = {version = "0.12.8", features = ["sync"]}
-
-
+moka = { version = "0.12.8", features = ["sync"] }

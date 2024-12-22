@@ -17,7 +17,7 @@ THEME_GENERATOR_DIR := tools/themegen
 THEME_INSTALLER_DIR := misc/themeinstall
 ICONS_DIR := tools/icongen
 
-DESKTOP_MODELS_DIR := internal/workbench/desktop/models
+DESKTOP_MODELS_DIR := crates/moss-desktop
 HTML_MODELS_DIR := crates/moss-html
 UIKIT_MODELS_DIR := crates/moss-uikit
 
