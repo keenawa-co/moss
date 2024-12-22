@@ -1059,6 +1059,7 @@ dependencies = [
  "rand 0.8.5",
  "serde",
  "serde_json",
+ "smallvec",
  "smol",
  "strum",
  "tauri",
@@ -2585,6 +2586,7 @@ name = "moss_desktop"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "async-trait",
  "dashmap",
  "dirs",
  "fnv",
@@ -2592,6 +2594,7 @@ dependencies = [
  "indexmap 2.7.0",
  "linkme",
  "log",
+ "moss_addon",
  "moss_cache",
  "moss_html",
  "moss_jsonlogic",
@@ -2604,7 +2607,9 @@ dependencies = [
  "quote",
  "serde",
  "serde_json",
+ "smallvec",
  "smol",
+ "strum",
  "tauri",
  "thiserror 2.0.8",
  "tokio",

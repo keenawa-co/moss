@@ -3,7 +3,10 @@ use hashbrown::HashMap;
 use moss_desktop::{
     command::CommandContext,
     models::application::{AppStateInfo, LocaleDescriptor, PreferencesInfo, ThemeDescriptor},
-    services::theme_service::{GetColorThemeOptions, ThemeService},
+    services::{
+        theme_service::{GetColorThemeOptions, ThemeService},
+        ServiceManager,
+    },
 };
 use moss_text::{quote, ReadOnlyStr};
 use serde_json::Value;
@@ -55,10 +58,13 @@ pub fn execute_command(
 
 #[tauri::command(async)]
 pub async fn get_color_theme(
-    theme_service: State<'_, ThemeService>,
+    // theme_service: State<'_, ThemeService>,
+    service_manager: State<'_, ServiceManager>,
     path: String,
     opts: Option<GetColorThemeOptions>,
 ) -> Result<String, String> {
+    let theme_service = service_manager.get_unchecked::<ThemeService>();
+
     theme_service
         .get_color_theme(&path, opts)
         .await

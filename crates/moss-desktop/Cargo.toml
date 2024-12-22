@@ -13,7 +13,9 @@ moss_jsonlogic.workspace = true
 moss_jsonlogic_macro.workspace = true
 moss_html.workspace = true
 moss_cache.workspace = true
+moss_addon.workspace = true
 
+strum.workspace = true
 smol.workspace = true
 indexmap = { workspace = true, features = ["serde"] }
 tokio = { workspace = true, features = ["full"] }
@@ -33,3 +35,5 @@ paste.workspace = true
 dirs.workspace = true
 log.workspace = true
 fnv.workspace = true
+smallvec.workspace = true
+async-trait.workspace = true

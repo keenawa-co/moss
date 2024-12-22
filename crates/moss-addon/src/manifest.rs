@@ -1,6 +1,8 @@
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 
+pub const MANIFEST_FILENAME: &'static str = "Moss.toml";
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum AddonActivationEvents {
     OnStartUp,

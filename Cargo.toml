@@ -60,7 +60,9 @@ moss_async = { path = "crates/moss-async" }
 moss_collection = { path = "crates/moss-collection" }
 moss_desktop = { path = "crates/moss-desktop" }
 moss_cache = { path = "crates/moss-cache" }
+moss_addon = { path = "crates/moss-addon" }
 
+smallvec = "1.13.2"
 toml = "0.8.19"
 linkme = "0.3"
 paste = "1.0.15"

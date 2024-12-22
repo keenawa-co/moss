@@ -1,8 +1,14 @@
 use anyhow::{anyhow, Context as _, Result};
+use async_trait::async_trait;
 use moss_cache::{backend::moka::MokaBackend, Cache, CacheError};
+use once_cell::sync::OnceCell;
 use serde::Deserialize;
 use std::{path::PathBuf, sync::Arc};
-use tauri::AppHandle;
+use tauri::Manager;
+
+use crate::state::AppState;
+
+use super::{AnyService, ServiceEvent};
 
 const CK_COLOR_THEME: &'static str = "color_theme";
 
@@ -13,15 +19,13 @@ pub struct GetColorThemeOptions {
 }
 
 pub struct ThemeService {
-    app_handle: AppHandle,
-    app_cache: Arc<Cache<MokaBackend>>,
+    app_cache: OnceCell<Arc<Cache<MokaBackend>>>,
 }
 
 impl ThemeService {
-    pub fn new(app_handle: AppHandle, app_cache: Arc<Cache<MokaBackend>>) -> Self {
+    pub fn new() -> Self {
         Self {
-            app_handle,
-            app_cache,
+            app_cache: OnceCell::new(),
         }
     }
 
@@ -30,6 +34,8 @@ impl ThemeService {
         source: &str,
         opts: Option<GetColorThemeOptions>,
     ) -> Result<String> {
+        let app_cache = self.app_cache.get().unwrap();
+
         let handle_cache_miss = || async {
             let content = self.read_color_theme_from_file(source).await?;
 
@@ -40,15 +46,14 @@ impl ThemeService {
             };
 
             if options.enable_cache {
-                // FIXME:
-                self.app_cache.insert(CK_COLOR_THEME, content.clone());
+                app_cache.insert(CK_COLOR_THEME, content.clone());
                 trace!("Color theme '{}' was successfully cached", source);
             };
 
             Ok(content)
         };
 
-        match self.app_cache.get::<String>(CK_COLOR_THEME) {
+        match app_cache.get::<String>(CK_COLOR_THEME) {
             Ok(cached_value) => {
                 trace!("Color theme '{source}' was restored from the cache");
 
@@ -83,6 +88,31 @@ impl ThemeService {
             .with_context(|| format!("Failed to read file '{}'", full_path.display()))?;
 
         Ok(content)
+    }
+}
+
+impl ThemeService {
+    fn on_activation(&self, app_state: &AppState) {
+        self.app_cache
+            .set(Arc::clone(&app_state.cache))
+            .unwrap_or_else(|_| {
+                panic!("Failed to set the app cache in ThemeService: the cache has already been initialized.")
+            });
+    }
+}
+
+#[async_trait]
+impl AnyService for ThemeService {
+    fn as_any(&self) -> &dyn std::any::Any {
+        self
+    }
+
+    async fn on_event(&self, app_handle: tauri::AppHandle, event: ServiceEvent) {
+        let app_state = app_handle.state::<AppState>();
+
+        match event {
+            ServiceEvent::Activation => self.on_activation(&app_state),
+        }
     }
 }
 

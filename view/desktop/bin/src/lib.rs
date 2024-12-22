@@ -8,10 +8,17 @@ mod window;
 
 pub use constants::*;
 
+use moss_desktop::services::addon_service::AddonService;
 use moss_desktop::services::theme_service::ThemeService;
+use moss_desktop::services::{
+    ActivationPoint, LifecycleEvent, ServiceManager, ServiceManagerEvent,
+};
 use moss_desktop::state::AppState;
+use plugins::app_formation;
 use rand::random;
+use smallvec::smallvec;
 use std::env;
+use std::path::PathBuf;
 use std::sync::Arc;
 use tauri::{AppHandle, Manager, RunEvent, WebviewWindow, WindowEvent};
 use tauri_plugin_global_shortcut::{Code, GlobalShortcutExt, Modifiers, Shortcut, ShortcutState};
@@ -59,7 +66,16 @@ pub fn run() {
                 .build(),
         )
         .plugin(tauri_plugin_fs::init())
-        .plugin(tauri_plugin_os::init());
+        .plugin(tauri_plugin_os::init())
+        .plugin(
+            app_formation::Builder::new()
+                .with_service(
+                    AddonService::new(builtin_addons_dir(), installed_addons_dir()),
+                    smallvec![ActivationPoint::OnStartUp],
+                )
+                .with_service(ThemeService::new(), smallvec![ActivationPoint::OnStartUp])
+                .build(),
+        );
     #[cfg(target_os = "macos")]
     {
         builder = builder.plugin(moss_plugins::tauri_mac_window::init());
@@ -117,7 +133,7 @@ pub fn run() {
         .expect("failed to run")
         .run(|app_handle, event| match event {
             RunEvent::Ready => {
-                let _ = create_main_window(app_handle, "/");
+                let _ = create_main_window(&app_handle, "/");
             }
 
             #[cfg(target_os = "macos")]
@@ -131,12 +147,19 @@ pub fn run() {
 }
 
 fn create_main_window(app_handle: &AppHandle, url: &str) -> WebviewWindow {
-    let state = AppState::new();
-    let theme_service = ThemeService::new(app_handle.clone(), Arc::clone(&state.cache));
+    // let service_manager = app_handle.state::<ServiceManager>();
+    // service_manager
+    //     .emit(ServiceManagerEvent::Lifecycle(LifecycleEvent::Activation(
+    //         ActivationPoint::OnStartUp,
+    //     )))
+    //     .unwrap();
+
+    // let state = AppState::new();
+    // let theme_service = ThemeService::new(app_handle.clone(), Arc::clone(&state.cache));
 
     {
-        app_handle.manage(theme_service);
-        app_handle.manage(state);
+        // app_handle.manage(theme_service);
+        // app_handle.manage(state);
     }
 
     let label = format!("{MAIN_WINDOW_PREFIX}{}", 0);
@@ -181,4 +204,14 @@ fn is_dev() -> bool {
     {
         return false;
     }
+}
+
+fn builtin_addons_dir() -> impl Into<PathBuf> {
+    std::env::var("BUILTIN_ADDONS_DIR")
+        .expect("Environment variable `BUILTIN_ADDONS_DIR` is not set or is invalid")
+}
+
+fn installed_addons_dir() -> impl Into<PathBuf> {
+    std::env::var("INSTALLED_ADDONS_DIR")
+        .expect("Environment variable `INSTALLED_ADDONS_DIR` is not set or is invalid")
 }
