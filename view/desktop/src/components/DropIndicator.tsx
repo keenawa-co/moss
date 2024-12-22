@@ -12,6 +12,8 @@ const edgeToOrientationMap: Record<Edge, Orientation> = {
   right: "vertical",
 };
 
+//FIXME remove eslint-disable-next-line when we update eslint rule for token names
+
 const orientationStyles: Record<Orientation, HTMLAttributes<HTMLElement>["className"]> = {
   //eslint-disable-next-line
   horizontal: "h-[--line-thickness] left-[--terminal-radius] right-0 before:left-[--negative-terminal-size]",
