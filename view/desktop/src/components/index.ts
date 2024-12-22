@@ -1,6 +1,5 @@
 export * from "../layouts/index";
 export * from "./Menu";
-export * from "../../../../packages/moss-ui/src/Button";
 export * from "./LanguageSelector";
 export * from "../parts/SideBar/Sidebar";
 export * from "./Accordion";
