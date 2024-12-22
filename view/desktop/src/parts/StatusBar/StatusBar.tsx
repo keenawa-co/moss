@@ -122,11 +122,11 @@ const StatusCircle = ({ className }: { className?: string }) => {
 };
 
 const StatusBarButton = ({
-  id,
   icon,
   iconClassName,
   label,
   className,
+  id,
   isDraggable,
   ...props
 }: StatusBarButtonProps) => {
