@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, type ComponentPropsWithoutRef } from "react";
 import { createPortal } from "react-dom";
 
-import { swapListById } from "@/utils/swapListById";
+import { swapListById } from "@/utils";
 import {
   attachClosestEdge,
   extractClosestEdge,
@@ -47,20 +47,14 @@ const StatusBar = ({ className }: ComponentPropsWithoutRef<"div">) => {
     return monitorForElements({
       onDrop({ location, source }) {
         const target = location.current.dropTargets[0];
-        if (!target) {
-          return;
-        }
+        if (!target) return;
 
         const sourceData = source.data;
         const targetData = target.data;
-        if (!sourceData || !targetData) {
-          return;
-        }
+        if (!sourceData || !targetData) return;
 
         const updatedItems = swapListById(sourceData.id as number, targetData.id as number, DNDList);
-        if (!updatedItems) {
-          return;
-        }
+        if (!updatedItems) return;
 
         setDNDList(updatedItems);
       },
@@ -122,11 +116,11 @@ const StatusCircle = ({ className }: { className?: string }) => {
 };
 
 const StatusBarButton = ({
-  id,
   icon,
   iconClassName,
   label,
   className,
+  id,
   isDraggable,
   ...props
 }: StatusBarButtonProps) => {
@@ -158,9 +152,7 @@ const StatusBarButton = ({
       }),
       dropTargetForElements({
         element,
-        onDrop: ({ source, self }) => {
-          if (source.data?.id === self.data.id) return;
-
+        onDrop: () => {
           setClosestEdge(null);
         },
         getData({ input }) {
@@ -184,9 +176,8 @@ const StatusBarButton = ({
           const closestEdge = extractClosestEdge(self.data);
 
           setClosestEdge((current) => {
-            if (current === closestEdge) {
-              return current;
-            }
+            if (current === closestEdge) return current;
+
             return closestEdge;
           });
         },

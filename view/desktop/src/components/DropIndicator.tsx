@@ -12,6 +12,8 @@ const edgeToOrientationMap: Record<Edge, Orientation> = {
   right: "vertical",
 };
 
+//FIXME remove eslint-disable-next-line when we update eslint rule for token names
+
 const orientationStyles: Record<Orientation, HTMLAttributes<HTMLElement>["className"]> = {
   //eslint-disable-next-line
   horizontal: "h-[--line-thickness] left-[--terminal-radius] right-0 before:left-[--negative-terminal-size]",
@@ -41,7 +43,7 @@ interface DropIndicatorProps {
   className?: string;
 }
 
-export function DropIndicator({ edge, gap = 0, strokeSize = 2, terminalSize = 8 }: DropIndicatorProps) {
+export function DropIndicator({ edge, gap = 0, strokeSize = 2, terminalSize = 8, className }: DropIndicatorProps) {
   const lineOffset = -0.5 * (gap + strokeSize);
   const offsetToAlignTerminalWithLine = (strokeSize - terminalSize) / 2;
 
@@ -63,7 +65,8 @@ export function DropIndicator({ edge, gap = 0, strokeSize = 2, terminalSize = 8 
         //eslint-disable-next-line
         `pointer-events-none absolute z-10 box-border bg-sky-700 before:absolute before:h-[--terminal-size] before:w-[--terminal-size] before:rounded-full before:border-[length:--line-thickness] before:border-solid before:border-sky-700 before:content-['']`,
         orientationStyles[orientation],
-        edgeStyles[edge]
+        edgeStyles[edge],
+        className
       )}
     />
   );

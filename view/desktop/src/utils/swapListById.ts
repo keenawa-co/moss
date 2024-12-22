@@ -15,9 +15,3 @@ export const swapListById = <T extends Identifiable>(fromId: number, toId: numbe
 
   return updatedItems;
 };
-
-export const swapByIndex = <T>(fromIndex: number, toIndex: number, list: T[]) => {
-  const updatedItems = [...list];
-  [updatedItems[fromIndex], updatedItems[toIndex]] = [updatedItems[toIndex], updatedItems[fromIndex]];
-  return updatedItems;
-};

@@ -1,5 +1,6 @@
-import { Icon } from "../../../../packages/moss-ui/src";
 import { useEffect, useState } from "react";
+
+import { Icon } from "@repo/moss-ui";
 
 // FIXME:
 // The statically created array `tips` is a temporary solution.
@@ -29,7 +30,7 @@ export const PageLoader = () => {
         <Icon icon="Loader" className="size-8 animate-[spin_1s_ease-in-out_infinite]" />
         <div className="flex flex-col gap-3 text-center">
           <div className="font-black">Did you know</div>
-          <div className="text animate-text-slide text-[#6F6F6F] ">{tip}</div>
+          <div className="text animate-text-slide text-[#6F6F6F]">{tip}</div>
         </div>
       </div>
 
