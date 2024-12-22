@@ -7,11 +7,7 @@ import {
   type Edge,
 } from "@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge";
 import { combine } from "@atlaskit/pragmatic-drag-and-drop/combine";
-import {
-  draggable,
-  dropTargetForElements,
-  monitorForElements,
-} from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
+import { draggable, dropTargetForElements } from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
 import { setCustomNativeDragPreview } from "@atlaskit/pragmatic-drag-and-drop/element/set-custom-native-drag-preview";
 import { cn, DropdownMenu as DM, Icon, Icons } from "@repo/moss-ui";
 
@@ -53,6 +49,8 @@ export const ActionsGroup = ({
   const [preview, setPreview] = useState<HTMLElement | null>(null);
   const [closestEdge, setClosestEdge] = useState<Edge | null>(null);
 
+  const dropIndicatorGap = 2;
+
   useEffect(() => {
     const element = ref.current;
 
@@ -76,9 +74,7 @@ export const ActionsGroup = ({
       }),
       dropTargetForElements({
         element,
-        onDrop: ({ source, self }) => {
-          if (source.data?.id === self.data.id) return;
-
+        onDrop: () => {
           setClosestEdge(null);
         },
         getData({ input }) {
@@ -102,9 +98,8 @@ export const ActionsGroup = ({
           const closestEdge = extractClosestEdge(self.data);
 
           setClosestEdge((current) => {
-            if (current === closestEdge) {
-              return current;
-            }
+            if (current === closestEdge) return current;
+
             return closestEdge;
           });
         },
@@ -144,7 +139,7 @@ export const ActionsGroup = ({
             </DM.Content>
           )}
         </DM.Root>
-        {closestEdge ? <DropIndicator edge={closestEdge} gap={4} /> : null}
+        {closestEdge ? <DropIndicator edge={closestEdge} gap={dropIndicatorGap} /> : null}
         {preview && createPortal(<ActionsGroup icon={icon} label={label} className="bg-sky-500" />, preview)}
       </div>
     );
@@ -188,8 +183,8 @@ export const ActionsGroup = ({
           </>
         )}
       </div>
-      {closestEdge ? <DropIndicator edge={closestEdge} gap={1} /> : null}
-      {preview && createPortal(<ActionsGroup icon={icon} label={label} className="bg-sky-500" />, preview)}
+      {closestEdge ? <DropIndicator edge={closestEdge} gap={dropIndicatorGap} /> : null}
+      {preview && createPortal(<ActionsGroup icon={icon} label={label} />, preview)}
     </div>
   );
 };

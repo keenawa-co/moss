@@ -164,7 +164,7 @@ export const WidgetBar = ({ os, className, ...props }: WidgetBarProps) => {
 
         <div className="flex w-full items-center justify-start gap-1">
           {DNDList.length === 0 && <OverflownMenu />}
-          <div className="sortable flex w-full items-center" ref={DNDListRef}>
+          <div className="flex w-full items-center" ref={DNDListRef}>
             {DNDList.map((id, index) => {
               const item = widgetsList.find((item) => item.id === id)!;
               const shouldShowSelect = overflownList.length > 0 && DNDList.length !== 0 && index + 1 === DNDList.length;
