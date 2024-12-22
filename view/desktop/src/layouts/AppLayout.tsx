@@ -1,16 +1,16 @@
-import { DockviewReact, DockviewReadyEvent, IDockviewPanelProps } from "dockview";
 import { Suspense } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 
 import { Home, Logs, Settings } from "@/pages";
 import { useLayoutStore } from "@/store/layout";
+import { DockviewReact, DockviewReadyEvent, IDockviewPanelProps } from "@repo/moss-tabs";
+
+import "@repo/moss-tabs/styles/dockview.css";
 
 import { LaunchPad } from "../components/LaunchPad";
 import { Menu } from "../components/Menu";
 import { Resizable, ResizablePanel } from "../components/Resizable";
 import { ContentLayout } from "./ContentLayout";
-
-import "../../node_modules/dockview/dist/styles/dockview.css";
 
 const components = {
   default: (props: IDockviewPanelProps) => {

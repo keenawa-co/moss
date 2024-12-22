@@ -30,6 +30,12 @@
     },
     {
       "path": "tools/icongen"
+    },
+    {
+      "path": "packages/moss-tabs"
+    },
+    {
+      "path": "packages/moss-tabs-core"
     }
   ]
 }
