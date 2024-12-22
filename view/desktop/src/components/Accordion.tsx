@@ -1,7 +1,6 @@
 import { ComponentPropsWithoutRef } from "react";
 
-import { cn } from "@/utils/cn";
-import { Icon } from "@repo/moss-ui";
+import { cn, Icon } from "@repo/moss-ui";
 
 interface AccordionProps extends ComponentPropsWithoutRef<"div"> {
   title: string;

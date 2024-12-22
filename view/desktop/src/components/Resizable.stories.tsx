@@ -6,9 +6,8 @@ import "allotment/dist/style.css";
 
 import { useState } from "react";
 
-import { expect, userEvent, within } from "@storybook/test";
-
-import { cn } from "../../../../packages/moss-ui/src";
+import { cn } from "@repo/moss-ui";
+import { expect, within } from "@storybook/test";
 
 const meta: Meta = {
   title: "desktop/Resizable",

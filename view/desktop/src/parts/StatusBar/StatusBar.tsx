@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, type ComponentPropsWithoutRef } from "react";
 import { createPortal } from "react-dom";
 
-import { swapListById } from "@/utils/swapListById";
+import { swapListById } from "@/utils";
 import {
   attachClosestEdge,
   extractClosestEdge,

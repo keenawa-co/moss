@@ -1,6 +1,8 @@
 import { ComponentPropsWithoutRef } from "react";
+
 import * as icons from "@repo/icongen";
-import { cn } from "./utils/utils";
+
+import { cn } from "./utils";
 
 export type Icons = keyof typeof icons;
 

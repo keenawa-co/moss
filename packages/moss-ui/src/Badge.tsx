@@ -1,5 +1,6 @@
 import { ComponentPropsWithRef } from "react";
-import { cn } from "./utils/utils";
+
+import { cn } from "./utils";
 
 const convertToRgba = ([r, g, b, a]: [number, number, number, number]) => `rgba(${r}, ${g}, ${b}, ${a / 100})`;
 
