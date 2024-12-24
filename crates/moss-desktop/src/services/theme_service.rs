@@ -6,7 +6,7 @@ use serde::Deserialize;
 use std::{path::PathBuf, sync::Arc};
 use tauri::Manager;
 
-use crate::state::AppState;
+use crate::app::state::AppState;
 
 use super::{AnyService, ServiceEvent};
 

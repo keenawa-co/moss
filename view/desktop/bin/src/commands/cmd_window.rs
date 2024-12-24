@@ -1,6 +1,7 @@
 use anyhow::Result;
 use hashbrown::HashMap;
 use moss_desktop::{
+    app::lifecycle::LifecycleManager,
     command::CommandContext,
     models::application::{AppStateInfo, LocaleDescriptor, PreferencesInfo, ThemeDescriptor},
     services::{
@@ -149,3 +150,6 @@ pub fn get_translations(language: String, namespace: String) -> Result<serde_jso
         Err(err) => Err(err.to_string()),
     }
 }
+
+#[tauri::command]
+pub fn test(app_state: State<'_, LifecycleManager>) {}

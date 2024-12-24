@@ -5,7 +5,7 @@ use moss_addon::manifest::MANIFEST_FILENAME;
 use std::path::PathBuf;
 use tauri::Manager;
 
-use crate::{addon_registry::AddonRegistry, state::AppState};
+use crate::{addon_registry::AddonRegistry, app::state::AppState};
 
 use super::AnyService;
 

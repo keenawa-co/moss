@@ -1,6 +1,6 @@
 use moss_desktop::{
+    app::state::AppState,
     services::{ActivationPoint, AnyService, ServiceManager, MAX_ACTIVATION_POINTS},
-    state::AppState,
 };
 use smallvec::SmallVec;
 use tauri::{
@@ -38,7 +38,6 @@ impl Builder {
                 app_handle.manage(state);
                 app_handle.manage(self.service_manager);
 
-                dbg!("app-formation");
                 Ok(())
             })
             .build()

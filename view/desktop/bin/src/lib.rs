@@ -7,89 +7,59 @@ mod utl;
 mod window;
 
 pub use constants::*;
+use moss_desktop::app::lifecycle::{LifecycleManager, LifecyclePhase};
 
-use moss_desktop::services::addon_service::AddonService;
-use moss_desktop::services::theme_service::ThemeService;
+use crate::plugins::*;
+use moss_desktop::app::state::AppState;
 use moss_desktop::services::{
     ActivationPoint, LifecycleEvent, ServiceManager, ServiceManagerEvent,
 };
-use moss_desktop::state::AppState;
 use plugins::app_formation;
 use rand::random;
 use smallvec::smallvec;
 use std::env;
 use std::path::PathBuf;
 use tauri::plugin::TauriPlugin;
-use tauri::{AppHandle, Manager, RunEvent, Runtime, WebviewWindow, WindowEvent, Wry};
+use tauri::{AppHandle, Listener, Manager, RunEvent, Runtime, WebviewWindow, WindowEvent, Wry};
 use tauri_plugin_global_shortcut::{Code, GlobalShortcutExt, Modifiers, Shortcut, ShortcutState};
-use tauri_plugin_log::{fern::colors::ColoredLevelConfig, Target, TargetKind};
 use tauri_plugin_os;
 use window::{create_window, CreateWindowInput};
 
 use crate::commands::*;
-use crate::plugins as moss_plugins;
 
 #[macro_use]
 extern crate serde;
 
-fn tauri_plugin_log<R: Runtime>() -> TauriPlugin<R> {
-    tauri_plugin_log::Builder::default()
-        .targets([
-            Target::new(TargetKind::Stdout),
-            Target::new(TargetKind::LogDir { file_name: None }),
-            Target::new(TargetKind::Webview),
-        ])
-        .level_for("tao", log::LevelFilter::Info)
-        .level_for("plugin_runtime", log::LevelFilter::Info)
-        .level_for("tracing", log::LevelFilter::Warn)
-        .with_colors(ColoredLevelConfig::default())
-        .level(if is_dev() {
-            log::LevelFilter::Trace
-        } else {
-            log::LevelFilter::Info
-        })
-        .build()
-}
-
-fn tauri_plugin_window_state<R: Runtime>() -> TauriPlugin<R> {
-    tauri_plugin_window_state::Builder::default()
-        .with_denylist(&["ignored"])
-        .map_label(|label| {
-            if label.starts_with(OTHER_WINDOW_PREFIX) {
-                "ignored"
-            } else {
-                label
-            }
-        })
-        .build()
-}
-
-fn app_formation() -> TauriPlugin<Wry> {
-    app_formation::Builder::new()
-        .with_service(
-            AddonService::new(builtin_addons_dir(), installed_addons_dir()),
-            smallvec![ActivationPoint::OnStartUp],
-        )
-        .with_service(ThemeService::new(), smallvec![ActivationPoint::OnStartUp])
-        .build()
-}
-
 pub fn run() {
     #[allow(unused_mut)]
     let mut builder = tauri::Builder::default()
-        .plugin(tauri_plugin_log())
-        .plugin(tauri_plugin_window_state())
+        .plugin(plugin_log::init())
+        .plugin(plugin_window_state::init())
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_os::init())
-        .plugin(app_formation());
+        .plugin(plugin_app_formation::init());
 
     #[cfg(target_os = "macos")]
     {
-        builder = builder.plugin(moss_plugins::tauri_mac_window::init());
+        builder = builder.plugin(mac_window::init());
     }
 
     builder
         .setup(|app| {
+            let lm = LifecycleManager::new();
+            let l = lm.observe(LifecyclePhase::Bootstrapping, |app_state| {
+                println!("Hello!");
+            });
+            lm.set_phase(app.app_handle(), LifecyclePhase::Bootstrapping);
+
+            // let service = LifecycleService::new();
+
+            // let l = service.register_phase_listener(LifecyclePhase::Starting, |app_state| {
+            //     println!("Hello!");
+            // });
+
+            // service.notify_phase(LifecyclePhase::Starting, app.app_handle().clone());
+
             let service_manager = app.app_handle().state::<ServiceManager>();
             service_manager
                 .emit(ServiceManagerEvent::Lifecycle(LifecycleEvent::Activation(
@@ -98,6 +68,8 @@ pub fn run() {
                 .unwrap();
 
             let ctrl_n_shortcut = Shortcut::new(Some(Modifiers::CONTROL), Code::KeyN);
+
+            let r = app.handle().listen("event", |e| {});
 
             app.handle().plugin(
                 tauri_plugin_global_shortcut::Builder::new()
@@ -207,25 +179,4 @@ fn create_child_window(app_handle: &AppHandle, url: &str) -> WebviewWindow {
     let webview_window = create_window(app_handle, config);
     webview_window.on_menu_event(move |window, event| menu::handle_event(window, &event));
     webview_window
-}
-
-fn is_dev() -> bool {
-    #[cfg(dev)]
-    {
-        return true;
-    }
-    #[cfg(not(dev))]
-    {
-        return false;
-    }
-}
-
-fn builtin_addons_dir() -> impl Into<PathBuf> {
-    std::env::var("BUILTIN_ADDONS_DIR")
-        .expect("Environment variable `BUILTIN_ADDONS_DIR` is not set or is invalid")
-}
-
-fn installed_addons_dir() -> impl Into<PathBuf> {
-    std::env::var("INSTALLED_ADDONS_DIR")
-        .expect("Environment variable `INSTALLED_ADDONS_DIR` is not set or is invalid")
 }
