@@ -10,6 +10,7 @@ use serde_json::Value;
 use std::path::PathBuf;
 
 use crate::{create_child_window, AppState};
+use moss_desktop::services::locale_service::{GetTranslationsOptions, LocaleService};
 use tauri::{AppHandle, Emitter, State, WebviewWindow, Window};
 
 #[derive(Clone, Serialize)]
@@ -61,6 +62,19 @@ pub async fn get_color_theme(
 ) -> Result<String, String> {
     theme_service
         .get_color_theme(&path, opts)
+        .await
+        .map_err(|err| err.to_string())
+}
+
+#[tauri::command(async)]
+pub async fn get_translations(
+    locale_service: State<'_, LocaleService>,
+    language: String,
+    namespace: String,
+    opts: Option<GetTranslationsOptions>,
+) -> Result<serde_json::Value, String> {
+    locale_service
+        .get_translations(&language, &namespace, opts)
         .await
         .map_err(|err| err.to_string())
 }
@@ -121,25 +135,4 @@ pub fn get_locales() -> Vec<LocaleDescriptor> {
             direction: Some("ltr".to_string()),
         },
     ]
-}
-
-#[tauri::command]
-pub fn get_translations(language: String, namespace: String) -> Result<serde_json::Value, String> {
-    let path = crate::utl::get_home_dir()
-        .map_err(|err| err.to_string())?
-        .join(".config")
-        .join("moss")
-        .join("locales")
-        .join(language)
-        .join(format!("{namespace}.json"));
-
-    match std::fs::read_to_string(path) {
-        Ok(data) => {
-            let translations: serde_json::Value =
-                serde_json::from_str(&data).map_err(|err| err.to_string())?;
-
-            Ok(translations)
-        }
-        Err(err) => Err(err.to_string()),
-    }
 }

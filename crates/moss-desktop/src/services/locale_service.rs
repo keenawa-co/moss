@@ -2,23 +2,24 @@ use crate::services::get_home_dir;
 use anyhow::{anyhow, Context as _, Result};
 use moss_cache::{backend::moka::MokaBackend, Cache, CacheError};
 use serde::Deserialize;
+use serde_json::Value;
 use std::{path::PathBuf, sync::Arc};
 use tauri::AppHandle;
 
-const CK_COLOR_THEME: &'static str = "color_theme";
+const CK_TRANSLATIONS: &'static str = "translations";
 
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct GetColorThemeOptions {
+pub struct GetTranslationsOptions {
     pub enable_cache: bool,
 }
 
-pub struct ThemeService {
+pub struct LocaleService {
     app_handle: AppHandle,
     app_cache: Arc<Cache<MokaBackend>>,
 }
 
-impl ThemeService {
+impl LocaleService {
     pub fn new(app_handle: AppHandle, app_cache: Arc<Cache<MokaBackend>>) -> Self {
         Self {
             app_handle,
@@ -26,14 +27,17 @@ impl ThemeService {
         }
     }
 
-    pub async fn get_color_theme(
+    pub async fn get_translations(
         &self,
-        source: &str,
-        opts: Option<GetColorThemeOptions>,
-    ) -> Result<String> {
+        language: &str,
+        namespace: &str,
+        opts: Option<GetTranslationsOptions>,
+    ) -> Result<Value> {
         let handle_cache_miss = || async {
-            let content = self.read_color_theme_from_file(source).await?;
-            println!("Cache Miss");
+            let content = self
+                .read_translations_from_file(language, namespace)
+                .await?;
+            println!("Cache miss: {} {}", language, namespace);
             let options = if let Some(options) = opts {
                 options
             } else {
@@ -41,23 +45,26 @@ impl ThemeService {
             };
 
             if options.enable_cache {
-                self.app_cache.insert(CK_COLOR_THEME, content.clone());
-                trace!("Color theme '{}' was successfully cached", source);
+                self.app_cache
+                    .insert(&format!("{CK_TRANSLATIONS}-{namespace}"), content.clone());
+                trace!("Language pack '{language}-{namespace}' was successfully cached");
             };
-
             Ok(content)
         };
 
-        match self.app_cache.get::<String>(CK_COLOR_THEME) {
+        match self
+            .app_cache
+            .get::<Value>(&format!("{CK_TRANSLATIONS}-{namespace}"))
+        {
             Ok(cached_value) => {
-                trace!("Color theme '{source}' was restored from the cache");
+                trace!("Language pack '{language}-{namespace}' was restored from the cache");
 
                 Ok((*cached_value).clone())
             }
             Err(CacheError::NonexistentKey { .. }) => handle_cache_miss().await,
             Err(CacheError::TypeMismatch { key, type_name }) => {
                 warn!(
-                    "Type mismatch for key '{}': expected 'String', found '{}'",
+                    "Type mismatch for key '{}': expected 'Value', found '{}'",
                     key, type_name
                 );
 
@@ -66,9 +73,9 @@ impl ThemeService {
         }
     }
 
-    async fn read_color_theme_from_file(&self, source: &str) -> Result<String> {
-        let themes_dir = get_themes_dir().context("Failed to get the themes directory")?;
-        let full_path = themes_dir.join(source);
+    async fn read_translations_from_file(&self, language: &str, namespace: &str) -> Result<Value> {
+        let locales_dir = get_locales_dir().context("Failed to get the locales directory")?;
+        let full_path = locales_dir.join(language).join(format!("{namespace}.json"));
 
         if !full_path.exists() {
             return Err(anyhow!("File '{}' does not exist", full_path.display()));
@@ -82,10 +89,11 @@ impl ThemeService {
             .await
             .with_context(|| format!("Failed to read file '{}'", full_path.display()))?;
 
-        Ok(content)
+        serde_json::from_str::<Value>(&content)
+            .with_context(|| format!("Failed to parse file '{}'", full_path.display()))
     }
 }
 
-fn get_themes_dir() -> Result<PathBuf> {
-    Ok(get_home_dir()?.join(".config").join("moss").join("themes"))
+fn get_locales_dir() -> Result<PathBuf> {
+    Ok(get_home_dir()?.join(".config").join("moss").join("locales"))
 }

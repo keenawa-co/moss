@@ -2642,15 +2642,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "moss_jsonschema"
-version = "0.1.0"
-dependencies = [
- "once_cell",
- "serde",
- "serde_json",
-]
-
-[[package]]
 name = "moss_text"
 version = "0.1.0"
 dependencies = [
@@ -2662,6 +2653,11 @@ dependencies = [
 [[package]]
 name = "moss_theme"
 version = "0.1.0"
+dependencies = [
+ "once_cell",
+ "serde",
+ "serde_json",
+]
 
 [[package]]
 name = "moss_themeconv"

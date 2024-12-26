@@ -8,6 +8,8 @@ mod window;
 
 pub use constants::*;
 
+use moss_desktop::services::locale_service;
+use moss_desktop::services::locale_service::LocaleService;
 use moss_desktop::services::theme_service::ThemeService;
 use moss_desktop::state::AppState;
 use rand::random;
@@ -133,9 +135,10 @@ pub fn run() {
 fn create_main_window(app_handle: &AppHandle, url: &str) -> WebviewWindow {
     let state = AppState::new();
     let theme_service = ThemeService::new(app_handle.clone(), Arc::clone(&state.cache));
-
+    let locale_service = LocaleService::new(app_handle.clone(), Arc::clone(&state.cache));
     {
         app_handle.manage(theme_service);
+        app_handle.manage(locale_service);
         app_handle.manage(state);
     }
 
