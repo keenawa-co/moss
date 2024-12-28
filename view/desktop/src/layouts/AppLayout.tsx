@@ -5,7 +5,8 @@ import { Home, Logs, Settings } from "@/pages";
 import { useLayoutStore } from "@/store/layout";
 
 import "@repo/moss-tabs/styles/dockview.css";
-import "./moss-tabs-demo/styles.css";
+
+//import "./moss-tabs-demo/styles.css";
 
 import { LaunchPad } from "../components/LaunchPad";
 import { Menu } from "../components/Menu";
@@ -133,7 +134,7 @@ const CenterLayout = ({ ...props }: ResizableLayoutProps) => {
           <ResizablePanel>
             <MainContent />
           </ResizablePanel>
-          <DockviewDemo />
+          <DockviewDemo theme="dockview-theme-abyss" />
           <ResizablePanel
             preferredSize={props.bottomPaneGetHeight()}
             snap

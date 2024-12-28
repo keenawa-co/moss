@@ -7,9 +7,7 @@ import { nextId } from "./defaultLayout";
 const Icon = (props: { icon: string; title?: string; onClick?: (event: React.MouseEvent) => void }) => {
   return (
     <div title={props.title} className="action" onClick={props.onClick}>
-      <span style={{ fontSize: "inherit" }} className="material-symbols-outlined">
-        {props.icon}
-      </span>
+      <span className="material-symbols-outlined text-[inherit]">{props.icon}</span>
     </div>
   );
 };
@@ -66,14 +64,8 @@ export const RightControls = (props: IDockviewHeaderActionsProps) => {
 
   return (
     <div
-      className="group-control"
-      style={{
-        display: "flex",
-        alignItems: "center",
-        padding: "0px 8px",
-        height: "100%",
-        color: "var(--dv-activegroup-visiblepanel-tab-color)",
-      }}
+      className="group-control flex h-full items-center px-2"
+      style={{ color: "var(--dv-activegroup-visiblepanel-tab-color)" }}
     >
       {props.isGroupActive && <Icon icon="star" />}
       {Component && <Component />}
@@ -107,14 +99,8 @@ export const LeftControls = (props: IDockviewHeaderActionsProps) => {
 
   return (
     <div
-      className="group-control"
-      style={{
-        display: "flex",
-        alignItems: "center",
-        padding: "0px 8px",
-        height: "100%",
-        color: "var(--dv-activegroup-visiblepanel-tab-color)",
-      }}
+      className="group-control flex h-full items-center px-2"
+      style={{ color: "var(--dv-activegroup-visiblepanel-tab-color)" }}
     >
       <Icon onClick={onClick} icon="add" />
     </div>
@@ -124,14 +110,8 @@ export const LeftControls = (props: IDockviewHeaderActionsProps) => {
 export const PrefixHeaderControls = (props: IDockviewHeaderActionsProps) => {
   return (
     <div
-      className="group-control"
-      style={{
-        display: "flex",
-        alignItems: "center",
-        padding: "0px 8px",
-        height: "100%",
-        color: "var(--dv-activegroup-visiblepanel-tab-color)",
-      }}
+      className="group-control flex h-full items-center px-2"
+      style={{ color: "var(--dv-activegroup-visiblepanel-tab-color)" }}
     >
       <Icon icon="Menu" />
     </div>

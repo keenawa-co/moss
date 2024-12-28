@@ -36,30 +36,14 @@ const components = {
 
     return (
       <div
-        style={{
-          height: "100%",
-          overflow: "auto",
-          position: "relative",
-          padding: 5,
-          border: isDebug ? "2px dashed orange" : "",
-        }}
+        className={`relative h-full overflow-auto p-1.5 ${isDebug ? "border-2 border-dashed border-orange-500" : ""}`}
       >
-        <span
-          style={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%,-50%)",
-            pointerEvents: "none",
-            fontSize: "42px",
-            opacity: 0.5,
-          }}
-        >
+        <span className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transform text-6xl opacity-50">
           {props.api.title}
         </span>
 
         {isDebug && (
-          <div style={{ fontSize: "0.8em" }}>
+          <div className="text-xs">
             <Option
               title="Panel Rendering Mode"
               value={metadata.renderer.value}
@@ -97,10 +81,7 @@ const components = {
             props.api.setActive();
           }
         }}
-        style={{
-          width: "100%",
-          height: "100%",
-        }}
+        className="h-full w-full"
         src="https://dockview.dev"
       />
     );
@@ -244,19 +225,7 @@ const DockviewDemo = (props: { theme?: string }) => {
   const [debug, setDebug] = React.useState<boolean>(false);
 
   return (
-    <div
-      style={{
-        height: "100%",
-        display: "flex",
-        flexDirection: "column",
-        flexGrow: 1,
-        padding: "8px",
-        backgroundColor: "rgba(0,0,50,0.25)",
-        borderRadius: "8px",
-        position: "relative",
-        ...css,
-      }}
-    >
+    <div className={`relative flex h-full flex-grow flex-col rounded-lg bg-[rgba(0,0,50,0.25)] p-2 ${css}`}>
       <div>
         <GridActions api={api} toggleCustomWatermark={() => setWatermark(!watermark)} hasCustomWatermark={watermark} />
         {api && <PanelActions api={api} panels={panels} activePanel={activePanel} />}
@@ -271,15 +240,7 @@ const DockviewDemo = (props: { theme?: string }) => {
                   </button>
               </div> */}
       </div>
-      <div
-        className="action-container"
-        style={{
-          display: "flex",
-          justifyContent: "flex-end",
-          alignItems: "center",
-          padding: "4px",
-        }}
-      >
+      <div className="action-container flex items-center justify-end p-1">
         <button
           onClick={() => {
             setDebug(!debug);
@@ -301,25 +262,12 @@ const DockviewDemo = (props: { theme?: string }) => {
             setShowLogs(!showLogs);
           }}
         >
-          <span style={{ paddingRight: "4px" }}>{`${showLogs ? "Hide" : "Show"} Events Log`}</span>
+          <span className="pr-1">{`${showLogs ? "Hide" : "Show"} Events Log`}</span>
           <span className="material-symbols-outlined">terminal</span>
         </button>
       </div>
-      <div
-        style={{
-          flexGrow: 1,
-          height: 0,
-          display: "flex",
-        }}
-      >
-        <div
-          style={{
-            flexGrow: 1,
-            overflow: "hidden",
-            height: "100%",
-            display: "flex",
-          }}
-        >
+      <div className="flex h-0 flex-grow">
+        <div className="flex h-full flex-grow overflow-hidden">
           <DebugContext.Provider value={debug}>
             <DockviewReact
               components={components}
@@ -335,58 +283,20 @@ const DockviewDemo = (props: { theme?: string }) => {
         </div>
 
         {showLogs && (
-          <div
-            style={{
-              width: "400px",
-              backgroundColor: "black",
-              color: "white",
-              overflow: "auto",
-              fontFamily: "monospace",
-              marginLeft: "10px",
-              flexShrink: 0,
-            }}
-          >
+          <div className="bg-black ml-2 w-[400px] flex-shrink-0 overflow-auto font-mono text-white">
             {logLines.map((line, i) => {
               return (
                 <div
-                  style={{
-                    height: "30px",
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                    whiteSpace: "nowrap",
-                    fontSize: "13px",
-                    display: "flex",
-                    alignItems: "center",
-
-                    backgroundColor: line.backgroundColor,
-                  }}
+                  className="flex h-[30px] items-center overflow-hidden text-ellipsis whitespace-nowrap text-sm"
+                  style={{ backgroundColor: line.backgroundColor }}
                   key={i}
                 >
-                  <span
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      minWidth: "20px",
-                      maxWidth: "20px",
-                      color: "gray",
-                      borderRight: "1px solid gray",
-                      marginRight: "4px",
-                      paddingLeft: "4px",
-                      height: "100%",
-                    }}
-                  >
+                  <span className="text-gray-500 border-gray-500 mr-1 flex h-full min-w-[20px] max-w-[20px] items-center border-r pl-1">
                     {logLines.length - i}
                   </span>
                   <span>
                     {line.timestamp && (
-                      <span
-                        style={{
-                          fontSize: "0.7em",
-                          padding: "0px 2px",
-                        }}
-                      >
-                        {line.timestamp.toISOString().substring(11, 23)}
-                      </span>
+                      <span className="px-0.5 text-[0.7em]">{line.timestamp.toISOString().substring(11, 23)}</span>
                     )}
                     <span>{line.text}</span>
                   </span>
