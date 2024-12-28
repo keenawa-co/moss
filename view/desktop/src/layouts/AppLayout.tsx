@@ -7,34 +7,11 @@ import { useLayoutStore } from "@/store/layout";
 import "@repo/moss-tabs/styles/dockview.css";
 import "./moss-tabs-demo/styles.css";
 
-//import "dockview/dist/styles/dockview.css";
-
 import { LaunchPad } from "../components/LaunchPad";
 import { Menu } from "../components/Menu";
 import { Resizable, ResizablePanel } from "../components/Resizable";
 import { ContentLayout } from "./ContentLayout";
-//import { DockviewReact, DockviewReadyEvent, IDockviewPanelProps } from "@repo/moss-tabs";
 import DockviewDemo from "./moss-tabs-demo/DockviewDemo";
-
-/*
-const components = {
-  default: (props: IDockviewPanelProps) => {
-    return <div>{props.api.title}</div>;
-  },
-};
-
-const onReady = (event: DockviewReadyEvent) => {
-  event.api.addPanel({
-    id: "panel_1",
-    component: "default",
-  });
-
-  event.api.addPanel({
-    id: "panel_2",
-    component: "default",
-  });
-};
-*/
 
 export const AppLayout = () => {
   const alignment = useLayoutStore((state) => state.alignment);
