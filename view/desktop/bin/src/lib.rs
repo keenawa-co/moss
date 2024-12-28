@@ -8,7 +8,7 @@ mod window;
 
 pub use constants::*;
 use moss_desktop::app::lifecycle::{LifecycleManager, LifecyclePhase};
-use moss_desktop::app::service::ServiceManager2;
+use moss_desktop::app::service::ServiceManager;
 
 use crate::plugins::*;
 use moss_desktop::app::state::AppState;
@@ -127,16 +127,8 @@ pub fn run() {
 }
 
 fn create_main_window(app_handle: &AppHandle, url: &str) -> WebviewWindow {
-    dbg!(1);
     let lifecycle_manager = app_handle.state::<Arc<LifecycleManager>>();
     lifecycle_manager.set_phase(app_handle, LifecyclePhase::Bootstrapping);
-    dbg!(2);
-    // let service_manager = app_handle.state::<ServiceManager>();
-    // service_manager
-    //     .emit(ServiceManagerEvent::Lifecycle(LifecycleEvent::Activation(
-    //         ActivationPoint::OnStartUp,
-    //     )))
-    //     .unwrap();
 
     // let state = AppState::new();
     // let theme_service = ThemeService::new(app_handle.clone(), Arc::clone(&state.cache));

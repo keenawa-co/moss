@@ -1,8 +1,9 @@
 use fnv::FnvHashMap;
-use parking_lot::RwLock;
+use parking_lot::{Mutex, RwLock};
 use smallvec::SmallVec;
 use std::{
     any::{Any, TypeId},
+    cell::UnsafeCell,
     sync::{
         atomic::{AtomicU8, Ordering},
         Arc,
@@ -15,6 +16,10 @@ use super::{
     lifecycle::{LifecycleManager, LifecyclePhase},
     subscription::Subscription,
 };
+
+pub trait ServiceMetadata {
+    const SERVICE_BRAND: &'static str;
+}
 
 pub trait AnyService: Any + Send + Sync {
     fn start(&self, app_handle: &AppHandle);
@@ -50,7 +55,7 @@ impl Into<LifecyclePhase> for ActivationPoint {
 
 #[repr(u8)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-enum ServiceState {
+enum ServiceStatus {
     Inactive = 0,
     Activating = 1,
     Active = 2,
@@ -58,25 +63,39 @@ enum ServiceState {
     Failed = 4,
 }
 
-// impl ServiceState {
-//     fn as_u8(self) {
+impl ServiceStatus {
+    fn as_u8(self) -> u8 {
+        self as u8
+    }
+}
 
-//     }
-// }
+struct ServiceHandleState {
+    activation_subscriptions: Mutex<SmallVec<[Subscription; MAX_ACTIVATION_POINTS]>>,
+    status: AtomicU8,
+}
+
+impl ServiceHandleState {
+    fn is_activation_possible(&self) -> bool {
+        self.status.load(Ordering::SeqCst) == ServiceStatus::Inactive.as_u8()
+    }
+
+    fn set_status(&self, new_status: ServiceStatus) {
+        self.status.store(new_status.as_u8(), Ordering::SeqCst);
+    }
+}
 
 #[derive(Clone)]
 pub struct ServiceHandle {
     service: Arc<dyn AnyService>,
-    lifecycle_sub: Arc<SmallVec<[Subscription; MAX_ACTIVATION_POINTS]>>,
-    state: Arc<AtomicU8>,
+    state: Arc<ServiceHandleState>,
 }
 
-pub struct ServiceManager2 {
+pub struct ServiceManager {
     lifecycle_manager: Arc<LifecycleManager>,
     services: Arc<RwLock<FnvHashMap<TypeId, ServiceHandle>>>,
 }
 
-impl ServiceManager2 {
+impl ServiceManager {
     pub fn new(lifecycle_manager: Arc<LifecycleManager>) -> Self {
         Self {
             lifecycle_manager,
@@ -84,44 +103,66 @@ impl ServiceManager2 {
         }
     }
 
-    pub fn register<T: AnyService>(
+    pub fn register<T: AnyService + ServiceMetadata>(
         &self,
         service: T,
         activation_points: SmallVec<[ActivationPoint; MAX_ACTIVATION_POINTS]>,
     ) {
-        let mut services_lock = self.services.write();
-        let mut subscriptions = SmallVec::new();
         let service_arc = Arc::new(service);
-        let service_state = Arc::new(AtomicU8::new(ServiceState::Inactive as u8));
+        let service_state = Arc::new(ServiceHandleState {
+            activation_subscriptions: Mutex::new(SmallVec::new()),
+            status: AtomicU8::new(ServiceStatus::Inactive.as_u8()),
+        });
+
+        let activation_callback = |app_handle: &AppHandle,
+                                   service: Arc<T>,
+                                   service_state: Arc<ServiceHandleState>,
+                                   phase: &LifecyclePhase| {
+            if !service_state.is_activation_possible() {
+                return;
+            }
+
+            trace!(
+                "Starting activation process for service: {} during phase: {:?}",
+                T::SERVICE_BRAND,
+                phase
+            );
+
+            service_state.set_status(ServiceStatus::Activating);
+            service.start(app_handle);
+            service_state.set_status(ServiceStatus::Active);
+
+            // Once the service is successfully activated, all other activation
+            // callbacks are no longer required and will be removed.
+            service_state.activation_subscriptions.lock().clear();
+        };
+
+        let service_state_clone = Arc::clone(&service_state);
+        let mut activation_subscriptions_lock = service_state_clone.activation_subscriptions.lock();
 
         for (index, point) in activation_points.into_iter().enumerate() {
             let service_arc_clone = Arc::clone(&service_arc);
             let service_state_clone = Arc::clone(&service_state);
+            let phase: LifecyclePhase = point.into();
 
-            subscriptions.insert(
+            activation_subscriptions_lock.insert(
                 index,
                 self.lifecycle_manager
-                    .observe(point.into(), move |app_handle| {
-                        let service_state_value = service_state_clone.load(Ordering::SeqCst);
-                        if service_state_value == ServiceState::Active as u8
-                            || service_state_value == ServiceState::Activating as u8
-                        {
-                            return;
-                        }
-
-                        service_state_clone.store(ServiceState::Activating as u8, Ordering::SeqCst);
-                        trace!("Activating service");
-                        service_arc_clone.start(app_handle);
-                        service_state_clone.store(ServiceState::Active as u8, Ordering::SeqCst);
+                    .observe(phase.clone(), move |app_handle| {
+                        activation_callback(
+                            app_handle,
+                            service_arc_clone.to_owned(),
+                            service_state_clone.to_owned(),
+                            &phase,
+                        );
                     }),
             );
         }
 
-        services_lock.insert(
+        self.services.write().insert(
             TypeId::of::<T>(),
             ServiceHandle {
                 service: service_arc,
-                lifecycle_sub: Arc::new(subscriptions),
                 state: service_state,
             },
         );

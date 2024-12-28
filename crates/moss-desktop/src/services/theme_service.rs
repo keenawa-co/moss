@@ -5,7 +5,11 @@ use serde::Deserialize;
 use std::{path::PathBuf, sync::Arc};
 use tauri::{AppHandle, Manager};
 
-use crate::app::{service::AnyService, state::AppState, subscription::Subscription};
+use crate::app::{
+    service::{AnyService, ServiceMetadata},
+    state::AppState,
+    subscription::Subscription,
+};
 
 // use super::{AnyService2, ServiceEvent};
 
@@ -123,20 +127,9 @@ impl AnyService for ThemeService {
     }
 }
 
-// #[async_trait]
-// impl AnyService2 for ThemeService {
-//     fn as_any(&self) -> &dyn std::any::Any {
-//         self
-//     }
-
-//     async fn on_event(&self, app_handle: tauri::AppHandle, event: ServiceEvent) {
-//         let app_state = app_handle.state::<AppState>();
-
-//         match event {
-//             ServiceEvent::Activation => self.on_activation(&app_state),
-//         }
-//     }
-// }
+impl ServiceMetadata for ThemeService {
+    const SERVICE_BRAND: &'static str = "ThemeService";
+}
 
 fn get_home_dir() -> Result<PathBuf> {
     dirs::home_dir().context("Home directory not found!")

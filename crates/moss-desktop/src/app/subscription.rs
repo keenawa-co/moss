@@ -152,7 +152,7 @@ where
     /// the subscriber is removed.
     pub(crate) fn retain<F>(&self, emitter_key: &EmitterKey, mut f: F)
     where
-        F: FnMut(&mut Callback) -> bool,
+        F: Fn(&Callback) -> bool,
     {
         let Some(mut subscribers) = self
             .state
@@ -168,7 +168,7 @@ where
         // true or are inactive.
         subscribers.retain(|_, subscriber| {
             if subscriber.is_active() {
-                f(&mut subscriber.callback)
+                f(&subscriber.callback)
             } else {
                 true
             }
