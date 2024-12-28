@@ -8,17 +8,16 @@ mod window;
 
 pub use constants::*;
 use moss_desktop::app::lifecycle::{LifecycleManager, LifecyclePhase};
+use moss_desktop::app::service::ServiceManager2;
 
 use crate::plugins::*;
 use moss_desktop::app::state::AppState;
-use moss_desktop::services::{
-    ActivationPoint, LifecycleEvent, ServiceManager, ServiceManagerEvent,
-};
 use plugins::app_formation;
 use rand::random;
 use smallvec::smallvec;
 use std::env;
 use std::path::PathBuf;
+use std::sync::Arc;
 use tauri::plugin::TauriPlugin;
 use tauri::{AppHandle, Listener, Manager, RunEvent, Runtime, WebviewWindow, WindowEvent, Wry};
 use tauri_plugin_global_shortcut::{Code, GlobalShortcutExt, Modifiers, Shortcut, ShortcutState};
@@ -46,11 +45,11 @@ pub fn run() {
 
     builder
         .setup(|app| {
-            let lm = LifecycleManager::new();
-            let l = lm.observe(LifecyclePhase::Bootstrapping, |app_state| {
-                println!("Hello!");
-            });
-            lm.set_phase(app.app_handle(), LifecyclePhase::Bootstrapping);
+            // let lm = LifecycleManager::new();
+            // let l = lm.observe(LifecyclePhase::Bootstrapping, |app_state| {
+            //     println!("Hello!");
+            // });
+            // lm.set_phase(app.app_handle(), LifecyclePhase::Bootstrapping);
 
             // let service = LifecycleService::new();
 
@@ -60,16 +59,11 @@ pub fn run() {
 
             // service.notify_phase(LifecyclePhase::Starting, app.app_handle().clone());
 
-            let service_manager = app.app_handle().state::<ServiceManager>();
-            service_manager
-                .emit(ServiceManagerEvent::Lifecycle(LifecycleEvent::Activation(
-                    ActivationPoint::OnStartUp,
-                )))
-                .unwrap();
-
+            // let service_manager = ServiceManager2::new();
+            // service_manager.register();
             let ctrl_n_shortcut = Shortcut::new(Some(Modifiers::CONTROL), Code::KeyN);
 
-            let r = app.handle().listen("event", |e| {});
+            // let r = app.handle().listen("event", |e| {});
 
             app.handle().plugin(
                 tauri_plugin_global_shortcut::Builder::new()
@@ -133,6 +127,10 @@ pub fn run() {
 }
 
 fn create_main_window(app_handle: &AppHandle, url: &str) -> WebviewWindow {
+    dbg!(1);
+    let lifecycle_manager = app_handle.state::<Arc<LifecycleManager>>();
+    lifecycle_manager.set_phase(app_handle, LifecyclePhase::Bootstrapping);
+    dbg!(2);
     // let service_manager = app_handle.state::<ServiceManager>();
     // service_manager
     //     .emit(ServiceManagerEvent::Lifecycle(LifecycleEvent::Activation(

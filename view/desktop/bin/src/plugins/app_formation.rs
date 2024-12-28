@@ -1,6 +1,9 @@
-use moss_desktop::{
-    app::state::AppState,
-    services::{ActivationPoint, AnyService, ServiceManager, MAX_ACTIVATION_POINTS},
+use std::sync::Arc;
+
+use moss_desktop::app::{
+    lifecycle::LifecycleManager,
+    service::{ActivationPoint, AnyService, ServiceManager2, MAX_ACTIVATION_POINTS},
+    state::AppState,
 };
 use smallvec::SmallVec;
 use tauri::{
@@ -9,13 +12,16 @@ use tauri::{
 };
 
 pub struct Builder {
-    service_manager: ServiceManager,
+    lifecycle_manager: Arc<LifecycleManager>,
+    service_manager: ServiceManager2,
 }
 
 impl Builder {
     pub fn new() -> Self {
+        let lifecycle_manager = Arc::new(LifecycleManager::new());
         Self {
-            service_manager: ServiceManager::new(),
+            lifecycle_manager: Arc::clone(&lifecycle_manager),
+            service_manager: ServiceManager2::new(lifecycle_manager),
         }
     }
     pub fn with_service(
@@ -33,10 +39,9 @@ impl Builder {
             .setup(move |app_handle, _api| {
                 let state = AppState::new();
 
-                self.service_manager.run(app_handle.clone());
-
                 app_handle.manage(state);
                 app_handle.manage(self.service_manager);
+                app_handle.manage(self.lifecycle_manager);
 
                 Ok(())
             })

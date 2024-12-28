@@ -30,11 +30,11 @@ struct SubscriberSetState<EmitterKey, Callback> {
 }
 
 pub struct Subscription {
-    unsubscribe: Option<Box<dyn FnOnce() + 'static>>,
+    unsubscribe: Option<Box<dyn FnOnce() + Send + Sync + 'static>>,
 }
 
 impl Subscription {
-    pub fn new(unsubscribe: impl 'static + FnOnce()) -> Self {
+    pub fn new(unsubscribe: impl FnOnce() + Send + Sync + 'static) -> Self {
         Self {
             unsubscribe: Some(Box::new(unsubscribe)),
         }
@@ -59,8 +59,8 @@ pub(crate) struct SubscriberSet<EmitterKey, Callback> {
 
 impl<EmitterKey, Callback> SubscriberSet<EmitterKey, Callback>
 where
-    EmitterKey: 'static + Ord + Clone + Debug,
-    Callback: 'static,
+    EmitterKey: 'static + Send + Sync + Ord + Clone + Debug,
+    Callback: 'static + Send + Sync,
 {
     pub(crate) fn new() -> Self {
         Self {

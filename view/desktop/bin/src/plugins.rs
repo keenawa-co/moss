@@ -58,9 +58,8 @@ pub mod plugin_window_state {
 }
 
 pub mod plugin_app_formation {
-    use moss_desktop::services::addon_service::AddonService;
-    use moss_desktop::services::theme_service::ThemeService;
-    use moss_desktop::services::ActivationPoint;
+
+    use moss_desktop::{app::service::ActivationPoint, services::theme_service::ThemeService};
     use smallvec::smallvec;
     use std::path::PathBuf;
 
@@ -68,11 +67,14 @@ pub mod plugin_app_formation {
 
     pub fn init() -> TauriPlugin<Wry> {
         app_formation::Builder::new()
+            // .with_service(
+            //     AddonService::new(builtin_addons_dir(), installed_addons_dir()),
+            //     smallvec![ActivationPoint::OnStartUp],
+            // )
             .with_service(
-                AddonService::new(builtin_addons_dir(), installed_addons_dir()),
-                smallvec![ActivationPoint::OnStartUp],
+                ThemeService::new(),
+                smallvec![ActivationPoint::OnBootstrapping],
             )
-            .with_service(ThemeService::new(), smallvec![ActivationPoint::OnStartUp])
             .build()
     }
 

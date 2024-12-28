@@ -1,13 +1,10 @@
 use anyhow::Result;
 use hashbrown::HashMap;
 use moss_desktop::{
-    app::lifecycle::LifecycleManager,
+    app::{lifecycle::LifecycleManager, service::ServiceManager2},
     command::CommandContext,
     models::application::{AppStateInfo, LocaleDescriptor, PreferencesInfo, ThemeDescriptor},
-    services::{
-        theme_service::{GetColorThemeOptions, ThemeService},
-        ServiceManager,
-    },
+    services::theme_service::{GetColorThemeOptions, ThemeService},
 };
 use moss_text::{quote, ReadOnlyStr};
 use serde_json::Value;
@@ -60,12 +57,13 @@ pub fn execute_command(
 #[tauri::command(async)]
 pub async fn get_color_theme(
     // theme_service: State<'_, ThemeService>,
-    service_manager: State<'_, ServiceManager>,
+    service_manager: State<'_, ServiceManager2>,
     path: String,
     opts: Option<GetColorThemeOptions>,
 ) -> Result<String, String> {
+    dbg!(3);
     let theme_service = service_manager.get_unchecked::<ThemeService>();
-
+    dbg!(4);
     theme_service
         .get_color_theme(&path, opts)
         .await

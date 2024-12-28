@@ -1,29 +1,34 @@
-use crate::services::{LifecycleEvent, ServiceEvent, ServiceManagerEvent};
 use anyhow::Result;
 use async_trait::async_trait;
 use moss_addon::manifest::MANIFEST_FILENAME;
 use std::path::PathBuf;
-use tauri::Manager;
+use tauri::{AppHandle, Manager};
 
-use crate::{addon_registry::AddonRegistry, app::state::AppState};
+use crate::{
+    addon_registry::AddonRegistry,
+    app::{service::AnyService, state::AppState, subscription::Subscription},
+};
 
-use super::AnyService;
+// use super::{AnyService2, ServiceEvent};
 
 pub struct AddonService {
     addons: AddonRegistry,
     builtin_addons_location: PathBuf,
     installed_addons_location: PathBuf,
+    lifecycle_manager_sub: Subscription,
 }
 
 impl AddonService {
     pub fn new(
         builtin_addons_location: impl Into<PathBuf>,
         installed_addons_location: impl Into<PathBuf>,
+        lifecycle_manager_sub: Subscription,
     ) -> Self {
         Self {
             addons: AddonRegistry::new(),
             builtin_addons_location: builtin_addons_location.into(),
             installed_addons_location: installed_addons_location.into(),
+            lifecycle_manager_sub,
         }
     }
 
@@ -44,20 +49,34 @@ impl AddonService {
     }
 }
 
-#[async_trait]
+// #[async_trait]
+// impl AnyService2 for AddonService {
+//     fn as_any(&self) -> &dyn std::any::Any {
+//         self
+//     }
+
+//     async fn on_event(&self, app_handle: tauri::AppHandle, event: ServiceEvent) {
+//         // let state = app_handle.state::<AppState>();
+//         match event {
+//             ServiceEvent::Activation => {
+//                 dbg!("on_event!");
+//                 //
+//                 // self.on_activation(&state).await.unwrap();
+//             }
+//         }
+//     }
+// }
+
 impl AnyService for AddonService {
-    fn as_any(&self) -> &dyn std::any::Any {
-        self
+    fn start(&self, app_handle: &AppHandle) {
+        todo!()
     }
 
-    async fn on_event(&self, app_handle: tauri::AppHandle, event: ServiceEvent) {
-        // let state = app_handle.state::<AppState>();
-        match event {
-            ServiceEvent::Activation => {
-                dbg!("on_event!");
-                //
-                // self.on_activation(&state).await.unwrap();
-            }
-        }
+    fn stop(&self, app_handle: &AppHandle) {
+        todo!()
+    }
+
+    fn as_any(&self) -> &dyn std::any::Any {
+        todo!()
     }
 }

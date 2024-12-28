@@ -4,14 +4,11 @@ use moss_text::ReadOnlyStr;
 use parking_lot::RwLock;
 use std::time::Duration;
 use std::{sync::atomic::AtomicUsize, sync::Arc};
-use tauri::AppHandle;
 
 use crate::command::CommandHandler;
 use crate::contribution_collector::ContributionCollector;
 use crate::models::application::{LocaleDescriptor, ThemeDescriptor};
 use crate::models::{actions::MenuItem, view::*};
-
-use super::subscription::SubscriberSet;
 
 const STATE_CACHE_TTL: Duration = Duration::from_secs(60 * 3);
 const STATE_MAX_CAPACITY: u64 = 100;
@@ -36,7 +33,6 @@ pub struct AppState {
     pub menus: DashMap<ReadOnlyStr, Vec<MenuItem>>,
     pub tree_view_groups: DashMap<TreeViewGroupLocation, Vec<TreeViewGroup>>,
     pub tree_views: DashMap<GroupId, Vec<TreeViewDescriptor>>,
-    // pub event_listeners: SubscriberSet<LifecyclePhase, Listener>,
 }
 
 impl AppState {

@@ -1,14 +1,13 @@
 use anyhow::{anyhow, Context as _, Result};
-use async_trait::async_trait;
 use moss_cache::{backend::moka::MokaBackend, Cache, CacheError};
 use once_cell::sync::OnceCell;
 use serde::Deserialize;
 use std::{path::PathBuf, sync::Arc};
-use tauri::Manager;
+use tauri::{AppHandle, Manager};
 
-use crate::app::state::AppState;
+use crate::app::{service::AnyService, state::AppState, subscription::Subscription};
 
-use super::{AnyService, ServiceEvent};
+// use super::{AnyService2, ServiceEvent};
 
 const CK_COLOR_THEME: &'static str = "color_theme";
 
@@ -20,12 +19,15 @@ pub struct GetColorThemeOptions {
 
 pub struct ThemeService {
     app_cache: OnceCell<Arc<Cache<MokaBackend>>>,
+    // lifecycle_manager_sub: Subscription,
 }
 
 impl ThemeService {
-    pub fn new() -> Self {
+    pub fn new(// lifecycle_manager_sub: Subscription
+    ) -> Self {
         Self {
             app_cache: OnceCell::new(),
+            // lifecycle_manager_sub,
         }
     }
 
@@ -101,20 +103,40 @@ impl ThemeService {
     }
 }
 
-#[async_trait]
 impl AnyService for ThemeService {
+    fn start(&self, app_handle: &AppHandle) {
+        let app_state = app_handle.state::<AppState>();
+
+        self.app_cache
+        .set(Arc::clone(&app_state.cache))
+        .unwrap_or_else(|_| {
+            panic!("Failed to set the app cache in ThemeService: the cache has already been initialized.")
+        });
+    }
+
+    fn stop(&self, app_handle: &AppHandle) {
+        todo!()
+    }
+
     fn as_any(&self) -> &dyn std::any::Any {
         self
     }
-
-    async fn on_event(&self, app_handle: tauri::AppHandle, event: ServiceEvent) {
-        let app_state = app_handle.state::<AppState>();
-
-        match event {
-            ServiceEvent::Activation => self.on_activation(&app_state),
-        }
-    }
 }
+
+// #[async_trait]
+// impl AnyService2 for ThemeService {
+//     fn as_any(&self) -> &dyn std::any::Any {
+//         self
+//     }
+
+//     async fn on_event(&self, app_handle: tauri::AppHandle, event: ServiceEvent) {
+//         let app_state = app_handle.state::<AppState>();
+
+//         match event {
+//             ServiceEvent::Activation => self.on_activation(&app_state),
+//         }
+//     }
+// }
 
 fn get_home_dir() -> Result<PathBuf> {
     dirs::home_dir().context("Home directory not found!")

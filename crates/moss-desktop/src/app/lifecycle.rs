@@ -12,7 +12,7 @@ pub enum LifecyclePhase {
     Stopping,
 }
 
-type Listener = Box<dyn Fn(&AppHandle) + Send + 'static>;
+type Listener = Box<dyn Fn(&AppHandle) + Send + Sync + 'static>;
 
 pub struct LifecycleManager {
     phase: Mutex<LifecyclePhase>,
@@ -30,7 +30,7 @@ impl LifecycleManager {
     pub fn observe(
         &self,
         phase: LifecyclePhase,
-        callback: impl Fn(&AppHandle) + Send + 'static,
+        callback: impl Fn(&AppHandle) + Send + Sync + 'static,
     ) -> Subscription {
         let (subscription, activate) = self.listeners.insert(phase, Box::new(callback));
         activate();
