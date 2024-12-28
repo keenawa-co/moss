@@ -3,7 +3,9 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 
 import { Home, Logs, Settings } from "@/pages";
 import { useLayoutStore } from "@/store/layout";
-import { DockviewReact, DockviewReadyEvent, IDockviewPanelProps } from "@repo/moss-tabs";
+
+//import { DockviewReact, DockviewReadyEvent, IDockviewPanelProps } from "@repo/moss-tabs";
+import DockviewDemo from "./moss-tabs-demo/DockviewDemo";
 
 import "@repo/moss-tabs/styles/dockview.css";
 
@@ -12,6 +14,7 @@ import { Menu } from "../components/Menu";
 import { Resizable, ResizablePanel } from "../components/Resizable";
 import { ContentLayout } from "./ContentLayout";
 
+/*
 const components = {
   default: (props: IDockviewPanelProps) => {
     return <div>{props.api.title}</div>;
@@ -29,6 +32,7 @@ const onReady = (event: DockviewReadyEvent) => {
     component: "default",
   });
 };
+*/
 
 export const AppLayout = () => {
   const alignment = useLayoutStore((state) => state.alignment);
@@ -130,7 +134,7 @@ const CenterLayout = ({ ...props }: ResizableLayoutProps) => {
         props.secondarySideBarSetWidth(secondarySideBarWidth);
       }}
     >
-      <DockviewReact className="dockview-theme-dark" onReady={onReady} components={components} />
+      <DockviewDemo />
       <ResizablePanel
         minSize={100}
         preferredSize={props.primarySideBarGetWidth()}
