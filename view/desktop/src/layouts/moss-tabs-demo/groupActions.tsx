@@ -1,5 +1,6 @@
-import { DockviewApi, DockviewGroupLocation, DockviewGroupPanel } from "dockview";
 import * as React from "react";
+
+import { DockviewApi, DockviewGroupLocation, DockviewGroupPanel } from "@repo/moss-tabs";
 
 const GroupAction = (props: { groupId: string; groups: string[]; api: DockviewApi; activeGroup?: string }) => {
   const onClick = () => {

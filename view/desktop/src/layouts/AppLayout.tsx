@@ -4,15 +4,17 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Home, Logs, Settings } from "@/pages";
 import { useLayoutStore } from "@/store/layout";
 
-//import { DockviewReact, DockviewReadyEvent, IDockviewPanelProps } from "@repo/moss-tabs";
-import DockviewDemo from "./moss-tabs-demo/DockviewDemo";
-
 import "@repo/moss-tabs/styles/dockview.css";
+import "./moss-tabs-demo/styles.css";
+
+//import "dockview/dist/styles/dockview.css";
 
 import { LaunchPad } from "../components/LaunchPad";
 import { Menu } from "../components/Menu";
 import { Resizable, ResizablePanel } from "../components/Resizable";
 import { ContentLayout } from "./ContentLayout";
+//import { DockviewReact, DockviewReadyEvent, IDockviewPanelProps } from "@repo/moss-tabs";
+import DockviewDemo from "./moss-tabs-demo/DockviewDemo";
 
 /*
 const components = {
@@ -134,7 +136,6 @@ const CenterLayout = ({ ...props }: ResizableLayoutProps) => {
         props.secondarySideBarSetWidth(secondarySideBarWidth);
       }}
     >
-      <DockviewDemo />
       <ResizablePanel
         minSize={100}
         preferredSize={props.primarySideBarGetWidth()}
@@ -155,6 +156,7 @@ const CenterLayout = ({ ...props }: ResizableLayoutProps) => {
           <ResizablePanel>
             <MainContent />
           </ResizablePanel>
+          <DockviewDemo />
           <ResizablePanel
             preferredSize={props.bottomPaneGetHeight()}
             snap

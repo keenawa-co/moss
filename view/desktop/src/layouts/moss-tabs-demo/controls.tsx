@@ -1,5 +1,7 @@
-import { IDockviewHeaderActionsProps } from "dockview";
 import * as React from "react";
+
+import { IDockviewHeaderActionsProps } from "@repo/moss-tabs";
+
 import { nextId } from "./defaultLayout";
 
 const Icon = (props: { icon: string; title?: string; onClick?: (event: React.MouseEvent) => void }) => {

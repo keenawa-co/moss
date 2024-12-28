@@ -1,5 +1,6 @@
-import { DockviewApi, IDockviewPanel } from "dockview";
 import * as React from "react";
+
+import { DockviewApi, IDockviewPanel } from "@repo/moss-tabs";
 
 const PanelAction = (props: { panels: string[]; api: DockviewApi; activePanel?: string; panelId: string }) => {
   const onClick = () => {

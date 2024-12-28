@@ -1,3 +1,5 @@
+import * as React from "react";
+
 import {
   DockviewApi,
   DockviewDefaultTab,
@@ -5,8 +7,7 @@ import {
   DockviewReadyEvent,
   IDockviewPanelHeaderProps,
   IDockviewPanelProps,
-} from "dockview";
-import * as React from "react";
+} from "@repo/moss-tabs";
 
 import "./app.scss";
 
@@ -130,7 +131,7 @@ const WatermarkComponent = () => {
   return <div>custom watermark</div>;
 };
 
-const DockviewDemo: React.FC = (props: { theme?: string }) => {
+const DockviewDemo = (props: { theme?: string }) => {
   const [logLines, setLogLines] = React.useState<{ text: string; timestamp?: Date; backgroundColor?: string }[]>([]);
 
   const [panels, setPanels] = React.useState<string[]>([]);

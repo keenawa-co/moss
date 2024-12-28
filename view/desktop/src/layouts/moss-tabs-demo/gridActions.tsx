@@ -1,8 +1,9 @@
-import { DockviewApi } from "dockview";
 import * as React from "react";
-import { defaultConfig, nextId } from "./defaultLayout";
-
 import { createRoot, Root } from "react-dom/client";
+
+import { DockviewApi } from "@repo/moss-tabs";
+
+import { defaultConfig, nextId } from "./defaultLayout";
 import { PanelBuilder } from "./panelBuilder";
 
 let mount = document.querySelector(".popover-anchor") as HTMLElement | null;

@@ -1,5 +1,6 @@
-import { DockviewGroupLocation, DockviewPanelApi, DockviewPanelRenderer } from "dockview";
 import * as React from "react";
+
+import { DockviewGroupLocation, DockviewPanelApi, DockviewPanelRenderer } from "@repo/moss-tabs";
 
 export interface PanelApiMetadata {
   isActive: {
