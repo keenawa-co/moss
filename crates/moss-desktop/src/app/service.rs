@@ -3,7 +3,6 @@ use parking_lot::{Mutex, RwLock};
 use smallvec::SmallVec;
 use std::{
     any::{Any, TypeId},
-    cell::UnsafeCell,
     sync::{
         atomic::{AtomicU8, Ordering},
         Arc,
@@ -77,6 +76,10 @@ struct ServiceHandleState {
 impl ServiceHandleState {
     fn is_activation_possible(&self) -> bool {
         self.status.load(Ordering::SeqCst) == ServiceStatus::Inactive.as_u8()
+    }
+
+    fn is_active(&self) -> bool {
+        self.status.load(Ordering::SeqCst) == ServiceStatus::Active.as_u8()
     }
 
     fn set_status(&self, new_status: ServiceStatus) {
@@ -168,28 +171,58 @@ impl ServiceManager {
         );
     }
 
-    pub fn get<T: AnyService>(&self) -> Option<Arc<T>> {
-        if let Some(service_handle) = self.services.read().get(&TypeId::of::<T>()).cloned() {
-            match service_handle.service.downcast_arc::<T>() {
-                Ok(arc_t) => Some(arc_t),
-                Err(_) => None,
+    pub fn get<T: AnyService + ServiceMetadata>(&self) -> Option<Arc<T>> {
+        let Some(service_handle) = self.services.read().get(&TypeId::of::<T>()).cloned() else {
+            return None;
+        };
+
+        if !service_handle.state.is_active() {
+            warn!(
+                "Attempting to retrieve service {} which has not yet been activated",
+                T::SERVICE_BRAND
+            );
+            return None;
+        }
+
+        match service_handle.service.downcast_arc::<T>() {
+            Ok(service_arc) => Some(service_arc),
+            Err(_) => {
+                debug!(
+                    "Failed to cast service {} to the required type",
+                    T::SERVICE_BRAND
+                );
+
+                None
             }
-        } else {
-            None
         }
     }
 
-    pub fn get_unchecked<T: AnyService>(&self) -> Arc<T> {
+    pub fn get_unchecked<T: AnyService + ServiceMetadata>(&self) -> Arc<T> {
         let service_handle = self
             .services
             .read()
             .get(&TypeId::of::<T>())
             .cloned()
-            .unwrap_or_else(|| panic!("Service not found"));
+            .unwrap_or_else(|| panic!(
+                "Service {} could not be found. Ensure it has been properly registered before attempting to retrieve it.", 
+                T::SERVICE_BRAND
+            ));
+
+        if !service_handle.state.is_active() {
+            panic!(
+                "Attempting to retrieve service {} which has not yet been activated",
+                T::SERVICE_BRAND
+            );
+        }
 
         service_handle
             .service
             .downcast_arc::<T>()
-            .unwrap_or_else(|_| panic!("Service type mismatch"))
+            .unwrap_or_else(|_| {
+                panic!(
+                    "Failed to cast service {} to the required type",
+                    T::SERVICE_BRAND
+                )
+            })
     }
 }

@@ -23,15 +23,12 @@ pub struct GetColorThemeOptions {
 
 pub struct ThemeService {
     app_cache: OnceCell<Arc<Cache<MokaBackend>>>,
-    // lifecycle_manager_sub: Subscription,
 }
 
 impl ThemeService {
-    pub fn new(// lifecycle_manager_sub: Subscription
-    ) -> Self {
+    pub fn new() -> Self {
         Self {
             app_cache: OnceCell::new(),
-            // lifecycle_manager_sub,
         }
     }
 
@@ -97,16 +94,6 @@ impl ThemeService {
     }
 }
 
-impl ThemeService {
-    fn on_activation(&self, app_state: &AppState) {
-        self.app_cache
-            .set(Arc::clone(&app_state.cache))
-            .unwrap_or_else(|_| {
-                panic!("Failed to set the app cache in ThemeService: the cache has already been initialized.")
-            });
-    }
-}
-
 impl AnyService for ThemeService {
     fn start(&self, app_handle: &AppHandle) {
         let app_state = app_handle.state::<AppState>();
@@ -118,9 +105,7 @@ impl AnyService for ThemeService {
         });
     }
 
-    fn stop(&self, app_handle: &AppHandle) {
-        todo!()
-    }
+    fn stop(&self, _app_handle: &AppHandle) {}
 
     fn as_any(&self) -> &dyn std::any::Any {
         self
