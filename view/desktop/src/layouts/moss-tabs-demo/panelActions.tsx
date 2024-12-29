@@ -50,7 +50,7 @@ const PanelAction = (props: { panels: string[]; api: DockviewApi; activePanel?: 
 
   return (
     <div className="button-action">
-      <div style={{ display: "flex" }}>
+      <div className="flex">
         <button
           className={props.activePanel === props.panelId ? "demo-button selected" : "demo-button"}
           onClick={onClick}
@@ -58,7 +58,7 @@ const PanelAction = (props: { panels: string[]; api: DockviewApi; activePanel?: 
           {props.panelId}
         </button>
       </div>
-      <div style={{ display: "flex" }}>
+      <div className="flex">
         <button
           className="demo-icon-button"
           onClick={() => {

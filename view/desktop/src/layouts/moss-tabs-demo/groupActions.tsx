@@ -58,12 +58,12 @@ const GroupAction = (props: { groupId: string; groups: string[]; api: DockviewAp
 
   return (
     <div className="button-action">
-      <div style={{ display: "flex" }}>
+      <div className="flex">
         <button onClick={onClick} className={isActive ? "demo-button selected" : "demo-button"}>
           {props.groupId}
         </button>
       </div>
-      <div style={{ display: "flex" }}>
+      <div className="flex">
         <button
           className={location?.type === "floating" ? "demo-icon-button selected" : "demo-icon-button"}
           onClick={() => {
