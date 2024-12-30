@@ -2656,6 +2656,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "moss_tauri"
+version = "0.1.0"
+
+[[package]]
 name = "moss_text"
 version = "0.1.0"
 dependencies = [
