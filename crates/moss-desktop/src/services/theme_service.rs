@@ -1,17 +1,18 @@
 use anyhow::{anyhow, Context as _, Result};
+use dashmap::DashSet;
 use moss_cache::{backend::moka::MokaBackend, Cache, CacheError};
 use once_cell::sync::OnceCell;
 use serde::Deserialize;
 use std::{path::PathBuf, sync::Arc};
 use tauri::{AppHandle, Manager};
 
-use crate::app::{
-    service::{AnyService, ServiceMetadata},
-    state::AppState,
-    subscription::Subscription,
+use crate::{
+    app::{
+        service::{AnyService, ServiceMetadata},
+        state::AppState,
+    },
+    models::application::ThemeDescriptor,
 };
-
-// use super::{AnyService2, ServiceEvent};
 
 const CK_COLOR_THEME: &'static str = "color_theme";
 
@@ -23,13 +24,19 @@ pub struct GetColorThemeOptions {
 
 pub struct ThemeService {
     app_cache: OnceCell<Arc<Cache<MokaBackend>>>,
+    themes: OnceCell<Arc<DashSet<ThemeDescriptor>>>,
 }
 
 impl ThemeService {
     pub fn new() -> Self {
         Self {
             app_cache: OnceCell::new(),
+            themes: OnceCell::new(),
         }
+    }
+
+    pub fn get_color_themes(&self) -> &DashSet<ThemeDescriptor> {
+        self.themes.get().unwrap()
     }
 
     pub async fn get_color_theme(
@@ -74,9 +81,8 @@ impl ThemeService {
         }
     }
 
-    async fn read_color_theme_from_file(&self, source: &str) -> Result<String> {
-        let themes_dir = get_themes_dir().context("Failed to get the themes directory")?;
-        let full_path = themes_dir.join(source);
+    async fn read_color_theme_from_file(&self, path: &str) -> Result<String> {
+        let full_path = PathBuf::from(path);
 
         if !full_path.exists() {
             return Err(anyhow!("File '{}' does not exist", full_path.display()));
@@ -98,6 +104,10 @@ impl AnyService for ThemeService {
     fn start(&self, app_handle: &AppHandle) {
         let app_state = app_handle.state::<AppState>();
 
+        self.themes
+            .set(app_state.contributions.themes.clone())
+            .unwrap();
+
         self.app_cache
         .set(Arc::clone(&app_state.cache))
         .unwrap_or_else(|_| {
@@ -114,12 +124,4 @@ impl AnyService for ThemeService {
 
 impl ServiceMetadata for ThemeService {
     const SERVICE_BRAND: &'static str = "ThemeService";
-}
-
-fn get_home_dir() -> Result<PathBuf> {
-    dirs::home_dir().context("Home directory not found!")
-}
-
-fn get_themes_dir() -> Result<PathBuf> {
-    Ok(get_home_dir()?.join(".config").join("moss").join("themes"))
 }

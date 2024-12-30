@@ -11,7 +11,6 @@ pub enum AddonActivationEvents {
 }
 
 #[derive(Deserialize, Serialize, Debug, Clone, Eq, PartialEq)]
-#[serde(rename_all = "camelCase")]
 pub enum AddonCategories {
     Themes,
     LanguagePacks,
@@ -27,7 +26,7 @@ pub struct ThemeContribution {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct TranslationItem {
+pub struct Translation {
     pub id: String,
     pub path: PathBuf,
 }
@@ -38,7 +37,7 @@ pub struct LocalizationContribution {
     pub code: String,
     pub name: String,
     pub localized_name: String,
-    pub translations: Vec<TranslationItem>,
+    pub translations: Vec<Translation>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -63,5 +62,5 @@ pub struct AddonInfo {
 pub struct AddonManifest {
     pub addon: AddonInfo,
     pub contributes: AddonContributions,
-    pub activation_events: Vec<AddonActivationEvents>,
+    pub activation_events: Option<Vec<AddonActivationEvents>>,
 }

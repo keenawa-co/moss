@@ -18,7 +18,7 @@ THEME_INSTALLER_DIR := misc/themeinstall
 ICONS_DIR := tools/icongen
 
 # --- Addon Directories ---
-export BUILTIN_ADDONS_DIR := addons
+export BUILTIN_ADDONS_DIR := ${CURDIR}/addons
 export INSTALLED_ADDONS_DIR := ${HOME_DIR}/.moss/addons
 
 # --- Model Directories ---

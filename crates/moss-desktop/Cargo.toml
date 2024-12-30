@@ -36,4 +36,4 @@ dirs.workspace = true
 log.workspace = true
 fnv.workspace = true
 smallvec.workspace = true
-async-trait.workspace = true
+toml.workspace = true

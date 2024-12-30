@@ -58,8 +58,10 @@ pub mod plugin_window_state {
 }
 
 pub mod plugin_app_formation {
-
-    use moss_desktop::{app::service::ActivationPoint, services::theme_service::ThemeService};
+    use moss_desktop::{
+        app::service::ActivationPoint,
+        services::{addon_service::AddonService, theme_service::ThemeService},
+    };
     use smallvec::smallvec;
     use std::path::PathBuf;
 
@@ -67,10 +69,10 @@ pub mod plugin_app_formation {
 
     pub fn init() -> TauriPlugin<Wry> {
         app_formation::Builder::new()
-            // .with_service(
-            //     AddonService::new(builtin_addons_dir(), installed_addons_dir()),
-            //     smallvec![ActivationPoint::OnStartUp],
-            // )
+            .with_service(
+                AddonService::new(builtin_addons_dir(), installed_addons_dir()),
+                smallvec![ActivationPoint::OnBootstrapping],
+            )
             .with_service(
                 ThemeService::new(),
                 smallvec![ActivationPoint::OnBootstrapping],
@@ -79,6 +81,11 @@ pub mod plugin_app_formation {
     }
 
     fn builtin_addons_dir() -> impl Into<PathBuf> {
+        let workspace_root =
+            std::env::current_dir().expect("Failed to retrieve the current working directory");
+
+        dbg!(&workspace_root);
+
         std::env::var("BUILTIN_ADDONS_DIR")
             .expect("Environment variable `BUILTIN_ADDONS_DIR` is not set or is invalid")
     }
