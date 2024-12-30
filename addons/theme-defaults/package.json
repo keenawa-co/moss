@@ -1,0 +1,15 @@
+{
+  "name": "@repo/theme-defaults",
+  "scripts": {
+    "start": "npx vite-node ./src/index.ts"
+  },
+  "devDependencies": {
+    "@repo/typescript-config": "workspace:*",
+    "@repo/moss-desktop": "workspace:*",
+    "@types/node": "^22.10.1",
+    "vite-node": "^2.1.1"
+  },
+  "dependencies": {
+    "typescript": "^5.7.2"
+  }
+}

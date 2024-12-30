@@ -9,7 +9,7 @@ pub fn get_menu_items_by_namespace(
     state: State<'_, AppState>,
     namespace: ReadOnlyStr,
 ) -> Result<Vec<MenuItem>, String> {
-    if let Some(menu_items_ref) = state.menus.get(&namespace) {
+    if let Some(menu_items_ref) = state.contributions.menus.get(&namespace) {
         let menu_items = menu_items_ref.clone();
         Ok(menu_items)
     } else {
