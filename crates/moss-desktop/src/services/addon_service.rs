@@ -119,6 +119,4 @@ impl AnyService for AddonService {
     }
 }
 
-impl ServiceMetadata for AddonService {
-    const SERVICE_BRAND: &'static str = "AddonService";
-}
+impl ServiceMetadata for AddonService {}

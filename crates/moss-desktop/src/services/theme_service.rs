@@ -122,6 +122,4 @@ impl AnyService for ThemeService {
     }
 }
 
-impl ServiceMetadata for ThemeService {
-    const SERVICE_BRAND: &'static str = "ThemeService";
-}
+impl ServiceMetadata for ThemeService {}

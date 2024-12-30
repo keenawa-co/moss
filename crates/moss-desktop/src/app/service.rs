@@ -17,7 +17,9 @@ use super::{
 };
 
 pub trait ServiceMetadata {
-    const SERVICE_BRAND: &'static str;
+    fn service_brand() -> &'static str {
+        std::any::type_name::<Self>()
+    }
 }
 
 pub trait AnyService: Any + Send + Sync {
@@ -127,7 +129,7 @@ impl ServiceManager {
 
             trace!(
                 "Starting activation process for service: {} during phase: {:?}",
-                T::SERVICE_BRAND,
+                T::service_brand(),
                 phase
             );
 
@@ -179,7 +181,7 @@ impl ServiceManager {
         if !service_handle.state.is_active() {
             warn!(
                 "Attempting to retrieve service {} which has not yet been activated",
-                T::SERVICE_BRAND
+                T::service_brand(),
             );
             return None;
         }
@@ -189,7 +191,7 @@ impl ServiceManager {
             Err(_) => {
                 debug!(
                     "Failed to cast service {} to the required type",
-                    T::SERVICE_BRAND
+                    T::service_brand(),
                 );
 
                 None
@@ -205,13 +207,13 @@ impl ServiceManager {
             .cloned()
             .unwrap_or_else(|| panic!(
                 "Service {} could not be found. Ensure it has been properly registered before attempting to retrieve it.", 
-                T::SERVICE_BRAND
+                T::service_brand(),
             ));
 
         if !service_handle.state.is_active() {
             panic!(
                 "Attempting to retrieve service {} which has not yet been activated",
-                T::SERVICE_BRAND
+                T::service_brand(),
             );
         }
 
@@ -221,7 +223,7 @@ impl ServiceManager {
             .unwrap_or_else(|_| {
                 panic!(
                     "Failed to cast service {} to the required type",
-                    T::SERVICE_BRAND
+                    T::service_brand(),
                 )
             })
     }
