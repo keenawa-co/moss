@@ -33,7 +33,6 @@ impl ThemeService {
     ) -> Result<String> {
         let handle_cache_miss = || async {
             let content = self.read_color_theme_from_file(source).await?;
-            println!("Cache Miss");
             let options = if let Some(options) = opts {
                 options
             } else {

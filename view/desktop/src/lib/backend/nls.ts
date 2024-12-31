@@ -5,7 +5,6 @@ const I18nTauriBackend: BackendModule = {
   type: "backend",
   init: () => {},
   read: async (language: string, namespace: string, callback: ReadCallback) => {
-    console.log(`getTranslations ${language} ${namespace}`);
     const result = await getTranslations(language, namespace);
     if (result.status === "ok") {
       callback(null, result.data);
