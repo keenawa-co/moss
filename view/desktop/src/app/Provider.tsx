@@ -1,5 +1,6 @@
-import React, { ReactNode } from "react";
+import { ReactNode } from "react";
 
+import { useInitializeAppState } from "@/hooks/useInitializeAppState";
 import { QueryCache, QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
@@ -29,7 +30,9 @@ const queryClient = new QueryClient({
   },
 });
 
-const Provider: React.FC<ProviderProps> = ({ children }) => {
+const Provider = ({ children }: ProviderProps) => {
+  useInitializeAppState();
+
   return (
     <QueryClientProvider client={queryClient}>
       {ENABLE_REACT_QUERY_DEVTOOLS && <ReactQueryDevtools initialIsOpen={false} buttonPosition="bottom-left" />}

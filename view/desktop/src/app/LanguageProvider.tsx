@@ -27,7 +27,7 @@ const LanguageProvider = ({ children }: { children: React.ReactNode }) => {
     let unlisten: UnlistenFn;
 
     const handleLanguagePackChanged = (event: { payload: LocaleDescriptor }) => {
-      console.log(event);
+      // console.log(event);
       const newLanguagePack: LocaleDescriptor = event.payload;
 
       if (newLanguagePack.code !== currentLanguageCode) {

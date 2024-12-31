@@ -4,42 +4,24 @@ import i18n from "@/app/i18n";
 import getLocales from "@/lib/backend/locales";
 import { LocaleDescriptor } from "@repo/moss-desktop";
 
-const LOCALSTORAGE_KEY = "language";
-
 interface LanguageStore {
-  currentLanguageCode: LocaleDescriptor["code"];
+  currentLanguageCode: LocaleDescriptor["code"] | null;
   languagePacks: LocaleDescriptor[];
   setLanguageCode: (newLanguage: LocaleDescriptor["code"]) => void;
-  initializeLanguage: () => void;
   initializeLanguages: () => void;
 }
 
 export const useLanguageStore = create<LanguageStore>((set, get) => ({
-  currentLanguageCode: (localStorage.getItem(LOCALSTORAGE_KEY) as LocaleDescriptor["code"]) || "en",
+  currentLanguageCode: "en",
   languagePacks: [],
-  setLanguageCode: (newLanguage) => {
+  setLanguageCode: (newLanguageCode) => {
     const { languagePacks } = get();
 
-    const isValidLanguage = languagePacks.some(({ code }) => code === newLanguage);
-    const validLanguageCode = isValidLanguage ? newLanguage : "en";
+    const isValidLanguage = languagePacks.some(({ code }) => code === newLanguageCode);
+    const validLanguageCode = isValidLanguage ? newLanguageCode : "en";
 
-    localStorage.setItem(LOCALSTORAGE_KEY, validLanguageCode);
     i18n.changeLanguage(validLanguageCode);
     set({ currentLanguageCode: validLanguageCode });
-  },
-  initializeLanguage: async () => {
-    const { languagePacks } = get();
-
-    const storedLanguageCode = localStorage.getItem(LOCALSTORAGE_KEY) as LocaleDescriptor["code"];
-
-    if (storedLanguageCode && languagePacks.some(({ code }) => code === storedLanguageCode)) {
-      i18n.changeLanguage(storedLanguageCode);
-      set({ currentLanguageCode: storedLanguageCode });
-    } else {
-      localStorage.setItem(LOCALSTORAGE_KEY, "en");
-      i18n.changeLanguage("en");
-      set({ currentLanguageCode: "en" });
-    }
   },
   initializeLanguages: async () => {
     try {
