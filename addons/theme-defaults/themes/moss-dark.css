@@ -1,0 +1,19 @@
+:root {
+  --color-page-background: rgba(22, 24, 25, 1);
+  --color-primary: rgba(255, 255, 255, 1);
+  --color-sideBar-background: rgba(39, 39, 42, 1);
+  --color-statusBar-background: linear-gradient(
+    90deg,
+    rgba(255, 0, 0, 1) 0%,
+    rgba(224, 0, 41, 1) 16%,
+    rgba(190, 0, 87, 1) 34%,
+    rgba(155, 0, 133, 1) 51%,
+    rgba(63, 0, 255, 1) 100%
+  );
+  --color-toolBar-background: rgba(30, 32, 33, 1);
+  --color-windowControlsLinux-activeBackground: rgba(86, 86, 86, 1);
+  --color-windowControlsLinux-background: rgba(55, 55, 55, 1);
+  --color-windowControlsLinux-hoverBackground: rgba(66, 66, 66, 1);
+  --color-windowControlsLinux-text: rgba(255, 255, 255, 1);
+  --color-windowsCloseButton-background: rgba(196, 43, 28, 1);
+}

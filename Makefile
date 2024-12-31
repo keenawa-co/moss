@@ -9,7 +9,7 @@ else
     HOME_DIR := ${HOME}
 endif
 
-# App Directories
+# --- App Directories ---
 DESKTOP_DIR := view/desktop
 STORYBOOK_DIR := view/storybook
 WEB_DIR := view/web
@@ -17,12 +17,19 @@ THEME_GENERATOR_DIR := tools/themegen
 THEME_INSTALLER_DIR := misc/themeinstall
 ICONS_DIR := tools/icongen
 
+# --- Addon Directories ---
+export BUILTIN_ADDONS_DIR := ${CURDIR}/addons
+export INSTALLED_ADDONS_DIR := ${HOME_DIR}/.moss/addons
+
+# --- Model Directories ---
 DESKTOP_MODELS_DIR := crates/moss-desktop
 HTML_MODELS_DIR := crates/moss-html
 UIKIT_MODELS_DIR := crates/moss-uikit
 
+# --- Schema Directories ---
 THEME_SCHEMA_DIR :=  crates/moss-theme
 
+# --- Tool Directories ---
 XTASK_DIR := tools/xtask
 
 # User Directories
@@ -250,13 +257,11 @@ check-unused-deps:
 # Runs a series of maintenance tasks to keep the project organized and up-to-date.
 # TODO: output workspace-audit and check-unused-deps to file
 .PHONY: tidy
-
 tidy: gen-license workspace-audit check-unused-deps
 	$(MAKE) clean
 
 # Create a release build
 .PHONY: build
-
 build:
 	# Enable compression feature for reducing binary size
 	$(CARGO) build --bin desktop --features compression

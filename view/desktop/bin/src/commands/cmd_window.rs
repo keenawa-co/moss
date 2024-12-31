@@ -56,10 +56,11 @@ pub fn execute_command(
 
 #[tauri::command(async)]
 pub async fn get_color_theme(
-    theme_service: State<'_, ThemeService>,
+    app_state: State<'_, AppState>,
     path: String,
     opts: Option<GetColorThemeOptions>,
 ) -> Result<String, String> {
+    let theme_service = app_state.services.get_unchecked::<ThemeService>();
     theme_service
         .get_color_theme(&path, opts)
         .await
@@ -92,26 +93,19 @@ pub fn get_state(app_state: State<'_, AppState>) -> Result<AppStateInfo, String>
 // FIXME: This is a temporary solution until we have a registry of installed
 // plugins and the ability to check which theme packs are installed.
 #[tauri::command(async)]
-pub async fn get_themes() -> Result<Vec<ThemeDescriptor>, String> {
-    Ok(vec![
-        ThemeDescriptor {
-            id: "theme-light".to_string(),
-            name: "Theme Light".to_string(),
-            source: PathBuf::from("moss-light.css")
-                .to_string_lossy()
-                .to_string(),
-        },
-        ThemeDescriptor {
-            id: "theme-dark".to_string(),
-            name: "Theme Dark".to_string(),
-            source: PathBuf::from("moss-dark.css").to_string_lossy().to_string(),
-        },
-        ThemeDescriptor {
-            id: "theme-pink".to_string(),
-            name: "Theme Pink".to_string(),
-            source: PathBuf::from("moss-pink.css").to_string_lossy().to_string(),
-        },
-    ])
+pub async fn get_themes(app_state: State<'_, AppState>) -> Result<Vec<ThemeDescriptor>, String> {
+    let theme_service = app_state.services.get_unchecked::<ThemeService>();
+    let r: Vec<ThemeDescriptor> = theme_service
+        .get_color_themes()
+        .clone()
+        .into_iter()
+        .collect();
+
+    Ok(theme_service
+        .get_color_themes()
+        .clone()
+        .into_iter()
+        .collect())
 }
 
 // FIXME: This is a temporary solution until we have a registry of installed

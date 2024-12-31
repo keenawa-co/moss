@@ -40,12 +40,11 @@ serde_json.workspace = true
 serde = { workspace = true, features = ["derive"] }
 strum = { workspace = true, features = ["derive"] }
 hashbrown = { workspace = true, features = ["serde"] }
-
+smallvec.workspace = true
 tauri.workspace = true
 
 tauri-plugin-log = { version = "2.0.1", features = ["colored"] }
 tauri-plugin-window-state = "2.0.1"
-# tauri-plugin-clipboard-manager = "2.0.1"
 tauri-plugin-fs = "2.1.0"
 tauri-plugin-global-shortcut = "2"
 tauri-plugin-os = "2.2.0"

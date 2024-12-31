@@ -7,7 +7,7 @@ use std::{cell::RefCell, sync::Arc};
 use tauri::{AppHandle, Window};
 use thiserror::Error;
 
-use crate::state::AppState;
+use crate::app::state::AppState;
 
 #[derive(Error, Debug)]
 pub enum CommandContextError {

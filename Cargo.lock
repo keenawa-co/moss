@@ -1059,6 +1059,7 @@ dependencies = [
  "rand 0.8.5",
  "serde",
  "serde_json",
+ "smallvec",
  "smol",
  "strum",
  "tauri",
@@ -2550,6 +2551,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "moss_addon"
+version = "0.1.0"
+dependencies = [
+ "serde",
+]
+
+[[package]]
 name = "moss_async"
 version = "0.1.0"
 dependencies = [
@@ -2580,10 +2588,12 @@ dependencies = [
  "anyhow",
  "dashmap",
  "dirs",
+ "fnv",
  "hashbrown 0.15.2",
  "indexmap 2.7.0",
  "linkme",
  "log",
+ "moss_addon",
  "moss_cache",
  "moss_html",
  "moss_jsonlogic",
@@ -2596,9 +2606,13 @@ dependencies = [
  "quote",
  "serde",
  "serde_json",
+ "smallvec",
  "smol",
+ "strum",
  "tauri",
  "thiserror 2.0.8",
+ "tokio",
+ "toml 0.8.19",
  "ts-rs",
 ]
 
@@ -2669,22 +2683,6 @@ dependencies = [
  "moss_desktop",
  "serde",
  "serde_json",
-]
-
-[[package]]
-name = "moss_typebridge"
-version = "0.1.0"
-dependencies = [
- "moss_typebridge_macro",
- "serde",
-]
-
-[[package]]
-name = "moss_typebridge_macro"
-version = "0.1.0"
-dependencies = [
- "quote",
- "syn 2.0.90",
 ]
 
 [[package]]
