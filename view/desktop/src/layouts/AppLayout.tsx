@@ -134,7 +134,7 @@ const CenterLayout = ({ ...props }: ResizableLayoutProps) => {
           <ResizablePanel>
             <MainContent />
           </ResizablePanel>
-          <DockviewDemo theme="dockview-theme-abyss" />
+          <DockviewDemo theme="dockview-theme-light" />
           <ResizablePanel
             preferredSize={props.bottomPaneGetHeight()}
             snap
