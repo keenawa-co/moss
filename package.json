@@ -21,7 +21,7 @@
     "@storybook/experimental-addon-test": "^8.4.7",
     "@storybook/test": "^8.4.7",
     "@types/node": "^22.10.1",
-    "@types/react": "^18",
+    "@types/react": "^19",
     "@types/react-dom": "^18",
     "@typespec/prettier-plugin-typespec": "0.62.0",
     "@vitejs/plugin-react": "^4.3.4",
@@ -45,8 +45,8 @@
     "node": ">=18"
   },
   "dependencies": {
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
     "react-router-dom": "6"
   }
 }
