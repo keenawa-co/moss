@@ -1,4 +1,6 @@
-import { DockviewGroupPanel, DockviewGroupPanelApi, DockviewGroupPanelModel } from "dockview-core";
+import { DockviewGroupPanelApi } from "../../api/dockviewGroupPanelApi";
+import { DockviewGroupPanel } from "../../dockview/dockviewGroupPanel";
+import { DockviewGroupPanelModel } from "../../dockview/dockviewGroupPanelModel";
 import { ReactHeaderActionsRendererPart } from "../../dockview/headerActionsRenderer";
 
 describe("headerActionsRenderer", () => {

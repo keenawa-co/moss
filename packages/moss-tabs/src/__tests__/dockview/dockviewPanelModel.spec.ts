@@ -1,8 +1,9 @@
+import { fromPartial } from "@total-typescript/shoehorn";
+
+import { DefaultTab } from "../../dockview/components/tab/defaultTab";
 import { DockviewComponent } from "../../dockview/dockviewComponent";
 import { DockviewPanelModel } from "../../dockview/dockviewPanelModel";
 import { IContentRenderer, ITabRenderer } from "../../dockview/types";
-import { DefaultTab } from "../../dockview/components/tab/defaultTab";
-import { fromPartial } from "@total-typescript/shoehorn";
 
 describe("dockviewGroupPanel", () => {
   let contentMock: jest.Mock<IContentRenderer>;
@@ -20,17 +21,18 @@ describe("dockviewGroupPanel", () => {
     });
 
     tabMock = jest.fn<ITabRenderer, []>(() => {
-      const partial: Partial<IContentRenderer> = {
+      const partial: Partial<ITabRenderer> = {
         element: document.createElement("div"),
         dispose: jest.fn(),
         update: jest.fn(),
+        init: jest.fn(),
       };
-      return partial as IContentRenderer;
+      return partial as ITabRenderer;
     });
 
     accessorMock = fromPartial<DockviewComponent>({
       options: {
-        createComponent(options) {
+        createComponent(options: { id: string; name: string }): IContentRenderer {
           switch (options.name) {
             case "contentComponent":
               return new contentMock(options.id, options.name);
@@ -38,7 +40,7 @@ describe("dockviewGroupPanel", () => {
               throw new Error(`unsupported`);
           }
         },
-        createTabComponent(options) {
+        createTabComponent(options: { id: string; name: string }): ITabRenderer {
           switch (options.name) {
             case "tabComponent":
               return new tabMock(options.id, options.name);
@@ -73,7 +75,7 @@ describe("dockviewGroupPanel", () => {
   test("that the default tab is created", () => {
     accessorMock = fromPartial<DockviewComponent>({
       options: {
-        createComponent(options) {
+        createComponent(options: { id: string; name: string }): IContentRenderer {
           switch (options.name) {
             case "contentComponent":
               return new contentMock(options.id, options.name);
@@ -81,10 +83,10 @@ describe("dockviewGroupPanel", () => {
               throw new Error(`unsupported`);
           }
         },
-        createTabComponent(options) {
+        createTabComponent(options: { id: string; name: string }): ITabRenderer {
           switch (options.name) {
             case "tabComponent":
-              return tabMock;
+              return new tabMock(options.id, options.name);
             default:
               throw new Error(`unsupported`);
           }
@@ -101,7 +103,7 @@ describe("dockviewGroupPanel", () => {
     accessorMock = fromPartial<DockviewComponent>({
       options: {
         defaultTabComponent: "tabComponent",
-        createComponent(options) {
+        createComponent(options: { id: string; name: string }): IContentRenderer {
           switch (options.name) {
             case "contentComponent":
               return new contentMock(options.id, options.name);
@@ -109,10 +111,10 @@ describe("dockviewGroupPanel", () => {
               throw new Error(`unsupported`);
           }
         },
-        createTabComponent(options) {
+        createTabComponent(options: { id: string; name: string }): ITabRenderer {
           switch (options.name) {
             case "tabComponent":
-              return tabMock;
+              return new tabMock(options.id, options.name);
             default:
               throw new Error(`unsupported`);
           }
@@ -128,7 +130,7 @@ describe("dockviewGroupPanel", () => {
   test("that is library default tab instance is created when no alternative exists", () => {
     accessorMock = fromPartial<DockviewComponent>({
       options: {
-        createComponent(options) {
+        createComponent(options: { id: string; name: string }): IContentRenderer {
           switch (options.name) {
             case "contentComponent":
               return new contentMock(options.id, options.name);
@@ -147,18 +149,18 @@ describe("dockviewGroupPanel", () => {
   test("that the default content is created", () => {
     accessorMock = fromPartial<DockviewComponent>({
       options: {
-        createComponent(options) {
+        createComponent(options: { id: string; name: string }): IContentRenderer {
           switch (options.name) {
             case "contentComponent":
-              return contentMock;
+              return new contentMock(options.id, options.name);
             default:
               throw new Error(`unsupported`);
           }
         },
-        createTabComponent(options) {
+        createTabComponent(options: { id: string; name: string }): ITabRenderer {
           switch (options.name) {
             case "tabComponent":
-              return tabMock;
+              return new tabMock(options.id, options.name);
             default:
               throw new Error(`unsupported`);
           }

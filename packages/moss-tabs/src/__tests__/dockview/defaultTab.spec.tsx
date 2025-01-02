@@ -1,11 +1,14 @@
-import { fireEvent, render, screen } from "@testing-library/react";
-import { DockviewDefaultTab } from "../../dockview/defaultTab";
 import React from "react";
-import { fromPartial } from "@total-typescript/shoehorn";
-import { DockviewApi, DockviewPanelApi, TitleEvent } from "dockview-core";
-import { Emitter } from "dockview-core/dist/cjs/events";
 import { act } from "react-dom/test-utils";
-import { Disposable } from "dockview-core/dist/cjs/lifecycle";
+
+import { fireEvent, render, screen } from "@testing-library/react";
+import { fromPartial } from "@total-typescript/shoehorn";
+
+import { DockviewApi } from "../../api/component.api";
+import { DockviewPanelApi, TitleEvent } from "../../api/dockviewPanelApi";
+import { DockviewDefaultTab } from "../../dockview/defaultTab";
+import { Emitter } from "../../events";
+import { Disposable } from "../../lifecycle";
 
 describe("defaultTab", () => {
   test("has close button by default", async () => {

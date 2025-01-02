@@ -55,8 +55,8 @@
     "clean": "rimraf dist/ .build/ .rollup.cache/",
     "prepublishOnly": "npm run rebuild && npm run test",
     "rebuild": "npm run clean && npm run build",
-    "test": "cross-env ../../node_modules/.bin/jest --selectProjects dockview-core",
-    "test:cov": "cross-env ../../node_modules/.bin/jest --selectProjects dockview-core --coverage"
+    "test": "cross-env ../../node_modules/.bin/jest --selectProjects moss-tabs",
+    "test:cov": "cross-env ../../node_modules/.bin/jest --selectProjects moss-tabs --coverage"
   },
   "devDependencies": {
     "@repo/typescript-config": "workspace:*",
@@ -68,7 +68,9 @@
   },
   "dependencies": {
     "@testing-library/dom": "^10.4.0",
+    "@testing-library/react": "^16.1.0",
     "@total-typescript/shoehorn": "^0.1.2",
+    "cross-env": "^7.0.3",
     "ts-jest": "^29.2.5"
   }
 }

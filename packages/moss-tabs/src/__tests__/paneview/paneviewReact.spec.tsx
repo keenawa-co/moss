@@ -2,22 +2,19 @@ import React from "react";
 
 import { act, render, waitFor } from "@testing-library/react";
 
-import "@testing-library/jest-dom/extend-expect";
-
 import { setMockRefElement } from "../__test_utils__/utils";
-import { DockviewApi } from "../../api/component.api";
-import { DockviewReact } from "../../dockview/dockview";
-import { IDockviewPanel } from "../../dockview/dockviewPanel";
-import { DockviewReadyEvent, IDockviewPanelProps } from "../../dockview/framework";
+import { PaneviewApi } from "../../api/component.api";
+import { IPaneviewPanel } from "../../paneview/paneviewPanel";
+import { IPaneviewPanelProps, PaneviewReact, PaneviewReadyEvent } from "../../paneview/paneviewReact";
 
 const { expect } = require("@jest/globals");
 
 describe("gridview react", () => {
-  let components: Record<string, React.FunctionComponent<IDockviewPanelProps>>;
+  let components: Record<string, React.FunctionComponent<IPaneviewPanelProps>>;
 
   beforeEach(() => {
     components = {
-      default: (props: IDockviewPanelProps) => {
+      default: (props: IPaneviewPanelProps) => {
         return (
           <div>
             {Object.keys(props.params).map((key) => {
@@ -30,52 +27,51 @@ describe("gridview react", () => {
   });
 
   test("default", () => {
-    let api: DockviewApi | undefined;
+    let api: PaneviewApi | undefined;
 
-    const onReady = (event: DockviewReadyEvent) => {
+    const onReady = (event: PaneviewReadyEvent) => {
       api = event.api;
     };
 
-    render(<DockviewReact components={components} onReady={onReady} />);
+    render(<PaneviewReact components={components} onReady={onReady} />);
 
     expect(api).toBeTruthy();
   });
 
   test("is sized to container", () => {
-    const el = document.createElement("div");
+    setMockRefElement({
+      clientHeight: 450,
+      clientWidth: 650,
+      appendChild: jest.fn(),
+    });
+    let api: PaneviewApi | undefined;
 
-    jest.spyOn(el, "clientHeight", "get").mockReturnValue(450);
-    jest.spyOn(el, "clientWidth", "get").mockReturnValue(650);
-
-    setMockRefElement(el);
-
-    let api: DockviewApi | undefined;
-
-    const onReady = (event: DockviewReadyEvent) => {
+    const onReady = (event: PaneviewReadyEvent) => {
       api = event.api;
     };
 
-    render(<DockviewReact components={components} onReady={onReady} />);
+    render(<PaneviewReact components={components} onReady={onReady} />);
 
     expect(api!.width).toBe(650);
     expect(api!.height).toBe(450);
   });
 
   test("that the component can update parameters", async () => {
-    let api: DockviewApi;
+    let api: PaneviewApi;
 
-    const onReady = (event: DockviewReadyEvent) => {
+    const onReady = (event: PaneviewReadyEvent) => {
       api = event.api;
     };
 
-    const wrapper = render(<DockviewReact components={components} onReady={onReady} />);
+    const wrapper = render(<PaneviewReact components={components} onReady={onReady} />);
 
-    let panel: IDockviewPanel;
+    let panel: IPaneviewPanel;
 
     act(() => {
       panel = api!.addPanel({
         id: "panel_1",
         component: "default",
+        title: "Panel 1",
         params: {
           keyA: "valueA",
           keyB: "valueB",

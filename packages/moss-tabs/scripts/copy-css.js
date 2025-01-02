@@ -7,7 +7,4 @@ if (!fs.existsSync(outDir)) {
   fs.mkdirSync(outDir);
 }
 
-fs.copyFileSync(
-  path.join(__dirname, "../../dockview-core/dist/styles/dockview.css"),
-  path.join(outDir, "dockview.css")
-);
+fs.copyFileSync(path.join(__dirname, "../../moss-tabs/dist/styles/dockview.css"), path.join(outDir, "dockview.css"));
