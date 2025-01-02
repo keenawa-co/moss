@@ -3,6 +3,7 @@ use serde_json::Value;
 use tauri::{Emitter, EventTarget, Manager};
 
 use crate::{
+    app::state::AppState,
     command::{CommandContext, CommandDecl},
     contribution::TreeViewGroupDecl,
     contribution_point,
@@ -11,7 +12,6 @@ use crate::{
         constants,
         view::*,
     },
-    state::AppState,
 };
 
 contribution_point!(WORKBENCH, {

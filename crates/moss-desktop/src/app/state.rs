@@ -6,11 +6,13 @@ use std::time::Duration;
 use std::{sync::atomic::AtomicUsize, sync::Arc};
 
 use crate::command::CommandHandler;
-use crate::contribution_collector::ContributionCollector;
+use crate::contribution_collector::{ContributionCollector, ContributionRegistry};
 use crate::models::application::{LocaleDescriptor, ThemeDescriptor};
 use crate::models::{actions::MenuItem, view::*};
 
-const STATE_CACHE_TTL: Duration = Duration::from_secs(60 * 5);
+use super::service::ServiceManager;
+
+const STATE_CACHE_TTL: Duration = Duration::from_secs(60 * 3);
 const STATE_MAX_CAPACITY: u64 = 100;
 
 pub struct Preferences {
@@ -18,21 +20,30 @@ pub struct Preferences {
     pub locale: RwLock<LocaleDescriptor>,
 }
 
+#[repr(i8)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord)]
+pub enum LifecyclePhase {
+    Starting = 0,
+}
+
 pub struct AppState {
     next_window_id: AtomicUsize,
+    pub contributions: ContributionRegistry,
     pub cache: Arc<Cache<MokaBackend>>,
     pub preferences: Preferences,
-    pub commands: DashMap<ReadOnlyStr, CommandHandler>,
-    pub menus: DashMap<ReadOnlyStr, Vec<MenuItem>>,
-    pub tree_view_groups: DashMap<TreeViewGroupLocation, Vec<TreeViewGroup>>,
-    pub tree_views: DashMap<GroupId, Vec<TreeViewDescriptor>>,
+    pub services: ServiceManager,
+    // pub themes: RwLock<Vec<ThemeDescriptor>>,
+    // pub commands: DashMap<ReadOnlyStr, CommandHandler>,
+    // pub menus: DashMap<ReadOnlyStr, Vec<MenuItem>>,
+    // pub tree_view_groups: DashMap<TreeViewGroupLocation, Vec<TreeViewGroup>>,
+    // pub tree_views: DashMap<GroupId, Vec<TreeViewDescriptor>>,
 }
 
 impl AppState {
-    pub fn new() -> Self {
+    pub fn new(services: ServiceManager) -> Self {
         // FIXME: This should be abstracted in the future.
-        let contribution_collector = ContributionCollector::new();
-        let contribution_collection = contribution_collector.collect();
+        // let contribution_collector = ContributionCollector::new();
+        // let contribution_collection = contribution_collector.collect();
         let cache = Cache::new(MokaBackend::new(STATE_MAX_CAPACITY, STATE_CACHE_TTL));
 
         let state = Self {
@@ -50,10 +61,13 @@ impl AppState {
                     direction: Some("ltr".to_string()),
                 }),
             },
-            commands: contribution_collection.commands,
-            menus: contribution_collection.menus,
-            tree_view_groups: contribution_collection.tree_view_groups,
-            tree_views: contribution_collection.tree_views,
+            services,
+            contributions: ContributionRegistry::new().init(),
+            // themes: RwLock::new(Vec::new()),
+            // commands: contribution_collection.commands,
+            // menus: contribution_collection.menus,
+            // tree_view_groups: contribution_collection.tree_view_groups,
+            // tree_views: contribution_collection.tree_views,
         };
 
         state
@@ -65,7 +79,10 @@ impl AppState {
     }
 
     pub fn get_command(&self, id: &ReadOnlyStr) -> Option<CommandHandler> {
-        self.commands.get(id).map(|cmd| Arc::clone(&cmd))
+        self.contributions
+            .commands
+            .get(id)
+            .map(|cmd| Arc::clone(&cmd))
     }
 
     pub fn change_language_pack(&self, locale_descriptor: LocaleDescriptor) {

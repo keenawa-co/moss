@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 use ts_rs::TS;
 
-#[derive(Deserialize, Serialize, Debug, Clone, Eq, PartialEq, TS)]
+#[derive(Deserialize, Serialize, Hash, Debug, Clone, Eq, PartialEq, TS)]
 #[serde(rename_all = "camelCase")]
 #[ts(export, export_to = "application.ts")]
 pub struct ThemeDescriptor {
