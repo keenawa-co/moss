@@ -48,20 +48,23 @@
     "build": "npm run build:package && npm run build:bundles",
     "build:bundles": "rollup -c",
     "build:cjs": "cross-env ../../node_modules/.bin/tsc --build ./tsconfig.json --verbose --extendedDiagnostics",
-    "build:css": "node scripts/copy-css.js",
+    "build:css": "gulp sass",
+    "build:css-old": "node scripts/copy-css.js",
     "build:esm": "cross-env ../../node_modules/.bin/tsc --build ./tsconfig.esm.json --verbose --extendedDiagnostics",
     "build:package": "npm run build:cjs && npm run build:esm && npm run build:css",
     "clean": "rimraf dist/ .build/ .rollup.cache/",
     "prepublishOnly": "npm run rebuild && npm run test",
     "rebuild": "npm run clean && npm run build",
-    "test": "cross-env ../../node_modules/.bin/jest --selectProjects dockview",
-    "test:cov": "cross-env ../../node_modules/.bin/jest --selectProjects dockview --coverage"
+    "test": "cross-env ../../node_modules/.bin/jest --selectProjects dockview-core",
+    "test:cov": "cross-env ../../node_modules/.bin/jest --selectProjects dockview-core --coverage"
   },
   "devDependencies": {
-    "@repo/moss-tabs-core": "workspace:*",
     "@repo/typescript-config": "workspace:*"
   },
   "peerDependencies": {
     "react": "^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0"
+  },
+  "dependencies": {
+    "ts-jest": "^29.2.5"
   }
 }

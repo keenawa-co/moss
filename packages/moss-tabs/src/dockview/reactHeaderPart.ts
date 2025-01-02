@@ -1,13 +1,9 @@
 import * as React from "react";
 
-import {
-  GroupPanelPartInitParameters,
-  IGroupPanelBaseProps,
-  ITabRenderer,
-  PanelUpdateEvent,
-} from "@repo/moss-tabs-core";
-
+import { PanelUpdateEvent } from "../panel/types";
 import { ReactPart, ReactPortalStore } from "../react";
+import { IGroupPanelBaseProps } from "./framework";
+import { GroupPanelPartInitParameters, ITabRenderer } from "./types";
 
 export class ReactPanelHeaderPart implements ITabRenderer {
   private readonly _element: HTMLElement;

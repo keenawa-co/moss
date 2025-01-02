@@ -1,15 +1,10 @@
 import * as React from "react";
 
-import {
-  DockviewEmitter,
-  DockviewEvent,
-  GroupPanelPartInitParameters,
-  IContentRenderer,
-  IDockviewPanelProps,
-  PanelUpdateEvent,
-} from "@repo/moss-tabs-core";
-
+import { Emitter as DockviewEmitter, Event as DockviewEvent } from "../events";
+import { PanelUpdateEvent } from "../panel/types";
 import { ReactPart, ReactPortalStore } from "../react";
+import { IDockviewPanelProps } from "./framework";
+import { GroupPanelPartInitParameters, IContentRenderer } from "./types";
 
 export class ReactPanelContentPart implements IContentRenderer {
   private readonly _element: HTMLElement;

@@ -4,9 +4,8 @@ const { join } = require("path");
 const typescript = require("@rollup/plugin-typescript");
 const terser = require("@rollup/plugin-terser");
 const postcss = require("rollup-plugin-postcss");
-const nodeResolve = require("@rollup/plugin-node-resolve");
 
-const { name, version, homepage, license } = require("./package.json");
+const { name, version, homepage, license } = require("../moss-tabs/package.json");
 const main = join(__dirname, "./scripts/rollupEntryTarget.ts");
 const mainNoStyles = join(__dirname, "./src/index.ts");
 const outputDir = join(__dirname, "dist");
@@ -60,9 +59,6 @@ function createBundle(format, options) {
   };
 
   const plugins = [
-    nodeResolve({
-      include: ["node_modules/dockview-core/**"],
-    }),
     typescript({
       tsconfig: "tsconfig.esm.json",
     }),

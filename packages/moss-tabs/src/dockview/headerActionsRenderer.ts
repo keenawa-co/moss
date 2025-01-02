@@ -1,17 +1,16 @@
 import * as React from "react";
 
+import { DockviewApi } from "../api/component.api";
+import { DockviewGroupPanelApi } from "../api/dockviewGroupPanelApi";
 import {
-  DockviewApi,
-  DockviewCompositeDisposable,
-  DockviewGroupPanel,
-  DockviewGroupPanelApi,
-  DockviewMutableDisposable,
-  IDockviewHeaderActionsProps,
-  IHeaderActionsRenderer,
-  PanelUpdateEvent,
-} from "@repo/moss-tabs-core";
-
+  CompositeDisposable as DockviewCompositeDisposable,
+  MutableDisposable as DockviewMutableDisposable,
+} from "../lifecycle";
+import { PanelUpdateEvent } from "../panel/types";
 import { ReactPart, ReactPortalStore } from "../react";
+import { DockviewGroupPanel } from "./dockviewGroupPanel";
+import { IDockviewHeaderActionsProps } from "./framework";
+import { IHeaderActionsRenderer } from "./options";
 
 export class ReactHeaderActionsRendererPart implements IHeaderActionsRenderer {
   private readonly mutableDisposable = new DockviewMutableDisposable();

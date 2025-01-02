@@ -1,13 +1,9 @@
-import {
-  GridviewApi,
-  GridviewComponent,
-  GridviewInitParameters,
-  GridviewPanel,
-  IFrameworkPart,
-} from "@repo/moss-tabs-core";
-
+import { GridviewApi } from "../api/component.api";
+import { IFrameworkPart } from "../panel/types";
 import { ReactPart, ReactPortalStore } from "../react";
-import { IGridviewPanelProps } from "./gridview";
+import { GridviewComponent } from "./gridviewComponent";
+import { GridviewInitParameters, GridviewPanel } from "./gridviewPanel";
+import { IGridviewPanelProps } from "./gridviewReact";
 
 export class ReactGridPanelView extends GridviewPanel {
   constructor(

@@ -1,9 +1,9 @@
 import React from "react";
 
-import { IPaneBodyPart, PanelUpdateEvent, PanePanelComponentInitParameter } from "@repo/moss-tabs-core";
-
+import { PanelUpdateEvent } from "../panel/types";
 import { ReactPart, ReactPortalStore } from "../react";
-import { IPaneviewPanelProps } from "./paneview";
+import { IPaneBodyPart, PanePanelComponentInitParameter } from "./paneviewPanel";
+import { IPaneviewPanelProps } from "./paneviewReact";
 
 export class PanePanelSection implements IPaneBodyPart {
   private readonly _element: HTMLElement;

@@ -1,8 +1,8 @@
 import * as React from "react";
 
-import { DockviewPanelApi, IDockviewPanelHeaderProps } from "@repo/moss-tabs-core";
-
-import { CloseButton } from "../svg";
+import { DockviewPanelApi } from "../api/dockviewPanelApi";
+import { CloseButton } from "../svgReact";
+import { IDockviewPanelHeaderProps } from "./framework";
 
 function useTitle(api: DockviewPanelApi): string | undefined {
   const [title, setTitle] = React.useState<string | undefined>(api.title);

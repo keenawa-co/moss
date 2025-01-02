@@ -1,25 +1,25 @@
 import * as React from "react";
 
+import { DockviewApi } from "../api/component.api";
+import { createDockview } from "../api/entryPoints";
+import { ReactPortalStore, usePortalsLifecycle } from "../react";
+import { DockviewGroupPanel } from "./dockviewGroupPanel";
+import { DockviewDidDropEvent, DockviewWillDropEvent } from "./dockviewGroupPanelModel";
 import {
-  createDockview,
-  DockviewApi,
-  DockviewComponentOptions,
-  DockviewDidDropEvent,
-  DockviewFrameworkOptions,
-  DockviewGroupPanel,
-  DockviewOptions,
   DockviewReadyEvent,
-  DockviewWillDropEvent,
   IDockviewHeaderActionsProps,
   IDockviewPanelHeaderProps,
   IDockviewPanelProps,
-  IHeaderActionsRenderer,
   IWatermarkPanelProps,
-  PROPERTY_KEYS,
-} from "@repo/moss-tabs-core";
-
-import { ReactPortalStore, usePortalsLifecycle } from "../react";
+} from "./framework";
 import { ReactHeaderActionsRendererPart } from "./headerActionsRenderer";
+import {
+  DockviewComponentOptions,
+  DockviewFrameworkOptions,
+  DockviewOptions,
+  IHeaderActionsRenderer,
+  PROPERTY_KEYS,
+} from "./options";
 import { ReactPanelContentPart } from "./reactContentPart";
 import { ReactPanelHeaderPart } from "./reactHeaderPart";
 import { ReactWatermarkPart } from "./reactWatermarkPart";

@@ -1,7 +1,8 @@
-import { PanelViewInitParameters, SplitviewApi, SplitviewPanel } from "@repo/moss-tabs-core";
-
+import { SplitviewApi } from "../api/component.api";
 import { ReactPart, ReactPortalStore } from "../react";
-import { ISplitviewPanelProps } from "./splitview";
+import { PanelViewInitParameters } from "./options";
+import { SplitviewPanel } from "./splitviewPanel";
+import { ISplitviewPanelProps } from "./splitviewReact";
 
 export class ReactPanelView extends SplitviewPanel {
   constructor(

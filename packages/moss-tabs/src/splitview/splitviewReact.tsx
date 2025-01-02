@@ -1,9 +1,11 @@
 import React from "react";
 
-import { createSplitview, Orientation, SplitviewApi, SplitviewPanelApi } from "@repo/moss-tabs-core";
-
+import { SplitviewApi } from "../api/component.api";
+import { createSplitview } from "../api/entryPoints";
+import { SplitviewPanelApi } from "../api/splitviewPanelApi";
 import { usePortalsLifecycle } from "../react";
 import { PanelParameters } from "../types";
+import { Orientation } from "./splitview";
 import { ReactPanelView } from "./view";
 
 export interface SplitviewReadyEvent {

@@ -1,10 +1,11 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 
-import { DockviewDisposable, DockviewIDisposable, IFrameworkPart, Parameters } from "@repo/moss-tabs-core";
+import { Disposable, IDisposable } from "./lifecycle";
+import { IFrameworkPart, Parameters } from "./panel/types";
 
 export interface ReactPortalStore {
-  addPortal: (portal: React.ReactPortal) => DockviewIDisposable;
+  addPortal: (portal: React.ReactPortal) => IDisposable;
 }
 
 interface IPanelWrapperProps {
@@ -66,7 +67,7 @@ export class ReactPart<P extends object, C extends object = {}> implements IFram
   private componentInstance?: IPanelWrapperRef;
   private ref?: {
     portal: React.ReactPortal;
-    disposable: DockviewIDisposable;
+    disposable: IDisposable;
   };
   private disposed = false;
 
@@ -140,7 +141,7 @@ export class ReactPart<P extends object, C extends object = {}> implements IFram
   }
 }
 
-type PortalLifecycleHook = () => [React.ReactPortal[], (portal: React.ReactPortal) => DockviewIDisposable];
+type PortalLifecycleHook = () => [React.ReactPortal[], (portal: React.ReactPortal) => IDisposable];
 
 /**
  * A React Hook that returns an array of portals to be rendered by the user of this hook
@@ -155,7 +156,7 @@ export const usePortalsLifecycle: PortalLifecycleHook = () => {
   const addPortal = React.useCallback((portal: React.ReactPortal) => {
     setPortals((existingPortals) => [...existingPortals, portal]);
     let disposed = false;
-    return DockviewDisposable.from(() => {
+    return Disposable.from(() => {
       if (disposed) {
         throw new Error("invalid operation: resource already disposed");
       }

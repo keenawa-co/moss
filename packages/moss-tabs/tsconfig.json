@@ -1,6 +1,7 @@
 {
   "extends": "@repo/typescript-config/base.json",
   "compilerOptions": {
+    "target": "es2015",
     "outDir": "dist/cjs",
     "tsBuildInfoFile": ".build/tsconfig.tsbuildinfo.cjs",
     "jsx": "react",

@@ -1,15 +1,12 @@
 import React from "react";
 
-import {
-  createPaneview,
-  PaneviewApi,
-  PaneviewDndOverlayEvent,
-  PaneviewDropEvent,
-  PaneviewPanelApi,
-} from "@repo/moss-tabs-core";
-
+import { PaneviewApi } from "../api/component.api";
+import { createPaneview } from "../api/entryPoints";
+import { PaneviewPanelApi } from "../api/paneviewPanelApi";
 import { usePortalsLifecycle } from "../react";
 import { PanelParameters } from "../types";
+import { PaneviewDropEvent } from "./draggablePaneviewPanel";
+import { PaneviewDndOverlayEvent } from "./paneviewComponent";
 import { PanePanelSection } from "./view";
 
 export interface PaneviewReadyEvent {

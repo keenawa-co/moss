@@ -1,14 +1,9 @@
 import * as React from "react";
 
-import {
-  GroupPanelPartInitParameters,
-  IWatermarkPanelProps,
-  IWatermarkRenderer,
-  PanelUpdateEvent,
-  WatermarkRendererInitParameters,
-} from "@repo/moss-tabs-core";
-
+import { PanelUpdateEvent } from "../panel/types";
 import { ReactPart, ReactPortalStore } from "../react";
+import { IWatermarkPanelProps } from "./framework";
+import { GroupPanelPartInitParameters, IWatermarkRenderer, WatermarkRendererInitParameters } from "./types";
 
 export class ReactWatermarkPart implements IWatermarkRenderer {
   private readonly _element: HTMLElement;
