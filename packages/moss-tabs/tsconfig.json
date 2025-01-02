@@ -5,8 +5,9 @@
     "outDir": "dist/cjs",
     "tsBuildInfoFile": ".build/tsconfig.tsbuildinfo.cjs",
     "jsx": "react",
-    "rootDir": "src"
+    "rootDir": "src",
+    "types": ["jest", "node"]
   },
   "include": ["src"],
-  "exclude": ["**/node_modules", "src/__tests__"]
+  "exclude": ["**/node_modules"]
 }
