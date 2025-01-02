@@ -1,6 +1,8 @@
-import { ReactNode } from "react";
+import { ReactNode, useEffect } from "react";
 
-import { useInitializeAppState } from "@/hooks/useInitializeAppState";
+import { getState } from "@/api/appearance";
+import { useLanguageStore } from "@/store/language";
+import { useThemeStore } from "@/store/theme";
 import { QueryCache, QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
@@ -29,6 +31,25 @@ const queryClient = new QueryClient({
     },
   },
 });
+
+const useInitializeAppState = () => {
+  const { setCurrentTheme } = useThemeStore();
+  const { setLanguageCode } = useLanguageStore();
+
+  useEffect(() => {
+    const fetchAndSetAppState = async () => {
+      try {
+        const { preferences } = await getState();
+        setCurrentTheme(preferences.theme);
+        setLanguageCode(preferences.locale.code);
+      } catch (error) {
+        console.error("Failed to fetch app state from backend:", error);
+      }
+    };
+
+    fetchAndSetAppState();
+  }, [setCurrentTheme, setLanguageCode]);
+};
 
 const Provider = ({ children }: ProviderProps) => {
   useInitializeAppState();
