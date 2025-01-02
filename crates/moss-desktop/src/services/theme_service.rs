@@ -6,10 +6,7 @@ use std::{path::PathBuf, sync::Arc};
 use tauri::{AppHandle, Manager};
 
 use crate::{
-    app::{
-        service::{AnyService, ServiceMetadata},
-        state::AppState,
-    },
+    app::{service::Service, state::AppState},
     models::application::ThemeDescriptor,
 };
 
@@ -99,7 +96,7 @@ impl ThemeService {
     }
 }
 
-impl AnyService for ThemeService {
+impl Service for ThemeService {
     fn name(&self) -> &'static str {
         std::any::type_name::<Self>()
     }
@@ -110,5 +107,3 @@ impl AnyService for ThemeService {
         self
     }
 }
-
-impl ServiceMetadata for ThemeService {}

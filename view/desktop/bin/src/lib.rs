@@ -51,12 +51,9 @@ pub fn run() {
                     |app_handle| {
                         AddonService::new(app_handle, builtin_addons_dir(), installed_addons_dir())
                     },
-                    InstantiationType::Eager,
+                    InstantiationType::Instant,
                 )
-                .with_service(
-                    |app_handle| ThemeService::new(app_handle),
-                    InstantiationType::Delayed,
-                );
+                .with_service(ThemeService::new, InstantiationType::Delayed);
             app_handle.manage(app_manager);
 
             let ctrl_n_shortcut = Shortcut::new(Some(Modifiers::CONTROL), Code::KeyN);

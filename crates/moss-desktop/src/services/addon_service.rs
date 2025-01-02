@@ -5,10 +5,7 @@ use tauri::{AppHandle, Manager};
 
 use crate::{
     addon_registry::AddonRegistry,
-    app::{
-        service::{AnyService, ServiceMetadata},
-        state::AppState,
-    },
+    app::{service::Service, state::AppState},
     models::application::ThemeDescriptor,
 };
 
@@ -58,7 +55,7 @@ impl AddonService {
     }
 }
 
-impl AnyService for AddonService {
+impl Service for AddonService {
     fn name(&self) -> &'static str {
         std::any::type_name::<Self>()
     }
@@ -70,6 +67,7 @@ impl AnyService for AddonService {
     }
 }
 
+// OPTIMIZE: This should probably be moved in the future to a separate entity responsible for loading add-ons.
 fn parse_addon_dir(app_state: &AppState, addon_dir: PathBuf) -> Result<()> {
     let mut read_dir = std::fs::read_dir(&addon_dir)
         .map_err(|err| anyhow!("Failed to read the directory {:?}: {}", addon_dir, err))?;
@@ -113,5 +111,3 @@ fn parse_addon_dir(app_state: &AppState, addon_dir: PathBuf) -> Result<()> {
 
     Ok(())
 }
-
-impl ServiceMetadata for AddonService {}
