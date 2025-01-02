@@ -10,8 +10,6 @@ use crate::contribution_collector::{ContributionCollector, ContributionRegistry}
 use crate::models::application::{LocaleDescriptor, ThemeDescriptor};
 use crate::models::{actions::MenuItem, view::*};
 
-use super::service::ServiceManager;
-
 const STATE_CACHE_TTL: Duration = Duration::from_secs(60 * 3);
 const STATE_MAX_CAPACITY: u64 = 100;
 
@@ -20,27 +18,15 @@ pub struct Preferences {
     pub locale: RwLock<LocaleDescriptor>,
 }
 
-#[repr(i8)]
-#[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord)]
-pub enum LifecyclePhase {
-    Starting = 0,
-}
-
 pub struct AppState {
     next_window_id: AtomicUsize,
     pub contributions: ContributionRegistry,
     pub cache: Arc<Cache<MokaBackend>>,
     pub preferences: Preferences,
-    pub services: ServiceManager,
-    // pub themes: RwLock<Vec<ThemeDescriptor>>,
-    // pub commands: DashMap<ReadOnlyStr, CommandHandler>,
-    // pub menus: DashMap<ReadOnlyStr, Vec<MenuItem>>,
-    // pub tree_view_groups: DashMap<TreeViewGroupLocation, Vec<TreeViewGroup>>,
-    // pub tree_views: DashMap<GroupId, Vec<TreeViewDescriptor>>,
 }
 
 impl AppState {
-    pub fn new(services: ServiceManager) -> Self {
+    pub fn new() -> Self {
         // FIXME: This should be abstracted in the future.
         // let contribution_collector = ContributionCollector::new();
         // let contribution_collection = contribution_collector.collect();
@@ -61,13 +47,7 @@ impl AppState {
                     direction: Some("ltr".to_string()),
                 }),
             },
-            services,
             contributions: ContributionRegistry::new().init(),
-            // themes: RwLock::new(Vec::new()),
-            // commands: contribution_collection.commands,
-            // menus: contribution_collection.menus,
-            // tree_view_groups: contribution_collection.tree_view_groups,
-            // tree_views: contribution_collection.tree_views,
         };
 
         state

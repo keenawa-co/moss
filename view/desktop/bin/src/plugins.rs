@@ -1,4 +1,5 @@
 pub mod app_formation;
+pub mod instantiation;
 pub mod mac_window;
 
 use tauri::plugin::TauriPlugin;
@@ -57,41 +58,36 @@ pub mod plugin_window_state {
     }
 }
 
-pub mod plugin_app_formation {
-    use moss_desktop::{
-        app::service::ActivationPoint,
-        services::{addon_service::AddonService, theme_service::ThemeService},
-    };
-    use smallvec::smallvec;
-    use std::path::PathBuf;
+// pub mod plugin_app_formation {
+//     use moss_desktop::{
+//         app::service::ActivationPoint,
+//         services::{addon_service::AddonService, theme_service::ThemeService},
+//     };
+//     use smallvec::smallvec;
+//     use std::path::PathBuf;
 
-    use super::*;
+//     use super::*;
 
-    pub fn init() -> TauriPlugin<Wry> {
-        app_formation::Builder::new()
-            .with_service(
-                AddonService::new(builtin_addons_dir(), installed_addons_dir()),
-                smallvec![ActivationPoint::OnBootstrapping],
-            )
-            .with_service(
-                ThemeService::new(),
-                smallvec![ActivationPoint::OnBootstrapping],
-            )
-            .build()
-    }
+//     pub fn init() -> TauriPlugin<Wry> {
+//         app_formation::Builder::new()
+//             .with_service(
+//                 AddonService::new(builtin_addons_dir(), installed_addons_dir()),
+//                 smallvec![ActivationPoint::OnBootstrapping],
+//             )
+//             .with_service(
+//                 ThemeService::new(),
+//                 smallvec![ActivationPoint::OnBootstrapping],
+//             )
+//             .build()
+//     }
 
-    fn builtin_addons_dir() -> impl Into<PathBuf> {
-        let workspace_root =
-            std::env::current_dir().expect("Failed to retrieve the current working directory");
+//     fn builtin_addons_dir() -> impl Into<PathBuf> {
+//         std::env::var("BUILTIN_ADDONS_DIR")
+//             .expect("Environment variable `BUILTIN_ADDONS_DIR` is not set or is invalid")
+//     }
 
-        dbg!(&workspace_root);
-
-        std::env::var("BUILTIN_ADDONS_DIR")
-            .expect("Environment variable `BUILTIN_ADDONS_DIR` is not set or is invalid")
-    }
-
-    fn installed_addons_dir() -> impl Into<PathBuf> {
-        std::env::var("INSTALLED_ADDONS_DIR")
-            .expect("Environment variable `INSTALLED_ADDONS_DIR` is not set or is invalid")
-    }
-}
+//     fn installed_addons_dir() -> impl Into<PathBuf> {
+//         std::env::var("INSTALLED_ADDONS_DIR")
+//             .expect("Environment variable `INSTALLED_ADDONS_DIR` is not set or is invalid")
+//     }
+// }

@@ -6,6 +6,7 @@ use crate::command::CommandHandler;
 use crate::models::application::ThemeDescriptor;
 use crate::models::{actions::MenuItem, view::*};
 
+#[derive(Default)]
 pub struct ContributionRegistry {
     pub themes: Arc<DashSet<ThemeDescriptor>>,
     pub commands: DashMap<ReadOnlyStr, CommandHandler>,

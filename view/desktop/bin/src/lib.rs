@@ -7,18 +7,22 @@ mod utl;
 mod window;
 
 pub use constants::*;
+use moss_desktop::app::instantiation::InstantiationType;
 use moss_desktop::app::lifecycle::{LifecycleManager, LifecyclePhase};
+use moss_desktop::app::manager::AppManager;
 use moss_desktop::app::service::ServiceManager;
+use moss_desktop::services::addon_service::AddonService;
+use moss_desktop::services::theme_service::ThemeService;
 
 use crate::plugins::*;
 use moss_desktop::app::state::AppState;
+use moss_tauri::app::ServiceStore;
 use plugins::app_formation;
 use rand::random;
 use smallvec::smallvec;
 use std::env;
 use std::path::PathBuf;
 use std::sync::Arc;
-use tauri::plugin::TauriPlugin;
 use tauri::{AppHandle, Listener, Manager, RunEvent, Runtime, WebviewWindow, WindowEvent, Wry};
 use tauri_plugin_global_shortcut::{Code, GlobalShortcutExt, Modifiers, Shortcut, ShortcutState};
 use tauri_plugin_os;
@@ -30,13 +34,16 @@ use crate::commands::*;
 extern crate serde;
 
 pub fn run() {
+    // let mut builder_2 = moss_tauri::app::Builder::new().plugin(plugin_log::init());
+
+    // builder_2.plugin(plugin_log::init());
     #[allow(unused_mut)]
     let mut builder = tauri::Builder::default()
         .plugin(plugin_log::init())
         .plugin(plugin_window_state::init())
         .plugin(tauri_plugin_fs::init())
-        .plugin(tauri_plugin_os::init())
-        .plugin(plugin_app_formation::init());
+        .plugin(tauri_plugin_os::init());
+    // .plugin(plugin_app_formation::init());
 
     #[cfg(target_os = "macos")]
     {
@@ -45,25 +52,25 @@ pub fn run() {
 
     builder
         .setup(|app| {
-            // let lm = LifecycleManager::new();
-            // let l = lm.observe(LifecyclePhase::Bootstrapping, |app_state| {
-            //     println!("Hello!");
-            // });
-            // lm.set_phase(app.app_handle(), LifecyclePhase::Bootstrapping);
+            let app_handle = app.app_handle();
 
-            // let service = LifecycleService::new();
+            let app_state = AppState::new();
+            app_handle.manage(app_state);
 
-            // let l = service.register_phase_listener(LifecyclePhase::Starting, |app_state| {
-            //     println!("Hello!");
-            // });
+            let app_manager = AppManager::new(app_handle.clone())
+                .with_service(
+                    |app_handle| {
+                        AddonService::new(app_handle, builtin_addons_dir(), installed_addons_dir())
+                    },
+                    InstantiationType::Eager,
+                )
+                .with_service(
+                    |app_handle| ThemeService::new(app_handle),
+                    InstantiationType::Delayed,
+                );
+            app_handle.manage(app_manager);
 
-            // service.notify_phase(LifecyclePhase::Starting, app.app_handle().clone());
-
-            // let service_manager = ServiceManager2::new();
-            // service_manager.register();
             let ctrl_n_shortcut = Shortcut::new(Some(Modifiers::CONTROL), Code::KeyN);
-
-            // let r = app.handle().listen("event", |e| {});
 
             app.handle().plugin(
                 tauri_plugin_global_shortcut::Builder::new()
@@ -127,8 +134,8 @@ pub fn run() {
 }
 
 fn create_main_window(app_handle: &AppHandle, url: &str) -> WebviewWindow {
-    let lifecycle_manager = app_handle.state::<Arc<LifecycleManager>>();
-    lifecycle_manager.set_phase(app_handle, LifecyclePhase::Bootstrapping);
+    // let lifecycle_manager = app_handle.state::<Arc<LifecycleManager>>();
+    // lifecycle_manager.set_phase(app_handle, LifecyclePhase::Bootstrapping);
 
     // let state = AppState::new();
     // let theme_service = ThemeService::new(app_handle.clone(), Arc::clone(&state.cache));
@@ -169,4 +176,14 @@ fn create_child_window(app_handle: &AppHandle, url: &str) -> WebviewWindow {
     let webview_window = create_window(app_handle, config);
     webview_window.on_menu_event(move |window, event| menu::handle_event(window, &event));
     webview_window
+}
+
+fn builtin_addons_dir() -> impl Into<PathBuf> {
+    std::env::var("BUILTIN_ADDONS_DIR")
+        .expect("Environment variable `BUILTIN_ADDONS_DIR` is not set or is invalid")
+}
+
+fn installed_addons_dir() -> impl Into<PathBuf> {
+    std::env::var("INSTALLED_ADDONS_DIR")
+        .expect("Environment variable `INSTALLED_ADDONS_DIR` is not set or is invalid")
 }

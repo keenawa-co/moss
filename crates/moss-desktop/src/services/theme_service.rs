@@ -23,20 +23,22 @@ pub struct GetColorThemeOptions {
 }
 
 pub struct ThemeService {
-    app_cache: OnceCell<Arc<Cache<MokaBackend>>>,
-    themes: OnceCell<Arc<DashSet<ThemeDescriptor>>>,
+    app_cache: Arc<Cache<MokaBackend>>,
+    themes: Arc<DashSet<ThemeDescriptor>>,
 }
 
 impl ThemeService {
-    pub fn new() -> Self {
+    pub fn new(app_handle: &AppHandle) -> Self {
+        let app_state = app_handle.state::<AppState>();
+
         Self {
-            app_cache: OnceCell::new(),
-            themes: OnceCell::new(),
+            app_cache: Arc::clone(&app_state.cache),
+            themes: Arc::clone(&app_state.contributions.themes),
         }
     }
 
     pub fn get_color_themes(&self) -> &DashSet<ThemeDescriptor> {
-        self.themes.get().unwrap()
+        &self.themes
     }
 
     pub async fn get_color_theme(
@@ -44,8 +46,6 @@ impl ThemeService {
         source: &str,
         opts: Option<GetColorThemeOptions>,
     ) -> Result<String> {
-        let app_cache = self.app_cache.get().unwrap();
-
         let handle_cache_miss = || async {
             let content = self.read_color_theme_from_file(source).await?;
 
@@ -56,14 +56,14 @@ impl ThemeService {
             };
 
             if options.enable_cache {
-                app_cache.insert(CK_COLOR_THEME, content.clone());
+                self.app_cache.insert(CK_COLOR_THEME, content.clone());
                 trace!("Color theme '{}' was successfully cached", source);
             };
 
             Ok(content)
         };
 
-        match app_cache.get::<String>(CK_COLOR_THEME) {
+        match self.app_cache.get::<String>(CK_COLOR_THEME) {
             Ok(cached_value) => {
                 trace!("Color theme '{source}' was restored from the cache");
 
@@ -101,18 +101,22 @@ impl ThemeService {
 }
 
 impl AnyService for ThemeService {
-    fn start(&self, app_handle: &AppHandle) {
-        let app_state = app_handle.state::<AppState>();
+    fn name(&self) -> &'static str {
+        std::any::type_name::<Self>()
+    }
 
-        self.themes
-            .set(app_state.contributions.themes.clone())
-            .unwrap();
+    fn initialize(&self, app_handle: &AppHandle) {
+        // let app_state = app_handle.state::<AppState>();
 
-        self.app_cache
-        .set(Arc::clone(&app_state.cache))
-        .unwrap_or_else(|_| {
-            panic!("Failed to set the app cache in ThemeService: the cache has already been initialized.")
-        });
+        // self.themes
+        //     .set(app_state.contributions.themes.clone())
+        //     .unwrap();
+
+        // self.app_cache
+        // .set(Arc::clone(&app_state.cache))
+        // .unwrap_or_else(|_| {
+        //     panic!("Failed to set the app cache in ThemeService: the cache has already been initialized.")
+        // });
     }
 
     fn stop(&self, _app_handle: &AppHandle) {}

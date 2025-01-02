@@ -39,10 +39,10 @@ impl Builder {
     pub fn build(self) -> TauriPlugin<Wry> {
         PluginBuilder::new("app-formation")
             .setup(move |app_handle, _api| {
-                let state = AppState::new(self.service_manager);
+                // let state = AppState::new(self.service_manager);
 
-                app_handle.manage(state);
-                app_handle.manage(self.lifecycle_manager);
+                // app_handle.manage(state);
+                // app_handle.manage(self.lifecycle_manager);
 
                 Ok(())
             })

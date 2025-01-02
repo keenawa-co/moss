@@ -1,14 +1,21 @@
-pub fn add(left: u64, right: u64) -> u64 {
-    left + right
-}
+use serde::Serialize;
 
-#[cfg(test)]
-mod tests {
-    use super::*;
+pub mod app;
 
-    #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
+#[derive(Debug, Serialize)]
+#[serde(transparent)]
+pub struct TauriError(String);
+
+impl std::fmt::Display for TauriError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.0)
     }
 }
+
+impl From<anyhow::Error> for TauriError {
+    fn from(e: anyhow::Error) -> Self {
+        TauriError(e.to_string())
+    }
+}
+
+pub type TauriResult<T> = Result<T, TauriError>;

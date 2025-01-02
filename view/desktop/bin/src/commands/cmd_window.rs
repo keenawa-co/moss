@@ -1,10 +1,12 @@
 use anyhow::Result;
 use hashbrown::HashMap;
 use moss_desktop::{
+    app::manager::AppManager,
     command::CommandContext,
     models::application::{AppStateInfo, LocaleDescriptor, PreferencesInfo, ThemeDescriptor},
     services::theme_service::{GetColorThemeOptions, ThemeService},
 };
+use moss_tauri::TauriResult;
 use moss_text::{quote, ReadOnlyStr};
 use serde_json::Value;
 use std::path::PathBuf;
@@ -55,15 +57,13 @@ pub fn execute_command(
 
 #[tauri::command(async)]
 pub async fn get_color_theme(
-    app_state: State<'_, AppState>,
+    app_manager: State<'_, AppManager>,
     path: String,
     opts: Option<GetColorThemeOptions>,
-) -> Result<String, String> {
-    let theme_service = app_state.services.get_unchecked::<ThemeService>();
-    theme_service
-        .get_color_theme(&path, opts)
-        .await
-        .map_err(|err| err.to_string())
+) -> TauriResult<String> {
+    let theme_service = app_manager.service::<ThemeService>()?;
+
+    Ok(theme_service.get_color_theme(&path, opts).await?)
 }
 
 #[tauri::command(async)]
@@ -79,13 +79,8 @@ pub fn get_state(app_state: State<'_, AppState>) -> Result<AppStateInfo, String>
 // FIXME: This is a temporary solution until we have a registry of installed
 // plugins and the ability to check which theme packs are installed.
 #[tauri::command(async)]
-pub async fn get_themes(app_state: State<'_, AppState>) -> Result<Vec<ThemeDescriptor>, String> {
-    let theme_service = app_state.services.get_unchecked::<ThemeService>();
-    let r: Vec<ThemeDescriptor> = theme_service
-        .get_color_themes()
-        .clone()
-        .into_iter()
-        .collect();
+pub async fn get_themes(app_manager: State<'_, AppManager>) -> TauriResult<Vec<ThemeDescriptor>> {
+    let theme_service = app_manager.service::<ThemeService>()?;
 
     Ok(theme_service
         .get_color_themes()

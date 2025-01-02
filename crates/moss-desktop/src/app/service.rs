@@ -23,7 +23,8 @@ pub trait ServiceMetadata {
 }
 
 pub trait AnyService: Any + Send + Sync {
-    fn start(&self, app_handle: &AppHandle);
+    fn name(&self) -> &'static str;
+    fn initialize(&self, app_handle: &AppHandle);
     fn stop(&self, app_handle: &AppHandle);
     fn as_any(&self) -> &dyn Any;
 }
@@ -134,7 +135,7 @@ impl ServiceManager {
             );
 
             service_state.set_status(ServiceStatus::Activating);
-            service.start(app_handle);
+            service.initialize(app_handle);
             service_state.set_status(ServiceStatus::Active);
 
             // Once the service is successfully activated, all other activation
