@@ -1,7 +1,6 @@
 use anyhow::{anyhow, Context as _, Result};
 use dashmap::DashSet;
 use moss_cache::{backend::moka::MokaBackend, Cache, CacheError};
-use once_cell::sync::OnceCell;
 use serde::Deserialize;
 use std::{path::PathBuf, sync::Arc};
 use tauri::{AppHandle, Manager};
@@ -105,21 +104,7 @@ impl AnyService for ThemeService {
         std::any::type_name::<Self>()
     }
 
-    fn initialize(&self, app_handle: &AppHandle) {
-        // let app_state = app_handle.state::<AppState>();
-
-        // self.themes
-        //     .set(app_state.contributions.themes.clone())
-        //     .unwrap();
-
-        // self.app_cache
-        // .set(Arc::clone(&app_state.cache))
-        // .unwrap_or_else(|_| {
-        //     panic!("Failed to set the app cache in ThemeService: the cache has already been initialized.")
-        // });
-    }
-
-    fn stop(&self, _app_handle: &AppHandle) {}
+    fn dispose(&self) {}
 
     fn as_any(&self) -> &dyn std::any::Any {
         self

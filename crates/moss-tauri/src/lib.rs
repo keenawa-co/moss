@@ -1,7 +1,5 @@
 use serde::Serialize;
 
-pub mod app;
-
 #[derive(Debug, Serialize)]
 #[serde(transparent)]
 pub struct TauriError(String);

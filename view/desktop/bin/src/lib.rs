@@ -8,22 +8,15 @@ mod window;
 
 pub use constants::*;
 use moss_desktop::app::instantiation::InstantiationType;
-use moss_desktop::app::lifecycle::{LifecycleManager, LifecyclePhase};
 use moss_desktop::app::manager::AppManager;
-use moss_desktop::app::service::ServiceManager;
 use moss_desktop::services::addon_service::AddonService;
 use moss_desktop::services::theme_service::ThemeService;
 
 use crate::plugins::*;
 use moss_desktop::app::state::AppState;
-use moss_tauri::app::ServiceStore;
-use plugins::app_formation;
 use rand::random;
-use smallvec::smallvec;
-use std::env;
 use std::path::PathBuf;
-use std::sync::Arc;
-use tauri::{AppHandle, Listener, Manager, RunEvent, Runtime, WebviewWindow, WindowEvent, Wry};
+use tauri::{AppHandle, Manager, RunEvent, WebviewWindow, WindowEvent};
 use tauri_plugin_global_shortcut::{Code, GlobalShortcutExt, Modifiers, Shortcut, ShortcutState};
 use tauri_plugin_os;
 use window::{create_window, CreateWindowInput};
@@ -34,16 +27,12 @@ use crate::commands::*;
 extern crate serde;
 
 pub fn run() {
-    // let mut builder_2 = moss_tauri::app::Builder::new().plugin(plugin_log::init());
-
-    // builder_2.plugin(plugin_log::init());
     #[allow(unused_mut)]
     let mut builder = tauri::Builder::default()
         .plugin(plugin_log::init())
         .plugin(plugin_window_state::init())
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_os::init());
-    // .plugin(plugin_app_formation::init());
 
     #[cfg(target_os = "macos")]
     {
@@ -134,17 +123,6 @@ pub fn run() {
 }
 
 fn create_main_window(app_handle: &AppHandle, url: &str) -> WebviewWindow {
-    // let lifecycle_manager = app_handle.state::<Arc<LifecycleManager>>();
-    // lifecycle_manager.set_phase(app_handle, LifecyclePhase::Bootstrapping);
-
-    // let state = AppState::new();
-    // let theme_service = ThemeService::new(app_handle.clone(), Arc::clone(&state.cache));
-
-    {
-        // app_handle.manage(theme_service);
-        // app_handle.manage(state);
-    }
-
     let label = format!("{MAIN_WINDOW_PREFIX}{}", 0);
     let config = CreateWindowInput {
         url,

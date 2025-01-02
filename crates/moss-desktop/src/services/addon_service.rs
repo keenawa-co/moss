@@ -1,6 +1,6 @@
 use anyhow::{anyhow, Result};
 use moss_addon::manifest::{AddonManifest, MANIFEST_FILENAME};
-use std::{path::PathBuf, sync::Arc};
+use std::path::PathBuf;
 use tauri::{AppHandle, Manager};
 
 use crate::{
@@ -8,13 +8,9 @@ use crate::{
     app::{
         service::{AnyService, ServiceMetadata},
         state::AppState,
-        subscription::Subscription,
     },
-    contribution_collector::ContributionRegistry,
     models::application::ThemeDescriptor,
 };
-
-// use super::{AnyService2, ServiceEvent};
 
 pub struct AddonService {
     addon_registry: AddonRegistry,
@@ -67,38 +63,7 @@ impl AnyService for AddonService {
         std::any::type_name::<Self>()
     }
 
-    fn initialize(&self, app_handle: &AppHandle) {
-        // let mut read_dir = std::fs::read_dir(&self.builtin_addons_location).unwrap_or_else(|err| {
-        //     panic!(
-        //         "Failed to read the directory {:?} containing built-in addons: {err}",
-        //         &self.builtin_addons_location
-        //     );
-        // });
-
-        // let app_state = app_handle.state::<AppState>();
-        // while let Some(entry) = read_dir.next() {
-        //     let Ok(entry) = entry else {
-        //         warn!(
-        //             "Failed to read an entry in the directory for built-in addons: {:?}",
-        //             entry.err()
-        //         );
-        //         continue;
-        //     };
-
-        //     if !entry.path().is_dir() {
-        //         continue;
-        //     }
-
-        //     if let Err(err) = self.parse_addon_dir(&app_state, entry.path()) {
-        //         warn!("Failed to parse addon: {err}");
-        //         continue;
-        //     };
-        // }
-    }
-
-    fn stop(&self, _app_handle: &AppHandle) {
-        ()
-    }
+    fn dispose(&self) {}
 
     fn as_any(&self) -> &dyn std::any::Any {
         self

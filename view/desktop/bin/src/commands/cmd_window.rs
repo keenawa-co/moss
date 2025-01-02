@@ -9,7 +9,6 @@ use moss_desktop::{
 use moss_tauri::TauriResult;
 use moss_text::{quote, ReadOnlyStr};
 use serde_json::Value;
-use std::path::PathBuf;
 
 use crate::{create_child_window, AppState};
 use tauri::{AppHandle, Emitter, State, WebviewWindow, Window};
@@ -76,8 +75,6 @@ pub fn get_state(app_state: State<'_, AppState>) -> Result<AppStateInfo, String>
     })
 }
 
-// FIXME: This is a temporary solution until we have a registry of installed
-// plugins and the ability to check which theme packs are installed.
 #[tauri::command(async)]
 pub async fn get_themes(app_manager: State<'_, AppManager>) -> TauriResult<Vec<ThemeDescriptor>> {
     let theme_service = app_manager.service::<ThemeService>()?;

@@ -1,4 +1,3 @@
-use dashmap::DashMap;
 use moss_cache::{backend::moka::MokaBackend, Cache};
 use moss_text::ReadOnlyStr;
 use parking_lot::RwLock;
@@ -6,9 +5,8 @@ use std::time::Duration;
 use std::{sync::atomic::AtomicUsize, sync::Arc};
 
 use crate::command::CommandHandler;
-use crate::contribution_collector::{ContributionCollector, ContributionRegistry};
+use crate::contribution_registry::ContributionRegistry;
 use crate::models::application::{LocaleDescriptor, ThemeDescriptor};
-use crate::models::{actions::MenuItem, view::*};
 
 const STATE_CACHE_TTL: Duration = Duration::from_secs(60 * 3);
 const STATE_MAX_CAPACITY: u64 = 100;
@@ -27,12 +25,9 @@ pub struct AppState {
 
 impl AppState {
     pub fn new() -> Self {
-        // FIXME: This should be abstracted in the future.
-        // let contribution_collector = ContributionCollector::new();
-        // let contribution_collection = contribution_collector.collect();
         let cache = Cache::new(MokaBackend::new(STATE_MAX_CAPACITY, STATE_CACHE_TTL));
 
-        let state = Self {
+        Self {
             next_window_id: AtomicUsize::new(0),
             cache: Arc::new(cache),
             preferences: Preferences {
@@ -47,10 +42,9 @@ impl AppState {
                     direction: Some("ltr".to_string()),
                 }),
             },
-            contributions: ContributionRegistry::new().init(),
-        };
-
-        state
+            contributions: ContributionRegistry::new()
+                .init(crate::contribution::CONTRIBUTIONS.iter().map(|c| &**c)),
+        }
     }
 
     pub fn inc_next_window_id(&self) -> usize {

@@ -7,7 +7,7 @@ pub mod models;
 pub mod services;
 
 mod contribution;
-mod contribution_collector;
+mod contribution_registry;
 
 pub extern crate linkme;
 
