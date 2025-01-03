@@ -9,7 +9,6 @@ use std::{
         Arc,
     },
 };
-use strum_macros::FromRepr;
 use tauri::AppHandle;
 
 use super::instantiation::InstantiationType;
@@ -45,19 +44,28 @@ where
 }
 
 #[repr(u8)]
-#[derive(Debug, Eq, Hash, PartialEq, FromRepr)]
+#[derive(Debug, Eq, Hash, PartialEq)]
 enum ServiceInstantiationMode {
     Pending = 0,
     Active = 1,
 }
 
+impl From<u8> for ServiceInstantiationMode {
+    #[inline]
+    fn from(value: u8) -> ServiceInstantiationMode {
+        unsafe { std::mem::transmute(value) }
+    }
+}
+
 impl ServiceInstantiationMode {
+    #[inline]
     fn as_u8(self) -> u8 {
         self as u8
     }
 }
 
 impl From<InstantiationType> for ServiceInstantiationMode {
+    #[inline]
     fn from(value: InstantiationType) -> Self {
         match value {
             InstantiationType::Instant => ServiceInstantiationMode::Active,
@@ -67,6 +75,7 @@ impl From<InstantiationType> for ServiceInstantiationMode {
 }
 
 impl Into<AtomicU8> for ServiceInstantiationMode {
+    #[inline]
     fn into(self) -> AtomicU8 {
         AtomicU8::new(self as u8)
     }
@@ -85,8 +94,7 @@ impl ServiceMetadata {
     }
 
     fn get_instantiation_mode(&self) -> ServiceInstantiationMode {
-        ServiceInstantiationMode::from_repr(self.instantiation_mode.load(Ordering::SeqCst))
-            .expect("Valid value for ServiceInstantiationMode: {value}")
+        ServiceInstantiationMode::from(self.instantiation_mode.load(Ordering::SeqCst))
     }
 }
 

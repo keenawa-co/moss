@@ -16,7 +16,6 @@ moss_cache.workspace = true
 moss_addon.workspace = true
 
 strum.workspace = true
-strum_macros.workspace = true
 smol.workspace = true
 indexmap = { workspace = true, features = ["serde"] }
 tokio = { workspace = true, features = ["full"] }

@@ -6,14 +6,7 @@ mod plugins;
 mod utl;
 mod window;
 
-pub use constants::*;
-use moss_desktop::app::instantiation::InstantiationType;
-use moss_desktop::app::manager::AppManager;
-use moss_desktop::services::addon_service::AddonService;
-use moss_desktop::services::theme_service::ThemeService;
-
-use crate::plugins::*;
-use moss_desktop::app::state::AppState;
+use anyhow::Result;
 use rand::random;
 use std::path::PathBuf;
 use tauri::{AppHandle, Manager, RunEvent, WebviewWindow, WindowEvent};
@@ -21,7 +14,18 @@ use tauri_plugin_global_shortcut::{Code, GlobalShortcutExt, Modifiers, Shortcut,
 use tauri_plugin_os;
 use window::{create_window, CreateWindowInput};
 
+use moss_desktop::app::manager::AppManager;
+use moss_desktop::app::state::AppState;
+use moss_desktop::services::addon_service::AddonService;
+use moss_desktop::services::theme_service::ThemeService;
+use moss_desktop::services::window_service::WindowService;
+use moss_desktop::{
+    app::instantiation::InstantiationType, services::lifecycle_service::LifecycleService,
+};
+
 use crate::commands::*;
+use crate::plugins::*;
+pub use constants::*;
 
 #[macro_use]
 extern crate serde;
@@ -47,12 +51,14 @@ pub fn run() {
             app_handle.manage(app_state);
 
             let app_manager = AppManager::new(app_handle.clone())
+                .with_service(|_| LifecycleService::new(), InstantiationType::Instant)
                 .with_service(
                     |app_handle| {
                         AddonService::new(app_handle, builtin_addons_dir(), installed_addons_dir())
                     },
                     InstantiationType::Instant,
                 )
+                .with_service(|_| WindowService::new(), InstantiationType::Delayed)
                 .with_service(ThemeService::new, InstantiationType::Delayed);
             app_handle.manage(app_manager);
 
@@ -136,8 +142,9 @@ fn create_main_window(app_handle: &AppHandle, url: &str) -> WebviewWindow {
     webview_window
 }
 
-fn create_child_window(app_handle: &AppHandle, url: &str) -> WebviewWindow {
-    let next_window_id = app_handle.state::<AppState>().inc_next_window_id() + 1;
+fn create_child_window(app_handle: &AppHandle, url: &str) -> Result<WebviewWindow> {
+    let app_manager = app_handle.state::<AppManager>();
+    let next_window_id = app_manager.service::<WindowService>()?.next_window_id() + 1;
     let config = CreateWindowInput {
         url,
         label: &format!("{MAIN_WINDOW_PREFIX}{}", next_window_id),
@@ -150,7 +157,8 @@ fn create_child_window(app_handle: &AppHandle, url: &str) -> WebviewWindow {
     };
     let webview_window = create_window(app_handle, config);
     webview_window.on_menu_event(move |window, event| menu::handle_event(window, &event));
-    webview_window
+
+    Ok(webview_window)
 }
 
 fn builtin_addons_dir() -> impl Into<PathBuf> {
