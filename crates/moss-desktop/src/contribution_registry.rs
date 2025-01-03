@@ -27,7 +27,6 @@ impl ContributionRegistry {
         }
     }
 
-    //  crate::contribution::CONTRIBUTIONS
     pub fn init<I>(self, contributions: I) -> Self
     where
         I: IntoIterator<Item = &'static Contribution>,
