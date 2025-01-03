@@ -25,6 +25,7 @@ moss_desktop.workspace = true
 moss_uikit.workspace = true
 moss_cache.workspace = true
 moss_tauri.workspace = true
+moss_addon.workspace = true
 
 anyhow.workspace = true
 once_cell.workspace = true

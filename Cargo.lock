@@ -1080,6 +1080,7 @@ dependencies = [
  "log",
  "macos-trampoline",
  "mimalloc",
+ "moss_addon",
  "moss_cache",
  "moss_desktop",
  "moss_env",

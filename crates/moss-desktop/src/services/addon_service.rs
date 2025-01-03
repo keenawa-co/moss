@@ -16,12 +16,9 @@ pub struct AddonService {
 impl AddonService {
     pub fn new(
         app_handle: &AppHandle,
-        builtin_addons_location: impl Into<PathBuf>,
-        installed_addons_location: impl Into<PathBuf>,
+        builtin_addons_location: PathBuf,
+        _installed_addons_location: PathBuf,
     ) -> Self {
-        let builtin_addons_location = builtin_addons_location.into();
-        let _installed_addons_location = installed_addons_location.into();
-
         let mut read_dir = std::fs::read_dir(&builtin_addons_location).unwrap_or_else(|err| {
             panic!(
                 "Failed to read the directory {:?} containing built-in addons: {err}",
@@ -47,6 +44,8 @@ impl AddonService {
                 warn!("Failed to parse addon: {err}");
                 continue;
             };
+
+            // TODO: Add addon registration once the addon entity becomes more clearly defined
         }
 
         Self {

@@ -8,12 +8,12 @@ mod window;
 
 use anyhow::Result;
 use rand::random;
-use std::path::PathBuf;
 use tauri::{AppHandle, Manager, RunEvent, WebviewWindow, WindowEvent};
 use tauri_plugin_global_shortcut::{Code, GlobalShortcutExt, Modifiers, Shortcut, ShortcutState};
 use tauri_plugin_os;
 use window::{create_window, CreateWindowInput};
 
+use moss_addon::{BUILTIN_ADDONS_DIR, INSTALLED_ADDONS_DIR};
 use moss_desktop::app::manager::AppManager;
 use moss_desktop::app::state::AppState;
 use moss_desktop::services::addon_service::AddonService;
@@ -54,7 +54,11 @@ pub fn run() {
                 .with_service(|_| LifecycleService::new(), InstantiationType::Instant)
                 .with_service(
                     |app_handle| {
-                        AddonService::new(app_handle, builtin_addons_dir(), installed_addons_dir())
+                        AddonService::new(
+                            app_handle,
+                            BUILTIN_ADDONS_DIR.to_path_buf(),
+                            INSTALLED_ADDONS_DIR.to_path_buf(),
+                        )
                     },
                     InstantiationType::Instant,
                 )
@@ -112,7 +116,9 @@ pub fn run() {
         .expect("failed to run")
         .run(|app_handle, event| match event {
             RunEvent::Ready => {
-                let _ = create_main_window(&app_handle, "/");
+                let webview_window = create_main_window(&app_handle, "/");
+                webview_window
+                    .on_menu_event(move |window, event| menu::handle_event(window, &event));
             }
 
             #[cfg(target_os = "macos")]
@@ -137,9 +143,8 @@ fn create_main_window(app_handle: &AppHandle, url: &str) -> WebviewWindow {
             100.0 + random::<f64>() * 20.0,
         ),
     };
-    let webview_window = create_window(app_handle, config);
-    webview_window.on_menu_event(move |window, event| menu::handle_event(window, &event));
-    webview_window
+
+    create_window(app_handle, config)
 }
 
 fn create_child_window(app_handle: &AppHandle, url: &str) -> Result<WebviewWindow> {
@@ -155,18 +160,6 @@ fn create_child_window(app_handle: &AppHandle, url: &str) -> Result<WebviewWindo
             100.0 + random::<f64>() * 20.0,
         ),
     };
-    let webview_window = create_window(app_handle, config);
-    webview_window.on_menu_event(move |window, event| menu::handle_event(window, &event));
 
-    Ok(webview_window)
-}
-
-fn builtin_addons_dir() -> impl Into<PathBuf> {
-    std::env::var("BUILTIN_ADDONS_DIR")
-        .expect("Environment variable `BUILTIN_ADDONS_DIR` is not set or is invalid")
-}
-
-fn installed_addons_dir() -> impl Into<PathBuf> {
-    std::env::var("INSTALLED_ADDONS_DIR")
-        .expect("Environment variable `INSTALLED_ADDONS_DIR` is not set or is invalid")
+    Ok(create_window(app_handle, config))
 }
