@@ -7,7 +7,9 @@ on:
     branches: ["main"]
 
 env:
+  RUST_BACKTRACE: 1
   CARGO_TERM_COLOR: always
+  CARGO_PROFILE_DEV_DEBUG: 0 # Reducing bloat to target folder, credit to https://github.com/tauri-apps/tauri/blob/dev/.github/workflows/test-cli-rs.yml
 
 jobs:
   check-modified-files:
@@ -35,38 +37,33 @@ jobs:
             **.jsx
             package.json
 
-
-  rust-workflows:
-    name: Rust Workflows - ${{ matrix.task.name }}
+  rust-unit-tests:
+    name: Rust Unit Tests (${{ matrix.platform.target }})
     needs: check-modified-files
     if: ${{ needs.check-modified-files.outputs.rust == 'true' }}
 
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.platform.os }}
 
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix:
-        task:
-          - name: Unit Tests
-            command: cargo -q test --lib
-          - name: Docs Tests
-            command: cargo -q test --doc
-          - name: Workspace Audit
-            command: |
-              set -e
-              cd ${GITHUB_WORKSPACE}/tools/xtask
-              cargo -q run -- --fail-fast rwa
+        platform:
+          - { target: x86_64-pc-windows-msvc, os: windows-latest }
+          - { target: aarch64-pc-windows-msvc, os: windows-latest }
+          - { target: x86_64-unknown-linux-gnu, os: ubuntu-latest }
+          - { target: x86_64-apple-darwin, os: macos-latest }
     timeout-minutes: 15
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Cache Rust Dependencies
-        uses: Swatinem/rust-cache@v2.7.5
+      - name: Setup Rust toolchain
+        uses: dtolnay/rust-toolchain@1.82
         with:
-          workspaces: ".github/cache"
+          targets: ${{ matrix.platform.target }}
 
-      - name: Cache Apt Packages
+      - name: Use Linux Apt Cache
+        if: matrix.platform.os == 'ubuntu-latest'
         uses: awalsh128/cache-apt-pkgs-action@latest
         with:
           packages: |
@@ -76,9 +73,51 @@ jobs:
             librsvg2-dev
             patchelf
 
-      - name: Execute Rust Task - ${{ matrix.task.name }}
-        run: ${{ matrix.task.command }}
+      - name: Use Rust Cache
+        uses: Swatinem/rust-cache@v2.7.5
+        with:
+          workspaces: ".github/cache"
+
+      - name: Unit Tests
+        run: cargo -q test --lib
         working-directory: ".github/cache"
+
+  rust-general-workflows:
+    name: Rust General Workflows
+    needs: check-modified-files
+    if: ${{ needs.check-modified-files.outputs.rust == 'true' }}
+
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Rust toolchain
+        uses: dtolnay/rust-toolchain@1.82
+
+      - name: Use Linux Apt Cache
+        uses: awalsh128/cache-apt-pkgs-action@latest
+        with:
+          packages: |
+            libwebkit2gtk-4.0-dev
+            libwebkit2gtk-4.1-dev
+            libappindicator3-dev
+            librsvg2-dev
+            patchelf
+
+      - name: Use Rust Cache
+        uses: Swatinem/rust-cache@v2.7.5
+        with:
+          workspaces: ".github/cache"
+
+      - name: Docs Test
+        run: cargo -q test --doc
+
+      - name: Workspace Audit
+        run: |
+          cd ${GITHUB_WORKSPACE}/tools/xtask
+          cargo -q run -- --fail-fast rwa
 
   node-workflows:
     name: Node.js Workflows - ${{ matrix.task.name }}

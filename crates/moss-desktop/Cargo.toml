@@ -37,3 +37,4 @@ log.workspace = true
 fnv.workspace = true
 smallvec.workspace = true
 toml.workspace = true
+derive_more = { workspace = true, features = ["full"] }

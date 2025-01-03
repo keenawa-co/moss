@@ -1,4 +1,3 @@
-use dashmap::DashMap;
 use moss_cache::{backend::moka::MokaBackend, Cache};
 use moss_text::ReadOnlyStr;
 use parking_lot::RwLock;
@@ -6,11 +5,8 @@ use std::time::Duration;
 use std::{sync::atomic::AtomicUsize, sync::Arc};
 
 use crate::command::CommandHandler;
-use crate::contribution_collector::{ContributionCollector, ContributionRegistry};
+use crate::contribution_registry::ContributionRegistry;
 use crate::models::application::{LocaleDescriptor, ThemeDescriptor};
-use crate::models::{actions::MenuItem, view::*};
-
-use super::service::ServiceManager;
 
 const STATE_CACHE_TTL: Duration = Duration::from_secs(60 * 3);
 const STATE_MAX_CAPACITY: u64 = 100;
@@ -20,34 +16,17 @@ pub struct Preferences {
     pub locale: RwLock<LocaleDescriptor>,
 }
 
-#[repr(i8)]
-#[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord)]
-pub enum LifecyclePhase {
-    Starting = 0,
-}
-
 pub struct AppState {
-    next_window_id: AtomicUsize,
     pub contributions: ContributionRegistry,
     pub cache: Arc<Cache<MokaBackend>>,
     pub preferences: Preferences,
-    pub services: ServiceManager,
-    // pub themes: RwLock<Vec<ThemeDescriptor>>,
-    // pub commands: DashMap<ReadOnlyStr, CommandHandler>,
-    // pub menus: DashMap<ReadOnlyStr, Vec<MenuItem>>,
-    // pub tree_view_groups: DashMap<TreeViewGroupLocation, Vec<TreeViewGroup>>,
-    // pub tree_views: DashMap<GroupId, Vec<TreeViewDescriptor>>,
 }
 
 impl AppState {
-    pub fn new(services: ServiceManager) -> Self {
-        // FIXME: This should be abstracted in the future.
-        // let contribution_collector = ContributionCollector::new();
-        // let contribution_collection = contribution_collector.collect();
+    pub fn new() -> Self {
         let cache = Cache::new(MokaBackend::new(STATE_MAX_CAPACITY, STATE_CACHE_TTL));
 
-        let state = Self {
-            next_window_id: AtomicUsize::new(0),
+        Self {
             cache: Arc::new(cache),
             preferences: Preferences {
                 theme: RwLock::new(ThemeDescriptor {
@@ -61,21 +40,9 @@ impl AppState {
                     direction: Some("ltr".to_string()),
                 }),
             },
-            services,
-            contributions: ContributionRegistry::new().init(),
-            // themes: RwLock::new(Vec::new()),
-            // commands: contribution_collection.commands,
-            // menus: contribution_collection.menus,
-            // tree_view_groups: contribution_collection.tree_view_groups,
-            // tree_views: contribution_collection.tree_views,
-        };
-
-        state
-    }
-
-    pub fn inc_next_window_id(&self) -> usize {
-        self.next_window_id
-            .fetch_add(1, std::sync::atomic::Ordering::SeqCst)
+            contributions: ContributionRegistry::new()
+                .init(crate::contribution::CONTRIBUTIONS.iter().map(|c| &**c)),
+        }
     }
 
     pub fn get_command(&self, id: &ReadOnlyStr) -> Option<CommandHandler> {

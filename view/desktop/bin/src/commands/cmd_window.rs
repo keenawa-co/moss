@@ -1,16 +1,16 @@
 use anyhow::Result;
 use hashbrown::HashMap;
 use moss_desktop::{
+    app::manager::AppManager,
     command::CommandContext,
     models::application::{AppStateInfo, LocaleDescriptor, PreferencesInfo, ThemeDescriptor},
     services::theme_service::{GetColorThemeOptions, ThemeService},
 };
+use moss_tauri::TauriResult;
 use moss_text::{quote, ReadOnlyStr};
 use serde_json::Value;
-use std::path::PathBuf;
 
-use crate::{create_child_window, AppState};
-use moss_desktop::services::locale_service::{GetTranslationsOptions, LocaleService};
+use crate::{create_child_window, menu, AppState};
 use tauri::{AppHandle, Emitter, State, WebviewWindow, Window};
 
 #[derive(Clone, Serialize)]
@@ -21,8 +21,10 @@ struct EventAData {
 // According to https://docs.rs/tauri/2.1.1/tauri/webview/struct.WebviewWindowBuilder.html
 // We should call WebviewWindowBuilder from async commands
 #[tauri::command]
-pub async fn create_new_window(app_handle: AppHandle) {
-    create_child_window(&app_handle, "/");
+pub async fn create_new_window(app_handle: AppHandle) -> TauriResult<()> {
+    let webview_window = create_child_window(&app_handle, "/")?;
+    webview_window.on_menu_event(move |window, event| menu::handle_event(window, &event));
+    Ok(())
 }
 
 #[tauri::command]
@@ -56,15 +58,13 @@ pub fn execute_command(
 
 #[tauri::command(async)]
 pub async fn get_color_theme(
-    app_state: State<'_, AppState>,
+    app_manager: State<'_, AppManager>,
     path: String,
     opts: Option<GetColorThemeOptions>,
-) -> Result<String, String> {
-    let theme_service = app_state.services.get_unchecked::<ThemeService>();
-    theme_service
-        .get_color_theme(&path, opts)
-        .await
-        .map_err(|err| err.to_string())
+) -> TauriResult<String> {
+    let theme_service = app_manager.service::<ThemeService>()?;
+
+    Ok(theme_service.get_color_theme(&path, opts).await?)
 }
 
 #[tauri::command(async)]
@@ -90,16 +90,9 @@ pub fn get_state(app_state: State<'_, AppState>) -> Result<AppStateInfo, String>
     })
 }
 
-// FIXME: This is a temporary solution until we have a registry of installed
-// plugins and the ability to check which theme packs are installed.
 #[tauri::command(async)]
-pub async fn get_themes(app_state: State<'_, AppState>) -> Result<Vec<ThemeDescriptor>, String> {
-    let theme_service = app_state.services.get_unchecked::<ThemeService>();
-    let r: Vec<ThemeDescriptor> = theme_service
-        .get_color_themes()
-        .clone()
-        .into_iter()
-        .collect();
+pub async fn get_themes(app_manager: State<'_, AppManager>) -> TauriResult<Vec<ThemeDescriptor>> {
+    let theme_service = app_manager.service::<ThemeService>()?;
 
     Ok(theme_service
         .get_color_themes()
@@ -129,4 +122,25 @@ pub fn get_locales() -> Vec<LocaleDescriptor> {
             direction: Some("ltr".to_string()),
         },
     ]
+}
+
+#[tauri::command]
+pub fn get_translations(language: String, namespace: String) -> Result<serde_json::Value, String> {
+    let path = crate::utl::get_home_dir()
+        .map_err(|err| err.to_string())?
+        .join(".config")
+        .join("moss")
+        .join("locales")
+        .join(language)
+        .join(format!("{namespace}.json"));
+
+    match std::fs::read_to_string(path) {
+        Ok(data) => {
+            let translations: serde_json::Value =
+                serde_json::from_str(&data).map_err(|err| err.to_string())?;
+
+            Ok(translations)
+        }
+        Err(err) => Err(err.to_string()),
+    }
 }
