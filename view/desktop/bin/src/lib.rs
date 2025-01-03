@@ -99,6 +99,7 @@ pub fn run() {
             cmd_base::get_menu_items_by_namespace,
             cmd_window::execute_command,
             cmd_window::get_color_theme,
+            cmd_window::get_state,
         ])
         .on_window_event(|window, event| match event {
             #[cfg(target_os = "macos")]

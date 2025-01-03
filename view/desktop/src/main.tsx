@@ -45,14 +45,14 @@ const rootElement = document.getElementById("root") as HTMLElement; // cache the
 
 if (rootElement) {
   createRoot(rootElement).render(
-    <StrictMode>
-      <Provider store={store}>
-        <GeneralProvider>
-          <Suspense fallback={<PageLoader />}>
-            <App />
-          </Suspense>
-        </GeneralProvider>
-      </Provider>
-    </StrictMode>
+    //<StrictMode>
+    <Provider store={store}>
+      <GeneralProvider>
+        <Suspense fallback={<PageLoader />}>
+          <App />
+        </Suspense>
+      </GeneralProvider>
+    </Provider>
+    //</StrictMode>
   );
 }
