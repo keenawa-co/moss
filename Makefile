@@ -28,6 +28,8 @@ UIKIT_MODELS_DIR := crates/moss-uikit
 
 # --- Schema Directories ---
 THEME_SCHEMA_DIR :=  crates/moss-theme
+TYPESPEC_OUTPUT_DIR := @typespec/json-schema
+SCHEMAS_DIR := assets/schemas
 
 # --- Tool Directories ---
 XTASK_DIR := tools/xtask
@@ -41,6 +43,7 @@ SURREAL := surreal
 CARGO := cargo
 RUSTUP := rustup
 TSP := tsp
+
 
 # Database settings
 DATABASE_FILE := file:rocksdb
@@ -152,6 +155,10 @@ endif
 .PHONY: compile-themes-schema
 compile-themes-schema:
 	@cd $(THEME_SCHEMA_DIR) && $(TSP) compile . --option "@typespec/json-schema.file-type=json"
+	@mv $(TYPESPEC_OUTPUT_DIR)/* $(SCHEMAS_DIR)
+	@rm -r @typespec
+
+
 
 ## Generate Icons
 .PHONY: gen-icons
