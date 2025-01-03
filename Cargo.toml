@@ -59,6 +59,7 @@ moss_desktop = { path = "crates/moss-desktop" }
 moss_cache = { path = "crates/moss-cache" }
 moss_addon = { path = "crates/moss-addon" }
 moss_tauri = { path = "crates/moss-tauri" }
+moss_theme = { path = "crates/moss-theme" }
 
 smallvec = "1.13.2"
 toml = "0.8.19"

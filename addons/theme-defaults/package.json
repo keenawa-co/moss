@@ -1,7 +1,7 @@
 {
   "name": "@repo/theme-defaults",
   "scripts": {
-    "start": "npx vite-node ./src/index.ts"
+    "build": "npx vite-node ./src/index.ts"
   },
   "devDependencies": {
     "@repo/typescript-config": "workspace:*",
