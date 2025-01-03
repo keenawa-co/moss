@@ -27,6 +27,7 @@ ADDON_THEME_DEFAULTS := ${BUILTIN_ADDONS_DIR}/theme-defaults
 DESKTOP_MODELS_DIR := crates/moss-desktop
 HTML_MODELS_DIR := crates/moss-html
 UIKIT_MODELS_DIR := crates/moss-uikit
+THEME_MODELS_DIR := crates/moss-theme
 
 # --- Schema Directories ---
 THEME_SCHEMA_DIR :=  crates/moss-theme
@@ -160,23 +161,19 @@ compile-themes-schema:
 gen-icons:
 	@cd $(ICONS_DIR) && $(PNPM) build
 
-## Generate HTML Models
-.PHONY: gen-html-models
-gen-html-models:
-	@$(CARGO) test --manifest-path $(HTML_MODELS_DIR)/Cargo.toml
-	@$(CARGO) build --manifest-path $(HTML_MODELS_DIR)/Cargo.toml
+define gen_models
+.PHONY: gen-$(1)-models
+gen-$(1)-models:
+	@$(CARGO) test --manifest-path $($(2))/Cargo.toml
+	@$(CARGO) build --manifest-path $($(2))/Cargo.toml
+endef
 
-## Generate UI Kit Models
-.PHONY: gen-uikit-models
-gen-uikit-models:
-	@$(CARGO) test --manifest-path $(UIKIT_MODELS_DIR)/Cargo.toml
-	@$(CARGO) build --manifest-path $(UIKIT_MODELS_DIR)/Cargo.toml
+## Generate Models
 
-## Generate Desktop Models
-.PHONY: gen-desktop-models
-gen-desktop-models:
-	@$(CARGO) test --manifest-path $(DESKTOP_MODELS_DIR)/Cargo.toml
-	@$(CARGO) build --manifest-path $(DESKTOP_MODELS_DIR)/Cargo.toml
+$(eval $(call gen_models,theme,THEME_MODELS_DIR))
+$(eval $(call gen_models,html,HTML_MODELS_DIR))
+$(eval $(call gen_models,uikit,UIKIT_MODELS_DIR))
+$(eval $(call gen_models,desktop,DESKTOP_MODELS_DIR))
 
 ## Generate All Models
 .PHONY: gen-models
@@ -184,6 +181,7 @@ gen-models: \
 	gen-html-models \
 	gen-uikit-models \
 	gen-desktop-models \
+	gen-theme-models \
 
 .PHONY: compile-schemas
 compile-schemas: compile-themes-schema

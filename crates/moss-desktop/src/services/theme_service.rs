@@ -1,8 +1,15 @@
 use anyhow::{anyhow, Context as _, Result};
 use dashmap::DashSet;
 use moss_cache::{backend::moka::MokaBackend, Cache, CacheError};
+use moss_theme::{
+    conversion::{
+        json_converter::JsonThemeConverter, jsonschema_validator::JsonSchemaValidator,
+        ThemeConverter,
+    },
+    schema::SCHEMA_THEME,
+};
 use serde::Deserialize;
-use std::{path::PathBuf, sync::Arc};
+use std::{ops::Deref, path::PathBuf, sync::Arc};
 use tauri::{AppHandle, Manager};
 
 use crate::{
@@ -20,15 +27,21 @@ pub struct GetColorThemeOptions {
 
 pub struct ThemeService {
     app_cache: Arc<Cache<MokaBackend>>,
+    converter: Arc<dyn ThemeConverter + Send + Sync>,
     themes: Arc<DashSet<ThemeDescriptor>>,
 }
 
 impl ThemeService {
     pub fn new(app_handle: &AppHandle) -> Self {
         let app_state = app_handle.state::<AppState>();
+        let json_schema_validator = JsonSchemaValidator::new(SCHEMA_THEME.deref());
+        let converter = JsonThemeConverter::new(json_schema_validator);
+
+        // let s = SCHEMA_THEME.deref();
 
         Self {
             app_cache: Arc::clone(&app_state.cache),
+            converter: Arc::new(converter),
             themes: Arc::clone(&app_state.contributions.themes),
         }
     }
@@ -43,20 +56,21 @@ impl ThemeService {
         opts: Option<GetColorThemeOptions>,
     ) -> Result<String> {
         let handle_cache_miss = || async {
-            let content = self.read_color_theme_from_file(source).await?;
+            let json_data = self.read_color_theme_from_file(source).await?;
+            let css_data = self.converter.convert_to_css(json_data)?;
 
             let options = if let Some(options) = opts {
                 options
             } else {
-                return Ok(content);
+                return Ok(css_data);
             };
 
             if options.enable_cache {
-                self.app_cache.insert(CK_COLOR_THEME, content.clone());
+                self.app_cache.insert(CK_COLOR_THEME, css_data.clone());
                 trace!("Color theme '{}' was successfully cached", source);
             };
 
-            Ok(content)
+            Ok(css_data)
         };
 
         match self.app_cache.get::<String>(CK_COLOR_THEME) {
