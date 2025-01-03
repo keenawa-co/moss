@@ -24,6 +24,8 @@ moss_text.workspace = true
 moss_desktop.workspace = true
 moss_uikit.workspace = true
 moss_cache.workspace = true
+moss_tauri.workspace = true
+moss_addon.workspace = true
 
 anyhow.workspace = true
 once_cell.workspace = true
@@ -32,7 +34,6 @@ log.workspace = true
 rand.workspace = true
 fern.workspace = true
 smol.workspace = true
-
 
 # surrealdb = { workspace = true, features = ["kv-rocksdb"] }
 tokio = { workspace = true, features = ["full", "macros", "signal"] }
