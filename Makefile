@@ -13,13 +13,15 @@ endif
 DESKTOP_DIR := view/desktop
 STORYBOOK_DIR := view/storybook
 WEB_DIR := view/web
-THEME_GENERATOR_DIR := tools/themegen
 THEME_INSTALLER_DIR := misc/themeinstall
 ICONS_DIR := tools/icongen
 
 # --- Addon Directories ---
 export BUILTIN_ADDONS_DIR := ${CURDIR}/addons
 export INSTALLED_ADDONS_DIR := ${HOME_DIR}/.moss/addons
+
+# --- Addons ---
+ADDON_THEME_DEFAULTS := ${BUILTIN_ADDONS_DIR}/theme-defaults
 
 # --- Model Directories ---
 DESKTOP_MODELS_DIR := crates/moss-desktop
@@ -110,7 +112,7 @@ endif
 ## Generate Theme JSONs
 .PHONY: gen-themes
 gen-themes:
-	@cd $(THEME_GENERATOR_DIR) && $(PNPM) start
+	@cd $(ADDON_THEME_DEFAULTS) && $(PNPM) build
 
 
 ## Convert Theme JSONs to CSS
@@ -215,7 +217,7 @@ clean-pnpm:
 	@echo Cleaning Web Directory Cache...
 	@cd $(WEB_DIR) && $(PNPM) prune
 	@echo Cleaning Theme Generator Directory Cache...
-	@cd $(THEME_GENERATOR_DIR) && $(PNPM) prune
+	@cd $(ADDON_THEME_DEFAULTS) && $(PNPM) prune
 	@echo Cleaning Icons Directory Cache...
 	@cd $(ICONS_DIR) && $(PNPM) prune
 	@echo Cleaning Desktop Models Directory Cache...
