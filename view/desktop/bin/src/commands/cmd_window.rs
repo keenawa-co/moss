@@ -10,7 +10,7 @@ use moss_tauri::TauriResult;
 use moss_text::{quote, ReadOnlyStr};
 use serde_json::Value;
 
-use crate::{create_child_window, AppState};
+use crate::{create_child_window, menu, AppState};
 use tauri::{AppHandle, Emitter, State, WebviewWindow, Window};
 
 #[derive(Clone, Serialize)]
