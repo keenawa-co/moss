@@ -102,3 +102,5 @@ jsonschema = { version = "0.26.1", default-features = false }
 os_info = { version = "3.9.0", default-features = false }
 gethostname = "0.5.0"
 moka = { version = "0.12.8", features = ["sync"] }
+
+# Force triggering a rust ci workflow 3
