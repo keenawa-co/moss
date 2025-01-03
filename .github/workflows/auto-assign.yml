@@ -7,6 +7,7 @@ on:
 jobs:
   assign_creator:
     runs-on: ubuntu-latest
+    if: ${{ github.actor != 'dependabot[bot]' }}
     steps:
       - name: Assign PR creator as assignee
         uses: actions-ecosystem/action-add-assignees@v1
