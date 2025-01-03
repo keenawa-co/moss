@@ -68,6 +68,19 @@ pub async fn get_color_theme(
 }
 
 #[tauri::command(async)]
+pub async fn get_translations(
+    locale_service: State<'_, LocaleService>,
+    language: String,
+    namespace: String,
+    opts: Option<GetTranslationsOptions>,
+) -> Result<serde_json::Value, String> {
+    locale_service
+        .get_translations(&language, &namespace, opts)
+        .await
+        .map_err(|err| err.to_string())
+}
+
+#[tauri::command(async)]
 pub fn get_state(app_state: State<'_, AppState>) -> Result<AppStateInfo, String> {
     Ok(AppStateInfo {
         preferences: PreferencesInfo {
