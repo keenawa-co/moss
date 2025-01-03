@@ -1,4 +1,4 @@
-import { ReactNode, useEffect } from "react";
+import { ReactNode, useEffect, useRef } from "react";
 
 import { getState } from "@/api/appearance";
 import { useLanguageStore } from "@/store/language";
@@ -33,14 +33,30 @@ const queryClient = new QueryClient({
 });
 
 const useInitializeAppState = () => {
-  const { setCurrentTheme } = useThemeStore();
+  const { setCurrentTheme, themes } = useThemeStore();
   const { setLanguageCode } = useLanguageStore();
+  const initialized = useRef(false);
 
   useEffect(() => {
+    if (initialized.current) return;
+    initialized.current = true;
+
+    // console.log("useEffect useInitializeAppState");
+
     const fetchAndSetAppState = async () => {
+      // console.log("fetchAndSetAppState");
       try {
         const { preferences } = await getState();
-        setCurrentTheme(preferences.theme);
+        // console.log("preferences.theme.source", preferences.theme.source);
+        // FIXME: This is a temporary solution until preferences.theme.source returns the correct theme source.
+        if (preferences.theme.source === "moss-light.css") {
+          setCurrentTheme(themes[0]);
+        } else if (preferences.theme.source === "moss-dark.css") {
+          setCurrentTheme(themes[1]);
+        } else {
+          setCurrentTheme(preferences.theme);
+        }
+
         setLanguageCode(preferences.locale.code);
       } catch (error) {
         console.error("Failed to fetch app state from backend:", error);
@@ -48,7 +64,7 @@ const useInitializeAppState = () => {
     };
 
     fetchAndSetAppState();
-  }, [setCurrentTheme, setLanguageCode]);
+  }, [setCurrentTheme, setLanguageCode, themes]);
 };
 
 const Provider = ({ children }: ProviderProps) => {
@@ -56,7 +72,7 @@ const Provider = ({ children }: ProviderProps) => {
 
   return (
     <QueryClientProvider client={queryClient}>
-      {ENABLE_REACT_QUERY_DEVTOOLS && <ReactQueryDevtools initialIsOpen={false} buttonPosition="bottom-left" />}
+      {ENABLE_REACT_QUERY_DEVTOOLS && <ReactQueryDevtools initialIsOpen={false} buttonPosition="bottom-right" />}
       <LanguageProvider>
         <ThemeProvider>{children}</ThemeProvider>
       </LanguageProvider>

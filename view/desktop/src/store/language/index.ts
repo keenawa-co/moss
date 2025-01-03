@@ -15,7 +15,9 @@ export const useLanguageStore = create<LanguageStore>((set, get) => ({
   currentLanguageCode: "en",
   languagePacks: [],
   setLanguageCode: (newLanguageCode) => {
-    const { languagePacks } = get();
+    const { languagePacks, currentLanguageCode } = get();
+
+    if (newLanguageCode === currentLanguageCode) return;
 
     const isValidLanguage = languagePacks.some(({ code }) => code === newLanguageCode);
     const validLanguageCode = isValidLanguage ? newLanguageCode : "en";
@@ -24,6 +26,7 @@ export const useLanguageStore = create<LanguageStore>((set, get) => ({
     set({ currentLanguageCode: validLanguageCode });
   },
   initializeLanguages: async () => {
+    console.log("initializeLanguages");
     try {
       const locales = await getLocales();
 
