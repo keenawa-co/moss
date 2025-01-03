@@ -5,9 +5,5 @@ edition = "2021"
 
 [dependencies]
 anyhow.workspace = true
-moss_desktop.workspace = true
-
 tauri.workspace = true
 serde.workspace = true
-tauri-runtime-wry = "2.2.0"
-derive_more = { workspace = true, features = ["full"] }
