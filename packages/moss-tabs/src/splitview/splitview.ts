@@ -3,12 +3,12 @@
  * https://github.com/microsoft/vscode/tree/main/src/vs/base/browser/ui/splitview
  *--------------------------------------------------------------------------------------------*/
 
-import { removeClasses, addClasses, toggleClass, disableIframePointEvents } from "../dom";
-import { Event, Emitter } from "../events";
-import { pushToStart, pushToEnd, firstIndex } from "../array";
-import { range, clamp } from "../math";
-import { ViewItem } from "./viewItem";
+import { firstIndex, pushToEnd, pushToStart } from "../array";
+import { addClasses, disableIframePointEvents, removeClasses, toggleClass } from "../dom";
+import { Emitter, Event } from "../events";
 import { IDisposable } from "../lifecycle";
+import { clamp, range } from "../math";
+import { ViewItem } from "./viewItem";
 
 export enum Orientation {
   HORIZONTAL = "HORIZONTAL",
@@ -824,10 +824,10 @@ export class Splitview {
   }
 
   private updateSash(sash: ISashItem, state: SashState): void {
-    toggleClass(sash.container, "dv-disabled", state === SashState.DISABLED);
-    toggleClass(sash.container, "dv-enabled", state === SashState.ENABLED);
-    toggleClass(sash.container, "dv-maximum", state === SashState.MAXIMUM);
-    toggleClass(sash.container, "dv-minimum", state === SashState.MINIMUM);
+    toggleClass(sash.container, "bg-dv-disabled", state === SashState.DISABLED);
+    toggleClass(sash.container, "bg-dv-enabled", state === SashState.ENABLED);
+    toggleClass(sash.container, "bg-dv-maximum", state === SashState.MAXIMUM);
+    toggleClass(sash.container, "bg-dv-minimum", state === SashState.MINIMUM);
   }
 
   private resize = (
