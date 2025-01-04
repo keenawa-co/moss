@@ -1,13 +1,13 @@
-import { Emitter, Event, AsapEvent } from "../events";
-import { getGridLocation, Gridview, IGridView } from "./gridview";
 import { Position } from "../dnd/droptarget";
+import { MovementOptions2 } from "../dockview/options";
+import { Classnames } from "../dom";
+import { AsapEvent, Emitter, Event } from "../events";
 import { Disposable, IDisposable, IValueDisposable } from "../lifecycle";
 import { sequentialNumberGenerator } from "../math";
-import { ISplitviewStyles, Orientation, Sizing } from "../splitview/splitview";
 import { IPanel } from "../panel/types";
-import { MovementOptions2 } from "../dockview/options";
 import { Resizable } from "../resizable";
-import { Classnames } from "../dom";
+import { ISplitviewStyles, Orientation, Sizing } from "../splitview/splitview";
+import { getGridLocation, Gridview, IGridView } from "./gridview";
 
 const nextLayoutId = sequentialNumberGenerator();
 
@@ -150,8 +150,7 @@ export abstract class BaseGrid<T extends IGridPanelView> extends Resizable imple
 
   constructor(parentElement: HTMLElement, options: BaseGridOptions) {
     super(document.createElement("div"), options.disableAutoResizing);
-    this.element.style.height = "100%";
-    this.element.style.width = "100%";
+    this.element.classList.add("h-full", "w-full");
 
     this._classNames = new Classnames(this.element);
     this._classNames.setClassNames(options.className ?? "");

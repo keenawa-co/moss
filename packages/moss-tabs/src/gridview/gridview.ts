@@ -3,14 +3,14 @@
  * https://github.com/microsoft/vscode/tree/main/src/vs/base/browser/ui/grid
  *--------------------------------------------------------------------------------------------*/
 
-import { ISplitviewStyles, LayoutPriority, Orientation, Sizing } from "../splitview/splitview";
 import { tail } from "../array";
-import { LeafNode } from "./leafNode";
-import { BranchNode } from "./branchNode";
-import { Node } from "./types";
+import { Position } from "../dnd/droptarget";
 import { Emitter, Event } from "../events";
 import { IDisposable, MutableDisposable } from "../lifecycle";
-import { Position } from "../dnd/droptarget";
+import { ISplitviewStyles, LayoutPriority, Orientation, Sizing } from "../splitview/splitview";
+import { BranchNode } from "./branchNode";
+import { LeafNode } from "./leafNode";
+import { Node } from "./types";
 
 function findLeaf(candiateNode: Node, last: boolean): LeafNode {
   if (candiateNode instanceof LeafNode) {
@@ -88,7 +88,7 @@ export function getGridLocation(element: HTMLElement): number[] {
     throw new Error("Invalid grid element");
   }
 
-  if (/\bdv-grid-view\b/.test(parentElement.className)) {
+  if (/\bh-full w-full\b/.test(parentElement.className)) {
     return [];
   }
 
@@ -696,7 +696,7 @@ export class Gridview implements IDisposable {
     margin?: number
   ) {
     this.element = document.createElement("div");
-    this.element.className = "dv-grid-view";
+    this.element.className = "h-full w-full";
 
     this._locked = locked ?? false;
     this._margin = margin ?? 0;

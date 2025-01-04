@@ -35,6 +35,7 @@
     "prettier-plugin-tailwindcss": "^0.6.9",
     "tailwind-merge": "^2.5.5",
     "tailwindcss": "^3.4.1",
+    "ts-jest": "^29.2.5",
     "turbo": "^2.0.6",
     "typescript": "^5.7.2",
     "vite": "^6.0.3",

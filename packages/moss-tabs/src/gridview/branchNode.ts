@@ -3,12 +3,12 @@
  * https://github.com/microsoft/vscode/tree/main/src/vs/base/browser/ui/grid
  *--------------------------------------------------------------------------------------------*/
 
-import { IView, Splitview, Orientation, Sizing, LayoutPriority, ISplitviewStyles } from "../splitview/splitview";
 import { Emitter, Event } from "../events";
+import { CompositeDisposable, Disposable, IDisposable } from "../lifecycle";
+import { ISplitviewStyles, IView, LayoutPriority, Orientation, Sizing, Splitview } from "../splitview/splitview";
 import { INodeDescriptor } from "./gridview";
 import { LeafNode } from "./leafNode";
 import { Node } from "./types";
-import { CompositeDisposable, IDisposable, Disposable } from "../lifecycle";
 
 export class BranchNode extends CompositeDisposable implements IView {
   readonly element: HTMLElement;
@@ -143,7 +143,7 @@ export class BranchNode extends CompositeDisposable implements IView {
     this._size = size;
 
     this.element = document.createElement("div");
-    this.element.className = "dv-branch-node";
+    this.element.className = "h-full w-full";
 
     if (!childDescriptors) {
       this.splitview = new Splitview(this.element, {
