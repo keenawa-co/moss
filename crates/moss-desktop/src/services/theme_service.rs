@@ -12,7 +12,7 @@ use std::{ops::Deref, path::PathBuf, sync::Arc};
 use tauri::{AppHandle, Manager};
 
 use crate::{
-    app::{service::Service, state::AppState},
+    app::{service::Service, state::AppStateManager},
     models::application::ThemeDescriptor,
 };
 
@@ -32,7 +32,7 @@ pub struct ThemeService {
 
 impl ThemeService {
     pub fn new(app_handle: &AppHandle) -> Self {
-        let app_state = app_handle.state::<AppState>();
+        let app_state = app_handle.state::<AppStateManager>();
         let json_schema_validator = JsonSchemaValidator::new(SCHEMA_THEME.deref());
         let converter = JsonThemeConverter::new(json_schema_validator);
 

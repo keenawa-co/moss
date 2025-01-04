@@ -3,14 +3,14 @@ use hashbrown::HashMap;
 use moss_desktop::{
     app::manager::AppManager,
     command::CommandContext,
-    models::application::{AppStateInfo, LocaleDescriptor, PreferencesInfo, ThemeDescriptor},
+    models::application::{AppState, Defaults, LocaleDescriptor, Preferences, ThemeDescriptor},
     services::theme_service::ThemeService,
 };
 use moss_tauri::TauriResult;
 use moss_text::{quote, ReadOnlyStr};
 use serde_json::Value;
 
-use crate::{create_child_window, menu, AppState};
+use crate::{create_child_window, menu, AppStateManager};
 use tauri::{AppHandle, Emitter, State, WebviewWindow, Window};
 
 #[derive(Clone, Serialize)]
@@ -44,7 +44,7 @@ pub fn main_window_is_ready(current_window: WebviewWindow) {
 #[tauri::command]
 pub fn execute_command(
     app_handle: AppHandle,
-    app_state: State<'_, AppState>,
+    app_state: State<'_, AppStateManager>,
     window: Window,
     cmd: ReadOnlyStr,
     args: HashMap<String, Value>,
@@ -67,11 +67,15 @@ pub async fn get_color_theme(
 }
 
 #[tauri::command(async)]
-pub fn get_state(app_state: State<'_, AppState>) -> Result<AppStateInfo, String> {
-    Ok(AppStateInfo {
-        preferences: PreferencesInfo {
-            theme: app_state.preferences.theme.read().clone(),
-            locale: app_state.preferences.locale.read().clone(),
+pub fn get_state(state_manager: State<'_, AppStateManager>) -> Result<AppState, String> {
+    Ok(AppState {
+        preferences: Preferences {
+            theme: state_manager.preferences.theme.read().clone(),
+            locale: state_manager.preferences.locale.read().clone(),
+        },
+        defaults: Defaults {
+            theme: state_manager.defaults.theme.clone(),
+            locale: state_manager.defaults.locale.clone(),
         },
     })
 }

@@ -91,10 +91,10 @@ fn parse_addon_dir(app_state: &AppState, addon_dir: PathBuf) -> Result<()> {
 
             if let Some(themes) = addon_manifest.contributes.themes {
                 for theme_contribution in themes {
-                    app_state.contributions.themes.insert(ThemeDescriptor {
+                    let value = ThemeDescriptor {
                         id: format!(
-                            "{}.{}",
-                            addon_manifest.addon.name,
+                            "{}.{}", // TODO: Add the addon author identifier as the first segment for greater uniqueness
+                            addon_manifest.addon.id,
                             theme_contribution.label.replace(" ", "")
                         ),
                         name: theme_contribution.label,
@@ -102,7 +102,9 @@ fn parse_addon_dir(app_state: &AppState, addon_dir: PathBuf) -> Result<()> {
                             .join(theme_contribution.path)
                             .to_string_lossy()
                             .to_string(),
-                    });
+                    };
+
+                    app_state.contributions.themes.insert(value);
                 }
             }
         }
