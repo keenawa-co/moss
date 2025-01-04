@@ -11,6 +11,9 @@
       "path": "crates/moss-uikit"
     },
     {
+      "path": "crates/moss-theme"
+    },
+    {
       "path": "crates/moss-desktop"
     },
     {

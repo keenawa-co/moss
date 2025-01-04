@@ -1,5 +1,8 @@
-import React, { ReactNode } from "react";
+import { ReactNode, useEffect } from "react";
 
+import { getState } from "@/api/appearance";
+import { useLanguageStore } from "@/store/language";
+import { useThemeStore } from "@/store/theme";
 import { QueryCache, QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
@@ -29,10 +32,35 @@ const queryClient = new QueryClient({
   },
 });
 
-const Provider: React.FC<ProviderProps> = ({ children }) => {
+const useInitializeAppState = () => {
+  const { setCurrentTheme } = useThemeStore();
+  const { setLanguageCode } = useLanguageStore();
+
+  useEffect(() => {
+    const fetchAndSetAppState = async () => {
+      try {
+        const { preferences, defaults } = await getState();
+
+        const theme = preferences?.theme ?? defaults.theme;
+        const localeCode = preferences?.locale?.code ?? defaults.locale.code;
+
+        setCurrentTheme(theme);
+        setLanguageCode(localeCode);
+      } catch (error) {
+        console.error("Failed to fetch app state from backend:", error);
+      }
+    };
+
+    fetchAndSetAppState();
+  }, [setCurrentTheme, setLanguageCode]);
+};
+
+const Provider = ({ children }: ProviderProps) => {
+  useInitializeAppState();
+
   return (
     <QueryClientProvider client={queryClient}>
-      {ENABLE_REACT_QUERY_DEVTOOLS && <ReactQueryDevtools initialIsOpen={false} buttonPosition="bottom-left" />}
+      {ENABLE_REACT_QUERY_DEVTOOLS && <ReactQueryDevtools initialIsOpen={false} buttonPosition="bottom-right" />}
       <LanguageProvider>
         <ThemeProvider>{children}</ThemeProvider>
       </LanguageProvider>

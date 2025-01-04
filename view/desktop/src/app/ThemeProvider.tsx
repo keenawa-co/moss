@@ -1,82 +1,35 @@
-import React, { useCallback, useEffect } from "react";
+import { ReactNode, useCallback, useEffect } from "react";
 
-import { getColorTheme } from "@/api/appearance";
 import { useGetColorThemes } from "@/hooks/useGetColorThemes";
-import { IpcResult } from "@/lib/backend/tauri";
 import { useThemeStore } from "@/store/theme";
 import { ThemeDescriptor } from "@repo/moss-desktop";
 import { listen, UnlistenFn } from "@tauri-apps/api/event";
 
 interface ThemeProviderProps {
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
-const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
-  const { data: themes, isLoading: themesLoading, error: themesError } = useGetColorThemes();
+const ThemeProvider = ({ children }: ThemeProviderProps) => {
+  const { data: newThemes } = useGetColorThemes();
+  const { setThemes, setCurrentTheme } = useThemeStore();
 
-  const { currentTheme, setCurrentTheme } = useThemeStore();
-
-  const applyThemeCSS = useCallback(async (theme: ThemeDescriptor | null) => {
-    if (!theme) {
-      console.warn("No theme to apply.");
-      return;
+  useEffect(() => {
+    if (newThemes) {
+      setThemes(newThemes);
     }
+  }, [newThemes, setThemes]);
 
-    try {
-      const result: IpcResult<string, string> = await getColorTheme(theme.source);
+  const handleColorThemeChanged = useCallback(
+    (event: { payload: ThemeDescriptor }) => {
+      const { payload: newThemeDescriptor } = event;
 
-      if (result.status === "ok") {
-        const cssContent = result.data;
-        let styleTag = document.getElementById("theme-style") as HTMLStyleElement | null;
-
-        if (styleTag) {
-          styleTag.innerHTML = cssContent;
-        } else {
-          styleTag = document.createElement("style");
-          styleTag.id = "theme-style";
-          styleTag.innerHTML = cssContent;
-          document.head.appendChild(styleTag);
-        }
-      } else {
-        console.error(`Error reading theme file for "${theme.id}":`, result.error);
-      }
-    } catch (error) {
-      console.error(`Failed to apply theme "${theme.id}":`, error);
-    }
-  }, []);
-
-  const setTheme = useCallback(
-    (themeDescriptor: ThemeDescriptor) => {
-      const selectedTheme = themes?.find((theme) => theme.id === themeDescriptor.id) || null;
-      if (selectedTheme) {
-        setCurrentTheme(selectedTheme);
-      } else {
-        console.error(`Theme with id "${themeDescriptor.id}" not found.`);
-      }
+      setCurrentTheme(newThemeDescriptor);
     },
-    [themes, setCurrentTheme]
+    [setCurrentTheme]
   );
 
   useEffect(() => {
-    applyThemeCSS(currentTheme);
-  }, [currentTheme, applyThemeCSS]);
-
-  useEffect(() => {
-    if (!currentTheme && themes && themes.length > 0 && !themesLoading) {
-      setTheme(themes[0]);
-    }
-  }, [currentTheme, themes, setTheme, themesLoading]);
-
-  useEffect(() => {
-    let unlisten: UnlistenFn;
-
-    const handleColorThemeChanged = (event: { payload: ThemeDescriptor }) => {
-      const newThemeDescriptor: ThemeDescriptor = event.payload;
-
-      if (newThemeDescriptor.id !== currentTheme?.id) {
-        setTheme(newThemeDescriptor);
-      }
-    };
+    let unlisten: UnlistenFn | undefined;
 
     const setupListener = async () => {
       try {
@@ -93,13 +46,7 @@ const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
         unlisten();
       }
     };
-  }, [currentTheme, setTheme]);
-
-  useEffect(() => {
-    if (themesError) {
-      console.error("Error loading themes:", themesError);
-    }
-  }, [themesError]);
+  }, [handleColorThemeChanged]);
 
   return <>{children}</>;
 };
