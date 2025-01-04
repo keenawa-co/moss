@@ -21,7 +21,6 @@ const ThemeProvider = ({ children }: ThemeProviderProps) => {
 
   const handleColorThemeChanged = useCallback(
     (event: { payload: ThemeDescriptor }) => {
-      // console.log("handleColorThemeChanged");
       const { payload: newThemeDescriptor } = event;
 
       setCurrentTheme(newThemeDescriptor);
@@ -31,8 +30,6 @@ const ThemeProvider = ({ children }: ThemeProviderProps) => {
 
   useEffect(() => {
     let unlisten: UnlistenFn | undefined;
-
-    // console.log("useEffect handleColorThemeChanged");
 
     const setupListener = async () => {
       try {

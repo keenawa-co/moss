@@ -14,8 +14,6 @@ const LanguageProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     let unlisten: UnlistenFn;
 
-    console.log("useEffect handleLanguagePackChanged");
-
     const handleLanguagePackChanged = (event: { payload: LocaleDescriptor }) => {
       const newLanguagePack: LocaleDescriptor = event.payload;
       setLanguageCode(newLanguagePack.code);

@@ -22,7 +22,6 @@ export const useThemeStore = create<ThemeStore>((set, get) => ({
       return;
     }
     if (currentTheme?.id === theme.id) {
-      // console.log(currentTheme?.id === theme.id, currentTheme.id, theme.id);
       return;
     }
 
@@ -49,8 +48,7 @@ export const useThemeStore = create<ThemeStore>((set, get) => ({
       console.error(`Failed to apply theme "${theme.id}":`, error);
     }
   },
-  setThemes: (themes) => {
-    // console.log("setThemes");
-    set({ themes });
+  setThemes: (newThemes) => {
+    set({ themes: newThemes });
   },
 }));

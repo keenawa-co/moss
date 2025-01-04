@@ -1,4 +1,4 @@
-import { ReactNode, useEffect, useRef } from "react";
+import { ReactNode, useEffect } from "react";
 
 import { getState } from "@/api/appearance";
 import { useLanguageStore } from "@/store/language";
@@ -35,19 +35,10 @@ const queryClient = new QueryClient({
 const useInitializeAppState = () => {
   const { setCurrentTheme, themes } = useThemeStore();
   const { setLanguageCode } = useLanguageStore();
-  const initialized = useRef(false);
-
   useEffect(() => {
-    if (initialized.current) return;
-    initialized.current = true;
-
-    // console.log("useEffect useInitializeAppState");
-
     const fetchAndSetAppState = async () => {
-      // console.log("fetchAndSetAppState");
       try {
         const { preferences } = await getState();
-        // console.log("preferences.theme.source", preferences.theme.source);
         // FIXME: This is a temporary solution until preferences.theme.source returns the correct theme source.
         if (preferences.theme.source === "moss-light.css") {
           setCurrentTheme(themes[0]);
