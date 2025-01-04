@@ -33,30 +33,26 @@ const queryClient = new QueryClient({
 });
 
 const useInitializeAppState = () => {
-  const { setCurrentTheme, themes } = useThemeStore();
+  const { setCurrentTheme } = useThemeStore();
   const { setLanguageCode } = useLanguageStore();
 
   useEffect(() => {
     const fetchAndSetAppState = async () => {
       try {
-        const { preferences } = await getState();
-        // FIXME: This is a temporary solution until preferences.theme.source returns the correct theme source.
-        if (preferences.theme.source === "moss-light.css") {
-          setCurrentTheme(themes[0]);
-        } else if (preferences.theme.source === "moss-dark.css") {
-          setCurrentTheme(themes[1]);
-        } else {
-          setCurrentTheme(preferences.theme);
-        }
+        const { preferences, defaults } = await getState();
 
-        setLanguageCode(preferences.locale.code);
+        const theme = preferences?.theme ?? defaults.theme;
+        const localeCode = preferences?.locale?.code ?? defaults.locale.code;
+
+        setCurrentTheme(theme);
+        setLanguageCode(localeCode);
       } catch (error) {
         console.error("Failed to fetch app state from backend:", error);
       }
     };
 
     fetchAndSetAppState();
-  }, [setCurrentTheme, setLanguageCode, themes]);
+  }, [setCurrentTheme, setLanguageCode]);
 };
 
 const Provider = ({ children }: ProviderProps) => {
