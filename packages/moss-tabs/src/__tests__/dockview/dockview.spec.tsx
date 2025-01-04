@@ -2,7 +2,7 @@ import React from "react";
 
 import { act, render, waitFor } from "@testing-library/react";
 
-import "@testing-library/jest-dom/extend-expect";
+import "@testing-library/jest-dom";
 
 import { setMockRefElement } from "../__test_utils__/utils";
 import { DockviewApi } from "../../api/component.api";

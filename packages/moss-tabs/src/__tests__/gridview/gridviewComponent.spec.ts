@@ -40,10 +40,12 @@ describe("gridview", () => {
       className: "test-a test-b",
     });
 
+    //FIXME: modified 2024-01-04
     expect(gridview.element.className).toBe("test-a test-b");
 
     gridview.updateOptions({ className: "test-b test-c" });
 
+    //FIXME: modified 2024-01-04
     expect(gridview.element.className).toBe("test-b test-c");
   });
 

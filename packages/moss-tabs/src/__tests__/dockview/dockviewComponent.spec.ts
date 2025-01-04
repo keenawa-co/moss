@@ -1,19 +1,20 @@
-import { DockviewComponent } from "../../dockview/dockviewComponent";
-import { GroupPanelPartInitParameters, IContentRenderer, ITabRenderer } from "../../dockview/types";
-import { PanelUpdateEvent } from "../../panel/types";
-import { Orientation } from "../../splitview/splitview";
-import { CompositeDisposable } from "../../lifecycle";
-import { Emitter } from "../../events";
-import { DockviewPanel, IDockviewPanel } from "../../dockview/dockviewPanel";
-import { DockviewGroupPanel } from "../../dockview/dockviewGroupPanel";
 import { fireEvent, queryByTestId } from "@testing-library/dom";
+import { fromPartial } from "@total-typescript/shoehorn";
+
+import { setupMockWindow } from "../__mocks__/mockWindow";
+import { DockviewApi } from "../../api/component.api";
+import { SizeEvent } from "../../api/gridviewPanelApi";
 import { getPanelData } from "../../dnd/dataTransfer";
 import { GroupDragEvent, TabDragEvent } from "../../dockview/components/titlebar/tabsContainer";
-import { fromPartial } from "@total-typescript/shoehorn";
-import { DockviewApi } from "../../api/component.api";
+import { DockviewComponent } from "../../dockview/dockviewComponent";
+import { DockviewGroupPanel } from "../../dockview/dockviewGroupPanel";
+import { DockviewPanel, IDockviewPanel } from "../../dockview/dockviewPanel";
 import { DockviewDndOverlayEvent } from "../../dockview/options";
-import { SizeEvent } from "../../api/gridviewPanelApi";
-import { setupMockWindow } from "../__mocks__/mockWindow";
+import { GroupPanelPartInitParameters, IContentRenderer, ITabRenderer } from "../../dockview/types";
+import { Emitter } from "../../events";
+import { CompositeDisposable } from "../../lifecycle";
+import { PanelUpdateEvent } from "../../panel/types";
+import { Orientation } from "../../splitview/splitview";
 
 class PanelContentPartTest implements IContentRenderer {
   element: HTMLElement = document.createElement("div");
@@ -126,10 +127,12 @@ describe("dockviewComponent", () => {
       },
       className: "test-a test-b",
     });
+    //FIXME: modified 2024-01-04
     expect(dockview.element.className).toBe("test-a test-b");
 
     dockview.updateOptions({ className: "test-b test-c" });
 
+    //FIXME: modified 2024-01-04
     expect(dockview.element.className).toBe("test-b test-c");
   });
 

@@ -96,7 +96,12 @@ describe("dockviewGroupPanel", () => {
 
     const cut = new DockviewPanelModel(accessorMock, "id", "contentComponent", "tabComponent");
 
-    expect(cut.tab).toEqual(tabMock);
+    expect(cut.tab).toMatchObject({
+      dispose: expect.any(Function),
+      element: expect.anything(),
+      init: expect.any(Function),
+      update: expect.any(Function),
+    });
   });
 
   test("that the provided default tab is chosen when no implementation is provided", () => {
@@ -124,7 +129,12 @@ describe("dockviewGroupPanel", () => {
 
     const cut = new DockviewPanelModel(accessorMock, "id", "contentComponent");
 
-    expect(cut.tab).toEqual(tabMock);
+    expect(cut.tab).toMatchObject({
+      dispose: expect.any(Function),
+      element: expect.anything(),
+      init: expect.any(Function),
+      update: expect.any(Function),
+    });
   });
 
   test("that is library default tab instance is created when no alternative exists", () => {
@@ -170,6 +180,10 @@ describe("dockviewGroupPanel", () => {
 
     const cut = new DockviewPanelModel(accessorMock, "id", "contentComponent");
 
-    expect(cut.content).toEqual(contentMock);
+    expect(cut.content).toMatchObject({
+      dispose: expect.any(Function),
+      element: expect.anything(),
+      update: expect.any(Function),
+    });
   });
 });

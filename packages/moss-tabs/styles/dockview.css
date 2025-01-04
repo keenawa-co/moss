@@ -390,6 +390,15 @@
   min-height: 0;
   outline: none;
 }
+.dv-root-wrapper {
+  height: 100%;
+  width: 100%;
+}
+.dv-grid-view,
+.dv-branch-node {
+  height: 100%;
+  width: 100%;
+}
 .dv-debug .dv-resize-container .dv-resize-handle-top {
   background-color: red;
 }

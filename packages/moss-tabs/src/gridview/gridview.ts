@@ -88,7 +88,7 @@ export function getGridLocation(element: HTMLElement): number[] {
     throw new Error("Invalid grid element");
   }
 
-  if (/\bh-full w-full\b/.test(parentElement.className)) {
+  if (/\bdv-grid-view\b/.test(parentElement.className)) {
     return [];
   }
 
@@ -696,7 +696,7 @@ export class Gridview implements IDisposable {
     margin?: number
   ) {
     this.element = document.createElement("div");
-    this.element.className = "h-full w-full";
+    this.element.className = "dv-grid-view";
 
     this._locked = locked ?? false;
     this._margin = margin ?? 0;

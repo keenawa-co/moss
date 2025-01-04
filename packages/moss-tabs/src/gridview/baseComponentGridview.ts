@@ -150,7 +150,8 @@ export abstract class BaseGrid<T extends IGridPanelView> extends Resizable imple
 
   constructor(parentElement: HTMLElement, options: BaseGridOptions) {
     super(document.createElement("div"), options.disableAutoResizing);
-    this.element.classList.add("h-full", "w-full");
+    this.element.style.height = "100%";
+    this.element.style.width = "100%";
 
     this._classNames = new Classnames(this.element);
     this._classNames.setClassNames(options.className ?? "");

@@ -56,7 +56,7 @@
     "prepublishOnly": "npm run rebuild && npm run test",
     "rebuild": "npm run clean && npm run build",
     "test": "cross-env npx jest --selectProjects moss-tabs",
-    "test:cov": "cross-env ../../node_modules/.bin/jest --selectProjects moss-tabs --coverage"
+    "test:cov": "cross-env npx jest --selectProjects moss-tabs --coverage"
   },
   "devDependencies": {
     "@repo/tailwind-config": "workspace:*",

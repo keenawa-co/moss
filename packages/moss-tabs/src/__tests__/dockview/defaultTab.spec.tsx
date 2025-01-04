@@ -1,7 +1,6 @@
 import React from "react";
-import { act } from "react-dom/test-utils";
 
-import { fireEvent, render, screen } from "@testing-library/react";
+import { act, fireEvent, render, screen } from "@testing-library/react";
 import { fromPartial } from "@total-typescript/shoehorn";
 
 import { DockviewApi } from "../../api/component.api";
