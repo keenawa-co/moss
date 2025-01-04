@@ -32,7 +32,7 @@ use crate::plugins::*;
 pub use constants::*;
 
 #[macro_use]
-extern crate serde;
+extern crate tracing;
 
 pub fn run() {
     #[allow(unused_mut)]
