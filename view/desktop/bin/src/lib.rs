@@ -6,25 +6,26 @@ mod plugins;
 mod utl;
 mod window;
 
-pub use constants::*;
-use moss_desktop::app::lifecycle::{LifecycleManager, LifecyclePhase};
-use moss_desktop::app::service::ServiceManager;
-
-use crate::plugins::*;
-use moss_desktop::app::state::AppState;
-use plugins::app_formation;
+use anyhow::Result;
 use rand::random;
-use smallvec::smallvec;
-use std::env;
-use std::path::PathBuf;
-use std::sync::Arc;
-use tauri::plugin::TauriPlugin;
-use tauri::{AppHandle, Listener, Manager, RunEvent, Runtime, WebviewWindow, WindowEvent, Wry};
+use tauri::{AppHandle, Manager, RunEvent, WebviewWindow, WindowEvent};
 use tauri_plugin_global_shortcut::{Code, GlobalShortcutExt, Modifiers, Shortcut, ShortcutState};
 use tauri_plugin_os;
 use window::{create_window, CreateWindowInput};
 
+use moss_addon::{BUILTIN_ADDONS_DIR, INSTALLED_ADDONS_DIR};
+use moss_desktop::app::manager::AppManager;
+use moss_desktop::app::state::AppState;
+use moss_desktop::services::addon_service::AddonService;
+use moss_desktop::services::theme_service::ThemeService;
+use moss_desktop::services::window_service::WindowService;
+use moss_desktop::{
+    app::instantiation::InstantiationType, services::lifecycle_service::LifecycleService,
+};
+
 use crate::commands::*;
+use crate::plugins::*;
+pub use constants::*;
 
 #[macro_use]
 extern crate serde;
@@ -35,8 +36,7 @@ pub fn run() {
         .plugin(plugin_log::init())
         .plugin(plugin_window_state::init())
         .plugin(tauri_plugin_fs::init())
-        .plugin(tauri_plugin_os::init())
-        .plugin(plugin_app_formation::init());
+        .plugin(tauri_plugin_os::init());
 
     #[cfg(target_os = "macos")]
     {
@@ -45,25 +45,28 @@ pub fn run() {
 
     builder
         .setup(|app| {
-            // let lm = LifecycleManager::new();
-            // let l = lm.observe(LifecyclePhase::Bootstrapping, |app_state| {
-            //     println!("Hello!");
-            // });
-            // lm.set_phase(app.app_handle(), LifecyclePhase::Bootstrapping);
+            let app_handle = app.app_handle();
 
-            // let service = LifecycleService::new();
+            let app_state = AppState::new();
+            app_handle.manage(app_state);
 
-            // let l = service.register_phase_listener(LifecyclePhase::Starting, |app_state| {
-            //     println!("Hello!");
-            // });
+            let app_manager = AppManager::new(app_handle.clone())
+                .with_service(|_| LifecycleService::new(), InstantiationType::Instant)
+                .with_service(
+                    |app_handle| {
+                        AddonService::new(
+                            app_handle,
+                            BUILTIN_ADDONS_DIR.to_path_buf(),
+                            INSTALLED_ADDONS_DIR.to_path_buf(),
+                        )
+                    },
+                    InstantiationType::Instant,
+                )
+                .with_service(|_| WindowService::new(), InstantiationType::Delayed)
+                .with_service(ThemeService::new, InstantiationType::Delayed);
+            app_handle.manage(app_manager);
 
-            // service.notify_phase(LifecyclePhase::Starting, app.app_handle().clone());
-
-            // let service_manager = ServiceManager2::new();
-            // service_manager.register();
             let ctrl_n_shortcut = Shortcut::new(Some(Modifiers::CONTROL), Code::KeyN);
-
-            // let r = app.handle().listen("event", |e| {});
 
             app.handle().plugin(
                 tauri_plugin_global_shortcut::Builder::new()
@@ -114,7 +117,9 @@ pub fn run() {
         .expect("failed to run")
         .run(|app_handle, event| match event {
             RunEvent::Ready => {
-                let _ = create_main_window(&app_handle, "/");
+                let webview_window = create_main_window(&app_handle, "/");
+                webview_window
+                    .on_menu_event(move |window, event| menu::handle_event(window, &event));
             }
 
             #[cfg(target_os = "macos")]
@@ -128,17 +133,6 @@ pub fn run() {
 }
 
 fn create_main_window(app_handle: &AppHandle, url: &str) -> WebviewWindow {
-    let lifecycle_manager = app_handle.state::<Arc<LifecycleManager>>();
-    lifecycle_manager.set_phase(app_handle, LifecyclePhase::Bootstrapping);
-
-    // let state = AppState::new();
-    // let theme_service = ThemeService::new(app_handle.clone(), Arc::clone(&state.cache));
-
-    {
-        // app_handle.manage(theme_service);
-        // app_handle.manage(state);
-    }
-
     let label = format!("{MAIN_WINDOW_PREFIX}{}", 0);
     let config = CreateWindowInput {
         url,
@@ -150,13 +144,13 @@ fn create_main_window(app_handle: &AppHandle, url: &str) -> WebviewWindow {
             100.0 + random::<f64>() * 20.0,
         ),
     };
-    let webview_window = create_window(app_handle, config);
-    webview_window.on_menu_event(move |window, event| menu::handle_event(window, &event));
-    webview_window
+
+    create_window(app_handle, config)
 }
 
-fn create_child_window(app_handle: &AppHandle, url: &str) -> WebviewWindow {
-    let next_window_id = app_handle.state::<AppState>().inc_next_window_id() + 1;
+fn create_child_window(app_handle: &AppHandle, url: &str) -> Result<WebviewWindow> {
+    let app_manager = app_handle.state::<AppManager>();
+    let next_window_id = app_manager.service::<WindowService>()?.next_window_id() + 1;
     let config = CreateWindowInput {
         url,
         label: &format!("{MAIN_WINDOW_PREFIX}{}", next_window_id),
@@ -167,7 +161,6 @@ fn create_child_window(app_handle: &AppHandle, url: &str) -> WebviewWindow {
             100.0 + random::<f64>() * 20.0,
         ),
     };
-    let webview_window = create_window(app_handle, config);
-    webview_window.on_menu_event(move |window, event| menu::handle_event(window, &event));
-    webview_window
+
+    Ok(create_window(app_handle, config))
 }
