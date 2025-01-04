@@ -2626,6 +2626,7 @@ dependencies = [
  "moss_jsonlogic",
  "moss_jsonlogic_macro",
  "moss_text",
+ "moss_theme",
  "moss_uikit",
  "once_cell",
  "parking_lot",
@@ -2704,9 +2705,13 @@ dependencies = [
 name = "moss_theme"
 version = "0.1.0"
 dependencies = [
+ "anyhow",
+ "indexmap 2.7.0",
+ "jsonschema",
  "once_cell",
  "serde",
  "serde_json",
+ "ts-rs",
 ]
 
 [[package]]
