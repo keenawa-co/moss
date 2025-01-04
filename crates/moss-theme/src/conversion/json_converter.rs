@@ -1,5 +1,4 @@
 use anyhow::{Context as _, Result};
-use std::sync::Arc;
 
 use crate::models::theme::Theme;
 
