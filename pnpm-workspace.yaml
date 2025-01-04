@@ -1,4 +1,5 @@
 packages:
+  - "addons/*"
   - "crates/*"
   - "packages/*"
   - "view/*"

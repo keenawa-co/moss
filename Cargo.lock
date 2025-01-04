@@ -2715,18 +2715,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "moss_themeconv"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "indexmap 2.7.0",
- "jsonschema",
- "moss_desktop",
- "serde",
- "serde_json",
-]
-
-[[package]]
 name = "moss_uikit"
 version = "0.1.0"
 dependencies = [
@@ -4829,15 +4817,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "06794f8f6c5c898b3275aebefa6b8a1cb24cd2c6c79397ab15774837a0bc5755"
 dependencies = [
  "winapi-util",
-]
-
-[[package]]
-name = "themeinstall"
-version = "0.1.0"
-dependencies = [
- "clap",
- "moss_themeconv",
- "serde_json",
 ]
 
 [[package]]
