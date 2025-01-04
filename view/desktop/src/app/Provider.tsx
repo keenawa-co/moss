@@ -35,6 +35,7 @@ const queryClient = new QueryClient({
 const useInitializeAppState = () => {
   const { setCurrentTheme, themes } = useThemeStore();
   const { setLanguageCode } = useLanguageStore();
+
   useEffect(() => {
     const fetchAndSetAppState = async () => {
       try {
