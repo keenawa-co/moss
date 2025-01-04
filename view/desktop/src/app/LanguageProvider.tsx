@@ -1,38 +1,22 @@
-import { useCallback, useEffect } from "react";
+import { useEffect } from "react";
 
 import { useLanguageStore } from "@/store/language";
 import { LocaleDescriptor } from "@repo/moss-desktop";
 import { listen, UnlistenFn } from "@tauri-apps/api/event";
 
 const LanguageProvider = ({ children }: { children: React.ReactNode }) => {
-  const { currentLanguageCode, languagePacks, setLanguageCode, initializeLanguages } = useLanguageStore();
+  const { setLanguageCode, initializeLanguages } = useLanguageStore();
 
   useEffect(() => {
     initializeLanguages();
   }, [initializeLanguages]);
 
-  const setLanguagePackWithoutSync = useCallback(
-    (language: LocaleDescriptor) => {
-      const selectedLanguage = languagePacks?.find((languagePack) => language.code === languagePack.code) || null;
-      if (selectedLanguage) {
-        setLanguageCode(selectedLanguage.code);
-      } else {
-        console.error(`Language pack with code "${language.code}" not found.`);
-      }
-    },
-    [languagePacks, setLanguageCode]
-  );
-
   useEffect(() => {
     let unlisten: UnlistenFn;
 
     const handleLanguagePackChanged = (event: { payload: LocaleDescriptor }) => {
-      console.log(event);
       const newLanguagePack: LocaleDescriptor = event.payload;
-
-      if (newLanguagePack.code !== currentLanguageCode) {
-        setLanguagePackWithoutSync(newLanguagePack);
-      }
+      setLanguageCode(newLanguagePack.code);
     };
 
     const setupListener = async () => {
@@ -50,7 +34,7 @@ const LanguageProvider = ({ children }: { children: React.ReactNode }) => {
         unlisten();
       }
     };
-  }, [currentLanguageCode, setLanguagePackWithoutSync]);
+  }, [setLanguageCode]);
 
   return <>{children}</>;
 };
