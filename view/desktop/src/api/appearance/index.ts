@@ -1,5 +1,5 @@
 import { invokeTauriIpc, IpcResult } from "@/lib/backend/tauri";
-import { PreferencesInfo, ThemeDescriptor } from "@repo/moss-desktop";
+import { AppStateInfo, LocaleDescriptor, ThemeDescriptor } from "@repo/moss-desktop";
 import { invoke } from "@tauri-apps/api/core";
 
 export interface GetColorThemeOptions {
@@ -20,6 +20,6 @@ export const getColorThemes = async (): Promise<ThemeDescriptor[]> => {
   return await invoke<ThemeDescriptor[]>("get_themes");
 };
 
-export const getState = async (): Promise<PreferencesInfo> => {
-  return await invoke<PreferencesInfo>("get_state");
+export const getState = async (): Promise<AppStateInfo> => {
+  return await invoke<AppStateInfo>("get_state");
 };
