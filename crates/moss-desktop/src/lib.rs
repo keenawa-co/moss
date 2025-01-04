@@ -12,4 +12,4 @@ mod contribution_registry;
 pub extern crate linkme;
 
 #[macro_use]
-extern crate log;
+extern crate tracing;

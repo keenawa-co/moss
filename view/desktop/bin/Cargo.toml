@@ -30,7 +30,6 @@ moss_addon.workspace = true
 anyhow.workspace = true
 once_cell.workspace = true
 dirs.workspace = true
-log.workspace = true
 rand.workspace = true
 fern.workspace = true
 smol.workspace = true
@@ -43,12 +42,16 @@ strum = { workspace = true, features = ["derive"] }
 hashbrown = { workspace = true, features = ["serde"] }
 smallvec.workspace = true
 tauri.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true
 
 tauri-plugin-log = { version = "2.0.1", features = ["colored"] }
 tauri-plugin-window-state = "2.0.1"
 tauri-plugin-fs = "2.1.0"
 tauri-plugin-global-shortcut = "2"
 tauri-plugin-os = "2.2.0"
+
+log = "0.4.21"
 
 [target.'cfg(any(target_os = "linux", target_os = "macos"))'.dependencies]
 mimalloc = { version = "0.1.39", default-features = false }

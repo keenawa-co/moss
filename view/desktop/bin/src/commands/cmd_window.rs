@@ -9,18 +9,15 @@ use moss_desktop::{
 use moss_tauri::TauriResult;
 use moss_text::{quote, ReadOnlyStr};
 use serde_json::Value;
+use tracing::instrument;
 
 use crate::{create_child_window, menu, AppStateManager};
-use tauri::{AppHandle, Emitter, State, WebviewWindow, Window};
-
-#[derive(Clone, Serialize)]
-struct EventAData {
-    data: String,
-}
+use tauri::{AppHandle, State, Window};
 
 // According to https://docs.rs/tauri/2.1.1/tauri/webview/struct.WebviewWindowBuilder.html
 // We should call WebviewWindowBuilder from async commands
 #[tauri::command]
+#[instrument(level = "trace", skip(app_handle))]
 pub async fn create_new_window(app_handle: AppHandle) -> TauriResult<()> {
     let webview_window = create_child_window(&app_handle, "/")?;
     webview_window.on_menu_event(move |window, event| menu::handle_event(window, &event));
@@ -28,20 +25,7 @@ pub async fn create_new_window(app_handle: AppHandle) -> TauriResult<()> {
 }
 
 #[tauri::command]
-pub fn main_window_is_ready(current_window: WebviewWindow) {
-    current_window.show().unwrap();
-
-    current_window
-        .emit(
-            "channel1:eventA",
-            EventAData {
-                data: "Hello from Rust!".to_string(),
-            },
-        )
-        .unwrap();
-}
-
-#[tauri::command]
+#[instrument(level = "trace", skip(app_handle, app_state), fields(window = window.label()))]
 pub fn execute_command(
     app_handle: AppHandle,
     app_state: State<'_, AppStateManager>,
@@ -57,6 +41,7 @@ pub fn execute_command(
 }
 
 #[tauri::command(async)]
+#[instrument(level = "trace", skip(app_manager))]
 pub async fn get_color_theme(
     app_manager: State<'_, AppManager>,
     path: String,
@@ -67,6 +52,7 @@ pub async fn get_color_theme(
 }
 
 #[tauri::command(async)]
+#[instrument(level = "trace", skip(state_manager))]
 pub fn get_state(state_manager: State<'_, AppStateManager>) -> Result<AppState, String> {
     Ok(AppState {
         preferences: Preferences {
@@ -81,6 +67,7 @@ pub fn get_state(state_manager: State<'_, AppStateManager>) -> Result<AppState, 
 }
 
 #[tauri::command(async)]
+#[instrument(level = "trace", skip(app_manager))]
 pub async fn get_themes(app_manager: State<'_, AppManager>) -> TauriResult<Vec<ThemeDescriptor>> {
     let theme_service = app_manager.service::<ThemeService>()?;
 
@@ -94,6 +81,7 @@ pub async fn get_themes(app_manager: State<'_, AppManager>) -> TauriResult<Vec<T
 // FIXME: This is a temporary solution until we have a registry of installed
 // plugins and the ability to check which language packs are installed.
 #[tauri::command]
+#[instrument(level = "trace")]
 pub fn get_locales() -> Vec<LocaleDescriptor> {
     vec![
         LocaleDescriptor {
@@ -115,6 +103,7 @@ pub fn get_locales() -> Vec<LocaleDescriptor> {
 }
 
 #[tauri::command]
+#[instrument(level = "trace")]
 pub fn get_translations(language: String, namespace: String) -> Result<serde_json::Value, String> {
     let path = crate::utl::get_home_dir()
         .map_err(|err| err.to_string())?

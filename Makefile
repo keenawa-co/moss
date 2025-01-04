@@ -1,3 +1,5 @@
+export LOG_LEVEL = trace
+
 .DEFAULT_GOAL := run-desktop
 
 # Detect Operating System
@@ -115,42 +117,6 @@ endif
 gen-themes:
 	@cd $(ADDON_THEME_DEFAULTS) && $(PNPM) build
 
-
-## Convert Theme JSONs to CSS
-.PHONY: install-themes
-install-themes:
-ifeq ($(DETECTED_OS),Windows)
-## Windows does not support for loop in makefile, unfortunately
-	$(CARGO) run --bin themeinstall -- \
-		 --schema ./@typespec/json-schema/Theme.json \
-		 --input $(THEME_DIR)/moss-dark.json \
-		 --output $(THEME_DIR) \
-
-	$(CARGO) run --bin themeinstall -- \
-		 --schema ./@typespec/json-schema/Theme.json \
-		 --input $(THEME_DIR)/moss-light.json \
-		 --output $(THEME_DIR) \
-
-	$(CARGO) run --bin themeinstall -- \
-		 --schema ./@typespec/json-schema/Theme.json \
-		 --input $(THEME_DIR)/moss-pink.json \
-		 --output $(THEME_DIR) \
-
-else
-	@if [ ! -f $(THEME_INSTALLER_DIR)/target/debug/themeinstall ]; then \
-		echo "Building themeinstall binary..."; \
-		cd $(THEME_INSTALLER_DIR) && cargo build --bin themeinstall --target-dir ./target; \
-	fi
-
-	@for theme in moss-dark moss-light moss-pink; do \
-		$(THEME_INSTALLER_DIR)/target/debug/themeinstall \
-			 --schema ./@typespec/json-schema/Theme.json \
-			 --input $(THEME_DIR)/$$theme.json \
-			 --output $(THEME_DIR); \
-	done
-endif
-
-
 ## Compile Theme JSON Schema
 .PHONY: compile-themes-schema
 compile-themes-schema:
@@ -183,6 +149,7 @@ gen-models: \
 	gen-desktop-models \
 	gen-theme-models \
 
+## Compile All Schemas
 .PHONY: compile-schemas
 compile-schemas: compile-themes-schema
 

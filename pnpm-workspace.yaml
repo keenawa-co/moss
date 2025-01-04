@@ -1,8 +1,7 @@
 packages:
+  - "addons/*"
   - "crates/*"
   - "packages/*"
   - "view/*"
-  - "lib/*"
   - "tools/*"
-  - "internal/workbench/desktop/*"
   - "misc/*"
