@@ -1,7 +1,7 @@
-import { Splitview, Orientation, ISplitViewDescriptor, Sizing } from "../splitview/splitview";
-import { CompositeDisposable, IDisposable } from "../lifecycle";
-import { Emitter, Event } from "../events";
 import { addClasses, removeClasses } from "../dom";
+import { Emitter, Event } from "../events";
+import { CompositeDisposable, IDisposable } from "../lifecycle";
+import { ISplitViewDescriptor, Orientation, Sizing, Splitview } from "../splitview/splitview";
 import { PaneviewPanel } from "./paneviewPanel";
 
 interface PaneItem {

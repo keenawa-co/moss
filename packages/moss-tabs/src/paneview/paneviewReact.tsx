@@ -126,7 +126,7 @@ export const PaneviewReact = React.forwardRef((props: IPaneviewReactProps, ref: 
   }, [props.showDndOverlay]);
 
   return (
-    <div className={props.className} style={{ height: "100%", width: "100%" }} ref={domRef}>
+    <div className={`${props.className} h-full w-full`} ref={domRef}>
       {portals}
     </div>
   );

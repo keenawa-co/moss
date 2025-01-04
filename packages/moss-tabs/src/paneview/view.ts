@@ -19,8 +19,7 @@ export class PanePanelSection implements IPaneBodyPart {
     private readonly reactPortalStore: ReactPortalStore
   ) {
     this._element = document.createElement("div");
-    this._element.style.height = "100%";
-    this._element.style.width = "100%";
+    this._element.className = "h-full w-full";
   }
 
   public init(parameters: PanePanelComponentInitParameter): void {
