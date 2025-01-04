@@ -16,10 +16,16 @@ pub struct Preferences {
     pub locale: RwLock<LocaleDescriptor>,
 }
 
+struct AppDefaults {
+    theme: ThemeDescriptor,
+    locale: LocaleDescriptor,
+}
+
 pub struct AppState {
     pub contributions: ContributionRegistry,
     pub cache: Arc<Cache<MokaBackend>>,
     pub preferences: Preferences,
+    // pub defaults:
 }
 
 impl AppState {

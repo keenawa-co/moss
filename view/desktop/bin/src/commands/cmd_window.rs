@@ -4,7 +4,7 @@ use moss_desktop::{
     app::manager::AppManager,
     command::CommandContext,
     models::application::{AppStateInfo, LocaleDescriptor, PreferencesInfo, ThemeDescriptor},
-    services::theme_service::{GetColorThemeOptions, ThemeService},
+    services::theme_service::ThemeService,
 };
 use moss_tauri::TauriResult;
 use moss_text::{quote, ReadOnlyStr};
@@ -60,11 +60,10 @@ pub fn execute_command(
 pub async fn get_color_theme(
     app_manager: State<'_, AppManager>,
     path: String,
-    opts: Option<GetColorThemeOptions>,
 ) -> TauriResult<String> {
     let theme_service = app_manager.service::<ThemeService>()?;
 
-    Ok(theme_service.get_color_theme(&path, opts).await?)
+    Ok(theme_service.get_color_theme(&path).await?)
 }
 
 #[tauri::command(async)]
