@@ -13,7 +13,6 @@ endif
 DESKTOP_DIR := view/desktop
 STORYBOOK_DIR := view/storybook
 WEB_DIR := view/web
-THEME_GENERATOR_DIR := tools/themegen
 THEME_INSTALLER_DIR := misc/themeinstall
 ICONS_DIR := tools/icongen
 
@@ -21,10 +20,14 @@ ICONS_DIR := tools/icongen
 export BUILTIN_ADDONS_DIR := ${CURDIR}/addons
 export INSTALLED_ADDONS_DIR := ${HOME_DIR}/.moss/addons
 
+# --- Addons ---
+ADDON_THEME_DEFAULTS := ${BUILTIN_ADDONS_DIR}/theme-defaults
+
 # --- Model Directories ---
 DESKTOP_MODELS_DIR := crates/moss-desktop
 HTML_MODELS_DIR := crates/moss-html
 UIKIT_MODELS_DIR := crates/moss-uikit
+THEME_MODELS_DIR := crates/moss-theme
 
 # --- Schema Directories ---
 THEME_SCHEMA_DIR :=  crates/moss-theme
@@ -110,7 +113,7 @@ endif
 ## Generate Theme JSONs
 .PHONY: gen-themes
 gen-themes:
-	@cd $(THEME_GENERATOR_DIR) && $(PNPM) start
+	@cd $(ADDON_THEME_DEFAULTS) && $(PNPM) build
 
 
 ## Convert Theme JSONs to CSS
@@ -158,23 +161,19 @@ compile-themes-schema:
 gen-icons:
 	@cd $(ICONS_DIR) && $(PNPM) build
 
-## Generate HTML Models
-.PHONY: gen-html-models
-gen-html-models:
-	@$(CARGO) test --manifest-path $(HTML_MODELS_DIR)/Cargo.toml
-	@$(CARGO) build --manifest-path $(HTML_MODELS_DIR)/Cargo.toml
+define gen_models
+.PHONY: gen-$(1)-models
+gen-$(1)-models:
+	@$(CARGO) test --manifest-path $($(2))/Cargo.toml
+	@$(CARGO) build --manifest-path $($(2))/Cargo.toml
+endef
 
-## Generate UI Kit Models
-.PHONY: gen-uikit-models
-gen-uikit-models:
-	@$(CARGO) test --manifest-path $(UIKIT_MODELS_DIR)/Cargo.toml
-	@$(CARGO) build --manifest-path $(UIKIT_MODELS_DIR)/Cargo.toml
+## Generate Models
 
-## Generate Desktop Models
-.PHONY: gen-desktop-models
-gen-desktop-models:
-	@$(CARGO) test --manifest-path $(DESKTOP_MODELS_DIR)/Cargo.toml
-	@$(CARGO) build --manifest-path $(DESKTOP_MODELS_DIR)/Cargo.toml
+$(eval $(call gen_models,theme,THEME_MODELS_DIR))
+$(eval $(call gen_models,html,HTML_MODELS_DIR))
+$(eval $(call gen_models,uikit,UIKIT_MODELS_DIR))
+$(eval $(call gen_models,desktop,DESKTOP_MODELS_DIR))
 
 ## Generate All Models
 .PHONY: gen-models
@@ -182,6 +181,7 @@ gen-models: \
 	gen-html-models \
 	gen-uikit-models \
 	gen-desktop-models \
+	gen-theme-models \
 
 .PHONY: compile-schemas
 compile-schemas: compile-themes-schema
@@ -215,7 +215,7 @@ clean-pnpm:
 	@echo Cleaning Web Directory Cache...
 	@cd $(WEB_DIR) && $(PNPM) prune
 	@echo Cleaning Theme Generator Directory Cache...
-	@cd $(THEME_GENERATOR_DIR) && $(PNPM) prune
+	@cd $(ADDON_THEME_DEFAULTS) && $(PNPM) prune
 	@echo Cleaning Icons Directory Cache...
 	@cd $(ICONS_DIR) && $(PNPM) prune
 	@echo Cleaning Desktop Models Directory Cache...

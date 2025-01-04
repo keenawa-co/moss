@@ -15,7 +15,7 @@ use window::{create_window, CreateWindowInput};
 
 use moss_addon::{BUILTIN_ADDONS_DIR, INSTALLED_ADDONS_DIR};
 use moss_desktop::app::manager::AppManager;
-use moss_desktop::app::state::AppState;
+use moss_desktop::app::state::AppStateManager;
 use moss_desktop::services::addon_service::AddonService;
 use moss_desktop::services::theme_service::ThemeService;
 use moss_desktop::services::window_service::WindowService;
@@ -47,7 +47,7 @@ pub fn run() {
         .setup(|app| {
             let app_handle = app.app_handle();
 
-            let app_state = AppState::new();
+            let app_state = AppStateManager::new();
             app_handle.manage(app_state);
 
             let app_manager = AppManager::new(app_handle.clone())

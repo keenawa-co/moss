@@ -5,7 +5,7 @@ use tauri::{AppHandle, Manager};
 
 use crate::{
     addon_registry::AddonRegistry,
-    app::{service::Service, state::AppState},
+    app::{service::Service, state::AppStateManager},
     models::application::ThemeDescriptor,
 };
 
@@ -26,7 +26,7 @@ impl AddonService {
             );
         });
 
-        let app_state = app_handle.state::<AppState>();
+        let app_state = app_handle.state::<AppStateManager>();
         while let Some(entry) = read_dir.next() {
             let Ok(entry) = entry else {
                 warn!(
@@ -67,7 +67,7 @@ impl Service for AddonService {
 }
 
 // OPTIMIZE: This should probably be moved in the future to a separate entity responsible for loading add-ons.
-fn parse_addon_dir(app_state: &AppState, addon_dir: PathBuf) -> Result<()> {
+fn parse_addon_dir(app_state: &AppStateManager, addon_dir: PathBuf) -> Result<()> {
     let mut read_dir = std::fs::read_dir(&addon_dir)
         .map_err(|err| anyhow!("Failed to read the directory {:?}: {}", addon_dir, err))?;
 
@@ -91,10 +91,10 @@ fn parse_addon_dir(app_state: &AppState, addon_dir: PathBuf) -> Result<()> {
 
             if let Some(themes) = addon_manifest.contributes.themes {
                 for theme_contribution in themes {
-                    app_state.contributions.themes.insert(ThemeDescriptor {
+                    let value = ThemeDescriptor {
                         id: format!(
-                            "{}.{}",
-                            addon_manifest.addon.name,
+                            "{}.{}", // TODO: Add the addon author identifier as the first segment for greater uniqueness
+                            addon_manifest.addon.id,
                             theme_contribution.label.replace(" ", "")
                         ),
                         name: theme_contribution.label,
@@ -102,7 +102,9 @@ fn parse_addon_dir(app_state: &AppState, addon_dir: PathBuf) -> Result<()> {
                             .join(theme_contribution.path)
                             .to_string_lossy()
                             .to_string(),
-                    });
+                    };
+
+                    app_state.contributions.themes.insert(value);
                 }
             }
         }
