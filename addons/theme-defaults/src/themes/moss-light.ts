@@ -1,4 +1,4 @@
-import { Theme } from "@repo/moss-desktop";
+import { Theme } from "@repo/moss-theme";
 
 import { rgba } from "../color.ts";
 

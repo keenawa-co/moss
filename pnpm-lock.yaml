@@ -91,9 +91,9 @@ importers:
         specifier: ^5.7.2
         version: 5.7.2
     devDependencies:
-      '@repo/moss-desktop':
+      '@repo/moss-theme':
         specifier: workspace:*
-        version: link:../../crates/moss-desktop
+        version: link:../../crates/moss-theme
       '@repo/typescript-config':
         specifier: workspace:*
         version: link:../../packages/config-typescript
