@@ -47,7 +47,7 @@ const StatusBar = ({ className }: ComponentPropsWithoutRef<"div">) => {
     return monitorForElements({
       onDrop({ location, source }) {
         const target = location.current.dropTargets[0];
-        if (!target) return;
+        if (!target || target.data.draggableType !== "StatusBarButton") return;
 
         const sourceData = source.data;
         const targetData = target.data;
@@ -73,7 +73,7 @@ const StatusBar = ({ className }: ComponentPropsWithoutRef<"div">) => {
 
         <div className="flex h-full gap-1">
           {DNDList.map((item) => (
-            <StatusBarButton key={item.id} {...item} isDraggable />
+            <StatusBarButton key={item.id} {...item} isDraggable draggableType="StatusBarButton" />
           ))}
         </div>
       </div>
@@ -109,6 +109,7 @@ interface StatusBarButtonProps extends Omit<ComponentPropsWithoutRef<"button">, 
 
   id?: number;
   isDraggable?: boolean;
+  draggableType?: string;
 }
 
 const StatusCircle = ({ className }: { className?: string }) => {
@@ -122,6 +123,7 @@ const StatusBarButton = ({
   className,
   id,
   isDraggable,
+  draggableType,
   ...props
 }: StatusBarButtonProps) => {
   const ref = useRef<HTMLButtonElement | null>(null);
@@ -157,7 +159,7 @@ const StatusBarButton = ({
         },
         getData({ input }) {
           return attachClosestEdge(
-            { id, label, icon },
+            { id, label, icon, draggableType },
             {
               element,
               input,
@@ -186,7 +188,7 @@ const StatusBarButton = ({
         },
       })
     );
-  }, [id, label, isDraggable, icon]);
+  }, [id, label, isDraggable, icon, draggableType]);
 
   return (
     <button
