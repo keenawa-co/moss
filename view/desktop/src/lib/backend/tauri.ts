@@ -7,7 +7,6 @@ export type TauriIpcCommand =
   | "execute_command"
   | "get_translations"
   | "get_color_theme"
-  | "main_window_is_ready"
   | "create_new_window"
   | "sidebar_get_all_activities"
   | "get_menu_items_by_namespace"
