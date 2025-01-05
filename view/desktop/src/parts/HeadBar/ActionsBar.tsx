@@ -4,14 +4,22 @@ import { ActionButton } from "@/components/Action/ActionButton";
 import { ActionsSubmenu } from "@/components/Action/ActionsSubmenu";
 import { ActionsGroup } from "@/components/ActionsGroup";
 import { invokeTauriIpc } from "@/lib/backend/tauri";
-import { LayoutAlignment, useLayoutStore } from "@/store/layout";
+import { LayoutAlignment, LayoutPrimarySideBarPosition, useLayoutStore } from "@/store/layout";
 import { MenuItem } from "@repo/moss-desktop";
 import { cn, DropdownMenu } from "@repo/moss-ui";
 
 export const ActionsBar = ({ className, ...props }: HTMLProps<HTMLDivElement>) => {
   const [activities, setActivities] = useState<MenuItem[]>([]);
 
-  const { primarySideBar, secondarySideBar, bottomPane, setAlignment, alignment } = useLayoutStore((state) => state);
+  const {
+    primarySideBar,
+    secondarySideBar,
+    bottomPane,
+    setAlignment,
+    alignment,
+    primarySideBarPosition,
+    setPrimarySideBarPosition,
+  } = useLayoutStore((state) => state);
 
   useEffect(() => {
     const getAllActivities = async () => {
@@ -104,6 +112,14 @@ export const ActionsBar = ({ className, ...props }: HTMLProps<HTMLDivElement>) =
                   <DropdownMenu.RadioItem value="justify" label="Justify" checked={alignment === "justify"} />
                   <DropdownMenu.RadioItem value="left" label="Left" checked={alignment === "left"} />
                   <DropdownMenu.RadioItem value="right" label="Right" checked={alignment === "right"} />
+                </DropdownMenu.RadioGroup>
+                <DropdownMenu.Separator />
+                <DropdownMenu.RadioGroup
+                  value={primarySideBarPosition}
+                  onValueChange={(value) => setPrimarySideBarPosition(value as LayoutPrimarySideBarPosition)}
+                >
+                  <DropdownMenu.RadioItem value="left" label="Left" checked={primarySideBarPosition === "left"} />
+                  <DropdownMenu.RadioItem value="right" label="Right" checked={primarySideBarPosition === "right"} />
                 </DropdownMenu.RadioGroup>
               </ActionsSubmenu>
             );

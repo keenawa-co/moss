@@ -2,9 +2,11 @@ import { create } from "zustand";
 
 //TODO this type should be imported from backend in the future
 export type LayoutAlignment = "center" | "justify" | "left" | "right";
-
+export type LayoutPrimarySideBarPosition = "left" | "right";
 export interface LayoutState {
   alignment: LayoutAlignment;
+  primarySideBarPosition: "left" | "right";
+  setPrimarySideBarPosition: (position: LayoutPrimarySideBarPosition) => void;
   setAlignment: (alignment: LayoutState["alignment"]) => void;
   primarySideBar: {
     width: number;
@@ -31,6 +33,10 @@ export interface LayoutState {
 
 export const useLayoutStore = create<LayoutState>()((set, get) => ({
   alignment: "center",
+  primarySideBarPosition: "left",
+  setPrimarySideBarPosition: (position: LayoutPrimarySideBarPosition) => {
+    set({ primarySideBarPosition: position });
+  },
   setAlignment: (newAlignment: LayoutState["alignment"]) => set({ alignment: newAlignment }),
   primarySideBar: {
     width: 255,
