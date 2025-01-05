@@ -1,7 +1,7 @@
 import { mkdirSync, writeFileSync } from "fs";
 
-import { defaultDarkTheme } from "./themes/moss-dark";
-import { defaultLightTheme } from "./themes/moss-light";
+import { defaultDarkTheme } from "./themes/dark";
+import { defaultLightTheme } from "./themes/light";
 
 const THEMES_DIR = "./themes";
 
