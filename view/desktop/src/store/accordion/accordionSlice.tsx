@@ -1,5 +1,7 @@
-import { PayloadAction, Slice, createSlice } from "@reduxjs/toolkit";
+import { createSlice, PayloadAction, Slice } from "@reduxjs/toolkit";
+
 import * as DesktopComponents from "../../components";
+
 type DesktopComponentKeys = keyof typeof DesktopComponents;
 type OmittedComponents = Record<DesktopComponentKeys, unknown>;
 type DesktopComponentsOmitted = keyof OmittedComponents;
