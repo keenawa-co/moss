@@ -9,7 +9,7 @@ export const defaultDarkTheme: Theme = {
   type: "dark",
   isDefault: false,
   colors: {
-    "primary": { "type": "solid", "value": rgba(255, 255, 255, 1) }, // prettier-ignore
+    "primary": { "type": "solid", "value": rgba(252, 255, 255, 1) }, // prettier-ignore
     "sideBar.background": { type: "solid", value: rgba(39, 39, 42, 1) },
     "toolBar.background": { type: "solid", value: rgba(30, 32, 33, 1) },
     "page.background": { type: "solid", value: rgba(22, 24, 25, 1) },
