@@ -35,7 +35,7 @@ export const ActivityBar = () => {
 
   if (position === "top" || position === "bottom") {
     return (
-      <div className="flex h-9 w-full items-center gap-2.5 px-2" onDoubleClick={() => handleSelectPosition(position)}>
+      <div className="flex w-full items-center gap-2.5 px-2 py-1" onDoubleClick={() => handleSelectPosition(position)}>
         {list.map(({ icon, active }, index) => (
           <ActivityBarButton key={index} icon={icon as Icons} active={active} onClick={() => toggleActiveItem(index)} />
         ))}
@@ -45,7 +45,7 @@ export const ActivityBar = () => {
 
   return (
     <div
-      className="flex h-full flex-col items-center gap-2.5 px-2"
+      className="flex h-full flex-col items-center gap-2.5 px-1 py-2"
       onDoubleClick={() => handleSelectPosition(position)}
     >
       {list.map(({ icon, active }, index) => (
