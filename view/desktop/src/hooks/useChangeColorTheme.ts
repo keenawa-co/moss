@@ -8,14 +8,14 @@ const changeTheme = async (themeDescriptor: ThemeDescriptor): Promise<void> => {
   });
 };
 
-export const useChangeTheme = () => {
+export const useChangeColorTheme = () => {
   const queryClient = useQueryClient();
 
   return useMutation<void, Error, ThemeDescriptor>({
-    mutationKey: ["changeTheme"],
+    mutationKey: ["changeColorTheme"],
     mutationFn: changeTheme,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["storedString"] });
+      queryClient.invalidateQueries({ queryKey: ["getState"] });
     },
   });
 };
