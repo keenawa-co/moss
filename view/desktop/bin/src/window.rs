@@ -1,8 +1,8 @@
-use log::{info, warn};
 use tauri::{AppHandle, WebviewUrl, WebviewWindow};
 
 use crate::{menu, MIN_WINDOW_HEIGHT, MIN_WINDOW_WIDTH};
 
+#[derive(Debug)]
 pub struct CreateWindowInput<'a> {
     pub url: &'a str,
     pub label: &'a str,
@@ -11,9 +11,8 @@ pub struct CreateWindowInput<'a> {
     pub position: (f64, f64),
 }
 
+#[instrument(level = "debug", skip(app_handle))]
 pub fn create_window(app_handle: &AppHandle, input: CreateWindowInput<'_>) -> WebviewWindow {
-    info!("Create new window label={}", input.label);
-
     #[cfg(target_os = "macos")]
     {
         let menu = menu::app_menu(app_handle).unwrap();

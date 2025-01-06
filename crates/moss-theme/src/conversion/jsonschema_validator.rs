@@ -1,14 +1,14 @@
+use anyhow::anyhow;
 use serde_json::Value;
-use std::sync::Arc;
 
-use crate::Validator;
+use super::Validator;
 
 pub struct JsonSchemaValidator {
-    schema: Arc<Value>,
+    schema: &'static Value,
 }
 
 impl JsonSchemaValidator {
-    pub fn new(schema: Arc<Value>) -> Self {
+    pub fn new(schema: &'static Value) -> Self {
         Self { schema }
     }
 }

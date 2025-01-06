@@ -11,11 +11,15 @@ use rand::random;
 use tauri::{AppHandle, Manager, RunEvent, WebviewWindow, WindowEvent};
 use tauri_plugin_global_shortcut::{Code, GlobalShortcutExt, Modifiers, Shortcut, ShortcutState};
 use tauri_plugin_os;
+use tracing::level_filters::LevelFilter;
+use tracing_subscriber::fmt::format::FmtSpan;
+use tracing_subscriber::layer::SubscriberExt;
+use tracing_subscriber::Layer;
 use window::{create_window, CreateWindowInput};
 
 use moss_addon::{BUILTIN_ADDONS_DIR, INSTALLED_ADDONS_DIR};
 use moss_desktop::app::manager::AppManager;
-use moss_desktop::app::state::AppState;
+use moss_desktop::app::state::AppStateManager;
 use moss_desktop::services::addon_service::AddonService;
 use moss_desktop::services::theme_service::ThemeService;
 use moss_desktop::services::window_service::WindowService;
@@ -29,7 +33,7 @@ pub use constants::*;
 use moss_desktop::services::locale_service::LocaleService;
 
 #[macro_use]
-extern crate serde;
+extern crate tracing;
 
 pub fn run() {
     #[allow(unused_mut)]
@@ -46,9 +50,32 @@ pub fn run() {
 
     builder
         .setup(|app| {
+            let log_format = tracing_subscriber::fmt::format()
+                .with_file(true)
+                .with_line_number(true)
+                .with_target(false)
+                .compact();
+
+            let log_level_filter = std::env::var("LOG_LEVEL")
+                .unwrap_or("trace".to_string())
+                .to_lowercase()
+                .parse()
+                .unwrap_or(LevelFilter::TRACE);
+
+            let subscriber = tracing_subscriber::registry().with(
+                tracing_subscriber::fmt::layer()
+                    .event_format(log_format)
+                    .with_ansi(true)
+                    .with_span_events(FmtSpan::CLOSE)
+                    .with_filter(log_level_filter),
+            );
+
+            tracing::subscriber::set_global_default(subscriber)
+                .expect("failed to set tracing subscriber");
+
             let app_handle = app.app_handle();
 
-            let app_state = AppState::new();
+            let app_state = AppStateManager::new();
             app_handle.manage(app_state);
 
             let app_manager = AppManager::new(app_handle.clone())
@@ -101,12 +128,12 @@ pub fn run() {
             cmd_window::get_locales,
             cmd_window::get_translations,
             cmd_window::get_themes,
-            cmd_window::main_window_is_ready,
             cmd_window::create_new_window,
             cmd_window::execute_command,
             cmd_base::get_menu_items_by_namespace,
             cmd_window::execute_command,
             cmd_window::get_color_theme,
+            cmd_window::get_state,
         ])
         .on_window_event(|window, event| match event {
             #[cfg(target_os = "macos")]

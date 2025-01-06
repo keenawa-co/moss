@@ -1,5 +1,6 @@
 use indexmap::IndexMap;
-use moss_desktop::models::appearance::theming::*;
+
+use crate::models::theme::{ColorDetail, ColorValue};
 
 const DEFAULT_DIRECTION: &str = "to right";
 

@@ -23,7 +23,7 @@ importers:
         version: 4.4.0(prettier@3.4.2)
       '@storybook/experimental-addon-test':
         specifier: ^8.4.7
-        version: 8.4.7(@vitest/browser@2.1.8)(@vitest/runner@2.1.8)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(storybook@8.4.7(prettier@3.4.2))(vitest@2.1.8)
+        version: 8.4.7(@vitest/browser@2.1.8(@types/node@22.10.2)(playwright@1.49.1)(typescript@5.7.2)(vite@6.0.3(@types/node@22.10.2)(jiti@2.4.1)(terser@5.37.0)(yaml@2.6.1))(vitest@2.1.8))(@vitest/runner@2.1.8)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(storybook@8.4.7(prettier@3.4.2))(vitest@2.1.8(@types/node@22.10.2)(@vitest/browser@2.1.8)(msw@2.7.0(@types/node@22.10.2)(typescript@5.7.2))(terser@5.37.0))
       '@storybook/test':
         specifier: ^8.4.7
         version: 8.4.7(storybook@8.4.7(prettier@3.4.2))
@@ -85,6 +85,25 @@ importers:
         specifier: ^2.1.8
         version: 2.1.8(@types/node@22.10.2)(@vitest/browser@2.1.8)(msw@2.7.0(@types/node@22.10.2)(typescript@5.7.2))(terser@5.37.0)
 
+  addons/theme-defaults:
+    dependencies:
+      typescript:
+        specifier: ^5.7.2
+        version: 5.7.2
+    devDependencies:
+      '@repo/moss-theme':
+        specifier: workspace:*
+        version: link:../../crates/moss-theme
+      '@repo/typescript-config':
+        specifier: workspace:*
+        version: link:../../packages/config-typescript
+      '@types/node':
+        specifier: ^22.10.1
+        version: 22.10.2
+      vite-node:
+        specifier: ^2.1.1
+        version: 2.1.8(@types/node@22.10.2)(terser@5.37.0)
+
   crates/moss-desktop:
     dependencies:
       typescript:
@@ -127,6 +146,9 @@ importers:
         specifier: ^0.62.0
         version: 0.62.0(@typespec/compiler@0.63.0)
     devDependencies:
+      '@repo/typescript-config':
+        specifier: workspace:*
+        version: link:../../packages/config-typescript
       '@typespec/compiler':
         specifier: latest
         version: 0.63.0
@@ -292,25 +314,6 @@ importers:
         specifier: ^5.7.2
         version: 5.7.2
 
-  tools/themegen:
-    dependencies:
-      typescript:
-        specifier: ^5.7.2
-        version: 5.7.2
-    devDependencies:
-      '@repo/moss-desktop':
-        specifier: workspace:*
-        version: link:../../crates/moss-desktop
-      '@repo/typescript-config':
-        specifier: workspace:*
-        version: link:../../packages/config-typescript
-      '@types/node':
-        specifier: ^22.10.1
-        version: 22.10.2
-      vite-node:
-        specifier: ^2.1.1
-        version: 2.1.8(@types/node@22.10.2)(terser@5.37.0)
-
   view/desktop:
     dependencies:
       '@atlaskit/pragmatic-drag-and-drop':
@@ -379,7 +382,7 @@ importers:
         version: 8.4.7(@storybook/test@8.4.7(storybook@8.4.7(prettier@3.4.2)))(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(storybook@8.4.7(prettier@3.4.2))(typescript@5.7.2)
       '@tailwindcss/typography':
         specifier: ^0.5.15
-        version: 0.5.15
+        version: 0.5.15(tailwindcss@3.4.16)
       '@tauri-apps/cli':
         specifier: ^2.1.0
         version: 2.1.0
@@ -449,7 +452,7 @@ importers:
         version: 8.4.7(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(storybook@8.4.7(prettier@3.4.2))
       '@storybook/experimental-addon-test':
         specifier: ^8.4.7
-        version: 8.4.7(@vitest/browser@2.1.8)(@vitest/runner@2.1.8)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(storybook@8.4.7(prettier@3.4.2))(vitest@2.1.8)
+        version: 8.4.7(@vitest/browser@2.1.8(@types/node@22.10.2)(playwright@1.49.1)(typescript@5.7.2)(vite@6.0.3(@types/node@22.10.2)(jiti@2.4.1)(terser@5.37.0)(yaml@2.6.1))(vitest@2.1.8))(@vitest/runner@2.1.8)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(storybook@8.4.7(prettier@3.4.2))(vitest@2.1.8(@types/node@22.10.2)(@vitest/browser@2.1.8)(msw@2.7.0(@types/node@22.10.2)(typescript@5.7.2))(terser@5.37.0))
       '@storybook/react':
         specifier: ^8.4.7
         version: 8.4.7(@storybook/test@8.4.7(storybook@8.4.7(prettier@3.4.2)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(storybook@8.4.7(prettier@3.4.2))(typescript@5.7.2)
@@ -7625,7 +7628,7 @@ snapshots:
     dependencies:
       type-fest: 2.19.0
 
-  '@storybook/experimental-addon-test@8.4.7(@vitest/browser@2.1.8)(@vitest/runner@2.1.8)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(storybook@8.4.7(prettier@3.4.2))(vitest@2.1.8)':
+  '@storybook/experimental-addon-test@8.4.7(@vitest/browser@2.1.8(@types/node@22.10.2)(playwright@1.49.1)(typescript@5.7.2)(vite@6.0.3(@types/node@22.10.2)(jiti@2.4.1)(terser@5.37.0)(yaml@2.6.1))(vitest@2.1.8))(@vitest/runner@2.1.8)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(storybook@8.4.7(prettier@3.4.2))(vitest@2.1.8(@types/node@22.10.2)(@vitest/browser@2.1.8)(msw@2.7.0(@types/node@22.10.2)(typescript@5.7.2))(terser@5.37.0))':
     dependencies:
       '@storybook/csf': 0.1.12
       '@storybook/global': 5.0.0
@@ -7872,12 +7875,13 @@ snapshots:
     dependencies:
       tslib: 2.8.1
 
-  '@tailwindcss/typography@0.5.15':
+  '@tailwindcss/typography@0.5.15(tailwindcss@3.4.16)':
     dependencies:
       lodash.castarray: 4.4.0
       lodash.isplainobject: 4.0.6
       lodash.merge: 4.6.2
       postcss-selector-parser: 6.0.10
+      tailwindcss: 3.4.16
 
   '@tanstack/query-core@5.62.7': {}
 
@@ -10619,7 +10623,7 @@ snapshots:
   vite-node@2.1.8(@types/node@22.10.2)(terser@5.37.0):
     dependencies:
       cac: 6.7.14
-      debug: 4.3.7
+      debug: 4.4.0
       es-module-lexer: 1.5.4
       pathe: 1.1.2
       vite: 5.4.11(@types/node@22.10.2)(terser@5.37.0)

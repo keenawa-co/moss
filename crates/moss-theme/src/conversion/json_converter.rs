@@ -1,25 +1,22 @@
 use anyhow::{Context as _, Result};
-use moss_desktop::models::appearance::theming::Theme;
-use std::sync::Arc;
 
-use crate::{util::convert_colors_to_css_variables, ThemeConverter, Validator};
+use crate::models::theme::Theme;
+
+use super::{util::convert_colors_to_css_variables, ThemeConverter, Validator};
 
 const COLOR_VARIABLE_PREFIX: &str = "color";
 
-#[cfg(feature = "json")]
-pub struct JsonThemeConverter {
-    validator: Arc<dyn Validator>,
+pub struct JsonThemeConverter<V: Validator> {
+    validator: V,
 }
 
-#[cfg(feature = "json")]
-impl JsonThemeConverter {
-    pub fn new(schema: Arc<dyn Validator>) -> Self {
-        Self { validator: schema }
+impl<V: Validator> JsonThemeConverter<V> {
+    pub fn new(validator: V) -> Self {
+        Self { validator }
     }
 }
 
-#[cfg(feature = "json")]
-impl ThemeConverter for JsonThemeConverter {
+impl<V: Validator> ThemeConverter for JsonThemeConverter<V> {
     fn convert_to_css(&self, content: String) -> Result<String> {
         let theme_value = serde_json::from_str(&content)
             .context("Failed to deserialize JSON content into Value.")?;
@@ -48,11 +45,10 @@ impl ThemeConverter for JsonThemeConverter {
 
 #[cfg(test)]
 mod tests {
-    use anyhow::Result;
+    use anyhow::{anyhow, Result};
     use indexmap::IndexMap;
-    use moss_desktop::models::appearance::theming::{
-        ColorDetail, ColorPosition, ColorType, ColorValue, ThemeType,
-    };
+
+    use crate::models::theme::{ColorDetail, ColorPosition, ColorType, ColorValue, ThemeType};
 
     use super::*;
 
@@ -88,7 +84,7 @@ mod tests {
         let validator = MockThemeValidator {
             theme_is_valid: true,
         };
-        let converter = JsonThemeConverter::new(Arc::new(validator));
+        let converter = JsonThemeConverter::new(validator);
         let result = converter.convert_to_css(json.to_string());
         assert!(result.is_err());
         Ok(())
@@ -156,7 +152,7 @@ mod tests {
         let validator = MockThemeValidator {
             theme_is_valid: true,
         };
-        let converter = JsonThemeConverter::new(Arc::new(validator));
+        let converter = JsonThemeConverter::new(validator);
         let css = converter.convert_to_css(serde_json::to_string(&theme)?)?;
 
         let expected_css = "\
@@ -204,7 +200,7 @@ mod tests {
         let validator = MockThemeValidator {
             theme_is_valid: true,
         };
-        let converter = JsonThemeConverter::new(Arc::new(validator));
+        let converter = JsonThemeConverter::new(validator);
         let css = converter.convert_to_css(serde_json::to_string(&theme)?)?;
 
         let expected_css = "\
@@ -242,7 +238,7 @@ mod tests {
         let validator = MockThemeValidator {
             theme_is_valid: true,
         };
-        let converter = JsonThemeConverter::new(Arc::new(validator));
+        let converter = JsonThemeConverter::new(validator);
         let css = converter.convert_to_css(serde_json::to_string(&theme)?)?;
 
         let expected_css = "\
@@ -271,7 +267,7 @@ mod tests {
         let validator = MockThemeValidator {
             theme_is_valid: true,
         };
-        let converter = JsonThemeConverter::new(Arc::new(validator));
+        let converter = JsonThemeConverter::new(validator);
         let css = converter.convert_to_css(serde_json::to_string(&theme)?)?;
 
         let expected_css = "\

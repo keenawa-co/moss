@@ -1,9 +1,9 @@
 {
-  "name": "Moss Light Test",
-  "slug": "moss-light-test",
+  "name": "Moss Light Default",
+  "slug": "moss-light",
   "type": "light",
   "isDefault": true,
-  "color": {
+  "colors": {
     "primary": {
       "type": "solid",
       "value": "rgba(0, 0, 0, 1)"
@@ -14,16 +14,7 @@
     },
     "toolBar.background": {
       "type": "solid",
-      "direction": "",
-      "value": [
-        { "color": "red", "position": 0 },
-        { "color": "orange", "position": 0.175 },
-        { "color": "yellow", "position": 0.325 },
-        { "color": "rgba(244, 244, 245, 1)", "position": 0.5 },
-        { "color": "blue", "position": 0.675 },
-        { "color": "indigo", "position": 0.825 },
-        { "color": "violet", "position": 1 }
-      ]
+      "value": "rgba(224, 224, 224, 1)"
     },
     "page.background": {
       "type": "solid",
@@ -31,7 +22,7 @@
     },
     "statusBar.background": {
       "type": "solid",
-      "value": "rgba(0, 122, 205, 1)"
+      "value": "#0F62FE"
     },
     "windowsCloseButton.background": {
       "type": "solid",

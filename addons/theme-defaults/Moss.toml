@@ -5,6 +5,6 @@ categories = ["Themes"]
 
 [contributes]
 themes = [
-  { label = "Moss Dark Default", path = "themes/moss-dark.css" },
-  { label = "Moss Light Default", path = "themes/moss-light.css" },
+  { label = "Moss Dark Default", path = "themes/dark-default.json" },
+  { label = "Moss Light Default", path = "themes/light-default.json" },
 ]

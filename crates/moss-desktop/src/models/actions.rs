@@ -1,5 +1,3 @@
-use std::sync::Arc;
-
 use moss_jsonlogic::raw_rule::RawRule;
 use moss_text::{localized_string::LocalizedString, ReadOnlyStr};
 use serde::Serialize;
