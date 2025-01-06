@@ -13,7 +13,7 @@ pub struct ThemeDescriptor {
     pub source: String,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, TS)]
+#[derive(Debug, Clone, Serialize, Deserialize, TS, Eq, Hash, PartialEq)]
 #[serde(rename_all = "camelCase")]
 #[ts(export, export_to = "application.ts")]
 pub struct LocaleDescriptor {
