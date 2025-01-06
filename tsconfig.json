@@ -11,6 +11,9 @@
       "path": "crates/moss-uikit"
     },
     {
+      "path": "crates/moss-theme"
+    },
+    {
       "path": "crates/moss-desktop"
     },
     {
@@ -26,10 +29,10 @@
       "path": "view/storybook"
     },
     {
-      "path": "tools/themegen"
+      "path": "tools/icongen"
     },
     {
-      "path": "tools/icongen"
+      "path": "addons/theme-defaults"
     }
   ]
 }

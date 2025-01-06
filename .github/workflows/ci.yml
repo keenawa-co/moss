@@ -6,10 +6,14 @@ on:
   pull_request:
     branches: ["main"]
 
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 env:
   RUST_BACKTRACE: 1
   CARGO_TERM_COLOR: always
-  CARGO_PROFILE_DEV_DEBUG: 0 # Reducing bloat to target folder, credit to https://github.com/tauri-apps/tauri/blob/dev/.github/workflows/test-cli-rs.yml
+  CARGO_PROFILE_DEV_DEBUG: 0
 
 jobs:
   check-modified-files:
@@ -18,7 +22,9 @@ jobs:
       node: ${{ steps.node.outputs.any_changed }}
       rust: ${{ steps.rust.outputs.any_changed }}
     steps:
-      - uses: actions/checkout@v4
+      - name: Check out code
+        uses: actions/checkout@v4
+
       - name: Get all changed Rust files
         id: rust
         uses: tj-actions/changed-files@v45
@@ -26,6 +32,7 @@ jobs:
           files: |
             **.rs
             Cargo.toml
+
       - name: Get all changed NodeJS files
         id: node
         uses: tj-actions/changed-files@v45
@@ -37,14 +44,11 @@ jobs:
             **.jsx
             package.json
 
-
   rust-unit-tests:
     name: Rust Unit Tests (${{ matrix.platform.target }})
     needs: check-modified-files
     if: ${{ needs.check-modified-files.outputs.rust == 'true' }}
-
     runs-on: ${{ matrix.platform.os }}
-
     strategy:
       fail-fast: false
       matrix:
@@ -53,13 +57,13 @@ jobs:
           - { target: aarch64-pc-windows-msvc, os: windows-latest }
           - { target: x86_64-unknown-linux-gnu, os: ubuntu-latest }
           - { target: x86_64-apple-darwin, os: macos-latest }
-    timeout-minutes: 15
+    timeout-minutes: 30
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
 
       - name: Setup Rust toolchain
-        uses: dtolnay/rust-toolchain@1.78
+        uses: dtolnay/rust-toolchain@1.82
         with:
           targets: ${{ matrix.platform.target }}
 
@@ -79,7 +83,7 @@ jobs:
         with:
           workspaces: ".github/cache"
 
-      - name: Unit Tests
+      - name: Run Unit Tests
         run: cargo -q test --lib
         working-directory: ".github/cache"
 
@@ -87,15 +91,14 @@ jobs:
     name: Rust General Workflows
     needs: check-modified-files
     if: ${{ needs.check-modified-files.outputs.rust == 'true' }}
-
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 30
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
 
       - name: Setup Rust toolchain
-        uses: dtolnay/rust-toolchain@1.78
+        uses: dtolnay/rust-toolchain@1.82
 
       - name: Use Linux Apt Cache
         uses: awalsh128/cache-apt-pkgs-action@latest
@@ -117,7 +120,7 @@ jobs:
 
       - name: Workspace Audit
         run: |
-          cd ${GITHUB_WORKSPACE}/tools/xtask
+          cd "${GITHUB_WORKSPACE}/tools/xtask"
           cargo -q run -- --fail-fast rwa
 
   node-workflows:
@@ -134,13 +137,16 @@ jobs:
 
           - name: Test Packages
             command: pnpm run test --project packages
+
           - name: Test Packages Stories
             command: pnpm run test --project packages-stories
+
           - name: Test Desktop
             command: pnpm run test --project desktop
+
           - name: Test Desktop Stories
             command: pnpm run test --project desktop-stories
-    timeout-minutes: 15
+    timeout-minutes: 30
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -157,8 +163,15 @@ jobs:
       - name: Install Dependencies
         run: pnpm install
 
-      - name: Install Playwright Browserx
+      - name: Install Playwright Browsers
         run: npx playwright install chromium --with-deps
+
+      - name: Cache optional Playwright paths
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('package-lock.json', 'pnpm-lock.yaml') }}
 
       - name: Build Icons
         run: make gen-icons

@@ -6,32 +6,6 @@ pub trait Extend<T> {
         I: IntoIterator<Item = T>;
 }
 
-impl<K, V> Extend<(K, V)> for radix_trie::Trie<K, V>
-where
-    K: radix_trie::TrieKey + AsRef<str> + Hash + Eq,
-    V: Clone,
-{
-    fn extend<I: IntoIterator<Item = (K, V)>>(&mut self, iter: I) {
-        let iter = iter.into_iter();
-        iter.for_each(move |(key, value)| {
-            self.insert(key, value);
-        });
-    }
-}
-
-impl<'a, K, V> Extend<(&'a K, &'a V)> for radix_trie::Trie<K, V>
-where
-    K: radix_trie::TrieKey + AsRef<str> + Hash + Eq + Clone,
-    V: Clone,
-{
-    fn extend<I: IntoIterator<Item = (&'a K, &'a V)>>(&mut self, iter: I) {
-        let iter = iter.into_iter();
-        iter.for_each(move |(key, value)| {
-            self.insert(key.clone(), value.clone());
-        });
-    }
-}
-
 pub trait MaybeExtend<T> {
     fn maybe_extend<I>(&mut self, option: Option<I>) -> Option<()>
     where

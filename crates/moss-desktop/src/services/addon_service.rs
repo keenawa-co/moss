@@ -1,95 +1,32 @@
 use anyhow::{anyhow, Result};
 use moss_addon::manifest::{AddonManifest, MANIFEST_FILENAME};
-use std::{path::PathBuf, sync::Arc};
+use std::path::PathBuf;
 use tauri::{AppHandle, Manager};
 
 use crate::{
     addon_registry::AddonRegistry,
-    app::{
-        service::{AnyService, ServiceMetadata},
-        state::AppState,
-        subscription::Subscription,
-    },
-    contribution_collector::ContributionRegistry,
+    app::{service::Service, state::AppStateManager},
     models::application::ThemeDescriptor,
 };
 
-// use super::{AnyService2, ServiceEvent};
-
 pub struct AddonService {
     addon_registry: AddonRegistry,
-    builtin_addons_location: PathBuf,
-    installed_addons_location: PathBuf,
 }
 
 impl AddonService {
     pub fn new(
-        builtin_addons_location: impl Into<PathBuf>,
-        installed_addons_location: impl Into<PathBuf>,
+        app_handle: &AppHandle,
+        builtin_addons_location: PathBuf,
+        _installed_addons_location: PathBuf,
     ) -> Self {
-        Self {
-            addon_registry: AddonRegistry::new(),
-            builtin_addons_location: builtin_addons_location.into(),
-            installed_addons_location: installed_addons_location.into(),
-        }
-    }
-
-    fn parse_addon_dir(&self, app_state: &AppState, addon_dir: PathBuf) -> Result<()> {
-        let mut read_dir = std::fs::read_dir(&addon_dir)
-            .map_err(|err| anyhow!("Failed to read the directory {:?}: {}", addon_dir, err))?;
-
-        while let Some(entry) = read_dir.next() {
-            let Ok(entry) = entry else {
-                info!(
-                    "Failed to read an entry in the directory of addon: {:?}",
-                    entry.err()
-                );
-                continue;
-            };
-
-            let entry_path = entry.path();
-
-            if !entry_path.is_dir() && entry.file_name() == MANIFEST_FILENAME {
-                let file_content = std::fs::read_to_string(&entry_path)
-                    .map_err(|err| anyhow!("Failed to read the {:?} file: {}", entry_path, err))?;
-
-                let addon_manifest: AddonManifest = toml::from_str(&file_content)
-                    .map_err(|err| anyhow!("Failed to parse the {:?} file: {}", entry_path, err))?;
-
-                if let Some(themes) = addon_manifest.contributes.themes {
-                    for theme_contribution in themes {
-                        app_state.contributions.themes.insert(ThemeDescriptor {
-                            id: format!(
-                                "{}.{}",
-                                addon_manifest.addon.name,
-                                theme_contribution.label.replace(" ", "")
-                            ),
-                            name: theme_contribution.label,
-                            source: addon_dir
-                                .join(theme_contribution.path)
-                                .to_string_lossy()
-                                .to_string(),
-                        });
-                    }
-                }
-            }
-        }
-
-        Ok(())
-    }
-}
-
-impl AnyService for AddonService {
-    fn start(&self, app_handle: &AppHandle) {
-        let app_state = app_handle.state::<AppState>();
-
-        let mut read_dir = std::fs::read_dir(&self.builtin_addons_location).unwrap_or_else(|err| {
+        let mut read_dir = std::fs::read_dir(&builtin_addons_location).unwrap_or_else(|err| {
             panic!(
                 "Failed to read the directory {:?} containing built-in addons: {err}",
-                &self.builtin_addons_location
+                &builtin_addons_location
             );
         });
 
+        let app_state = app_handle.state::<AppStateManager>();
         while let Some(entry) = read_dir.next() {
             let Ok(entry) = entry else {
                 warn!(
@@ -103,22 +40,75 @@ impl AnyService for AddonService {
                 continue;
             }
 
-            if let Err(err) = self.parse_addon_dir(&app_state, entry.path()) {
+            if let Err(err) = parse_addon_dir(&app_state, entry.path()) {
                 warn!("Failed to parse addon: {err}");
                 continue;
             };
+
+            // TODO: Add addon registration once the addon entity becomes more clearly defined
+        }
+
+        Self {
+            addon_registry: AddonRegistry::new(),
         }
     }
+}
 
-    fn stop(&self, _app_handle: &AppHandle) {
-        ()
+impl Service for AddonService {
+    fn name(&self) -> &'static str {
+        std::any::type_name::<Self>()
     }
+
+    fn dispose(&self) {}
 
     fn as_any(&self) -> &dyn std::any::Any {
         self
     }
 }
 
-impl ServiceMetadata for AddonService {
-    const SERVICE_BRAND: &'static str = "AddonService";
+// OPTIMIZE: This should probably be moved in the future to a separate entity responsible for loading add-ons.
+fn parse_addon_dir(app_state: &AppStateManager, addon_dir: PathBuf) -> Result<()> {
+    let mut read_dir = std::fs::read_dir(&addon_dir)
+        .map_err(|err| anyhow!("Failed to read the directory {:?}: {}", addon_dir, err))?;
+
+    while let Some(entry) = read_dir.next() {
+        let Ok(entry) = entry else {
+            info!(
+                "Failed to read an entry in the directory of addon: {:?}",
+                entry.err()
+            );
+            continue;
+        };
+
+        let entry_path = entry.path();
+
+        if !entry_path.is_dir() && entry.file_name() == MANIFEST_FILENAME {
+            let file_content = std::fs::read_to_string(&entry_path)
+                .map_err(|err| anyhow!("Failed to read the {:?} file: {}", entry_path, err))?;
+
+            let addon_manifest: AddonManifest = toml::from_str(&file_content)
+                .map_err(|err| anyhow!("Failed to parse the {:?} file: {}", entry_path, err))?;
+
+            if let Some(themes) = addon_manifest.contributes.themes {
+                for theme_contribution in themes {
+                    let value = ThemeDescriptor {
+                        id: format!(
+                            "{}.{}", // TODO: Add the addon author identifier as the first segment for greater uniqueness
+                            addon_manifest.addon.id,
+                            theme_contribution.label.replace(" ", "")
+                        ),
+                        name: theme_contribution.label,
+                        source: addon_dir
+                            .join(theme_contribution.path)
+                            .to_string_lossy()
+                            .to_string(),
+                    };
+
+                    app_state.contributions.themes.insert(value);
+                }
+            }
+        }
+    }
+
+    Ok(())
 }
