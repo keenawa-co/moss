@@ -23,7 +23,7 @@ importers:
         version: 4.4.0(prettier@3.4.2)
       '@storybook/experimental-addon-test':
         specifier: ^8.4.7
-        version: 8.4.7(@vitest/browser@2.1.8(@types/node@22.10.2)(playwright@1.49.1)(typescript@5.7.2)(vite@6.0.3(@types/node@22.10.2)(jiti@2.4.1)(terser@5.37.0)(yaml@2.6.1))(vitest@2.1.8))(@vitest/runner@2.1.8)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(storybook@8.4.7(prettier@3.4.2))(vitest@2.1.8(@types/node@22.10.2)(@vitest/browser@2.1.8)(msw@2.7.0(@types/node@22.10.2)(typescript@5.7.2))(terser@5.37.0))
+        version: 8.4.7(@vitest/browser@2.1.8)(@vitest/runner@2.1.8)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(storybook@8.4.7(prettier@3.4.2))(vitest@2.1.8)
       '@storybook/test':
         specifier: ^8.4.7
         version: 8.4.7(storybook@8.4.7(prettier@3.4.2))
@@ -341,8 +341,8 @@ importers:
         specifier: ^2.1.1
         version: 2.1.1
       '@tauri-apps/plugin-fs':
-        specifier: 2.0.0-rc.0
-        version: 2.0.0-rc.0
+        specifier: 2.2.0
+        version: 2.2.0
       '@tauri-apps/plugin-global-shortcut':
         specifier: ^2.0.0
         version: 2.2.0
@@ -452,7 +452,7 @@ importers:
         version: 8.4.7(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(storybook@8.4.7(prettier@3.4.2))
       '@storybook/experimental-addon-test':
         specifier: ^8.4.7
-        version: 8.4.7(@vitest/browser@2.1.8(@types/node@22.10.2)(playwright@1.49.1)(typescript@5.7.2)(vite@6.0.3(@types/node@22.10.2)(jiti@2.4.1)(terser@5.37.0)(yaml@2.6.1))(vitest@2.1.8))(@vitest/runner@2.1.8)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(storybook@8.4.7(prettier@3.4.2))(vitest@2.1.8(@types/node@22.10.2)(@vitest/browser@2.1.8)(msw@2.7.0(@types/node@22.10.2)(typescript@5.7.2))(terser@5.37.0))
+        version: 8.4.7(@vitest/browser@2.1.8)(@vitest/runner@2.1.8)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(storybook@8.4.7(prettier@3.4.2))(vitest@2.1.8)
       '@storybook/react':
         specifier: ^8.4.7
         version: 8.4.7(@storybook/test@8.4.7(storybook@8.4.7(prettier@3.4.2)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(storybook@8.4.7(prettier@3.4.2))(typescript@5.7.2)
@@ -2751,8 +2751,8 @@ packages:
     engines: {node: '>= 10'}
     hasBin: true
 
-  '@tauri-apps/plugin-fs@2.0.0-rc.0':
-    resolution: {integrity: sha512-74VCXEZlzTJ+Jv1V3KrV0qIHhSePpE/ljsF78rcEuvSfyTxLtt/Sb5CIUmVhFlKTRFOH9dX50T4dTZ3qFLyRnA==}
+  '@tauri-apps/plugin-fs@2.2.0':
+    resolution: {integrity: sha512-+08mApuONKI8/sCNEZ6AR8vf5vI9DXD4YfrQ9NQmhRxYKMLVhRW164vdW5BSLmMpuevftpQ2FVoL9EFkfG9Z+g==}
 
   '@tauri-apps/plugin-global-shortcut@2.2.0':
     resolution: {integrity: sha512-clI9Bg/BcxWXNDK+ij601o1qC2WxMEy8ovhGgEW5Ai17oPy0KK8uwzmc59KiVnOYKpBWHCUPqBxG+KBNUFXgzw==}
@@ -7653,7 +7653,7 @@ snapshots:
     dependencies:
       type-fest: 2.19.0
 
-  '@storybook/experimental-addon-test@8.4.7(@vitest/browser@2.1.8(@types/node@22.10.2)(playwright@1.49.1)(typescript@5.7.2)(vite@6.0.3(@types/node@22.10.2)(jiti@2.4.1)(terser@5.37.0)(yaml@2.6.1))(vitest@2.1.8))(@vitest/runner@2.1.8)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(storybook@8.4.7(prettier@3.4.2))(vitest@2.1.8(@types/node@22.10.2)(@vitest/browser@2.1.8)(msw@2.7.0(@types/node@22.10.2)(typescript@5.7.2))(terser@5.37.0))':
+  '@storybook/experimental-addon-test@8.4.7(@vitest/browser@2.1.8)(@vitest/runner@2.1.8)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(storybook@8.4.7(prettier@3.4.2))(vitest@2.1.8)':
     dependencies:
       '@storybook/csf': 0.1.12
       '@storybook/global': 5.0.0
@@ -7968,7 +7968,7 @@ snapshots:
       '@tauri-apps/cli-win32-ia32-msvc': 2.1.0
       '@tauri-apps/cli-win32-x64-msvc': 2.1.0
 
-  '@tauri-apps/plugin-fs@2.0.0-rc.0':
+  '@tauri-apps/plugin-fs@2.2.0':
     dependencies:
       '@tauri-apps/api': 2.1.1
 
