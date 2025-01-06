@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "private": true,
   "devDependencies": {
-    "@typescript-eslint/rule-tester": "^8.17.0",
+    "@typescript-eslint/rule-tester": "^8.19.1",
     "eslint": "^9.16.0",
     "eslint-config-turbo": "^2.0.0",
     "eslint-plugin-react-hooks": "^5.0.0",
