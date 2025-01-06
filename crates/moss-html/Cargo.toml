@@ -10,7 +10,7 @@ crate-type = ["cdylib", "rlib"]
 [dependencies]
 moss_text.workspace = true
 
-serde = { workspace = true, features = ["derive", "rc"] }
+serde = { workspace = true, features = ["derive"] }
 ts-rs.workspace = true
 
 [lints]

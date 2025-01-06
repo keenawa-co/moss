@@ -23,6 +23,7 @@ interface ActionsGroupProps extends Omit<ComponentPropsWithoutRef<"div">, "id"> 
 
   id?: number;
   isDraggable?: boolean;
+  draggableType?: string;
 }
 
 const buttonStyle =
@@ -40,6 +41,7 @@ export const ActionsGroup = ({
   iconClassName,
   id,
   isDraggable,
+  draggableType,
   ...props
 }: ActionsGroupProps) => {
   const [open, setOpen] = useState(false);
@@ -79,7 +81,7 @@ export const ActionsGroup = ({
         },
         getData({ input }) {
           return attachClosestEdge(
-            { id, label, icon },
+            { id, label, icon, draggableType },
             {
               element,
               input,
@@ -108,7 +110,7 @@ export const ActionsGroup = ({
         },
       })
     );
-  }, [id, label, isDraggable, icon]);
+  }, [id, label, isDraggable, icon, draggableType]);
 
   if (!defaultAction) {
     return (

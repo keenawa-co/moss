@@ -1,43 +1,34 @@
-import React, { ReactNode } from "react";
+import { ReactNode, useEffect } from "react";
 
-import { QueryCache, QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import { useGetAppState } from "@/hooks/useGetAppState";
+import { applyLanguagePack } from "@/utils/applyLanguagePack";
+import { applyTheme } from "@/utils/applyTheme";
 
 import LanguageProvider from "./LanguageProvider";
 import ThemeProvider from "./ThemeProvider";
 
-const ENABLE_REACT_QUERY_DEVTOOLS = true;
+const Provider = ({ children }: { children: ReactNode }) => {
+  useInitializeAppState();
 
-interface ProviderProps {
-  children: ReactNode;
-}
-
-const queryClient = new QueryClient({
-  queryCache: new QueryCache({
-    onError: (err, query) => {
-      console.log("Query client error", { err, query });
-    },
-  }),
-  defaultOptions: {
-    queries: {
-      retry: false,
-      networkMode: "always",
-      refetchOnWindowFocus: true,
-      refetchOnReconnect: false,
-      refetchOnMount: false,
-    },
-  },
-});
-
-const Provider: React.FC<ProviderProps> = ({ children }) => {
   return (
-    <QueryClientProvider client={queryClient}>
-      {ENABLE_REACT_QUERY_DEVTOOLS && <ReactQueryDevtools initialIsOpen={false} buttonPosition="bottom-left" />}
-      <LanguageProvider>
-        <ThemeProvider>{children}</ThemeProvider>
-      </LanguageProvider>
-    </QueryClientProvider>
+    <LanguageProvider>
+      <ThemeProvider>{children}</ThemeProvider>
+    </LanguageProvider>
   );
+};
+
+const useInitializeAppState = () => {
+  const { data } = useGetAppState();
+
+  useEffect(() => {
+    if (data) {
+      const theme = data.preferences?.theme ?? data.defaults.theme;
+      const languagePack = data.preferences?.locale ?? data.defaults.locale;
+
+      applyTheme(theme);
+      applyLanguagePack(languagePack);
+    }
+  }, [data]);
 };
 
 export default Provider;

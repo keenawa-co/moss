@@ -1,47 +1,27 @@
 export type ColorStop = [color: string, percentage: number];
 
-export function clamp_rgb(value: number) {
-  if (value < 0) {
-    return 0;
-  } else if (value > 255) {
-    return 255;
-  } else {
-    return value;
-  }
-}
+const clamp = (min: number, max: number, value: number): number => Math.max(min, Math.min(max, value));
 
-export function clamp_alpha(value: number) {
-  if (value < 0) {
-    return 0;
-  } else if (value > 1) {
-    return 1;
-  } else {
-    return value;
-  }
-}
+export const clampRgb = (value: number): number => clamp(0, 255, value);
+export const clampAlpha = (value: number): number => clamp(0, 1, value);
+export const clampPercent = (value: number): number => clamp(0, 100, value);
 
-export function clamp_percent(percent: number) {
-  if (percent < 0) {
-    return 0;
-  } else if (percent > 100) {
-    return 100;
-  } else {
-    return percent;
-  }
-}
+export const rgba = (r: number, g: number, b: number, a: number): string =>
+  `rgba(${clampRgb(r)}, ${clampRgb(g)}, ${clampRgb(b)}, ${clampAlpha(a)})`;
 
-export function rgba(r: number, g: number, b: number, a: number) {
-  return `rgba(${clamp_rgb(r)}, ${clamp_rgb(g)}, ${clamp_rgb(b)}, ${clamp_alpha(a)})`;
-}
+export type GradientDirection =
+  | "to top"
+  | "to bottom"
+  | "to left"
+  | "to right"
+  | "to top right"
+  | "to top left"
+  | "to bottom right"
+  | "to bottom left"
+  | `${number}deg`;
 
-export function linearGradient(direction: string, ...colorStopList: ColorStop[]) {
-  return (
-    `linear-gradient(${direction}` +
-    colorStopList
-      .map((stop) => {
-        return `, ${stop[0]} ${clamp_percent(stop[1])}%`;
-      })
-      .join("") +
-    ")"
-  );
-}
+export const linearGradient = (direction: GradientDirection, ...colorStops: ColorStop[]): string => {
+  const stops = colorStops.map(([color, percentage]) => `${color} ${clampPercent(percentage)}%`).join(", ");
+
+  return `linear-gradient(${direction}, ${stops})`;
+};

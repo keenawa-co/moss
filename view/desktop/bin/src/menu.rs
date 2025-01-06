@@ -4,7 +4,7 @@ use tauri::{
     AppHandle, Manager, Window, Wry,
 };
 
-use crate::create_main_window;
+use crate::create_child_window;
 
 #[derive(Debug, StrumEnumString, StrumDisplay, StrumAsRefStr)]
 pub enum BuiltInMenuEvent {
@@ -19,13 +19,23 @@ pub fn handle_event(_window: &Window, event: &MenuEvent) {
     let event_id = event.id().0.as_str();
     let app_handle = _window.app_handle().clone();
     match event_id {
-        "file.newWindow" => {
-            tauri::async_runtime::spawn(async move {
-                create_main_window(&app_handle, "/");
-            });
-        }
+        "file.newWindow" => handle_new_window(app_handle),
         _ => {}
     }
+}
+
+fn handle_new_window(app_handle: tauri::AppHandle) {
+    tauri::async_runtime::spawn(async move {
+        match create_child_window(&app_handle, "/") {
+            Ok(webview_window) => {
+                webview_window.on_menu_event(move |window, event| handle_event(window, &event));
+            }
+            Err(err) => {
+                eprintln!("Failed to open a new window: {}", err);
+                return;
+            }
+        }
+    });
 }
 
 pub fn app_menu(app_handle: &AppHandle) -> tauri::Result<Menu<Wry>> {

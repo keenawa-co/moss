@@ -1,15 +1,27 @@
 import { invokeTauriIpc, IpcResult } from "@/lib/backend/tauri";
+import { AppState, LocaleDescriptor, ThemeDescriptor } from "@repo/moss-desktop";
+import { invoke } from "@tauri-apps/api/core";
 
-export interface GetColorThemeOptions {
-  enableCache: boolean;
-}
+// App state
 
-export const getColorTheme = async (
-  source: string,
-  opts?: GetColorThemeOptions
-): Promise<IpcResult<string, string>> => {
+export const getState = async (): Promise<AppState> => {
+  return await invoke<AppState>("get_state");
+};
+
+//Color themes
+
+export const getColorThemes = async (): Promise<ThemeDescriptor[]> => {
+  return await invoke<ThemeDescriptor[]>("get_themes");
+};
+
+export const getColorTheme = async (source: string): Promise<IpcResult<string, string>> => {
   return await invokeTauriIpc<string, string>("get_color_theme", {
     path: source,
-    opts,
   });
+};
+
+//Language packs
+
+export const getLanguagePacks = async (): Promise<LocaleDescriptor[]> => {
+  return await invoke<LocaleDescriptor[]>("get_locales");
 };

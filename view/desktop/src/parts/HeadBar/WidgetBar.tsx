@@ -43,7 +43,7 @@ export const WidgetBar = ({ os, className, ...props }: WidgetBarProps) => {
     return monitorForElements({
       onDrop({ location, source }) {
         const target = location.current.dropTargets[0];
-        if (!target) return;
+        if (!target || target.data.draggableType !== "WidgetBarButton") return;
 
         const sourceData = source.data;
         const targetData = target.data;
@@ -75,6 +75,7 @@ export const WidgetBar = ({ os, className, ...props }: WidgetBarProps) => {
       setDNDList((prevList) => {
         return prevList.filter((id) => id !== targetId);
       });
+
       setOverflownList((prevOverflownIds) => {
         if (prevOverflownIds.includes(targetId)) return prevOverflownIds;
         return [targetId, ...prevOverflownIds];
@@ -177,6 +178,7 @@ export const WidgetBar = ({ os, className, ...props }: WidgetBarProps) => {
                     actions={item.actions}
                     defaultAction={item.defaultAction}
                     isDraggable
+                    draggableType="WidgetBarButton"
                     id={item.id}
                   />
 

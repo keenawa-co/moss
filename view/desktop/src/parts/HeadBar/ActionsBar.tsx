@@ -4,14 +4,25 @@ import { ActionButton } from "@/components/Action/ActionButton";
 import { ActionsSubmenu } from "@/components/Action/ActionsSubmenu";
 import { ActionsGroup } from "@/components/ActionsGroup";
 import { invokeTauriIpc } from "@/lib/backend/tauri";
-import { LayoutAlignment, useLayoutStore } from "@/store/layout";
+import { useActivityBarStore } from "@/store/activityBar";
+import { LayoutAlignment, LayoutPrimarySideBarPosition, useLayoutStore } from "@/store/layout";
 import { MenuItem } from "@repo/moss-desktop";
 import { cn, DropdownMenu } from "@repo/moss-ui";
 
 export const ActionsBar = ({ className, ...props }: HTMLProps<HTMLDivElement>) => {
   const [activities, setActivities] = useState<MenuItem[]>([]);
 
-  const { primarySideBar, secondarySideBar, bottomPane, setAlignment, alignment } = useLayoutStore((state) => state);
+  const {
+    primarySideBar,
+    secondarySideBar,
+    bottomPane,
+    setAlignment,
+    alignment,
+    primarySideBarPosition,
+    setPrimarySideBarPosition,
+  } = useLayoutStore((state) => state);
+
+  const { position: activityBarPosition, setPosition: setActivityBarPosition } = useActivityBarStore();
 
   useEffect(() => {
     const getAllActivities = async () => {
@@ -20,7 +31,6 @@ export const ActionsBar = ({ className, ...props }: HTMLProps<HTMLDivElement>) =
 
         if (res.status === "ok") {
           setActivities(res.data);
-          // console.log(res.data);
         }
       } catch (err) {
         console.error("Failed to get workbench state:", err);
@@ -49,14 +59,25 @@ export const ActionsBar = ({ className, ...props }: HTMLProps<HTMLDivElement>) =
           if ("action" in item) {
             const command = item.action.command;
 
+            const visibility =
+              primarySideBarPosition === "left" ? primarySideBar.visibility : secondarySideBar.visibility;
+
+            const handleVisibilityChange = () => {
+              if (primarySideBarPosition === "left") {
+                primarySideBar.setVisibility(!visibility);
+              } else {
+                secondarySideBar.setVisibility(!visibility);
+              }
+            };
+
             if (index === 0) {
               return (
                 <ActionButton
                   key={command.id}
                   iconClassName="size-[18px]"
                   {...command}
-                  icon={primarySideBar.visibility ? "HeadBarPrimarySideBarActive" : "HeadBarPrimarySideBar"}
-                  onClick={() => primarySideBar.setVisibility(!primarySideBar.visibility)}
+                  icon={visibility ? "HeadBarPrimarySideBarActive" : "HeadBarPrimarySideBar"}
+                  onClick={handleVisibilityChange}
                   visibility={item.action.visibility}
                 />
               );
@@ -74,14 +95,25 @@ export const ActionsBar = ({ className, ...props }: HTMLProps<HTMLDivElement>) =
                 />
               );
             }
+
             if (index === 2) {
+              const visibility =
+                primarySideBarPosition === "right" ? primarySideBar.visibility : secondarySideBar.visibility;
+
+              const handleVisibilityChange = () => {
+                if (primarySideBarPosition === "right") {
+                  primarySideBar.setVisibility(!visibility);
+                } else {
+                  secondarySideBar.setVisibility(!visibility);
+                }
+              };
               return (
                 <ActionButton
                   key={command.id}
                   iconClassName="size-[18px]"
                   {...command}
-                  icon={secondarySideBar.visibility ? "HeadBarSecondarySideBarActive" : "HeadBarSecondarySideBar"}
-                  onClick={() => secondarySideBar.setVisibility(!secondarySideBar.visibility)}
+                  icon={visibility ? "HeadBarSecondarySideBarActive" : "HeadBarSecondarySideBar"}
+                  onClick={handleVisibilityChange}
                   visibility={item.action.visibility}
                 />
               );
@@ -104,6 +136,22 @@ export const ActionsBar = ({ className, ...props }: HTMLProps<HTMLDivElement>) =
                   <DropdownMenu.RadioItem value="justify" label="Justify" checked={alignment === "justify"} />
                   <DropdownMenu.RadioItem value="left" label="Left" checked={alignment === "left"} />
                   <DropdownMenu.RadioItem value="right" label="Right" checked={alignment === "right"} />
+                </DropdownMenu.RadioGroup>
+                <DropdownMenu.Separator />
+                <DropdownMenu.RadioGroup
+                  value={primarySideBarPosition}
+                  onValueChange={(value) => {
+                    if (activityBarPosition === "left") {
+                      setActivityBarPosition("right");
+                    } else if (activityBarPosition === "right") {
+                      setActivityBarPosition("left");
+                    }
+
+                    setPrimarySideBarPosition(value as LayoutPrimarySideBarPosition);
+                  }}
+                >
+                  <DropdownMenu.RadioItem value="left" label="Left" checked={primarySideBarPosition === "left"} />
+                  <DropdownMenu.RadioItem value="right" label="Right" checked={primarySideBarPosition === "right"} />
                 </DropdownMenu.RadioGroup>
               </ActionsSubmenu>
             );

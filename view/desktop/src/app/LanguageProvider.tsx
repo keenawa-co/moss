@@ -1,43 +1,24 @@
-import { useCallback, useEffect } from "react";
+import { useEffect } from "react";
 
-import { useLanguageStore } from "@/store/language";
+import { applyLanguagePack } from "@/utils/applyLanguagePack";
 import { LocaleDescriptor } from "@repo/moss-desktop";
+import { useQueryClient } from "@tanstack/react-query";
 import { listen, UnlistenFn } from "@tauri-apps/api/event";
 
 const LanguageProvider = ({ children }: { children: React.ReactNode }) => {
-  const { currentLanguageCode, languagePacks, setLanguageCode, initializeLanguages } = useLanguageStore();
+  const queryClient = useQueryClient();
 
   useEffect(() => {
-    initializeLanguages();
-  }, [initializeLanguages]);
+    let unlisten: UnlistenFn | undefined;
 
-  const setLanguagePackWithoutSync = useCallback(
-    (language: LocaleDescriptor) => {
-      const selectedLanguage = languagePacks?.find((languagePack) => language.code === languagePack.code) || null;
-      if (selectedLanguage) {
-        setLanguageCode(selectedLanguage.code);
-      } else {
-        console.error(`Language pack with code "${language.code}" not found.`);
-      }
-    },
-    [languagePacks, setLanguageCode]
-  );
-
-  useEffect(() => {
-    let unlisten: UnlistenFn;
-
-    const handleLanguagePackChanged = (event: { payload: LocaleDescriptor }) => {
-      console.log(event);
-      const newLanguagePack: LocaleDescriptor = event.payload;
-
-      if (newLanguagePack.code !== currentLanguageCode) {
-        setLanguagePackWithoutSync(newLanguagePack);
-      }
+    const handleLanguageChange = (event: { payload: LocaleDescriptor }) => {
+      applyLanguagePack(event.payload);
+      queryClient.invalidateQueries({ queryKey: ["getState"] });
     };
 
     const setupListener = async () => {
       try {
-        unlisten = await listen("core://language-pack-changed", handleLanguagePackChanged);
+        unlisten = await listen("core://language-pack-changed", handleLanguageChange);
       } catch (error) {
         console.error("Failed to set up language pack change listener:", error);
       }
@@ -50,7 +31,7 @@ const LanguageProvider = ({ children }: { children: React.ReactNode }) => {
         unlisten();
       }
     };
-  }, [currentLanguageCode, setLanguagePackWithoutSync]);
+  }, [queryClient]);
 
   return <>{children}</>;
 };

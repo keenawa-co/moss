@@ -1,10 +1,7 @@
-use super::{
-    lifecycle::{LifecycleManager, LifecyclePhase},
-    subscription::Subscription,
-};
+use anyhow::{anyhow, Result};
+use derive_more::{Deref, DerefMut};
 use fnv::FnvHashMap;
-use parking_lot::{Mutex, RwLock};
-use smallvec::SmallVec;
+use parking_lot::RwLock;
 use std::{
     any::{Any, TypeId},
     sync::{
@@ -12,22 +9,18 @@ use std::{
         Arc,
     },
 };
-use strum::{EnumCount, EnumIter};
 use tauri::AppHandle;
-use tracing::{trace, warn};
 
-pub trait ServiceMetadata {
-    const SERVICE_BRAND: &'static str;
-}
+use super::instantiation::InstantiationType;
 
-pub trait AnyService: Any + Send + Sync {
-    fn start(&self, app_handle: &AppHandle);
-    fn stop(&self, app_handle: &AppHandle);
+pub trait Service: Any + Send + Sync {
+    fn name(&self) -> &'static str;
+    fn dispose(&self);
     fn as_any(&self) -> &dyn Any;
 }
 
-impl dyn AnyService {
-    pub fn downcast_arc<T: AnyService>(self: Arc<Self>) -> Result<Arc<T>, Arc<Self>> {
+impl dyn Service {
+    pub fn downcast_arc<T: Service>(self: Arc<Self>) -> Result<Arc<T>, Arc<Self>> {
         if self.as_any().is::<T>() {
             let raw = Arc::into_raw(self) as *const T;
             Ok(unsafe { Arc::from_raw(raw) })
@@ -37,190 +30,252 @@ impl dyn AnyService {
     }
 }
 
-pub const MAX_ACTIVATION_POINTS: usize = ActivationPoint::COUNT;
+#[derive(Debug, Deref, DerefMut)]
+pub struct ServiceHandle<T>
+where
+    T: Service,
+{
+    #[deref]
+    #[deref_mut]
+    service: Arc<T>,
 
-#[derive(Debug, Eq, Hash, PartialEq, EnumIter, EnumCount)]
-pub enum ActivationPoint {
-    OnBootstrapping,
-}
-
-#[allow(clippy::from_over_into)]
-impl Into<LifecyclePhase> for ActivationPoint {
-    fn into(self) -> LifecyclePhase {
-        match self {
-            ActivationPoint::OnBootstrapping => LifecyclePhase::Bootstrapping,
-        }
-    }
+    #[allow(unused)]
+    metadata: Arc<ServiceMetadata>,
 }
 
 #[repr(u8)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-enum ServiceStatus {
-    Inactive = 0,
-    Activating = 1,
-    Active = 2,
-    Deactivating = 3,
-    Failed = 4,
+#[derive(Debug, Eq, Hash, PartialEq)]
+enum ServiceInstantiationMode {
+    Pending = 0,
+    Active = 1,
 }
 
-impl ServiceStatus {
+impl From<u8> for ServiceInstantiationMode {
+    #[inline]
+    fn from(value: u8) -> ServiceInstantiationMode {
+        unsafe { std::mem::transmute(value) }
+    }
+}
+
+impl ServiceInstantiationMode {
+    #[inline]
     fn as_u8(self) -> u8 {
         self as u8
     }
 }
 
-struct ServiceHandleState {
-    activation_subscriptions: Mutex<SmallVec<[Subscription; MAX_ACTIVATION_POINTS]>>,
-    status: AtomicU8,
-}
-
-impl ServiceHandleState {
-    fn is_activation_possible(&self) -> bool {
-        self.status.load(Ordering::SeqCst) == ServiceStatus::Inactive.as_u8()
-    }
-
-    fn is_active(&self) -> bool {
-        self.status.load(Ordering::SeqCst) == ServiceStatus::Active.as_u8()
-    }
-
-    fn set_status(&self, new_status: ServiceStatus) {
-        self.status.store(new_status.as_u8(), Ordering::SeqCst);
+impl From<InstantiationType> for ServiceInstantiationMode {
+    #[inline]
+    fn from(value: InstantiationType) -> Self {
+        match value {
+            InstantiationType::Instant => ServiceInstantiationMode::Active,
+            InstantiationType::Delayed => ServiceInstantiationMode::Pending,
+        }
     }
 }
 
-#[derive(Clone)]
-pub struct ServiceHandle {
-    service: Arc<dyn AnyService>,
-    state: Arc<ServiceHandleState>,
+impl Into<AtomicU8> for ServiceInstantiationMode {
+    #[inline]
+    fn into(self) -> AtomicU8 {
+        AtomicU8::new(self as u8)
+    }
 }
 
-pub struct ServiceManager {
-    lifecycle_manager: Arc<LifecycleManager>,
-    services: Arc<RwLock<FnvHashMap<TypeId, ServiceHandle>>>,
+#[derive(Debug)]
+struct ServiceMetadata {
+    service_name: &'static str,
+    instantiation_mode: AtomicU8,
 }
 
-impl ServiceManager {
-    pub fn new(lifecycle_manager: Arc<LifecycleManager>) -> Self {
+impl ServiceMetadata {
+    fn set_instantiation_mode(&self, mode: ServiceInstantiationMode) {
+        self.instantiation_mode
+            .store(mode.as_u8(), Ordering::SeqCst);
+    }
+
+    fn get_instantiation_mode(&self) -> ServiceInstantiationMode {
+        ServiceInstantiationMode::from(self.instantiation_mode.load(Ordering::SeqCst))
+    }
+}
+
+struct ServiceCollectionState {
+    services: FnvHashMap<TypeId, Arc<dyn Service>>,
+    pending_services: FnvHashMap<TypeId, Box<dyn FnOnce(&AppHandle) -> Arc<dyn Service>>>,
+    known_services: FnvHashMap<TypeId, Arc<ServiceMetadata>>,
+}
+
+impl Default for ServiceCollectionState {
+    fn default() -> Self {
         Self {
-            lifecycle_manager,
-            services: Arc::new(RwLock::new(FnvHashMap::default())),
+            services: Default::default(),
+            pending_services: Default::default(),
+            known_services: Default::default(),
+        }
+    }
+}
+
+pub struct ServiceCollection {
+    app_handle: AppHandle,
+    state: RwLock<ServiceCollectionState>,
+}
+
+impl ServiceCollection {
+    pub fn new(app_handle: AppHandle) -> Self {
+        Self {
+            app_handle,
+            state: RwLock::new(ServiceCollectionState::default()),
         }
     }
 
-    pub fn register<T: AnyService + ServiceMetadata>(
-        &self,
-        service: T,
-        activation_points: SmallVec<[ActivationPoint; MAX_ACTIVATION_POINTS]>,
-    ) {
-        let service_arc = Arc::new(service);
-        let service_state = Arc::new(ServiceHandleState {
-            activation_subscriptions: Mutex::new(SmallVec::new()),
-            status: AtomicU8::new(ServiceStatus::Inactive.as_u8()),
-        });
+    pub fn register<T, F>(&self, creation_fn: F, activation_type: InstantiationType)
+    where
+        T: Service + 'static,
+        F: FnOnce(&AppHandle) -> T + 'static,
+    {
+        let type_id = TypeId::of::<T>();
+        let service_name = std::any::type_name::<T>();
+        let mut state_lock = self.state.write();
 
-        let activation_callback = |app_handle: &AppHandle,
-                                   service: Arc<T>,
-                                   service_state: Arc<ServiceHandleState>,
-                                   phase: &LifecyclePhase| {
-            if !service_state.is_activation_possible() {
-                return;
+        match activation_type {
+            InstantiationType::Instant => {
+                let service = creation_fn(&self.app_handle);
+
+                state_lock
+                    .services
+                    .insert(type_id.clone(), Arc::new(service));
+
+                debug!("Service {service_name} was activated");
             }
+            InstantiationType::Delayed => {
+                state_lock.pending_services.insert(
+                    type_id.clone(),
+                    Box::new(move |app_handle| {
+                        let service = creation_fn(app_handle);
 
-            trace!(
-                "Starting activation process for service: {} during phase: {:?}",
-                T::SERVICE_BRAND,
-                phase
-            );
-
-            service_state.set_status(ServiceStatus::Activating);
-            service.start(app_handle);
-            service_state.set_status(ServiceStatus::Active);
-
-            // Once the service is successfully activated, all other activation
-            // callbacks are no longer required and will be removed.
-            service_state.activation_subscriptions.lock().clear();
-        };
-
-        let service_state_clone = Arc::clone(&service_state);
-        let mut activation_subscriptions_lock = service_state_clone.activation_subscriptions.lock();
-
-        for (index, point) in activation_points.into_iter().enumerate() {
-            let service_arc_clone = Arc::clone(&service_arc);
-            let service_state_clone = Arc::clone(&service_state);
-            let phase: LifecyclePhase = point.into();
-
-            activation_subscriptions_lock.insert(
-                index,
-                self.lifecycle_manager.observe(phase, move |app_handle| {
-                    activation_callback(
-                        app_handle,
-                        service_arc_clone.to_owned(),
-                        service_state_clone.to_owned(),
-                        &phase,
-                    );
-                }),
-            );
+                        Arc::new(service)
+                    }),
+                );
+            }
         }
 
-        self.services.write().insert(
-            TypeId::of::<T>(),
-            ServiceHandle {
-                service: service_arc,
-                state: service_state,
-            },
+        state_lock.known_services.insert(
+            type_id,
+            Arc::new(ServiceMetadata {
+                service_name,
+                instantiation_mode: ServiceInstantiationMode::from(activation_type).into(),
+            }),
         );
     }
 
-    pub fn get<T: AnyService + ServiceMetadata>(&self) -> Option<Arc<T>> {
-        let service_handle = self.services.read().get(&TypeId::of::<T>()).cloned()?;
+    fn get_internal(
+        &self,
+        service_metadata: Arc<ServiceMetadata>,
+        type_id: TypeId,
+    ) -> Result<Arc<dyn Service>> {
+        match service_metadata.get_instantiation_mode() {
+            ServiceInstantiationMode::Active => {
+                let state_lock = self.state.write();
+                let service = state_lock.services.get(&type_id).ok_or_else(|| {
+                    anyhow!(
+                        "The service {} was not found among the activated ones",
+                        service_metadata.service_name
+                    )
+                })?;
 
-        if !service_handle.state.is_active() {
-            warn!(
-                "Attempting to retrieve service {} which has not yet been activated",
-                T::SERVICE_BRAND
-            );
-            return None;
-        }
+                Ok(Arc::clone(service))
+            }
+            ServiceInstantiationMode::Pending => {
+                let mut state_lock = self.state.write();
+                let creation_fn =
+                    state_lock
+                        .pending_services
+                        .remove(&type_id)
+                        .ok_or_else(|| {
+                            anyhow!(
+                                "The service {} was not found among those awaiting activation",
+                                service_metadata.service_name
+                            )
+                        })?;
 
-        match service_handle.service.downcast_arc::<T>() {
-            Ok(service_arc) => Some(service_arc),
-            Err(_) => {
+                let service = creation_fn(&self.app_handle);
+
+                state_lock.services.insert(type_id, Arc::clone(&service));
+                service_metadata.set_instantiation_mode(ServiceInstantiationMode::Active);
                 debug!(
-                    "Failed to cast service {} to the required type",
-                    T::SERVICE_BRAND
+                    "Service {} was activated upon request",
+                    service_metadata.service_name
                 );
 
-                None
+                Ok(service)
             }
         }
     }
 
-    pub fn get_unchecked<T: AnyService + ServiceMetadata>(&self) -> Arc<T> {
-        let service_handle = self
-            .services
-            .read()
-            .get(&TypeId::of::<T>())
+    pub fn get<T: Service>(&self) -> Result<ServiceHandle<T>> {
+        let type_id = TypeId::of::<T>();
+        let service_metadata = self
+            .state
+            .write()
+            .known_services
+            .get(&type_id)
             .cloned()
-            .unwrap_or_else(|| panic!(
-                "Service {} could not be found. Ensure it has been properly registered before attempting to retrieve it.", 
-                T::SERVICE_BRAND
-            ));
-
-        if !service_handle.state.is_active() {
-            panic!(
-                "Attempting to retrieve service {} which has not yet been activated",
-                T::SERVICE_BRAND
-            );
-        }
-
-        service_handle
-            .service
-            .downcast_arc::<T>()
-            .unwrap_or_else(|_| {
-                panic!(
-                    "Failed to cast service {} to the required type",
-                    T::SERVICE_BRAND
+            .ok_or_else(|| {
+                anyhow!(
+                    "The service {} must be registered before it can be used",
+                    std::any::type_name::<T>()
                 )
+            })?;
+
+        // A panic here is likely an indicator of a bug in the program because if
+        // the service was "known", this panic should not occur in this location.
+        let any_service = self
+            .get_internal(Arc::clone(&service_metadata), type_id)
+            .unwrap();
+
+        if let Ok(service) = any_service.downcast_arc::<T>() {
+            Ok(ServiceHandle {
+                service,
+                metadata: service_metadata,
             })
+        } else {
+            Err(anyhow!(
+                "Failed to cast service {} to the required type",
+                service_metadata.service_name,
+            ))
+        }
+    }
+
+    pub fn get_unchecked<T: Service>(&self) -> ServiceHandle<T> {
+        let type_id = TypeId::of::<T>();
+        let service_metadata = self
+            .state
+            .write()
+            .known_services
+            .get(&type_id)
+            .cloned()
+            .unwrap_or_else(|| {
+                panic!(
+                    "The service {} must be registered before it can be used",
+                    std::any::type_name::<T>()
+                )
+            });
+
+        // A panic here is likely an indicator of a bug in the program because if the service was
+        // known and activated, this panic should not occur in this location.
+        let any_service = self
+            .get_internal(Arc::clone(&service_metadata), type_id)
+            .unwrap();
+
+        let service = any_service.downcast_arc::<T>().unwrap_or_else(|_| {
+            panic!(
+                "Failed to cast service {} to the required type",
+                service_metadata.service_name,
+            )
+        });
+
+        ServiceHandle {
+            service,
+            metadata: service_metadata,
+        }
     }
 }

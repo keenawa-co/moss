@@ -6,7 +6,6 @@ publish = false
 
 [dependencies]
 hashbrown.workspace = true
-radix_trie.workspace = true
 
 [lints]
 workspace = true

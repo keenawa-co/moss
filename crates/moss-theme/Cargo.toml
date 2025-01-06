@@ -3,10 +3,18 @@ name = "moss_theme"
 version = "0.1.0"
 edition = "2021"
 
+[lib]
+crate-type = ["cdylib", "rlib"]
+
 [dependencies]
-serde.workspace = true
+anyhow.workspace = true
+serde = { workspace = true, features = ["derive"] }
 serde_json.workspace = true
 once_cell.workspace = true
+ts-rs = { workspace = true, features = ["indexmap-impl", "serde-json-impl"] }
+indexmap = { workspace = true, features = ["serde"] }
+jsonschema.workspace = true
+
 
 [lints]
 workspace = true
