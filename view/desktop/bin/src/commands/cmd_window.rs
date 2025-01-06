@@ -56,11 +56,10 @@ pub async fn get_translations(
     app_manager: State<'_, AppManager>,
     language: String,
     namespace: String,
-    opts: Option<GetTranslationsOptions>,
 ) -> TauriResult<Value> {
     let locale_service = app_manager.service::<LocaleService>()?;
     Ok(locale_service
-        .get_translations(&language, &namespace, opts)
+        .get_translations(&language, &namespace)
         .await?)
 }
 

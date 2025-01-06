@@ -1,5 +1,5 @@
 use crate::{
-    app::{service::Service, state::AppState},
+    app::{service::Service, state::AppStateManager},
     models::application::LocaleDescriptor,
 };
 use anyhow::{anyhow, Context as _, Result};
@@ -14,10 +14,10 @@ use tauri::{AppHandle, Manager};
 
 const CK_TRANSLATIONS: &'static str = "translations";
 
-#[derive(Debug, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct GetTranslationsOptions {
-    pub enable_cache: bool,
+#[derive(Clone)]
+struct LocaleCacheEntry {
+    language: String,
+    data: Value,
 }
 
 pub struct LocaleService {
@@ -27,7 +27,7 @@ pub struct LocaleService {
 
 impl LocaleService {
     pub fn new(app_handle: &AppHandle) -> Self {
-        let app_state = app_handle.state::<AppState>();
+        let app_state = app_handle.state::<AppStateManager>();
 
         Self {
             app_cache: Arc::clone(&app_state.cache),
@@ -38,49 +38,52 @@ impl LocaleService {
     pub fn get_locales(&self) -> &DashSet<LocaleDescriptor> {
         &self.locales
     }
-    pub async fn get_translations(
-        &self,
-        language: &str,
-        namespace: &str,
-        opts: Option<GetTranslationsOptions>,
-    ) -> Result<Value> {
-        let handle_cache_miss = || async {
-            let content = self
-                .read_translations_from_file(language, namespace)
-                .await?;
-            let options = if let Some(options) = opts {
-                options
-            } else {
-                return Ok(content);
-            };
-
-            if options.enable_cache {
-                self.app_cache
-                    .insert(&format!("{CK_TRANSLATIONS}-{namespace}"), content.clone());
-                trace!("Language pack '{language}-{namespace}' was successfully cached");
-            };
-            Ok(content)
-        };
-
+    pub async fn get_translations(&self, language: &str, namespace: &str) -> Result<Value> {
         match self
             .app_cache
-            .get::<Value>(&format!("{CK_TRANSLATIONS}-{namespace}"))
+            .get::<LocaleCacheEntry>(&format!("{CK_TRANSLATIONS}-{namespace}"))
         {
-            Ok(cached_value) => {
-                trace!("Language pack '{language}-{namespace}' was restored from the cache");
-
-                Ok((*cached_value).clone())
+            Ok(entry) => {
+                if entry.language == language {
+                    trace!(
+                        "Language Pack '{}-{}' was restored from the cache",
+                        language,
+                        namespace
+                    );
+                    return Ok(entry.data.clone());
+                } else {
+                    trace!(
+                        "Language Pack in cache does not match the requested language '{}'",
+                        language
+                    );
+                }
             }
-            Err(CacheError::NonexistentKey { .. }) => handle_cache_miss().await,
+            Err(CacheError::NonexistentKey { .. }) => {
+                trace!("No language pack in cache for key '{}'", CK_TRANSLATIONS);
+            }
             Err(CacheError::TypeMismatch { key, type_name }) => {
                 warn!(
-                    "Type mismatch for key '{}': expected 'Value', found '{}'",
+                    "Type mismatch for key '{}': expected 'LocaleCacheEntry', found '{}'",
                     key, type_name
                 );
-
-                handle_cache_miss().await
             }
         }
+        self.get_translations_internal(language, namespace).await
+    }
+
+    async fn get_translations_internal(&self, language: &str, namespace: &str) -> Result<Value> {
+        let translations = self
+            .read_translations_from_file(language, namespace)
+            .await?;
+        self.app_cache.insert(
+            &format!("{CK_TRANSLATIONS}-{namespace}"),
+            LocaleCacheEntry {
+                language: language.to_string(),
+                data: translations.clone(),
+            },
+        );
+
+        Ok(translations)
     }
 
     async fn read_translations_from_file(&self, language: &str, namespace: &str) -> Result<Value> {
