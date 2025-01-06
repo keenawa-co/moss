@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 
 import { useChangeColorTheme } from "@/hooks/useChangeColorTheme";
@@ -14,12 +15,12 @@ export const Settings = () => {
   const { data: themes } = useGetColorThemes();
   const { mutate: mutateChangeColorTheme } = useChangeColorTheme();
 
-  const { data: langs } = useGetLanguagePacks();
+  const { data: languages } = useGetLanguagePacks();
   const { mutate: mutateChangeLanguagePack } = useChangeLanguagePack();
 
   const handleLanguageChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedCode = event.target.value;
-    const selectedLang = langs?.find((lang) => lang.code === selectedCode);
+    const selectedLang = languages?.find((lang) => lang.code === selectedCode);
     if (selectedLang) {
       mutateChangeLanguagePack(selectedLang);
     }
@@ -33,8 +34,6 @@ export const Settings = () => {
     }
   };
 
-  console.log("settings page render");
-
   return (
     <main>
       <div>
@@ -45,7 +44,7 @@ export const Settings = () => {
           value={appState?.preferences.locale?.code || appState?.defaults.locale?.code}
           onChange={handleLanguageChange}
         >
-          {langs?.map((lang) => (
+          {languages?.map((lang) => (
             <option key={lang.code} value={lang.code}>
               {lang.name}
             </option>
