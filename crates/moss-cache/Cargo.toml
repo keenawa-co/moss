@@ -8,3 +8,6 @@ edition = "2021"
 moka.workspace = true
 dashmap.workspace = true
 thiserror.workspace = true
+
+[lints]
+workspace = true

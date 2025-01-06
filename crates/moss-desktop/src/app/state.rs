@@ -1,4 +1,3 @@
-use dashmap::DashMap;
 use moss_cache::{backend::moka::MokaBackend, Cache};
 use moss_text::ReadOnlyStr;
 use parking_lot::RwLock;
@@ -6,9 +5,8 @@ use std::time::Duration;
 use std::{sync::atomic::AtomicUsize, sync::Arc};
 
 use crate::command::CommandHandler;
-use crate::contribution_collector::{ContributionCollector, ContributionRegistry};
+use crate::contribution_collector::ContributionRegistry;
 use crate::models::application::{LocaleDescriptor, ThemeDescriptor};
-use crate::models::{actions::MenuItem, view::*};
 
 use super::service::ServiceManager;
 
@@ -46,7 +44,7 @@ impl AppState {
         // let contribution_collection = contribution_collector.collect();
         let cache = Cache::new(MokaBackend::new(STATE_MAX_CAPACITY, STATE_CACHE_TTL));
 
-        let state = Self {
+        Self {
             next_window_id: AtomicUsize::new(0),
             cache: Arc::new(cache),
             preferences: Preferences {
@@ -68,9 +66,7 @@ impl AppState {
             // menus: contribution_collection.menus,
             // tree_view_groups: contribution_collection.tree_view_groups,
             // tree_views: contribution_collection.tree_views,
-        };
-
-        state
+        }
     }
 
     pub fn inc_next_window_id(&self) -> usize {

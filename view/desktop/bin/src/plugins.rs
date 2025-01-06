@@ -31,11 +31,11 @@ pub mod plugin_log {
     fn is_dev() -> bool {
         #[cfg(dev)]
         {
-            return true;
+            true
         }
         #[cfg(not(dev))]
         {
-            return false;
+            false
         }
     }
 }

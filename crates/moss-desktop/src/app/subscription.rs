@@ -131,7 +131,7 @@ where
         (subscription, move || active.store(true, Ordering::SeqCst))
     }
 
-    pub(crate) fn remove(&self, ref emitter_key: EmitterKey) -> impl IntoIterator<Item = Callback> {
+    pub(crate) fn remove(&self, emitter_key: &EmitterKey) -> impl IntoIterator<Item = Callback> {
         let subscribers = self.state.lock().subscribers.remove(emitter_key);
         subscribers
             .unwrap_or_default()
@@ -150,7 +150,7 @@ where
     /// Iterates over each subscriber for the given emitter and applies
     /// the provided callback function. If the callback returns `false`,
     /// the subscriber is removed.
-    pub(crate) fn retain<F>(&self, emitter_key: &EmitterKey, mut f: F)
+    pub(crate) fn retain<F>(&self, emitter_key: &EmitterKey, f: F)
     where
         F: Fn(&Callback) -> bool,
     {

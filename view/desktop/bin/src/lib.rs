@@ -8,20 +8,14 @@ mod window;
 
 pub use constants::*;
 use moss_desktop::app::lifecycle::{LifecycleManager, LifecyclePhase};
-use moss_desktop::app::service::ServiceManager;
 
 use crate::plugins::*;
 use moss_desktop::app::state::AppState;
-use plugins::app_formation;
 use rand::random;
-use smallvec::smallvec;
 use std::env;
-use std::path::PathBuf;
 use std::sync::Arc;
-use tauri::plugin::TauriPlugin;
-use tauri::{AppHandle, Listener, Manager, RunEvent, Runtime, WebviewWindow, WindowEvent, Wry};
+use tauri::{AppHandle, Manager, RunEvent, WebviewWindow, WindowEvent};
 use tauri_plugin_global_shortcut::{Code, GlobalShortcutExt, Modifiers, Shortcut, ShortcutState};
-use tauri_plugin_os;
 use window::{create_window, CreateWindowInput};
 
 use crate::commands::*;
@@ -113,7 +107,7 @@ pub fn run() {
         .expect("failed to run")
         .run(|app_handle, event| match event {
             RunEvent::Ready => {
-                let _ = create_main_window(&app_handle, "/");
+                let _ = create_main_window(app_handle, "/");
             }
 
             #[cfg(target_os = "macos")]

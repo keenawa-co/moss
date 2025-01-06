@@ -71,14 +71,14 @@ pub async fn check_dependencies_job(
     while let Some(result) = task_set.join_next().await {
         match result {
             Ok(Ok(())) => {}
-            Ok(Err(e)) => {
+            Ok(Err(_)) => {
                 failure_count += 1;
                 if fail_fast {
                     task_set.abort_all();
                     return Err(anyhow!("Failing Fast"));
                 }
             }
-            Err(e) => {
+            Err(_) => {
                 failure_count += 1;
                 if fail_fast {
                     task_set.abort_all();
@@ -102,12 +102,12 @@ async fn handle_package_dependencies(
 ) -> Result<()> {
     if let Some(dependencies) = cargo_toml.get("dependencies").and_then(|d| d.as_table()) {
         for (dep_name, dep_value) in dependencies {
-            if rwa_config.global_ignore.contains(&dep_name) {
+            if rwa_config.global_ignore.contains(dep_name) {
                 trace!("ignoring {} dependency in '{}'", dep_name, package.name);
                 continue;
             }
             if let Some(ignored_list) = rwa_config.crate_ignore.get(&package.name) {
-                if ignored_list.contains(&dep_name) {
+                if ignored_list.contains(dep_name) {
                     trace!("ignoring {} dependency in '{}'", dep_name, package.name);
                     continue;
                 }

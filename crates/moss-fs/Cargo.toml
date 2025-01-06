@@ -6,3 +6,6 @@ publish = false
 
 [dependencies]
 dunce.workspace = true
+
+[lints]
+workspace = true

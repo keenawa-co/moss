@@ -14,7 +14,7 @@ use crate::{
     models::application::ThemeDescriptor,
 };
 
-const CK_COLOR_THEME: &'static str = "color_theme";
+const CK_COLOR_THEME: &str = "color_theme";
 
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]

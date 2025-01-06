@@ -7,3 +7,6 @@ edition = "2021"
 moss_themeconv.workspace = true
 clap.workspace = true
 serde_json.workspace = true
+
+[lints]
+workspace = true

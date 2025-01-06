@@ -26,7 +26,7 @@ pub fn normalize(path: impl AsRef<Path>) -> PathBuf {
         PathBuf::new()
     };
 
-    while let Some(component) = components.next() {
+    for component in components {
         match component {
             Component::Prefix(..) => unreachable!(),
             Component::RootDir => {

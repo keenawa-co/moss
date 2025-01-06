@@ -1,18 +1,16 @@
-use anyhow::{anyhow, Result};
-use moss_addon::manifest::{AddonManifest, MANIFEST_FILENAME};
-use std::{path::PathBuf, sync::Arc};
-use tauri::{AppHandle, Manager};
-
 use crate::{
     addon_registry::AddonRegistry,
     app::{
         service::{AnyService, ServiceMetadata},
         state::AppState,
-        subscription::Subscription,
     },
-    contribution_collector::ContributionRegistry,
     models::application::ThemeDescriptor,
 };
+use anyhow::{anyhow, Result};
+use moss_addon::manifest::{AddonManifest, MANIFEST_FILENAME};
+use std::path::PathBuf;
+use tauri::{AppHandle, Manager};
+use tracing::{info, warn};
 
 // use super::{AnyService2, ServiceEvent};
 
@@ -35,14 +33,14 @@ impl AddonService {
     }
 
     fn parse_addon_dir(&self, app_state: &AppState, addon_dir: PathBuf) -> Result<()> {
-        let mut read_dir = std::fs::read_dir(&addon_dir)
+        let read_dir = std::fs::read_dir(&addon_dir)
             .map_err(|err| anyhow!("Failed to read the directory {:?}: {}", addon_dir, err))?;
 
-        while let Some(entry) = read_dir.next() {
-            let Ok(entry) = entry else {
+        for entry_result in read_dir {
+            let Ok(entry) = entry_result else {
                 info!(
                     "Failed to read an entry in the directory of addon: {:?}",
-                    entry.err()
+                    entry_result.err()
                 );
                 continue;
             };
@@ -90,11 +88,11 @@ impl AnyService for AddonService {
             );
         });
 
-        while let Some(entry) = read_dir.next() {
-            let Ok(entry) = entry else {
+        for entry_result in read_dir {
+            let Ok(entry) = entry_result else {
                 warn!(
                     "Failed to read an entry in the directory for built-in addons: {:?}",
-                    entry.err()
+                    entry_result.err()
                 );
                 continue;
             };
@@ -110,9 +108,7 @@ impl AnyService for AddonService {
         }
     }
 
-    fn stop(&self, _app_handle: &AppHandle) {
-        ()
-    }
+    fn stop(&self, _app_handle: &AppHandle) {}
 
     fn as_any(&self) -> &dyn std::any::Any {
         self

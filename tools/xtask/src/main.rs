@@ -36,6 +36,7 @@ struct Args {
     fail_fast: bool,
 }
 
+#[allow(clippy::upper_case_acronyms)]
 #[derive(clap::ValueEnum, Clone)]
 enum InfoLevel {
     TRACE,

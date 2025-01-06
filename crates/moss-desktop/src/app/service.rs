@@ -1,3 +1,7 @@
+use super::{
+    lifecycle::{LifecycleManager, LifecyclePhase},
+    subscription::Subscription,
+};
 use fnv::FnvHashMap;
 use parking_lot::{Mutex, RwLock};
 use smallvec::SmallVec;
@@ -10,11 +14,7 @@ use std::{
 };
 use strum::{EnumCount, EnumIter};
 use tauri::AppHandle;
-
-use super::{
-    lifecycle::{LifecycleManager, LifecyclePhase},
-    subscription::Subscription,
-};
+use tracing::{trace, warn};
 
 pub trait ServiceMetadata {
     const SERVICE_BRAND: &'static str;
@@ -44,6 +44,7 @@ pub enum ActivationPoint {
     OnBootstrapping,
 }
 
+#[allow(clippy::from_over_into)]
 impl Into<LifecyclePhase> for ActivationPoint {
     fn into(self) -> LifecyclePhase {
         match self {
@@ -150,15 +151,14 @@ impl ServiceManager {
 
             activation_subscriptions_lock.insert(
                 index,
-                self.lifecycle_manager
-                    .observe(phase.clone(), move |app_handle| {
-                        activation_callback(
-                            app_handle,
-                            service_arc_clone.to_owned(),
-                            service_state_clone.to_owned(),
-                            &phase,
-                        );
-                    }),
+                self.lifecycle_manager.observe(phase, move |app_handle| {
+                    activation_callback(
+                        app_handle,
+                        service_arc_clone.to_owned(),
+                        service_state_clone.to_owned(),
+                        &phase,
+                    );
+                }),
             );
         }
 
@@ -172,9 +172,7 @@ impl ServiceManager {
     }
 
     pub fn get<T: AnyService + ServiceMetadata>(&self) -> Option<Arc<T>> {
-        let Some(service_handle) = self.services.read().get(&TypeId::of::<T>()).cloned() else {
-            return None;
-        };
+        let service_handle = self.services.read().get(&TypeId::of::<T>()).cloned()?;
 
         if !service_handle.state.is_active() {
             warn!(

@@ -81,7 +81,7 @@ pub(crate) struct ContributionCollector {}
 
 impl ContributionCollector {
     pub(crate) fn new() -> Self {
-        return Self {};
+        Self {}
     }
 
     pub(crate) fn collect(&self) -> ContributionCollection {

@@ -2613,6 +2613,7 @@ dependencies = [
  "thiserror 2.0.8",
  "tokio",
  "toml 0.8.19",
+ "tracing",
  "ts-rs",
 ]
 

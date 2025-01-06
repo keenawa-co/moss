@@ -7,7 +7,6 @@ use moss_desktop::{
 };
 use moss_text::{quote, ReadOnlyStr};
 use serde_json::Value;
-use std::path::PathBuf;
 
 use crate::{create_child_window, AppState};
 use tauri::{AppHandle, Emitter, State, WebviewWindow, Window};
@@ -81,11 +80,6 @@ pub fn get_state(app_state: State<'_, AppState>) -> Result<AppStateInfo, String>
 #[tauri::command(async)]
 pub async fn get_themes(app_state: State<'_, AppState>) -> Result<Vec<ThemeDescriptor>, String> {
     let theme_service = app_state.services.get_unchecked::<ThemeService>();
-    let r: Vec<ThemeDescriptor> = theme_service
-        .get_color_themes()
-        .clone()
-        .into_iter()
-        .collect();
 
     Ok(theme_service
         .get_color_themes()

@@ -13,3 +13,6 @@ moss_html.workspace = true
 
 serde = { workspace = true, features = ["derive", "rc"] }
 ts-rs.workspace = true
+
+[lints]
+workspace = true

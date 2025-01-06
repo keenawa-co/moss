@@ -14,6 +14,7 @@ pub enum BuiltInMenuEvent {
     CloseWindow,
 }
 
+#[allow(clippy::single_match)]
 pub fn handle_event(_window: &Window, event: &MenuEvent) {
     let event_id = event.id().0.as_str();
     let app_handle = _window.app_handle().clone();

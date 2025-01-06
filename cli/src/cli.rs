@@ -1,7 +1,7 @@
 pub mod cli_info;
 
 use crate::cli::cli_info::info_handler;
-use clap::{arg, Parser, Subcommand};
+use clap::{Parser, Subcommand};
 use std::process::Command;
 
 #[derive(Parser, Debug)]

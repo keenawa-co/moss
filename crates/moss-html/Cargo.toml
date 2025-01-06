@@ -12,3 +12,6 @@ moss_text.workspace = true
 
 serde = { workspace = true, features = ["derive", "rc"] }
 ts-rs.workspace = true
+
+[lints]
+workspace = true

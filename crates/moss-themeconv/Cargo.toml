@@ -15,3 +15,6 @@ jsonschema.workspace = true
 [features]
 default = ["json"]
 json = []
+
+[lints]
+workspace = true
