@@ -5,7 +5,6 @@ import { invoke } from "@tauri-apps/api/core";
 // App state
 
 export const getState = async (): Promise<AppState> => {
-  console.log("get app state");
   return await invoke<AppState>("get_state");
 };
 
