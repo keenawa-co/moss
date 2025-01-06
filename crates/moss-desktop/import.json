@@ -1,0 +1,8 @@
+{
+  "bindings/actions.ts": {
+    "@repo/moss-text": {
+      "types": ["LocalizedString"],
+      "is_type_import": true
+    }
+  }
+}
