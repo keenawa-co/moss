@@ -1,6 +1,5 @@
 export * from "../layouts/index";
 export * from "./Menu";
-export * from "./LanguageSelector";
 export * from "../parts/SideBar/Sidebar";
 export * from "./Accordion";
 export * from "../parts/SideBar/SidebarHeader";
