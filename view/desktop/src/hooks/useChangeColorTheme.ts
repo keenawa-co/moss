@@ -15,7 +15,6 @@ export const useChangeColorTheme = () => {
     mutationKey: ["changeColorTheme"],
     mutationFn: changeTheme,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["getColorTheme"] });
       queryClient.invalidateQueries({ queryKey: ["getState"] });
     },
   });

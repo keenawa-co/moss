@@ -14,7 +14,6 @@ export const useChangeLanguagePack = () => {
     mutationKey: ["changeLanguagePack"],
     mutationFn: changeLanguagePack,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["getLanguagePacks"] });
       queryClient.invalidateQueries({ queryKey: ["getState"] });
     },
   });
