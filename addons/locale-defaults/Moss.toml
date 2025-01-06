@@ -1,0 +1,12 @@
+[addon]
+id = "locale-defaults"
+name = "Moss Default Localization"
+categories = ["LanguagePacks"]
+
+[contributes]
+localizations = [
+    {code = "en", name = "English", direction = "ltr"},
+    {code = "de", name = "Deutsche", direction = "ltr"},
+    {code = "ru", name = "Русский", direction = "ltr"},
+
+]

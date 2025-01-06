@@ -1,10 +1,16 @@
-use crate::services::get_home_dir;
+use crate::{
+    app::{service::Service, state::AppState},
+    models::application::LocaleDescriptor,
+};
 use anyhow::{anyhow, Context as _, Result};
+use dashmap::DashSet;
+use dirs::home_dir;
 use moss_cache::{backend::moka::MokaBackend, Cache, CacheError};
 use serde::Deserialize;
 use serde_json::Value;
+use std::any::Any;
 use std::{path::PathBuf, sync::Arc};
-use tauri::AppHandle;
+use tauri::{AppHandle, Manager};
 
 const CK_TRANSLATIONS: &'static str = "translations";
 
@@ -15,18 +21,23 @@ pub struct GetTranslationsOptions {
 }
 
 pub struct LocaleService {
-    app_handle: AppHandle,
     app_cache: Arc<Cache<MokaBackend>>,
+    locales: Arc<DashSet<LocaleDescriptor>>,
 }
 
 impl LocaleService {
-    pub fn new(app_handle: AppHandle, app_cache: Arc<Cache<MokaBackend>>) -> Self {
+    pub fn new(app_handle: &AppHandle) -> Self {
+        let app_state = app_handle.state::<AppState>();
+
         Self {
-            app_handle,
-            app_cache,
+            app_cache: Arc::clone(&app_state.cache),
+            locales: Arc::clone(&app_state.contributions.locales),
         }
     }
 
+    pub fn get_locales(&self) -> &DashSet<LocaleDescriptor> {
+        &self.locales
+    }
     pub async fn get_translations(
         &self,
         language: &str,
@@ -37,7 +48,6 @@ impl LocaleService {
             let content = self
                 .read_translations_from_file(language, namespace)
                 .await?;
-            println!("Cache miss: {} {}", language, namespace);
             let options = if let Some(options) = opts {
                 options
             } else {
@@ -74,7 +84,7 @@ impl LocaleService {
     }
 
     async fn read_translations_from_file(&self, language: &str, namespace: &str) -> Result<Value> {
-        let locales_dir = get_locales_dir().context("Failed to get the locales directory")?;
+        let locales_dir = get_locales_dir()?;
         let full_path = locales_dir.join(language).join(format!("{namespace}.json"));
 
         if !full_path.exists() {
@@ -94,6 +104,22 @@ impl LocaleService {
     }
 }
 
+impl Service for LocaleService {
+    fn name(&self) -> &'static str {
+        std::any::type_name::<Self>()
+    }
+
+    fn dispose(&self) {}
+
+    fn as_any(&self) -> &dyn Any {
+        self
+    }
+}
+
 fn get_locales_dir() -> Result<PathBuf> {
-    Ok(get_home_dir()?.join(".config").join("moss").join("locales"))
+    Ok(home_dir()
+        .ok_or(anyhow!("Couldn't get the home directory"))?
+        .join(".config")
+        .join("moss")
+        .join("locales"))
 }
