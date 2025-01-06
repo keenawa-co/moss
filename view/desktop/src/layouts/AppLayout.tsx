@@ -107,7 +107,6 @@ interface ResizableLayoutProps {
 }
 
 const CenterLayout = ({ ...props }: ResizableLayoutProps) => {
-  console.log("CenterLayout");
   return (
     <Resizable
       key={props.primarySideBarPosition}

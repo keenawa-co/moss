@@ -31,7 +31,6 @@ export const ActionsBar = ({ className, ...props }: HTMLProps<HTMLDivElement>) =
 
         if (res.status === "ok") {
           setActivities(res.data);
-          // console.log(res.data);
         }
       } catch (err) {
         console.error("Failed to get workbench state:", err);
@@ -42,23 +41,6 @@ export const ActionsBar = ({ className, ...props }: HTMLProps<HTMLDivElement>) =
 
   return (
     <div className={cn("flex items-center gap-3", className)} {...props}>
-      <table className="absolute left-0 top-0 bg-storm-800 p-2 text-white opacity-50">
-        <tbody>
-          <tr>
-            <th>primarySideBarPosition</th>
-            <th>{primarySideBarPosition}</th>
-          </tr>
-          <tr>
-            <th>primarySideBar.width</th>
-            <th>{primarySideBar.width}</th>
-          </tr>
-          <tr>
-            <th>secondarySideBar.width</th>
-            <th>{secondarySideBar.width}</th>
-          </tr>
-        </tbody>
-      </table>
-
       <div className="flex items-center">
         <ActionsSubmenu
           visibility="classic"
