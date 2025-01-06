@@ -4,12 +4,12 @@ use std::sync::Arc;
 
 use crate::command::CommandHandler;
 use crate::contribution::Contribution;
-use crate::models::application::ThemeDescriptor;
+use crate::models::application::{LocaleDescriptor, ThemeDescriptor};
 use crate::models::{actions::MenuItem, view::*};
 
-#[derive(Default)]
 pub struct ContributionRegistry {
     pub themes: Arc<DashSet<ThemeDescriptor>>,
+    pub locales: Arc<DashSet<LocaleDescriptor>>,
     pub commands: DashMap<ReadOnlyStr, CommandHandler>,
     pub menus: DashMap<ReadOnlyStr, Vec<MenuItem>>,
     pub tree_view_groups: DashMap<TreeViewGroupLocation, Vec<TreeViewGroup>>,
@@ -20,6 +20,7 @@ impl ContributionRegistry {
     pub fn new() -> Self {
         Self {
             themes: Arc::new(DashSet::new()),
+            locales: Arc::new(DashSet::new()),
             commands: DashMap::new(),
             menus: DashMap::new(),
             tree_view_groups: DashMap::new(),

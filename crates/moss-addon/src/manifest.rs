@@ -24,20 +24,14 @@ pub struct ThemeContribution {
     pub path: PathBuf,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Translation {
-    pub id: String,
-    pub path: PathBuf,
-}
-
+// FIXME: Temporarily changed to match the LocaleDescriptor
+// Until Localization addon pack is fully implemented
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct LocalizationContribution {
     pub code: String,
     pub name: String,
-    pub localized_name: String,
-    pub translations: Vec<Translation>,
+    pub direction: Option<String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
