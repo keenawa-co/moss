@@ -1,5 +1,4 @@
 import { useActivityBarStore } from "@/store/activityBar";
-import { useLayoutStore } from "@/store/layout";
 
 import SidebarHeader from "../parts/SideBar/SidebarHeader";
 import { AccordionsList } from "./AccordionsList";
