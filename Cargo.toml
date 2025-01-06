@@ -20,7 +20,8 @@ members = [
     "crates/moss-theme",
     "crates/moss-cache",
     "crates/moss-addon",
-    "crates/moss-tauri",
+    "crates/moss-tauri", 
+    "crates/moss-configuration",
 ]
 
 [profile.dev]
@@ -57,6 +58,7 @@ moss_cache = { path = "crates/moss-cache" }
 moss_addon = { path = "crates/moss-addon" }
 moss_tauri = { path = "crates/moss-tauri" }
 moss_theme = { path = "crates/moss-theme" }
+moss_configuration = { path = "crates/moss-configuration" }
 
 smallvec = "1.13.2"
 toml = "0.8.19"

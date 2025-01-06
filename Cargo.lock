@@ -2610,6 +2610,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "moss_configuration"
+version = "0.1.0"
+dependencies = [
+ "serde",
+ "serde_json",
+]
+
+[[package]]
 name = "moss_desktop"
 version = "0.1.0"
 dependencies = [
