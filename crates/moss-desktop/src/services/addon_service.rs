@@ -3,6 +3,7 @@ use moss_addon::manifest::{AddonManifest, MANIFEST_FILENAME};
 use std::path::PathBuf;
 use tauri::{AppHandle, Manager};
 
+use crate::models::application::LocaleDescriptor;
 use crate::{
     addon_registry::AddonRegistry,
     app::{service::Service, state::AppStateManager},
@@ -105,6 +106,19 @@ fn parse_addon_dir(app_state: &AppStateManager, addon_dir: PathBuf) -> Result<()
                     };
 
                     app_state.contributions.themes.insert(value);
+                }
+            }
+
+            if let Some(localizations) = addon_manifest.contributes.localizations {
+                for localization_contribution in localizations {
+                    app_state.contributions.locales.insert(LocaleDescriptor {
+                        code: localization_contribution.code,
+                        name: localization_contribution.name,
+                        direction: match localization_contribution.direction {
+                            Some(direction) => Some(direction),
+                            None => None,
+                        },
+                    });
                 }
             }
         }
