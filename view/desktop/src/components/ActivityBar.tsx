@@ -85,7 +85,7 @@ const ActivityBarButton = forwardRef<HTMLDivElement, ActivityBarButtonProps>(
           icon={icon}
           className={cn(
             {
-              "text-[--color-statusBar-background]": active,
+              "text-[--moss-color-statusBar-background]": active,
               "text-[#525252]": !active,
             },
             iconClassName

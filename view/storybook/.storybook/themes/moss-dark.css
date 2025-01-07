@@ -1,12 +1,12 @@
 :root {
-  --color-page-background: rgba(22, 24, 25, 1);
-  --color-primary: rgba(255, 255, 255, 1);
-  --color-sideBar-background: rgba(39, 39, 42, 1);
-  --color-statusBar-background: #0f62fe;
-  --color-toolBar-background: rgba(30, 32, 33, 1);
-  --color-windowControlsLinux-activeBackground: rgba(86, 86, 86, 1);
-  --color-windowControlsLinux-background: rgba(55, 55, 55, 1);
-  --color-windowControlsLinux-hoverBackground: rgba(66, 66, 66, 1);
-  --color-windowControlsLinux-text: rgba(255, 255, 255, 1);
-  --color-windowsCloseButton-background: rgba(196, 43, 28, 1);
+  --moss-color-page-background: rgba(22, 24, 25, 1);
+  --moss-color-primary: rgba(255, 255, 255, 1);
+  --moss-color-sideBar-background: rgba(39, 39, 42, 1);
+  --moss-color-statusBar-background: #0f62fe;
+  --moss-color-toolBar-background: rgba(30, 32, 33, 1);
+  --moss-color-windowControlsLinux-activeBackground: rgba(86, 86, 86, 1);
+  --moss-color-windowControlsLinux-background: rgba(55, 55, 55, 1);
+  --moss-color-windowControlsLinux-hoverBackground: rgba(66, 66, 66, 1);
+  --moss-color-windowControlsLinux-text: rgba(255, 255, 255, 1);
+  --moss-color-windowsCloseButton-background: rgba(196, 43, 28, 1);
 }

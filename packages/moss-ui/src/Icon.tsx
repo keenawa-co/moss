@@ -14,7 +14,7 @@ interface IconProps extends ComponentPropsWithoutRef<"svg"> {
 export const Icon = ({ icon, className, ...props }: IconProps) => {
   if (icon && icons[icon]) {
     const IconTag = icons[icon];
-    return <IconTag className={cn("size-4 flex-shrink-0 text-[var(--color-primary)]", className)} {...props} />;
+    return <IconTag className={cn("size-4 flex-shrink-0 text-[var(--moss-color-primary)]", className)} {...props} />;
   }
 
   return <FailedIcon />;

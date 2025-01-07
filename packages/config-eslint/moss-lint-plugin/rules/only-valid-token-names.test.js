@@ -18,27 +18,27 @@ ruleTester.run("only-valid-token-names", rule, {
   valid: [
     {
       name: "Valid token in selector",
-      code: `<div className="background-[--color-primary]"></div>`,
+      code: `<div className="background-[--moss-color-primary]"></div>`,
     },
     {
       name: "Valid token in selector",
-      code: `<div className="text-[--color-primary]"></div>`,
+      code: `<div className="text-[--moss-color-primary]"></div>`,
     },
     {
       name: "Valid token selector in template string ",
-      code: `<div className={\`background-[--color-primary]\`}></div>`,
+      code: `<div className={\`background-[--moss-color-primary]\`}></div>`,
     },
     {
       name: "Valid token in selector with var()",
-      code: `<div className="background-[var(--color-primary)]"></div>`,
+      code: `<div className="background-[var(--moss-color-primary)]"></div>`,
     },
     {
       name: "Valid token in selector with pseudoclass",
-      code: `<div className="hover:text-[--color-primary]"></div>`,
+      code: `<div className="hover:text-[--moss-color-primary]"></div>`,
     },
     {
       name: "Valid token with group selector",
-      code: `<div className="group-text-[--color-primary]"></div>`,
+      code: `<div className="group-text-[--moss-color-primary]"></div>`,
     },
     {
       name: "Valid tailwind arbitrary values",

@@ -1,9 +1,9 @@
 :root {
-  --color-primary: rgba(255, 255, 255, 1);
-  --color-sidebar-background: rgba(39, 39, 42, 1);
-  --color-toolbar-background: rgba(30, 32, 33, 1);
-  --color-page-background: rgba(22, 24, 25, 1);
-  --color-statusbar-background: linear-gradient(
+  --moss-color-primary: rgba(255, 255, 255, 1);
+  --moss-color-sideBar-background: rgba(39, 39, 42, 1);
+  --moss-color-toolBar-background: rgba(30, 32, 33, 1);
+  --moss-color-page-background: rgba(22, 24, 25, 1);
+  --moss-color-statusBar-background: linear-gradient(
     90deg,
     rgba(255, 0, 0, 1) 0%,
     rgba(224, 0, 41, 1) 16%,

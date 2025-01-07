@@ -58,7 +58,7 @@ const preview: Preview = {
       applyTheme(themeFiles[theme]);
 
       return (
-        <div style={{ backgroundColor: "var(--color-page-background)" }}>
+        <div style={{ backgroundColor: "var(--moss-color-page-background)" }}>
           <Story />
         </div>
       );

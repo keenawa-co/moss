@@ -19,11 +19,11 @@ export const Logs: React.FC = () => {
 
   return (
     <main className="p-4">
-      <h1 className="mb-4 text-2xl text-[var(--color-primary)]">Logs</h1>
+      <h1 className="mb-4 text-2xl text-[var(--moss-color-primary)]">Logs</h1>
       <div className="bg-gray-100 rounded p-4">
         {logs.length > 0 ? (
           logs.map((log, index) => (
-            <p key={index} className="text-[var(--color-primary)]">
+            <p key={index} className="text-[var(--moss-color-primary)]">
               {log}
             </p>
           ))

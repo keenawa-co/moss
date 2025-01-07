@@ -4,7 +4,7 @@ use crate::models::theme::Theme;
 
 use super::{util::convert_colors_to_css_variables, ThemeConverter, Validator};
 
-const COLOR_VARIABLE_PREFIX: &str = "color";
+const COLOR_VARIABLE_PREFIX: &str = "moss-color";
 
 pub struct JsonThemeConverter<V: Validator> {
     validator: V,
@@ -157,8 +157,8 @@ mod tests {
 
         let expected_css = "\
 :root {
-  --color-primary: rgba(0, 0, 0, 1);
-  --color-toolBar-background: linear-gradient(to right, red 0%, orange 18%, yellow 33%, rgba(244, 244, 245, 1) 50%, blue 68%, indigo 83%, violet 100%);
+  --moss-color-primary: rgba(0, 0, 0, 1);
+  --moss-color-toolBar-background: linear-gradient(to right, red 0%, orange 18%, yellow 33%, rgba(244, 244, 245, 1) 50%, blue 68%, indigo 83%, violet 100%);
 }
 ";
 

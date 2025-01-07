@@ -1,9 +1,9 @@
 :root {
-  --color-primary: rgba(0, 0, 0, 1);
-  --color-sidebar-background: rgba(244, 244, 245, 1);
-  --color-toolbar-background: rgba(224, 224, 224, 1);
-  --color-page-background: rgba(255, 255, 255, 1);
-  --color-statusbar-background: rgba(0, 122, 205, 1);
+  --moss-color-primary: rgba(0, 0, 0, 1);
+  --moss-color-sideBar-background: rgba(244, 244, 245, 1);
+  --moss-color-toolBar-background: rgba(224, 224, 224, 1);
+  --moss-color-page-background: rgba(255, 255, 255, 1);
+  --moss-color-statusBar-background: rgba(0, 122, 205, 1);
   --color-windows-close-button-background: rgba(196, 43, 28, 1);
   --color-window-controls-linux-background: rgba(218, 218, 218, 1);
   --color-window-controls-linux-text: rgba(61, 61, 61, 1);

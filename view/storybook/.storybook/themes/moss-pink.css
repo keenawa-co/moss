@@ -1,8 +1,8 @@
 :root {
-  --color-page-background: rgba(227, 54, 245, 1);
-  --color-primary: rgba(0, 0, 0, 1);
-  --color-sideBar-background: rgba(234, 157, 242, 1);
-  --color-statusBar-background: linear-gradient(
+  --moss-color-page-background: rgba(227, 54, 245, 1);
+  --moss-color-primary: rgba(0, 0, 0, 1);
+  --moss-color-sideBar-background: rgba(234, 157, 242, 1);
+  --moss-color-statusBar-background: linear-gradient(
     90deg,
     rgba(255, 0, 0, 1) 0%,
     rgba(224, 0, 41, 1) 16%,
@@ -10,10 +10,10 @@
     rgba(155, 0, 133, 1) 51%,
     rgba(63, 0, 255, 1) 100%
   );
-  --color-toolBar-background: rgba(222, 125, 232, 1);
-  --color-windowControlsLinux-activeBackground: rgba(191, 191, 191, 1);
-  --color-windowControlsLinux-background: rgba(218, 218, 218, 1);
-  --color-windowControlsLinux-hoverBackground: rgba(209, 209, 209, 1);
-  --color-windowControlsLinux-text: rgba(61, 61, 61, 1);
-  --color-windowsCloseButton-background: rgba(196, 43, 28, 1);
+  --moss-color-toolBar-background: rgba(222, 125, 232, 1);
+  --moss-color-windowControlsLinux-activeBackground: rgba(191, 191, 191, 1);
+  --moss-color-windowControlsLinux-background: rgba(218, 218, 218, 1);
+  --moss-color-windowControlsLinux-hoverBackground: rgba(209, 209, 209, 1);
+  --moss-color-windowControlsLinux-text: rgba(61, 61, 61, 1);
+  --moss-color-windowsCloseButton-background: rgba(196, 43, 28, 1);
 }
