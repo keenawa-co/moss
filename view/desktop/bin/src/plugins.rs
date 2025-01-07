@@ -1,3 +1,4 @@
+#[cfg(target_os = "macos")]
 pub mod mac_window;
 
 use tauri::plugin::TauriPlugin;
@@ -30,11 +31,11 @@ pub mod plugin_log {
     fn is_dev() -> bool {
         #[cfg(dev)]
         {
-            return true;
+            true
         }
         #[cfg(not(dev))]
         {
-            return false;
+            false
         }
     }
 }

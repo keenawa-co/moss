@@ -39,3 +39,6 @@ smallvec.workspace = true
 toml.workspace = true
 derive_more = { workspace = true, features = ["full"] }
 tracing.workspace = true
+
+[lints]
+workspace = true

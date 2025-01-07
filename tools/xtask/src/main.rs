@@ -36,6 +36,7 @@ struct Args {
     fail_fast: bool,
 }
 
+#[allow(clippy::upper_case_acronyms)]
 #[derive(clap::ValueEnum, Clone)]
 enum InfoLevel {
     TRACE,
@@ -86,7 +87,7 @@ async fn main() -> Result<()> {
             runner.run().await
         }
         CliCommand::Rwa(args) => {
-            runner.spawn_job(tasks::rust_workspace_audit::check_dependencies_job(
+            runner.spawn_job(tasks::rust_workspace_audit::run_workspace_audit(
                 args, metadata, fail_fast,
             ));
             runner.run().await

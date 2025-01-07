@@ -1,10 +1,13 @@
 use strum::{AsRefStr as StrumAsRefStr, Display as StrumDisplay, EnumString as StrumEnumString};
 use tauri::{
-    menu::{Menu, MenuEvent, PredefinedMenuItem},
+    menu::{Menu, MenuEvent},
     AppHandle, Manager, Window, Wry,
 };
 
 use crate::create_child_window;
+
+#[cfg(target_os = "macos")]
+use tauri::menu::PredefinedMenuItem;
 
 #[derive(Debug, StrumEnumString, StrumDisplay, StrumAsRefStr)]
 pub enum BuiltInMenuEvent {
@@ -14,6 +17,7 @@ pub enum BuiltInMenuEvent {
     CloseWindow,
 }
 
+#[allow(clippy::single_match)]
 pub fn handle_event(_window: &Window, event: &MenuEvent) {
     let event_id = event.id().0.as_str();
     let app_handle = _window.app_handle().clone();
@@ -31,12 +35,12 @@ fn handle_new_window(app_handle: tauri::AppHandle) {
             }
             Err(err) => {
                 eprintln!("Failed to open a new window: {}", err);
-                return;
             }
         }
     });
 }
 
+#[allow(dead_code)]
 pub fn app_menu(app_handle: &AppHandle) -> tauri::Result<Menu<Wry>> {
     #[cfg(not(target_os = "macos"))]
     {

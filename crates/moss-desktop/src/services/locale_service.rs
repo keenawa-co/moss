@@ -6,13 +6,12 @@ use anyhow::{anyhow, Context as _, Result};
 use dashmap::DashSet;
 use dirs::home_dir;
 use moss_cache::{backend::moka::MokaBackend, Cache, CacheError};
-use serde::Deserialize;
 use serde_json::Value;
 use std::any::Any;
 use std::{path::PathBuf, sync::Arc};
 use tauri::{AppHandle, Manager};
 
-const CK_TRANSLATIONS: &'static str = "translations";
+const CK_TRANSLATIONS: &str = "translations";
 
 #[derive(Clone)]
 struct LocaleCacheEntry {

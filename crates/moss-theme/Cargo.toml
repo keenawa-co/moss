@@ -14,3 +14,7 @@ once_cell.workspace = true
 ts-rs = { workspace = true, features = ["indexmap-impl", "serde-json-impl"] }
 indexmap = { workspace = true, features = ["serde"] }
 jsonschema.workspace = true
+
+
+[lints]
+workspace = true

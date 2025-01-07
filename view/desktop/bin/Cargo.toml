@@ -60,3 +60,6 @@ mimalloc = { version = "0.1.39", default-features = false }
 objc = "0.2.7"
 cocoa = "0.26.0"
 macos-trampoline = { path = "./lib/macos" }
+
+[lints]
+workspace = true

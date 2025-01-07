@@ -1,4 +1,5 @@
 use moss_text::localized_string::LocalizedString;
+use std::fmt::Display;
 
 /// Represents an HTML link (`<a>`) with attributes commonly used in web development.
 #[derive(Debug, Serialize, Clone, TS)]
@@ -75,14 +76,18 @@ pub enum Target {
     Top,
 }
 
-impl ToString for Target {
-    fn to_string(&self) -> String {
-        match self {
-            Target::SelfTarget => "_self".to_string(),
-            Target::Blank => "_blank".to_string(),
-            Target::Parent => "_parent".to_string(),
-            Target::Top => "_top".to_string(),
-        }
+impl Display for Target {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            match self {
+                Target::SelfTarget => "_self".to_string(),
+                Target::Blank => "_blank".to_string(),
+                Target::Parent => "_parent".to_string(),
+                Target::Top => "_top".to_string(),
+            }
+        )
     }
 }
 
@@ -105,12 +110,16 @@ pub enum Rel {
     NoFollow,
 }
 
-impl ToString for Rel {
-    fn to_string(&self) -> String {
-        match self {
-            Rel::Noopener => "noopener".to_string(),
-            Rel::Noreferrer => "noreferrer".to_string(),
-            Rel::NoFollow => "nofollow".to_string(),
-        }
+impl Display for Rel {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            match self {
+                Rel::Noopener => "noopener".to_string(),
+                Rel::Noreferrer => "noreferrer".to_string(),
+                Rel::NoFollow => "nofollow".to_string(),
+            }
+        )
     }
 }

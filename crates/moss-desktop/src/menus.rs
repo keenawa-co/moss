@@ -10,6 +10,6 @@ pub struct Menus {
 impl Menus {
     // TODO: rename to insert
     pub fn append_menu_item(&mut self, key: ReadOnlyStr, item: MenuItem) {
-        self.state.entry(key).or_insert_with(Vec::new).push(item);
+        self.state.entry(key).or_default().push(item);
     }
 }

@@ -3,14 +3,12 @@ mod constants;
 mod mem;
 mod menu;
 mod plugins;
-mod utl;
 mod window;
 
 use anyhow::Result;
 use rand::random;
 use tauri::{AppHandle, Manager, RunEvent, WebviewWindow, WindowEvent};
 use tauri_plugin_global_shortcut::{Code, GlobalShortcutExt, Modifiers, Shortcut, ShortcutState};
-use tauri_plugin_os;
 use tracing::level_filters::LevelFilter;
 use tracing_subscriber::fmt::format::FmtSpan;
 use tracing_subscriber::layer::SubscriberExt;
@@ -35,6 +33,7 @@ use moss_desktop::services::locale_service::LocaleService;
 #[macro_use]
 extern crate tracing;
 
+#[allow(unused_variables)]
 pub fn run() {
     #[allow(unused_mut)]
     let mut builder = tauri::Builder::default()
@@ -91,14 +90,8 @@ pub fn run() {
                     InstantiationType::Instant,
                 )
                 .with_service(|_| WindowService::new(), InstantiationType::Delayed)
-                .with_service(
-                    |app_handle| ThemeService::new(app_handle),
-                    InstantiationType::Delayed,
-                )
-                .with_service(
-                    |app_handle| LocaleService::new(app_handle),
-                    InstantiationType::Delayed,
-                );
+                .with_service(ThemeService::new, InstantiationType::Delayed)
+                .with_service(LocaleService::new, InstantiationType::Delayed);
             app_handle.manage(app_manager);
 
             let ctrl_n_shortcut = Shortcut::new(Some(Modifiers::CONTROL), Code::KeyN);
@@ -151,7 +144,7 @@ pub fn run() {
         .expect("failed to run")
         .run(|app_handle, event| match event {
             RunEvent::Ready => {
-                let webview_window = create_main_window(&app_handle, "/");
+                let webview_window = create_main_window(app_handle, "/");
                 webview_window
                     .on_menu_event(move |window, event| menu::handle_event(window, &event));
             }

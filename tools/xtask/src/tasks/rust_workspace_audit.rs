@@ -15,7 +15,7 @@ pub struct RustWorkspaceAuditCommandArgs {
     config_file_path: String,
 }
 
-pub async fn check_dependencies_job(
+pub async fn run_workspace_audit(
     args: RustWorkspaceAuditCommandArgs,
     metadata: Metadata,
     fail_fast: bool,
@@ -43,7 +43,7 @@ pub async fn check_dependencies_job(
                     }
                 };
 
-                let cargo_toml = match toml::from_str(&cargo_toml_content) {
+                let cargo_toml: Value = match toml::from_str(&cargo_toml_content) {
                     Ok(value) => value,
                     Err(e) => {
                         return Err(anyhow!(
@@ -54,10 +54,12 @@ pub async fn check_dependencies_job(
                     }
                 };
 
+                handle_lints_config(&cargo_toml, &package).await?;
+
                 match handle_package_dependencies(
-                    cargo_toml,
+                    &cargo_toml,
                     &config_file_clone.rust_workspace_audit,
-                    package,
+                    &package,
                 )
                 .await
                 {
@@ -71,14 +73,14 @@ pub async fn check_dependencies_job(
     while let Some(result) = task_set.join_next().await {
         match result {
             Ok(Ok(())) => {}
-            Ok(Err(e)) => {
+            Ok(Err(_)) => {
                 failure_count += 1;
                 if fail_fast {
                     task_set.abort_all();
                     return Err(anyhow!("Failing Fast"));
                 }
             }
-            Err(e) => {
+            Err(_) => {
                 failure_count += 1;
                 if fail_fast {
                     task_set.abort_all();
@@ -95,19 +97,38 @@ pub async fn check_dependencies_job(
     }
 }
 
+async fn handle_lints_config(cargo_toml: &Value, package: &Package) -> Result<()> {
+    let has_clippy_lints = cargo_toml
+        .get("lints")
+        .and_then(Value::as_table)
+        .and_then(|t| t.get("workspace"))
+        .and_then(Value::as_bool)
+        .unwrap_or(false);
+
+    if has_clippy_lints {
+        Ok(())
+    } else {
+        error!("crate '{}' does not have workspace lints", package.name);
+        Err(anyhow!(
+            "crate '{}' does not have workspace lints",
+            package.name
+        ))
+    }
+}
+
 async fn handle_package_dependencies(
-    cargo_toml: Value,
+    cargo_toml: &Value,
     rwa_config: &RustWorkspaceAuditConfig,
-    package: Package,
+    package: &Package,
 ) -> Result<()> {
     if let Some(dependencies) = cargo_toml.get("dependencies").and_then(|d| d.as_table()) {
         for (dep_name, dep_value) in dependencies {
-            if rwa_config.global_ignore.contains(&dep_name) {
+            if rwa_config.global_ignore.contains(dep_name) {
                 trace!("ignoring {} dependency in '{}'", dep_name, package.name);
                 continue;
             }
             if let Some(ignored_list) = rwa_config.crate_ignore.get(&package.name) {
-                if ignored_list.contains(&dep_name) {
+                if ignored_list.contains(dep_name) {
                     trace!("ignoring {} dependency in '{}'", dep_name, package.name);
                     continue;
                 }

@@ -7,3 +7,6 @@ edition = "2021"
 clap.workspace = true
 tokio = {workspace = true, features = ["rt-multi-thread", "macros"]}
 os_info.workspace = true
+
+[lints]
+workspace = true

@@ -287,10 +287,8 @@ impl CheckedRule {
         let other_type = other.get_type();
         if self_type == other_type {
             true
-        } else if self_type == ResultType::Variable || other_type == ResultType::Variable {
-            true
         } else {
-            false
+            self_type == ResultType::Variable || other_type == ResultType::Variable
         }
     }
 

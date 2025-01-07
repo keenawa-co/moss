@@ -10,9 +10,11 @@ pub const MIN_WINDOW_HEIGHT: f64 = 600.0;
 pub const DEFAULT_WINDOW_WIDTH: f64 = 1160.0;
 pub const DEFAULT_WINDOW_HEIGHT: f64 = 720.0;
 
+#[allow(clippy::declare_interior_mutable_const)]
 pub const RUNTIME_MAX_BLOCKING_THREADS: Lazy<usize> =
     lazy_env_parse!("MOSS_RUNTIME_MAX_BLOCKING_THREADS", usize, 512);
 
+#[allow(clippy::declare_interior_mutable_const)]
 pub const RUNTIME_STACK_SIZE: Lazy<usize> =
     lazy_env_parse_or_else!("MOSS_RUNTIME_STACK_SIZE", usize, |_| {
         // In debug mode, stack frames tend to be larger.

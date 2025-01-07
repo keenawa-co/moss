@@ -54,7 +54,7 @@ async fn handle_package_license(
     package: Package,
     default_license: PathBuf,
     workspace_root: PathBuf,
-    license_files: &Vec<String>,
+    license_files: &[String],
 ) -> Result<()> {
     let crate_path = package
         .manifest_path
@@ -85,14 +85,14 @@ async fn handle_package_license(
         let new_symlink_path = crate_path.join(&license_files[0]);
         let default_license_path = pathdiff::diff_paths(default_license, crate_path)
             .ok_or_else(|| anyhow!("failed to create relative path for default license"))?;
-        create_symlink(&default_license_path, &new_symlink_path.as_std_path()).await?;
+        create_symlink(&default_license_path, new_symlink_path.as_std_path()).await?;
     }
 
     Ok(())
 }
 async fn handle_update_symlink(
-    symlink_path: &PathBuf,
-    root_license_path: &PathBuf,
+    symlink_path: &Path,
+    root_license_path: &Path,
 ) -> Result<(), anyhow::Error> {
     fs::remove_file(symlink_path).await?;
     create_symlink(root_license_path, symlink_path).await?;
@@ -101,7 +101,7 @@ async fn handle_update_symlink(
 
 async fn get_first_license_symlink_path(
     crate_path: impl AsRef<Path>,
-    license_files: &Vec<String>,
+    license_files: &[String],
 ) -> Option<(PathBuf, usize)> {
     let crate_path = crate_path.as_ref();
     for (index, license_file) in license_files.iter().enumerate() {

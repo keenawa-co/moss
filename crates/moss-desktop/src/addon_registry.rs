@@ -28,6 +28,7 @@ pub struct AddonDescription {
 #[derive(Debug, Clone, Eq, Hash, PartialEq)]
 pub struct AddonId(ReadOnlyStr);
 
+#[allow(dead_code)]
 pub struct AddonRegistry {
     addons: RwLock<HashMap<AddonId, AddonDescription>>,
     activation_queue: RwLock<FnvHashMap<ActivationEvent, Vec<AddonId>>>,

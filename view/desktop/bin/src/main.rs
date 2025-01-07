@@ -1,5 +1,6 @@
 use desktop_app_lib::{RUNTIME_MAX_BLOCKING_THREADS, RUNTIME_STACK_SIZE};
 
+#[allow(clippy::borrow_interior_mutable_const)]
 fn main() {
     tokio::runtime::Builder::new_multi_thread()
         .enable_all()
