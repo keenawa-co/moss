@@ -30,6 +30,7 @@ use moss_desktop::{
 use crate::commands::*;
 use crate::plugins::*;
 pub use constants::*;
+use moss_desktop::services::locale_service::LocaleService;
 
 #[macro_use]
 extern crate tracing;
@@ -90,7 +91,14 @@ pub fn run() {
                     InstantiationType::Instant,
                 )
                 .with_service(|_| WindowService::new(), InstantiationType::Delayed)
-                .with_service(ThemeService::new, InstantiationType::Delayed);
+                .with_service(
+                    |app_handle| ThemeService::new(app_handle),
+                    InstantiationType::Delayed,
+                )
+                .with_service(
+                    |app_handle| LocaleService::new(app_handle),
+                    InstantiationType::Delayed,
+                );
             app_handle.manage(app_manager);
 
             let ctrl_n_shortcut = Shortcut::new(Some(Modifiers::CONTROL), Code::KeyN);

@@ -1,35 +1,20 @@
-import { ReactNode, useCallback, useEffect } from "react";
+import { ReactNode, useEffect } from "react";
 
-import { useGetColorThemes } from "@/hooks/useGetColorThemes";
-import { useThemeStore } from "@/store/theme";
+import { applyTheme } from "@/utils/applyTheme";
 import { ThemeDescriptor } from "@repo/moss-desktop";
+import { useQueryClient } from "@tanstack/react-query";
 import { listen, UnlistenFn } from "@tauri-apps/api/event";
 
-interface ThemeProviderProps {
-  children: ReactNode;
-}
-
-const ThemeProvider = ({ children }: ThemeProviderProps) => {
-  const { data: newThemes } = useGetColorThemes();
-  const { setThemes, setCurrentTheme } = useThemeStore();
-
-  useEffect(() => {
-    if (newThemes) {
-      setThemes(newThemes);
-    }
-  }, [newThemes, setThemes]);
-
-  const handleColorThemeChanged = useCallback(
-    (event: { payload: ThemeDescriptor }) => {
-      const { payload: newThemeDescriptor } = event;
-
-      setCurrentTheme(newThemeDescriptor);
-    },
-    [setCurrentTheme]
-  );
+const ThemeProvider = ({ children }: { children: ReactNode }) => {
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     let unlisten: UnlistenFn | undefined;
+
+    const handleColorThemeChanged = (event: { payload: ThemeDescriptor }) => {
+      applyTheme(event.payload);
+      queryClient.invalidateQueries({ queryKey: ["getState"] });
+    };
 
     const setupListener = async () => {
       try {
@@ -46,7 +31,7 @@ const ThemeProvider = ({ children }: ThemeProviderProps) => {
         unlisten();
       }
     };
-  }, [handleColorThemeChanged]);
+  }, [queryClient]);
 
   return <>{children}</>;
 };

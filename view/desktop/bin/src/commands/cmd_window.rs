@@ -4,7 +4,7 @@ use moss_desktop::{
     app::manager::AppManager,
     command::CommandContext,
     models::application::{AppState, Defaults, LocaleDescriptor, Preferences, ThemeDescriptor},
-    services::theme_service::ThemeService,
+    services::{locale_service::LocaleService, theme_service::ThemeService},
 };
 use moss_tauri::TauriResult;
 use moss_text::{quote, ReadOnlyStr};
@@ -52,6 +52,19 @@ pub async fn get_color_theme(
 }
 
 #[tauri::command(async)]
+#[instrument(level = "trace", skip(app_manager))]
+pub async fn get_translations(
+    app_manager: State<'_, AppManager>,
+    language: String,
+    namespace: String,
+) -> TauriResult<Value> {
+    let locale_service = app_manager.service::<LocaleService>()?;
+    Ok(locale_service
+        .get_translations(&language, &namespace)
+        .await?)
+}
+
+#[tauri::command(async)]
 #[instrument(level = "trace", skip(state_manager))]
 pub fn get_state(state_manager: State<'_, AppStateManager>) -> Result<AppState, String> {
     Ok(AppState {
@@ -78,48 +91,33 @@ pub async fn get_themes(app_manager: State<'_, AppManager>) -> TauriResult<Vec<T
         .collect())
 }
 
-// FIXME: This is a temporary solution until we have a registry of installed
-// plugins and the ability to check which language packs are installed.
-#[tauri::command]
-#[instrument(level = "trace")]
-pub fn get_locales() -> Vec<LocaleDescriptor> {
-    vec![
-        LocaleDescriptor {
-            code: "en".to_string(),
-            name: "English".to_string(),
-            direction: Some("ltr".to_string()),
-        },
-        LocaleDescriptor {
-            code: "de".to_string(),
-            name: "Deutsche".to_string(),
-            direction: Some("ltr".to_string()),
-        },
-        LocaleDescriptor {
-            code: "ru".to_string(),
-            name: "Русский".to_string(),
-            direction: Some("ltr".to_string()),
-        },
-    ]
+#[tauri::command(async)]
+#[instrument(level = "trace", skip(app_manager))]
+pub async fn get_locales(app_manager: State<'_, AppManager>) -> TauriResult<Vec<LocaleDescriptor>> {
+    let locale_service = app_manager.service::<LocaleService>()?;
+
+    Ok(locale_service.get_locales().clone().into_iter().collect())
 }
 
-#[tauri::command]
-#[instrument(level = "trace")]
-pub fn get_translations(language: String, namespace: String) -> Result<serde_json::Value, String> {
-    let path = crate::utl::get_home_dir()
-        .map_err(|err| err.to_string())?
-        .join(".config")
-        .join("moss")
-        .join("locales")
-        .join(language)
-        .join(format!("{namespace}.json"));
-
-    match std::fs::read_to_string(path) {
-        Ok(data) => {
-            let translations: serde_json::Value =
-                serde_json::from_str(&data).map_err(|err| err.to_string())?;
-
-            Ok(translations)
-        }
-        Err(err) => Err(err.to_string()),
-    }
-}
+// // FIXME: This is a temporary solution until we have a registry of installed
+// // plugins and the ability to check which language packs are installed.
+// #[tauri::command]
+// pub fn get_locales() -> Vec<LocaleDescriptor> {
+//     vec![
+//         LocaleDescriptor {
+//             code: "en".to_string(),
+//             name: "English".to_string(),
+//             direction: Some("ltr".to_string()),
+//         },
+//         LocaleDescriptor {
+//             code: "de".to_string(),
+//             name: "Deutsche".to_string(),
+//             direction: Some("ltr".to_string()),
+//         },
+//         LocaleDescriptor {
+//             code: "ru".to_string(),
+//             name: "Русский".to_string(),
+//             direction: Some("ltr".to_string()),
+//         },
+//     ]
+// }
