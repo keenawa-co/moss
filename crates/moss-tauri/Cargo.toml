@@ -7,3 +7,6 @@ edition = "2021"
 anyhow.workspace = true
 tauri.workspace = true
 serde.workspace = true
+
+[lints]
+workspace = true

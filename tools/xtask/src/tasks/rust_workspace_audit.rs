@@ -1,6 +1,7 @@
 use anyhow::Result;
 use cargo_metadata::{Metadata, Package};
 use clap::Parser;
+use futures::future::err;
 use smol::fs;
 use std::sync::Arc;
 use tokio::task::JoinSet;
@@ -15,7 +16,7 @@ pub struct RustWorkspaceAuditCommandArgs {
     config_file_path: String,
 }
 
-pub async fn check_dependencies_job(
+pub async fn run_workspace_audit(
     args: RustWorkspaceAuditCommandArgs,
     metadata: Metadata,
     fail_fast: bool,
@@ -43,7 +44,7 @@ pub async fn check_dependencies_job(
                     }
                 };
 
-                let cargo_toml = match toml::from_str(&cargo_toml_content) {
+                let cargo_toml: Value = match toml::from_str(&cargo_toml_content) {
                     Ok(value) => value,
                     Err(e) => {
                         return Err(anyhow!(
@@ -54,10 +55,12 @@ pub async fn check_dependencies_job(
                     }
                 };
 
+                handle_lints_config(&cargo_toml, &package).await?;
+
                 match handle_package_dependencies(
-                    cargo_toml,
+                    &cargo_toml,
                     &config_file_clone.rust_workspace_audit,
-                    package,
+                    &package,
                 )
                 .await
                 {
@@ -95,10 +98,29 @@ pub async fn check_dependencies_job(
     }
 }
 
+async fn handle_lints_config(cargo_toml: &Value, package: &Package) -> Result<()> {
+    let has_clippy_lints = cargo_toml
+        .get("lints")
+        .and_then(Value::as_table)
+        .and_then(|t| t.get("workspace"))
+        .and_then(Value::as_bool)
+        .unwrap_or(false);
+
+    if has_clippy_lints {
+        Ok(())
+    } else {
+        error!("crate '{}' does not have workspace lints", package.name);
+        Err(anyhow!(
+            "crate '{}' does not have workspace lints",
+            package.name
+        ))
+    }
+}
+
 async fn handle_package_dependencies(
-    cargo_toml: Value,
+    cargo_toml: &Value,
     rwa_config: &RustWorkspaceAuditConfig,
-    package: Package,
+    package: &Package,
 ) -> Result<()> {
     if let Some(dependencies) = cargo_toml.get("dependencies").and_then(|d| d.as_table()) {
         for (dep_name, dep_value) in dependencies {
