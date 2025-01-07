@@ -3,7 +3,7 @@ import themeInterface from "../test.json" with { type: "json" };
 
 const colorKeysToCssValues = (colors) => {
   const keys = Object.keys(colors);
-  return keys.map((color) => "--color-" + color.replaceAll(".", "-"));
+  return keys.map((color) => "--moss-color-" + color.replaceAll(".", "-"));
 };
 
 const VALID_TOKENS = new Set(colorKeysToCssValues(themeInterface.colors));
