@@ -115,6 +115,9 @@ jobs:
         with:
           workspaces: ".github/cache"
 
+      - name: Install Clippy
+        run: rustup component add clippy
+
       - name: Cargo Clippy
         run: cargo clippy -- -D warnings
 
