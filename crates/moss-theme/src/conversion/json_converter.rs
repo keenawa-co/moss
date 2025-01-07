@@ -205,7 +205,7 @@ mod tests {
 
         let expected_css = "\
 :root {
-  --color-background-gradient: linear-gradient(to right, green 0%, blue 100%);
+  --moss-color-background-gradient: linear-gradient(to right, green 0%, blue 100%);
 }
 ";
 
@@ -243,7 +243,7 @@ mod tests {
 
         let expected_css = "\
 :root {
-  --color-sidebar-text: rgba(200, 200, 200, 1);
+  --moss-color-sidebar-text: rgba(200, 200, 200, 1);
 }
 ";
 
