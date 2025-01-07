@@ -115,6 +115,9 @@ jobs:
         with:
           workspaces: ".github/cache"
 
+      - name: Cargo Clippy
+        run: cargo clippy -- -D warnings
+
       - name: Docs Test
         run: cargo -q test --doc
 
