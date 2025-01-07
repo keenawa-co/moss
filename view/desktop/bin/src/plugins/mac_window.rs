@@ -27,7 +27,6 @@ struct UnsafeWindowHandle(*mut std::ffi::c_void);
 unsafe impl Send for UnsafeWindowHandle {}
 unsafe impl Sync for UnsafeWindowHandle {}
 
-#[cfg(target_os = "macos")]
 pub fn init() -> TauriPlugin<Wry> {
     Builder::new("mac_window")
         .on_window_ready(|window| {
@@ -46,7 +45,6 @@ pub fn init() -> TauriPlugin<Wry> {
         .build()
 }
 
-#[cfg(target_os = "macos")]
 fn position_traffic_lights(ns_window_handle: UnsafeWindowHandle, x: f64, y: f64, label: String) {
     use objc::{msg_send, sel, sel_impl};
 
@@ -86,13 +84,11 @@ fn position_traffic_lights(ns_window_handle: UnsafeWindowHandle, x: f64, y: f64,
     }
 }
 
-#[cfg(target_os = "macos")]
 #[derive(Debug)]
 struct WindowState<R: Runtime> {
     window: Window<R>,
 }
 
-#[cfg(target_os = "macos")]
 pub fn setup_traffic_light_positioner<R: Runtime>(window: &Window<R>) {
     use cocoa::{
         appkit::NSWindow,

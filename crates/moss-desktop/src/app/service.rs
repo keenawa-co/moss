@@ -44,7 +44,7 @@ where
 }
 
 #[repr(u8)]
-#[derive(Debug, Eq, Hash, PartialEq)]
+#[derive(Copy, Clone, Debug, Eq, Hash, PartialEq)]
 enum ServiceInstantiationMode {
     Pending = 0,
     Active = 1,
@@ -53,14 +53,18 @@ enum ServiceInstantiationMode {
 impl From<u8> for ServiceInstantiationMode {
     #[inline]
     fn from(value: u8) -> ServiceInstantiationMode {
-        unsafe { std::mem::transmute(value) }
+        match value {
+            0 => ServiceInstantiationMode::Pending,
+            1 => ServiceInstantiationMode::Active,
+            _ => unreachable!(),
+        }
     }
 }
 
 impl ServiceInstantiationMode {
     #[inline]
-    fn as_u8(self) -> u8 {
-        self as u8
+    fn as_u8(&self) -> u8 {
+        *self as u8
     }
 }
 
@@ -74,6 +78,7 @@ impl From<InstantiationType> for ServiceInstantiationMode {
     }
 }
 
+#[allow(clippy::from_over_into)]
 impl Into<AtomicU8> for ServiceInstantiationMode {
     #[inline]
     fn into(self) -> AtomicU8 {
@@ -98,20 +103,13 @@ impl ServiceMetadata {
     }
 }
 
+type ServiceCreator = dyn FnOnce(&AppHandle) -> Arc<dyn Service>;
+
+#[derive(Default)]
 struct ServiceCollectionState {
     services: FnvHashMap<TypeId, Arc<dyn Service>>,
-    pending_services: FnvHashMap<TypeId, Box<dyn FnOnce(&AppHandle) -> Arc<dyn Service>>>,
+    pending_services: FnvHashMap<TypeId, Box<ServiceCreator>>,
     known_services: FnvHashMap<TypeId, Arc<ServiceMetadata>>,
-}
-
-impl Default for ServiceCollectionState {
-    fn default() -> Self {
-        Self {
-            services: Default::default(),
-            pending_services: Default::default(),
-            known_services: Default::default(),
-        }
-    }
 }
 
 pub struct ServiceCollection {
@@ -140,15 +138,13 @@ impl ServiceCollection {
             InstantiationType::Instant => {
                 let service = creation_fn(&self.app_handle);
 
-                state_lock
-                    .services
-                    .insert(type_id.clone(), Arc::new(service));
+                state_lock.services.insert(type_id, Arc::new(service));
 
                 debug!("Service {service_name} was activated");
             }
             InstantiationType::Delayed => {
                 state_lock.pending_services.insert(
-                    type_id.clone(),
+                    type_id,
                     Box::new(move |app_handle| {
                         let service = creation_fn(app_handle);
 

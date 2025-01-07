@@ -10,6 +10,7 @@ use crate::{
     models::application::ThemeDescriptor,
 };
 
+#[allow(dead_code)]
 pub struct AddonService {
     addon_registry: AddonRegistry,
 }
@@ -20,7 +21,7 @@ impl AddonService {
         builtin_addons_location: PathBuf,
         _installed_addons_location: PathBuf,
     ) -> Self {
-        let mut read_dir = std::fs::read_dir(&builtin_addons_location).unwrap_or_else(|err| {
+        let read_dir = std::fs::read_dir(&builtin_addons_location).unwrap_or_else(|err| {
             panic!(
                 "Failed to read the directory {:?} containing built-in addons: {err}",
                 &builtin_addons_location
@@ -28,7 +29,7 @@ impl AddonService {
         });
 
         let app_state = app_handle.state::<AppStateManager>();
-        while let Some(entry) = read_dir.next() {
+        for entry in read_dir {
             let Ok(entry) = entry else {
                 warn!(
                     "Failed to read an entry in the directory for built-in addons: {:?}",
@@ -69,7 +70,7 @@ impl Service for AddonService {
 
 // OPTIMIZE: This should probably be moved in the future to a separate entity responsible for loading add-ons.
 fn parse_addon_dir(app_state: &AppStateManager, addon_dir: PathBuf) -> Result<()> {
-    let mut read_dir = std::fs::read_dir(&addon_dir)
+    let read_dir = std::fs::read_dir(&addon_dir)
         .map_err(|err| anyhow!("Failed to read the directory {:?}: {}", addon_dir, err))?;
 
     for entry_result in read_dir {
@@ -114,10 +115,7 @@ fn parse_addon_dir(app_state: &AppStateManager, addon_dir: PathBuf) -> Result<()
                     app_state.contributions.locales.insert(LocaleDescriptor {
                         code: localization_contribution.code,
                         name: localization_contribution.name,
-                        direction: match localization_contribution.direction {
-                            Some(direction) => Some(direction),
-                            None => None,
-                        },
+                        direction: localization_contribution.direction,
                     });
                 }
             }

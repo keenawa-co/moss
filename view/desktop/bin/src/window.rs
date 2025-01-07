@@ -1,6 +1,9 @@
 use tauri::{AppHandle, WebviewUrl, WebviewWindow};
 
-use crate::{menu, MIN_WINDOW_HEIGHT, MIN_WINDOW_WIDTH};
+use crate::{MIN_WINDOW_HEIGHT, MIN_WINDOW_WIDTH};
+
+#[cfg(target_os = "macos")]
+use crate::menu;
 
 #[derive(Debug)]
 pub struct CreateWindowInput<'a> {
