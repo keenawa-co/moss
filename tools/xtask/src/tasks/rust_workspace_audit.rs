@@ -1,7 +1,6 @@
 use anyhow::Result;
 use cargo_metadata::{Metadata, Package};
 use clap::Parser;
-use futures::future::err;
 use smol::fs;
 use std::sync::Arc;
 use tokio::task::JoinSet;

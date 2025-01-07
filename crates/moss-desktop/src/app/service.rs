@@ -53,11 +53,7 @@ enum ServiceInstantiationMode {
 impl From<u8> for ServiceInstantiationMode {
     #[inline]
     fn from(value: u8) -> ServiceInstantiationMode {
-        match value {
-            0 => ServiceInstantiationMode::Pending,
-            1 => ServiceInstantiationMode::Active,
-            _ => unreachable!(),
-        }
+        unsafe { std::mem::transmute(value) }
     }
 }
 
@@ -103,12 +99,11 @@ impl ServiceMetadata {
     }
 }
 
-type ServiceCreator = dyn FnOnce(&AppHandle) -> Arc<dyn Service>;
-
+#[allow(clippy::type_complexity)]
 #[derive(Default)]
 struct ServiceCollectionState {
     services: FnvHashMap<TypeId, Arc<dyn Service>>,
-    pending_services: FnvHashMap<TypeId, Box<ServiceCreator>>,
+    pending_services: FnvHashMap<TypeId, Box<dyn FnOnce(&AppHandle) -> Arc<dyn Service>>>,
     known_services: FnvHashMap<TypeId, Arc<ServiceMetadata>>,
 }
 
