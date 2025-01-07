@@ -14,6 +14,7 @@ pub struct CreateWindowInput<'a> {
     pub position: (f64, f64),
 }
 
+#[allow(unused_mut)]
 #[instrument(level = "debug", skip(app_handle))]
 pub fn create_window(app_handle: &AppHandle, input: CreateWindowInput<'_>) -> WebviewWindow {
     #[cfg(target_os = "macos")]
