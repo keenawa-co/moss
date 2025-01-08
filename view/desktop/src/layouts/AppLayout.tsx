@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 
-import { AppLayoutState, useGetAppLayoutState } from "@/hooks/useAppLayoutState";
+import { AppLayoutState, useChangeAppLayoutState, useGetAppLayoutState } from "@/hooks/useAppLayoutState";
 import { Home, Logs, Settings } from "@/pages";
 
 import { LaunchPad } from "../components/LaunchPad";
@@ -11,20 +11,21 @@ import { ContentLayout } from "./ContentLayout";
 
 export const AppLayout = () => {
   const { data: layout } = useGetAppLayoutState();
+  const { mutate: changeAppLayoutState } = useChangeAppLayoutState();
 
   if (!layout) return null;
 
   if (layout.alignment === "center") {
-    return <CenterLayout layout={layout} />;
+    return <CenterLayout layout={layout} changeAppLayoutState={changeAppLayoutState} />;
   }
   if (layout.alignment === "justify") {
-    return <JustifyLayout layout={layout} />;
+    return <JustifyLayout layout={layout} changeAppLayoutState={changeAppLayoutState} />;
   }
   if (layout.alignment === "left") {
-    return <LeftLayout layout={layout} />;
+    return <LeftLayout layout={layout} changeAppLayoutState={changeAppLayoutState} />;
   }
   if (layout.alignment === "right") {
-    return <RightLayout layout={layout} />;
+    return <RightLayout layout={layout} changeAppLayoutState={changeAppLayoutState} />;
   }
 };
 
@@ -32,19 +33,27 @@ export const AppLayout = () => {
 
 interface ResizableLayoutProps {
   layout: AppLayoutState;
+  changeAppLayoutState: (newLayout: AppLayoutState) => void;
 }
 
-const CenterLayout = ({ layout, ...props }: ResizableLayoutProps) => {
+const CenterLayout = ({ layout, changeAppLayoutState }: ResizableLayoutProps) => {
   return (
     <Resizable
       key={layout.primarySideBarPosition}
       proportionalLayout
       onDragEnd={(sizes) => {
         const [primarySideBarWidth, _, secondarySideBarWidth] = sizes;
-        layout.primarySideBar.width =
-          layout.primarySideBarPosition === "left" ? primarySideBarWidth : secondarySideBarWidth;
-        layout.secondarySideBar.width =
-          layout.primarySideBarPosition === "left" ? secondarySideBarWidth : primarySideBarWidth;
+        changeAppLayoutState({
+          ...layout,
+          primarySideBar: {
+            ...layout.primarySideBar,
+            width: layout.primarySideBarPosition === "left" ? primarySideBarWidth : secondarySideBarWidth,
+          },
+          secondarySideBar: {
+            ...layout.secondarySideBar,
+            width: layout.primarySideBarPosition === "left" ? secondarySideBarWidth : primarySideBarWidth,
+          },
+        });
       }}
     >
       <ResizablePanel
@@ -102,7 +111,7 @@ const CenterLayout = ({ layout, ...props }: ResizableLayoutProps) => {
   );
 };
 
-const JustifyLayout = ({ layout, ...props }: ResizableLayoutProps) => {
+const JustifyLayout = ({ layout, changeAppLayoutState }: ResizableLayoutProps) => {
   return (
     <Resizable
       vertical
@@ -154,7 +163,7 @@ const JustifyLayout = ({ layout, ...props }: ResizableLayoutProps) => {
   );
 };
 
-const LeftLayout = ({ layout, ...props }: ResizableLayoutProps) => {
+const LeftLayout = ({ layout, changeAppLayoutState }: ResizableLayoutProps) => {
   return (
     <Resizable
       onDragEnd={(sizes) => {
@@ -215,7 +224,7 @@ const LeftLayout = ({ layout, ...props }: ResizableLayoutProps) => {
   );
 };
 
-const RightLayout = ({ layout, ...props }: ResizableLayoutProps) => {
+const RightLayout = ({ layout, changeAppLayoutState }: ResizableLayoutProps) => {
   return (
     <Resizable
       onDragEnd={(sizes) => {
