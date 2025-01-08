@@ -8,13 +8,16 @@ let ActivityBarState = {
   position: "top",
 };
 
+const getActivityBarState = async () => {
+  console.log("getActivityBarState");
+  await new Promise((resolve) => setTimeout(resolve, 0));
+  return ActivityBarState as ActivityBarState;
+};
+
 export const useGetActivityBarState = () => {
   return useQuery<ActivityBarState, Error>({
     queryKey: ["getActivityBar"],
-    queryFn: async () => {
-      await new Promise((resolve) => setTimeout(resolve, 50));
-      return ActivityBarState as ActivityBarState;
-    },
+    queryFn: getActivityBarState,
   });
 };
 
@@ -24,10 +27,12 @@ export const useChangeActivityBarState = () => {
     mutationFn: async (newLayout) => {
       await new Promise((resolve) => setTimeout(resolve, 50));
 
-      queryClient.invalidateQueries({ queryKey: ["getActivityBar"] });
-
       ActivityBarState = newLayout;
       return newLayout;
+    },
+    onSuccess(data, variables, context) {
+      console.log("onSuccess", { data, variables, context });
+      queryClient.invalidateQueries({ queryKey: ["getActivityBar"] });
     },
   });
 };

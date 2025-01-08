@@ -6,6 +6,7 @@ import { ActionsGroup } from "@/components/ActionsGroup";
 import { useChangeActivityBarState, useGetActivityBarState } from "@/hooks/useActivityBarState";
 import { AppLayoutState, useChangeAppLayoutState, useGetAppLayoutState } from "@/hooks/useAppLayoutState";
 import { invokeTauriIpc } from "@/lib/backend/tauri";
+import { useAppResizableLayoutStore } from "@/store/appResizableLayout";
 import { MenuItem } from "@repo/moss-desktop";
 import { cn, DropdownMenu } from "@repo/moss-ui";
 
@@ -14,6 +15,8 @@ export const ActionsBar = ({ className, ...props }: HTMLProps<HTMLDivElement>) =
 
   const { data: activityBarState } = useGetActivityBarState();
   const { mutate: changeActivityBarState } = useChangeActivityBarState();
+
+  const { primarySideBar, secondarySideBar, bottomPane } = useAppResizableLayoutStore((state) => state);
 
   const { data: appLayoutState } = useGetAppLayoutState();
   const { mutate: changeAppLayoutState } = useChangeAppLayoutState();
@@ -56,27 +59,14 @@ export const ActionsBar = ({ className, ...props }: HTMLProps<HTMLDivElement>) =
             if (index === 0) {
               const visibility =
                 appLayoutState?.primarySideBarPosition === "left"
-                  ? appLayoutState?.primarySideBar.visibility
-                  : appLayoutState?.secondarySideBar.visibility;
+                  ? primarySideBar.visibility
+                  : secondarySideBar.visibility;
 
               const handleVisibilityChange = () => {
                 if (appLayoutState?.primarySideBarPosition === "left") {
-                  changeAppLayoutState({
-                    ...(appLayoutState as AppLayoutState),
-                    primarySideBar: {
-                      ...(appLayoutState as AppLayoutState).primarySideBar,
-                      visibility: !visibility,
-                    },
-                  });
+                  primarySideBar.setVisibility(!visibility);
                 } else {
-                  changeAppLayoutState({
-                    ...(appLayoutState as AppLayoutState),
-
-                    secondarySideBar: {
-                      ...(appLayoutState as AppLayoutState).secondarySideBar,
-                      visibility: !visibility,
-                    },
-                  });
+                  secondarySideBar.setVisibility(!visibility);
                 }
               };
 
@@ -98,16 +88,8 @@ export const ActionsBar = ({ className, ...props }: HTMLProps<HTMLDivElement>) =
                   key={command.id}
                   iconClassName="size-[18px]"
                   {...command}
-                  icon={appLayoutState?.bottomPane.visibility ? "HeadBarPanelActive" : "HeadBarPanel"}
-                  onClick={() => {
-                    changeAppLayoutState({
-                      ...(appLayoutState as AppLayoutState),
-                      bottomPane: {
-                        ...(appLayoutState as AppLayoutState).bottomPane,
-                        visibility: !appLayoutState?.bottomPane.visibility,
-                      },
-                    });
-                  }}
+                  icon={bottomPane.visibility ? "HeadBarPanelActive" : "HeadBarPanel"}
+                  onClick={() => bottomPane.setVisibility(!bottomPane.visibility)}
                   visibility={item.action.visibility}
                 />
               );
@@ -116,27 +98,14 @@ export const ActionsBar = ({ className, ...props }: HTMLProps<HTMLDivElement>) =
             if (index === 2) {
               const visibility =
                 appLayoutState?.primarySideBarPosition === "right"
-                  ? appLayoutState?.primarySideBar.visibility
-                  : appLayoutState?.secondarySideBar.visibility;
+                  ? primarySideBar.visibility
+                  : secondarySideBar.visibility;
 
               const handleVisibilityChange = () => {
                 if (appLayoutState?.primarySideBarPosition === "right") {
-                  changeAppLayoutState({
-                    ...(appLayoutState as AppLayoutState),
-                    primarySideBar: {
-                      ...(appLayoutState as AppLayoutState).primarySideBar,
-                      visibility: !visibility,
-                    },
-                  });
+                  primarySideBar.setVisibility(!visibility);
                 } else {
-                  changeAppLayoutState({
-                    ...(appLayoutState as AppLayoutState),
-
-                    secondarySideBar: {
-                      ...(appLayoutState as AppLayoutState).secondarySideBar,
-                      visibility: !visibility,
-                    },
-                  });
+                  secondarySideBar.setVisibility(!visibility);
                 }
               };
               return (
@@ -182,9 +151,7 @@ export const ActionsBar = ({ className, ...props }: HTMLProps<HTMLDivElement>) =
                   <DropdownMenu.RadioItem value="left" label="Left" checked={appLayoutState?.alignment === "left"} />
                   <DropdownMenu.RadioItem value="right" label="Right" checked={appLayoutState?.alignment === "right"} />
                 </DropdownMenu.RadioGroup>
-
                 <DropdownMenu.Separator />
-
                 <DropdownMenu.RadioGroup
                   value={appLayoutState?.primarySideBarPosition}
                   onValueChange={(value) => {

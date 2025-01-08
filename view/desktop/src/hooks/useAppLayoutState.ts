@@ -1,60 +1,40 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-export type LayoutAlignment = "center" | "justify" | "left" | "right";
-export type LayoutPrimarySideBarPosition = "left" | "right";
 export interface AppLayoutState {
-  alignment: LayoutAlignment;
+  alignment: "center" | "justify" | "left" | "right";
   primarySideBarPosition: "left" | "right";
-  primarySideBar: {
-    width: number;
-    visibility: boolean;
-  };
-  secondarySideBar: {
-    width: number;
-    visibility: boolean;
-  };
-  bottomPane: {
-    height: number;
-    visibility: boolean;
-  };
 }
 
-let AppLayout: AppLayoutState = {
+let AppLayoutState = {
   alignment: "center",
   primarySideBarPosition: "left",
-  primarySideBar: {
-    width: 255,
-    visibility: true,
-  },
-  secondarySideBar: {
-    width: 255,
-    visibility: true,
-  },
-  bottomPane: {
-    height: 333,
-    visibility: true,
-  },
+};
+
+const getAppLayoutState = async () => {
+  await new Promise((resolve) => setTimeout(resolve, 0));
+  return AppLayoutState as AppLayoutState;
 };
 
 export const useGetAppLayoutState = () => {
   return useQuery<AppLayoutState, Error>({
-    queryKey: ["getLayout"],
-    queryFn: async () => {
-      await new Promise((resolve) => setTimeout(resolve, 50));
-      return AppLayout;
-    },
+    queryKey: ["getAppLayoutState"],
+    queryFn: getAppLayoutState,
   });
 };
+
 export const useChangeAppLayoutState = () => {
   const queryClient = useQueryClient();
+
   return useMutation<AppLayoutState, Error, AppLayoutState>({
     mutationFn: async (newLayout) => {
       await new Promise((resolve) => setTimeout(resolve, 50));
 
-      queryClient.invalidateQueries({ queryKey: ["getLayout"] });
-
-      AppLayout = newLayout;
+      AppLayoutState = newLayout;
       return newLayout;
+    },
+    onSuccess(data, variables, context) {
+      console.log("onSuccess", { data, variables, context });
+      queryClient.invalidateQueries({ queryKey: ["getAppLayoutState"] });
     },
   });
 };
