@@ -2,25 +2,41 @@ use std::collections::{HashMap, HashSet};
 
 use serde_json::Value as JsonValue;
 
+#[repr(u8)]
 #[derive(Debug)]
-pub enum Target {}
+pub enum Level {
+    Application = 1,
+    Machine,
+    Window,
+    Resource,
+    LanguageSpecific,
+    MachineOverridable,
+}
+
+#[repr(u8)]
+#[derive(Debug)]
+pub enum Target {
+    Application = 1,
+    User,
+    Workspace,
+}
 
 pub struct OverrideObject {
     /// A set of all keys that are overridden in this object.
-    keys: HashSet<String>,
+    pub keys: HashSet<String>,
     /// An object that stores the actual data for these overridden keys.
-    value: JsonValue,
+    pub value: JsonValue,
     /// A set of identifiers that own this override.
-    identifiers: HashSet<String>,
+    pub identifiers: HashSet<String>,
 }
 
 pub struct ConfigurationObject {
     /// A JSON object with string keys, where the values are specific settings.
-    value: JsonValue,
+    pub value: JsonValue,
     /// A set of all keys present in this object.
-    keys: HashSet<String>,
+    pub keys: HashSet<String>,
     /// A list of override blocks
-    overrides: HashMap<String, OverrideObject>,
+    pub overrides: HashMap<String, OverrideObject>,
 }
 
 pub struct Configuration {

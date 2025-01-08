@@ -1,0 +1,20 @@
+{
+  "name": "@repo/moss-configuration",
+  "version": "0.1.0",
+  "type": "module",
+  "exports": {
+    ".": "./index.ts"
+  },
+  "peerDependencies": {
+    "@typespec/compiler": "latest"
+  },
+  "devDependencies": {
+    "@repo/typescript-config": "workspace:*",
+    "@typespec/compiler": "latest"
+  },
+  "private": true,
+  "dependencies": {
+    "@typespec-tools/emitter-typescript": "^0.3.0",
+    "@typespec/json-schema": "^0.62.0"
+  }
+}

@@ -33,6 +33,7 @@ THEME_MODELS_DIR := crates/moss-theme
 
 # --- Schema Directories ---
 THEME_SCHEMA_DIR :=  crates/moss-theme
+CONFIGURATION_SCHEMA_DIR := crates/moss-configuration
 
 # --- Tool Directories ---
 XTASK_DIR := tools/xtask
@@ -121,6 +122,10 @@ gen-themes:
 .PHONY: compile-themes-schema
 compile-themes-schema:
 	@cd $(THEME_SCHEMA_DIR) && $(TSP) compile . --option "@typespec/json-schema.file-type=json"
+
+.PHONY: compile-configuration-schema
+compile-configuration-schema:
+	@cd $(CONFIGURATION_SCHEMA_DIR) && $(TSP) compile . --option "@typespec/json-schema.file-type=json"
 
 ## Generate Icons
 .PHONY: gen-icons

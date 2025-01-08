@@ -104,6 +104,22 @@ importers:
         specifier: ^2.1.1
         version: 2.1.8(@types/node@22.10.2)(terser@5.37.0)
 
+  crates/moss-configuration:
+    dependencies:
+      '@typespec-tools/emitter-typescript':
+        specifier: ^0.3.0
+        version: 0.3.0(@typespec/compiler@0.63.0)
+      '@typespec/json-schema':
+        specifier: ^0.62.0
+        version: 0.62.0(@typespec/compiler@0.63.0)
+    devDependencies:
+      '@repo/typescript-config':
+        specifier: workspace:*
+        version: link:../../packages/config-typescript
+      '@typespec/compiler':
+        specifier: latest
+        version: 0.63.0
+
   crates/moss-desktop:
     dependencies:
       typescript:
@@ -2928,6 +2944,12 @@ packages:
   '@typescript-eslint/visitor-keys@8.18.0':
     resolution: {integrity: sha512-pCh/qEA8Lb1wVIqNvBke8UaRjJ6wrAWkJO5yyIbs8Yx6TNGYyfNjOo61tLv+WwLvoLPp4BQ8B7AHKijl8NGUfw==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
+
+  '@typespec-tools/emitter-typescript@0.3.0':
+    resolution: {integrity: sha512-aty5BaVKBsiwkUyGBI0NqDC/79L9yr7ayoiZoz/EpkO6LPKi0RM9DTJ49iFH8Gy/Vnlo8zMQ46VbHynxx7ZaPA==}
+    engines: {node: '>=18'}
+    peerDependencies:
+      '@typespec/compiler': ^0.59.1
 
   '@typespec/compiler@0.63.0':
     resolution: {integrity: sha512-cC3YniwbFghn1fASX3r1IgNjMrwaY4gmzznkHT4f/NxE+HK4XoXWn4EG7287QgVMCaHUykzJCIfW9k7kIleW5A==}
@@ -8169,6 +8191,10 @@ snapshots:
     dependencies:
       '@typescript-eslint/types': 8.18.0
       eslint-visitor-keys: 4.2.0
+
+  '@typespec-tools/emitter-typescript@0.3.0(@typespec/compiler@0.63.0)':
+    dependencies:
+      '@typespec/compiler': 0.63.0
 
   '@typespec/compiler@0.63.0':
     dependencies:
