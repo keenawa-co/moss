@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 
 export const useGetColorThemes = () => {
   return useQuery<ThemeDescriptor[], Error>({
-    queryKey: ["getColorThemes"],
+    queryKey: ["getColorTheme"],
     queryFn: getColorThemes,
   });
 };

@@ -1,6 +1,6 @@
 import { invokeMossCommand } from "@/lib/backend/platfrom";
 import { LocaleDescriptor } from "@repo/moss-desktop";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 const changeLanguagePack = async (localeDescriptor: LocaleDescriptor): Promise<void> => {
   await invokeMossCommand("workbench.changeLanguagePack", {
@@ -9,11 +9,12 @@ const changeLanguagePack = async (localeDescriptor: LocaleDescriptor): Promise<v
 };
 
 export const useChangeLanguagePack = () => {
-  // const queryClient = useQueryClient();
-
+  const queryClient = useQueryClient();
   return useMutation<void, Error, LocaleDescriptor>({
     mutationKey: ["changeLanguagePack"],
     mutationFn: changeLanguagePack,
-    onSuccess: () => {},
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["getState"] });
+    },
   });
 };

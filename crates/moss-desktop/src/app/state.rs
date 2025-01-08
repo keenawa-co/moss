@@ -41,8 +41,8 @@ impl AppStateManager {
             },
             defaults: AppDefaults {
                 theme: ThemeDescriptor {
-                    id: "theme-light".to_string(),
-                    name: "Theme Light".to_string(),
+                    id: "theme-defaults.MossLightDefault".to_string(),
+                    name: "Moss Light Default".to_string(),
                     source: BUILTIN_ADDONS_DIR
                         .join("theme-defaults")
                         .join("themes")

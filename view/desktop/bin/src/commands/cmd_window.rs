@@ -52,6 +52,7 @@ pub async fn get_color_theme(
 }
 
 #[tauri::command(async)]
+#[instrument(level = "trace", skip(app_manager))]
 pub async fn get_translations(
     app_manager: State<'_, AppManager>,
     language: String,
@@ -91,6 +92,7 @@ pub async fn get_themes(app_manager: State<'_, AppManager>) -> TauriResult<Vec<T
 }
 
 #[tauri::command(async)]
+#[instrument(level = "trace", skip(app_manager))]
 pub async fn get_locales(app_manager: State<'_, AppManager>) -> TauriResult<Vec<LocaleDescriptor>> {
     let locale_service = app_manager.service::<LocaleService>()?;
 
