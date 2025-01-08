@@ -1,8 +1,8 @@
 import { Suspense } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 
+import { AppLayoutState, useGetAppLayoutState } from "@/hooks/useAppLayoutState";
 import { Home, Logs, Settings } from "@/pages";
-import { LayoutState, useLayoutStore } from "@/store/layout";
 
 import { LaunchPad } from "../components/LaunchPad";
 import { Menu } from "../components/Menu";
@@ -10,146 +10,74 @@ import { Resizable, ResizablePanel } from "../components/Resizable";
 import { ContentLayout } from "./ContentLayout";
 
 export const AppLayout = () => {
-  const alignment = useLayoutStore((state) => state.alignment);
-  const primarySideBarPosition = useLayoutStore((state) => state.primarySideBarPosition);
+  const { data: layout } = useGetAppLayoutState();
 
-  const primarySideBarVisibility = useLayoutStore((state) => state.primarySideBar.visibility);
-  const primarySideBarSetWidth = useLayoutStore((state) => state.primarySideBar.setWidth);
-  const primarySideBarGetWidth = useLayoutStore((state) => state.primarySideBar.getWidth);
+  if (!layout) return null;
 
-  const secondarySideBarVisibility = useLayoutStore((state) => state.secondarySideBar.visibility);
-  const secondarySideBarSetWidth = useLayoutStore((state) => state.secondarySideBar.setWidth);
-  const secondarySideBarGetWidth = useLayoutStore((state) => state.secondarySideBar.getWidth);
-
-  const bottomPaneVisibility = useLayoutStore((state) => state.bottomPane.visibility);
-  const bottomPaneSetHeight = useLayoutStore((state) => state.bottomPane.setHeight);
-  const bottomPaneGetHeight = useLayoutStore((state) => state.bottomPane.getHeight);
-
-  if (alignment === "center") {
-    return (
-      <CenterLayout
-        primarySideBarVisibility={primarySideBarVisibility}
-        primarySideBarSetWidth={primarySideBarSetWidth}
-        primarySideBarGetWidth={primarySideBarGetWidth}
-        secondarySideBarVisibility={secondarySideBarVisibility}
-        secondarySideBarSetWidth={secondarySideBarSetWidth}
-        secondarySideBarGetWidth={secondarySideBarGetWidth}
-        bottomPaneVisibility={bottomPaneVisibility}
-        bottomPaneSetHeight={bottomPaneSetHeight}
-        bottomPaneGetHeight={bottomPaneGetHeight}
-        primarySideBarPosition={primarySideBarPosition}
-      />
-    );
+  if (layout.alignment === "center") {
+    return <CenterLayout layout={layout} />;
   }
-  if (alignment === "justify") {
-    return (
-      <JustifyLayout
-        primarySideBarVisibility={primarySideBarVisibility}
-        primarySideBarSetWidth={primarySideBarSetWidth}
-        primarySideBarGetWidth={primarySideBarGetWidth}
-        secondarySideBarVisibility={secondarySideBarVisibility}
-        secondarySideBarSetWidth={secondarySideBarSetWidth}
-        secondarySideBarGetWidth={secondarySideBarGetWidth}
-        bottomPaneVisibility={bottomPaneVisibility}
-        bottomPaneSetHeight={bottomPaneSetHeight}
-        bottomPaneGetHeight={bottomPaneGetHeight}
-        primarySideBarPosition={primarySideBarPosition}
-      />
-    );
+  if (layout.alignment === "justify") {
+    return <JustifyLayout layout={layout} />;
   }
-  if (alignment === "left") {
-    return (
-      <LeftLayout
-        primarySideBarVisibility={primarySideBarVisibility}
-        primarySideBarSetWidth={primarySideBarSetWidth}
-        primarySideBarGetWidth={primarySideBarGetWidth}
-        secondarySideBarVisibility={secondarySideBarVisibility}
-        secondarySideBarSetWidth={secondarySideBarSetWidth}
-        secondarySideBarGetWidth={secondarySideBarGetWidth}
-        bottomPaneVisibility={bottomPaneVisibility}
-        bottomPaneSetHeight={bottomPaneSetHeight}
-        bottomPaneGetHeight={bottomPaneGetHeight}
-        primarySideBarPosition={primarySideBarPosition}
-      />
-    );
+  if (layout.alignment === "left") {
+    return <LeftLayout layout={layout} />;
   }
-  if (alignment === "right") {
-    return (
-      <RightLayout
-        primarySideBarVisibility={primarySideBarVisibility}
-        primarySideBarSetWidth={primarySideBarSetWidth}
-        primarySideBarGetWidth={primarySideBarGetWidth}
-        secondarySideBarVisibility={secondarySideBarVisibility}
-        secondarySideBarSetWidth={secondarySideBarSetWidth}
-        secondarySideBarGetWidth={secondarySideBarGetWidth}
-        bottomPaneVisibility={bottomPaneVisibility}
-        bottomPaneSetHeight={bottomPaneSetHeight}
-        bottomPaneGetHeight={bottomPaneGetHeight}
-        primarySideBarPosition={primarySideBarPosition}
-      />
-    );
+  if (layout.alignment === "right") {
+    return <RightLayout layout={layout} />;
   }
 };
 
 // Resizable layouts
 
 interface ResizableLayoutProps {
-  primarySideBarVisibility: boolean;
-  primarySideBarSetWidth: (newWidth: number) => void;
-  primarySideBarGetWidth: () => number;
-  secondarySideBarVisibility: boolean;
-  secondarySideBarSetWidth: (newWidth: number) => void;
-  secondarySideBarGetWidth: () => number;
-  bottomPaneVisibility: boolean;
-  bottomPaneSetHeight: (newHeight: number) => void;
-  bottomPaneGetHeight: () => number;
-  primarySideBarPosition: LayoutState["primarySideBarPosition"];
+  layout: AppLayoutState;
 }
 
-const CenterLayout = ({ ...props }: ResizableLayoutProps) => {
+const CenterLayout = ({ layout, ...props }: ResizableLayoutProps) => {
   return (
     <Resizable
-      key={props.primarySideBarPosition}
+      key={layout.primarySideBarPosition}
       proportionalLayout
       onDragEnd={(sizes) => {
         const [primarySideBarWidth, _, secondarySideBarWidth] = sizes;
-        props.primarySideBarSetWidth(
-          props.primarySideBarPosition === "left" ? primarySideBarWidth : secondarySideBarWidth
-        );
-        props.secondarySideBarSetWidth(
-          props.primarySideBarPosition === "left" ? secondarySideBarWidth : primarySideBarWidth
-        );
+        layout.primarySideBar.width =
+          layout.primarySideBarPosition === "left" ? primarySideBarWidth : secondarySideBarWidth;
+        layout.secondarySideBar.width =
+          layout.primarySideBarPosition === "left" ? secondarySideBarWidth : primarySideBarWidth;
       }}
     >
       <ResizablePanel
         minSize={100}
         preferredSize={
-          props.primarySideBarPosition === "left" ? props.primarySideBarGetWidth() : props.secondarySideBarGetWidth()
+          layout.primarySideBarPosition === "left" ? layout.primarySideBar.width : layout.secondarySideBar.width
         }
         snap
         visible={
-          props.primarySideBarPosition === "left" ? props.primarySideBarVisibility : props.secondarySideBarVisibility
+          layout.primarySideBarPosition === "left"
+            ? layout.primarySideBar.visibility
+            : layout.secondarySideBar.visibility
         }
         className="select-none"
       >
-        {props.primarySideBarPosition === "left" ? <PrimarySideBar /> : <SecondarySideBar />}
+        {layout.primarySideBarPosition === "left" ? <PrimarySideBar /> : <SecondarySideBar />}
       </ResizablePanel>
       <ResizablePanel>
         <Resizable
           vertical
           onDragEnd={(sizes) => {
             const [_, bottomPaneHeight] = sizes;
-            props.bottomPaneSetHeight(bottomPaneHeight);
+            layout.bottomPane.height = bottomPaneHeight;
           }}
         >
           <ResizablePanel>
             <MainContent />
           </ResizablePanel>
           <ResizablePanel
-            preferredSize={props.bottomPaneGetHeight()}
+            preferredSize={layout.bottomPane.height}
             snap
             minSize={100}
-            visible={props.bottomPaneVisibility}
+            visible={layout.bottomPane.visibility}
           >
             <BottomPaneContent />
           </ResizablePanel>
@@ -158,42 +86,44 @@ const CenterLayout = ({ ...props }: ResizableLayoutProps) => {
       <ResizablePanel
         minSize={100}
         preferredSize={
-          props.primarySideBarPosition === "right" ? props.primarySideBarGetWidth() : props.secondarySideBarGetWidth()
+          layout.primarySideBarPosition === "right" ? layout.primarySideBar.width : layout.secondarySideBar.width
         }
         snap
         visible={
-          props.primarySideBarPosition === "right" ? props.primarySideBarVisibility : props.secondarySideBarVisibility
+          layout.primarySideBarPosition === "right"
+            ? layout.primarySideBar.visibility
+            : layout.secondarySideBar.visibility
         }
         className="select-none"
       >
-        {props.primarySideBarPosition === "right" ? <PrimarySideBar /> : <SecondarySideBar />}
+        {layout.primarySideBarPosition === "right" ? <PrimarySideBar /> : <SecondarySideBar />}
       </ResizablePanel>
     </Resizable>
   );
 };
 
-const JustifyLayout = ({ ...props }: ResizableLayoutProps) => {
+const JustifyLayout = ({ layout, ...props }: ResizableLayoutProps) => {
   return (
     <Resizable
       vertical
       onDragEnd={(sizes) => {
         const [_, bottomPaneHeight] = sizes;
-        props.bottomPaneSetHeight(bottomPaneHeight);
+        layout.bottomPane.height = bottomPaneHeight;
       }}
     >
       <ResizablePanel>
         <Resizable
           onDragEnd={(sizes) => {
             const [primarySideBarWidth, _, secondarySideBarWidth] = sizes;
-            props.primarySideBarSetWidth(primarySideBarWidth);
-            props.secondarySideBarSetWidth(secondarySideBarWidth);
+            layout.primarySideBar.width = primarySideBarWidth;
+            layout.secondarySideBar.width = secondarySideBarWidth;
           }}
         >
           <ResizablePanel
             minSize={100}
-            preferredSize={props.primarySideBarGetWidth()}
+            preferredSize={layout.primarySideBar.width}
             snap
-            visible={props.primarySideBarVisibility}
+            visible={layout.primarySideBar.visibility}
             className="select-none"
           >
             <PrimarySideBar />
@@ -203,9 +133,9 @@ const JustifyLayout = ({ ...props }: ResizableLayoutProps) => {
           </ResizablePanel>
           <ResizablePanel
             minSize={100}
-            preferredSize={props.secondarySideBarGetWidth()}
+            preferredSize={layout.secondarySideBar.width}
             snap
-            visible={props.secondarySideBarVisibility}
+            visible={layout.secondarySideBar.visibility}
           >
             <SecondarySideBar />
           </ResizablePanel>
@@ -213,10 +143,10 @@ const JustifyLayout = ({ ...props }: ResizableLayoutProps) => {
       </ResizablePanel>
 
       <ResizablePanel
-        preferredSize={props.bottomPaneGetHeight()}
+        preferredSize={layout.bottomPane.height}
         snap
         minSize={100}
-        visible={props.bottomPaneVisibility}
+        visible={layout.bottomPane.visibility}
       >
         <BottomPaneContent />
       </ResizablePanel>
@@ -224,12 +154,12 @@ const JustifyLayout = ({ ...props }: ResizableLayoutProps) => {
   );
 };
 
-const LeftLayout = ({ ...props }: ResizableLayoutProps) => {
+const LeftLayout = ({ layout, ...props }: ResizableLayoutProps) => {
   return (
     <Resizable
       onDragEnd={(sizes) => {
         const [_, secondarySideBarWidth] = sizes;
-        props.secondarySideBarSetWidth(secondarySideBarWidth);
+        layout.secondarySideBar.width = secondarySideBarWidth;
       }}
     >
       <ResizablePanel>
@@ -237,21 +167,21 @@ const LeftLayout = ({ ...props }: ResizableLayoutProps) => {
           vertical
           onDragEnd={(sizes) => {
             const [_, bottomPaneHeight] = sizes;
-            props.bottomPaneSetHeight(bottomPaneHeight);
+            layout.bottomPane.height = bottomPaneHeight;
           }}
         >
           <ResizablePanel>
             <Resizable
               onDragEnd={(sizes) => {
                 const [primarySideBarWidth, _] = sizes;
-                props.primarySideBarSetWidth(primarySideBarWidth);
+                layout.primarySideBar.width = primarySideBarWidth;
               }}
             >
               <ResizablePanel
                 minSize={100}
-                preferredSize={props.primarySideBarGetWidth()}
+                preferredSize={layout.primarySideBar.width}
                 snap
-                visible={props.primarySideBarVisibility}
+                visible={layout.primarySideBar.visibility}
                 className="select-none"
               >
                 <PrimarySideBar />
@@ -263,10 +193,10 @@ const LeftLayout = ({ ...props }: ResizableLayoutProps) => {
           </ResizablePanel>
 
           <ResizablePanel
-            preferredSize={props.bottomPaneGetHeight()}
+            preferredSize={layout.bottomPane.height}
             snap
             minSize={100}
-            visible={props.bottomPaneVisibility}
+            visible={layout.bottomPane.visibility}
           >
             <BottomPaneContent />
           </ResizablePanel>
@@ -275,9 +205,9 @@ const LeftLayout = ({ ...props }: ResizableLayoutProps) => {
 
       <ResizablePanel
         minSize={100}
-        preferredSize={props.secondarySideBarGetWidth()}
+        preferredSize={layout.secondarySideBar.width}
         snap
-        visible={props.secondarySideBarVisibility}
+        visible={layout.secondarySideBar.visibility}
       >
         <SecondarySideBar />
       </ResizablePanel>
@@ -285,19 +215,19 @@ const LeftLayout = ({ ...props }: ResizableLayoutProps) => {
   );
 };
 
-const RightLayout = ({ ...props }: ResizableLayoutProps) => {
+const RightLayout = ({ layout, ...props }: ResizableLayoutProps) => {
   return (
     <Resizable
       onDragEnd={(sizes) => {
         const [primarySideBarWidth, _] = sizes;
-        props.primarySideBarSetWidth(primarySideBarWidth);
+        layout.primarySideBar.width = primarySideBarWidth;
       }}
     >
       <ResizablePanel
         minSize={100}
-        preferredSize={props.primarySideBarGetWidth()}
+        preferredSize={layout.primarySideBar.width}
         snap
-        visible={props.primarySideBarVisibility}
+        visible={layout.primarySideBar.visibility}
         className="select-none"
       >
         <PrimarySideBar />
@@ -308,14 +238,14 @@ const RightLayout = ({ ...props }: ResizableLayoutProps) => {
           vertical
           onDragEnd={(sizes) => {
             const [_, bottomPaneHeight] = sizes;
-            props.bottomPaneSetHeight(bottomPaneHeight);
+            layout.bottomPane.height = bottomPaneHeight;
           }}
         >
           <ResizablePanel>
             <Resizable
               onDragEnd={(sizes) => {
                 const [_, secondarySideBarWidth] = sizes;
-                props.secondarySideBarSetWidth(secondarySideBarWidth);
+                layout.secondarySideBar.width = secondarySideBarWidth;
               }}
             >
               <ResizablePanel>
@@ -323,9 +253,9 @@ const RightLayout = ({ ...props }: ResizableLayoutProps) => {
               </ResizablePanel>
               <ResizablePanel
                 minSize={100}
-                preferredSize={props.secondarySideBarGetWidth()}
+                preferredSize={layout.secondarySideBar.width}
                 snap
-                visible={props.secondarySideBarVisibility}
+                visible={layout.secondarySideBar.visibility}
               >
                 <SecondarySideBar />
               </ResizablePanel>
@@ -333,10 +263,10 @@ const RightLayout = ({ ...props }: ResizableLayoutProps) => {
           </ResizablePanel>
 
           <ResizablePanel
-            preferredSize={props.bottomPaneGetHeight()}
+            preferredSize={layout.bottomPane.height}
             snap
             minSize={100}
-            visible={props.bottomPaneVisibility}
+            visible={layout.bottomPane.visibility}
           >
             <BottomPaneContent />
           </ResizablePanel>

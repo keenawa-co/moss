@@ -3,26 +3,20 @@ import { HTMLProps, useEffect, useState } from "react";
 import { ActionButton } from "@/components/Action/ActionButton";
 import { ActionsSubmenu } from "@/components/Action/ActionsSubmenu";
 import { ActionsGroup } from "@/components/ActionsGroup";
+import { useChangeActivityBarState, useGetActivityBarState } from "@/hooks/useActivityBarState";
+import { AppLayoutState, useChangeAppLayoutState, useGetAppLayoutState } from "@/hooks/useAppLayoutState";
 import { invokeTauriIpc } from "@/lib/backend/tauri";
-import { useActivityBarStore } from "@/store/activityBar";
-import { LayoutAlignment, LayoutPrimarySideBarPosition, useLayoutStore } from "@/store/layout";
 import { MenuItem } from "@repo/moss-desktop";
 import { cn, DropdownMenu } from "@repo/moss-ui";
 
 export const ActionsBar = ({ className, ...props }: HTMLProps<HTMLDivElement>) => {
   const [activities, setActivities] = useState<MenuItem[]>([]);
 
-  const {
-    primarySideBar,
-    secondarySideBar,
-    bottomPane,
-    setAlignment,
-    alignment,
-    primarySideBarPosition,
-    setPrimarySideBarPosition,
-  } = useLayoutStore((state) => state);
+  const { data: activityBarState } = useGetActivityBarState();
+  const { mutate: changeActivityBarState } = useChangeActivityBarState();
 
-  const { position: activityBarPosition, setPosition: setActivityBarPosition } = useActivityBarStore();
+  const { data: appLayoutState } = useGetAppLayoutState();
+  const { mutate: changeAppLayoutState } = useChangeAppLayoutState();
 
   useEffect(() => {
     const getAllActivities = async () => {
@@ -59,18 +53,33 @@ export const ActionsBar = ({ className, ...props }: HTMLProps<HTMLDivElement>) =
           if ("action" in item) {
             const command = item.action.command;
 
-            const visibility =
-              primarySideBarPosition === "left" ? primarySideBar.visibility : secondarySideBar.visibility;
-
-            const handleVisibilityChange = () => {
-              if (primarySideBarPosition === "left") {
-                primarySideBar.setVisibility(!visibility);
-              } else {
-                secondarySideBar.setVisibility(!visibility);
-              }
-            };
-
             if (index === 0) {
+              const visibility =
+                appLayoutState?.primarySideBarPosition === "left"
+                  ? appLayoutState?.primarySideBar.visibility
+                  : appLayoutState?.secondarySideBar.visibility;
+
+              const handleVisibilityChange = () => {
+                if (appLayoutState?.primarySideBarPosition === "left") {
+                  changeAppLayoutState({
+                    ...(appLayoutState as AppLayoutState),
+                    primarySideBar: {
+                      ...(appLayoutState as AppLayoutState).primarySideBar,
+                      visibility: !visibility,
+                    },
+                  });
+                } else {
+                  changeAppLayoutState({
+                    ...(appLayoutState as AppLayoutState),
+
+                    secondarySideBar: {
+                      ...(appLayoutState as AppLayoutState).secondarySideBar,
+                      visibility: !visibility,
+                    },
+                  });
+                }
+              };
+
               return (
                 <ActionButton
                   key={command.id}
@@ -89,8 +98,16 @@ export const ActionsBar = ({ className, ...props }: HTMLProps<HTMLDivElement>) =
                   key={command.id}
                   iconClassName="size-[18px]"
                   {...command}
-                  icon={bottomPane.visibility ? "HeadBarPanelActive" : "HeadBarPanel"}
-                  onClick={() => bottomPane.setVisibility(!bottomPane.visibility)}
+                  icon={appLayoutState?.bottomPane.visibility ? "HeadBarPanelActive" : "HeadBarPanel"}
+                  onClick={() => {
+                    changeAppLayoutState({
+                      ...(appLayoutState as AppLayoutState),
+                      bottomPane: {
+                        ...(appLayoutState as AppLayoutState).bottomPane,
+                        visibility: !appLayoutState?.bottomPane.visibility,
+                      },
+                    });
+                  }}
                   visibility={item.action.visibility}
                 />
               );
@@ -98,13 +115,28 @@ export const ActionsBar = ({ className, ...props }: HTMLProps<HTMLDivElement>) =
 
             if (index === 2) {
               const visibility =
-                primarySideBarPosition === "right" ? primarySideBar.visibility : secondarySideBar.visibility;
+                appLayoutState?.primarySideBarPosition === "right"
+                  ? appLayoutState?.primarySideBar.visibility
+                  : appLayoutState?.secondarySideBar.visibility;
 
               const handleVisibilityChange = () => {
-                if (primarySideBarPosition === "right") {
-                  primarySideBar.setVisibility(!visibility);
+                if (appLayoutState?.primarySideBarPosition === "right") {
+                  changeAppLayoutState({
+                    ...(appLayoutState as AppLayoutState),
+                    primarySideBar: {
+                      ...(appLayoutState as AppLayoutState).primarySideBar,
+                      visibility: !visibility,
+                    },
+                  });
                 } else {
-                  secondarySideBar.setVisibility(!visibility);
+                  changeAppLayoutState({
+                    ...(appLayoutState as AppLayoutState),
+
+                    secondarySideBar: {
+                      ...(appLayoutState as AppLayoutState).secondarySideBar,
+                      visibility: !visibility,
+                    },
+                  });
                 }
               };
               return (
@@ -129,29 +161,55 @@ export const ActionsBar = ({ className, ...props }: HTMLProps<HTMLDivElement>) =
                 icon="HeadBarCustomizeLayout"
               >
                 <DropdownMenu.RadioGroup
-                  value={alignment}
-                  onValueChange={(value) => setAlignment(value as LayoutAlignment)}
-                >
-                  <DropdownMenu.RadioItem value="center" label="Center" checked={alignment === "center"} />
-                  <DropdownMenu.RadioItem value="justify" label="Justify" checked={alignment === "justify"} />
-                  <DropdownMenu.RadioItem value="left" label="Left" checked={alignment === "left"} />
-                  <DropdownMenu.RadioItem value="right" label="Right" checked={alignment === "right"} />
-                </DropdownMenu.RadioGroup>
-                <DropdownMenu.Separator />
-                <DropdownMenu.RadioGroup
-                  value={primarySideBarPosition}
+                  value={appLayoutState?.alignment}
                   onValueChange={(value) => {
-                    if (activityBarPosition === "left") {
-                      setActivityBarPosition("right");
-                    } else if (activityBarPosition === "right") {
-                      setActivityBarPosition("left");
-                    }
-
-                    setPrimarySideBarPosition(value as LayoutPrimarySideBarPosition);
+                    changeAppLayoutState({
+                      ...(appLayoutState as AppLayoutState),
+                      alignment: value as AppLayoutState["alignment"],
+                    });
                   }}
                 >
-                  <DropdownMenu.RadioItem value="left" label="Left" checked={primarySideBarPosition === "left"} />
-                  <DropdownMenu.RadioItem value="right" label="Right" checked={primarySideBarPosition === "right"} />
+                  <DropdownMenu.RadioItem
+                    value="center"
+                    label="Center"
+                    checked={appLayoutState?.alignment === "center"}
+                  />
+                  <DropdownMenu.RadioItem
+                    value="justify"
+                    label="Justify"
+                    checked={appLayoutState?.alignment === "justify"}
+                  />
+                  <DropdownMenu.RadioItem value="left" label="Left" checked={appLayoutState?.alignment === "left"} />
+                  <DropdownMenu.RadioItem value="right" label="Right" checked={appLayoutState?.alignment === "right"} />
+                </DropdownMenu.RadioGroup>
+
+                <DropdownMenu.Separator />
+
+                <DropdownMenu.RadioGroup
+                  value={appLayoutState?.primarySideBarPosition}
+                  onValueChange={(value) => {
+                    if (activityBarState?.position === "left") {
+                      changeActivityBarState({ position: "right" });
+                    } else if (activityBarState?.position === "right") {
+                      changeActivityBarState({ position: "left" });
+                    }
+
+                    changeAppLayoutState({
+                      ...(appLayoutState as AppLayoutState),
+                      primarySideBarPosition: value as AppLayoutState["primarySideBarPosition"],
+                    });
+                  }}
+                >
+                  <DropdownMenu.RadioItem
+                    value="left"
+                    label="Left"
+                    checked={appLayoutState?.primarySideBarPosition === "left"}
+                  />
+                  <DropdownMenu.RadioItem
+                    value="right"
+                    label="Right"
+                    checked={appLayoutState?.primarySideBarPosition === "right"}
+                  />
                 </DropdownMenu.RadioGroup>
               </ActionsSubmenu>
             );
