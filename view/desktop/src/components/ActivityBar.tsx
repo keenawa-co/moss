@@ -1,12 +1,14 @@
 import { ComponentPropsWithoutRef, forwardRef, useState } from "react";
 
-import { ActivityBarStore, useActivityBarStore } from "@/store/activityBar";
+import { ActivityBarState, useChangeActivityBarState, useGetActivityBarState } from "@/hooks/useActivityBarState";
 import { cn, Icon, Icons } from "@repo/moss-ui";
 
 const positions = ["top", "bottom", "left", "right"] as const;
 
 export const ActivityBar = () => {
-  const { position, setPosition } = useActivityBarStore();
+  const { data: activityBarState } = useGetActivityBarState();
+  const { mutate: changeActivityBarState } = useChangeActivityBarState();
+
   const [list, setList] = useState([
     {
       icon: "ActivityBarIcon1",
@@ -27,20 +29,20 @@ export const ActivityBar = () => {
     );
   };
 
-  const handleSelectPosition = (position: ActivityBarStore["position"]) => {
+  const handleSelectPosition = (position: ActivityBarState["position"]) => {
     const index = positions.indexOf(position);
-    if (index === 3) setPosition("top");
-    else setPosition(positions[index + 1]);
+    if (index === 3) changeActivityBarState({ position: "top" });
+    else changeActivityBarState({ position: positions[index + 1] });
   };
 
-  if (position === "top" || position === "bottom") {
+  if (activityBarState?.position === "top" || activityBarState?.position === "bottom") {
     return (
       <div
         className={cn("flex w-full items-center gap-2.5 border bg-[#F4F4F4] px-2 py-1", {
-          "border-b-[#c6c6c6]": position === "top",
-          "border-t-[#c6c6c6]": position === "bottom",
+          "border-b-[#c6c6c6]": activityBarState?.position === "top",
+          "border-t-[#c6c6c6]": activityBarState?.position === "bottom",
         })}
-        onDoubleClick={() => handleSelectPosition(position)}
+        onDoubleClick={() => handleSelectPosition(activityBarState?.position)}
       >
         {list.map(({ icon, active }, index) => (
           <ActivityBarButton key={index} icon={icon as Icons} active={active} onClick={() => toggleActiveItem(index)} />
@@ -52,10 +54,10 @@ export const ActivityBar = () => {
   return (
     <div
       className={cn("flex h-full flex-col items-center gap-2.5 border bg-[#F4F4F4] px-1 py-2", {
-        "border-r-[#c6c6c6]": position === "left",
-        "border-l-[#c6c6c6]": position === "right",
+        "border-r-[#c6c6c6]": activityBarState?.position === "left",
+        "border-l-[#c6c6c6]": activityBarState?.position === "right",
       })}
-      onDoubleClick={() => handleSelectPosition(position)}
+      onDoubleClick={() => handleSelectPosition(activityBarState?.position as ActivityBarState["position"])}
     >
       {list.map(({ icon, active }, index) => (
         <ActivityBarButton key={index} icon={icon as Icons} active={active} onClick={() => toggleActiveItem(index)} />

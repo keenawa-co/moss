@@ -1,10 +1,8 @@
 import { useTranslation } from "react-i18next";
 
-import { useChangeColorTheme } from "@/hooks/useChangeColorTheme";
-import { useChangeLanguagePack } from "@/hooks/useChangeLanguagePack";
+import { useChangeColorTheme, useGetColorThemes } from "@/hooks/useColorTheme";
 import { useGetAppState } from "@/hooks/useGetAppState";
-import { useGetColorThemes } from "@/hooks/useGetColorThemes";
-import { useGetLanguagePacks } from "@/hooks/useGetLanguagePacks";
+import { useChangeLanguagePack, useGetLanguagePacks } from "@/hooks/useLanguagePack";
 
 export const Settings = () => {
   const { t } = useTranslation(["ns1", "ns2"]);

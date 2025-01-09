@@ -1,13 +1,13 @@
-import { useActivityBarStore } from "@/store/activityBar";
+import { useGetActivityBarState } from "@/hooks/useActivityBarState";
 
 import SidebarHeader from "../parts/SideBar/SidebarHeader";
 import { AccordionsList } from "./AccordionsList";
 import { ActivityBar } from "./ActivityBar";
 
 export const LaunchPad = () => {
-  const { position } = useActivityBarStore();
+  const { data: activityBarState } = useGetActivityBarState();
 
-  if (position === "top") {
+  if (activityBarState?.position === "top") {
     return (
       <div className="flex h-full flex-col">
         <ActivityBar />
@@ -17,7 +17,7 @@ export const LaunchPad = () => {
     );
   }
 
-  if (position === "bottom") {
+  if (activityBarState?.position === "bottom") {
     return (
       <div className="flex h-full flex-col">
         <SidebarHeader title="launchpad" />
@@ -27,7 +27,7 @@ export const LaunchPad = () => {
     );
   }
 
-  if (position === "left") {
+  if (activityBarState?.position === "left") {
     return (
       <div className="flex h-full">
         <ActivityBar />
@@ -39,7 +39,7 @@ export const LaunchPad = () => {
     );
   }
 
-  if (position === "right") {
+  if (activityBarState?.position === "right") {
     return (
       <div className="flex h-full">
         <div className="w-full">
