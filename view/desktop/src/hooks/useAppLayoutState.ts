@@ -32,8 +32,7 @@ export const useChangeAppLayoutState = () => {
       AppLayoutState = newLayout;
       return newLayout;
     },
-    onSuccess(data, variables, context) {
-      console.log("onSuccess", { data, variables, context });
+    onSuccess() {
       queryClient.invalidateQueries({ queryKey: ["getAppLayoutState"] });
     },
   });

@@ -9,7 +9,6 @@ let ActivityBarState = {
 };
 
 const getActivityBarState = async () => {
-  console.log("getActivityBarState");
   await new Promise((resolve) => setTimeout(resolve, 0));
   return ActivityBarState as ActivityBarState;
 };
@@ -30,8 +29,7 @@ export const useChangeActivityBarState = () => {
       ActivityBarState = newLayout;
       return newLayout;
     },
-    onSuccess(data, variables, context) {
-      console.log("onSuccess", { data, variables, context });
+    onSuccess() {
       queryClient.invalidateQueries({ queryKey: ["getActivityBar"] });
     },
   });

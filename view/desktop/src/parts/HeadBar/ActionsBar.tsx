@@ -1,40 +1,24 @@
-import { HTMLProps, useEffect, useState } from "react";
+import { HTMLProps } from "react";
 
 import { ActionButton } from "@/components/Action/ActionButton";
 import { ActionsSubmenu } from "@/components/Action/ActionsSubmenu";
 import { ActionsGroup } from "@/components/ActionsGroup";
+import { useGetActivitiesState } from "@/hooks/useActivitiesState";
 import { useChangeActivityBarState, useGetActivityBarState } from "@/hooks/useActivityBarState";
 import { AppLayoutState, useChangeAppLayoutState, useGetAppLayoutState } from "@/hooks/useAppLayoutState";
-import { invokeTauriIpc } from "@/lib/backend/tauri";
 import { useAppResizableLayoutStore } from "@/store/appResizableLayout";
-import { MenuItem } from "@repo/moss-desktop";
 import { cn, DropdownMenu } from "@repo/moss-ui";
 
 export const ActionsBar = ({ className, ...props }: HTMLProps<HTMLDivElement>) => {
-  const [activities, setActivities] = useState<MenuItem[]>([]);
-
   const { data: activityBarState } = useGetActivityBarState();
   const { mutate: changeActivityBarState } = useChangeActivityBarState();
-
-  const { primarySideBar, secondarySideBar, bottomPane } = useAppResizableLayoutStore((state) => state);
 
   const { data: appLayoutState } = useGetAppLayoutState();
   const { mutate: changeAppLayoutState } = useChangeAppLayoutState();
 
-  useEffect(() => {
-    const getAllActivities = async () => {
-      try {
-        const res = await invokeTauriIpc<MenuItem[], Error>("get_menu_items_by_namespace", { namespace: "headItem" }); // this here should be a type
+  const { data: activities } = useGetActivitiesState();
 
-        if (res.status === "ok") {
-          setActivities(res.data);
-        }
-      } catch (err) {
-        console.error("Failed to get workbench state:", err);
-      }
-    };
-    getAllActivities();
-  }, []);
+  const { primarySideBar, secondarySideBar, bottomPane } = useAppResizableLayoutStore((state) => state);
 
   return (
     <div className={cn("flex items-center gap-3", className)} {...props}>
@@ -52,7 +36,7 @@ export const ActionsBar = ({ className, ...props }: HTMLProps<HTMLDivElement>) =
       </div>
 
       <div className="flex items-center">
-        {activities.map((item, index) => {
+        {activities?.map((item, index) => {
           if ("action" in item) {
             const command = item.action.command;
 

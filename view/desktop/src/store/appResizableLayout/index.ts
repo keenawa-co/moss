@@ -89,7 +89,6 @@ export const useAppResizableLayoutStore = create<AppResizableLayoutStore>()((set
         },
       })),
     getHeight: () => {
-      console.log("getHeight bottomPane", get().bottomPane.height);
       return get().bottomPane.height;
     },
   },
