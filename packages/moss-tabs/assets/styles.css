@@ -21,11 +21,11 @@
 }
 
 .dv-groupview {
-  @apply bg-dv-group-view-bg-dark flex h-full flex-col overflow-hidden;
+  @apply flex h-full flex-col overflow-hidden bg-[var(--dv-group-view-background-color)];
 }
 
 .dv-tabs-and-actions-container {
-  @apply bg-dv-tabs-container-bg-dark h-dv-tabs-height text-dv-tabs-font box-border flex shrink-0;
+  @apply box-border flex h-[var(--dv-tabs-and-actions-container-height)] shrink-0 bg-[var(--dv-tabs-and-actions-container-background-color)] text-[var(--dv-tabs-and-actions-container-font-size)];
 }
 
 .dv-tabs-container {
@@ -33,11 +33,11 @@
 }
 
 .dv-tab-divider {
-  @apply border-dv-tab-divider-dark;
+  @apply border-[var(--dv-tab-divider-color)];
 }
 
 .dv-pane-header {
-  @apply border-dv-pane-header-border-dark box-border border-t;
+  @apply box-border border-t border-[var(--dv-paneview-header-border-color)];
 }
 
 .dv-pane {
@@ -50,7 +50,7 @@
 
 .dv-pane-body:focus:before,
 .dv-pane-body:focus-within:before {
-  @apply outline-dv-focus-outline pointer-events-none absolute left-0 top-0 h-full w-full;
+  @apply pointer-events-none absolute left-0 top-0 h-full w-full outline-[var(--dv-paneview-active-outline-color)];
 }
 
 .dv-sash {
@@ -58,16 +58,171 @@
 }
 
 .dv-sash:hover {
-  @apply bg-dv-drag-over-bg;
+  @apply bg-[var(--dv-drag-over-background-color)];
 }
 
 .dv-tab-dragging {
-  @apply bg-dv-tab-dragging-bg text-dv-tab-dragging-color;
+  @apply bg-[var(--dv-activegroup-visiblepanel-tab-background-color)] text-[var(--dv-activegroup-visiblepanel-tab-color)];
 }
 
 .dv-tabs-container::-webkit-scrollbar {
   @apply h-1;
 }
 .dv-tabs-container::-webkit-scrollbar-thumb {
-  @apply bg-dv-drag-over-bg;
+  @apply bg-[var(--dv-tabs-container-scrollbar-color)];
+}
+
+.dv-drop-target {
+  @apply relative;
+}
+
+.dv-drop-target > .dv-drop-target-dropzone {
+  @apply pointer-events-none absolute left-0 top-0 z-[1000] h-full w-full;
+}
+
+.dv-drop-target > .dv-drop-target-dropzone > .dv-drop-target-selection {
+  @apply pointer-events-none relative box-border h-full w-full bg-[var(--dv-drag-over-background-color)] transition-transform duration-[70ms] ease-out;
+}
+
+.dv-drop-target
+  > .dv-drop-target-dropzone
+  > .dv-drop-target-selection.dv-drop-target-top.dv-drop-target-small-vertical {
+  @apply border-t border-[var(--dv-drag-over-border-color)];
+}
+
+.dv-drop-target
+  > .dv-drop-target-dropzone
+  > .dv-drop-target-selection.dv-drop-target-bottom.dv-drop-target-small-vertical {
+  @apply border-b border-[var(--dv-drag-over-border-color)];
+}
+
+.dv-drop-target
+  > .dv-drop-target-dropzone
+  > .dv-drop-target-selection.dv-drop-target-left.dv-drop-target-small-horizontal {
+  @apply border-l border-[var(--dv-drag-over-border-color)];
+}
+
+.dv-drop-target
+  > .dv-drop-target-dropzone
+  > .dv-drop-target-selection.dv-drop-target-right.dv-drop-target-small-horizontal {
+  @apply border-r border-[var(--dv-drag-over-border-color)];
+}
+
+.dv-dockview {
+  @apply relative bg-[var(--dv-group-view-background-color)];
+}
+
+.dv-dockview .dv-watermark-container {
+  @apply absolute left-0 top-0 h-full w-full z-1;
+}
+
+.dv-dockview .dv-overlay-render-container {
+  @apply relative;
+}
+
+.dv-pane-container {
+  @apply h-full w-full;
+}
+
+.dv-pane-container.dv-animated .dv-view {
+  @apply transition duration-[150ms] ease-out;
+}
+
+.dv-split-view-container {
+  @apply relative h-full w-full overflow-hidden;
+}
+
+.dv-split-view-container .dv-sash-container {
+  @apply absolute h-full w-full;
+}
+
+.dv-split-view-container .dv-sash-container .dv-sash {
+  @apply user-select-none absolute z-[99] outline-none;
+}
+
+.dv-split-view-container .dv-sash-container .dv-sash.dv-enabled {
+  @apply cursor-ew-resize;
+}
+
+.dv-split-view-container.dv-horizontal > .dv-sash-container > .dv-sash {
+  @apply h-full w-1;
+}
+
+.dv-split-view-container.dv-vertical > .dv-sash-container > .dv-sash {
+  @apply h-1 w-full;
+}
+
+.dv-debug .dv-split-view-container .dv-sash-container .dv-sash.dv-enabled {
+  @apply bg-black;
+}
+.dv-debug .dv-split-view-container .dv-sash-container .dv-sash.dv-disabled {
+  @apply bg-orange-500;
+}
+.dv-debug .dv-split-view-container .dv-sash-container .dv-sash.dv-maximum {
+  @apply bg-green-500;
+}
+.dv-debug .dv-split-view-container .dv-sash-container .dv-sash.dv-minimum {
+  @apply bg-red-500;
+}
+
+.dv-resize-container {
+  @apply absolute z-[999] border bg-transparent shadow-[var(--dv-floating-box-shadow)];
+}
+.dv-resize-container.dv-hidden {
+  @apply hidden;
+}
+.dv-resize-container.dv-resize-container-dragging {
+  @apply opacity-50;
+}
+.dv-resize-container .dv-resize-handle-top,
+.dv-resize-container .dv-resize-handle-bottom {
+  @apply absolute left-[4px] h-[4px] w-[calc(100%-8px)] cursor-ns-resize;
+}
+.dv-resize-container .dv-resize-handle-left,
+.dv-resize-container .dv-resize-handle-right {
+  @apply absolute top-[4px] h-[calc(100%-8px)] w-[4px] cursor-ew-resize;
+}
+.dv-resize-container .dv-resize-handle-topleft,
+.dv-resize-container .dv-resize-handle-topright,
+.dv-resize-container .dv-resize-handle-bottomleft,
+.dv-resize-container .dv-resize-handle-bottomright {
+  @apply cursor-resize absolute h-[4px] w-[4px];
+}
+
+.dv-render-overlay {
+  @apply absolute h-full z-1;
+}
+.dv-render-overlay.dv-render-overlay-float {
+  @apply z-[998];
+}
+.dv-render-overlay.dv-render-overlay-float {
+  @apply outline outline-red-500;
+}
+.dv-resize-container .dv-view {
+  @apply flex flex-col overflow-hidden;
+}
+.dv-resize-container.dv-animated .dv-view {
+  @apply transition duration-[150ms] ease-out;
+}
+.dv-grid-view,
+.dv-branch-node {
+  @apply h-full w-full;
+}
+.dv-pane {
+  @apply flex h-full flex-col overflow-hidden;
+}
+.dv-pane .dv-pane-header {
+  @apply relative box-border outline-none;
+}
+.dv-pane-container {
+  @apply flex h-full w-full;
+}
+.dv-tab .dv-default-tab {
+  @apply relative flex min-w-[80px] items-center text-ellipsis px-2;
+}
+.dv-pane-container .dv-pane .dv-pane-body {
+  @apply relative flex-grow overflow-y-auto overflow-x-hidden outline-none;
+}
+.dv-pane-container .dv-pane .dv-pane-body:focus:before {
+  @apply pointer-events-none absolute left-0 top-0 h-full w-full;
 }
