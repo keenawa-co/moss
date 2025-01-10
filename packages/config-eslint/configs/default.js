@@ -55,7 +55,6 @@ export default tseslint.config(...tseslint.configs.recommended, {
     ],
     "@typescript-eslint/no-explicit-any": "error",
     "prefer-const": "warn",
-    "no-with": "off",
     "mossLint/tw-no-bg-with-arbitrary-value": "error",
     "mossLint/only-valid-token-names": "error",
   },
