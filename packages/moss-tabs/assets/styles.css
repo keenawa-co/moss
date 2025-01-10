@@ -2,75 +2,13 @@
 @tailwind components;
 @tailwind utilities;
 
+/*-------------------dv-svg---------------------*/
+
 .dv-svg {
   @apply inline-block fill-current stroke-current stroke-0;
 }
 
-.dv-tab {
-  @apply relative flex-shrink-0 focus:outline-none;
-}
-
-.dv-tab:focus-within,
-.dv-tab:focus {
-  @apply relative outline-none;
-}
-
-.dv-tab:focus-within::after,
-.dv-tab:focus::after {
-  @apply pointer-events-none absolute left-0 top-0 h-full w-full outline outline-1;
-}
-
-.dv-groupview {
-  @apply flex h-full flex-col overflow-hidden bg-[var(--dv-group-view-background-color)];
-}
-
-.dv-tabs-and-actions-container {
-  @apply box-border flex h-[var(--dv-tabs-and-actions-container-height)] shrink-0 bg-[var(--dv-tabs-and-actions-container-background-color)] text-[var(--dv-tabs-and-actions-container-font-size)];
-}
-
-.dv-tabs-container {
-  @apply flex overflow-x-auto overflow-y-hidden;
-}
-
-.dv-tab-divider {
-  @apply border-[var(--dv-tab-divider-color)];
-}
-
-.dv-pane-header {
-  @apply box-border border-t border-[var(--dv-paneview-header-border-color)];
-}
-
-.dv-pane {
-  @apply flex h-full flex-col overflow-hidden;
-}
-
-.dv-pane-body {
-  @apply relative flex-grow overflow-y-auto overflow-x-hidden outline-none;
-}
-
-.dv-pane-body:focus:before,
-.dv-pane-body:focus-within:before {
-  @apply pointer-events-none absolute left-0 top-0 h-full w-full outline-[var(--dv-paneview-active-outline-color)];
-}
-
-.dv-sash {
-  @apply absolute bg-transparent;
-}
-
-.dv-sash:hover {
-  @apply bg-[var(--dv-drag-over-background-color)];
-}
-
-.dv-tab-dragging {
-  @apply bg-[var(--dv-activegroup-visiblepanel-tab-background-color)] text-[var(--dv-activegroup-visiblepanel-tab-color)];
-}
-
-.dv-tabs-container::-webkit-scrollbar {
-  @apply h-1;
-}
-.dv-tabs-container::-webkit-scrollbar-thumb {
-  @apply bg-[var(--dv-tabs-container-scrollbar-color)];
-}
+/*------------------dv-drop-target----------------------*/
 
 .dv-drop-target {
   @apply relative;
@@ -108,6 +46,8 @@
   @apply border-r border-[var(--dv-drag-over-border-color)];
 }
 
+/*--------------------dv-dockview--------------------*/
+
 .dv-dockview {
   @apply relative bg-[var(--dv-group-view-background-color)];
 }
@@ -120,38 +60,130 @@
   @apply relative;
 }
 
-.dv-pane-container {
+/*--------------------dv-groupview--------------------*/
+
+.dv-groupview {
+  @apply flex h-full flex-col overflow-hidden bg-[var(--dv-group-view-background-color)];
+}
+
+.dv-groupview:focus {
+  @apply outline-none;
+}
+
+.dv-groupview > .dv-content-container {
+  @apply min-h-0 flex-grow outline-none;
+}
+
+.dv-groupview.dv-active-group > .dv-tabs-and-actions-container > .dv-tabs-container > .dv-tab.dv-active-tab {
+  @apply bg-[var(--dv-activegroup-visiblepanel-tab-background-color)] text-[var(--dv-activegroup-visiblepanel-tab-color)];
+}
+
+.dv-groupview.dv-active-group > .dv-tabs-and-actions-container > .dv-tabs-container > .dv-tab.dv-inactive-tab {
+  @apply bg-[var(--dv-activegroup-hiddenpanel-tab-background-color)] text-[var(--dv-activegroup-hiddenpanel-tab-color)];
+}
+
+.dv-groupview.dv-inactive-group > .dv-tabs-and-actions-container > .dv-tabs-container > .dv-tab.dv-active-tab {
+  @apply bg-[var(--dv-inactivegroup-visiblepanel-tab-background-color)] text-[var(--dv-inactivegroup-visiblepanel-tab-color)];
+}
+
+.dv-groupview.dv-inactive-group > .dv-tabs-and-actions-container > .dv-tabs-container > .dv-tab.dv-inactive-tab {
+  @apply bg-[var(--dv-inactivegroup-hiddenpanel-tab-background-color)] text-[var(--dv-inactivegroup-hiddenpanel-tab-color)];
+}
+
+/*--------------------dv-tab--------------------*/
+
+.dv-tab {
+  @apply flex-shrink-0;
+}
+
+.dv-tab:focus-within,
+.dv-tab:focus {
+  @apply relative;
+}
+
+.dv-tab:focus-within::after,
+.dv-tab:focus::after {
+  @apply pointer-events-none absolute left-0 top-0 z-[5] h-full w-full content-[""];
+  outline: 1px solid var(--dv-tab-divider-color) !important;
+  outline-offset: -1px;
+}
+
+/**
+ * when a tab is dragged we lose the above stylings because they are conditional on parent elements
+ * therefore we also set some stylings for the dragging event
+ **/
+.dv-tab.dv-tab-dragging {
+  @apply bg-[var(--dv-activegroup-visiblepanel-tab-background-color)] text-[var(--dv-activegroup-visiblepanel-tab-color)];
+}
+
+.dv-tab.dv-tab-dragging .dv-default-tab-action {
+  @apply bg-[var(--dv-activegroup-visiblepanel-tab-color)];
+}
+
+.dv-tab.dv-active-tab .dv-default-tab .dv-default-tab-action {
+  @apply visible;
+}
+
+.dv-tab.dv-inactive-tab .dv-default-tab .dv-default-tab-action {
+  @apply invisible;
+}
+
+.dv-tab.dv-inactive-tab .dv-default-tab:hover .dv-default-tab-action {
+  @apply visible;
+}
+
+.dv-tab .dv-default-tab {
+  @apply relative flex h-full min-w-[80px] items-center text-ellipsis whitespace-nowrap px-2;
+}
+
+.dv-tab .dv-default-tab .dv-default-tab-content {
+  @apply flex-grow px-[8px] py-0;
+}
+
+.dv-tab .dv-default-tab .dv-default-tab-action {
+  @apply box-border flex items-center justify-center p-[4px];
+}
+
+.dv-tab .dv-default-tab .dv-default-tab-action:hover {
+  @apply bg-[var(--dv-icon-hover-background-color)] hover:rounded-[2px];
+}
+
+/*--------------------dv-root-wrapper--------------------*/
+
+.dv-root-wrapper {
   @apply h-full w-full;
 }
 
-.dv-pane-container.dv-animated .dv-view {
-  @apply transition duration-[150ms] ease-out;
+/*--------------------dv-grid-view--------------------*/
+
+.dv-grid-view,
+.dv-branch-node {
+  @apply h-full w-full;
 }
 
-.dv-split-view-container {
-  @apply relative h-full w-full overflow-hidden;
-}
+/*--------------------dv-debug--------------------*/
 
-.dv-split-view-container .dv-sash-container {
-  @apply absolute h-full w-full;
+.dv-debug .dv-resize-container .dv-resize-handle-top {
+  @apply bg-red-500;
 }
-
-.dv-split-view-container .dv-sash-container .dv-sash {
-  @apply user-select-none absolute z-[99] outline-none;
+.dv-debug .dv-resize-container .dv-resize-handle-bottom {
+  @apply bg-green-500;
 }
-
-.dv-split-view-container .dv-sash-container .dv-sash.dv-enabled {
-  @apply cursor-ew-resize;
+.dv-debug .dv-resize-container .dv-resize-handle-left {
+  @apply bg-yellow-500;
 }
-
-.dv-split-view-container.dv-horizontal > .dv-sash-container > .dv-sash {
-  @apply h-full w-1;
+.dv-debug .dv-resize-container .dv-resize-handle-right {
+  @apply bg-blue-500;
 }
-
-.dv-split-view-container.dv-vertical > .dv-sash-container > .dv-sash {
-  @apply h-1 w-full;
+.dv-debug .dv-resize-container .dv-resize-handle-topleft,
+.dv-debug .dv-resize-container .dv-resize-handle-topright,
+.dv-debug .dv-resize-container .dv-resize-handle-bottomleft,
+.dv-debug .dv-resize-container .dv-resize-handle-bottomright {
+  @apply bg-cyan-500;
 }
-
+.dv-debug .dv-render-overlay {
+  @apply outline-offset-[-1] outline-[1px_solid_red];
+}
 .dv-debug .dv-split-view-container .dv-sash-container .dv-sash.dv-enabled {
   @apply bg-black;
 }
@@ -165,64 +197,277 @@
   @apply bg-red-500;
 }
 
+/*--------------------dv-debug--------------------*/
+
 .dv-resize-container {
-  @apply absolute z-[999] border bg-transparent shadow-[var(--dv-floating-box-shadow)];
+  @apply absolute z-[calc(var(--dv-overlay-z-index)-2)] border border-[var(--dv-tab-divider-color)] shadow-[var(--dv-floating-box-shadow)];
 }
+
 .dv-resize-container.dv-hidden {
   @apply hidden;
 }
+
 .dv-resize-container.dv-resize-container-dragging {
   @apply opacity-50;
 }
-.dv-resize-container .dv-resize-handle-top,
-.dv-resize-container .dv-resize-handle-bottom {
-  @apply absolute left-[4px] h-[4px] w-[calc(100%-8px)] cursor-ns-resize;
-}
-.dv-resize-container .dv-resize-handle-left,
-.dv-resize-container .dv-resize-handle-right {
-  @apply absolute top-[4px] h-[calc(100%-8px)] w-[4px] cursor-ew-resize;
-}
-.dv-resize-container .dv-resize-handle-topleft,
-.dv-resize-container .dv-resize-handle-topright,
-.dv-resize-container .dv-resize-handle-bottomleft,
-.dv-resize-container .dv-resize-handle-bottomright {
-  @apply cursor-resize absolute h-[4px] w-[4px];
+
+.dv-resize-container .dv-resize-handle-top {
+  @apply absolute left-[4px] top-[-2px] z-[var(--dv-overlay-z-index)] h-[4px] w-[calc(100%-8px)] cursor-ns-resize;
 }
 
+.dv-resize-container .dv-resize-handle-bottom {
+  @apply absolute bottom-[-2px] left-[4px] z-[var(--dv-overlay-z-index)] h-[4px] w-[calc(100%-8px)] cursor-ns-resize;
+}
+
+.dv-resize-container .dv-resize-handle-left {
+  @apply absolute left-[-2px] top-[4px] z-[var(--dv-overlay-z-index)] h-[calc(100%-8px)] w-[4px] cursor-ew-resize;
+}
+
+.dv-resize-container .dv-resize-handle-right {
+  @apply absolute right-[-2px] top-[4px] z-[var(--dv-overlay-z-index)] h-[calc(100%-8px)] w-[4px] cursor-ew-resize;
+}
+
+.dv-resize-container .dv-resize-handle-topleft {
+  @apply absolute left-[-2px] top-[-2px] z-[var(--dv-overlay-z-index)] h-[4px] w-[4px] cursor-nw-resize;
+}
+
+.dv-resize-container .dv-resize-handle-topright {
+  @apply absolute right-[-2px] top-[-2px] z-[var(--dv-overlay-z-index)] h-[4px] w-[4px] cursor-ne-resize;
+}
+
+.dv-resize-container .dv-resize-handle-bottomleft {
+  @apply absolute bottom-[-2px] left-[-2px] z-[var(--dv-overlay-z-index)] h-[4px] w-[4px] cursor-sw-resize;
+}
+
+.dv-resize-container .dv-resize-handle-bottomright {
+  @apply absolute bottom-[-2px] right-[-2px] z-[var(--dv-overlay-z-index)] h-[4px] w-[4px] cursor-se-resize;
+}
+
+/*--------------------dv-render-overlay--------------------*/
+
 .dv-render-overlay {
-  @apply absolute h-full z-1;
+  @apply absolute z-[1] h-full;
 }
+
 .dv-render-overlay.dv-render-overlay-float {
-  @apply z-[998];
+  @apply z-[calc(var(--dv-overlay-z-index)-1)];
 }
-.dv-render-overlay.dv-render-overlay-float {
-  @apply outline outline-red-500;
-}
-.dv-resize-container .dv-view {
-  @apply flex flex-col overflow-hidden;
-}
-.dv-resize-container.dv-animated .dv-view {
-  @apply transition duration-[150ms] ease-out;
-}
-.dv-grid-view,
-.dv-branch-node {
+
+/*--------------------dv-pane-container--------------------*/
+
+.dv-pane-container {
   @apply h-full w-full;
 }
-.dv-pane {
+
+.dv-pane-container.dv-animated .dv-view {
+  @apply transition duration-150 ease-out;
+}
+
+.dv-pane-container .dv-view {
+  @apply flex flex-col overflow-hidden !p-0;
+}
+
+.dv-pane-container .dv-view:not(:first-child)::before {
+  @apply !bg-transparent;
+}
+
+.dv-pane-container .dv-view:not(:first-child) .dv-pane > .dv-pane-header {
+  @apply border-t border-[var(--dv-paneview-header-border-color)];
+}
+
+.dv-pane-container .dv-view .dv-default-header {
+  @apply flex cursor-pointer bg-[var(--dv-group-view-background-color)] px-2 text-[var(--dv-activegroup-visiblepanel-tab-color)];
+}
+
+.dv-pane-container .dv-view .dv-default-header .dv-pane-header-icon {
+  @apply flex items-center justify-center;
+}
+
+.dv-pane-container .dv-view .dv-default-header > span {
+  @apply flex-grow pl-[8px];
+}
+
+.dv-pane-container:first-of-type > .dv-pane > .dv-pane-header {
+  @apply !border-t-0;
+}
+
+.dv-pane-container .dv-pane {
   @apply flex h-full flex-col overflow-hidden;
 }
-.dv-pane .dv-pane-header {
-  @apply relative box-border outline-none;
+
+.dv-pane-container .dv-pane .dv-pane-header {
+  @apply relative box-border select-none outline-none;
 }
-.dv-pane-container {
-  @apply flex h-full w-full;
+
+.dv-pane-container .dv-pane .dv-pane-header.dv-pane-draggable {
+  @apply cursor-pointer;
 }
-.dv-tab .dv-default-tab {
-  @apply relative flex min-w-[80px] items-center text-ellipsis px-2;
+
+.dv-pane-container .dv-pane .dv-pane-header:focus:before,
+.dv-pane-container .dv-pane .dv-pane-header:focus-within:before {
+  @apply pointer-events-none absolute left-0 top-0 z-[5] h-full w-full outline-[-1px] outline-offset-[-1px] outline-[1px_solid] [outline-style:solid];
 }
+
 .dv-pane-container .dv-pane .dv-pane-body {
   @apply relative flex-grow overflow-y-auto overflow-x-hidden outline-none;
 }
-.dv-pane-container .dv-pane .dv-pane-body:focus:before {
-  @apply pointer-events-none absolute left-0 top-0 h-full w-full;
+
+.dv-pane-container .dv-pane .dv-pane-body:focus:before,
+.dv-pane-container .dv-pane .dv-pane-body:focus-within:before {
+  @apply pointer-events-none absolute left-0 top-0 z-[5] h-full w-full content-[""];
+  outline: 1px solid var(--dv-paneview-active-outline-color);
+  outline-width: -1px;
+  outline-style: solid;
+  outline-offset: -1px;
+}
+
+/*--------------------dv-split-view-contain--------------------*/
+
+.dv-split-view-container {
+  @apply relative h-full w-full overflow-hidden;
+}
+
+.dv-split-view-container.dv-splitview-disabled > .dv-sash-container > .dv-sash {
+  @apply pointer-events-none;
+}
+
+.dv-split-view-container.dv-animation .dv-view,
+.dv-split-view-container.dv-animation .dv-sash {
+  @apply transition duration-150 ease-out;
+}
+
+.dv-split-view-container.dv-horizontal {
+  @apply h-full;
+}
+
+.dv-split-view-container.dv-horizontal > .dv-sash-container > .dv-sash {
+  @apply h-full w-[4px];
+}
+
+.dv-split-view-container.dv-horizontal > .dv-sash-container > .dv-sash.dv-enabled {
+  @apply cursor-ew-resize;
+}
+
+.dv-split-view-container.dv-horizontal > .dv-sash-container > .dv-sash.dv-disabled {
+  @apply cursor-default;
+}
+
+.dv-split-view-container.dv-horizontal > .dv-sash-container > .dv-sash.dv-maximum {
+  @apply cursor-w-resize;
+}
+
+.dv-split-view-container.dv-horizontal > .dv-sash-container > .dv-sash.dv-minimum {
+  @apply cursor-e-resize;
+}
+
+.dv-split-view-container.dv-horizontal > .dv-view-container > .dv-view:not(:first-child)::before {
+  @apply h-full w-[1px];
+}
+
+.dv-split-view-container.dv-vertical {
+  @apply w-full;
+}
+
+.dv-split-view-container.dv-vertical > .dv-sash-container > .dv-sash {
+  @apply h-[4px] w-full;
+}
+
+.dv-split-view-container.dv-vertical > .dv-sash-container > .dv-sash.dv-enabled {
+  @apply cursor-ns-resize;
+}
+
+.dv-split-view-container.dv-vertical > .dv-sash-container > .dv-sash.dv-disabled {
+  @apply cursor-default;
+}
+
+.dv-split-view-container.dv-vertical > .dv-sash-container > .dv-sash.dv-maximum {
+  @apply cursor-n-resize;
+}
+
+.dv-split-view-container.dv-vertical > .dv-sash-container > .dv-sash.dv-minimum {
+  @apply cursor-s-resize;
+}
+
+.dv-split-view-container.dv-vertical > .dv-view-container > .dv-view {
+  @apply w-full;
+}
+
+.dv-split-view-container.dv-vertical > .dv-view-container > .dv-view:not(:first-child)::before {
+  @apply h-[1px] w-full;
+}
+
+.dv-split-view-container .dv-sash-container {
+  @apply absolute h-full w-full;
+}
+
+/*FIXME*/
+.dv-split-view-container .dv-sash-container .dv-sash {
+  @apply absolute z-[99] touch-none select-none outline-none;
+}
+
+.dv-split-view-container .dv-sash-container .dv-sash:not(.disabled):active {
+  @apply bg-[var(--dv-active-sash-color,transparent)] transition-colors duration-100 ease-in-out;
+}
+
+.dv-split-view-container .dv-sash-container .dv-sash:not(.disabled):hover {
+  @apply bg-[var(--dv-active-sash-color,transparent)] transition-colors delay-500 duration-100 ease-in-out;
+}
+
+.dv-split-view-container .dv-view-container {
+  @apply relative h-full w-full;
+}
+
+.dv-split-view-container .dv-view-container .dv-view {
+  @apply absolute box-border h-full overflow-auto;
+}
+
+.dv-split-view-container.dv-separator-border .dv-view:not(:first-child)::before {
+  @apply pointer-events-none absolute left-0 top-0 z-[5] bg-[var(--dv-separator-border)] content-[""];
+}
+
+.dv-tabs-and-actions-container.dv-single-tab.dv-full-width-single-tab .dv-tabs-container {
+  @apply flex-grow;
+}
+
+.dv-tabs-and-actions-container.dv-single-tab.dv-full-width-single-tab .dv-tabs-container .dv-tab {
+  @apply flex-grow;
+}
+
+.dv-tabs-and-actions-container.dv-single-tab.dv-full-width-single-tab .dv-void-container {
+  @apply flex-grow-0;
+}
+
+.dv-tabs-and-actions-container .dv-void-container {
+  @apply flex flex-grow cursor-grab;
+}
+
+.dv-tabs-and-actions-container .dv-tabs-container {
+  @apply scrollbar-thin /* Track | Handle */ flex overflow-x-auto overflow-y-hidden;
+}
+
+.dv-tabs-and-actions-container .dv-tabs-container::-webkit-scrollbar {
+  @apply h-[3px];
+}
+
+.dv-tabs-and-actions-container .dv-tabs-container::-webkit-scrollbar-track {
+  @apply bg-transparent;
+}
+
+.dv-tabs-and-actions-container .dv-tabs-container::-webkit-scrollbar-thumb {
+  @apply bg-[var(--dv-tabs-container-scrollbar-color)];
+}
+
+.dv-tabs-and-actions-container .dv-tabs-container .dv-tab {
+  @apply relative box-border min-w-[75px] cursor-pointer outline-none;
+  -webkit-user-drag: element;
+}
+
+.dv-tabs-and-actions-container .dv-tabs-container .dv-tab:not(:first-child)::before {
+  @apply pointer-events-none absolute left-0 top-0 z-[5] h-full w-[1px] bg-[var(--dv-tab-divider-color)] content-[""];
+}
+
+/*--------------------dv-dragged--------------------*/
+
+.dv-dragged {
+  @apply translate-z-0 translate-x-0 translate-y-0 transform;
 }
