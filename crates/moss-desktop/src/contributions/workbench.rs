@@ -3,6 +3,7 @@ use serde_json::Value;
 use tauri::{Emitter, EventTarget, Manager};
 
 use crate::{
+    app::state::AppStateManager,
     command::{CommandContext, CommandDecl},
     contribution::TreeViewGroupDecl,
     contribution_point,
@@ -11,7 +12,6 @@ use crate::{
         constants,
         view::*,
     },
-    state::AppState,
 };
 
 contribution_point!(WORKBENCH, {
@@ -39,7 +39,10 @@ contribution_point!(WORKBENCH, {
     ]
 });
 
-pub fn change_color_theme(ctx: CommandContext, app_state: &AppState) -> Result<Value, String> {
+pub fn change_color_theme(
+    ctx: CommandContext,
+    app_state: &AppStateManager,
+) -> Result<Value, String> {
     let theme_descriptor_arg = ctx.take_arg::<ThemeDescriptor>("themeDescriptor")?;
 
     app_state.change_color_theme(theme_descriptor_arg.clone());
@@ -61,7 +64,10 @@ pub fn change_color_theme(ctx: CommandContext, app_state: &AppState) -> Result<V
     Ok(Value::Null)
 }
 
-pub fn change_language_pack(ctx: CommandContext, app_state: &AppState) -> Result<Value, String> {
+pub fn change_language_pack(
+    ctx: CommandContext,
+    app_state: &AppStateManager,
+) -> Result<Value, String> {
     let locale_descriptor_arg = ctx.take_arg::<LocaleDescriptor>("localeDescriptor")?;
 
     app_state.change_language_pack(locale_descriptor_arg.clone());

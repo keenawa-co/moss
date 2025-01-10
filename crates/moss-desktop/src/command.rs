@@ -7,7 +7,7 @@ use std::{cell::RefCell, sync::Arc};
 use tauri::{AppHandle, Window};
 use thiserror::Error;
 
-use crate::state::AppState;
+use crate::app::state::AppStateManager;
 
 #[derive(Error, Debug)]
 pub enum CommandContextError {
@@ -78,10 +78,10 @@ impl CommandContext {
 }
 
 pub type CommandHandler =
-    Arc<dyn Fn(CommandContext, &AppState) -> Result<Value, String> + Send + Sync>;
+    Arc<dyn Fn(CommandContext, &AppStateManager) -> Result<Value, String> + Send + Sync>;
 
 #[derive(Debug)]
 pub struct CommandDecl {
     pub name: ReadOnlyStr,
-    pub callback: fn(CommandContext, &AppState) -> Result<serde_json::Value, String>,
+    pub callback: fn(CommandContext, &AppStateManager) -> Result<serde_json::Value, String>,
 }

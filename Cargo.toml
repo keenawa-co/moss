@@ -7,7 +7,6 @@ members = [
     "view/desktop/bin",
     "cli",
     "tools/xtask",
-    "misc/themeinstall",
 
     "crates/moss-text",
     "crates/moss-fs",
@@ -15,12 +14,13 @@ members = [
     "crates/moss-jsonlogic-macro",
     "crates/moss-uikit",
     "crates/moss-html",
-    "crates/moss-themeconv",
     "crates/moss-env",
     "crates/moss-async",
     "crates/moss-collection",
     "crates/moss-theme",
     "crates/moss-cache",
+    "crates/moss-addon",
+    "crates/moss-tauri",
 ]
 
 [profile.dev]
@@ -47,7 +47,6 @@ moss_uikit = { path = "crates/moss-uikit" }
 moss_html = { path = "crates/moss-html" }
 moss_text = { path = "crates/moss-text" }
 moss_fs = { path = "crates/moss-fs" }
-moss_themeconv = { path = "crates/moss-themeconv" }
 moss_jsonlogic = { path = "crates/moss-jsonlogic" }
 moss_jsonlogic_macro = { path = "crates/moss-jsonlogic-macro" }
 moss_env = { path = "crates/moss-env" }
@@ -55,7 +54,12 @@ moss_async = { path = "crates/moss-async" }
 moss_collection = { path = "crates/moss-collection" }
 moss_desktop = { path = "crates/moss-desktop" }
 moss_cache = { path = "crates/moss-cache" }
+moss_addon = { path = "crates/moss-addon" }
+moss_tauri = { path = "crates/moss-tauri" }
+moss_theme = { path = "crates/moss-theme" }
 
+smallvec = "1.13.2"
+toml = "0.8.19"
 linkme = "0.3"
 paste = "1.0.15"
 dashmap = "6.1.0"
@@ -73,7 +77,6 @@ tauri = { version = "2.0.6", default-features = false, features = [
 ] }
 anyhow = "1.0"
 hashbrown = "0.15.0"
-radix_trie = "0.2.1"
 parking_lot = "0.12.3"
 strum = "0.26"
 dunce = "1.0.5"
@@ -87,17 +90,15 @@ once_cell = "1.19"
 tracing = "0.1"
 tracing-subscriber = "0.3.18"
 tracing-appender = "0.2.3"
-clap = { version = "4.5.23", features = ["derive"] }
 
+clap = { version = "4.5.23", features = ["derive"] }
+fnv = "1.0.7"
 fern = "0.7.0"
 rand = "0.8.5"
-log = "0.4.21"
 quote = "1.0"
 dirs = "5.0.1"
 jsonschema = { version = "0.26.1", default-features = false }
-
-
 os_info = { version = "3.9.0", default-features = false }
 gethostname = "0.5.0"
-
 moka = { version = "0.12.8", features = ["sync"] }
+derive_more = "1.0.0"

@@ -1,15 +1,19 @@
 {
-  "name": "moss-theme",
+  "name": "@repo/moss-theme",
   "version": "0.1.0",
   "type": "module",
+  "exports": {
+    ".": "./index.ts"
+  },
   "peerDependencies": {
     "@typespec/compiler": "latest"
   },
   "devDependencies": {
+    "@repo/typescript-config": "workspace:*",
     "@typespec/compiler": "latest"
   },
   "private": true,
   "dependencies": {
-    "@typespec/json-schema": "^0.62.0"
+    "@typespec/json-schema": "^0.63.0"
   }
 }

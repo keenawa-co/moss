@@ -1,73 +1,98 @@
 use anyhow::{anyhow, Context as _, Result};
+use dashmap::DashSet;
 use moss_cache::{backend::moka::MokaBackend, Cache, CacheError};
-use serde::Deserialize;
-use std::{path::PathBuf, sync::Arc};
-use tauri::AppHandle;
+use moss_theme::{
+    conversion::{
+        json_converter::JsonThemeConverter, jsonschema_validator::JsonSchemaValidator,
+        ThemeConverter,
+    },
+    schema::SCHEMA_THEME,
+};
+use std::{ops::Deref, path::PathBuf, sync::Arc};
+use tauri::{AppHandle, Manager};
+
+use crate::{
+    app::{service::Service, state::AppStateManager},
+    models::application::ThemeDescriptor,
+};
 
 const CK_COLOR_THEME: &'static str = "color_theme";
 
-#[derive(Debug, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct GetColorThemeOptions {
-    pub enable_cache: bool,
+#[derive(Clone)]
+struct ThemeCacheEntry {
+    source: String,
+    data: String,
 }
 
 pub struct ThemeService {
-    app_handle: AppHandle,
     app_cache: Arc<Cache<MokaBackend>>,
+    converter: Arc<dyn ThemeConverter + Send + Sync>,
+    themes: Arc<DashSet<ThemeDescriptor>>,
 }
 
 impl ThemeService {
-    pub fn new(app_handle: AppHandle, app_cache: Arc<Cache<MokaBackend>>) -> Self {
+    pub fn new(app_handle: &AppHandle) -> Self {
+        let app_state = app_handle.state::<AppStateManager>();
+        let json_schema_validator = JsonSchemaValidator::new(SCHEMA_THEME.deref());
+        let converter = JsonThemeConverter::new(json_schema_validator);
+
+        // let s = SCHEMA_THEME.deref();
+
         Self {
-            app_handle,
-            app_cache,
+            app_cache: Arc::clone(&app_state.cache),
+            converter: Arc::new(converter),
+            themes: Arc::clone(&app_state.contributions.themes),
         }
     }
 
-    pub async fn get_color_theme(
-        &self,
-        source: &str,
-        opts: Option<GetColorThemeOptions>,
-    ) -> Result<String> {
-        let handle_cache_miss = || async {
-            let content = self.read_color_theme_from_file(source).await?;
+    pub fn get_color_themes(&self) -> &DashSet<ThemeDescriptor> {
+        &self.themes
+    }
 
-            let options = if let Some(options) = opts {
-                options
-            } else {
-                return Ok(content);
-            };
-
-            if options.enable_cache {
-                self.app_cache.insert(CK_COLOR_THEME, content.clone());
-                trace!("Color theme '{}' was successfully cached", source);
-            };
-
-            Ok(content)
-        };
-
-        match self.app_cache.get::<String>(CK_COLOR_THEME) {
-            Ok(cached_value) => {
-                trace!("Color theme '{source}' was restored from the cache");
-
-                Ok((*cached_value).clone())
+    pub async fn get_color_theme(&self, source: &str) -> Result<String> {
+        match self.app_cache.get::<ThemeCacheEntry>(CK_COLOR_THEME) {
+            Ok(entry) if entry.source == source => {
+                trace!("Color theme '{}' was restored from the cache", source);
+                return Ok(entry.data.clone());
             }
-            Err(CacheError::NonexistentKey { .. }) => handle_cache_miss().await,
+            Ok(_) => {
+                trace!(
+                    "Color theme in cache does not match the requested source '{}'",
+                    source
+                );
+            }
+            Err(CacheError::NonexistentKey { .. }) => {
+                trace!("No color theme found in cache for key '{}'", CK_COLOR_THEME);
+            }
             Err(CacheError::TypeMismatch { key, type_name }) => {
                 warn!(
-                    "Type mismatch for key '{}': expected 'String', found '{}'",
+                    "Type mismatch for key '{}': expected 'ThemeCacheEntry', found '{}'",
                     key, type_name
                 );
-
-                handle_cache_miss().await
             }
         }
+
+        self.get_color_theme_internal(source).await
     }
 
-    async fn read_color_theme_from_file(&self, source: &str) -> Result<String> {
-        let themes_dir = get_themes_dir().context("Failed to get the themes directory")?;
-        let full_path = themes_dir.join(source);
+    async fn get_color_theme_internal(&self, source: &str) -> Result<String> {
+        let json_data = self.read_color_theme_from_file(source).await?;
+        // TODO: Add merging of the global theme object with the user’s custom theme settings object.
+        let css_data = self.converter.convert_to_css(json_data)?;
+
+        self.app_cache.insert(
+            CK_COLOR_THEME,
+            ThemeCacheEntry {
+                source: source.to_string(),
+                data: css_data.clone(),
+            },
+        );
+
+        Ok(css_data)
+    }
+
+    async fn read_color_theme_from_file(&self, path: &str) -> Result<String> {
+        let full_path = PathBuf::from(path);
 
         if !full_path.exists() {
             return Err(anyhow!("File '{}' does not exist", full_path.display()));
@@ -85,10 +110,14 @@ impl ThemeService {
     }
 }
 
-fn get_home_dir() -> Result<PathBuf> {
-    dirs::home_dir().context("Home directory not found!")
-}
+impl Service for ThemeService {
+    fn name(&self) -> &'static str {
+        std::any::type_name::<Self>()
+    }
 
-fn get_themes_dir() -> Result<PathBuf> {
-    Ok(get_home_dir()?.join(".config").join("moss").join("themes"))
+    fn dispose(&self) {}
+
+    fn as_any(&self) -> &dyn std::any::Any {
+        self
+    }
 }

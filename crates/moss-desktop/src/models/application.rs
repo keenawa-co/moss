@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 use ts_rs::TS;
 
-#[derive(Deserialize, Serialize, Debug, Clone, Eq, PartialEq, TS)]
+#[derive(Deserialize, Serialize, Hash, Debug, Clone, Eq, PartialEq, TS)]
 #[serde(rename_all = "camelCase")]
 #[ts(export, export_to = "application.ts")]
 pub struct ThemeDescriptor {
@@ -13,7 +13,7 @@ pub struct ThemeDescriptor {
     pub source: String,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, TS)]
+#[derive(Debug, Clone, Serialize, Deserialize, TS, Eq, Hash, PartialEq)]
 #[serde(rename_all = "camelCase")]
 #[ts(export, export_to = "application.ts")]
 pub struct LocaleDescriptor {
@@ -29,17 +29,26 @@ pub struct LocaleDescriptor {
 #[derive(Debug, Deserialize, Serialize, Clone, TS)]
 #[serde(rename_all = "camelCase")]
 #[ts(export, export_to = "application.ts")]
-pub struct PreferencesInfo {
-    /// The selected theme for the application.
+pub struct Preferences {
+    #[ts(optional)]
+    pub theme: Option<ThemeDescriptor>,
+    #[ts(optional)]
+    pub locale: Option<LocaleDescriptor>,
+}
+
+#[derive(Debug, Deserialize, Serialize, Clone, TS)]
+#[serde(rename_all = "camelCase")]
+#[ts(export, export_to = "application.ts")]
+pub struct Defaults {
     pub theme: ThemeDescriptor,
-    /// The selected locale for the application.
     pub locale: LocaleDescriptor,
 }
 
 #[derive(Debug, Deserialize, Serialize, Clone, TS)]
 #[serde(rename_all = "camelCase")]
 #[ts(export, export_to = "application.ts")]
-pub struct AppStateInfo {
+pub struct AppState {
     /// The user preferences for the application.
-    pub preferences: PreferencesInfo,
+    pub preferences: Preferences,
+    pub defaults: Defaults,
 }

@@ -6,67 +6,101 @@ mod plugins;
 mod utl;
 mod window;
 
-pub use constants::*;
-
-use moss_desktop::services::theme_service::ThemeService;
-use moss_desktop::state::AppState;
+use anyhow::Result;
 use rand::random;
-use std::env;
-use std::sync::Arc;
 use tauri::{AppHandle, Manager, RunEvent, WebviewWindow, WindowEvent};
 use tauri_plugin_global_shortcut::{Code, GlobalShortcutExt, Modifiers, Shortcut, ShortcutState};
-use tauri_plugin_log::{fern::colors::ColoredLevelConfig, Target, TargetKind};
 use tauri_plugin_os;
+use tracing::level_filters::LevelFilter;
+use tracing_subscriber::fmt::format::FmtSpan;
+use tracing_subscriber::layer::SubscriberExt;
+use tracing_subscriber::Layer;
 use window::{create_window, CreateWindowInput};
 
+use moss_addon::{BUILTIN_ADDONS_DIR, INSTALLED_ADDONS_DIR};
+use moss_desktop::app::manager::AppManager;
+use moss_desktop::app::state::AppStateManager;
+use moss_desktop::services::addon_service::AddonService;
+use moss_desktop::services::theme_service::ThemeService;
+use moss_desktop::services::window_service::WindowService;
+use moss_desktop::{
+    app::instantiation::InstantiationType, services::lifecycle_service::LifecycleService,
+};
+
 use crate::commands::*;
-use crate::plugins as moss_plugins;
+use crate::plugins::*;
+pub use constants::*;
+use moss_desktop::services::locale_service::LocaleService;
 
 #[macro_use]
-extern crate serde;
+extern crate tracing;
 
 pub fn run() {
     #[allow(unused_mut)]
     let mut builder = tauri::Builder::default()
-        .plugin(
-            tauri_plugin_log::Builder::default()
-                .targets([
-                    Target::new(TargetKind::Stdout),
-                    Target::new(TargetKind::LogDir { file_name: None }),
-                    Target::new(TargetKind::Webview),
-                ])
-                .level_for("tao", log::LevelFilter::Info)
-                .level_for("plugin_runtime", log::LevelFilter::Info)
-                .level_for("tracing", log::LevelFilter::Warn)
-                .with_colors(ColoredLevelConfig::default())
-                .level(if is_dev() {
-                    log::LevelFilter::Trace
-                } else {
-                    log::LevelFilter::Info
-                })
-                .build(),
-        )
-        .plugin(
-            tauri_plugin_window_state::Builder::default()
-                .with_denylist(&["ignored"])
-                .map_label(|label| {
-                    if label.starts_with(OTHER_WINDOW_PREFIX) {
-                        "ignored"
-                    } else {
-                        label
-                    }
-                })
-                .build(),
-        )
+        .plugin(plugin_log::init())
+        .plugin(plugin_window_state::init())
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_os::init());
+
     #[cfg(target_os = "macos")]
     {
-        builder = builder.plugin(moss_plugins::tauri_mac_window::init());
+        builder = builder.plugin(mac_window::init());
     }
 
     builder
         .setup(|app| {
+            let log_format = tracing_subscriber::fmt::format()
+                .with_file(true)
+                .with_line_number(true)
+                .with_target(false)
+                .compact();
+
+            let log_level_filter = std::env::var("LOG_LEVEL")
+                .unwrap_or("trace".to_string())
+                .to_lowercase()
+                .parse()
+                .unwrap_or(LevelFilter::TRACE);
+
+            let subscriber = tracing_subscriber::registry().with(
+                tracing_subscriber::fmt::layer()
+                    .event_format(log_format)
+                    .with_ansi(true)
+                    .with_span_events(FmtSpan::CLOSE)
+                    .with_filter(log_level_filter),
+            );
+
+            tracing::subscriber::set_global_default(subscriber)
+                .expect("failed to set tracing subscriber");
+
+            let app_handle = app.app_handle();
+
+            let app_state = AppStateManager::new();
+            app_handle.manage(app_state);
+
+            let app_manager = AppManager::new(app_handle.clone())
+                .with_service(|_| LifecycleService::new(), InstantiationType::Instant)
+                .with_service(
+                    |app_handle| {
+                        AddonService::new(
+                            app_handle,
+                            BUILTIN_ADDONS_DIR.to_path_buf(),
+                            INSTALLED_ADDONS_DIR.to_path_buf(),
+                        )
+                    },
+                    InstantiationType::Instant,
+                )
+                .with_service(|_| WindowService::new(), InstantiationType::Delayed)
+                .with_service(
+                    |app_handle| ThemeService::new(app_handle),
+                    InstantiationType::Delayed,
+                )
+                .with_service(
+                    |app_handle| LocaleService::new(app_handle),
+                    InstantiationType::Delayed,
+                );
+            app_handle.manage(app_manager);
+
             let ctrl_n_shortcut = Shortcut::new(Some(Modifiers::CONTROL), Code::KeyN);
 
             app.handle().plugin(
@@ -94,12 +128,12 @@ pub fn run() {
             cmd_window::get_locales,
             cmd_window::get_translations,
             cmd_window::get_themes,
-            cmd_window::main_window_is_ready,
             cmd_window::create_new_window,
             cmd_window::execute_command,
             cmd_base::get_menu_items_by_namespace,
             cmd_window::execute_command,
             cmd_window::get_color_theme,
+            cmd_window::get_state,
         ])
         .on_window_event(|window, event| match event {
             #[cfg(target_os = "macos")]
@@ -117,7 +151,9 @@ pub fn run() {
         .expect("failed to run")
         .run(|app_handle, event| match event {
             RunEvent::Ready => {
-                let _ = create_main_window(app_handle, "/");
+                let webview_window = create_main_window(&app_handle, "/");
+                webview_window
+                    .on_menu_event(move |window, event| menu::handle_event(window, &event));
             }
 
             #[cfg(target_os = "macos")]
@@ -131,14 +167,6 @@ pub fn run() {
 }
 
 fn create_main_window(app_handle: &AppHandle, url: &str) -> WebviewWindow {
-    let state = AppState::new();
-    let theme_service = ThemeService::new(app_handle.clone(), Arc::clone(&state.cache));
-
-    {
-        app_handle.manage(theme_service);
-        app_handle.manage(state);
-    }
-
     let label = format!("{MAIN_WINDOW_PREFIX}{}", 0);
     let config = CreateWindowInput {
         url,
@@ -150,13 +178,13 @@ fn create_main_window(app_handle: &AppHandle, url: &str) -> WebviewWindow {
             100.0 + random::<f64>() * 20.0,
         ),
     };
-    let webview_window = create_window(app_handle, config);
-    webview_window.on_menu_event(move |window, event| menu::handle_event(window, &event));
-    webview_window
+
+    create_window(app_handle, config)
 }
 
-fn create_child_window(app_handle: &AppHandle, url: &str) -> WebviewWindow {
-    let next_window_id = app_handle.state::<AppState>().inc_next_window_id() + 1;
+fn create_child_window(app_handle: &AppHandle, url: &str) -> Result<WebviewWindow> {
+    let app_manager = app_handle.state::<AppManager>();
+    let next_window_id = app_manager.service::<WindowService>()?.next_window_id() + 1;
     let config = CreateWindowInput {
         url,
         label: &format!("{MAIN_WINDOW_PREFIX}{}", next_window_id),
@@ -167,18 +195,6 @@ fn create_child_window(app_handle: &AppHandle, url: &str) -> WebviewWindow {
             100.0 + random::<f64>() * 20.0,
         ),
     };
-    let webview_window = create_window(app_handle, config);
-    webview_window.on_menu_event(move |window, event| menu::handle_event(window, &event));
-    webview_window
-}
 
-fn is_dev() -> bool {
-    #[cfg(dev)]
-    {
-        return true;
-    }
-    #[cfg(not(dev))]
-    {
-        return false;
-    }
+    Ok(create_window(app_handle, config))
 }
