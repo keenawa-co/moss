@@ -1,3 +1,4 @@
+import importPlugin from "eslint-plugin-import";
 import reactHooksPlugin from "eslint-plugin-react-hooks";
 import reactRefreshPlugin from "eslint-plugin-react-refresh";
 import tseslint from "typescript-eslint";
@@ -18,16 +19,29 @@ export default tseslint.config(...tseslint.configs.recommended, {
     "**/*.spec.*",
   ],
   languageOptions: {},
-  settings: {},
+  "settings": {
+    "import/parsers": {
+      "@typescript-eslint/parser": [".ts", ".tsx"],
+    },
+    "import/resolver": {
+      "typescript": {
+        "project": ["tsconfig.json", "packages/*/tsconfig.json", "view/*/tsconfig.json"],
+      },
+      "node": {
+        "extensions": [".js", ".jsx", ".ts", ".tsx", ".json"],
+      },
+    },
+  },
   files: ["**/*.{ts,tsx,js,jsx}"],
-
   plugins: {
     "react-hooks": reactHooksPlugin,
     "react-refresh": reactRefreshPlugin,
     "@typescript-eslint": tseslint.plugin,
     mossLint: mossLintPlugin,
+    import: importPlugin,
   },
   rules: {
+    "import/no-unresolved": "error",
     "react-hooks/rules-of-hooks": "error",
     "react-hooks/exhaustive-deps": "warn",
     "react-refresh/only-export-components": ["warn", { allowConstantExport: true }],

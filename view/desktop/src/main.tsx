@@ -1,20 +1,18 @@
+import "@repo/moss-ui/src/fonts.css";
+import "@/assets/index.csss";
+
 import { lazy, StrictMode, Suspense } from "react";
 import { createRoot } from "react-dom/client";
 import { Provider } from "react-redux";
 
+import { QueryCache, QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { getCurrentWebviewWindow } from "@tauri-apps/api/webviewWindow";
 import { type } from "@tauri-apps/plugin-os";
 
+import GeneralProvider from "./app/Provider";
 import { PageLoader } from "./components/PageLoader";
 import { store } from "./store";
-
-import "@/assets/index.css";
-import "@repo/moss-ui/src/fonts.css";
-
-import { QueryCache, QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-
-import GeneralProvider from "./app/Provider";
 
 const sharedWorker = new SharedWorker("./shared-worker.js");
 
