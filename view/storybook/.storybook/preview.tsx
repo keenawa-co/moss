@@ -26,7 +26,7 @@ const applyTheme = (theme: Theme) => {
 
   Object.entries(colors).forEach(([key, color]) => {
     // @ts-expect-error this shouldn't be an error and seems to be a problem with config, but tsconfig seems fine
-    root.style.setProperty(`--color-${key}`.replaceAll(".", "-"), color.value);
+    root.style.setProperty(`--moss-${key}`.replaceAll(".", "-"), color.value);
   });
 };
 
@@ -58,7 +58,7 @@ const preview: Preview = {
       applyTheme(themeFiles[theme]);
 
       return (
-        <div style={{ backgroundColor: "var(--moss-color-page-background)" }}>
+        <div style={{ backgroundColor: "var(--moss-page-background)" }}>
           <Story />
         </div>
       );

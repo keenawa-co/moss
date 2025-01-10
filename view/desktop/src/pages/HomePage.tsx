@@ -17,14 +17,14 @@ export const Home: React.FC = () => {
 
   return (
     <div>
-      <h1 className="text-[var(--moss-color-primary)]">{t("title")}</h1>
+      <h1 className="text-[var(--moss-primary)]">{t("title")}</h1>
 
       <button className="bg-green-500 px-3" onClick={handleNewWindowButton}>
         New Window
       </button>
 
       <div>
-        <Tooltip label="Test" className="text-[var(--moss-color-primary)]">
+        <Tooltip label="Test" className="text-[var(--moss-primary)]">
           <Icon icon="Code" />
         </Tooltip>
       </div>
@@ -72,9 +72,9 @@ const SessionComponent = () => {
 
   return (
     <>
-      <span className="text-[var(--moss-color-primary)]">{t("description.part1")}</span>
+      <span className="text-[var(--moss-primary)]">{t("description.part1")}</span>
       <br />
-      <span className="bg-secondary text-[var(--moss-color-primary)]">{t("description.part1", { ns: "ns2" })}</span>
+      <span className="bg-secondary text-[var(--moss-primary)]">{t("description.part1", { ns: "ns2" })}</span>
       {data !== null && <p>Received data: {data}</p>}
     </>
   );
