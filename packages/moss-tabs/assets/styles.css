@@ -1,0 +1,73 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.dv-svg {
+  @apply inline-block fill-current stroke-current stroke-0;
+}
+
+.dv-tab {
+  @apply relative flex-shrink-0 focus:outline-none;
+}
+
+.dv-tab:focus-within,
+.dv-tab:focus {
+  @apply relative outline-none;
+}
+
+.dv-tab:focus-within::after,
+.dv-tab:focus::after {
+  @apply pointer-events-none absolute left-0 top-0 h-full w-full outline outline-1;
+}
+
+.dv-groupview {
+  @apply bg-dv-group-view-bg-dark flex h-full flex-col overflow-hidden;
+}
+
+.dv-tabs-and-actions-container {
+  @apply bg-dv-tabs-container-bg-dark h-dv-tabs-height text-dv-tabs-font box-border flex shrink-0;
+}
+
+.dv-tabs-container {
+  @apply flex overflow-x-auto overflow-y-hidden;
+}
+
+.dv-tab-divider {
+  @apply border-dv-tab-divider-dark;
+}
+
+.dv-pane-header {
+  @apply border-dv-pane-header-border-dark box-border border-t;
+}
+
+.dv-pane {
+  @apply flex h-full flex-col overflow-hidden;
+}
+
+.dv-pane-body {
+  @apply relative flex-grow overflow-y-auto overflow-x-hidden outline-none;
+}
+
+.dv-pane-body:focus:before,
+.dv-pane-body:focus-within:before {
+  @apply outline-dv-focus-outline pointer-events-none absolute left-0 top-0 h-full w-full;
+}
+
+.dv-sash {
+  @apply absolute bg-transparent;
+}
+
+.dv-sash:hover {
+  @apply bg-dv-drag-over-bg;
+}
+
+.dv-tab-dragging {
+  @apply bg-dv-tab-dragging-bg text-dv-tab-dragging-color;
+}
+
+.dv-tabs-container::-webkit-scrollbar {
+  @apply h-1;
+}
+.dv-tabs-container::-webkit-scrollbar-thumb {
+  @apply bg-dv-drag-over-bg;
+}

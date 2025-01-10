@@ -4,7 +4,8 @@
   "type": "module",
   "exports": {
     ".": "./src/index.ts",
-    "./styles/dockview.css": "./styles/dockview.css"
+    "./styles/dockview.css": "./styles/dockview.css",
+    "./assets/styles.css": "./assets/styles.css"
   },
   "description": "Zero dependency layout manager supporting tabs, grids and splitviews",
   "keywords": [

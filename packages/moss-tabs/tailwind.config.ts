@@ -8,100 +8,26 @@ const config: Pick<Config, "content" | "presets" | "theme" | "plugins"> = {
   presets: [sharedConfig],
   theme: {
     extend: {
-      colors: {
-        "dv-paneview-header-border-color": "var(--dv-paneview-header-border-color)",
-        "dv-group-view-background-color": "var(--dv-group-view-background-color)",
-        "dv-activegroup-visiblepanel-tab-color": "var(--dv-activegroup-visiblepanel-tab-color)",
-        "dv-paneview-active-outline-color": "var(--dv-paneview-active-outline-color)",
+      fontSize: {
+        "dv-tabs-font": "13px",
       },
-      backgroundColor: {
-        "dv-enabled": "black",
-        "dv-disabled": "orange",
-        "dv-maximum": "green",
-        "dv-minimum": "red",
-        "dv-group-view": "var(--dv-group-view-background-color)",
+      spacing: {
+        "dv-tabs-height": "35px",
       },
-      borderColor: {
-        "dv-paneview-header": "var(--dv-paneview-header-border-color)",
-      },
-      outlineColor: {
-        "dv-paneview-active": "var(--dv-paneview-active-outline-color)",
-      },
-      cursor: {
-        "ew-resize": "ew-resize",
-        "ns-resize": "ns-resize",
-        "w-resize": "w-resize",
-        "e-resize": "e-resize",
-        "n-resize": "n-resize",
-        "s-resize": "s-resize",
-        "pointer": "pointer",
-      },
-      transitionDuration: {
-        "150": "0.15s",
-      },
-      transitionTimingFunction: {
-        "ease-out": "ease-out",
+      boxShadow: {
+        "dv-floating": "8px 8px 8px 0px rgba(83, 89, 93, 0.5)",
       },
       zIndex: {
-        "5": "5",
-        "99": "99",
+        "dv-overlay": "999",
       },
-      inset: {
-        "0": "0",
+      borderWidth: {
+        "dv-tab-divider": "1px",
       },
-      width: {
-        "1": "1px",
-        "4": "4px",
-        "100": "100%",
-        "full": "100%",
-      },
-      height: {
-        "1": "1px",
-        "4": "4px",
-        "100": "100%",
-        "full": "100%",
-      },
-      padding: {
-        "0": "0px",
-        "2": "0.5rem",
-        "8": "8px",
-      },
-      flexGrow: {
-        "1": "1",
-      },
-      flexDirection: {
-        "col": "column",
-      },
-      overflow: {
-        "hidden": "hidden",
-        "auto": "auto",
-      },
-      position: {
-        "relative": "relative",
+      opacity: {
+        "dv-dragging": "0.5",
       },
       outline: {
-        "none": "none",
-      },
-      display: {
-        "flex": "flex",
-      },
-      justifyContent: {
-        "center": "center",
-      },
-      alignItems: {
-        "center": "center",
-      },
-      boxSizing: {
-        "border-box": "border-box",
-      },
-      userSelect: {
-        "none": "none",
-      },
-      paddingLeft: {
-        "2": "0.5rem",
-      },
-      borderTopWidth: {
-        "0": "0",
+        "dv-focus-outline": "1px solid var(--dv-paneview-active-outline-color)",
       },
     },
   },
