@@ -41,3 +41,4 @@ toml.workspace = true
 derive_more = { workspace = true, features = ["full"] }
 tracing.workspace = true
 jsonschema.workspace = true
+hcl-rs.workspace = true

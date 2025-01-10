@@ -1,0 +1,9 @@
+[package]
+name = "moss_extension_point"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+anyhow.workspace = true
+hcl-rs.workspace = true
+serde_json.workspace = true

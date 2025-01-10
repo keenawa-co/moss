@@ -4,6 +4,11 @@ use serde_json::{json, Value as JsonValue};
 
 use crate::app::service::Service;
 
+// contribution::submit!(Registry);
+// contribution::submit!(ConfigurationRegistry, {
+
+// });
+
 pub struct ConfigurationRegistry {}
 
 pub struct Registry {}
