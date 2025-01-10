@@ -1,5 +1,5 @@
-import { IWatermarkRenderer, WatermarkRendererInitParameters } from "../../types";
 import { CompositeDisposable } from "../../../lifecycle";
+import { IWatermarkRenderer, WatermarkRendererInitParameters } from "../../types";
 
 export class Watermark extends CompositeDisposable implements IWatermarkRenderer {
   private readonly _element: HTMLElement;
@@ -11,7 +11,7 @@ export class Watermark extends CompositeDisposable implements IWatermarkRenderer
   constructor() {
     super();
     this._element = document.createElement("div");
-    this._element.className = "dv-watermark";
+    this._element.className = "flex h-full";
   }
 
   init(_params: WatermarkRendererInitParameters): void {
