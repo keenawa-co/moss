@@ -19,20 +19,8 @@ export default tseslint.config(...tseslint.configs.recommended, {
     "**/*.spec.*",
   ],
   languageOptions: {},
-  "settings": {
-    "import/parsers": {
-      "@typescript-eslint/parser": [".ts", ".tsx"],
-    },
-    "import/resolver": {
-      "typescript": {
-        "project": ["tsconfig.json", "packages/*/tsconfig.json", "view/*/tsconfig.json"], // ???
-      },
-      "node": {
-        "extensions": [".js", ".jsx", ".ts", ".tsx", ".json"],
-      },
-    },
-  },
-  files: ["**/*.{ts,tsx,js,jsx}"],
+  "settings": {},
+  files: ["**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx"],
   plugins: {
     "react-hooks": reactHooksPlugin,
     "react-refresh": reactRefreshPlugin,
