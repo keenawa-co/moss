@@ -1,5 +1,6 @@
 import "./globals.css";
-import "@repo/moss-ui/styles.css";
+import "@repo/moss-ui/src/styles.css"; // ESlint error:Unable to resolve path to module '@repo/moss-ui/styles.css'.eslintimport/no-unresolved
+
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 
