@@ -1084,6 +1084,7 @@ dependencies = [
  "moss_cache",
  "moss_desktop",
  "moss_env",
+ "moss_extension_point",
  "moss_tauri",
  "moss_text",
  "moss_uikit",
@@ -2683,6 +2684,7 @@ dependencies = [
  "moss_addon",
  "moss_cache",
  "moss_configuration",
+ "moss_extension_point",
  "moss_html",
  "moss_jsonlogic",
  "moss_jsonlogic_macro",
@@ -2715,7 +2717,11 @@ name = "moss_extension_point"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "ctor",
+ "hashbrown 0.15.2",
  "hcl-rs",
+ "parking_lot",
+ "serde",
  "serde_json",
 ]
 

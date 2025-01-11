@@ -14,4 +14,4 @@ pub extern crate linkme;
 #[macro_use]
 extern crate tracing;
 
-// contribution::submit!("./src/contribution");
+moss_extension_point::submit!("crates/moss-desktop/contributions");

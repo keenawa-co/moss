@@ -5,6 +5,8 @@ locals {
 }
 
 extends "configuration" {
+    order = 5
+
     parameter "window.defaultWidth" {
         type = number
         minimum = 800

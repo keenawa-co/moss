@@ -16,6 +16,7 @@ moss_cache.workspace = true
 moss_addon.workspace = true
 moss_theme.workspace = true
 moss_configuration.workspace = true
+moss_extension_point.workspace = true
 
 strum.workspace = true
 smol.workspace = true

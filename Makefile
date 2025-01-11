@@ -1,4 +1,5 @@
 export LOG_LEVEL = trace
+export CARGO_WORKSPACE_ROOT_DIR = ${CURDIR}
 
 .DEFAULT_GOAL := run-desktop
 

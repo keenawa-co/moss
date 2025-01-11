@@ -7,6 +7,8 @@ mod utl;
 mod window;
 
 use anyhow::Result;
+use moss_extension_point::loader::Loader;
+use moss_extension_point::registry;
 use rand::random;
 use tauri::{AppHandle, Manager, RunEvent, WebviewWindow, WindowEvent};
 use tauri_plugin_global_shortcut::{Code, GlobalShortcutExt, Modifiers, Shortcut, ShortcutState};
@@ -77,6 +79,14 @@ pub fn run() {
 
             let app_state = AppStateManager::new();
             app_handle.manage(app_state);
+
+            let mut loader = Loader::new();
+            loader
+                .load(
+                    std::env::var("CARGO_WORKSPACE_ROOT_DIR").unwrap().into(),
+                    registry::take(),
+                )
+                .unwrap();
 
             let app_manager = AppManager::new(app_handle.clone())
                 .with_service(|_| LifecycleService::new(), InstantiationType::Instant)
