@@ -64,14 +64,7 @@ const PanelAction = (props: { panels: string[]; api: DockviewApi; activePanel?: 
           onClick={() => {
             const panel = props.api.getPanel(props.panelId);
             if (panel) {
-              props.api.addFloatingGroup(panel, {
-                position: {
-                  width: 400,
-                  height: 300,
-                  bottom: 50,
-                  right: 50,
-                },
-              });
+              props.api.addFloatingGroup(panel);
             }
           }}
         >

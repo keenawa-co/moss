@@ -1,7 +1,9 @@
+import { fireEvent } from "@testing-library/dom";
+
 import { Emitter } from "../../events";
 import { CompositeDisposable } from "../../lifecycle";
 import { IView, LayoutPriority, Orientation, Sizing, Splitview } from "../../splitview/splitview";
-import { fireEvent } from "@testing-library/dom";
+
 class Testview implements IView {
   private _element: HTMLElement = document.createElement("div");
   private _size = 0;

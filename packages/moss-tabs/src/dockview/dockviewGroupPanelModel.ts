@@ -1,21 +1,21 @@
 import { DockviewApi } from "../api/component.api";
+import { TitleEvent } from "../api/dockviewPanelApi";
 import { getPanelData, PanelTransfer } from "../dnd/dataTransfer";
 import { Position, WillShowOverlayEvent } from "../dnd/droptarget";
-import { DockviewComponent } from "./dockviewComponent";
 import { isAncestor, toggleClass } from "../dom";
 import { addDisposableListener, DockviewEvent, Emitter, Event, IDockviewEvent } from "../events";
 import { IViewSize } from "../gridview/gridview";
+import { Contraints } from "../gridview/gridviewPanel";
 import { CompositeDisposable, IDisposable } from "../lifecycle";
+import { OverlayRenderContainer } from "../overlay/overlayRenderContainer";
 import { IPanel, PanelInitParameters, PanelUpdateEvent, Parameters } from "../panel/types";
 import { ContentContainer, IContentContainer } from "./components/panel/content";
 import { GroupDragEvent, ITabsContainer, TabDragEvent, TabsContainer } from "./components/titlebar/tabsContainer";
-import { IWatermarkRenderer } from "./types";
+import { DockviewComponent } from "./dockviewComponent";
 import { DockviewGroupPanel } from "./dockviewGroupPanel";
 import { IDockviewPanel } from "./dockviewPanel";
 import { DockviewDndOverlayEvent, DockviewUnhandledDragOverEvent, IHeaderActionsRenderer } from "./options";
-import { OverlayRenderContainer } from "../overlay/overlayRenderContainer";
-import { TitleEvent } from "../api/dockviewPanelApi";
-import { Contraints } from "../gridview/gridviewPanel";
+import { IWatermarkRenderer } from "./types";
 
 interface GroupMoveEvent {
   groupId: string;
@@ -424,7 +424,9 @@ export class DockviewGroupPanelModel extends CompositeDisposable implements IDoc
       this._onDidAddPanel,
       this._onDidRemovePanel,
       this._onDidActivePanelChange,
-      this._onUnhandledDragOverEvent
+      this._onUnhandledDragOverEvent,
+      this._onDidPanelTitleChange,
+      this._onDidPanelParametersChange
     );
   }
 

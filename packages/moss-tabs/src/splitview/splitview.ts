@@ -27,11 +27,11 @@ export interface ISplitviewStyles {
 }
 
 export interface SplitViewOptions {
-  readonly orientation: Orientation;
-  readonly descriptor?: ISplitViewDescriptor;
-  readonly proportionalLayout?: boolean;
-  readonly styles?: ISplitviewStyles;
-  readonly margin?: number;
+  orientation?: Orientation;
+  descriptor?: ISplitViewDescriptor;
+  proportionalLayout?: boolean;
+  styles?: ISplitviewStyles;
+  margin?: number;
 }
 
 export enum LayoutPriority {
@@ -214,7 +214,7 @@ export class Splitview {
     private readonly container: HTMLElement,
     options: SplitViewOptions
   ) {
-    this._orientation = options.orientation;
+    this._orientation = options.orientation ?? Orientation.VERTICAL;
     this.element = this.createContainer();
 
     this.margin = options.margin ?? 0;
@@ -824,10 +824,10 @@ export class Splitview {
   }
 
   private updateSash(sash: ISashItem, state: SashState): void {
-    toggleClass(sash.container, "bg-dv-disabled", state === SashState.DISABLED);
-    toggleClass(sash.container, "bg-dv-enabled", state === SashState.ENABLED);
-    toggleClass(sash.container, "bg-dv-maximum", state === SashState.MAXIMUM);
-    toggleClass(sash.container, "bg-dv-minimum", state === SashState.MINIMUM);
+    toggleClass(sash.container, "dv-disabled", state === SashState.DISABLED);
+    toggleClass(sash.container, "dv-enabled", state === SashState.ENABLED);
+    toggleClass(sash.container, "dv-maximum", state === SashState.MAXIMUM);
+    toggleClass(sash.container, "dv-minimum", state === SashState.MINIMUM);
   }
 
   private resize = (

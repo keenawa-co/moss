@@ -1,476 +1,483 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <testExecutions version="1">
-  <file path="C:\code\Moss\packages\moss-tabs\src\__tests__\dnd\abstractDragHandler.spec.ts">
-    <testCase name="abstractDragHandler that className dv-dragged is added to element after dragstart event" duration="64"/>
-    <testCase name="abstractDragHandler that iframes and webviews have pointerEvents=none set whilst drag action is in process" duration="89"/>
-    <testCase name="abstractDragHandler that the disabling of pointerEvents is restored on a premature disposal of the handler" duration="48"/>
-    <testCase name="abstractDragHandler that .preventDefault() is called for cancelled events" duration="4"/>
-    <testCase name="abstractDragHandler that .preventDefault() is not called for non-cancelled events" duration="3"/>
+  <file path="C:\code\Moss\packages\moss-tabs\src\__tests__\overlay\overlayRenderContainer.spec.ts">
+    <testCase name="overlayRenderContainer that attach(...) and detach(...) mutate the DOM as expected" duration="66"/>
+    <testCase name="overlayRenderContainer add a view that is not currently in the DOM" duration="20"/>
+    <testCase name="overlayRenderContainer related z-index from `aria-level` set on floating panels" duration="7"/>
   </file>
-  <file path="C:\code\Moss\packages\moss-tabs\src\__tests__\dnd\groupDragHandler.spec.ts">
-    <testCase name="groupDragHandler that the dnd transfer object is setup and torndown" duration="162"/>
-    <testCase name="groupDragHandler that the event is cancelled when floating and shiftKey=true" duration="7"/>
-    <testCase name="groupDragHandler that the event is never cancelled when the group is not floating" duration="13"/>
+  <file path="C:\code\Moss\packages\moss-tabs\src\__tests__\paneview\paneview.spec.ts">
+    <testCase name="paneview onDidAddView and onDidRemoveView events" duration="58"/>
+    <testCase name="paneview dispose of paneview" duration="8"/>
   </file>
-  <file path="C:\code\Moss\packages\moss-tabs\src\__tests__\gridview\gridviewReact.spec.tsx">
-    <testCase name="gridview react default" duration="165"/>
-    <testCase name="gridview react is sized to container" duration="17"/>
-    <testCase name="gridview react that the component can update parameters" duration="171"/>
-  </file>
-  <file path="C:\code\Moss\packages\moss-tabs\src\__tests__\dockview\dockviewGroupPanelModel.spec.ts">
-    <testCase name="dockviewGroupPanelModel panel events are captured during de-serialization" duration="184"/>
-    <testCase name="dockviewGroupPanelModel panel events flow" duration="15"/>
-    <testCase name="dockviewGroupPanelModel moveToPrevious and moveToNext" duration="36"/>
-    <testCase name="dockviewGroupPanelModel default" duration="22"/>
-    <testCase name="dockviewGroupPanelModel closeAllPanels with panels" duration="44"/>
-    <testCase name="dockviewGroupPanelModel closeAllPanels with no panels" duration="5"/>
-    <testCase name="dockviewGroupPanelModel that group is set on panel during onDidAddPanel event" duration="98"/>
-    <testCase name="dockviewGroupPanelModel toJSON() default" duration="10"/>
-    <testCase name="dockviewGroupPanelModel toJSON() locked and hideHeader" duration="6"/>
-    <testCase name="dockviewGroupPanelModel that openPanel with skipSetActive doesn&apos;t set panel to active" duration="31"/>
-    <testCase name="dockviewGroupPanelModel that should not show drop target is external event" duration="20"/>
-    <testCase name="dockviewGroupPanelModel that the .locked behaviour is as" duration="12"/>
-    <testCase name="dockviewGroupPanelModel that should not show drop target if dropping on self" duration="6"/>
-    <testCase name="dockviewGroupPanelModel that should not allow drop when dropping on self for same component id" duration="62"/>
-    <testCase name="dockviewGroupPanelModel that should not allow drop when not dropping for different component id" duration="11"/>
-    <testCase name="dockviewGroupPanelModel that the watermark is removed when dispose is called" duration="18"/>
-    <testCase name="dockviewGroupPanelModel that watermark is added" duration="33"/>
-  </file>
-  <file path="C:\code\Moss\packages\moss-tabs\src\__tests__\dockview\components\titlebar\tabsContainer.spec.ts">
-    <testCase name="dockviewGroupPanelModel panel events are captured during de-serialization" duration="189"/>
-    <testCase name="dockviewGroupPanelModel panel events flow" duration="34"/>
-    <testCase name="dockviewGroupPanelModel moveToPrevious and moveToNext" duration="12"/>
-    <testCase name="dockviewGroupPanelModel default" duration="24"/>
-    <testCase name="dockviewGroupPanelModel closeAllPanels with panels" duration="17"/>
-    <testCase name="dockviewGroupPanelModel closeAllPanels with no panels" duration="5"/>
-    <testCase name="dockviewGroupPanelModel that group is set on panel during onDidAddPanel event" duration="41"/>
-    <testCase name="dockviewGroupPanelModel toJSON() default" duration="10"/>
-    <testCase name="dockviewGroupPanelModel toJSON() locked and hideHeader" duration="6"/>
-    <testCase name="dockviewGroupPanelModel that openPanel with skipSetActive doesn&apos;t set panel to active" duration="10"/>
-    <testCase name="dockviewGroupPanelModel that should not show drop target is external event" duration="9"/>
-    <testCase name="dockviewGroupPanelModel that the .locked behaviour is as" duration="11"/>
-    <testCase name="dockviewGroupPanelModel that should not show drop target if dropping on self" duration="13"/>
-    <testCase name="dockviewGroupPanelModel that should not allow drop when dropping on self for same component id" duration="17"/>
-    <testCase name="dockviewGroupPanelModel that should not allow drop when not dropping for different component id" duration="8"/>
-    <testCase name="dockviewGroupPanelModel that the watermark is removed when dispose is called" duration="6"/>
-    <testCase name="dockviewGroupPanelModel that watermark is added" duration="14"/>
-    <testCase name="tabsContainer that an external event does not render a drop target and calls through to the group mode" duration="3"/>
-    <testCase name="tabsContainer that a drag over event from another tab should render a drop target" duration="11"/>
-    <testCase name="tabsContainer that dropping over the empty space should render a drop target" duration="10"/>
-    <testCase name="tabsContainer that dropping the first tab should render a drop target" duration="3"/>
-    <testCase name="tabsContainer that dropping a tab from another component should not render a drop target" duration="4"/>
-    <testCase name="tabsContainer left actions" duration="7"/>
-    <testCase name="tabsContainer right actions" duration="4"/>
-    <testCase name="tabsContainer that a tab will become floating when clicked if not floating and shift is selected" duration="5"/>
-    <testCase name="tabsContainer that a tab that is already floating cannot be floated again" duration="84"/>
-    <testCase name="tabsContainer that selecting a tab with shift down will move that tab into a new floating group" duration="4"/>
-    <testCase name="tabsContainer pre header actions" duration="7"/>
-    <testCase name="tabsContainer left header actions" duration="11"/>
-    <testCase name="tabsContainer right header actions" duration="5"/>
-  </file>
-  <file path="C:\code\Moss\packages\moss-tabs\src\__tests__\paneview\paneviewReact.spec.tsx">
-    <testCase name="gridview react default" duration="277"/>
-    <testCase name="gridview react is sized to container" duration="11"/>
-    <testCase name="gridview react that the component can update parameters" duration="339"/>
-  </file>
-  <file path="C:\code\Moss\packages\moss-tabs\src\__tests__\react\react.spec.tsx">
-    <testCase name="react ReactPart update underlying component via ReactPart class" duration="67"/>
-    <testCase name="react isReactElement functional component" duration="1"/>
-    <testCase name="react isReactElement React.memo component" duration="7"/>
-    <testCase name="react isReactElement forward ref component" duration="1"/>
-  </file>
-  <file path="C:\code\Moss\packages\moss-tabs\src\__tests__\gridview\gridview.spec.ts">
-    <testCase name="gridview dispose of gridview" duration="4"/>
-    <testCase name="gridview insertOrthogonalSplitviewAtRoot #1" duration="134"/>
-    <testCase name="gridview insertOrthogonalSplitviewAtRoot #2" duration="8"/>
-    <testCase name="gridview removeView: remove leaf from branch where branch becomes leaf and parent is root" duration="26"/>
-    <testCase name="gridview removeView: remove leaf from branch where branch remains branch and parent is root" duration="79"/>
-    <testCase name="gridview removeView: remove leaf where parent is root" duration="10"/>
-    <testCase name="gridview removeView: remove leaf from branch where branch becomes leaf and parent is not root" duration="70"/>
-    <testCase name="gridview removeView: remove leaf from branch where branch remains branch and parent is not root" duration="12"/>
-    <testCase name="gridview removeView: remove leaf where parent is root" duration="15"/>
-    <testCase name="gridview that calling insertOrthogonalSplitviewAtRoot() for an empty view doesnt add any nodes" duration="3"/>
-    <testCase name="gridview re-structuring deep gridivew where a branchnode becomes of length one and is coverted to a leaf node" duration="22"/>
-    <testCase name="gridview gridview nested proportional layouts" duration="22"/>
-    <testCase name="gridview that maximizeView retains original dimensions when restored" duration="90"/>
-    <testCase name="gridview that maximizedView is exited when a views visibility is changed" duration="6"/>
-    <testCase name="gridview that maximizedView is exited when a view is moved" duration="12"/>
-    <testCase name="gridview that maximizedView is exited when a view is added" duration="6"/>
-    <testCase name="gridview that maximizedView is exited when a view is removed" duration="8"/>
-    <testCase name="gridview that maximizedView is cleared when layout is cleared" duration="6"/>
-    <testCase name="gridview that maximizedView is cleared when layout is disposed" duration="6"/>
-    <testCase name="gridview that maximizedView is cleared when layout is reset" duration="7"/>
-    <testCase name="gridview visibility check" duration="50"/>
-  </file>
-  <file path="C:\code\Moss\packages\moss-tabs\src\__tests__\dockview\dockviewComponent.spec.ts">
-    <testCase name="dockviewComponent update className" duration="78"/>
-    <testCase name="dockviewComponent duplicate panel" duration="341"/>
-    <testCase name="dockviewComponent move group horizontal" duration="118"/>
-    <testCase name="dockviewComponent move group vertical" duration="79"/>
-    <testCase name="dockviewComponent set active panel" duration="34"/>
-    <testCase name="dockviewComponent remove group" duration="26"/>
-    <testCase name="dockviewComponent active panel" duration="103"/>
-    <testCase name="dockviewComponent add a panel and move to a new group" duration="28"/>
-    <testCase name="dockviewComponent panel content added to content-container css check" duration="104"/>
-    <testCase name="dockviewComponent serialization basic" duration="310"/>
-    <testCase name="dockviewComponent serialization serialized layout with maximized node" duration="62"/>
-    <testCase name="dockviewComponent add panel" duration="61"/>
-    <testCase name="dockviewComponent toJSON shouldnt fire any layout events" duration="10"/>
-    <testCase name="dockviewComponent totalPanels is updated before panel event fires" duration="12"/>
-    <testCase name="dockviewComponent size is updated before group event fires" duration="53"/>
-    <testCase name="dockviewComponent events flow" duration="117"/>
-    <testCase name="dockviewComponent that removing a panel from a group reflects in the dockviewcomponent when searching for a panel" duration="8"/>
-    <testCase name="dockviewComponent #1" duration="22"/>
-    <testCase name="dockviewComponent dispose of dockviewComponent" duration="8"/>
-    <testCase name="dockviewComponent panel is disposed of when closed" duration="59"/>
-    <testCase name="dockviewComponent can add panel of same id if already removed" duration="17"/>
-    <testCase name="dockviewComponent panel is disposed of when removed" duration="6"/>
-    <testCase name="dockviewComponent panel is not disposed of when moved to a new group" duration="9"/>
-    <testCase name="dockviewComponent panel is not disposed of when moved within another group" duration="8"/>
-    <testCase name="dockviewComponent panel is not disposed of when moved within another group" duration="64"/>
-    <testCase name="dockviewComponent panel is disposed of when group is disposed" duration="9"/>
-    <testCase name="dockviewComponent panel is disposed of when component is disposed" duration="5"/>
-    <testCase name="dockviewComponent panel is disposed of when from JSON is called" duration="8"/>
-    <testCase name="dockviewComponent move entire group into another group" duration="20"/>
-    <testCase name="dockviewComponent fromJSON events should still fire" duration="55"/>
-    <testCase name="dockviewComponent load a layout with a non-existant tab id" duration="22"/>
-    <testCase name="dockviewComponent load and persist layout with custom tab header" duration="51"/>
-    <testCase name="dockviewComponent #2" duration="59"/>
-    <testCase name="dockviewComponent orthogonal realigment #1" duration="11"/>
-    <testCase name="dockviewComponent orthogonal realigment #2" duration="53"/>
-    <testCase name="dockviewComponent orthogonal realigment #3" duration="12"/>
-    <testCase name="dockviewComponent orthogonal realigment #4" duration="5"/>
-    <testCase name="dockviewComponent that a empty component has no groups" duration="2"/>
-    <testCase name="dockviewComponent that deserializing an empty layout has zero groups and a watermark" duration="3"/>
-    <testCase name="dockviewComponent empty" duration="2"/>
-    <testCase name="dockviewComponent that title and params.title do not conflict" duration="10"/>
-    <testCase name="dockviewComponent check dockview component is rendering to the DOM as expected" duration="37"/>
-    <testCase name="dockviewComponent that fromJSON layouts are resized to the current dimensions" duration="6"/>
-    <testCase name="dockviewComponent that moving the last panel to be floating should leave an empty gridview" duration="10"/>
-    <testCase name="dockviewComponent that api.setSize applies to the overlay for floating panels" duration="5"/>
-    <testCase name="dockviewComponent that external dnd events do not trigger the top-level center dnd target unless empty" duration="38"/>
-    <testCase name="dockviewComponent that dragging a tab triggers onWillDragPanel" duration="8"/>
-    <testCase name="dockviewComponent that dragging a group triggers onWillDragGroup" duration="129"/>
-    <testCase name="dockviewComponent corrupt layout: bad inline view" duration="50"/>
-    <testCase name="dockviewComponent corrupt layout: bad floating view" duration="144"/>
-    <testCase name="dockviewComponent that disableAutoResizing is false by default" duration="2"/>
-    <testCase name="dockviewComponent that disableAutoResizing can be enabled" duration="2"/>
-    <testCase name="dockviewComponent floating groups that a floating group can be removed" duration="10"/>
-    <testCase name="dockviewComponent floating groups move a floating group of one tab to a new fixed group" duration="15"/>
-    <testCase name="dockviewComponent floating groups move a floating group of one tab to an existing fixed group" duration="84"/>
-    <testCase name="dockviewComponent floating groups move a floating group of one tab to an existing floating group" duration="15"/>
-    <testCase name="dockviewComponent floating groups move a floating group of many tabs to a new fixed group" duration="19"/>
-    <testCase name="dockviewComponent floating groups move a floating group of many tabs to an existing fixed group" duration="18"/>
-    <testCase name="dockviewComponent floating groups move a floating group of many tabs to an existing floating group" duration="13"/>
-    <testCase name="dockviewComponent floating groups move a floating tab of one tab to a new fixed group" duration="8"/>
-    <testCase name="dockviewComponent floating groups move a floating tab of one tab to an existing fixed group" duration="31"/>
-    <testCase name="dockviewComponent floating groups move a floating tab of one tab to an existing floating group" duration="13"/>
-    <testCase name="dockviewComponent floating groups move a floating tab of many tabs to a new fixed group" duration="28"/>
-    <testCase name="dockviewComponent floating groups move a floating tab of many tabs to an existing fixed group" duration="11"/>
-    <testCase name="dockviewComponent floating groups move a floating tab of many tabs to an existing floating group" duration="13"/>
-    <testCase name="dockviewComponent floating groups move a fixed tab of one tab to an existing floating group" duration="13"/>
-    <testCase name="dockviewComponent floating groups move a fixed tab of many tabs to an existing floating group" duration="24"/>
-    <testCase name="dockviewComponent floating groups move a fixed group of one tab to an existing floating group" duration="11"/>
-    <testCase name="dockviewComponent floating groups move a fixed group of many tabs to an existing floating group" duration="83"/>
-    <testCase name="dockviewComponent floating groups move a fixed tab of one tab to a new floating group" duration="13"/>
-    <testCase name="dockviewComponent floating groups move a fixed tab of many tabs to a new floating group" duration="11"/>
-    <testCase name="dockviewComponent floating groups move a fixed group of one tab to a new floating group" duration="62"/>
-    <testCase name="dockviewComponent floating groups move a fixed group of many tabs to a new floating group" duration="53"/>
-    <testCase name="dockviewComponent popout group add a popout group" duration="25"/>
-    <testCase name="dockviewComponent popout group popout / floating layouts" duration="70"/>
-    <testCase name="dockviewComponent popout group close popout window object" duration="21"/>
-    <testCase name="dockviewComponent popout group remove all panels from popout group" duration="23"/>
-    <testCase name="dockviewComponent popout group that can remove a popout group" duration="21"/>
-    <testCase name="dockviewComponent popout group move from fixed to popout group and back" duration="58"/>
-    <testCase name="dockviewComponent popout group persistance with custom url" duration="35"/>
-    <testCase name="dockviewComponent maximized group that a maximzied group is set to active" duration="11"/>
-    <testCase name="dockviewComponent that emits onDidLayoutChange when panels or groups change" duration="27"/>
-    <testCase name="dockviewComponent that emits onDidLayoutChange that emits onDidPanelTitleChange and onDidLayoutChange when the panel set a title" duration="5"/>
-    <testCase name="dockviewComponent that emits onDidLayoutChange that emits onDidPanelParametersChange and onDidLayoutChange when the panel updates parameters" duration="5"/>
-    <testCase name="dockviewComponent panel visibility that setVisible toggles visiblity" duration="22"/>
-    <testCase name="dockviewComponent panel visibility setVisible #1" duration="15"/>
-    <testCase name="dockviewComponent panel visibility that watermark appears when all views are not visible" duration="13"/>
-    <testCase name="dockviewComponent panel visibility setVisible on floating group" duration="63"/>
-    <testCase name="dockviewComponent panel visibility setVisible on popout group should have no effect" duration="25"/>
-    <testCase name="dockviewComponent panel visibility opening a popout group from a group that is non visible should automatically make it visible" duration="44"/>
-    <testCase name="dockviewComponent addPanel that can add panel to index with referencePanel" duration="23"/>
-    <testCase name="dockviewComponent addPanel that can add panel to index with referenceGroup" duration="5"/>
-    <testCase name="dockviewComponent addPanel that can add panel" duration="6"/>
-    <testCase name="dockviewComponent addPanel that can add panel with absolute direction" duration="7"/>
-    <testCase name="dockviewComponent addPanel that can add floating panel" duration="7"/>
-    <testCase name="dockviewComponent addPanel that can add panel positional to another (within)" duration="80"/>
-    <testCase name="dockviewComponent addPanel that can add panel positional to another (not within)" duration="15"/>
-    <testCase name="dockviewComponent events flow that floating a panel should not call an additional addPanel event" duration="7"/>
-    <testCase name="dockviewComponent that `onDidLayoutChange` only subscribes to events after initial subscription time" duration="7"/>
-    <testCase name="dockviewComponent addGroup with absolute position" duration="70"/>
-    <testCase name="dockviewComponent updateOptions gap" duration="2"/>
+  <file path="C:\code\Moss\packages\moss-tabs\src\__tests__\dockview\components\panel\content.spec.ts">
+    <testCase name="contentContainer basic focus test" duration="29"/>
+    <testCase name="contentContainer that panels renderered as &apos;onlyWhenVisible&apos; are removed when closed" duration="6"/>
   </file>
   <file path="C:\code\Moss\packages\moss-tabs\src\__tests__\splitview\splitview.spec.ts">
-    <testCase name="splitview vertical splitview" duration="74"/>
+    <testCase name="splitview vertical splitview" duration="29"/>
     <testCase name="splitview horiziontal splitview" duration="3"/>
-    <testCase name="splitview has views and sashes" duration="22"/>
-    <testCase name="splitview visiblity classnames" duration="5"/>
-    <testCase name="splitview calls lifecycle methods on view" duration="3"/>
+    <testCase name="splitview has views and sashes" duration="21"/>
+    <testCase name="splitview visiblity classnames" duration="6"/>
+    <testCase name="splitview calls lifecycle methods on view" duration="9"/>
     <testCase name="splitview add view at specified index" duration="9"/>
     <testCase name="splitview streches to viewport" duration="3"/>
-    <testCase name="splitview can resize views 1" duration="4"/>
-    <testCase name="splitview can resize views 2" duration="6"/>
-    <testCase name="splitview move view" duration="7"/>
-    <testCase name="splitview layout called after views added" duration="4"/>
-    <testCase name="splitview proportional layout" duration="3"/>
-    <testCase name="splitview disable proportional layout" duration="3"/>
+    <testCase name="splitview can resize views 1" duration="3"/>
+    <testCase name="splitview can resize views 2" duration="11"/>
+    <testCase name="splitview move view" duration="5"/>
+    <testCase name="splitview layout called after views added" duration="3"/>
+    <testCase name="splitview proportional layout" duration="2"/>
+    <testCase name="splitview disable proportional layout" duration="14"/>
     <testCase name="splitview high priority" duration="4"/>
     <testCase name="splitview low priority" duration="4"/>
-    <testCase name="splitview from descriptor" duration="2"/>
+    <testCase name="splitview from descriptor" duration="1"/>
     <testCase name="splitview onDidAddView and onDidRemoveView events" duration="4"/>
-    <testCase name="splitview dispose of splitview" duration="4"/>
-    <testCase name="splitview dnd: pointer events to move sash" duration="14"/>
-    <testCase name="splitview setViewVisible" duration="24"/>
-    <testCase name="splitview setViewVisible with one view having high layout priority" duration="5"/>
-    <testCase name="splitview set view size" duration="7"/>
+    <testCase name="splitview dispose of splitview" duration="2"/>
+    <testCase name="splitview dnd: pointer events to move sash" duration="10"/>
+    <testCase name="splitview setViewVisible" duration="3"/>
+    <testCase name="splitview setViewVisible with one view having high layout priority" duration="4"/>
+    <testCase name="splitview set view size" duration="3"/>
     <testCase name="splitview set view size with one view having high layout priority" duration="4"/>
-    <testCase name="splitview that margins are applied to view sizing" duration="12"/>
+    <testCase name="splitview that margins are applied to view sizing" duration="10"/>
+  </file>
+  <file path="C:\code\Moss\packages\moss-tabs\src\__tests__\dockview\defaultTab.spec.tsx">
+    <testCase name="defaultTab has close button by default" duration="86"/>
+    <testCase name="defaultTab that title is displayed" duration="7"/>
+    <testCase name="defaultTab that title is updated" duration="10"/>
+    <testCase name="defaultTab has no close button when hideClose=true" duration="4"/>
+    <testCase name="defaultTab that settings closeActionOverride skips api.close()" duration="23"/>
+    <testCase name="defaultTab that clicking close calls api.close()" duration="5"/>
+    <testCase name="defaultTab has close button when hideClose=false" duration="8"/>
+    <testCase name="defaultTab that pointerDown on close button prevents panel becoming active" duration="5"/>
+  </file>
+  <file path="C:\code\Moss\packages\moss-tabs\src\__tests__\dockview\dockviewGroupPanel.spec.ts">
+    <testCase name="dockviewGroupPanel default minimum/maximium width/height" duration="34"/>
+    <testCase name="dockviewGroupPanel group constraints" duration="18"/>
+  </file>
+  <file path="C:\code\Moss\packages\moss-tabs\src\__tests__\dockview\components\titlebar\tabsContainer.spec.ts">
+    <testCase name="dockviewGroupPanelModel panel events are captured during de-serialization" duration="13"/>
+    <testCase name="dockviewGroupPanelModel panel events flow" duration="8"/>
+    <testCase name="dockviewGroupPanelModel moveToPrevious and moveToNext" duration="12"/>
+    <testCase name="dockviewGroupPanelModel default" duration="17"/>
+    <testCase name="dockviewGroupPanelModel closeAllPanels with panels" duration="6"/>
+    <testCase name="dockviewGroupPanelModel closeAllPanels with no panels" duration="2"/>
+    <testCase name="dockviewGroupPanelModel that group is set on panel during onDidAddPanel event" duration="21"/>
+    <testCase name="dockviewGroupPanelModel toJSON() default" duration="20"/>
+    <testCase name="dockviewGroupPanelModel toJSON() locked and hideHeader" duration="3"/>
+    <testCase name="dockviewGroupPanelModel that openPanel with skipSetActive doesn&apos;t set panel to active" duration="10"/>
+    <testCase name="dockviewGroupPanelModel that should not show drop target is external event" duration="5"/>
+    <testCase name="dockviewGroupPanelModel that the .locked behaviour is as" duration="22"/>
+    <testCase name="dockviewGroupPanelModel that should not show drop target if dropping on self" duration="5"/>
+    <testCase name="dockviewGroupPanelModel that should not allow drop when dropping on self for same component id" duration="5"/>
+    <testCase name="dockviewGroupPanelModel that should not allow drop when not dropping for different component id" duration="3"/>
+    <testCase name="dockviewGroupPanelModel that the watermark is removed when dispose is called" duration="2"/>
+    <testCase name="dockviewGroupPanelModel that watermark is added" duration="11"/>
+    <testCase name="tabsContainer that an external event does not render a drop target and calls through to the group mode" duration="2"/>
+    <testCase name="tabsContainer that a drag over event from another tab should render a drop target" duration="1"/>
+    <testCase name="tabsContainer that dropping over the empty space should render a drop target" duration="2"/>
+    <testCase name="tabsContainer that dropping the first tab should render a drop target" duration="2"/>
+    <testCase name="tabsContainer that dropping a tab from another component should not render a drop target" duration="2"/>
+    <testCase name="tabsContainer left actions" duration="4"/>
+    <testCase name="tabsContainer right actions" duration="2"/>
+    <testCase name="tabsContainer that a tab will become floating when clicked if not floating and shift is selected" duration="4"/>
+    <testCase name="tabsContainer that a tab that is already floating cannot be floated again" duration="2"/>
+    <testCase name="tabsContainer that selecting a tab with shift down will move that tab into a new floating group" duration="3"/>
+    <testCase name="tabsContainer pre header actions" duration="7"/>
+    <testCase name="tabsContainer left header actions" duration="3"/>
+    <testCase name="tabsContainer right header actions" duration="2"/>
+    <testCase name="tabsContainer class dv-single-tab is present when only one tab exists`" duration="2"/>
+  </file>
+  <file path="C:\code\Moss\packages\moss-tabs\src\__tests__\dockview\dockviewGroupPanelModel.spec.ts">
+    <testCase name="dockviewGroupPanelModel panel events are captured during de-serialization" duration="22"/>
+    <testCase name="dockviewGroupPanelModel panel events flow" duration="7"/>
+    <testCase name="dockviewGroupPanelModel moveToPrevious and moveToNext" duration="6"/>
+    <testCase name="dockviewGroupPanelModel default" duration="12"/>
+    <testCase name="dockviewGroupPanelModel closeAllPanels with panels" duration="10"/>
+    <testCase name="dockviewGroupPanelModel closeAllPanels with no panels" duration="2"/>
+    <testCase name="dockviewGroupPanelModel that group is set on panel during onDidAddPanel event" duration="16"/>
+    <testCase name="dockviewGroupPanelModel toJSON() default" duration="7"/>
+    <testCase name="dockviewGroupPanelModel toJSON() locked and hideHeader" duration="3"/>
+    <testCase name="dockviewGroupPanelModel that openPanel with skipSetActive doesn&apos;t set panel to active" duration="5"/>
+    <testCase name="dockviewGroupPanelModel that should not show drop target is external event" duration="21"/>
+    <testCase name="dockviewGroupPanelModel that the .locked behaviour is as" duration="7"/>
+    <testCase name="dockviewGroupPanelModel that should not show drop target if dropping on self" duration="4"/>
+    <testCase name="dockviewGroupPanelModel that should not allow drop when dropping on self for same component id" duration="5"/>
+    <testCase name="dockviewGroupPanelModel that should not allow drop when not dropping for different component id" duration="5"/>
+    <testCase name="dockviewGroupPanelModel that the watermark is removed when dispose is called" duration="9"/>
+    <testCase name="dockviewGroupPanelModel that watermark is added" duration="7"/>
+  </file>
+  <file path="C:\code\Moss\packages\moss-tabs\src\__tests__\paneview\paneviewReact.spec.tsx">
+    <testCase name="gridview react default" duration="26"/>
+    <testCase name="gridview react is sized to container" duration="4"/>
+    <testCase name="gridview react that the component can update parameters" duration="97"/>
+  </file>
+  <file path="C:\code\Moss\packages\moss-tabs\src\__tests__\dockview\headerActionsRenderer.spec.ts">
+    <testCase name="headerActionsRenderer #1" duration="23"/>
+  </file>
+  <file path="C:\code\Moss\packages\moss-tabs\src\__tests__\gridview\gridviewReact.spec.tsx">
+    <testCase name="gridview react default" duration="27"/>
+    <testCase name="gridview react is sized to container" duration="5"/>
+    <testCase name="gridview react that the component can update parameters" duration="135"/>
+  </file>
+  <file path="C:\code\Moss\packages\moss-tabs\src\__tests__\dockview\components\tab\defaultTab.spec.ts">
+    <testCase name="defaultTab that title updates" duration="4"/>
+    <testCase name="defaultTab that click closes tab" duration="3"/>
   </file>
   <file path="C:\code\Moss\packages\moss-tabs\src\__tests__\splitview\splitviewComponent.spec.ts">
-    <testCase name="componentSplitview event leakage" duration="166"/>
-    <testCase name="componentSplitview remove panel" duration="12"/>
-    <testCase name="componentSplitview horizontal dimensions" duration="2"/>
+    <testCase name="componentSplitview that the container is not removed when grid is disposed" duration="2"/>
+    <testCase name="componentSplitview event leakage" duration="110"/>
+    <testCase name="componentSplitview remove panel" duration="5"/>
+    <testCase name="componentSplitview horizontal dimensions" duration="1"/>
     <testCase name="componentSplitview vertical dimensions" duration="1"/>
-    <testCase name="componentSplitview api resize" duration="22"/>
-    <testCase name="componentSplitview api" duration="13"/>
-    <testCase name="componentSplitview vertical panels" duration="6"/>
-    <testCase name="componentSplitview horizontal panels" duration="9"/>
-    <testCase name="componentSplitview serialization" duration="5"/>
-    <testCase name="componentSplitview toJSON shouldnt fire any layout events" duration="3"/>
-    <testCase name="componentSplitview dispose of splitviewComponent" duration="4"/>
-    <testCase name="componentSplitview panel is disposed of when component is disposed" duration="3"/>
+    <testCase name="componentSplitview api resize" duration="14"/>
+    <testCase name="componentSplitview api" duration="9"/>
+    <testCase name="componentSplitview vertical panels" duration="5"/>
+    <testCase name="componentSplitview horizontal panels" duration="4"/>
+    <testCase name="componentSplitview serialization" duration="4"/>
+    <testCase name="componentSplitview toJSON shouldnt fire any layout events" duration="15"/>
+    <testCase name="componentSplitview panel is disposed of when component is disposed" duration="5"/>
     <testCase name="componentSplitview panel is disposed of when removed" duration="3"/>
-    <testCase name="componentSplitview panel is disposed of when fromJSON is called" duration="4"/>
-    <testCase name="componentSplitview that fromJSON layouts are resized to the current dimensions" duration="3"/>
+    <testCase name="componentSplitview panel is disposed of when fromJSON is called" duration="3"/>
+    <testCase name="componentSplitview that fromJSON layouts are resized to the current dimensions" duration="2"/>
     <testCase name="componentSplitview that disableAutoResizing is false by default" duration="1"/>
-    <testCase name="componentSplitview that disableAutoResizing can be enabled" duration="1"/>
-    <testCase name="componentSplitview that setVisible toggles visiblity" duration="6"/>
+    <testCase name="componentSplitview that disableAutoResizing can be enabled" duration="0"/>
+    <testCase name="componentSplitview that setVisible toggles visiblity" duration="5"/>
     <testCase name="componentSplitview update className" duration="1"/>
   </file>
   <file path="C:\code\Moss\packages\moss-tabs\src\__tests__\dockview\dockview.spec.tsx">
-    <testCase name="gridview react default" duration="69"/>
-    <testCase name="gridview react is sized to container" duration="11"/>
-    <testCase name="gridview react that the component can update parameters" duration="141"/>
-  </file>
-  <file path="C:\code\Moss\packages\moss-tabs\src\__tests__\dockview\defaultTab.spec.tsx">
-    <testCase name="defaultTab has close button by default" duration="15"/>
-    <testCase name="defaultTab that title is displayed" duration="6"/>
-    <testCase name="defaultTab that title is updated" duration="8"/>
-    <testCase name="defaultTab has no close button when hideClose=true" duration="4"/>
-    <testCase name="defaultTab that settings closeActionOverride skips api.close()" duration="13"/>
-    <testCase name="defaultTab that clicking close calls api.close()" duration="8"/>
-    <testCase name="defaultTab has close button when hideClose=false" duration="6"/>
-    <testCase name="defaultTab that pointerDown on close button prevents panel becoming active" duration="10"/>
+    <testCase name="gridview react default" duration="38"/>
+    <testCase name="gridview react is sized to container" duration="7"/>
+    <testCase name="gridview react that the component can update parameters" duration="153"/>
   </file>
   <file path="C:\code\Moss\packages\moss-tabs\src\__tests__\dnd\droptarget.spec.ts">
-    <testCase name="droptarget that dragover events are marked" duration="7"/>
-    <testCase name="droptarget that the drop target is removed when receiving a marked dragover event" duration="6"/>
-    <testCase name="droptarget directionToPosition" duration="59"/>
-    <testCase name="droptarget positionToDirection" duration="4"/>
+    <testCase name="droptarget that dragover events are marked" duration="4"/>
+    <testCase name="droptarget that the drop target is removed when receiving a marked dragover event" duration="3"/>
+    <testCase name="droptarget directionToPosition" duration="63"/>
+    <testCase name="droptarget positionToDirection" duration="3"/>
     <testCase name="droptarget non-directional" duration="2"/>
-    <testCase name="droptarget drop" duration="4"/>
-    <testCase name="droptarget default" duration="28"/>
+    <testCase name="droptarget drop" duration="2"/>
+    <testCase name="droptarget default" duration="16"/>
     <testCase name="droptarget calculateQuadrantAsPercentage variety of cases" duration="2"/>
-    <testCase name="droptarget calculateQuadrantAsPixels variety of cases" duration="2"/>
+    <testCase name="droptarget calculateQuadrantAsPixels variety of cases" duration="1"/>
   </file>
-  <file path="C:\code\Moss\packages\moss-tabs\src\__tests__\dockview\dockviewGroupPanel.spec.ts">
-    <testCase name="dockviewGroupPanel default minimum/maximium width/height" duration="11"/>
-    <testCase name="dockviewGroupPanel group constraints" duration="11"/>
-  </file>
-  <file path="C:\code\Moss\packages\moss-tabs\src\__tests__\gridview\gridviewComponent.spec.ts">
-    <testCase name="gridview update className" duration="40"/>
-    <testCase name="gridview added views are visible by default" duration="22"/>
-    <testCase name="gridview remove panel" duration="10"/>
-    <testCase name="gridview active panel" duration="44"/>
-    <testCase name="gridview deserialize and serialize a layout" duration="25"/>
-    <testCase name="gridview toJSON shouldnt fire any layout events" duration="10"/>
-    <testCase name="gridview gridview events" duration="18"/>
-    <testCase name="gridview dispose of gridviewComponent" duration="10"/>
-    <testCase name="gridview #1/VERTICAL" duration="7"/>
-    <testCase name="gridview #2/HORIZONTAL" duration="5"/>
-    <testCase name="gridview #3/HORIZONTAL" duration="5"/>
-    <testCase name="gridview #4/HORIZONTAL" duration="11"/>
-    <testCase name="gridview #5/VERTICAL" duration="6"/>
-    <testCase name="gridview #5/VERTICAL/proportional/false" duration="6"/>
-    <testCase name="gridview #6/VERTICAL" duration="8"/>
-    <testCase name="gridview #7/VERTICAL layout first" duration="14"/>
-    <testCase name="gridview #8/VERTICAL layout after" duration="20"/>
-    <testCase name="gridview #9/HORIZONTAL" duration="11"/>
-    <testCase name="gridview #9/HORIZONTAL/proportional/false" duration="13"/>
-    <testCase name="gridview #10/HORIZONTAL scale x:1.5 y:2" duration="8"/>
-    <testCase name="gridview panel is disposed of when component is disposed" duration="4"/>
-    <testCase name="gridview panel is disposed of when removed" duration="8"/>
-    <testCase name="gridview panel is disposed of when fromJSON is called" duration="7"/>
-    <testCase name="gridview fromJSON  events should still fire" duration="20"/>
-    <testCase name="gridview that fromJSON layouts are resized to the current dimensions" duration="13"/>
-    <testCase name="gridview that a deep HORIZONTAL layout with fromJSON dimensions identical to the current dimensions loads" duration="15"/>
-    <testCase name="gridview that a deep VERTICAL layout with fromJSON dimensions identical to the current dimensions loads" duration="14"/>
-    <testCase name="gridview that loading a corrupt layout throws an error and leaves a clean gridview behind" duration="138"/>
-    <testCase name="gridview that disableAutoResizing is false by default" duration="2"/>
-    <testCase name="gridview that disableAutoResizing can be enabled" duration="4"/>
-    <testCase name="gridview that setVisible toggles visiblity" duration="7"/>
-  </file>
-  <file path="C:\code\Moss\packages\moss-tabs\src\__tests__\gridview\gridviewPanel.spec.ts">
-    <testCase name="gridviewPanel get panel" duration="7"/>
-  </file>
-  <file path="C:\code\Moss\packages\moss-tabs\src\__tests__\overlay\overlayRenderContainer.spec.ts">
-    <testCase name="overlayRenderContainer that attach(...) and detach(...) mutate the DOM as expected" duration="14"/>
-    <testCase name="overlayRenderContainer add a view that is not currently in the DOM" duration="12"/>
-    <testCase name="overlayRenderContainer related z-index from `aria-level` set on floating panels" duration="6"/>
+  <file path="C:\code\Moss\packages\moss-tabs\src\__tests__\react\react.spec.tsx">
+    <testCase name="react ReactPart update underlying component via ReactPart class" duration="18"/>
+    <testCase name="react isReactElement functional component" duration="1"/>
+    <testCase name="react isReactElement React.memo component" duration="0"/>
+    <testCase name="react isReactElement forward ref component" duration="1"/>
   </file>
   <file path="C:\code\Moss\packages\moss-tabs\src\__tests__\paneview\paneviewComponent.spec.ts">
-    <testCase name="componentPaneview vertical panels" duration="24"/>
-    <testCase name="componentPaneview serialization" duration="40"/>
-    <testCase name="componentPaneview toJSON shouldnt fire any layout events" duration="6"/>
-    <testCase name="componentPaneview dispose of paneviewComponent" duration="9"/>
-    <testCase name="componentPaneview panel is disposed of when component is disposed" duration="7"/>
-    <testCase name="componentPaneview panel is disposed of when removed" duration="6"/>
-    <testCase name="componentPaneview panel is disposed of when fromJSON is called" duration="6"/>
-    <testCase name="componentPaneview that fromJSON layouts are resized to the current dimensions" duration="14"/>
-    <testCase name="componentPaneview that disableAutoResizing is false by default" duration="1"/>
-    <testCase name="componentPaneview that disableAutoResizing can be enabled" duration="1"/>
-    <testCase name="componentPaneview that setVisible toggles visiblity" duration="7"/>
-    <testCase name="componentPaneview update className" duration="1"/>
+    <testCase name="componentSplitview that the container is not removed when grid is disposed" duration="4"/>
+    <testCase name="componentSplitview event leakage" duration="144"/>
+    <testCase name="componentSplitview remove panel" duration="13"/>
+    <testCase name="componentSplitview horizontal dimensions" duration="2"/>
+    <testCase name="componentSplitview vertical dimensions" duration="0"/>
+    <testCase name="componentSplitview api resize" duration="9"/>
+    <testCase name="componentSplitview api" duration="4"/>
+    <testCase name="componentSplitview vertical panels" duration="37"/>
+    <testCase name="componentSplitview horizontal panels" duration="3"/>
+    <testCase name="componentSplitview serialization" duration="4"/>
+    <testCase name="componentSplitview toJSON shouldnt fire any layout events" duration="3"/>
+    <testCase name="componentSplitview panel is disposed of when component is disposed" duration="3"/>
+    <testCase name="componentSplitview panel is disposed of when removed" duration="2"/>
+    <testCase name="componentSplitview panel is disposed of when fromJSON is called" duration="5"/>
+    <testCase name="componentSplitview that fromJSON layouts are resized to the current dimensions" duration="6"/>
+    <testCase name="componentSplitview that disableAutoResizing is false by default" duration="1"/>
+    <testCase name="componentSplitview that disableAutoResizing can be enabled" duration="0"/>
+    <testCase name="componentSplitview that setVisible toggles visiblity" duration="3"/>
+    <testCase name="componentSplitview update className" duration="1"/>
   </file>
-  <file path="C:\code\Moss\packages\moss-tabs\src\__tests__\dockview\components\panel\content.spec.ts">
-    <testCase name="contentContainer basic focus test" duration="10"/>
-    <testCase name="contentContainer that panels renderered as &apos;onlyWhenVisible&apos; are removed when closed" duration="4"/>
+  <file path="C:\code\Moss\packages\moss-tabs\src\__tests__\gridview\gridview.spec.ts">
+    <testCase name="gridview dispose of gridview" duration="9"/>
+    <testCase name="gridview insertOrthogonalSplitviewAtRoot #1" duration="17"/>
+    <testCase name="gridview insertOrthogonalSplitviewAtRoot #2" duration="7"/>
+    <testCase name="gridview removeView: remove leaf from branch where branch becomes leaf and parent is root" duration="55"/>
+    <testCase name="gridview removeView: remove leaf from branch where branch remains branch and parent is root" duration="6"/>
+    <testCase name="gridview removeView: remove leaf where parent is root" duration="32"/>
+    <testCase name="gridview removeView: remove leaf from branch where branch becomes leaf and parent is not root" duration="13"/>
+    <testCase name="gridview removeView: remove leaf from branch where branch remains branch and parent is not root" duration="13"/>
+    <testCase name="gridview removeView: remove leaf where parent is root" duration="32"/>
+    <testCase name="gridview that calling insertOrthogonalSplitviewAtRoot() for an empty view doesnt add any nodes" duration="2"/>
+    <testCase name="gridview re-structuring deep gridivew where a branchnode becomes of length one and is coverted to a leaf node" duration="18"/>
+    <testCase name="gridview gridview nested proportional layouts" duration="12"/>
+    <testCase name="gridview that maximizeView retains original dimensions when restored" duration="58"/>
+    <testCase name="gridview that maximizedView is exited when a views visibility is changed" duration="5"/>
+    <testCase name="gridview that maximizedView is exited when a view is moved" duration="8"/>
+    <testCase name="gridview that maximizedView is exited when a view is added" duration="5"/>
+    <testCase name="gridview that maximizedView is exited when a view is removed" duration="8"/>
+    <testCase name="gridview that maximizedView is cleared when layout is cleared" duration="5"/>
+    <testCase name="gridview that maximizedView is cleared when layout is disposed" duration="4"/>
+    <testCase name="gridview that maximizedView is cleared when layout is reset" duration="4"/>
+    <testCase name="gridview visibility check" duration="35"/>
   </file>
-  <file path="C:\code\Moss\packages\moss-tabs\src\__tests__\lifecycle.spec.ts">
-    <testCase name="lifecycle mutable disposable" duration="6"/>
-    <testCase name="lifecycle composite disposable" duration="5"/>
-    <testCase name="lifecycle that isDisposed=true once CompositeDisposable is disposed" duration="1"/>
-    <testCase name="lifecycle Disposable.from(...)" duration="2"/>
+  <file path="C:\code\Moss\packages\moss-tabs\src\__tests__\dnd\groupDragHandler.spec.ts">
+    <testCase name="groupDragHandler that the dnd transfer object is setup and torndown" duration="40"/>
+    <testCase name="groupDragHandler that the event is cancelled when floating and shiftKey=true" duration="1"/>
+    <testCase name="groupDragHandler that the event is never cancelled when the group is not floating" duration="3"/>
+  </file>
+  <file path="C:\code\Moss\packages\moss-tabs\src\__tests__\overlay\overlay.spec.ts">
+    <testCase name="overlay toJSON, top left" duration="8"/>
+    <testCase name="overlay toJSON, bottom right" duration="2"/>
+    <testCase name="overlay that out-of-bounds dimensions are fixed, top left" duration="6"/>
+    <testCase name="overlay that out-of-bounds dimensions are fixed, bottom right" duration="2"/>
+    <testCase name="overlay setBounds, top left" duration="7"/>
+    <testCase name="overlay setBounds, bottom right" duration="3"/>
+    <testCase name="overlay that the resize handles are added" duration="4"/>
+    <testCase name="overlay aria-level attributes and corresponding z-index" duration="12"/>
+  </file>
+  <file path="C:\code\Moss\packages\moss-tabs\src\__tests__\dockview\dockviewComponent.spec.ts">
+    <testCase name="dockviewComponent update className" duration="55"/>
+    <testCase name="dockviewComponent memory leakage event leakage" duration="968"/>
+    <testCase name="dockviewComponent duplicate panel" duration="10"/>
+    <testCase name="dockviewComponent move group horizontal" duration="16"/>
+    <testCase name="dockviewComponent move group vertical" duration="19"/>
+    <testCase name="dockviewComponent set active panel" duration="26"/>
+    <testCase name="dockviewComponent remove group" duration="18"/>
+    <testCase name="dockviewComponent active panel" duration="13"/>
+    <testCase name="dockviewComponent add a panel and move to a new group" duration="11"/>
+    <testCase name="dockviewComponent panel content added to content-container css check" duration="31"/>
+    <testCase name="dockviewComponent serialization basic" duration="101"/>
+    <testCase name="dockviewComponent serialization serialized layout with maximized node" duration="40"/>
+    <testCase name="dockviewComponent add panel" duration="10"/>
+    <testCase name="dockviewComponent toJSON shouldnt fire any layout events" duration="9"/>
+    <testCase name="dockviewComponent totalPanels is updated before panel event fires" duration="15"/>
+    <testCase name="dockviewComponent size is updated before group event fires" duration="8"/>
+    <testCase name="dockviewComponent events flow" duration="28"/>
+    <testCase name="dockviewComponent that removing a panel from a group reflects in the dockviewcomponent when searching for a panel" duration="10"/>
+    <testCase name="dockviewComponent #1" duration="15"/>
+    <testCase name="dockviewComponent dispose of dockviewComponent" duration="15"/>
+    <testCase name="dockviewComponent panel is disposed of when closed" duration="6"/>
+    <testCase name="dockviewComponent can add panel of same id if already removed" duration="13"/>
+    <testCase name="dockviewComponent panel is disposed of when removed" duration="25"/>
+    <testCase name="dockviewComponent panel is not disposed of when moved to a new group" duration="6"/>
+    <testCase name="dockviewComponent panel is not disposed of when moved within another group" duration="20"/>
+    <testCase name="dockviewComponent panel is not disposed of when moved within another group" duration="14"/>
+    <testCase name="dockviewComponent panel is disposed of when group is disposed" duration="13"/>
+    <testCase name="dockviewComponent panel is disposed of when component is disposed" duration="3"/>
+    <testCase name="dockviewComponent panel is disposed of when from JSON is called" duration="23"/>
+    <testCase name="dockviewComponent move entire group into another group" duration="12"/>
+    <testCase name="dockviewComponent fromJSON events should still fire" duration="22"/>
+    <testCase name="dockviewComponent load a layout with a non-existant tab id" duration="22"/>
+    <testCase name="dockviewComponent load and persist layout with custom tab header" duration="6"/>
+    <testCase name="dockviewComponent #2" duration="7"/>
+    <testCase name="dockviewComponent orthogonal realigment #1" duration="13"/>
+    <testCase name="dockviewComponent orthogonal realigment #2" duration="14"/>
+    <testCase name="dockviewComponent orthogonal realigment #3" duration="11"/>
+    <testCase name="dockviewComponent orthogonal realigment #4" duration="3"/>
+    <testCase name="dockviewComponent that a empty component has no groups" duration="2"/>
+    <testCase name="dockviewComponent that deserializing an empty layout has zero groups and a watermark" duration="3"/>
+    <testCase name="dockviewComponent empty" duration="2"/>
+    <testCase name="dockviewComponent that title and params.title do not conflict" duration="4"/>
+    <testCase name="dockviewComponent check dockview component is rendering to the DOM as expected" duration="15"/>
+    <testCase name="dockviewComponent that fromJSON layouts are resized to the current dimensions" duration="4"/>
+    <testCase name="dockviewComponent that moving the last panel to be floating should leave an empty gridview" duration="6"/>
+    <testCase name="dockviewComponent that api.setSize applies to the overlay for floating panels" duration="6"/>
+    <testCase name="dockviewComponent that external dnd events do not trigger the top-level center dnd target unless empty" duration="14"/>
+    <testCase name="dockviewComponent that dragging a tab triggers onWillDragPanel" duration="6"/>
+    <testCase name="dockviewComponent that dragging a group triggers onWillDragGroup" duration="44"/>
+    <testCase name="dockviewComponent corrupt layout: bad inline view" duration="19"/>
+    <testCase name="dockviewComponent corrupt layout: bad floating view" duration="19"/>
+    <testCase name="dockviewComponent that disableAutoResizing is false by default" duration="2"/>
+    <testCase name="dockviewComponent that disableAutoResizing can be enabled" duration="1"/>
+    <testCase name="dockviewComponent floating groups that a floating group can be removed" duration="4"/>
+    <testCase name="dockviewComponent floating groups move a floating group of one tab to a new fixed group" duration="8"/>
+    <testCase name="dockviewComponent floating groups move a floating group of one tab to an existing fixed group" duration="8"/>
+    <testCase name="dockviewComponent floating groups move a floating group of one tab to an existing floating group" duration="18"/>
+    <testCase name="dockviewComponent floating groups move a floating group of many tabs to a new fixed group" duration="7"/>
+    <testCase name="dockviewComponent floating groups move a floating group of many tabs to an existing fixed group" duration="7"/>
+    <testCase name="dockviewComponent floating groups move a floating group of many tabs to an existing floating group" duration="16"/>
+    <testCase name="dockviewComponent floating groups move a floating tab of one tab to a new fixed group" duration="11"/>
+    <testCase name="dockviewComponent floating groups move a floating tab of one tab to an existing fixed group" duration="22"/>
+    <testCase name="dockviewComponent floating groups move a floating tab of one tab to an existing floating group" duration="8"/>
+    <testCase name="dockviewComponent floating groups move a floating tab of many tabs to a new fixed group" duration="27"/>
+    <testCase name="dockviewComponent floating groups move a floating tab of many tabs to an existing fixed group" duration="7"/>
+    <testCase name="dockviewComponent floating groups move a floating tab of many tabs to an existing floating group" duration="8"/>
+    <testCase name="dockviewComponent floating groups move a fixed tab of one tab to an existing floating group" duration="18"/>
+    <testCase name="dockviewComponent floating groups move a fixed tab of many tabs to an existing floating group" duration="11"/>
+    <testCase name="dockviewComponent floating groups move a fixed group of one tab to an existing floating group" duration="8"/>
+    <testCase name="dockviewComponent floating groups move a fixed group of many tabs to an existing floating group" duration="7"/>
+    <testCase name="dockviewComponent floating groups move a fixed tab of one tab to a new floating group" duration="10"/>
+    <testCase name="dockviewComponent floating groups move a fixed tab of many tabs to a new floating group" duration="5"/>
+    <testCase name="dockviewComponent floating groups move a fixed group of one tab to a new floating group" duration="11"/>
+    <testCase name="dockviewComponent floating groups move a fixed group of many tabs to a new floating group" duration="5"/>
+    <testCase name="dockviewComponent popout group deserailize popout with no reference group" duration="9"/>
+    <testCase name="dockviewComponent popout group grid -&gt; floating -&gt; popout -&gt; popout closed" duration="16"/>
+    <testCase name="dockviewComponent popout group grid -&gt; floating -&gt; popout -&gt; floating" duration="20"/>
+    <testCase name="dockviewComponent popout group that panel is rendered when moving from popout to new group" duration="26"/>
+    <testCase name="dockviewComponent popout group move popout group of 1 panel inside grid" duration="9"/>
+    <testCase name="dockviewComponent popout group add a popout group" duration="28"/>
+    <testCase name="dockviewComponent popout group popout / floating layouts" duration="53"/>
+    <testCase name="dockviewComponent popout group close popout window object" duration="12"/>
+    <testCase name="dockviewComponent popout group remove all panels from popout group" duration="13"/>
+    <testCase name="dockviewComponent popout group that can remove a popout group" duration="43"/>
+    <testCase name="dockviewComponent popout group move from fixed to popout group and back" duration="18"/>
+    <testCase name="dockviewComponent popout group persistance with custom url" duration="70"/>
+    <testCase name="dockviewComponent maximized group that a maximzied group is set to active" duration="5"/>
+    <testCase name="dockviewComponent that emits onDidLayoutChange when panels or groups change" duration="8"/>
+    <testCase name="dockviewComponent that emits onDidLayoutChange that emits onDidPanelTitleChange and onDidLayoutChange when the panel set a title" duration="4"/>
+    <testCase name="dockviewComponent that emits onDidLayoutChange that emits onDidPanelParametersChange and onDidLayoutChange when the panel updates parameters" duration="3"/>
+    <testCase name="dockviewComponent panel visibility that setVisible toggles visiblity" duration="46"/>
+    <testCase name="dockviewComponent panel visibility setVisible #1" duration="8"/>
+    <testCase name="dockviewComponent panel visibility that watermark appears when all views are not visible" duration="8"/>
+    <testCase name="dockviewComponent panel visibility setVisible on floating group" duration="10"/>
+    <testCase name="dockviewComponent panel visibility setVisible on popout group should have no effect" duration="17"/>
+    <testCase name="dockviewComponent panel visibility opening a popout group from a group that is non visible should automatically make it visible" duration="12"/>
+    <testCase name="dockviewComponent addPanel that can add panel to index with referencePanel" duration="4"/>
+    <testCase name="dockviewComponent addPanel that can add panel to index with referenceGroup" duration="4"/>
+    <testCase name="dockviewComponent addPanel that can add panel" duration="4"/>
+    <testCase name="dockviewComponent addPanel that can add panel with absolute direction" duration="4"/>
+    <testCase name="dockviewComponent addPanel that can add floating panel" duration="22"/>
+    <testCase name="dockviewComponent addPanel that can add panel positional to another (within)" duration="3"/>
+    <testCase name="dockviewComponent addPanel that can add panel positional to another (not within)" duration="13"/>
+    <testCase name="dockviewComponent events flow that floating a panel should not call an additional addPanel event" duration="6"/>
+    <testCase name="dockviewComponent that `onDidLayoutChange` only subscribes to events after initial subscription time" duration="7"/>
+    <testCase name="dockviewComponent addGroup with absolute position" duration="6"/>
+    <testCase name="dockviewComponent updateOptions gap" duration="2"/>
   </file>
   <file path="C:\code\Moss\packages\moss-tabs\src\__tests__\dockview\dockviewPanelModel.spec.ts">
     <testCase name="dockviewGroupPanel that dispose is called on content and tab renderers when present" duration="3"/>
     <testCase name="dockviewGroupPanel that update is called on content and tab renderers when present" duration="1"/>
-    <testCase name="dockviewGroupPanel that the default tab is created" duration="5"/>
-    <testCase name="dockviewGroupPanel that the provided default tab is chosen when no implementation is provided" duration="2"/>
+    <testCase name="dockviewGroupPanel that the default tab is created" duration="1"/>
+    <testCase name="dockviewGroupPanel that the provided default tab is chosen when no implementation is provided" duration="1"/>
     <testCase name="dockviewGroupPanel that is library default tab instance is created when no alternative exists" duration="3"/>
     <testCase name="dockviewGroupPanel that the default content is created" duration="1"/>
-  </file>
-  <file path="C:\code\Moss\packages\moss-tabs\src\__tests__\paneview\paneview.spec.ts">
-    <testCase name="paneview onDidAddView and onDidRemoveView events" duration="12"/>
-    <testCase name="paneview dispose of paneview" duration="11"/>
   </file>
   <file path="C:\code\Moss\packages\moss-tabs\src\__tests__\dockview\components\titlebar\voidContainer.spec.ts">
     <testCase name="voidContainer that `pointerDown` triggers activation" duration="5"/>
   </file>
-  <file path="C:\code\Moss\packages\moss-tabs\src\__tests__\events.spec.ts">
-    <testCase name="events emitter debug mode is off" duration="2"/>
-    <testCase name="events emitter should emit values" duration="1"/>
-    <testCase name="events emitter should stop emitting after dispose" duration="1"/>
-    <testCase name="events emitter should stop emitting after dispose" duration="1"/>
-    <testCase name="events emitter should relay last value in replay mode" duration="1"/>
-    <testCase name="events asapEvent that asapEvents fire once per event-loop-cycle" duration="3"/>
-    <testCase name="events should emit a value when any event fires" duration="1"/>
-    <testCase name="events addDisposableWindowListener with capture options" duration="3"/>
-    <testCase name="events addDisposableWindowListener without capture options" duration="1"/>
-    <testCase name="events addDisposableListener with capture options" duration="1"/>
-    <testCase name="events addDisposableListener without capture options" duration="2"/>
-  </file>
   <file path="C:\code\Moss\packages\moss-tabs\src\__tests__\dockview\components\tab.spec.ts">
-    <testCase name="tab that empty tab has inactive-tab class" duration="5"/>
+    <testCase name="tab that empty tab has inactive-tab class" duration="2"/>
     <testCase name="tab that active tab has active-tab class" duration="3"/>
-    <testCase name="tab that an external event does not render a drop target and calls through to the group model" duration="16"/>
-    <testCase name="tab that if you drag over yourself no drop target is shown" duration="13"/>
-    <testCase name="tab that if you drag over another tab a drop target is shown" duration="4"/>
+    <testCase name="tab that an external event does not render a drop target and calls through to the group model" duration="2"/>
+    <testCase name="tab that if you drag over yourself no drop target is shown" duration="1"/>
+    <testCase name="tab that if you drag over another tab a drop target is shown" duration="2"/>
     <testCase name="tab that dropping on a tab with the same id but from a different component should not render a drop over and call through to the group model" duration="2"/>
-    <testCase name="tab that dropping on a tab from a different component should not render a drop over and call through to the group model" duration="2"/>
+    <testCase name="tab that dropping on a tab from a different component should not render a drop over and call through to the group model" duration="1"/>
   </file>
-  <file path="C:\code\Moss\packages\moss-tabs\src\__tests__\dockview\components\tab\defaultTab.spec.ts">
-    <testCase name="defaultTab that title updates" duration="14"/>
-    <testCase name="defaultTab that click closes tab" duration="4"/>
+  <file path="C:\code\Moss\packages\moss-tabs\src\__tests__\dockview\dockviewPanel.spec.ts">
+    <testCase name="dockviewPanel update title" duration="12"/>
+    <testCase name="dockviewPanel that .setTitle updates the title" duration="1"/>
+    <testCase name="dockviewPanel dispose cleanup" duration="1"/>
+    <testCase name="dockviewPanel get params" duration="1"/>
+    <testCase name="dockviewPanel setSize propagates to underlying group" duration="1"/>
+    <testCase name="dockviewPanel updateParameter" duration="3"/>
   </file>
-  <file path="C:\code\Moss\packages\moss-tabs\src\__tests__\array.spec.ts">
-    <testCase name="array tail" duration="30"/>
-    <testCase name="array last" duration="1"/>
-    <testCase name="array pushToEnd" duration="1"/>
-    <testCase name="array pushToStart" duration="1"/>
-    <testCase name="array firstIndex" duration="1"/>
-    <testCase name="array firstIndex" duration="3"/>
-    <testCase name="array remove" duration="2"/>
+  <file path="C:\code\Moss\packages\moss-tabs\src\__tests__\gridview\baseComponentGridview.spec.ts">
+    <testCase name="baseComponentGridview that the container is not removed when grid is disposed" duration="4"/>
+    <testCase name="baseComponentGridview that .layout(...) force flag works" duration="2"/>
+    <testCase name="baseComponentGridview can add group" duration="44"/>
   </file>
-  <file path="C:\code\Moss\packages\moss-tabs\src\__tests__\dnd\dataTransfer.spec.ts">
-    <testCase name="dataTransfer getPanelData should be undefined when there is no local transfer object" duration="1"/>
-    <testCase name="dataTransfer getPanelData should be undefined when there is a local transfer object that is not a PanelTransfer" duration="3"/>
-    <testCase name="dataTransfer getPanelData should retrieve the PanelTransfer object when transfer is active" duration="1"/>
-    <testCase name="dataTransfer getPanelData should retrieve the PanelTransfer when a new transfer overrides an existing one" duration="1"/>
-    <testCase name="dataTransfer getPaneData should be undefined when there is no local transfer object" duration="1"/>
-    <testCase name="dataTransfer getPaneData should be undefined when there is a local transfer object that is not a PaneTransfer" duration="0"/>
-    <testCase name="dataTransfer getPaneData should retrieve the PaneTransfer object when transfer is active" duration="1"/>
-    <testCase name="dataTransfer getPaneData should retrieve the PanelTransfer when a new transfer overrides an existing one" duration="1"/>
+  <file path="C:\code\Moss\packages\moss-tabs\src\__tests__\dnd\abstractDragHandler.spec.ts">
+    <testCase name="abstractDragHandler that className dv-dragged is added to element after dragstart event" duration="10"/>
+    <testCase name="abstractDragHandler that iframes and webviews have pointerEvents=none set whilst drag action is in process" duration="26"/>
+    <testCase name="abstractDragHandler that the disabling of pointerEvents is restored on a premature disposal of the handler" duration="16"/>
+    <testCase name="abstractDragHandler that .preventDefault() is called for cancelled events" duration="3"/>
+    <testCase name="abstractDragHandler that .preventDefault() is not called for non-cancelled events" duration="2"/>
+  </file>
+  <file path="C:\code\Moss\packages\moss-tabs\src\__tests__\api\component.api.spec.ts">
+    <testCase name="component.api splitview splitviewapi" duration="4"/>
+    <testCase name="component.api paneview panviewapi" duration="2"/>
+    <testCase name="component.api gridview gridviewapi" duration="3"/>
+    <testCase name="component.api dockview dockviewapi" duration="30"/>
+  </file>
+  <file path="C:\code\Moss\packages\moss-tabs\src\__tests__\events.spec.ts">
+    <testCase name="events emitter debug mode is off" duration="1"/>
+    <testCase name="events emitter should emit values" duration="1"/>
+    <testCase name="events emitter should stop emitting after dispose" duration="0"/>
+    <testCase name="events emitter should stop emitting after dispose" duration="1"/>
+    <testCase name="events emitter should relay last value in replay mode" duration="0"/>
+    <testCase name="events asapEvent that asapEvents fire once per event-loop-cycle" duration="1"/>
+    <testCase name="events should emit a value when any event fires" duration="1"/>
+    <testCase name="events addDisposableWindowListener with capture options" duration="2"/>
+    <testCase name="events addDisposableWindowListener without capture options" duration="2"/>
+    <testCase name="events addDisposableListener with capture options" duration="7"/>
+    <testCase name="events addDisposableListener without capture options" duration="1"/>
   </file>
   <file path="C:\code\Moss\packages\moss-tabs\src\__tests__\dom.spec.ts">
     <testCase name="dom quasiPreventDefault" duration="2"/>
     <testCase name="dom quasiDefaultPrevented" duration="1"/>
     <testCase name="dom isInDocument: DOM element" duration="2"/>
     <testCase name="dom isInDocument: Shadow DOM element" duration="2"/>
-    <testCase name="dom disableIframePointEvents" duration="44"/>
+    <testCase name="dom disableIframePointEvents" duration="26"/>
+  </file>
+  <file path="C:\code\Moss\packages\moss-tabs\src\__tests__\gridview\gridviewPanel.spec.ts">
+    <testCase name="gridviewPanel get panel" duration="10"/>
+  </file>
+  <file path="C:\code\Moss\packages\moss-tabs\src\__tests__\api\dockviewPanelApi.spec.ts">
+    <testCase name="groupPanelApi title" duration="2"/>
+    <testCase name="groupPanelApi updateParameters" duration="6"/>
+    <testCase name="groupPanelApi onDidGroupChange" duration="23"/>
+  </file>
+  <file path="C:\code\Moss\packages\moss-tabs\src\__tests__\lifecycle.spec.ts">
+    <testCase name="lifecycle mutable disposable" duration="2"/>
+    <testCase name="lifecycle composite disposable" duration="3"/>
+    <testCase name="lifecycle that isDisposed=true once CompositeDisposable is disposed" duration="1"/>
+    <testCase name="lifecycle Disposable.from(...)" duration="1"/>
+  </file>
+  <file path="C:\code\Moss\packages\moss-tabs\src\__tests__\api\api.spec.ts">
+    <testCase name="api updateParameters" duration="2"/>
+    <testCase name="api should update isFcoused getter" duration="1"/>
+    <testCase name="api should update isActive getter" duration="9"/>
+    <testCase name="api should update isActive getter" duration="2"/>
+    <testCase name="api should update width and height getter" duration="2"/>
+  </file>
+  <file path="C:\code\Moss\packages\moss-tabs\src\__tests__\dnd\ghost.spec.ts">
+    <testCase name="ghost that a custom class is added, the element is added to the document and all is removed afterwards" duration="7"/>
+  </file>
+  <file path="C:\code\Moss\packages\moss-tabs\src\__tests__\array.spec.ts">
+    <testCase name="array tail" duration="16"/>
+    <testCase name="array last" duration="1"/>
+    <testCase name="array pushToEnd" duration="1"/>
+    <testCase name="array pushToStart" duration="0"/>
+    <testCase name="array firstIndex" duration="1"/>
+    <testCase name="array firstIndex" duration="2"/>
+    <testCase name="array remove" duration="1"/>
   </file>
   <file path="C:\code\Moss\packages\moss-tabs\src\__tests__\math.spec.ts">
     <testCase name="math clamp should clamp between a minimum and maximum value" duration="2"/>
     <testCase name="math clamp if min &gt; max return min" duration="0"/>
-    <testCase name="math range" duration="7"/>
+    <testCase name="math range" duration="1"/>
   </file>
-  <file path="C:\code\Moss\packages\moss-tabs\src\__tests__\overlay\overlay.spec.ts">
-    <testCase name="overlay toJSON, top left" duration="8"/>
-    <testCase name="overlay toJSON, bottom right" duration="16"/>
-    <testCase name="overlay that out-of-bounds dimensions are fixed, top left" duration="4"/>
-    <testCase name="overlay that out-of-bounds dimensions are fixed, bottom right" duration="3"/>
-    <testCase name="overlay setBounds, top left" duration="11"/>
-    <testCase name="overlay setBounds, bottom right" duration="4"/>
-    <testCase name="overlay that the resize handles are added" duration="10"/>
-    <testCase name="overlay aria-level attributes and corresponding z-index" duration="14"/>
+  <file path="C:\code\Moss\packages\moss-tabs\src\__tests__\dnd\dataTransfer.spec.ts">
+    <testCase name="dataTransfer getPanelData should be undefined when there is no local transfer object" duration="2"/>
+    <testCase name="dataTransfer getPanelData should be undefined when there is a local transfer object that is not a PanelTransfer" duration="1"/>
+    <testCase name="dataTransfer getPanelData should retrieve the PanelTransfer object when transfer is active" duration="1"/>
+    <testCase name="dataTransfer getPanelData should retrieve the PanelTransfer when a new transfer overrides an existing one" duration="1"/>
+    <testCase name="dataTransfer getPaneData should be undefined when there is no local transfer object" duration="1"/>
+    <testCase name="dataTransfer getPaneData should be undefined when there is a local transfer object that is not a PaneTransfer" duration="3"/>
+    <testCase name="dataTransfer getPaneData should retrieve the PaneTransfer object when transfer is active" duration="0"/>
+    <testCase name="dataTransfer getPaneData should retrieve the PanelTransfer when a new transfer overrides an existing one" duration="2"/>
   </file>
-  <file path="C:\code\Moss\packages\moss-tabs\src\__tests__\dockview\headerActionsRenderer.spec.ts">
-    <testCase name="headerActionsRenderer #1" duration="6"/>
-  </file>
-  <file path="C:\code\Moss\packages\moss-tabs\src\__tests__\api\component.api.spec.ts">
-    <testCase name="component.api splitview splitviewapi" duration="6"/>
-    <testCase name="component.api paneview panviewapi" duration="5"/>
-    <testCase name="component.api gridview gridviewapi" duration="10"/>
-    <testCase name="component.api dockview dockviewapi" duration="6"/>
-  </file>
-  <file path="C:\code\Moss\packages\moss-tabs\src\__tests__\api\api.spec.ts">
-    <testCase name="api updateParameters" duration="3"/>
-    <testCase name="api should update isFcoused getter" duration="1"/>
-    <testCase name="api should update isActive getter" duration="2"/>
-    <testCase name="api should update isActive getter" duration="1"/>
-    <testCase name="api should update width and height getter" duration="5"/>
-  </file>
-  <file path="C:\code\Moss\packages\moss-tabs\src\__tests__\panel\componentFactory.spec.ts">
-    <testCase name="componentFactory createComponent valid component and framework component" duration="24"/>
-    <testCase name="componentFactory createComponent valid framework component but no factory" duration="2"/>
-    <testCase name="componentFactory createComponent valid framework component" duration="3"/>
-    <testCase name="componentFactory createComponent no valid component with fallback" duration="1"/>
-    <testCase name="componentFactory createComponent no valid component" duration="2"/>
-    <testCase name="componentFactory createComponent valid component" duration="1"/>
-  </file>
-  <file path="C:\code\Moss\packages\moss-tabs\src\__tests__\gridview\baseComponentGridview.spec.ts">
-    <testCase name="baseComponentGridview that .layout(...) force flag works" duration="10"/>
-    <testCase name="baseComponentGridview can add group" duration="7"/>
-  </file>
-  <file path="C:\code\Moss\packages\moss-tabs\src\__tests__\api\dockviewPanelApi.spec.ts">
-    <testCase name="groupPanelApi title" duration="3"/>
-    <testCase name="groupPanelApi updateParameters" duration="5"/>
-    <testCase name="groupPanelApi onDidGroupChange" duration="5"/>
-  </file>
-  <file path="C:\code\Moss\packages\moss-tabs\src\__tests__\dnd\ghost.spec.ts">
-    <testCase name="ghost that a custom class is added, the element is added to the document and all is removed afterwards" duration="9"/>
-  </file>
-  <file path="C:\code\Moss\packages\moss-tabs\src\__tests__\dockview\dockviewPanel.spec.ts">
-    <testCase name="dockviewPanel update title" duration="4"/>
-    <testCase name="dockviewPanel that .setTitle updates the title" duration="2"/>
-    <testCase name="dockviewPanel dispose cleanup" duration="2"/>
-    <testCase name="dockviewPanel get params" duration="2"/>
-    <testCase name="dockviewPanel setSize propagates to underlying group" duration="1"/>
-    <testCase name="dockviewPanel updateParameter" duration="9"/>
+  <file path="C:\code\Moss\packages\moss-tabs\src\__tests__\gridview\gridviewComponent.spec.ts">
+    <testCase name="gridview update className" duration="2"/>
+    <testCase name="gridview added views are visible by default" duration="2"/>
+    <testCase name="gridview remove panel" duration="2"/>
+    <testCase name="gridview active panel" duration="4"/>
+    <testCase name="gridview deserialize and serialize a layout" duration="7"/>
+    <testCase name="gridview toJSON shouldnt fire any layout events" duration="3"/>
+    <testCase name="gridview gridview events" duration="2"/>
+    <testCase name="gridview dispose of gridviewComponent" duration="2"/>
+    <testCase name="gridview #1/VERTICAL" duration="2"/>
+    <testCase name="gridview #2/HORIZONTAL" duration="2"/>
+    <testCase name="gridview #3/HORIZONTAL" duration="1"/>
+    <testCase name="gridview #4/HORIZONTAL" duration="2"/>
+    <testCase name="gridview #5/VERTICAL" duration="2"/>
+    <testCase name="gridview #5/VERTICAL/proportional/false" duration="1"/>
+    <testCase name="gridview #6/VERTICAL" duration="2"/>
+    <testCase name="gridview #7/VERTICAL layout first" duration="2"/>
+    <testCase name="gridview #8/VERTICAL layout after" duration="1"/>
+    <testCase name="gridview #9/HORIZONTAL" duration="2"/>
+    <testCase name="gridview #9/HORIZONTAL/proportional/false" duration="2"/>
+    <testCase name="gridview #10/HORIZONTAL scale x:1.5 y:2" duration="2"/>
+    <testCase name="gridview panel is disposed of when component is disposed" duration="1"/>
+    <testCase name="gridview panel is disposed of when removed" duration="1"/>
+    <testCase name="gridview panel is disposed of when fromJSON is called" duration="4"/>
+    <testCase name="gridview fromJSON  events should still fire" duration="4"/>
+    <testCase name="gridview that fromJSON layouts are resized to the current dimensions" duration="2"/>
+    <testCase name="gridview that a deep HORIZONTAL layout with fromJSON dimensions identical to the current dimensions loads" duration="3"/>
+    <testCase name="gridview that a deep VERTICAL layout with fromJSON dimensions identical to the current dimensions loads" duration="3"/>
+    <testCase name="gridview that loading a corrupt layout throws an error and leaves a clean gridview behind" duration="38"/>
+    <testCase name="gridview that disableAutoResizing is false by default" duration="0"/>
+    <testCase name="gridview that disableAutoResizing can be enabled" duration="0"/>
+    <testCase name="gridview that setVisible toggles visiblity" duration="2"/>
   </file>
 </testExecutions>

@@ -1,12 +1,12 @@
-import { addDisposableListener } from "../events";
 import { PaneviewPanelApiImpl } from "../api/paneviewPanelApi";
+import { toggleClass } from "../dom";
+import { addDisposableListener } from "../events";
 import { CompositeDisposable, MutableDisposable } from "../lifecycle";
 import { PanelUpdateEvent } from "../panel/types";
-import { IPaneHeaderPart, PanePanelInitParameter } from "./paneviewPanel";
-import { toggleClass } from "../dom";
 import { createChevronRightButton, createExpandMoreButton } from "../svg";
+import { IPanePart, PanePanelInitParameter } from "./paneviewPanel";
 
-export class DefaultHeader extends CompositeDisposable implements IPaneHeaderPart {
+export class DefaultHeader extends CompositeDisposable implements IPanePart {
   private readonly _expandedIcon = createExpandMoreButton();
   private readonly _collapsedIcon = createChevronRightButton();
   private readonly disposable = new MutableDisposable();

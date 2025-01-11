@@ -26,7 +26,7 @@ export class ReactPanelContentPart implements IContentRenderer {
     private readonly reactPortalStore: ReactPortalStore
   ) {
     this._element = document.createElement("div");
-    this._element.className = "dockview-react-part";
+    this._element.className = "dv-react-part";
     this._element.style.height = "100%";
     this._element.style.width = "100%";
   }
@@ -36,6 +36,8 @@ export class ReactPanelContentPart implements IContentRenderer {
   }
 
   public init(parameters: GroupPanelPartInitParameters): void {
+    console.warn("--------------------------->");
+    console.warn(this.component);
     this.part = new ReactPart(this.element, this.reactPortalStore, this.component, {
       params: parameters.params,
       api: parameters.api,

@@ -36,14 +36,30 @@ const components = {
 
     return (
       <div
-        className={`relative h-full overflow-auto p-1.5 ${isDebug ? "border-2 border-dashed border-orange-500" : ""}`}
+        style={{
+          height: "100%",
+          overflow: "auto",
+          position: "relative",
+          padding: 5,
+          border: isDebug ? "2px dashed orange" : "",
+        }}
       >
-        <span className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transform text-6xl opacity-50">
+        <span
+          style={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%,-50%)",
+            pointerEvents: "none",
+            fontSize: "42px",
+            opacity: 0.5,
+          }}
+        >
           {props.api.title}
         </span>
 
         {isDebug && (
-          <div className="text-xs">
+          <div style={{ fontSize: "0.8em" }}>
             <Option
               title="Panel Rendering Mode"
               value={metadata.renderer.value}
@@ -61,12 +77,15 @@ const components = {
       <DockviewReact
         components={components}
         onReady={(event: DockviewReadyEvent) => {
-          event.api.addPanel({ id: "panel_1", component: "Default" });
-          event.api.addPanel({ id: "panel_2", component: "Default" });
+          event.api.addPanel({ id: "panel_1", component: "default" });
+          event.api.addPanel({ id: "panel_2", component: "default" });
           event.api.addPanel({
             id: "panel_3",
-            component: "Default",
-            floating: true,
+            component: "default",
+          });
+
+          event.api.onDidRemovePanel((e) => {
+            console.log("remove", e);
           });
         }}
         className={"dockview-theme-abyss"}
@@ -81,7 +100,10 @@ const components = {
             props.api.setActive();
           }
         }}
-        className="h-full w-full"
+        style={{
+          width: "100%",
+          height: "100%",
+        }}
         src="https://dockview.dev"
       />
     );
@@ -137,73 +159,90 @@ const DockviewDemo = (props: { theme?: string }) => {
     setPending([]);
   }, [pending]);
 
-  const onReady = (event: DockviewReadyEvent) => {
-    setApi(event.api);
-
-    event.api.onDidAddPanel((event) => {
-      setPanels((_) => [..._, event.id]);
-      addLogLine(`Panel Added ${event.id}`);
-    });
-    event.api.onDidActivePanelChange((event) => {
-      setActivePanel(event?.id);
-      addLogLine(`Panel Activated ${event?.id}`);
-    });
-    event.api.onDidRemovePanel((event) => {
-      setPanels((_) => {
-        const next = [..._];
-        next.splice(
-          next.findIndex((x) => x === event.id),
-          1
-        );
-
-        return next;
-      });
-      addLogLine(`Panel Removed ${event.id}`);
-    });
-
-    event.api.onDidAddGroup((event) => {
-      setGroups((_) => [..._, event.id]);
-      addLogLine(`Group Added ${event.id}`);
-    });
-
-    event.api.onDidMovePanel((event) => {
-      addLogLine(`Panel Moved ${event.panel.id}`);
-    });
-
-    event.api.onDidMaximizedGroupChange((event) => {
-      addLogLine(`Group Maximized Changed ${event.view.id} [${event.isMaximized}]`);
-    });
-
-    event.api.onDidRemoveGroup((event) => {
-      setGroups((_) => {
-        const next = [..._];
-        next.splice(
-          next.findIndex((x) => x === event.id),
-          1
-        );
-
-        return next;
-      });
-      addLogLine(`Group Removed ${event.id}`);
-    });
-
-    event.api.onDidActiveGroupChange((event) => {
-      setActiveGroup(event?.id);
-      addLogLine(`Group Activated ${event?.id}`);
-    });
-
-    const state = localStorage.getItem("dv-demo-state");
-    if (state) {
-      try {
-        event.api.fromJSON(JSON.parse(state));
-        return;
-      } catch {
-        localStorage.removeItem("dv-demo-state");
-      }
+  React.useEffect(() => {
+    if (!api) {
       return;
     }
 
-    defaultConfig(event.api);
+    const disposables = [
+      api.onDidAddPanel((event) => {
+        setPanels((_) => [..._, event.id]);
+        addLogLine(`Panel Added ${event.id}`);
+      }),
+      api.onDidActivePanelChange((event) => {
+        setActivePanel(event?.id);
+        addLogLine(`Panel Activated ${event?.id}`);
+      }),
+      api.onDidRemovePanel((event) => {
+        setPanels((_) => {
+          const next = [..._];
+          next.splice(
+            next.findIndex((x) => x === event.id),
+            1
+          );
+
+          return next;
+        });
+        addLogLine(`Panel Removed ${event.id}`);
+      }),
+
+      api.onDidAddGroup((event) => {
+        setGroups((_) => [..._, event.id]);
+        addLogLine(`Group Added ${event.id}`);
+      }),
+
+      api.onDidMovePanel((event) => {
+        addLogLine(`Panel Moved ${event.panel.id}`);
+      }),
+
+      api.onDidMaximizedGroupChange((event) => {
+        addLogLine(`Group Maximized Changed ${event.group.api.id} [${event.isMaximized}]`);
+      }),
+
+      api.onDidRemoveGroup((event) => {
+        setGroups((_) => {
+          const next = [..._];
+          next.splice(
+            next.findIndex((x) => x === event.id),
+            1
+          );
+
+          return next;
+        });
+        addLogLine(`Group Removed ${event.id}`);
+      }),
+
+      api.onDidActiveGroupChange((event) => {
+        setActiveGroup(event?.id);
+        addLogLine(`Group Activated ${event?.id}`);
+      }),
+    ];
+
+    const loadLayout = () => {
+      const state = localStorage.getItem("dv-demo-state");
+
+      if (state) {
+        try {
+          api.fromJSON(JSON.parse(state));
+          return;
+        } catch {
+          localStorage.removeItem("dv-demo-state");
+        }
+        return;
+      }
+
+      defaultConfig(api);
+    };
+
+    loadLayout();
+
+    return () => {
+      disposables.forEach((disposable) => disposable.dispose());
+    };
+  }, [api]);
+
+  const onReady = (event: DockviewReadyEvent) => {
+    setApi(event.api);
   };
 
   const [watermark, setWatermark] = React.useState<boolean>(false);
@@ -225,7 +264,20 @@ const DockviewDemo = (props: { theme?: string }) => {
   const [debug, setDebug] = React.useState<boolean>(false);
 
   return (
-    <div className={`relative flex h-full flex-grow flex-col rounded-lg bg-[rgba(0,0,50,0.25)] p-2 ${css}`}>
+    <div
+      className="dockview-demo"
+      style={{
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+        flexGrow: 1,
+        padding: "8px",
+        backgroundColor: "rgba(0,0,50,0.25)",
+        borderRadius: "8px",
+        position: "relative",
+        ...css,
+      }}
+    >
       <div>
         <GridActions api={api} toggleCustomWatermark={() => setWatermark(!watermark)} hasCustomWatermark={watermark} />
         {api && <PanelActions api={api} panels={panels} activePanel={activePanel} />}
@@ -240,7 +292,15 @@ const DockviewDemo = (props: { theme?: string }) => {
                   </button>
               </div> */}
       </div>
-      <div className="action-container flex items-center justify-end p-1">
+      <div
+        className="action-container"
+        style={{
+          display: "flex",
+          justifyContent: "flex-end",
+          alignItems: "center",
+          padding: "4px",
+        }}
+      >
         <button
           onClick={() => {
             setDebug(!debug);
@@ -262,12 +322,25 @@ const DockviewDemo = (props: { theme?: string }) => {
             setShowLogs(!showLogs);
           }}
         >
-          <span className="pr-1">{`${showLogs ? "Hide" : "Show"} Events Log`}</span>
+          <span style={{ paddingRight: "4px" }}>{`${showLogs ? "Hide" : "Show"} Events Log`}</span>
           <span className="material-symbols-outlined">terminal</span>
         </button>
       </div>
-      <div className="flex h-0 flex-grow">
-        <div className="flex h-full flex-grow overflow-hidden">
+      <div
+        style={{
+          flexGrow: 1,
+          height: 0,
+          display: "flex",
+        }}
+      >
+        <div
+          style={{
+            flexGrow: 1,
+            overflow: "hidden",
+            height: "100%",
+            display: "flex",
+          }}
+        >
           <DebugContext.Provider value={debug}>
             <DockviewReact
               components={components}
@@ -283,26 +356,77 @@ const DockviewDemo = (props: { theme?: string }) => {
         </div>
 
         {showLogs && (
-          <div className="bg-black ml-2 w-[400px] flex-shrink-0 overflow-auto font-mono text-white">
-            {logLines.map((line, i) => {
-              return (
-                <div
-                  className="flex h-[30px] items-center overflow-hidden text-ellipsis whitespace-nowrap text-sm"
-                  style={{ backgroundColor: line.backgroundColor }}
-                  key={i}
-                >
-                  <span className="text-gray-500 border-gray-500 mr-1 flex h-full min-w-[20px] max-w-[20px] items-center border-r pl-1">
-                    {logLines.length - i}
-                  </span>
-                  <span>
-                    {line.timestamp && (
-                      <span className="px-0.5 text-[0.7em]">{line.timestamp.toISOString().substring(11, 23)}</span>
-                    )}
-                    <span>{line.text}</span>
-                  </span>
-                </div>
-              );
-            })}
+          <div
+            style={{
+              width: "400px",
+              backgroundColor: "black",
+              color: "white",
+              overflow: "hidden",
+              fontFamily: "monospace",
+              marginLeft: "10px",
+              flexShrink: 0,
+              display: "flex",
+              flexDirection: "column",
+            }}
+          >
+            <div style={{ flexGrow: 1, overflow: "auto" }}>
+              {logLines.map((line, i) => {
+                return (
+                  <div
+                    style={{
+                      height: "30px",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      whiteSpace: "nowrap",
+                      fontSize: "13px",
+                      display: "flex",
+                      alignItems: "center",
+
+                      backgroundColor: line.backgroundColor,
+                    }}
+                    key={i}
+                  >
+                    <span
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        minWidth: "20px",
+                        maxWidth: "20px",
+                        color: "gray",
+                        borderRight: "1px solid gray",
+                        marginRight: "4px",
+                        paddingLeft: "4px",
+                        height: "100%",
+                      }}
+                    >
+                      {logLines.length - i}
+                    </span>
+                    <span>
+                      {line.timestamp && (
+                        <span
+                          style={{
+                            fontSize: "0.7em",
+                            padding: "0px 2px",
+                          }}
+                        >
+                          {line.timestamp.toISOString().substring(11, 23)}
+                        </span>
+                      )}
+                      <span>{line.text}</span>
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+            <div
+              style={{
+                padding: "4px",
+                display: "flex",
+                justifyContent: "flex-end",
+              }}
+            >
+              <button onClick={() => setLogLines([])}>Clear</button>
+            </div>
           </div>
         )}
       </div>

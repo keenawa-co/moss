@@ -1,3 +1,4 @@
+import { GroupDragEvent, TabDragEvent } from "../dockview/components/titlebar/tabsContainer";
 import {
   DockviewMaximizedGroupChanged,
   FloatingGroupOptions,
@@ -5,6 +6,13 @@ import {
   MovePanelEvent,
   SerializedDockview,
 } from "../dockview/dockviewComponent";
+import { DockviewGroupPanel, IDockviewGroupPanel } from "../dockview/dockviewGroupPanel";
+import {
+  DockviewDidDropEvent,
+  DockviewWillDropEvent,
+  WillShowOverlayLocationEvent,
+} from "../dockview/dockviewGroupPanelModel";
+import { IDockviewPanel } from "../dockview/dockviewPanel";
 import {
   AddGroupOptions,
   AddPanelOptions,
@@ -12,34 +20,25 @@ import {
   DockviewDndOverlayEvent,
   MovementOptions,
 } from "../dockview/options";
-import { Parameters } from "../panel/types";
+import { Event } from "../events";
 import { Direction } from "../gridview/baseComponentGridview";
 import { AddComponentOptions, IGridviewComponent, SerializedGridviewComponent } from "../gridview/gridviewComponent";
 import { IGridviewPanel } from "../gridview/gridviewPanel";
-
-import { AddPaneviewComponentOptions, SerializedPaneview, IPaneviewComponent } from "../paneview/paneviewComponent";
+import { GridviewComponentOptions } from "../gridview/options";
+import { Parameters } from "../panel/types";
+import { PaneviewDidDropEvent } from "../paneview/draggablePaneviewPanel";
+import { PaneviewComponentOptions, PaneviewDndOverlayEvent } from "../paneview/options";
+import { AddPaneviewComponentOptions, IPaneviewComponent, SerializedPaneview } from "../paneview/paneviewComponent";
 import { IPaneviewPanel } from "../paneview/paneviewPanel";
+import { SplitviewComponentOptions } from "../splitview/options";
+import { IView, Orientation, Sizing } from "../splitview/splitview";
 import {
   AddSplitviewComponentOptions,
   ISplitviewComponent,
   SerializedSplitview,
 } from "../splitview/splitviewComponent";
-import { IView, Orientation, Sizing } from "../splitview/splitview";
 import { ISplitviewPanel } from "../splitview/splitviewPanel";
-import { DockviewGroupPanel, IDockviewGroupPanel } from "../dockview/dockviewGroupPanel";
-import { Emitter, Event } from "../events";
-import { IDockviewPanel } from "../dockview/dockviewPanel";
-import { PaneviewDropEvent } from "../paneview/draggablePaneviewPanel";
-import { GroupDragEvent, TabDragEvent } from "../dockview/components/titlebar/tabsContainer";
 import { Box } from "../types";
-import {
-  DockviewDidDropEvent,
-  DockviewWillDropEvent,
-  WillShowOverlayLocationEvent,
-} from "../dockview/dockviewGroupPanelModel";
-import { PaneviewComponentOptions } from "../paneview/options";
-import { SplitviewComponentOptions } from "../splitview/options";
-import { GridviewComponentOptions } from "../gridview/options";
 
 export interface CommonApi<T = any> {
   readonly height: number;
@@ -278,19 +277,12 @@ export class PaneviewApi implements CommonApi<SerializedPaneview> {
   /**
    * Invoked when a Drag'n'Drop event occurs that the component was unable to handle. Exposed for custom Drag'n'Drop functionality.
    */
-  get onDidDrop(): Event<PaneviewDropEvent> {
-    const emitter = new Emitter<PaneviewDropEvent>();
+  get onDidDrop(): Event<PaneviewDidDropEvent> {
+    return this.component.onDidDrop;
+  }
 
-    const disposable = this.component.onDidDrop((e) => {
-      emitter.fire({ ...e, api: this });
-    });
-
-    emitter.dispose = () => {
-      disposable.dispose();
-      emitter.dispose();
-    };
-
-    return emitter.event;
+  get onUnhandledDragOverEvent(): Event<PaneviewDndOverlayEvent> {
+    return this.component.onUnhandledDragOverEvent;
   }
 
   constructor(private readonly component: IPaneviewComponent) {}

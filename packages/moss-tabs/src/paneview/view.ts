@@ -2,10 +2,10 @@ import React from "react";
 
 import { PanelUpdateEvent } from "../panel/types";
 import { ReactPart, ReactPortalStore } from "../react";
-import { IPaneBodyPart, PanePanelComponentInitParameter } from "./paneviewPanel";
+import { IPanePart, PanePanelComponentInitParameter } from "./paneviewPanel";
 import { IPaneviewPanelProps } from "./paneviewReact";
 
-export class PanePanelSection implements IPaneBodyPart {
+export class PanePanelSection implements IPanePart {
   private readonly _element: HTMLElement;
   private part?: ReactPart<IPaneviewPanelProps>;
 
@@ -19,7 +19,8 @@ export class PanePanelSection implements IPaneBodyPart {
     private readonly reactPortalStore: ReactPortalStore
   ) {
     this._element = document.createElement("div");
-    this._element.className = "h-full w-full";
+    this._element.style.height = "100%";
+    this._element.style.width = "100%";
   }
 
   public init(parameters: PanePanelComponentInitParameter): void {

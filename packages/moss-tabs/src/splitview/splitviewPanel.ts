@@ -1,9 +1,9 @@
-import { PanelViewInitParameters } from "./options";
-import { BasePanelView, BasePanelViewExported } from "../gridview/basePanelView";
 import { SplitviewPanelApiImpl } from "../api/splitviewPanelApi";
-import { LayoutPriority, Orientation } from "./splitview";
-import { FunctionOrValue } from "../types";
 import { Emitter, Event } from "../events";
+import { BasePanelView, BasePanelViewExported } from "../gridview/basePanelView";
+import { FunctionOrValue } from "../types";
+import { PanelViewInitParameters } from "./options";
+import { LayoutPriority, Orientation } from "./splitview";
 
 export interface ISplitviewPanel extends BasePanelViewExported<SplitviewPanelApiImpl> {
   readonly priority: LayoutPriority | undefined;

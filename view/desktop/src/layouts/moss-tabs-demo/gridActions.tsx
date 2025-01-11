@@ -39,10 +39,27 @@ const PopoverComponent = (props: { close: () => void; component: React.FC<{ clos
   }, []);
 
   return (
-    <div className="absolute left-0 top-0 z-[9999] h-full w-full">
+    <div
+      style={{
+        position: "absolute",
+        top: 0,
+        left: 0,
+        zIndex: 9999,
+        height: "100%",
+        width: "100%",
+      }}
+    >
       <div
         ref={ref}
-        className="bg-black absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transform p-2.5 text-white"
+        style={{
+          position: "absolute",
+          top: "50%",
+          left: "50%",
+          transform: "translate(-50%,-50%)",
+          backgroundColor: "black",
+          color: "white",
+          padding: 10,
+        }}
       >
         <props.component close={props.close} />
       </div>
@@ -113,7 +130,7 @@ export const GridActions = (props: {
 
   const popover = usePopover();
 
-  const onAddPanel = (options?: { advanced: boolean }) => {
+  const onAddPanel = (options?: { advanced?: boolean; nested?: boolean }) => {
     if (options?.advanced) {
       popover.open(({ close }) => {
         return <PanelBuilder api={props.api!} done={close} />;
@@ -121,7 +138,7 @@ export const GridActions = (props: {
     } else {
       props.api?.addPanel({
         id: `id_${Date.now().toString()}`,
-        component: "default",
+        component: options?.nested ? "nested" : "default",
         title: `Tab ${nextId()}`,
         renderer: "always",
       });
@@ -148,6 +165,9 @@ export const GridActions = (props: {
           <span className="material-symbols-outlined">tune</span>
         </button>
       </div>
+      <button className="text-button" onClick={() => onAddPanel({ nested: true })}>
+        Add Nested Panel
+      </button>
       <button className="text-button" onClick={onAddGroup}>
         Add Group
       </button>
@@ -171,9 +191,9 @@ export const GridActions = (props: {
       <button className="text-button" onClick={onReset}>
         Reset
       </button>
-      <span className="flex-grow" />
-      <div className="flex">
-        <span className="pr-1">Group Gap</span>
+      <span style={{ flexGrow: 1 }} />
+      <div style={{ display: "flex", alignItems: "center" }}>
+        <span style={{ paddingRight: "4px" }}>Grid Gap</span>
         <input
           style={{ width: 40 }}
           type="number"
@@ -183,6 +203,7 @@ export const GridActions = (props: {
           value={gap}
           onChange={(event) => setGap(Number(event.target.value))}
         />
+        <button onClick={() => setGap(0)}>Reset</button>
       </div>
     </div>
   );

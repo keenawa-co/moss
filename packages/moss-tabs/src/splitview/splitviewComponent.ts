@@ -1,12 +1,11 @@
-import { CompositeDisposable, IDisposable, MutableDisposable } from "../lifecycle";
-import { IView, LayoutPriority, Orientation, Sizing, Splitview, SplitViewOptions } from "./splitview";
-import { SplitviewComponentOptions } from "./options";
-import { BaseComponentOptions, Parameters } from "../panel/types";
-import { Emitter, Event } from "../events";
-import { SplitviewPanel, ISplitviewPanel } from "./splitviewPanel";
-import { createComponent } from "../panel/componentFactory";
-import { Resizable } from "../resizable";
 import { Classnames } from "../dom";
+import { Emitter, Event } from "../events";
+import { CompositeDisposable, IDisposable, MutableDisposable } from "../lifecycle";
+import { BaseComponentOptions, Parameters } from "../panel/types";
+import { Resizable } from "../resizable";
+import { SplitviewComponentOptions } from "./options";
+import { IView, LayoutPriority, Orientation, Sizing, Splitview, SplitViewOptions } from "./splitview";
+import { ISplitviewPanel, SplitviewPanel } from "./splitviewPanel";
 
 export interface SerializedSplitviewPanelData {
   id: string;
@@ -133,20 +132,18 @@ export class SplitviewComponent extends Resizable implements ISplitviewComponent
     return this.splitview.orientation === Orientation.HORIZONTAL ? this.splitview.size : this.splitview.orthogonalSize;
   }
 
-  constructor(parentElement: HTMLElement, options: SplitviewComponentOptions) {
-    super(parentElement, options.disableAutoResizing);
+  constructor(container: HTMLElement, options: SplitviewComponentOptions) {
+    super(document.createElement("div"), options.disableAutoResizing);
+    this.element.style.height = "100%";
+    this.element.style.width = "100%";
 
     this._classNames = new Classnames(this.element);
     this._classNames.setClassNames(options.className ?? "");
 
-    this._options = options;
+    // the container is owned by the third-party, do not modify/delete it
+    container.appendChild(this.element);
 
-    if (!options.components) {
-      options.components = {};
-    }
-    if (!options.frameworkComponents) {
-      options.frameworkComponents = {};
-    }
+    this._options = options;
 
     this.splitview = new Splitview(this.element, options);
 
@@ -231,17 +228,10 @@ export class SplitviewComponent extends Resizable implements ISplitviewComponent
       throw new Error(`panel ${options.id} already exists`);
     }
 
-    const view = createComponent(
-      options.id,
-      options.component,
-      this.options.components ?? {},
-      this.options.frameworkComponents ?? {},
-      this.options.frameworkWrapper
-        ? {
-            createComponent: this.options.frameworkWrapper.createComponent,
-          }
-        : undefined
-    );
+    const view = this.options.createComponent({
+      id: options.id,
+      name: options.component,
+    });
 
     view.orientation = this.splitview.orientation;
 
@@ -324,17 +314,10 @@ export class SplitviewComponent extends Resizable implements ISplitviewComponent
             throw new Error(`panel ${data.id} already exists`);
           }
 
-          const panel = createComponent(
-            data.id,
-            data.component,
-            this.options.components ?? {},
-            this.options.frameworkComponents ?? {},
-            this.options.frameworkWrapper
-              ? {
-                  createComponent: this.options.frameworkWrapper.createComponent,
-                }
-              : undefined
-          );
+          const panel = this.options.createComponent({
+            id: data.id,
+            name: data.component,
+          });
 
           queue.push(() => {
             panel.init({

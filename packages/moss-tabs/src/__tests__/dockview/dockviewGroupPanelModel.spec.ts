@@ -1,26 +1,27 @@
-import { DockviewComponent } from "../../dockview/dockviewComponent";
-import {
-  GroupviewPanelState,
-  IGroupPanelInitParameters,
-  GroupPanelPartInitParameters,
-  IContentRenderer,
-  ITabRenderer,
-  IWatermarkRenderer,
-} from "../../dockview/types";
-import { PanelUpdateEvent, Parameters } from "../../panel/types";
-import { DockviewGroupPanelModel, GroupOptions } from "../../dockview/dockviewGroupPanelModel";
 import { fireEvent } from "@testing-library/dom";
-import { LocalSelectionTransfer, PanelTransfer } from "../../dnd/dataTransfer";
-import { CompositeDisposable } from "../../lifecycle";
+import { fromPartial } from "@total-typescript/shoehorn";
+
+import { createOffsetDragOverEvent } from "../__test_utils__/utils";
 import { DockviewPanelApi } from "../../api/dockviewPanelApi";
+import { LocalSelectionTransfer, PanelTransfer } from "../../dnd/dataTransfer";
+import { DockviewComponent } from "../../dockview/dockviewComponent";
+import { DockviewGroupPanel } from "../../dockview/dockviewGroupPanel";
+import { DockviewGroupPanelModel, GroupOptions } from "../../dockview/dockviewGroupPanelModel";
 import { IDockviewPanel } from "../../dockview/dockviewPanel";
 import { IDockviewPanelModel } from "../../dockview/dockviewPanelModel";
-import { DockviewGroupPanel } from "../../dockview/dockviewGroupPanel";
-import { WatermarkRendererInitParameters } from "../../dockview/types";
-import { createOffsetDragOverEvent } from "../__test_utils__/utils";
-import { OverlayRenderContainer } from "../../overlay/overlayRenderContainer";
+import {
+  GroupPanelPartInitParameters,
+  GroupviewPanelState,
+  IContentRenderer,
+  IGroupPanelInitParameters,
+  ITabRenderer,
+  IWatermarkRenderer,
+  WatermarkRendererInitParameters,
+} from "../../dockview/types";
 import { Emitter } from "../../events";
-import { fromPartial } from "@total-typescript/shoehorn";
+import { CompositeDisposable } from "../../lifecycle";
+import { OverlayRenderContainer } from "../../overlay/overlayRenderContainer";
+import { PanelUpdateEvent, Parameters } from "../../panel/types";
 
 enum GroupChangeKind2 {
   ADD_PANEL,

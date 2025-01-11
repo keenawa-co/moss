@@ -1,13 +1,13 @@
-import { IDisposable, CompositeDisposable, IValueDisposable } from "../../../lifecycle";
-import { addDisposableListener, Emitter, Event } from "../../../events";
-import { Tab } from "../tab/tab";
-import { DockviewGroupPanel } from "../../dockviewGroupPanel";
-import { VoidContainer } from "./voidContainer";
-import { toggleClass } from "../../../dom";
-import { DockviewPanel, IDockviewPanel } from "../../dockviewPanel";
-import { DockviewComponent } from "../../dockviewComponent";
-import { WillShowOverlayLocationEvent } from "../../dockviewGroupPanelModel";
 import { getPanelData } from "../../../dnd/dataTransfer";
+import { toggleClass } from "../../../dom";
+import { addDisposableListener, Emitter, Event } from "../../../events";
+import { CompositeDisposable, IDisposable, IValueDisposable } from "../../../lifecycle";
+import { DockviewComponent } from "../../dockviewComponent";
+import { DockviewGroupPanel } from "../../dockviewGroupPanel";
+import { WillShowOverlayLocationEvent } from "../../dockviewGroupPanelModel";
+import { DockviewPanel, IDockviewPanel } from "../../dockviewPanel";
+import { Tab } from "../tab/tab";
+import { VoidContainer } from "./voidContainer";
 
 export interface TabDropIndexEvent {
   readonly event: DragEvent;
@@ -188,16 +188,6 @@ export class TabsContainer extends CompositeDisposable implements ITabsContainer
     this._element.appendChild(this.rightActionsContainer);
 
     this.addDisposables(
-      this.accessor.onDidAddPanel((e) => {
-        if (e.api.group === this.group) {
-          toggleClass(this._element, "dv-single-tab", this.size === 1);
-        }
-      }),
-      this.accessor.onDidRemovePanel((e) => {
-        if (e.api.group === this.group) {
-          toggleClass(this._element, "dv-single-tab", this.size === 1);
-        }
-      }),
       this._onWillShowOverlay,
       this._onDrop,
       this._onTabDragStart,
@@ -260,20 +250,6 @@ export class TabsContainer extends CompositeDisposable implements ITabsContainer
     // noop
   }
 
-  private addTab(tab: IValueDisposable<Tab>, index: number = this.tabs.length): void {
-    if (index < 0 || index > this.tabs.length) {
-      throw new Error("invalid location");
-    }
-
-    this.tabContainer.insertBefore(tab.value.element, this.tabContainer.children[index]);
-
-    this.tabs = [...this.tabs.slice(0, index), tab, ...this.tabs.slice(index)];
-
-    if (this.selectedIndex < 0) {
-      this.selectedIndex = index;
-    }
-  }
-
   public delete(id: string): void {
     const index = this.tabs.findIndex((tab) => tab.value.panel.id === id);
 
@@ -284,6 +260,8 @@ export class TabsContainer extends CompositeDisposable implements ITabsContainer
     disposable.dispose();
     value.dispose();
     value.element.remove();
+
+    this.updateClassnames();
   }
 
   public setActivePanel(panel: IDockviewPanel): void {
@@ -372,5 +350,25 @@ export class TabsContainer extends CompositeDisposable implements ITabsContainer
     }
 
     this.tabs = [];
+  }
+
+  private addTab(tab: IValueDisposable<Tab>, index: number = this.tabs.length): void {
+    if (index < 0 || index > this.tabs.length) {
+      throw new Error("invalid location");
+    }
+
+    this.tabContainer.insertBefore(tab.value.element, this.tabContainer.children[index]);
+
+    this.tabs = [...this.tabs.slice(0, index), tab, ...this.tabs.slice(index)];
+
+    if (this.selectedIndex < 0) {
+      this.selectedIndex = index;
+    }
+
+    this.updateClassnames();
+  }
+
+  private updateClassnames(): void {
+    toggleClass(this._element, "dv-single-tab", this.size === 1);
   }
 }

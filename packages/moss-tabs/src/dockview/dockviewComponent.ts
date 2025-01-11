@@ -1,19 +1,40 @@
+import { DockviewApi } from "../api/component.api";
+import { remove, sequenceEquals, tail } from "../array";
+import { DEFAULT_FLOATING_GROUP_OVERFLOW_SIZE, DEFAULT_FLOATING_GROUP_POSITION } from "../constants";
+import { getPanelData } from "../dnd/dataTransfer";
+import { directionToPosition, Droptarget, DroptargetOverlayModel, Position } from "../dnd/droptarget";
+import { addTestId, getDockviewTheme, toggleClass, watchElementResize } from "../dom";
+import { addDisposableWindowListener, Emitter, Event } from "../events";
+import { BaseGrid, Direction, IBaseGrid, toTarget } from "../gridview/baseComponentGridview";
 import {
-  getRelativeLocation,
-  SerializedGridObject,
   getGridLocation,
+  getRelativeLocation,
   ISerializedLeafNode,
   orthogonal,
+  SerializedGridObject,
 } from "../gridview/gridview";
-import { directionToPosition, Droptarget, DroptargetOverlayModel, Position } from "../dnd/droptarget";
-import { tail, sequenceEquals, remove } from "../array";
-import { DockviewPanel, IDockviewPanel } from "./dockviewPanel";
 import { CompositeDisposable, Disposable } from "../lifecycle";
-import { Event, Emitter, addDisposableWindowListener } from "../events";
-import { Watermark } from "./components/watermark/watermark";
-import { IWatermarkRenderer, GroupviewPanelState } from "./types";
 import { sequentialNumberGenerator } from "../math";
+import { Overlay } from "../overlay/overlay";
+import { DockviewPanelRenderer, OverlayRenderContainer } from "../overlay/overlayRenderContainer";
+import { Parameters } from "../panel/types";
+import { PopoutWindow } from "../popoutWindow";
+import { Orientation } from "../splitview/splitview";
+import { AnchoredBox, AnchorPosition, Box } from "../types";
+import { GroupDragEvent, TabDragEvent } from "./components/titlebar/tabsContainer";
+import { Watermark } from "./components/watermark/watermark";
 import { DefaultDockviewDeserialzier } from "./deserializer";
+import { DockviewFloatingGroupPanel } from "./dockviewFloatingGroupPanel";
+import { DockviewGroupPanel } from "./dockviewGroupPanel";
+import {
+  DockviewDidDropEvent,
+  DockviewWillDropEvent,
+  GroupOptions,
+  GroupPanelViewState,
+  WillShowOverlayLocationEvent,
+} from "./dockviewGroupPanelModel";
+import { DockviewPanel, IDockviewPanel } from "./dockviewPanel";
+import { DockviewPanelModel } from "./dockviewPanelModel";
 import {
   AddGroupOptions,
   AddPanelOptions,
@@ -27,28 +48,8 @@ import {
   isPanelOptionsWithPanel,
   MovementOptions,
 } from "./options";
-import { BaseGrid, Direction, IBaseGrid, toTarget } from "../gridview/baseComponentGridview";
-import { DockviewApi } from "../api/component.api";
-import { Orientation } from "../splitview/splitview";
-import {
-  GroupOptions,
-  GroupPanelViewState,
-  DockviewDidDropEvent,
-  DockviewWillDropEvent,
-  WillShowOverlayLocationEvent,
-} from "./dockviewGroupPanelModel";
-import { DockviewGroupPanel } from "./dockviewGroupPanel";
-import { DockviewPanelModel } from "./dockviewPanelModel";
-import { getPanelData } from "../dnd/dataTransfer";
-import { Parameters } from "../panel/types";
-import { Overlay } from "../overlay/overlay";
-import { addTestId, getDockviewTheme, toggleClass, watchElementResize } from "../dom";
-import { DockviewFloatingGroupPanel } from "./dockviewFloatingGroupPanel";
-import { GroupDragEvent, TabDragEvent } from "./components/titlebar/tabsContainer";
-import { AnchoredBox, AnchorPosition, Box } from "../types";
-import { DEFAULT_FLOATING_GROUP_OVERFLOW_SIZE, DEFAULT_FLOATING_GROUP_POSITION } from "../constants";
-import { DockviewPanelRenderer, OverlayRenderContainer } from "../overlay/overlayRenderContainer";
-import { PopoutWindow } from "../popoutWindow";
+import { StrictEventsSequencing } from "./strictEventsSequencing";
+import { GroupviewPanelState, IWatermarkRenderer } from "./types";
 
 const DEFAULT_ROOT_OVERLAY_MODEL: DroptargetOverlayModel = {
   activationSize: { type: "pixels", value: 10 },
@@ -317,8 +318,8 @@ export class DockviewComponent extends BaseGrid<DockviewGroupPanel> implements I
     return this._floatingGroups;
   }
 
-  constructor(parentElement: HTMLElement, options: DockviewComponentOptions) {
-    super(parentElement, {
+  constructor(container: HTMLElement, options: DockviewComponentOptions) {
+    super(container, {
       proportionalLayout: true,
       orientation: Orientation.HORIZONTAL,
       styles: options.hideBorders ? { separatorBorder: "transparent" } : undefined,
@@ -332,6 +333,10 @@ export class DockviewComponent extends BaseGrid<DockviewGroupPanel> implements I
 
     toggleClass(this.gridview.element, "dv-dockview", true);
     toggleClass(this.element, "dv-debug", !!options.debug);
+
+    if (options.debug) {
+      this.addDisposables(new StrictEventsSequencing(this));
+    }
 
     this.addDisposables(
       this.overlayRenderContainer,
@@ -349,6 +354,7 @@ export class DockviewComponent extends BaseGrid<DockviewGroupPanel> implements I
       this._onDidRemoveGroup,
       this._onDidActiveGroupChange,
       this._onUnhandledDragOverEvent,
+      this._onDidMaximizedGroupChange,
       this.onDidViewVisibilityChangeMicroTaskQueue(() => {
         this.updateWatermark();
       }),
@@ -624,6 +630,8 @@ export class DockviewComponent extends BaseGrid<DockviewGroupPanel> implements I
         group.model.renderContainer = overlayRenderContainer;
         group.layout(_window.window!.innerWidth, _window.window!.innerHeight);
 
+        let floatingBox: AnchoredBox | undefined;
+
         if (!options?.overridePopoutGroup && isGroupAddedToDom) {
           if (itemToPopout instanceof DockviewPanel) {
             this.movingLock(() => {
@@ -644,7 +652,12 @@ export class DockviewComponent extends BaseGrid<DockviewGroupPanel> implements I
                 break;
               case "floating":
               case "popout":
+                floatingBox = this._floatingGroups
+                  .find((value) => value.group.api.id === itemToPopout.api.id)
+                  ?.overlay.toJSON();
+
                 this.removeGroup(referenceGroup);
+
                 break;
             }
           }
@@ -724,20 +737,42 @@ export class DockviewComponent extends BaseGrid<DockviewGroupPanel> implements I
                 });
               }
             } else if (this.getPanel(group.id)) {
-              this.doRemoveGroup(group, {
-                skipDispose: true,
-                skipActive: true,
-                skipPopoutReturn: true,
-              });
+              group.model.renderContainer = this.overlayRenderContainer;
+              returnedGroup = group;
 
-              const removedGroup = group;
+              const alreadyRemoved = !this._popoutGroups.find((p) => p.popoutGroup === group);
 
-              removedGroup.model.renderContainer = this.overlayRenderContainer;
-              removedGroup.model.location = { type: "grid" };
-              returnedGroup = removedGroup;
+              if (alreadyRemoved) {
+                /**
+                 * If this popout group was explicitly removed then we shouldn't run the additional
+                 * steps. To tell if the running of this disposable is the result of this popout group
+                 * being explicitly removed we can check if this popout group is still referenced in
+                 * the `this._popoutGroups` list.
+                 */
+                return;
+              }
 
-              this.doAddGroup(removedGroup, [0]);
-              this.doSetGroupAndPanelActive(removedGroup);
+              if (floatingBox) {
+                this.addFloatingGroup(group, {
+                  height: floatingBox.height,
+                  width: floatingBox.width,
+                  position: floatingBox,
+                });
+              } else {
+                this.doRemoveGroup(group, {
+                  skipDispose: true,
+                  skipActive: true,
+                  skipPopoutReturn: true,
+                });
+
+                group.model.location = { type: "grid" };
+
+                this.movingLock(() => {
+                  // suppress group add events since the group already exists
+                  this.doAddGroup(group, [0]);
+                });
+              }
+              this.doSetGroupAndPanelActive(group);
             }
           })
         );
@@ -1137,6 +1172,7 @@ export class DockviewComponent extends BaseGrid<DockviewGroupPanel> implements I
           locked: !!locked,
           hideHeader: !!hideHeader,
         });
+        this._onDidAddGroup.fire(group);
 
         const createdPanels: IDockviewPanel[] = [];
 
@@ -1149,8 +1185,6 @@ export class DockviewComponent extends BaseGrid<DockviewGroupPanel> implements I
           const panel = this._deserializer.fromJSON(panels[child], group);
           createdPanels.push(panel);
         }
-
-        this._onDidAddGroup.fire(group);
 
         for (let i = 0; i < views.length; i++) {
           const panel = createdPanels[i];
@@ -1222,6 +1256,7 @@ export class DockviewComponent extends BaseGrid<DockviewGroupPanel> implements I
       }
     } catch (err) {
       console.error("dockview: failed to deserialize layout. Reverting changes", err);
+
       /**
        * Takes all the successfully created groups and remove all of their panels.
        */
@@ -1651,7 +1686,7 @@ export class DockviewComponent extends BaseGrid<DockviewGroupPanel> implements I
         if (!options?.skipDispose) {
           if (!options?.skipPopoutAssociated) {
             const refGroup = selectedGroup.referenceGroup ? this.getPanel(selectedGroup.referenceGroup) : undefined;
-            if (refGroup) {
+            if (refGroup && refGroup.panels.length === 0) {
               this.removeGroup(refGroup);
             }
           }
@@ -1826,11 +1861,7 @@ export class DockviewComponent extends BaseGrid<DockviewGroupPanel> implements I
           this.doRemoveGroup(sourceGroup, { skipActive: true });
 
           const newGroup = this.createGroupAtLocation(targetLocation);
-          this.movingLock(() =>
-            newGroup.model.openPanel(removedPanel, {
-              skipSetActive: true,
-            })
-          );
+          this.movingLock(() => newGroup.model.openPanel(removedPanel));
           this.doSetGroupAndPanelActive(newGroup);
 
           this._onDidMovePanel.fire({

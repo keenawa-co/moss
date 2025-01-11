@@ -100,11 +100,9 @@ export class ReactPart<P extends object, C extends object = {}> implements IFram
     }
 
     if (!isReactComponent(this.component)) {
-      /**
-       * we know this isn't a React.FunctionComponent so throw an error here.
-       * if we do not intercept then React library will throw a very obsure error
-       * for the same reason... at least at this point we will emit a sensible stacktrace.
-       */
+      // we know this isn't a React.FunctionComponent so throw an error here.
+      // if we do not intercept then React library will throw a very obscure error
+      // for the same reason... at least at this point we will emit a sensible stacktrace.
       throw new Error(
         "Dockview: Only React.memo(...), React.ForwardRef(...) and functional components are accepted as components"
       );

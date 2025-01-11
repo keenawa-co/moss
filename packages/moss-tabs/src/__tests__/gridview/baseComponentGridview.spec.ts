@@ -1,5 +1,5 @@
 import { Emitter } from "../../events";
-import { BaseGrid, IGridPanelView, BaseGridOptions } from "../../gridview/baseComponentGridview";
+import { BaseGrid, BaseGridOptions, IGridPanelView } from "../../gridview/baseComponentGridview";
 import { IViewSize } from "../../gridview/gridview";
 import { CompositeDisposable } from "../../lifecycle";
 import { PanelInitParameters, PanelUpdateEvent, Parameters } from "../../panel/types";
@@ -94,6 +94,21 @@ class ClassUnderTest extends BaseGrid<TestPanel> {
 }
 
 describe("baseComponentGridview", () => {
+  test("that the container is not removed when grid is disposed", () => {
+    const root = document.createElement("div");
+    const container = document.createElement("div");
+    root.appendChild(container);
+
+    const cut = new ClassUnderTest(container, {
+      orientation: Orientation.HORIZONTAL,
+      proportionalLayout: true,
+    });
+
+    cut.dispose();
+
+    expect(container.parentElement).toBe(root);
+  });
+
   test("that .layout(...) force flag works", () => {
     const cut = new ClassUnderTest(document.createElement("div"), {
       orientation: Orientation.HORIZONTAL,

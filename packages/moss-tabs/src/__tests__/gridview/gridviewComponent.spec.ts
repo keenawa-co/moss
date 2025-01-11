@@ -36,16 +36,21 @@ describe("gridview", () => {
     const gridview = new GridviewComponent(container, {
       proportionalLayout: false,
       orientation: Orientation.VERTICAL,
-      components: { default: TestGridview },
+      createComponent: (options) => {
+        switch (options.name) {
+          case "default":
+            return new TestGridview(options.id, options.name);
+          default:
+            throw new Error("unsupported");
+        }
+      },
       className: "test-a test-b",
     });
 
-    //FIXME: modified 2024-01-04
     expect(gridview.element.className).toBe("test-a test-b");
 
     gridview.updateOptions({ className: "test-b test-c" });
 
-    //FIXME: modified 2024-01-04
     expect(gridview.element.className).toBe("test-b test-c");
   });
 
@@ -53,7 +58,14 @@ describe("gridview", () => {
     const gridview = new GridviewComponent(container, {
       proportionalLayout: false,
       orientation: Orientation.VERTICAL,
-      components: { default: TestGridview },
+      createComponent: (options) => {
+        switch (options.name) {
+          case "default":
+            return new TestGridview(options.id, options.name);
+          default:
+            throw new Error("unsupported");
+        }
+      },
     });
 
     gridview.layout(800, 400);
@@ -72,7 +84,14 @@ describe("gridview", () => {
     const gridview = new GridviewComponent(container, {
       proportionalLayout: false,
       orientation: Orientation.VERTICAL,
-      components: { default: TestGridview },
+      createComponent: (options) => {
+        switch (options.name) {
+          case "default":
+            return new TestGridview(options.id, options.name);
+          default:
+            throw new Error("unsupported");
+        }
+      },
     });
 
     gridview.layout(800, 400);
@@ -102,7 +121,14 @@ describe("gridview", () => {
     const gridview = new GridviewComponent(container, {
       proportionalLayout: false,
       orientation: Orientation.VERTICAL,
-      components: { default: TestGridview },
+      createComponent: (options) => {
+        switch (options.name) {
+          case "default":
+            return new TestGridview(options.id, options.name);
+          default:
+            throw new Error("unsupported");
+        }
+      },
     });
 
     gridview.layout(800, 400);
@@ -162,7 +188,14 @@ describe("gridview", () => {
     const gridview = new GridviewComponent(container, {
       proportionalLayout: false,
       orientation: Orientation.VERTICAL,
-      components: { default: TestGridview },
+      createComponent: (options) => {
+        switch (options.name) {
+          case "default":
+            return new TestGridview(options.id, options.name);
+          default:
+            throw new Error("unsupported");
+        }
+      },
     });
 
     gridview.layout(800, 400);
@@ -289,7 +322,14 @@ describe("gridview", () => {
     const gridview = new GridviewComponent(container, {
       proportionalLayout: false,
       orientation: Orientation.VERTICAL,
-      components: { default: TestGridview },
+      createComponent: (options) => {
+        switch (options.name) {
+          case "default":
+            return new TestGridview(options.id, options.name);
+          default:
+            throw new Error("unsupported");
+        }
+      },
     });
 
     gridview.layout(1000, 1000);
@@ -325,7 +365,14 @@ describe("gridview", () => {
     const gridview = new GridviewComponent(container, {
       proportionalLayout: false,
       orientation: Orientation.VERTICAL,
-      components: { default: TestGridview },
+      createComponent: (options) => {
+        switch (options.name) {
+          case "default":
+            return new TestGridview(options.id, options.name);
+          default:
+            throw new Error("unsupported");
+        }
+      },
     });
 
     gridview.layout(800, 400);
@@ -448,7 +495,14 @@ describe("gridview", () => {
     const gridview = new GridviewComponent(container, {
       proportionalLayout: false,
       orientation: Orientation.VERTICAL,
-      components: { default: TestGridview },
+      createComponent: (options) => {
+        switch (options.name) {
+          case "default":
+            return new TestGridview(options.id, options.name);
+          default:
+            throw new Error("unsupported");
+        }
+      },
     });
 
     gridview.layout(800, 400);
@@ -477,7 +531,14 @@ describe("gridview", () => {
     const gridview = new GridviewComponent(container, {
       proportionalLayout: true,
       orientation: Orientation.VERTICAL,
-      components: { default: TestGridview },
+      createComponent: (options) => {
+        switch (options.name) {
+          case "default":
+            return new TestGridview(options.id, options.name);
+          default:
+            throw new Error("unsupported");
+        }
+      },
     });
 
     gridview.layout(800, 400);
@@ -535,7 +596,14 @@ describe("gridview", () => {
     const gridview = new GridviewComponent(container, {
       proportionalLayout: true,
       orientation: Orientation.HORIZONTAL,
-      components: { default: TestGridview },
+      createComponent: (options) => {
+        switch (options.name) {
+          case "default":
+            return new TestGridview(options.id, options.name);
+          default:
+            throw new Error("unsupported");
+        }
+      },
     });
 
     gridview.layout(800, 400);
@@ -593,7 +661,14 @@ describe("gridview", () => {
     const gridview = new GridviewComponent(container, {
       proportionalLayout: true,
       orientation: Orientation.HORIZONTAL,
-      components: { default: TestGridview },
+      createComponent: (options) => {
+        switch (options.name) {
+          case "default":
+            return new TestGridview(options.id, options.name);
+          default:
+            throw new Error("unsupported");
+        }
+      },
     });
 
     gridview.layout(800, 400);
@@ -669,7 +744,14 @@ describe("gridview", () => {
     const gridview = new GridviewComponent(container, {
       proportionalLayout: true,
       orientation: Orientation.HORIZONTAL,
-      components: { default: TestGridview },
+      createComponent: (options) => {
+        switch (options.name) {
+          case "default":
+            return new TestGridview(options.id, options.name);
+          default:
+            throw new Error("unsupported");
+        }
+      },
     });
 
     gridview.layout(800, 400);
@@ -763,7 +845,14 @@ describe("gridview", () => {
     const gridview = new GridviewComponent(container, {
       proportionalLayout: true,
       orientation: Orientation.VERTICAL,
-      components: { default: TestGridview },
+      createComponent: (options) => {
+        switch (options.name) {
+          case "default":
+            return new TestGridview(options.id, options.name);
+          default:
+            throw new Error("unsupported");
+        }
+      },
     });
 
     gridview.layout(800, 400);
@@ -857,7 +946,14 @@ describe("gridview", () => {
     const gridview = new GridviewComponent(container, {
       proportionalLayout: false,
       orientation: Orientation.VERTICAL,
-      components: { default: TestGridview },
+      createComponent: (options) => {
+        switch (options.name) {
+          case "default":
+            return new TestGridview(options.id, options.name);
+          default:
+            throw new Error("unsupported");
+        }
+      },
     });
 
     gridview.layout(800, 400);
@@ -951,7 +1047,14 @@ describe("gridview", () => {
     const gridview = new GridviewComponent(container, {
       proportionalLayout: true,
       orientation: Orientation.VERTICAL,
-      components: { default: TestGridview },
+      createComponent: (options) => {
+        switch (options.name) {
+          case "default":
+            return new TestGridview(options.id, options.name);
+          default:
+            throw new Error("unsupported");
+        }
+      },
     });
 
     gridview.layout(800, 400);
@@ -1075,7 +1178,14 @@ describe("gridview", () => {
     const gridview = new GridviewComponent(container, {
       proportionalLayout: true,
       orientation: Orientation.VERTICAL,
-      components: { default: TestGridview },
+      createComponent: (options) => {
+        switch (options.name) {
+          case "default":
+            return new TestGridview(options.id, options.name);
+          default:
+            throw new Error("unsupported");
+        }
+      },
     });
 
     gridview.layout(800, 400);
@@ -1199,7 +1309,14 @@ describe("gridview", () => {
     const gridview = new GridviewComponent(container, {
       proportionalLayout: true,
       orientation: Orientation.VERTICAL,
-      components: { default: TestGridview },
+      createComponent: (options) => {
+        switch (options.name) {
+          case "default":
+            return new TestGridview(options.id, options.name);
+          default:
+            throw new Error("unsupported");
+        }
+      },
     });
 
     gridview.layout(800, 400);
@@ -1325,7 +1442,14 @@ describe("gridview", () => {
     const gridview = new GridviewComponent(container, {
       proportionalLayout: true,
       orientation: Orientation.HORIZONTAL,
-      components: { default: TestGridview },
+      createComponent: (options) => {
+        switch (options.name) {
+          case "default":
+            return new TestGridview(options.id, options.name);
+          default:
+            throw new Error("unsupported");
+        }
+      },
     });
 
     gridview.layout(800, 400);
@@ -1449,7 +1573,14 @@ describe("gridview", () => {
     const gridview = new GridviewComponent(container, {
       proportionalLayout: false,
       orientation: Orientation.HORIZONTAL,
-      components: { default: TestGridview },
+      createComponent: (options) => {
+        switch (options.name) {
+          case "default":
+            return new TestGridview(options.id, options.name);
+          default:
+            throw new Error("unsupported");
+        }
+      },
     });
 
     gridview.layout(800, 400);
@@ -1573,7 +1704,14 @@ describe("gridview", () => {
     const gridview = new GridviewComponent(container, {
       proportionalLayout: true,
       orientation: Orientation.HORIZONTAL,
-      components: { default: TestGridview },
+      createComponent: (options) => {
+        switch (options.name) {
+          case "default":
+            return new TestGridview(options.id, options.name);
+          default:
+            throw new Error("unsupported");
+        }
+      },
     });
 
     gridview.fromJSON({
@@ -1700,7 +1838,14 @@ describe("gridview", () => {
     const gridview = new GridviewComponent(container, {
       proportionalLayout: false,
       orientation: Orientation.VERTICAL,
-      components: { default: TestGridview },
+      createComponent: (options) => {
+        switch (options.name) {
+          case "default":
+            return new TestGridview(options.id, options.name);
+          default:
+            throw new Error("unsupported");
+        }
+      },
     });
 
     gridview.layout(1000, 1000);
@@ -1730,7 +1875,14 @@ describe("gridview", () => {
     const gridview = new GridviewComponent(container, {
       proportionalLayout: false,
       orientation: Orientation.VERTICAL,
-      components: { default: TestGridview },
+      createComponent: (options) => {
+        switch (options.name) {
+          case "default":
+            return new TestGridview(options.id, options.name);
+          default:
+            throw new Error("unsupported");
+        }
+      },
     });
     gridview.layout(1000, 1000);
 
@@ -1759,7 +1911,14 @@ describe("gridview", () => {
     const gridview = new GridviewComponent(container, {
       proportionalLayout: false,
       orientation: Orientation.VERTICAL,
-      components: { default: TestGridview },
+      createComponent: (options) => {
+        switch (options.name) {
+          case "default":
+            return new TestGridview(options.id, options.name);
+          default:
+            throw new Error("unsupported");
+        }
+      },
     });
     gridview.layout(1000, 1000);
 
@@ -1797,7 +1956,14 @@ describe("gridview", () => {
     const gridview = new GridviewComponent(container, {
       proportionalLayout: true,
       orientation: Orientation.HORIZONTAL,
-      components: { default: TestGridview },
+      createComponent: (options) => {
+        switch (options.name) {
+          case "default":
+            return new TestGridview(options.id, options.name);
+          default:
+            throw new Error("unsupported");
+        }
+      },
     });
 
     let addGroup: GridviewPanel[] = [];
@@ -1919,7 +2085,14 @@ describe("gridview", () => {
     const gridview = new GridviewComponent(container, {
       proportionalLayout: true,
       orientation: Orientation.VERTICAL,
-      components: { default: TestGridview },
+      createComponent: (options) => {
+        switch (options.name) {
+          case "default":
+            return new TestGridview(options.id, options.name);
+          default:
+            throw new Error("unsupported");
+        }
+      },
     });
 
     gridview.layout(1600, 800);
@@ -2045,7 +2218,14 @@ describe("gridview", () => {
     const gridview = new GridviewComponent(container, {
       proportionalLayout: true,
       orientation: Orientation.VERTICAL,
-      components: { default: TestGridview },
+      createComponent: (options) => {
+        switch (options.name) {
+          case "default":
+            return new TestGridview(options.id, options.name);
+          default:
+            throw new Error("unsupported");
+        }
+      },
     });
 
     gridview.layout(6000, 5000);
@@ -2320,7 +2500,14 @@ describe("gridview", () => {
     const gridview = new GridviewComponent(container, {
       proportionalLayout: true,
       orientation: Orientation.VERTICAL,
-      components: { default: TestGridview },
+      createComponent: (options) => {
+        switch (options.name) {
+          case "default":
+            return new TestGridview(options.id, options.name);
+          default:
+            throw new Error("unsupported");
+        }
+      },
     });
 
     gridview.layout(5000, 6000);
@@ -2593,7 +2780,14 @@ describe("gridview", () => {
     const gridview = new GridviewComponent(container, {
       proportionalLayout: true,
       orientation: Orientation.HORIZONTAL,
-      components: { default: TestGridview },
+      createComponent: (options) => {
+        switch (options.name) {
+          case "default":
+            return new TestGridview(options.id, options.name);
+          default:
+            throw new Error(`unsupported panel '${options.name}'`);
+        }
+      },
     });
 
     let el = gridview.element.querySelector(".dv-view-container");
@@ -2657,7 +2851,7 @@ describe("gridview", () => {
         },
         activePanel: "panel_1",
       });
-    }).toThrow("Cannot create 'panel_1', no component 'somethingBad' provided");
+    }).toThrow("unsupported panel 'somethingBad'");
 
     expect(gridview.groups.length).toBe(0);
 
@@ -2670,7 +2864,14 @@ describe("gridview", () => {
     const gridview = new GridviewComponent(container, {
       proportionalLayout: true,
       orientation: Orientation.HORIZONTAL,
-      components: { default: TestGridview },
+      createComponent: (options) => {
+        switch (options.name) {
+          case "default":
+            return new TestGridview(options.id, options.name);
+          default:
+            throw new Error("unsupported");
+        }
+      },
     });
 
     expect(gridview.disableResizing).toBeFalsy();
@@ -2680,7 +2881,14 @@ describe("gridview", () => {
     const gridview = new GridviewComponent(container, {
       proportionalLayout: true,
       orientation: Orientation.HORIZONTAL,
-      components: { default: TestGridview },
+      createComponent: (options) => {
+        switch (options.name) {
+          case "default":
+            return new TestGridview(options.id, options.name);
+          default:
+            throw new Error("unsupported");
+        }
+      },
       disableAutoResizing: true,
     });
 
@@ -2691,7 +2899,14 @@ describe("gridview", () => {
     const gridview = new GridviewComponent(container, {
       proportionalLayout: true,
       orientation: Orientation.HORIZONTAL,
-      components: { default: TestGridview },
+      createComponent: (options) => {
+        switch (options.name) {
+          case "default":
+            return new TestGridview(options.id, options.name);
+          default:
+            throw new Error("unsupported");
+        }
+      },
       disableAutoResizing: true,
     });
     gridview.layout(1000, 1000);
