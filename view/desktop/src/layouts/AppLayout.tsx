@@ -6,7 +6,7 @@ import { AppLayoutState, useGetAppLayoutState } from "@/hooks/useAppLayoutState"
 import { Home, Logs, Settings } from "@/pages";
 import { useAppResizableLayoutStore } from "@/store/appResizableLayout";
 
-import "@repo/moss-tabs/styles/dockview.css";
+import "@repo/moss-tabs/assets/styles.css";
 
 //import "./moss-tabs-demo/styles.css";
 

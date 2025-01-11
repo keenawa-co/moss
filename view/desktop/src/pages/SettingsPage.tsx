@@ -3,9 +3,6 @@ import { useTranslation } from "react-i18next";
 import { useChangeColorTheme, useGetColorThemes } from "@/hooks/useColorTheme";
 import { useGetAppState } from "@/hooks/useGetAppState";
 import { useChangeLanguagePack, useGetLanguagePacks } from "@/hooks/useLanguagePack";
-import { DockviewReact, DockviewReadyEvent, IDockviewPanelProps } from "@repo/moss-tabs";
-
-import "@repo/moss-tabs/styles/dockview.css";
 
 export const Settings = () => {
   const { t } = useTranslation(["ns1", "ns2"]);

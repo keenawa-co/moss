@@ -1,4 +1,4 @@
-import tailwindColors from "tailwindcss/colors";
+import tailwindColors, { blue } from "tailwindcss/colors";
 
 const extendedTailwindColors = {
   amber: tailwindColors.amber,
@@ -10,6 +10,22 @@ const extendedTailwindColors = {
 };
 
 export const staticColors = {
+  black: "#000000",
+  cyan: {
+    50: "#E0F7FA",
+    100: "#B3ECEF",
+    200: "#80E1E3",
+    300: "#4DD6D8",
+    400: "#26CCCE",
+    500: "#00C2C3",
+    600: "#00A0A1",
+    700: "#00777A",
+    800: "#004F52",
+    900: "#002729",
+  },
+  blue: {
+    500: "#0078D4",
+  },
   olive: {
     50: "#FAF9E0",
     100: "#F5F2C2",
