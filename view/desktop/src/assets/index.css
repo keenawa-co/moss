@@ -22,7 +22,7 @@
 @layer base {
   html,
   body {
-    @apply font-sans text-[rgba(var(--color-primary))];
+    @apply font-sans text-[rgba(var(--moss-primary))];
     overflow: hidden;
     position: fixed;
     width: 100vw;
@@ -35,7 +35,7 @@
   h2,
   h3,
   h4 {
-    @apply text-[rgba(var(--color-primary))];
+    @apply text-[rgba(var(--moss-primary))];
   }
 
   h2,
@@ -61,7 +61,7 @@
   }
 
   p {
-    @apply text-sm leading-normal text-[rgba(var(--color-primary))];
+    @apply text-sm leading-normal text-[rgba(var(--moss-primary))];
   }
 }
 

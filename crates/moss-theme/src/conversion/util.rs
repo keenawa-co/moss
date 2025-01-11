@@ -1,14 +1,13 @@
-use indexmap::IndexMap;
-
+use crate::conversion::json_converter::MOSS_VARIABLE_PREFIX;
 use crate::models::theme::{ColorDetail, ColorValue};
+use indexmap::IndexMap;
 
 const DEFAULT_DIRECTION: &str = "to right";
 
 pub(crate) fn convert_colors_to_css_variables(
-    category: &str,
     colors: &IndexMap<String, ColorDetail>,
 ) -> IndexMap<String, String> {
-    convert_category_to_css_variables(category, colors, |color_detail| match &color_detail.value {
+    convert_category_to_css_variables(colors, |color_detail| match &color_detail.value {
         ColorValue::Solid(val) => val.clone(),
         ColorValue::Gradient(vals) => {
             let direction = color_detail
@@ -32,7 +31,6 @@ pub(crate) fn convert_colors_to_css_variables(
 }
 
 pub(crate) fn convert_category_to_css_variables<F, T>(
-    category: &str,
     tokens: &IndexMap<String, T>,
     converter: F,
 ) -> IndexMap<String, String>
@@ -42,7 +40,7 @@ where
     let mut css_vars = IndexMap::with_capacity(tokens.len());
 
     for (key, token) in tokens {
-        let css_var_name = format!("--{}-{}", category, key.replace('.', "-"));
+        let css_var_name = format!("--{}-{}", MOSS_VARIABLE_PREFIX, key.replace('.', "-"));
         let css_var_value = converter(token);
         css_vars.insert(css_var_name, css_var_value);
     }
