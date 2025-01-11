@@ -63,11 +63,17 @@ sudo apt install clang
 
 **Note for Windows users:**
 
-You need to first install GNU make before running the `make` scripts:
+You need to first install GNU make and other utilities before running the `make` scripts:
 
 1. Install Chocolatey from https://chocolatey.org/install
 
 2. In an administrative shell, run `choco install make`
+
+3. Then, run `choco install gnuwin32-coreutils.install` in an administrative shell,
+   which will install several GNU utilities such as `mv` command.
+
+4. You also need to add `C:\Program Files (x86)\GnuWin32\bin` to your PATH environment variable
+   to make sure that the make scripts can make use of these commands.
 
 <!-- ## Nix usage (not ready to be used!)
 
