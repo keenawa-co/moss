@@ -4,7 +4,6 @@
   "type": "module",
   "exports": {
     ".": "./src/index.ts",
-    "./styles/dockview.css": "./styles/dockview.css",
     "./assets/styles.css": "./assets/styles.css"
   },
   "description": "Zero dependency layout manager supporting tabs, grids and splitviews",
@@ -49,7 +48,6 @@
     "build": "npm run build:package && npm run build:bundles",
     "build:bundles": "rollup -c",
     "build:cjs": "cross-env ../../node_modules/.bin/tsc --build ./tsconfig.json --verbose --extendedDiagnostics",
-    "build:css": "gulp sass",
     "build:css-old": "node scripts/copy-css.js",
     "build:esm": "cross-env ../../node_modules/.bin/tsc --build ./tsconfig.esm.json --verbose --extendedDiagnostics",
     "build:package": "npm run build:cjs && npm run build:esm && npm run build:css",
