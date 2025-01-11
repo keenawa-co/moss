@@ -77,13 +77,8 @@
 .dv-groupview.dv-active-group > .dv-tabs-and-actions-container > .dv-tabs-container > .dv-tab.dv-active-tab {
   @apply bg-[var(--color-dv-activegroup-visiblepanel-tab-background-color)] text-[var(--color-dv-activegroup-visiblepanel-tab-color)];
 }
-Holmenkollveien 34,
-0376
-  Oslo
-  .dv-groupview.dv-active-group
-  > .dv-tabs-and-actions-container
-  > .dv-tabs-container
-  > .dv-tab.dv-inactive-tab {
+
+.dv-groupview.dv-active-group > .dv-tabs-and-actions-container > .dv-tabs-container > .dv-tab.dv-inactive-tab {
   @apply bg-[var(--color-dv-activegroup-hiddenpanel-tab-background-color)] text-[var(--color-dv-activegroup-hiddenpanel-tab-color)];
 }
 
