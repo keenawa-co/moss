@@ -9,7 +9,7 @@ fn main() {
 
     Command::new(python_cmd)
         .arg("../../misc/importer.py")
-        .arg("import.json")
+        .arg("package.json")
         .status()
         .expect("Failed to execute script");
 }

@@ -17,26 +17,33 @@ auto_generated_comment = """\
 // re-run `make gen-models` it to regenerate the file accordingly.
 """
 
+CUSTOM_SECTION_KEY = "importMap"  # Unique key in package.json for the import map
+
 def load_import_map(import_map_path: str) -> Dict[str, Dict[str, Dict[str, any]]]:
     """
-    Loads the import_map from a JSON file.
+    Loads the import_map from the custom section in package.json.
 
     Args:
-        import_map_path (str): Path to the JSON file containing the import_map.
+        import_map_path (str): Path to the package.json file.
 
     Returns:
-        Dict[str, Dict[str, Dict[str, any]]]: The parsed import_map.
+        Dict[str, Dict[str, Dict[str, any]]]: The parsed import_map from the custom section.
 
     Raises:
         FileNotFoundError: If the file does not exist.
+        KeyError: If the custom section key is not found in package.json.
         json.JSONDecodeError: If the file contains invalid JSON.
     """
     if not os.path.isfile(import_map_path):
         raise FileNotFoundError(f"[ERROR] The file '{import_map_path}' does not exist.")
     
     with open(import_map_path, "r", encoding="utf-8") as f:
-        return json.load(f)
+        package_json = json.load(f)
 
+    if CUSTOM_SECTION_KEY not in package_json:
+        raise KeyError(f"[ERROR] '{CUSTOM_SECTION_KEY}' section not found in {import_map_path}.")
+    
+    return package_json[CUSTOM_SECTION_KEY]
 
 
 def parse_existing_imports(content: str) -> Dict[str, Set[str]]:
@@ -180,14 +187,14 @@ def process_file(file_path: str, import_details: Dict[str, Dict[str, any]]):
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
-        print("[ERROR] Please provide the path to the import_map JSON file as a CLI argument.")
+        print("[ERROR] Please provide the path to the package.json file as a CLI argument.")
         sys.exit(1)
 
-    import_map_path = sys.argv[1]
+    package_json_path = sys.argv[1]
 
     try:
-        import_map = load_import_map(import_map_path)
-    except (FileNotFoundError, json.JSONDecodeError) as e:
+        import_map = load_import_map(package_json_path)
+    except (FileNotFoundError, KeyError, json.JSONDecodeError) as e:
         print(f"[ERROR] Failed to load import_map: {e}")
         sys.exit(1)
 
