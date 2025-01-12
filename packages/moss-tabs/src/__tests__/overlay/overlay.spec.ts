@@ -1,5 +1,5 @@
-import { Overlay } from "../../overlay/overlay";
 import { mockGetBoundingClientRect } from "../__test_utils__/utils";
+import { Overlay } from "../../overlay/overlay";
 
 describe("overlay", () => {
   test("toJSON, top left", () => {
@@ -331,7 +331,7 @@ describe("overlay", () => {
 
     const overlay1 = createOverlay();
 
-    const zIndexValue = (delta: number) => `calc(var(--dv-overlay-z-index, 999) + ${delta})`;
+    const zIndexValue = (delta: number) => `calc(var(--moss-overlay-z-index, 999) + ${delta})`;
 
     expect(overlay1.element.getAttribute("aria-level")).toBe("0");
     expect(overlay1.element.style.zIndex).toBe(zIndexValue(0));

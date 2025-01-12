@@ -72,7 +72,7 @@ export const RightControls = (props: IDockviewHeaderActionsProps) => {
         alignItems: "center",
         padding: "0px 8px",
         height: "100%",
-        color: "var(--moss-dv-activegroup-visiblepanel-tab-color)",
+        color: "var(--moss-activegroup-visiblepanel-tab-color)",
       }}
     >
       {props.isGroupActive && <Icon icon="star" />}
@@ -113,7 +113,7 @@ export const LeftControls = (props: IDockviewHeaderActionsProps) => {
         alignItems: "center",
         padding: "0px 8px",
         height: "100%",
-        color: "var(--moss-dv-activegroup-visiblepanel-tab-color)",
+        color: "var(--moss-activegroup-visiblepanel-tab-color)",
       }}
     >
       <Icon onClick={onClick} icon="add" />
@@ -130,7 +130,7 @@ export const PrefixHeaderControls = (props: IDockviewHeaderActionsProps) => {
         alignItems: "center",
         padding: "0px 8px",
         height: "100%",
-        color: "var(--moss-dv-activegroup-visiblepanel-tab-color)",
+        color: "var(--moss-activegroup-visiblepanel-tab-color)",
       }}
     >
       <Icon icon="Menu" />

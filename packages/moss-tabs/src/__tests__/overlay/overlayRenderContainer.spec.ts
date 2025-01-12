@@ -1,11 +1,12 @@
+import { fromPartial } from "@total-typescript/shoehorn";
+
+import { exhaustMicrotaskQueue, Writable } from "../__test_utils__/utils";
 import { Droptarget } from "../../dnd/droptarget";
+import { DockviewComponent } from "../../dockview/dockviewComponent";
+import { DockviewGroupPanel } from "../../dockview/dockviewGroupPanel";
 import { IDockviewPanel } from "../../dockview/dockviewPanel";
 import { Emitter } from "../../events";
 import { IRenderable, OverlayRenderContainer } from "../../overlay/overlayRenderContainer";
-import { fromPartial } from "@total-typescript/shoehorn";
-import { Writable, exhaustMicrotaskQueue } from "../__test_utils__/utils";
-import { DockviewComponent } from "../../dockview/dockviewComponent";
-import { DockviewGroupPanel } from "../../dockview/dockviewGroupPanel";
 
 describe("overlayRenderContainer", () => {
   let referenceContainer: IRenderable;
@@ -236,6 +237,6 @@ describe("overlayRenderContainer", () => {
     await exhaustMicrotaskQueue();
 
     expect(spy).toHaveBeenCalledWith("aria-level");
-    expect(panelContentEl.parentElement!.style.zIndex).toBe("calc(var(--dv-overlay-z-index, 999) + 5)");
+    expect(panelContentEl.parentElement!.style.zIndex).toBe("calc(var(--moss-overlay-z-index, 999) + 5)");
   });
 });

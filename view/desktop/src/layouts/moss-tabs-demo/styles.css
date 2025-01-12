@@ -9,7 +9,7 @@
 }
 .dockview-demo .group-control .action:hover {
   border-radius: 2px;
-  background-color: var(--moss-dv-icon-hover-background-color);
+  background-color: var(--moss-icon-hover-background-color);
 }
 .dockview-demo .data-table table {
   font-size: 11px;

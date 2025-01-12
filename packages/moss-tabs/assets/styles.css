@@ -19,37 +19,37 @@
 }
 
 .dv-drop-target > .dv-drop-target-dropzone > .dv-drop-target-selection {
-  @apply pointer-events-none relative box-border h-full w-full bg-[var(--moss-dv-drag-over-background-color)] transition-[top_70ms_ease-out,left_70ms_ease-out,width_70ms_ease-out,height_70ms_ease-out,opacity_0.15s_ease-out] will-change-transform;
+  @apply pointer-events-none relative box-border h-full w-full bg-[var(--moss-drag-over-background-color)] transition-[top_70ms_ease-out,left_70ms_ease-out,width_70ms_ease-out,height_70ms_ease-out,opacity_0.15s_ease-out] will-change-transform;
 }
 
 .dv-drop-target
   > .dv-drop-target-dropzone
   > .dv-drop-target-selection.dv-drop-target-top.dv-drop-target-small-vertical {
-  @apply border-t border-[var(--moss-dv-drag-over-border-color)];
+  @apply border-t border-[var(--moss-drag-over-border-color)];
 }
 
 .dv-drop-target
   > .dv-drop-target-dropzone
   > .dv-drop-target-selection.dv-drop-target-bottom.dv-drop-target-small-vertical {
-  @apply border-b border-[var(--moss-dv-drag-over-border-color)];
+  @apply border-b border-[var(--moss-drag-over-border-color)];
 }
 
 .dv-drop-target
   > .dv-drop-target-dropzone
   > .dv-drop-target-selection.dv-drop-target-left.dv-drop-target-small-horizontal {
-  @apply border-l border-[var(--moss-dv-drag-over-border-color)];
+  @apply border-l border-[var(--moss-drag-over-border-color)];
 }
 
 .dv-drop-target
   > .dv-drop-target-dropzone
   > .dv-drop-target-selection.dv-drop-target-right.dv-drop-target-small-horizontal {
-  @apply border-r border-[var(--moss-dv-drag-over-border-color)];
+  @apply border-r border-[var(--moss-drag-over-border-color)];
 }
 
 /*--------------------dv-dockview--------------------*/
 
 .dv-dockview {
-  @apply relative bg-[var(--moss-dv-group-view-background-color)];
+  @apply relative bg-[var(--moss-group-view-background-color)];
 }
 
 .dv-dockview .dv-watermark-container {
@@ -63,7 +63,7 @@
 /*--------------------dv-groupview--------------------*/
 
 .dv-groupview {
-  @apply flex h-full flex-col overflow-hidden bg-[var(--moss-dv-group-view-background-color)];
+  @apply flex h-full flex-col overflow-hidden bg-[var(--moss-group-view-background-color)];
 }
 
 .dv-groupview:focus {
@@ -75,19 +75,19 @@
 }
 
 .dv-groupview.dv-active-group > .dv-tabs-and-actions-container > .dv-tabs-container > .dv-tab.dv-active-tab {
-  @apply bg-[var(--moss-dv-activegroup-visiblepanel-tab-background-color)] text-[var(--moss-dv-activegroup-visiblepanel-tab-color)];
+  @apply bg-[var(--moss-activegroup-visiblepanel-tab-background-color)] text-[var(--moss-activegroup-visiblepanel-tab-color)];
 }
 
 .dv-groupview.dv-active-group > .dv-tabs-and-actions-container > .dv-tabs-container > .dv-tab.dv-inactive-tab {
-  @apply bg-[var(--moss-dv-activegroup-hiddenpanel-tab-background-color)] text-[var(--moss-dv-activegroup-hiddenpanel-tab-color)];
+  @apply bg-[var(--moss-activegroup-hiddenpanel-tab-background-color)] text-[var(--moss-activegroup-hiddenpanel-tab-color)];
 }
 
 .dv-groupview.dv-inactive-group > .dv-tabs-and-actions-container > .dv-tabs-container > .dv-tab.dv-active-tab {
-  @apply bg-[var(--moss-dv-inactivegroup-visiblepanel-tab-background-color)] text-[var(--moss-dv-inactivegroup-visiblepanel-tab-color)];
+  @apply bg-[var(--moss-inactivegroup-visiblepanel-tab-background-color)] text-[var(--moss-inactivegroup-visiblepanel-tab-color)];
 }
 
 .dv-groupview.dv-inactive-group > .dv-tabs-and-actions-container > .dv-tabs-container > .dv-tab.dv-inactive-tab {
-  @apply bg-[var(--moss-dv-inactivegroup-hiddenpanel-tab-background-color)] text-[var(--moss-dv-inactivegroup-hiddenpanel-tab-color)];
+  @apply bg-[var(--moss-inactivegroup-hiddenpanel-tab-background-color)] text-[var(--moss-inactivegroup-hiddenpanel-tab-color)];
 }
 
 /*--------------------dv-tab--------------------*/
@@ -103,7 +103,7 @@
 
 .dv-tab:focus-within::after,
 .dv-tab:focus::after {
-  @apply pointer-events-none absolute left-0 top-0 z-[5] h-full w-full outline-offset-[-1px] outline-[1px_solid_var(--moss-dv-tab-divider-color)_!important] content-[''];
+  @apply pointer-events-none absolute left-0 top-0 z-[5] h-full w-full outline-offset-[-1px] outline-[1px_solid_var(--moss-tab-divider-color)_!important] content-[''];
 }
 
 /**
@@ -111,11 +111,11 @@
  * therefore we also set some stylings for the dragging event
  **/
 .dv-tab.dv-tab-dragging {
-  @apply bg-[var(--moss-dv-activegroup-visiblepanel-tab-background-color)] text-[var(--moss-dv-activegroup-visiblepanel-tab-color)];
+  @apply bg-[var(--moss-activegroup-visiblepanel-tab-background-color)] text-[var(--moss-activegroup-visiblepanel-tab-color)];
 }
 
 .dv-tab.dv-tab-dragging .dv-default-tab-action {
-  @apply bg-[var(--moss-dv-activegroup-visiblepanel-tab-color)];
+  @apply bg-[var(--moss-activegroup-visiblepanel-tab-color)];
 }
 
 .dv-tab.dv-active-tab .dv-default-tab .dv-default-tab-action {
@@ -143,7 +143,7 @@
 }
 
 .dv-tab .dv-default-tab .dv-default-tab-action:hover {
-  @apply rounded-sm bg-[var(--moss-dv-icon-hover-background-color)];
+  @apply rounded-sm bg-[var(--moss-icon-hover-background-color)];
 }
 
 /*--------------------dv-root-wrapper--------------------*/
@@ -207,8 +207,8 @@
 /*--------------------dv-resize-container--------------------*/
 
 .dv-resize-container {
-  --moss-dv-overlay-z-index: var(--moss-dv-overlay-z-index, 999);
-  @apply absolute z-[calc(var(--moss-dv-overlay-z-index)-2)] border border-[var(--moss-dv-tab-divider-color)] shadow-[var(--moss-dv-floating-box-shadow)];
+  --moss-overlay-z-index: var(--moss-overlay-z-index, 999);
+  @apply absolute z-[calc(var(--moss-overlay-z-index)-2)] border border-[var(--moss-tab-divider-color)] shadow-[var(--moss-floating-box-shadow)];
 }
 
 .dv-resize-container.dv-hidden {
@@ -220,46 +220,46 @@
 }
 
 .dv-resize-container .dv-resize-handle-top {
-  @apply absolute left-1 top-[-2px] z-[var(--moss-dv-overlay-z-index)] h-1 w-[calc(100%-8px)] cursor-ns-resize;
+  @apply absolute left-1 top-[-2px] z-[var(--moss-overlay-z-index)] h-1 w-[calc(100%-8px)] cursor-ns-resize;
 }
 
 .dv-resize-container .dv-resize-handle-bottom {
-  @apply absolute bottom-[-2px] left-1 z-[var(--moss-dv-overlay-z-index)] h-1 w-[calc(100%-8px)] cursor-ns-resize;
+  @apply absolute bottom-[-2px] left-1 z-[var(--moss-overlay-z-index)] h-1 w-[calc(100%-8px)] cursor-ns-resize;
 }
 
 .dv-resize-container .dv-resize-handle-left {
-  @apply absolute left-[-2px] top-1 z-[var(--moss-dv-overlay-z-index)] h-[calc(100%-8px)] w-1 cursor-ew-resize;
+  @apply absolute left-[-2px] top-1 z-[var(--moss-overlay-z-index)] h-[calc(100%-8px)] w-1 cursor-ew-resize;
 }
 
 .dv-resize-container .dv-resize-handle-right {
-  @apply absolute right-[-2px] top-1 z-[var(--moss-dv-overlay-z-index)] h-[calc(100%-8px)] w-1 cursor-ew-resize;
+  @apply absolute right-[-2px] top-1 z-[var(--moss-overlay-z-index)] h-[calc(100%-8px)] w-1 cursor-ew-resize;
 }
 
 .dv-resize-container .dv-resize-handle-topleft {
-  @apply absolute left-[-2px] top-[-2px] z-[var(--moss-dv-overlay-z-index)] h-1 w-1 cursor-nw-resize;
+  @apply absolute left-[-2px] top-[-2px] z-[var(--moss-overlay-z-index)] h-1 w-1 cursor-nw-resize;
 }
 
 .dv-resize-container .dv-resize-handle-topright {
-  @apply absolute right-[-2px] top-[-2px] z-[var(--moss-dv-overlay-z-index)] h-1 w-1 cursor-ne-resize;
+  @apply absolute right-[-2px] top-[-2px] z-[var(--moss-overlay-z-index)] h-1 w-1 cursor-ne-resize;
 }
 
 .dv-resize-container .dv-resize-handle-bottomleft {
-  @apply absolute bottom-[-2px] left-[-2px] z-[var(--moss-dv-overlay-z-index)] h-1 w-1 cursor-sw-resize;
+  @apply absolute bottom-[-2px] left-[-2px] z-[var(--moss-overlay-z-index)] h-1 w-1 cursor-sw-resize;
 }
 
 .dv-resize-container .dv-resize-handle-bottomright {
-  @apply absolute bottom-[-2px] right-[-2px] z-[var(--moss-dv-overlay-z-index)] h-1 w-1 cursor-se-resize;
+  @apply absolute bottom-[-2px] right-[-2px] z-[var(--moss-overlay-z-index)] h-1 w-1 cursor-se-resize;
 }
 
 /*--------------------dv-render-overlay--------------------*/
 
 .dv-render-overlay {
-  --moss-dv-overlay-z-index: var(--moss-dv-overlay-z-index, 999);
+  --moss-overlay-z-index: var(--moss-overlay-z-index, 999);
   @apply absolute z-[1] h-full;
 }
 
 .dv-render-overlay.dv-render-overlay-float {
-  @apply z-[calc(var(--moss-dv-overlay-z-index)-1)];
+  @apply z-[calc(var(--moss-overlay-z-index)-1)];
 }
 
 /*--------------------dv-pane-container--------------------*/
@@ -281,11 +281,11 @@
 }
 
 .dv-pane-container .dv-view:not(:first-child) .dv-pane > .dv-pane-header {
-  @apply border-t border-[var(--moss-dv-paneview-header-border-color)];
+  @apply border-t border-[var(--moss-paneview-header-border-color)];
 }
 
 .dv-pane-container .dv-view .dv-default-header {
-  @apply flex cursor-pointer bg-[var(--moss-dv-group-view-background-color)] px-2 text-[var(--moss-dv-activegroup-visiblepanel-tab-color)];
+  @apply flex cursor-pointer bg-[var(--moss-group-view-background-color)] px-2 text-[var(--moss-activegroup-visiblepanel-tab-color)];
 }
 
 .dv-pane-container .dv-view .dv-default-header .dv-pane-header-icon {
@@ -325,7 +325,7 @@
 .dv-pane-container .dv-pane .dv-pane-header:focus:before,
 .dv-pane-container .dv-pane .dv-pane-header:focus-within:before {
   @apply pointer-events-none absolute left-0 top-0 z-[5] h-full w-full outline-offset-[-1px] outline-[1px_solid] content-[''];
-  outline-color: var(--moss-dv-paneview-active-outline-color);
+  outline-color: var(--moss-paneview-active-outline-color);
 }
 
 /*--------------------dv-split-view-contain--------------------*/
@@ -416,11 +416,11 @@
 }
 
 .dv-split-view-container .dv-sash-container .dv-sash:not(.disabled):active {
-  @apply bg-[var(--moss-dv-active-sash-color,transparent)] transition-colors duration-100 ease-in-out;
+  @apply bg-[var(--moss-active-sash-color,transparent)] transition-colors duration-100 ease-in-out;
 }
 
 .dv-split-view-container .dv-sash-container .dv-sash:not(.disabled):hover {
-  @apply bg-[var(--moss-dv-active-sash-color,transparent)] transition-colors delay-500 duration-100 ease-in-out;
+  @apply bg-[var(--moss-active-sash-color,transparent)] transition-colors delay-500 duration-100 ease-in-out;
 }
 
 .dv-split-view-container .dv-view-container {
@@ -432,13 +432,13 @@
 }
 
 .dv-split-view-container.dv-separator-border .dv-view:not(:first-child)::before {
-  @apply pointer-events-none absolute left-0 top-0 z-[5] bg-[var(--moss-dv-separator-border)] content-[''];
+  @apply pointer-events-none absolute left-0 top-0 z-[5] bg-[var(--moss-separator-border)] content-[''];
 }
 
 /*--------------------dv-split-view-contain--------------------*/
 
 .dv-tabs-and-actions-container {
-  @apply box-border flex h-[var(--moss-dv-tabs-and-actions-container-height)] flex-shrink-0 bg-[var(--moss-dv-tabs-and-actions-container-background-color)] text-[var(--moss-dv-tabs-and-actions-container-font-size)];
+  @apply box-border flex h-[var(--moss-tabs-and-actions-container-height)] flex-shrink-0 bg-[var(--moss-tabs-and-actions-container-background-color)] text-[var(--moss-tabs-and-actions-container-font-size)];
 }
 
 .dv-tabs-and-actions-container.dv-single-tab.dv-full-width-single-tab .dv-tabs-container {
@@ -471,7 +471,7 @@
 }
 
 .dv-tabs-and-actions-container .dv-tabs-container::-webkit-scrollbar-thumb {
-  @apply bg-[var(--moss-dv-tabs-container-scrollbar-color)];
+  @apply bg-[var(--moss-tabs-container-scrollbar-color)];
 }
 
 .dv-tabs-and-actions-container .dv-tabs-container .dv-tab {
@@ -480,7 +480,7 @@
 }
 
 .dv-tabs-and-actions-container .dv-tabs-container .dv-tab:not(:first-child)::before {
-  @apply pointer-events-none absolute left-0 top-0 z-[5] h-full w-[1px] bg-[var(--moss-dv-tab-divider-color)] content-[''];
+  @apply pointer-events-none absolute left-0 top-0 z-[5] h-full w-[1px] bg-[var(--moss-tab-divider-color)] content-[''];
 }
 
 /*--------------------dv-dragged--------------------*/

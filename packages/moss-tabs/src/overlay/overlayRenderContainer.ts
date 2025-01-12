@@ -1,9 +1,9 @@
 import { DragAndDropObserver } from "../dnd/dnd";
 import { Droptarget } from "../dnd/droptarget";
+import { DockviewComponent } from "../dockview/dockviewComponent";
+import { IDockviewPanel } from "../dockview/dockviewPanel";
 import { getDomNodePagePosition, toggleClass } from "../dom";
 import { CompositeDisposable, Disposable, IDisposable, MutableDisposable } from "../lifecycle";
-import { IDockviewPanel } from "../dockview/dockviewPanel";
-import { DockviewComponent } from "../dockview/dockviewComponent";
 
 export type DockviewPanelRenderer = "onlyWhenVisible" | "always";
 
@@ -120,7 +120,7 @@ export class OverlayRenderContainer extends CompositeDisposable {
 
           const update = () => {
             const level = Number(element.getAttribute("aria-level"));
-            focusContainer.style.zIndex = `calc(var(--dv-overlay-z-index, 999) + ${level * 2 + 1})`;
+            focusContainer.style.zIndex = `calc(var(--moss-overlay-z-index, 999) + ${level * 2 + 1})`;
           };
 
           const observer = new MutationObserver(() => {

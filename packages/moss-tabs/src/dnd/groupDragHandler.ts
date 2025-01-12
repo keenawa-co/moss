@@ -50,8 +50,8 @@ export class GroupDragHandler extends DragHandler {
 
     const style = window.getComputedStyle(this.el);
 
-    const bgColor = style.getPropertyValue("--dv-activegroup-visiblepanel-tab-background-color");
-    const color = style.getPropertyValue("--dv-activegroup-visiblepanel-tab-color");
+    const bgColor = style.getPropertyValue("--moss-activegroup-visiblepanel-tab-background-color");
+    const color = style.getPropertyValue("--moss-activegroup-visiblepanel-tab-color");
 
     if (dataTransfer) {
       const ghostElement = document.createElement("div");

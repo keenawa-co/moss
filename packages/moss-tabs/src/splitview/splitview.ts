@@ -262,11 +262,11 @@ export class Splitview {
   style(styles?: ISplitviewStyles): void {
     if (styles?.separatorBorder === "transparent") {
       removeClasses(this.element, "dv-separator-border");
-      this.element.style.removeProperty("--dv-separator-border");
+      this.element.style.removeProperty("--moss-separator-border");
     } else {
       addClasses(this.element, "dv-separator-border");
       if (styles?.separatorBorder) {
-        this.element.style.setProperty("--dv-separator-border", styles.separatorBorder);
+        this.element.style.setProperty("--moss-separator-border", styles.separatorBorder);
       }
     }
   }

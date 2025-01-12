@@ -27,7 +27,7 @@ const config: Pick<Config, "content" | "presets" | "theme" | "plugins"> = {
         "dv-dragging": "0.5",
       },
       outline: {
-        "dv-focus-outline": "1px solid var(--dv-paneview-active-outline-color)",
+        "dv-focus-outline": "1px solid var(--moss-paneview-active-outline-color)",
       },
     },
   },
