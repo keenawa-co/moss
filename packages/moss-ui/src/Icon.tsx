@@ -12,13 +12,11 @@ interface IconProps extends ComponentPropsWithoutRef<"svg"> {
 }
 
 export const Icon = ({ icon, className, ...props }: IconProps) => {
-  // Check that the icon is not null and exists in icons
   if (icon && icons[icon]) {
     const IconTag = icons[icon];
-    return <IconTag className={cn("size-4 flex-shrink-0 text-[var(--color-primary)]", className)} {...props} />;
+    return <IconTag className={cn("size-4 flex-shrink-0 text-[var(--moss-primary)]", className)} {...props} />;
   }
 
-  // If the icon is null or not found, return the default SVG
   return <FailedIcon />;
 };
 

@@ -1,27 +1,24 @@
 import { useEffect } from "react";
 
-import { useLanguageStore } from "@/store/language";
+import { applyLanguagePack } from "@/utils/applyLanguagePack";
 import { LocaleDescriptor } from "@repo/moss-desktop";
+import { useQueryClient } from "@tanstack/react-query";
 import { listen, UnlistenFn } from "@tauri-apps/api/event";
 
 const LanguageProvider = ({ children }: { children: React.ReactNode }) => {
-  const { setLanguageCode, initializeLanguages } = useLanguageStore();
+  const queryClient = useQueryClient();
 
   useEffect(() => {
-    initializeLanguages();
-  }, [initializeLanguages]);
+    let unlisten: UnlistenFn | undefined;
 
-  useEffect(() => {
-    let unlisten: UnlistenFn;
-
-    const handleLanguagePackChanged = (event: { payload: LocaleDescriptor }) => {
-      const newLanguagePack: LocaleDescriptor = event.payload;
-      setLanguageCode(newLanguagePack.code);
+    const handleLanguageChange = (event: { payload: LocaleDescriptor }) => {
+      applyLanguagePack(event.payload);
+      queryClient.invalidateQueries({ queryKey: ["getState"] });
     };
 
     const setupListener = async () => {
       try {
-        unlisten = await listen("core://language-pack-changed", handleLanguagePackChanged);
+        unlisten = await listen("core://language-pack-changed", handleLanguageChange);
       } catch (error) {
         console.error("Failed to set up language pack change listener:", error);
       }
@@ -34,7 +31,7 @@ const LanguageProvider = ({ children }: { children: React.ReactNode }) => {
         unlisten();
       }
     };
-  }, [setLanguageCode]);
+  }, [queryClient]);
 
   return <>{children}</>;
 };

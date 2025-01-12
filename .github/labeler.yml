@@ -5,7 +5,7 @@ github_actions:
 
 jsonschema:
   - changed-files:
-      - any-glob-to-any-file: '@typespec/**'
+      - any-glob-to-any-file: 'assets/schemas'
 
 makefile:
   - changed-files:

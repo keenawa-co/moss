@@ -1,11 +1,7 @@
 import { create } from "zustand";
 
 //TODO this type should be imported from backend in the future
-export type LayoutAlignment = "center" | "justify" | "left" | "right";
-
-export interface LayoutState {
-  alignment: LayoutAlignment;
-  setAlignment: (alignment: LayoutState["alignment"]) => void;
+export interface AppResizableLayoutStore {
   primarySideBar: {
     width: number;
     visibility: boolean;
@@ -29,9 +25,7 @@ export interface LayoutState {
   };
 }
 
-export const useLayoutStore = create<LayoutState>()((set, get) => ({
-  alignment: "center",
-  setAlignment: (newAlignment: LayoutState["alignment"]) => set({ alignment: newAlignment }),
+export const useAppResizableLayoutStore = create<AppResizableLayoutStore>()((set, get) => ({
   primarySideBar: {
     width: 255,
     visibility: true,

@@ -4,7 +4,7 @@ use crate::models::theme::Theme;
 
 use super::{util::convert_colors_to_css_variables, ThemeConverter, Validator};
 
-const COLOR_VARIABLE_PREFIX: &str = "color";
+pub const MOSS_VARIABLE_PREFIX: &str = "moss";
 
 pub struct JsonThemeConverter<V: Validator> {
     validator: V,
@@ -30,7 +30,7 @@ impl<V: Validator> ThemeConverter for JsonThemeConverter<V> {
             return Ok(String::from(":root {}\n"));
         }
 
-        let color_vars = convert_colors_to_css_variables(COLOR_VARIABLE_PREFIX, &theme.colors);
+        let color_vars = convert_colors_to_css_variables(&theme.colors);
 
         let mut css_content = String::with_capacity(color_vars.len() * 50 + 10); // Оценка емкости
         css_content.push_str(":root {\n");
@@ -155,12 +155,12 @@ mod tests {
         let converter = JsonThemeConverter::new(validator);
         let css = converter.convert_to_css(serde_json::to_string(&theme)?)?;
 
-        let expected_css = "\
-:root {
-  --color-primary: rgba(0, 0, 0, 1);
-  --color-toolBar-background: linear-gradient(to right, red 0%, orange 18%, yellow 33%, rgba(244, 244, 245, 1) 50%, blue 68%, indigo 83%, violet 100%);
-}
-";
+        let expected_css = format!("\
+:root {{
+  --{}-primary: rgba(0, 0, 0, 1);
+  --{}-toolBar-background: linear-gradient(to right, red 0%, orange 18%, yellow 33%, rgba(244, 244, 245, 1) 50%, blue 68%, indigo 83%, violet 100%);
+}}
+", MOSS_VARIABLE_PREFIX, MOSS_VARIABLE_PREFIX);
 
         assert_eq!(css, expected_css);
 
@@ -203,11 +203,14 @@ mod tests {
         let converter = JsonThemeConverter::new(validator);
         let css = converter.convert_to_css(serde_json::to_string(&theme)?)?;
 
-        let expected_css = "\
-:root {
-  --color-background-gradient: linear-gradient(to right, green 0%, blue 100%);
-}
-";
+        let expected_css = format!(
+            "\
+:root {{
+  --{}-background-gradient: linear-gradient(to right, green 0%, blue 100%);
+}}
+",
+            MOSS_VARIABLE_PREFIX
+        );
 
         assert_eq!(css, expected_css);
 
@@ -241,11 +244,14 @@ mod tests {
         let converter = JsonThemeConverter::new(validator);
         let css = converter.convert_to_css(serde_json::to_string(&theme)?)?;
 
-        let expected_css = "\
-:root {
-  --color-sidebar-text: rgba(200, 200, 200, 1);
-}
-";
+        let expected_css = format!(
+            "\
+:root {{
+  --{}-sidebar-text: rgba(200, 200, 200, 1);
+}}
+",
+            MOSS_VARIABLE_PREFIX
+        );
 
         assert_eq!(css, expected_css);
 
