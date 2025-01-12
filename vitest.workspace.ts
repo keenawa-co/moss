@@ -26,11 +26,11 @@ export default defineWorkspace([
     test: {
       name: "packages",
       include: [
-        "packages/config-eslint/*.{test,spec}.?(c|m)[jt]s?(x)",
-        "packages/config-tailwind/*.{test,spec}.?(c|m)[jt]s?(x)",
-        "packages/config-typescript/*.{test,spec}.?(c|m)[jt]s?(x)",
-        "packages/moss_lang/*.{test,spec}.?(c|m)[jt]s?(x)",
-        "packages/moss-ui/*.{test,spec}.?(c|m)[jt]s?(x)",
+        "packages/config-eslint/**/*.{test,spec}.?(c|m)[jt]s?(x)",
+        "packages/config-tailwind/**/*.{test,spec}.?(c|m)[jt]s?(x)",
+        "packages/config-typescript/**/*.{test,spec}.?(c|m)[jt]s?(x)",
+        "packages/moss_lang/**/*.{test,spec}.?(c|m)[jt]s?(x)",
+        "packages/moss-ui/**/*.{test,spec}.?(c|m)[jt]s?(x)",
       ],
     },
   },
