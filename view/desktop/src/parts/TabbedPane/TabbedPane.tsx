@@ -9,14 +9,14 @@ import {
   IDockviewPanelProps,
 } from "@repo/moss-tabs";
 
-import "./dockview.css";
-
 import { LeftControls, PrefixHeaderControls, RightControls } from "./controls";
 import { Table, usePanelApiMetadata } from "./debugPanel";
 import { defaultConfig } from "./defaultLayout";
 import { GridActions } from "./gridActions";
 import { GroupActions } from "./groupActions";
 import { PanelActions } from "./panelActions";
+
+import "./styles.css";
 
 const DebugContext = React.createContext<boolean>(false);
 

@@ -19,7 +19,14 @@
 }
 
 .dv-drop-target > .dv-drop-target-dropzone > .dv-drop-target-selection {
-  @apply pointer-events-none relative box-border h-full w-full bg-[var(--moss-drag-over-background-color)] transition-[top_70ms_ease-out,left_70ms_ease-out,width_70ms_ease-out,height_70ms_ease-out,opacity_0.15s_ease-out] will-change-transform;
+  @apply pointer-events-none relative box-border h-full w-full bg-[var(--moss-drag-over-background-color)];
+  transition:
+    top 70ms ease-out,
+    left 70ms ease-out,
+    width 70ms ease-out,
+    height 70ms ease-out,
+    opacity 0.15s ease-out;
+  will-change: transform;
 }
 
 .dv-drop-target
@@ -103,7 +110,7 @@
 
 .dv-tab:focus-within::after,
 .dv-tab:focus::after {
-  @apply pointer-events-none absolute left-0 top-0 z-[5] h-full w-full outline-offset-[-1px] outline-[1px_solid_var(--moss-tab-divider-color)_!important] content-[''];
+  @apply pointer-events-none absolute left-0 top-0 z-[5] h-full w-full !outline !outline-1 outline-offset-[-1px] !outline-[var(--moss-tab-divider-color)] content-[''];
 }
 
 /**
@@ -185,7 +192,7 @@
 }
 
 .dv-debug .dv-render-overlay {
-  @apply outline-offset-[-1] outline-[1px_solid_red];
+  @apply outline outline-1 outline-offset-[-1] outline-red-500;
 }
 
 .dv-debug .dv-split-view-container .dv-sash-container .dv-sash.dv-enabled {
@@ -314,18 +321,13 @@
 
 .dv-pane-container .dv-pane .dv-pane-header:focus:before,
 .dv-pane-container .dv-pane .dv-pane-header:focus-within:before {
-  @apply pointer-events-none absolute left-0 top-0 z-[5] h-full w-full outline-[-1px] outline-offset-[-1px] outline-[1px_solid] [outline-style:solid];
+  @apply pointer-events-none absolute left-0 top-0 z-[5] h-full w-full outline outline-1 outline-offset-[-1px] outline-[var(--moss-paneview-active-outline-color)] content-[''];
+  outline-width: -1px;
+  outline-style: solid;
 }
 
 .dv-pane-container .dv-pane .dv-pane-body {
   @apply relative flex-grow overflow-y-auto overflow-x-hidden outline-none;
-}
-
-/*FIXME*/
-.dv-pane-container .dv-pane .dv-pane-header:focus:before,
-.dv-pane-container .dv-pane .dv-pane-header:focus-within:before {
-  @apply pointer-events-none absolute left-0 top-0 z-[5] h-full w-full outline-offset-[-1px] outline-[1px_solid] content-[''];
-  outline-color: var(--moss-paneview-active-outline-color);
 }
 
 /*--------------------dv-split-view-contain--------------------*/
@@ -486,5 +488,9 @@
 /*--------------------dv-dragged--------------------*/
 
 .dv-dragged {
-  @apply [transform:translate3d(_0px,_0px,_0px_)];
+  transform: translate3d(
+    0px,
+    0px,
+    0px
+  ); /* forces tab to be drawn on a separate layer (see https://github.com/microsoft/vscode/issues/18733) */
 }
