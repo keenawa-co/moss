@@ -1,5 +1,5 @@
 import { env } from "process";
-import { defineWorkspace } from "vitest/config";
+import { configDefaults, defineWorkspace } from "vitest/config";
 
 import { storybookTest } from "@storybook/experimental-addon-test/vitest-plugin";
 
@@ -25,7 +25,14 @@ export default defineWorkspace([
   {
     test: {
       name: "packages",
-      include: ["packages/**/*.{test,spec}.?(c|m)[jt]s?(x)"],
+      include: [
+        "packages/config-eslint/*.{test,spec}.?(c|m)[jt]s?(x)",
+        "packages/config-tailwind/*.{test,spec}.?(c|m)[jt]s?(x)",
+        "packages/config-typescript/*.{test,spec}.?(c|m)[jt]s?(x)",
+        "packages/moss_lang/*.{test,spec}.?(c|m)[jt]s?(x)",
+        "packages/moss-ui/*.{test,spec}.?(c|m)[jt]s?(x)",
+      ],
+      exclude: [...configDefaults.exclude],
     },
   },
   {
