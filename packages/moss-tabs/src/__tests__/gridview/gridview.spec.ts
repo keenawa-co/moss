@@ -1,12 +1,12 @@
 import { Emitter, Event } from "../../events";
 import { BranchNode } from "../../gridview/branchNode";
 import {
+  getGridLocation,
   Gridview,
   IGridView,
   IViewSize,
-  SerializedGridview,
-  getGridLocation,
   orthogonal,
+  SerializedGridview,
 } from "../../gridview/gridview";
 import { Orientation, Sizing } from "../../splitview/splitview";
 

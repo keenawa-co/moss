@@ -20,8 +20,8 @@
     "clean": "rimraf dist/ .build/ .rollup.cache/",
     "prepublishOnly": "npm run rebuild && npm run test",
     "rebuild": "npm run clean && npm run build",
-    "test": "cross-env npx jest --selectProjects moss-tabs",
-    "test:cov": "cross-env npx jest --selectProjects moss-tabs --coverage"
+    "test": "cross-env npx jest --selectProjects moss-tabs --env=jsdom",
+    "test:cov": "cross-env npx jest --selectProjects moss-tabs --coverage --env=jsdom"
   },
   "devDependencies": {
     "@repo/tailwind-config": "workspace:*",

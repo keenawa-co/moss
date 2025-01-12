@@ -1,5 +1,5 @@
 import { disableIframePointEvents, quasiDefaultPrevented, toggleClass } from "../dom";
-import { Emitter, Event, addDisposableListener, addDisposableWindowListener } from "../events";
+import { addDisposableListener, addDisposableWindowListener, Emitter, Event } from "../events";
 import { CompositeDisposable, MutableDisposable } from "../lifecycle";
 import { clamp } from "../math";
 import { AnchoredBox } from "../types";
@@ -21,7 +21,7 @@ class AriaLevelTracker {
   private update(): void {
     for (let i = 0; i < this._orderedList.length; i++) {
       this._orderedList[i].setAttribute("aria-level", `${i}`);
-      this._orderedList[i].style.zIndex = `calc(var(--dv-overlay-z-index, 999) + ${i * 2})`;
+      this._orderedList[i].style.zIndex = `calc(var(--moss-overlay-z-index, 999) + ${i * 2})`;
     }
   }
 }
