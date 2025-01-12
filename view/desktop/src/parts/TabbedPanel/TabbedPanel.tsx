@@ -134,7 +134,7 @@ const WatermarkComponent = () => {
   return <div>custom watermark</div>;
 };
 
-const DockviewDemo = (props: { theme?: string }) => {
+const TabbedPanel = (props: { theme?: string }) => {
   const [logLines, setLogLines] = React.useState<{ text: string; timestamp?: Date; backgroundColor?: string }[]>([]);
 
   const [panels, setPanels] = React.useState<string[]>([]);
@@ -434,4 +434,4 @@ const DockviewDemo = (props: { theme?: string }) => {
   );
 };
 
-export default DockviewDemo;
+export default TabbedPanel;
