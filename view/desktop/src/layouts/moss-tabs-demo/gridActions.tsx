@@ -138,7 +138,7 @@ export const GridActions = (props: {
     } else {
       props.api?.addPanel({
         id: `id_${Date.now().toString()}`,
-        component: options?.nested ? "nested" : "default",
+        component: options?.nested ? "nested" : "Default",
         title: `Tab ${nextId()}`,
         renderer: "always",
       });

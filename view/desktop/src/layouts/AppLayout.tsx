@@ -8,8 +8,6 @@ import { useAppResizableLayoutStore } from "@/store/appResizableLayout";
 
 import "@repo/moss-tabs/assets/styles.css";
 
-//import "./moss-tabs-demo/styles.css";
-
 import { LaunchPad } from "../components/LaunchPad";
 import { Menu } from "../components/Menu";
 import { Resizable, ResizablePanel } from "../components/Resizable";

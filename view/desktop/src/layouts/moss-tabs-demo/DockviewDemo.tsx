@@ -9,7 +9,7 @@ import {
   IDockviewPanelProps,
 } from "@repo/moss-tabs";
 
-import "./app.scss";
+import "./styles.css";
 
 import { LeftControls, PrefixHeaderControls, RightControls } from "./controls";
 import { Table, usePanelApiMetadata } from "./debugPanel";
@@ -77,11 +77,11 @@ const components = {
       <DockviewReact
         components={components}
         onReady={(event: DockviewReadyEvent) => {
-          event.api.addPanel({ id: "panel_1", component: "default" });
-          event.api.addPanel({ id: "panel_2", component: "default" });
+          event.api.addPanel({ id: "panel_1", component: "Default" });
+          event.api.addPanel({ id: "panel_2", component: "Default" });
           event.api.addPanel({
             id: "panel_3",
-            component: "default",
+            component: "Default",
           });
 
           event.api.onDidRemovePanel((e) => {
