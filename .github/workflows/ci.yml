@@ -136,7 +136,7 @@ jobs:
             command: pnpm run lint -- --quiet
 
           - name: Test Packages
-            command: pnpm run test --project packages
+            command: pnpm run test --project packages && pnpm run jest
 
           - name: Test Packages Stories
             command: pnpm run test --project packages-stories

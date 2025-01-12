@@ -10,7 +10,8 @@
     "format": "prettier --plugin=prettier-plugin-tailwindcss --write \"**/*.{ts,tsx,md}\"",
     "prepare": "husky",
     "precommit": "lint-staged",
-    "test": "vitest --globals && jest"
+    "test": "vitest --globals",
+    "jest": "jest"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx,css,md,json}": "prettier --plugin=prettier-plugin-tailwindcss --write",
