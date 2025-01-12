@@ -11,7 +11,7 @@ import "@repo/moss-tabs/assets/styles.css";
 import { LaunchPad } from "../components/LaunchPad";
 import { Menu } from "../components/Menu";
 import { Resizable, ResizablePanel } from "../components/Resizable";
-import TabbedPanel from "../parts/TabbedPanel/TabbedPanel";
+import TabbedPane from "../parts/TabbedPane/TabbedPane";
 import { ContentLayout } from "./ContentLayout";
 
 export const AppLayout = () => {
@@ -150,7 +150,7 @@ const CenterLayout = ({ ...props }: ResizableLayoutProps) => {
           <ResizablePanel>
             <MainContent />
           </ResizablePanel>
-          <TabbedPanel theme="dockview-theme-light" />
+          <TabbedPane theme="dockview-theme-light" />
           <ResizablePanel
             preferredSize={props.bottomPaneGetHeight()}
             snap

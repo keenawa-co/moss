@@ -9,7 +9,7 @@ import {
   IDockviewPanelProps,
 } from "@repo/moss-tabs";
 
-import "./styles.css";
+import "./dockview.css";
 
 import { LeftControls, PrefixHeaderControls, RightControls } from "./controls";
 import { Table, usePanelApiMetadata } from "./debugPanel";
@@ -134,7 +134,7 @@ const WatermarkComponent = () => {
   return <div>custom watermark</div>;
 };
 
-const TabbedPanel = (props: { theme?: string }) => {
+const TabbedPane = (props: { theme?: string }) => {
   const [logLines, setLogLines] = React.useState<{ text: string; timestamp?: Date; backgroundColor?: string }[]>([]);
 
   const [panels, setPanels] = React.useState<string[]>([]);
@@ -434,4 +434,4 @@ const TabbedPanel = (props: { theme?: string }) => {
   );
 };
 
-export default TabbedPanel;
+export default TabbedPane;
