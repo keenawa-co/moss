@@ -36,8 +36,6 @@ export class ReactPanelContentPart implements IContentRenderer {
   }
 
   public init(parameters: GroupPanelPartInitParameters): void {
-    console.warn("--------------------------->");
-    console.warn(this.component);
     this.part = new ReactPart(this.element, this.reactPortalStore, this.component, {
       params: parameters.params,
       api: parameters.api,

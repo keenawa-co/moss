@@ -255,7 +255,7 @@ const DockviewDemo = (props: { theme?: string }) => {
     }
 
     return {
-      "--dv-group-gap-size": "0.5rem",
+      "--moss-dv-group-gap-size": "0.5rem",
       "--demo-border": "5px dashed purple",
     } as React.CSSProperties;
   }, [gapCheck]);

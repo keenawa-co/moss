@@ -7,7 +7,9 @@ import { nextId } from "./defaultLayout";
 const Icon = (props: { icon: string; title?: string; onClick?: (event: React.MouseEvent) => void }) => {
   return (
     <div title={props.title} className="action" onClick={props.onClick}>
-      <span className="material-symbols-outlined text-[inherit]">{props.icon}</span>
+      <span style={{ fontSize: "inherit" }} className="material-symbols-outlined">
+        {props.icon}
+      </span>
     </div>
   );
 };
@@ -63,7 +65,16 @@ export const RightControls = (props: IDockviewHeaderActionsProps) => {
   };
 
   return (
-    <div className="group-control flex h-full items-center px-2 text-[var(--dv-activegroup-visiblepanel-tab-color)]">
+    <div
+      className="group-control"
+      style={{
+        display: "flex",
+        alignItems: "center",
+        padding: "0px 8px",
+        height: "100%",
+        color: "var(--moss-dv-activegroup-visiblepanel-tab-color)",
+      }}
+    >
       {props.isGroupActive && <Icon icon="star" />}
       {Component && <Component />}
       <Icon
@@ -86,7 +97,7 @@ export const LeftControls = (props: IDockviewHeaderActionsProps) => {
   const onClick = () => {
     props.containerApi.addPanel({
       id: `id_${Date.now().toString()}`,
-      component: "default",
+      component: "Default",
       title: `Tab ${nextId()}`,
       position: {
         referenceGroup: props.group,
@@ -95,7 +106,16 @@ export const LeftControls = (props: IDockviewHeaderActionsProps) => {
   };
 
   return (
-    <div className="group-control flex h-full items-center px-2 text-[var(--dv-activegroup-visiblepanel-tab-color)]">
+    <div
+      className="group-control"
+      style={{
+        display: "flex",
+        alignItems: "center",
+        padding: "0px 8px",
+        height: "100%",
+        color: "var(--moss-dv-activegroup-visiblepanel-tab-color)",
+      }}
+    >
       <Icon onClick={onClick} icon="add" />
     </div>
   );
@@ -103,7 +123,16 @@ export const LeftControls = (props: IDockviewHeaderActionsProps) => {
 
 export const PrefixHeaderControls = (props: IDockviewHeaderActionsProps) => {
   return (
-    <div className="group-control flex h-full items-center px-2 text-[var(--dv-activegroup-visiblepanel-tab-color)]">
+    <div
+      className="group-control"
+      style={{
+        display: "flex",
+        alignItems: "center",
+        padding: "0px 8px",
+        height: "100%",
+        color: "var(--moss-dv-activegroup-visiblepanel-tab-color)",
+      }}
+    >
       <Icon icon="Menu" />
     </div>
   );

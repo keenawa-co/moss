@@ -41,7 +41,6 @@
     "@testing-library/react": "^16.1.0",
     "@total-typescript/shoehorn": "^0.1.2",
     "cross-env": "^7.0.3",
-    "react-map-gl": "^7.1.8",
     "ts-jest": "^29.2.5"
   }
 }
