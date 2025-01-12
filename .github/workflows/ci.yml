@@ -136,7 +136,7 @@ jobs:
             command: pnpm run lint -- --quiet
 
           - name: Test Packages
-            command: pnpm run test --project packages && pnpm run jest
+            command: pnpm run test --project packages
 
           - name: Test Packages Stories
             command: pnpm run test --project packages-stories
@@ -146,6 +146,9 @@ jobs:
 
           - name: Test Desktop Stories
             command: pnpm run test --project desktop-stories
+
+          - name: Jest Test Packages
+            command: pnpm run jest
     timeout-minutes: 30
     steps:
       - name: Checkout Code
