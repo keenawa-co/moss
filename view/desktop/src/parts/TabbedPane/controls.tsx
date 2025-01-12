@@ -66,12 +66,8 @@ export const RightControls = (props: IDockviewHeaderActionsProps) => {
 
   return (
     <div
-      className="group-control"
+      className="group-control flex h-full items-center px-2"
       style={{
-        display: "flex",
-        alignItems: "center",
-        padding: "0px 8px",
-        height: "100%",
         color: "var(--moss-activegroup-visiblepanel-tab-color)",
       }}
     >
@@ -107,12 +103,8 @@ export const LeftControls = (props: IDockviewHeaderActionsProps) => {
 
   return (
     <div
-      className="group-control"
+      className="group-control flex h-full items-center px-2"
       style={{
-        display: "flex",
-        alignItems: "center",
-        padding: "0px 8px",
-        height: "100%",
         color: "var(--moss-activegroup-visiblepanel-tab-color)",
       }}
     >
@@ -124,12 +116,8 @@ export const LeftControls = (props: IDockviewHeaderActionsProps) => {
 export const PrefixHeaderControls = (props: IDockviewHeaderActionsProps) => {
   return (
     <div
-      className="group-control"
+      className="group-control flex h-full items-center px-2"
       style={{
-        display: "flex",
-        alignItems: "center",
-        padding: "0px 8px",
-        height: "100%",
         color: "var(--moss-activegroup-visiblepanel-tab-color)",
       }}
     >

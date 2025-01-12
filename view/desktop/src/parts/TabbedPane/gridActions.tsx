@@ -39,27 +39,10 @@ const PopoverComponent = (props: { close: () => void; component: React.FC<{ clos
   }, []);
 
   return (
-    <div
-      style={{
-        position: "absolute",
-        top: 0,
-        left: 0,
-        zIndex: 9999,
-        height: "100%",
-        width: "100%",
-      }}
-    >
+    <div className="absolute left-0 top-0 z-[9999] h-full w-full">
       <div
         ref={ref}
-        style={{
-          position: "absolute",
-          top: "50%",
-          left: "50%",
-          transform: "translate(-50%,-50%)",
-          backgroundColor: "black",
-          color: "white",
-          padding: 10,
-        }}
+        className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transform bg-black p-2.5 text-white"
       >
         <props.component close={props.close} />
       </div>
@@ -191,11 +174,11 @@ export const GridActions = (props: {
       <button className="text-button" onClick={onReset}>
         Reset
       </button>
-      <span style={{ flexGrow: 1 }} />
-      <div style={{ display: "flex", alignItems: "center" }}>
-        <span style={{ paddingRight: "4px" }}>Grid Gap</span>
+      <span className="flex-grow" />
+      <div className="flex items-center">
+        <span className="pr-1">Grid Gap</span>
         <input
-          style={{ width: 40 }}
+          className="w-10"
           type="number"
           min={0}
           max={99}

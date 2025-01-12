@@ -16,7 +16,7 @@ import { GridActions } from "./gridActions";
 import { GroupActions } from "./groupActions";
 import { PanelActions } from "./panelActions";
 
-import "./styles.css";
+import "./assets/styles.css";
 
 const DebugContext = React.createContext<boolean>(false);
 
@@ -36,30 +36,14 @@ const components = {
 
     return (
       <div
-        style={{
-          height: "100%",
-          overflow: "auto",
-          position: "relative",
-          padding: 5,
-          border: isDebug ? "2px dashed orange" : "",
-        }}
+        className={`p-1.25 relative h-full overflow-auto ${isDebug ? "border-2 border-dashed border-orange-500" : ""}`}
       >
-        <span
-          style={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%,-50%)",
-            pointerEvents: "none",
-            fontSize: "42px",
-            opacity: 0.5,
-          }}
-        >
+        <span className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transform text-[42px] opacity-50">
           {props.api.title}
         </span>
 
         {isDebug && (
-          <div style={{ fontSize: "0.8em" }}>
+          <div className="text-[0.8em]">
             <Option
               title="Panel Rendering Mode"
               value={metadata.renderer.value}
@@ -100,10 +84,7 @@ const components = {
             props.api.setActive();
           }
         }}
-        style={{
-          width: "100%",
-          height: "100%",
-        }}
+        className="h-full w-full"
         src="https://dockview.dev"
       />
     );
@@ -265,16 +246,8 @@ const TabbedPane = (props: { theme?: string }) => {
 
   return (
     <div
-      className="dockview-demo"
+      className="dockview-demo relative flex h-full flex-grow flex-col rounded bg-[rgba(0,0,50,0.25)] p-2"
       style={{
-        height: "100%",
-        display: "flex",
-        flexDirection: "column",
-        flexGrow: 1,
-        padding: "8px",
-        backgroundColor: "rgba(0,0,50,0.25)",
-        borderRadius: "8px",
-        position: "relative",
         ...css,
       }}
     >
@@ -292,15 +265,7 @@ const TabbedPane = (props: { theme?: string }) => {
                   </button>
               </div> */}
       </div>
-      <div
-        className="action-container"
-        style={{
-          display: "flex",
-          justifyContent: "flex-end",
-          alignItems: "center",
-          padding: "4px",
-        }}
-      >
+      <div className="action-container flex items-center justify-end p-1">
         <button
           onClick={() => {
             setDebug(!debug);
@@ -322,25 +287,12 @@ const TabbedPane = (props: { theme?: string }) => {
             setShowLogs(!showLogs);
           }}
         >
-          <span style={{ paddingRight: "4px" }}>{`${showLogs ? "Hide" : "Show"} Events Log`}</span>
+          <span className="pr-1">{`${showLogs ? "Hide" : "Show"} Events Log`}</span>
           <span className="material-symbols-outlined">terminal</span>
         </button>
       </div>
-      <div
-        style={{
-          flexGrow: 1,
-          height: 0,
-          display: "flex",
-        }}
-      >
-        <div
-          style={{
-            flexGrow: 1,
-            overflow: "hidden",
-            height: "100%",
-            display: "flex",
-          }}
-        >
+      <div className="flex h-0 flex-grow">
+        <div className="flex h-full flex-grow overflow-hidden">
           <DebugContext.Provider value={debug}>
             <DockviewReact
               components={components}
@@ -356,61 +308,23 @@ const TabbedPane = (props: { theme?: string }) => {
         </div>
 
         {showLogs && (
-          <div
-            style={{
-              width: "400px",
-              backgroundColor: "black",
-              color: "white",
-              overflow: "hidden",
-              fontFamily: "monospace",
-              marginLeft: "10px",
-              flexShrink: 0,
-              display: "flex",
-              flexDirection: "column",
-            }}
-          >
-            <div style={{ flexGrow: 1, overflow: "auto" }}>
+          <div className="ml-2 flex w-[400px] flex-shrink-0 flex-col overflow-hidden bg-black font-mono text-white">
+            <div className="flex-grow overflow-auto">
               {logLines.map((line, i) => {
                 return (
                   <div
+                    className="flex h-[30px] items-center overflow-hidden text-ellipsis whitespace-nowrap text-[13px]"
                     style={{
-                      height: "30px",
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                      whiteSpace: "nowrap",
-                      fontSize: "13px",
-                      display: "flex",
-                      alignItems: "center",
-
                       backgroundColor: line.backgroundColor,
                     }}
                     key={i}
                   >
-                    <span
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        minWidth: "20px",
-                        maxWidth: "20px",
-                        color: "gray",
-                        borderRight: "1px solid gray",
-                        marginRight: "4px",
-                        paddingLeft: "4px",
-                        height: "100%",
-                      }}
-                    >
+                    <span className="mr-1 flex h-full min-w-[20px] max-w-[20px] items-center border-r border-gray-500 pl-1 text-gray-500">
                       {logLines.length - i}
                     </span>
                     <span>
                       {line.timestamp && (
-                        <span
-                          style={{
-                            fontSize: "0.7em",
-                            padding: "0px 2px",
-                          }}
-                        >
-                          {line.timestamp.toISOString().substring(11, 23)}
-                        </span>
+                        <span className="px-[2px] text-[0.7em]">{line.timestamp.toISOString().substring(11, 23)}</span>
                       )}
                       <span>{line.text}</span>
                     </span>
@@ -418,13 +332,7 @@ const TabbedPane = (props: { theme?: string }) => {
                 );
               })}
             </div>
-            <div
-              style={{
-                padding: "4px",
-                display: "flex",
-                justifyContent: "flex-end",
-              }}
-            >
+            <div className="flex justify-end p-1">
               <button onClick={() => setLogLines([])}>Clear</button>
             </div>
           </div>

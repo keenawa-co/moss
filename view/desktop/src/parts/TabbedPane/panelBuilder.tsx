@@ -15,12 +15,7 @@ export const PanelBuilder = (props: { api: DockviewApi; done: () => void }) => {
   }>({});
   return (
     <div>
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "1fr 1fr",
-        }}
-      >
+      <div className="grid grid-cols-2">
         <div>{"Initial Width"}</div>
         <input
           type="number"
