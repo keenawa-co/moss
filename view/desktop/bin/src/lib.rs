@@ -7,8 +7,10 @@ mod utl;
 mod window;
 
 use anyhow::Result;
+use moss_configuration::default_configuration::DefaultConfiguration;
+use moss_desktop::services::configuration_service::ConfigurationService;
 use moss_extension_point::loader::Loader;
-use moss_extension_point::registry;
+use moss_extension_point::registry::{self, Registry};
 use rand::random;
 use tauri::{AppHandle, Manager, RunEvent, WebviewWindow, WindowEvent};
 use tauri_plugin_global_shortcut::{Code, GlobalShortcutExt, Modifiers, Shortcut, ShortcutState};
@@ -80,6 +82,9 @@ pub fn run() {
             let app_state = AppStateManager::new();
             app_handle.manage(app_state);
 
+            // ---------------------------------------
+            // TODO: Will be moved to a more appropriate place in the future.
+
             let mut loader = Loader::new();
             loader
                 .load(
@@ -88,8 +93,18 @@ pub fn run() {
                 )
                 .unwrap();
 
+            let registry = Registry::new(loader.modules());
+            let default_configurations =
+                DefaultConfiguration::new(registry.configuration_registry());
+
+            // ---------------------------------------
+
             let app_manager = AppManager::new(app_handle.clone())
                 .with_service(|_| LifecycleService::new(), InstantiationType::Instant)
+                .with_service(
+                    |_| ConfigurationService::new(default_configurations),
+                    InstantiationType::Instant,
+                )
                 .with_service(
                     |app_handle| {
                         AddonService::new(
@@ -177,12 +192,25 @@ pub fn run() {
 }
 
 fn create_main_window(app_handle: &AppHandle, url: &str) -> WebviewWindow {
+    let app_manager = app_handle.state::<AppManager>();
+    let configuration_service = app_manager
+        .service::<ConfigurationService>()
+        .expect("The configuration service must already be available at this point");
+
+    let window_inner_height = configuration_service
+        .get_typed_value("window.defaultHeight")
+        .unwrap();
+
+    let window_inner_width = configuration_service
+        .get_typed_value("window.defaultWidth")
+        .unwrap();
+
     let label = format!("{MAIN_WINDOW_PREFIX}{}", 0);
     let config = CreateWindowInput {
         url,
         label: label.as_str(),
         title: "Moss Studio",
-        inner_size: (DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT),
+        inner_size: (window_inner_height, window_inner_width),
         position: (
             100.0 + random::<f64>() * 20.0,
             100.0 + random::<f64>() * 20.0,

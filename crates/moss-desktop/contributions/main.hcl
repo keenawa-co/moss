@@ -5,6 +5,8 @@ locals {
 }
 
 extends "configuration" {
+    id = "moss.core.window"
+    title = "Window"
     order = 5
 
     parameter "window.defaultWidth" {
@@ -12,6 +14,8 @@ extends "configuration" {
         minimum = 800
         maximum = 3840
         default = 800
+        order = 1
+        scope = "APPLICATION"
         description = "The width of the application window in pixels."
     }
 
@@ -20,6 +24,16 @@ extends "configuration" {
         minimum = 600
         maximum = 2160
         default = 600
+        order = 2
+        scope = "APPLICATION"
         description = "The height of the application window in pixels."
+    }
+
+    override "editor.fontSize" {
+        value = 16
+    }
+
+    modify "window.defaultHeight" {
+        value = 16
     }
 }

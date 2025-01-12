@@ -1,6 +1,7 @@
 use anyhow::Result;
+use hashbrown::HashMap;
 use hcl::eval::{Context as EvalContext, Evaluate};
-use std::{collections::HashMap, path::PathBuf};
+use std::path::PathBuf;
 
 use crate::module::{ExtensionPointFile, ExtensionPointModule};
 
@@ -61,7 +62,7 @@ impl Loader {
             }
         }
 
-        Ok(ExtensionPointModule::new())
+        Ok(module)
     }
 
     fn parse_file(&self, ctx: &mut EvalContext, path: &PathBuf) -> Result<ExtensionPointFile> {
@@ -102,21 +103,18 @@ mod tests {
     #[test]
     fn test2() {
         let input = r#"
-pragma required_version ">= 1.0" {}
-pragma static {}
-
-locals {
-    max_subnet_length = 10
-}
-
 extends "configuration" {
+    id = "moss.core.window"
+    title = "Window"
     order = 5
-    
+
     parameter "window.defaultWidth" {
         type = number
         minimum = 800
         maximum = 3840
         default = 800
+        order = 1
+        scope = "APPLICATION"
         description = "The width of the application window in pixels."
     }
 
@@ -125,10 +123,15 @@ extends "configuration" {
         minimum = 600
         maximum = 2160
         default = 600
+        order = 2
+        scope = "APPLICATION"
         description = "The height of the application window in pixels."
     }
-}
 
+    override "editor.fontSize" {
+        value = 16
+    }
+}
     "#;
         // let loader = Loader::new();
         // loader.process(input).unwrap();

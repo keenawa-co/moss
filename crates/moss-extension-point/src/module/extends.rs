@@ -1,35 +1,78 @@
+use arcstr::ArcStr;
 use serde::{Deserialize, Serialize};
-use serde_json::Value;
-use std::collections::HashMap;
+use serde_json::{Number, Value as JsonValue};
+use std::{collections::HashMap, sync::Arc};
 
 #[derive(Debug, Deserialize, Serialize)]
-pub enum ParameterType {
+pub enum ParameterValueType {
     #[serde(rename = "number")]
     Number,
     #[serde(rename = "string")]
     String,
 }
 
+impl ParameterValueType {
+    pub fn default_json_value(&self) -> JsonValue {
+        match self {
+            ParameterValueType::Number => JsonValue::Number(Number::from(0)),
+            ParameterValueType::String => JsonValue::String(String::new()),
+        }
+    }
+}
+
+#[derive(Debug, Default, Deserialize, Serialize)]
+pub enum ParameterScope {
+    APPLICATION,
+    #[default]
+    WINDOW,
+    RESOURCE,
+    #[allow(non_camel_case_types)]
+    LANGUAGE_SPECIFIC,
+}
+
 #[derive(Debug, Deserialize, Serialize)]
 pub struct ParameterValue {
-    maximum: Option<Value>,
-    minimum: Option<Value>,
     #[serde(rename = "type")]
-    typ: ParameterType,
-    default: Value,
-    description: Option<String>,
-    order: Option<usize>,
+    pub typ: ParameterValueType,
+    #[serde(default)]
+    pub maximum: JsonValue,
+    #[serde(default)]
+    pub minimum: JsonValue,
+    #[serde(default)]
+    pub default: JsonValue,
+    /// The order in which the parameter appears within its group in the settings UI.
+    pub order: Option<usize>,
+    #[serde(default)]
+    pub scope: ParameterScope,
+    pub description: Option<String>,
+    /// Excluded parameters are hidden from the UI but can still be registered.
+    #[serde(default)]
+    pub excluded: bool,
+    /// Indicates if this setting is protected from addon overrides.
+    #[serde(default)]
+    pub protected: bool,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct OverrideValue {
+    pub value: JsonValue,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct ConfigurationDecl {
-    order: Option<usize>,
-    description: Option<String>,
+    pub id: String,
+    pub title: Option<String>,
+    pub description: Option<String>,
+
+    /// The order in which this group appears in the settings UI.
+    pub order: Option<usize>,
     #[serde(rename = "parameter")]
-    parameters: HashMap<String, ParameterValue>,
+    pub parameters: HashMap<ArcStr, Arc<ParameterValue>>,
+    #[serde(rename = "override")]
+    pub overrides: HashMap<ArcStr, OverrideValue>,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct ExtendsDecl {
-    configuration: Option<ConfigurationDecl>,
+    pub configuration: Option<Arc<ConfigurationDecl>>,
 }

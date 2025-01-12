@@ -7,7 +7,9 @@ edition = "2021"
 anyhow.workspace = true
 hcl-rs.workspace = true
 serde_json.workspace = true
-serde = { workspace = true, features = ["derive"] }
+serde = { workspace = true, features = ["derive", "rc"] }
 parking_lot.workspace = true
 ctor.workspace = true
 hashbrown.workspace = true
+arcstr = { workspace = true, features = ["serde"] }
+tracing.workspace = true

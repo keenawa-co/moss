@@ -1082,6 +1082,7 @@ dependencies = [
  "mimalloc",
  "moss_addon",
  "moss_cache",
+ "moss_configuration",
  "moss_desktop",
  "moss_env",
  "moss_extension_point",
@@ -2663,8 +2664,12 @@ dependencies = [
 name = "moss_configuration"
 version = "0.1.0"
 dependencies = [
+ "arcstr",
+ "hashbrown 0.15.2",
+ "moss_extension_point",
  "serde",
  "serde_json",
+ "tracing",
 ]
 
 [[package]]
@@ -2717,12 +2722,14 @@ name = "moss_extension_point"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "arcstr",
  "ctor",
  "hashbrown 0.15.2",
  "hcl-rs",
  "parking_lot",
  "serde",
  "serde_json",
+ "tracing",
 ]
 
 [[package]]
