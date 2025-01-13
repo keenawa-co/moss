@@ -17,6 +17,9 @@
       "path": "crates/moss-desktop"
     },
     {
+      "path": "crates/moss-configuration"
+    },
+    {
       "path": "packages/moss-ui"
     },
     {
