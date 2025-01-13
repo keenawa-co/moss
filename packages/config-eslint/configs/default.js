@@ -18,7 +18,10 @@ export default tseslint.config(...tseslint.configs.recommended, {
     "**/*.test.*",
     "**/*.spec.*",
   ],
-  languageOptions: {},
+
+  languageOptions: {
+    parser: tseslint.parser,
+  },
   "settings": {
     "import/parsers": {
       "@typescript-eslint/parser": [".ts", ".tsx"],
