@@ -28,7 +28,6 @@
     "@tauri-apps/plugin-shell": "^2.0.1",
     "allotment": "^1.20.2",
     "i18next-resources-to-backend": "^1.2.1",
-    "react-map-gl": "^7.1.8",
     "react-redux": "^9.2.0",
     "zustand": "^5.0.2"
   },
