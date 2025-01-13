@@ -1,4 +1,5 @@
 export LOG_LEVEL = trace
+export CARGO_WORKSPACE_ROOT_DIR = ${CURDIR}
 
 .DEFAULT_GOAL := run-desktop
 
@@ -33,6 +34,7 @@ THEME_MODELS_DIR := crates/moss-theme
 
 # --- Schema Directories ---
 THEME_SCHEMA_DIR :=  crates/moss-theme
+CONFIGURATION_SCHEMA_DIR := crates/moss-configuration
 TYPESPEC_OUTPUT_DIR := @typespec/json-schema
 SCHEMAS_DIR := assets/schemas
 
@@ -128,6 +130,10 @@ compile-themes-schema:
 	@rm -r @typespec
 
 
+
+.PHONY: compile-configuration-schema
+compile-configuration-schema:
+	@cd $(CONFIGURATION_SCHEMA_DIR) && $(TSP) compile . --option "@typespec/json-schema.file-type=json"
 
 ## Generate Icons
 .PHONY: gen-icons

@@ -51,6 +51,6 @@ model SolidColor {
 }
 
 model GradientColor {
-  type: "gradient";
+  type: "gradient" ;
   value: GradientString;
 }
