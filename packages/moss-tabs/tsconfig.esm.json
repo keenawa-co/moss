@@ -1,0 +1,16 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "target": "es6",
+    "outDir": "dist/esm",
+    "tsBuildInfoFile": ".build/tsconfig.tsbuildinfo.esm",
+    "jsx": "react",
+    "rootDir": "src",
+    "types": ["jest", "node"]
+  },
+  "include": ["src"],
+  "exclude": ["**/node_modules"]
+}

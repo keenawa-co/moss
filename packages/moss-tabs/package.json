@@ -1,0 +1,46 @@
+{
+  "name": "@repo/moss-tabs",
+  "version": "0.0.0",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./assets/styles.css": "./assets/styles.css"
+  },
+  "description": "Zero dependency layout manager supporting tabs, grids and splitviews",
+  "license": "MIT",
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/esm/index.js",
+  "types": "./dist/cjs/index.d.ts",
+  "scripts": {
+    "build": "npm run build:package && npm run build:bundles",
+    "build:bundles": "rollup -c",
+    "build:cjs": "cross-env ../../node_modules/.bin/tsc --build ./tsconfig.json --verbose --extendedDiagnostics",
+    "build:esm": "cross-env ../../node_modules/.bin/tsc --build ./tsconfig.esm.json --verbose --extendedDiagnostics",
+    "build:package": "npm run build:cjs && npm run build:esm && npm run build:css",
+    "clean": "rimraf dist/ .build/ .rollup.cache/",
+    "prepublishOnly": "npm run rebuild && npm run test",
+    "rebuild": "npm run clean && npm run build",
+    "test": "cross-env npx jest --selectProjects moss-tabs --env=jsdom",
+    "test:cov": "cross-env npx jest --selectProjects moss-tabs --coverage --env=jsdom"
+  },
+  "devDependencies": {
+    "@repo/tailwind-config": "workspace:*",
+    "@repo/typescript-config": "workspace:*",
+    "@tailwindcss/typography": "^0.5.15",
+    "@types/jest": "^29.5.14",
+    "@types/node": "^22.10.1",
+    "jest-environment-jsdom": "^29.7.0",
+    "jest-sonar-reporter": "^2.0.0",
+    "ts-node": "^10.9.2"
+  },
+  "peerDependencies": {
+    "react": "^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0"
+  },
+  "dependencies": {
+    "@testing-library/dom": "^10.4.0",
+    "@testing-library/react": "^16.1.0",
+    "@total-typescript/shoehorn": "^0.1.2",
+    "cross-env": "^7.0.3",
+    "ts-jest": "^29.2.5"
+  }
+}

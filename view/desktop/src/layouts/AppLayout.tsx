@@ -6,9 +6,12 @@ import { AppLayoutState, useGetAppLayoutState } from "@/hooks/useAppLayoutState"
 import { Home, Logs, Settings } from "@/pages";
 import { useAppResizableLayoutStore } from "@/store/appResizableLayout";
 
+import "@repo/moss-tabs/assets/styles.css";
+
 import { LaunchPad } from "../components/LaunchPad";
 import { Menu } from "../components/Menu";
 import { Resizable, ResizablePanel } from "../components/Resizable";
+import TabbedPane from "../parts/TabbedPane/TabbedPane";
 import { ContentLayout } from "./ContentLayout";
 
 export const AppLayout = () => {
@@ -147,6 +150,7 @@ const CenterLayout = ({ ...props }: ResizableLayoutProps) => {
           <ResizablePanel>
             <MainContent />
           </ResizablePanel>
+          <TabbedPane theme="dockview-theme-light" />
           <ResizablePanel
             preferredSize={props.bottomPaneGetHeight()}
             snap

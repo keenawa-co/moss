@@ -53,8 +53,6 @@ const preview: Preview = {
     (Story, context) => {
       const theme = context.args.theme ?? context.globals.theme;
 
-      console.warn("-------------------->", theme);
-
       applyTheme(themeFiles[theme]);
 
       return (

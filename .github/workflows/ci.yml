@@ -135,17 +135,21 @@ jobs:
           - name: Lint
             command: pnpm run lint -- --quiet
 
-          - name: Test Packages
+          - name: Test Packages (Vitest)
             command: pnpm run test --project packages
 
-          - name: Test Packages Stories
+          - name: Test Packages (Jest)
+            command: pnpm run jest
+
+          - name: Test Packages Stories (Vitest)
             command: pnpm run test --project packages-stories
 
-          - name: Test Desktop
+          - name: Test Desktop (Vitest)
             command: pnpm run test --project desktop
 
-          - name: Test Desktop Stories
+          - name: Test Desktop Stories (Vitest)
             command: pnpm run test --project desktop-stories
+
     timeout-minutes: 30
     steps:
       - name: Checkout Code
