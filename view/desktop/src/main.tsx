@@ -1,5 +1,5 @@
 import "@repo/moss-ui/src/fonts.css";
-import "@/assets/index.csss";
+import "@/assets/index.css";
 
 import { lazy, StrictMode, Suspense } from "react";
 import { createRoot } from "react-dom/client";
