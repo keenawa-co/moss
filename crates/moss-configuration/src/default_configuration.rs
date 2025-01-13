@@ -25,7 +25,7 @@ impl DefaultConfiguration {
                 value.default.clone()
             };
 
-            if model.insert(key, default_value) {
+            if !model.insert(key, default_value) {
                 warn!("Parameter '{key}' already exists in the default configuration model")
             }
         }
