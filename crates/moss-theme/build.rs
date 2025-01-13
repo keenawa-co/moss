@@ -8,7 +8,8 @@ fn main() {
     let python_cmd = "python3";
 
     Command::new(python_cmd)
-        .arg("importer.py")
+        .arg("../../misc/importer.py")
+        .arg("package.json")
         .status()
         .expect("Failed to execute script");
 }
