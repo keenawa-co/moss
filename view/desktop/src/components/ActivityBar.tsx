@@ -1,4 +1,4 @@
-import { ComponentPropsWithoutRef, forwardRef } from "react";
+import { ComponentPropsWithoutRef, forwardRef, useCallback } from "react";
 
 import { ActivityBarState, useChangeActivityBarState, useGetActivityBarState } from "@/hooks/useActivityBarState";
 import { useChangeViewGroups, useGetViewGroups } from "@/hooks/useViewGroups";
@@ -13,16 +13,24 @@ export const ActivityBar = () => {
   const { data: viewGroups } = useGetViewGroups();
   const { mutate: changeViewGroups } = useChangeViewGroups();
 
-  const toggleActiveItem = (index: number) => {
-    const newGroups = viewGroups?.map((item, i) => ({
-      ...item,
-      active: i === index,
-    }));
+  const activityBarGroups = viewGroups?.viewGroups;
 
-    if (!newGroups) return;
+  const toggleActiveItem = useCallback(
+    (index: number) => {
+      const newGroups = activityBarGroups?.map((item, i) => ({
+        ...item,
+        active: i === index,
+      }));
 
-    changeViewGroups(newGroups);
-  };
+      if (!newGroups) return;
+
+      changeViewGroups({
+        ...viewGroups,
+        viewGroups: newGroups,
+      });
+    },
+    [changeViewGroups, activityBarGroups, viewGroups]
+  );
 
   const handleSelectPosition = (position: ActivityBarState["position"]) => {
     const index = positions.indexOf(position);
@@ -39,7 +47,7 @@ export const ActivityBar = () => {
         })}
         onDoubleClick={() => handleSelectPosition(activityBarState?.position)}
       >
-        {viewGroups?.map(({ icon, active }, index) => (
+        {activityBarGroups?.map(({ icon, active }, index) => (
           <ActivityBarButton key={index} icon={icon as Icons} active={active} onClick={() => toggleActiveItem(index)} />
         ))}
       </div>
@@ -54,7 +62,7 @@ export const ActivityBar = () => {
       })}
       onDoubleClick={() => handleSelectPosition(activityBarState?.position as ActivityBarState["position"])}
     >
-      {viewGroups?.map(({ icon, active }, index) => (
+      {activityBarGroups?.map(({ icon, active }, index) => (
         <ActivityBarButton key={index} icon={icon as Icons} active={active} onClick={() => toggleActiveItem(index)} />
       ))}
     </div>

@@ -8,48 +8,55 @@ export interface ViewGroup {
   active: boolean;
 }
 
-// ViewGroups
-let ViewGroups: ViewGroup[] = [
-  {
-    "id": "explorer",
-    "title": "Explorer",
-    "order": 1,
-    "icon": "ActivityBarIcon1",
-    active: true,
-  },
-  {
-    "id": "activities",
-    "title": "Activities",
-    "order": 2,
-    "icon": "ActivityBarIcon2",
-    active: false,
-  },
-];
+export interface Views {
+  viewGroups: ViewGroup[];
+}
 
-export const getViewGroups = async () => {
-  await new Promise((resolve) => setTimeout(resolve, 50));
-  return ViewGroups;
+// Views
+let Views: Views = {
+  "viewGroups": [
+    {
+      "id": "explorer.groupId",
+      "title": "Explorer",
+      "order": 1,
+      "icon": "ActivityBarIcon1",
+      active: true,
+    },
+    {
+      "id": "activities.groupId",
+      "title": "Activities",
+      "order": 2,
+      "icon": "ActivityBarIcon2",
+      active: false,
+    },
+  ],
 };
 
 export const useGetViewGroups = () => {
-  return useQuery<ViewGroup[], Error>({
+  return useQuery<Views, Error>({
     queryKey: ["getViewGroups"],
-    queryFn: getViewGroups,
+    queryFn: async () => {
+      await new Promise((resolve) => setTimeout(resolve, 50));
+      return Views;
+    },
   });
 };
 
 export const useChangeViewGroups = () => {
   const queryClient = useQueryClient();
 
-  return useMutation<ViewGroup[], Error, ViewGroup[]>({
+  return useMutation<Views, Error, Views>({
     mutationFn: async (newViewGroups) => {
       await new Promise((resolve) => setTimeout(resolve, 50));
 
-      ViewGroups = newViewGroups;
+      Views = newViewGroups;
+
       return newViewGroups;
     },
-    onSuccess() {
-      queryClient.invalidateQueries({ queryKey: ["getViewGroups"] });
+    onSuccess(newViewGroups) {
+      console.log("onSuccess");
+      // queryClient.invalidateQueries({ queryKey: ["getViewGroups"] });
+      queryClient.setQueryData(["getViewGroups"], newViewGroups);
     },
   });
 };
@@ -59,21 +66,24 @@ export const useChangeViewGroups = () => {
 interface GroupView {
   id: string;
   name: string;
+  component: string;
 }
 
-export const getViewGroup = async (groupId: string) => {
+const getViewGroup = async (groupId: string) => {
   await new Promise((resolve) => setTimeout(resolve, 50));
 
-  if (groupId === "explorer") {
+  if (groupId === "explorer.groupId") {
     return {
       "id": "explorer",
       "name": "My View1",
+      "component": "AccordionsList",
     };
   }
-  if (groupId === "activities") {
+  if (groupId === "activities.groupId") {
     return {
       "id": "activities",
       "name": "My View2",
+      "component": "ActivitiesList",
     };
   }
 
