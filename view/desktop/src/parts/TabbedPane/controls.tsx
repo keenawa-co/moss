@@ -65,12 +65,7 @@ export const RightControls = (props: IDockviewHeaderActionsProps) => {
   };
 
   return (
-    <div
-      className="group-control flex h-full items-center px-2"
-      style={{
-        color: "var(--moss-activegroup-visiblepanel-tab-color)",
-      }}
-    >
+    <div className="group-control flex h-full items-center px-2 text-[var(--moss-activegroup-visiblepanel-tab-color)]">
       {props.isGroupActive && <Icon icon="star" />}
       {Component && <Component />}
       <Icon
@@ -102,12 +97,7 @@ export const LeftControls = (props: IDockviewHeaderActionsProps) => {
   };
 
   return (
-    <div
-      className="group-control flex h-full items-center px-2"
-      style={{
-        color: "var(--moss-activegroup-visiblepanel-tab-color)",
-      }}
-    >
+    <div className="group-control flex h-full items-center px-2 text-[var(--moss-activegroup-visiblepanel-tab-color)]">
       <Icon onClick={onClick} icon="add" />
     </div>
   );
@@ -115,12 +105,7 @@ export const LeftControls = (props: IDockviewHeaderActionsProps) => {
 
 export const PrefixHeaderControls = (props: IDockviewHeaderActionsProps) => {
   return (
-    <div
-      className="group-control flex h-full items-center px-2"
-      style={{
-        color: "var(--moss-activegroup-visiblepanel-tab-color)",
-      }}
-    >
+    <div className="group-control flex h-full items-center px-2 text-[var(--moss-activegroup-visiblepanel-tab-color)]">
       <Icon icon="Menu" />
     </div>
   );

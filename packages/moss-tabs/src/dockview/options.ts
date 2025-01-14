@@ -206,7 +206,7 @@ export type AddPanelOptions<P extends object = Parameters> = {
    */
   component: string;
   /**
-   * The id of the tab componnet renderer
+   * The id of the tab component renderer
    */
   tabComponent?: string;
   /**

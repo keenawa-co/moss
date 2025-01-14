@@ -144,7 +144,7 @@ export const GridActions = (props: {
         <button className="text-button" onClick={() => onAddPanel()}>
           Add Panel
         </button>
-        <button className="demo-icon-button" onClick={() => onAddPanel({ advanced: true })}>
+        <button className="demo-icon-button !rounded" onClick={() => onAddPanel({ advanced: true })}>
           <span className="material-symbols-outlined">tune</span>
         </button>
       </div>
@@ -156,7 +156,7 @@ export const GridActions = (props: {
       </button>
       <span className="button-action">
         <button
-          className={props.hasCustomWatermark ? "demo-button selected" : "demo-button"}
+          className={props.hasCustomWatermark ? "demo-button selected !rounded" : "demo-button !rounded"}
           onClick={props.toggleCustomWatermark}
         >
           Use Custom Watermark
@@ -176,9 +176,9 @@ export const GridActions = (props: {
       </button>
       <span className="flex-grow" />
       <div className="flex items-center">
-        <span className="pr-1">Grid Gap</span>
+        <span className="pr-1 text-[var(--moss-activegroup-visiblepanel-tab-color)]">Grid Gap</span>
         <input
-          className="w-10"
+          className="w-10 text-center"
           type="number"
           min={0}
           max={99}
@@ -186,7 +186,9 @@ export const GridActions = (props: {
           value={gap}
           onChange={(event) => setGap(Number(event.target.value))}
         />
-        <button onClick={() => setGap(0)}>Reset</button>
+        <button className="text-button" onClick={() => setGap(0)}>
+          Reset
+        </button>
       </div>
     </div>
   );

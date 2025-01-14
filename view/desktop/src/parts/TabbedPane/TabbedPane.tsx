@@ -24,7 +24,9 @@ const Option = (props: { title: string; onClick: () => void; value: string }) =>
   return (
     <div>
       <span>{`${props.title}: `}</span>
-      <button onClick={props.onClick}>{props.value}</button>
+      <button className="rounded bg-red-500 p-1" onClick={props.onClick}>
+        {props.value}
+      </button>
     </div>
   );
 };
@@ -267,6 +269,7 @@ const TabbedPane = (props: { theme?: string }) => {
       </div>
       <div className="action-container flex items-center justify-end p-1">
         <button
+          className="mr-2 rounded"
           onClick={() => {
             setDebug(!debug);
           }}
@@ -275,6 +278,7 @@ const TabbedPane = (props: { theme?: string }) => {
         </button>
         {showLogs && (
           <button
+            className="mr-1 rounded"
             onClick={() => {
               setLogLines([]);
             }}
@@ -283,6 +287,7 @@ const TabbedPane = (props: { theme?: string }) => {
           </button>
         )}
         <button
+          className="rounded p-1"
           onClick={() => {
             setShowLogs(!showLogs);
           }}
