@@ -1,7 +1,8 @@
 import { ComponentPropsWithoutRef, forwardRef, useCallback } from "react";
 
 import { ActivityBarState, useChangeActivityBarState, useGetActivityBarState } from "@/hooks/useActivityBarState";
-import { useChangeViewGroups, useGetViewGroups } from "@/hooks/useViewGroups";
+import { useChangeProjectSessionState, useGetProjectSessionState } from "@/hooks/useProjectSession";
+import { useGetViewGroups } from "@/hooks/useViewGroups";
 import { cn, Icon, Icons } from "@repo/moss-ui";
 
 const positions = ["top", "bottom", "left", "right"] as const;
@@ -11,25 +12,23 @@ export const ActivityBar = () => {
   const { mutate: changeActivityBarState } = useChangeActivityBarState();
 
   const { data: viewGroups } = useGetViewGroups();
-  const { mutate: changeViewGroups } = useChangeViewGroups();
+
+  const { data: projectSessionState } = useGetProjectSessionState();
+
+  const { mutate: changeProjectSessionState } = useChangeProjectSessionState();
 
   const activityBarGroups = viewGroups?.viewGroups;
 
-  const toggleActiveItem = useCallback(
-    (index: number) => {
-      const newGroups = activityBarGroups?.map((item, i) => ({
-        ...item,
-        active: i === index,
-      }));
+  const toggleActiveGroup = useCallback(
+    (id: string) => {
+      if (!projectSessionState) return;
 
-      if (!newGroups) return;
-
-      changeViewGroups({
-        ...viewGroups,
-        viewGroups: newGroups,
+      changeProjectSessionState({
+        ...projectSessionState,
+        lastActiveGroup: id,
       });
     },
-    [changeViewGroups, activityBarGroups, viewGroups]
+    [changeProjectSessionState, projectSessionState]
   );
 
   const handleSelectPosition = (position: ActivityBarState["position"]) => {
@@ -47,8 +46,13 @@ export const ActivityBar = () => {
         })}
         onDoubleClick={() => handleSelectPosition(activityBarState?.position)}
       >
-        {activityBarGroups?.map(({ icon, active }, index) => (
-          <ActivityBarButton key={index} icon={icon as Icons} active={active} onClick={() => toggleActiveItem(index)} />
+        {activityBarGroups?.map(({ icon, id }, index) => (
+          <ActivityBarButton
+            key={index}
+            icon={icon as Icons}
+            active={projectSessionState?.lastActiveGroup === id}
+            onClick={() => toggleActiveGroup(id)}
+          />
         ))}
       </div>
     );
@@ -62,8 +66,13 @@ export const ActivityBar = () => {
       })}
       onDoubleClick={() => handleSelectPosition(activityBarState?.position as ActivityBarState["position"])}
     >
-      {activityBarGroups?.map(({ icon, active }, index) => (
-        <ActivityBarButton key={index} icon={icon as Icons} active={active} onClick={() => toggleActiveItem(index)} />
+      {activityBarGroups?.map(({ icon, id }, index) => (
+        <ActivityBarButton
+          key={index}
+          icon={icon as Icons}
+          active={projectSessionState?.lastActiveGroup === id}
+          onClick={() => toggleActiveGroup(id)}
+        />
       ))}
     </div>
   );

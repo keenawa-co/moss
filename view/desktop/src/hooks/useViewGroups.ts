@@ -5,7 +5,6 @@ export interface ViewGroup {
   title: string;
   order: number;
   icon: string;
-  active: boolean;
 }
 
 export interface Views {
@@ -20,14 +19,12 @@ let Views: Views = {
       "title": "Explorer",
       "order": 1,
       "icon": "ActivityBarIcon1",
-      active: true,
     },
     {
       "id": "activities.groupId",
       "title": "Activities",
       "order": 2,
       "icon": "ActivityBarIcon2",
-      active: false,
     },
   ],
 };
@@ -54,8 +51,6 @@ export const useChangeViewGroups = () => {
       return newViewGroups;
     },
     onSuccess(newViewGroups) {
-      console.log("onSuccess");
-      // queryClient.invalidateQueries({ queryKey: ["getViewGroups"] });
       queryClient.setQueryData(["getViewGroups"], newViewGroups);
     },
   });

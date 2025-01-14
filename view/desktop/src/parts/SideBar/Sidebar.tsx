@@ -1,6 +1,7 @@
 import { ActivityBar } from "@/components/ActivityBar";
 import { ViewContainer } from "@/components/ViewContainer";
 import { useGetActivityBarState } from "@/hooks/useActivityBarState";
+import { useGetProjectSessionState } from "@/hooks/useProjectSession";
 import { useGetViewGroups } from "@/hooks/useViewGroups";
 
 import SidebarHeader from "./SidebarHeader";
@@ -8,8 +9,9 @@ import SidebarHeader from "./SidebarHeader";
 export const Sidebar = () => {
   const { data: activityBarState } = useGetActivityBarState();
   const { data: viewGroups } = useGetViewGroups();
+  const { data: projectSessionState } = useGetProjectSessionState();
 
-  const activeGroup = viewGroups?.viewGroups?.find((group) => group.active);
+  const activeGroup = viewGroups?.viewGroups?.find((group) => group.id === projectSessionState?.lastActiveGroup);
   const activeGroupTitle = activeGroup?.title || "Launchpad";
   const activeGroupId = activeGroup?.id || "";
 
@@ -59,6 +61,5 @@ export const Sidebar = () => {
 
   return <div>Launchpad is empty</div>;
 };
-// mb-5.5 flex w-full flex-col overflow-auto p-0  background-[--moss-sideBar-background]
 
 export default Sidebar;
