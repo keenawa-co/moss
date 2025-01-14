@@ -33,36 +33,39 @@ export const Settings = () => {
 
   return (
     <main>
-      <div>
-        <h3>{t("selectLanguage")}</h3>
-        <select
-          id="lang-select"
-          className="rounded border p-2"
-          value={appState?.preferences.locale?.code || appState?.defaults.locale?.code}
-          onChange={handleLanguageChange}
-        >
-          {languages?.map((lang) => (
-            <option key={lang.code} value={lang.code}>
-              {lang.name}
-            </option>
-          ))}
-        </select>
-      </div>
+      <div className="p-5 text-[var(--moss-primary)]">
+        <h1 className="mb-3 text-2xl">Settings</h1>
+        <div>
+          <h3>{t("selectLanguage")}</h3>
+          <select
+            id="lang-select"
+            className="rounded border bg-gray-400 p-2"
+            value={appState?.preferences.locale?.code || appState?.defaults.locale?.code}
+            onChange={handleLanguageChange}
+          >
+            {languages?.map((lang) => (
+              <option key={lang.code} value={lang.code}>
+                {lang.name}
+              </option>
+            ))}
+          </select>
+        </div>
 
-      <div>
-        <h3>{t("selectTheme")}</h3>
-        <select
-          id="theme-select"
-          className="rounded border p-2"
-          value={appState?.preferences.theme?.id || appState?.defaults.theme?.id}
-          onChange={handleThemeChange}
-        >
-          {themes?.map((theme) => (
-            <option key={theme.id} value={theme.id}>
-              {theme.name}
-            </option>
-          ))}
-        </select>
+        <div>
+          <h3>{t("selectTheme")}</h3>
+          <select
+            id="theme-select"
+            className="rounded border bg-gray-400 p-2"
+            value={appState?.preferences.theme?.id || appState?.defaults.theme?.id}
+            onChange={handleThemeChange}
+          >
+            {themes?.map((theme) => (
+              <option key={theme.id} value={theme.id}>
+                {theme.name}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
     </main>
   );

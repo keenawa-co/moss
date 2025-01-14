@@ -113,16 +113,21 @@ export const GridActions = (props: {
 
   const popover = usePopover();
 
-  const onAddPanel = (options?: { advanced?: boolean; nested?: boolean }) => {
+  const onAddPanel = (options?: { advanced?: boolean; type?: string }) => {
+    const panelType = options?.type;
+    if (panelType && props.api?.getPanel(panelType) !== undefined) {
+      return;
+    }
+
     if (options?.advanced) {
       popover.open(({ close }) => {
         return <PanelBuilder api={props.api!} done={close} />;
       });
     } else {
       props.api?.addPanel({
-        id: `id_${Date.now().toString()}`,
-        component: options?.nested ? "nested" : "Default",
-        title: `Tab ${nextId()}`,
+        id: panelType && panelType !== "nested" ? panelType : `id_${Date.now().toString()}`,
+        component: options?.type ?? "Default",
+        title: options?.type ?? `Tab ${nextId()}`,
         renderer: "always",
       });
     }
@@ -140,6 +145,16 @@ export const GridActions = (props: {
 
   return (
     <div className="action-container">
+      <button className="text-button" onClick={() => onAddPanel({ type: "Home" })}>
+        Home
+      </button>
+      <button className="text-button" onClick={() => onAddPanel({ type: "Settings" })}>
+        Settings
+      </button>
+      <button className="text-button" onClick={() => onAddPanel({ type: "Logs" })}>
+        Logs
+      </button>
+      <span className="flex-grow" />
       <div className="button-group">
         <button className="text-button" onClick={() => onAddPanel()}>
           Add Panel
@@ -148,7 +163,7 @@ export const GridActions = (props: {
           <span className="material-symbols-outlined">tune</span>
         </button>
       </div>
-      <button className="text-button" onClick={() => onAddPanel({ nested: true })}>
+      <button className="text-button" onClick={() => onAddPanel({ type: "nested" })}>
         Add Nested Panel
       </button>
       <button className="text-button" onClick={onAddGroup}>
