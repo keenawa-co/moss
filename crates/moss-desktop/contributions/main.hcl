@@ -4,7 +4,7 @@ locals {
     max_subnet_length = 10
 }
 
-configuration "moss.core.window" {
+configuration "moss.kernel.window" {
     title = "Window"
     order = 5
 
@@ -40,19 +40,9 @@ configuration "moss.core.window" {
 
     override "editor.fontSize" {
         value = 16
-        context = [
-            "typescript",
-            "javascript"
-        ]
-    }
-}
-
-configuration {
-    override "editor.fontSize" {
-        value = 16
-        context = [
-            "typescript",
-            "javascript"
-        ]
+        # context = [
+        #     "typescript",
+        #     "javascript"
+        # ]
     }
 }
