@@ -1,4 +1,5 @@
 use anyhow::Result;
+use moss_extension_point::registry::Registry;
 use tauri::AppHandle;
 
 use super::{
@@ -6,17 +7,19 @@ use super::{
     service::{Service, ServiceCollection, ServiceHandle},
 };
 
-pub struct AppManager {
+pub struct AppManager<'a> {
     services: ServiceCollection,
+    registry: Registry<'a>,
 }
 
-unsafe impl Send for AppManager {}
-unsafe impl Sync for AppManager {}
+unsafe impl<'a> Send for AppManager<'a> {}
+unsafe impl<'a> Sync for AppManager<'a> {}
 
-impl AppManager {
-    pub fn new(app_handle: AppHandle) -> Self {
+impl<'a> AppManager<'a> {
+    pub fn new(app_handle: AppHandle, registry: Registry<'a>) -> Self {
         Self {
             services: ServiceCollection::new(app_handle),
+            registry,
         }
     }
 

@@ -43,7 +43,7 @@ pub fn execute_command(
 #[tauri::command(async)]
 #[instrument(level = "trace", skip(app_manager))]
 pub async fn get_color_theme(
-    app_manager: State<'_, AppManager>,
+    app_manager: State<'_, AppManager<'_>>,
     path: String,
 ) -> TauriResult<String> {
     let theme_service = app_manager.service::<ThemeService>()?;
@@ -54,7 +54,7 @@ pub async fn get_color_theme(
 #[tauri::command(async)]
 #[instrument(level = "trace", skip(app_manager))]
 pub async fn get_translations(
-    app_manager: State<'_, AppManager>,
+    app_manager: State<'_, AppManager<'_>>,
     language: String,
     namespace: String,
 ) -> TauriResult<Value> {
@@ -81,7 +81,9 @@ pub fn get_state(state_manager: State<'_, AppStateManager>) -> Result<AppState, 
 
 #[tauri::command(async)]
 #[instrument(level = "trace", skip(app_manager))]
-pub async fn get_themes(app_manager: State<'_, AppManager>) -> TauriResult<Vec<ThemeDescriptor>> {
+pub async fn get_themes(
+    app_manager: State<'_, AppManager<'_>>,
+) -> TauriResult<Vec<ThemeDescriptor>> {
     let theme_service = app_manager.service::<ThemeService>()?;
 
     Ok(theme_service
@@ -93,7 +95,9 @@ pub async fn get_themes(app_manager: State<'_, AppManager>) -> TauriResult<Vec<T
 
 #[tauri::command(async)]
 #[instrument(level = "trace", skip(app_manager))]
-pub async fn get_locales(app_manager: State<'_, AppManager>) -> TauriResult<Vec<LocaleDescriptor>> {
+pub async fn get_locales(
+    app_manager: State<'_, AppManager<'_>>,
+) -> TauriResult<Vec<LocaleDescriptor>> {
     let locale_service = app_manager.service::<LocaleService>()?;
 
     Ok(locale_service.get_locales().clone().into_iter().collect())

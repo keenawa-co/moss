@@ -32,7 +32,7 @@ pub enum ParameterScope {
 }
 
 #[derive(Debug, Deserialize, Serialize)]
-pub struct ParameterValue {
+pub struct ParameterDecl {
     #[serde(rename = "type")]
     pub typ: ParameterValueType,
     #[serde(default)]
@@ -54,18 +54,10 @@ pub struct ParameterValue {
     pub protected: bool,
 }
 
-#[derive(Debug, Hash, Clone, PartialEq, Eq, Deserialize, Serialize)]
-pub enum OverrideContext {
-    #[serde(rename = "*")]
-    Global,
-    #[serde(untagged)]
-    Specific(String),
-}
-
 #[derive(Debug, Deserialize, Serialize)]
-pub struct OverrideValue {
+pub struct OverrideDecl {
     pub value: JsonValue,
-    pub context: HashSet<OverrideContext>,
+    pub context: Option<HashSet<String>>,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -76,7 +68,7 @@ pub struct ConfigurationDecl {
     /// The order in which this group appears in the settings UI.
     pub order: Option<usize>,
     #[serde(rename = "parameter")]
-    pub parameters: HashMap<ArcStr, Arc<ParameterValue>>,
+    pub parameters: HashMap<ArcStr, Arc<ParameterDecl>>,
     #[serde(rename = "override")]
-    pub overrides: HashMap<ArcStr, OverrideValue>,
+    pub overrides: HashMap<ArcStr, Arc<OverrideDecl>>,
 }

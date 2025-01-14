@@ -13,3 +13,4 @@ ctor.workspace = true
 hashbrown = { workspace = true, features = ["serde"] }
 arcstr = { workspace = true, features = ["serde"] }
 tracing.workspace = true
+phf.workspace = true

@@ -135,24 +135,6 @@ configuration "moss.core.window" {
         scope = "WINDOW"
         description = "The width of the application window in pixels."
     }
-
-    override "editor.fontSize" {
-        value = 16
-        context = [
-            "typescript",
-            "javascript"
-        ]
-    }
-}
-
-configuration {
-    override "editor.fontSize" {
-        value = 16
-        context = [
-            "typescript",
-            "javascript"
-        ]
-    }
 }
     "#;
         let mut ctx = hcl::eval::Context::new();

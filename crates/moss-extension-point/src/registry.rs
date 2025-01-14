@@ -3,10 +3,10 @@ use arcstr::ArcStr;
 use hashbrown::{HashMap, HashSet};
 use parking_lot::Mutex;
 use serde_json::Value as JsonValue;
-use std::{path::PathBuf, sync::Arc};
+use std::{marker::PhantomData, path::PathBuf, sync::Arc};
 
 use crate::module::{
-    configuration::{ConfigurationDecl, OverrideContext, ParameterValue},
+    configuration::{ConfigurationDecl, OverrideDecl, ParameterDecl},
     ExtensionPointModule,
 };
 
@@ -32,37 +32,44 @@ pub fn with_mut(f: impl FnOnce(&mut Vec<PathBuf>)) {
     f(&mut __EP_REGISTRY__.lock())
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct ValueProviderInfo {
     pub id: String,
 }
 
-#[derive(Debug, Default)]
+#[derive(Debug, Clone)]
 pub struct DefaultOverrideDescriptor {
-    value: JsonValue,
-    provider_info: Option<ValueProviderInfo>,
+    pub value: JsonValue,
+    pub provider_info: Option<ValueProviderInfo>,
 }
 
-#[derive(Debug, Default)]
+#[derive(Debug)]
 pub struct DefaultOverrides {
-    all: Vec<DefaultOverrideDescriptor>,
-    consolidated: Option<DefaultOverrideDescriptor>,
+    all: Vec<Arc<DefaultOverrideDescriptor>>,
+    consolidated: Arc<DefaultOverrideDescriptor>,
 }
 
 #[derive(Debug, Default)]
 pub struct ConfigurationRegistry {
     configuration_decls: Vec<(ArcStr, Arc<ConfigurationDecl>)>,
-    known_parameters: HashMap<ArcStr, Arc<ParameterValue>>,
-    excluded_parameters: HashMap<ArcStr, Arc<ParameterValue>>,
-    overrides_by_context: HashMap<OverrideContext, HashMap<ArcStr, JsonValue>>,
-    default_overrides: HashMap<ArcStr, HashMap<OverrideContext, DefaultOverrides>>,
+    known_parameters: HashMap<ArcStr, Arc<ParameterDecl>>,
+    excluded_parameters: HashMap<ArcStr, Arc<ParameterDecl>>,
+    default_overrides: HashMap<ArcStr, DefaultOverrides>,
+    specific_overrides: HashMap<ArcStr, OverrideDecl>,
     override_identifiers: HashSet<ArcStr>,
     decl_identifiers: HashSet<ArcStr>,
 }
 
 impl ConfigurationRegistry {
-    pub fn parameters(&self) -> &HashMap<ArcStr, Arc<ParameterValue>> {
+    pub fn parameters(&self) -> &HashMap<ArcStr, Arc<ParameterDecl>> {
         &self.known_parameters
+    }
+
+    pub fn get_override(&self, key: &ArcStr) -> Option<Arc<DefaultOverrideDescriptor>> {
+        self.default_overrides
+            .get(key)
+            .map(|value| &value.consolidated)
+            .cloned()
     }
 
     pub fn register(&mut self, decls: HashMap<ArcStr, Arc<ConfigurationDecl>>) {
@@ -72,39 +79,70 @@ impl ConfigurationRegistry {
                 continue;
             }
 
-            for (parameter_key, parameter_value) in &decl.parameters {
-                if let Err(err) = self.validate_parameter(&parameter_key, &parameter_value) {
-                    warn!(
-                        "Failed to register the parameter '{}': {err}",
-                        parameter_key
-                    );
-                    continue;
-                }
-
-                let target = if parameter_value.excluded {
-                    &mut self.excluded_parameters
-                } else {
-                    &mut self.known_parameters
-                };
-
-                target.insert(ArcStr::clone(parameter_key), Arc::clone(parameter_value));
-            }
-
-            for (override_key, override_value) in &decl.overrides {
-                // TODO: Validation
-
-                for override_context in &override_value.context {
-                    self.overrides_by_context
-                        .entry(override_context.clone())
-                        .or_insert_with(HashMap::new)
-                        .insert(ArcStr::clone(override_key), override_value.value.clone());
-                }
-            }
+            self.register_parameters(&decl.parameters);
+            self.register_overrides(&decl.overrides);
 
             self.override_identifiers
                 .extend(decl.overrides.keys().cloned());
             self.decl_identifiers.insert(ArcStr::clone(&id));
             self.configuration_decls.push((id, decl));
+        }
+    }
+
+    fn register_parameters(&mut self, parameters: &HashMap<ArcStr, Arc<ParameterDecl>>) {
+        for (key, decl) in parameters {
+            if let Err(err) = self.validate_parameter(&key, &decl) {
+                warn!("Failed to register the parameter '{}': {err}", key);
+                continue;
+            }
+
+            let target = if decl.excluded {
+                &mut self.excluded_parameters
+            } else {
+                &mut self.known_parameters
+            };
+
+            target.insert(ArcStr::clone(key), Arc::clone(decl));
+        }
+    }
+
+    fn register_overrides(&mut self, overrides: &HashMap<ArcStr, Arc<OverrideDecl>>) {
+        for (override_key, override_decl) in overrides {
+            // TODO: validate the override key and declaration
+
+            if override_decl.value.is_null() {
+                warn!("The value of the '{override_key}' override is null. This override will be ignored.");
+                continue;
+            }
+
+            if override_decl.context.is_some() {
+                // TODO: context specific handling can be added here in the future
+                continue;
+            }
+
+            let new_descriptor = Arc::new(match &override_decl.value {
+                JsonValue::Bool(_) | JsonValue::Number(_) | JsonValue::String(_) => {
+                    DefaultOverrideDescriptor {
+                        value: override_decl.value.clone(),
+                        provider_info: None,
+                    }
+                }
+                JsonValue::Null => unreachable!("Null values are already checked earlier."),
+                _ => unimplemented!("Handling for this type is not implemented."),
+            });
+
+            let key = ArcStr::from(override_key);
+
+            self.default_overrides
+                .entry(key)
+                .and_modify(|default_overrides| {
+                    default_overrides.all.push(Arc::clone(&new_descriptor));
+                    default_overrides.consolidated = Arc::clone(&new_descriptor);
+                })
+                .or_insert_with(|| DefaultOverrides {
+                    all: vec![Arc::clone(&new_descriptor)],
+                    consolidated: new_descriptor,
+                });
         }
     }
 
@@ -131,7 +169,7 @@ impl ConfigurationRegistry {
         Ok(())
     }
 
-    fn validate_parameter(&self, key: &ArcStr, parameter: &Arc<ParameterValue>) -> Result<()> {
+    fn validate_parameter(&self, key: &ArcStr, parameter: &Arc<ParameterDecl>) -> Result<()> {
         if self.known_parameters.get(key).is_some() {
             return Err(anyhow!("This parameter has already been registered"));
         }
@@ -152,7 +190,7 @@ impl ConfigurationRegistry {
         Ok(())
     }
 
-    fn validate_parameter_value(&self, _parameter: &Arc<ParameterValue>) -> Result<()> {
+    fn validate_parameter_value(&self, _parameter: &Arc<ParameterDecl>) -> Result<()> {
         // TODO: Validate the default value of the parameter to ensure it meets
         // the specified constraints. For example, if it is a numeric value, it must
         // not be less than the minimum or greater than the maximum, and so on.
@@ -165,11 +203,12 @@ impl ConfigurationRegistry {
     }
 }
 
-pub struct Registry {
+pub struct Registry<'a> {
     configurations: Arc<ConfigurationRegistry>,
+    phantom: PhantomData<&'a ()>,
 }
 
-impl Registry {
+impl Registry<'_> {
     pub fn new(modules: &HashMap<PathBuf, ExtensionPointModule>) -> Self {
         let mut configurations = ConfigurationRegistry::default();
 
@@ -183,6 +222,7 @@ impl Registry {
 
         Self {
             configurations: Arc::new(configurations),
+            phantom: PhantomData,
         }
     }
 
