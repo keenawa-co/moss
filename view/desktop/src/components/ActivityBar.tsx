@@ -1,6 +1,7 @@
-import { ComponentPropsWithoutRef, forwardRef, useState } from "react";
+import { ComponentPropsWithoutRef, forwardRef } from "react";
 
 import { ActivityBarState, useChangeActivityBarState, useGetActivityBarState } from "@/hooks/useActivityBarState";
+import { useChangeViewGroups, useGetViewGroups } from "@/hooks/useViewGroups";
 import { cn, Icon, Icons } from "@repo/moss-ui";
 
 const positions = ["top", "bottom", "left", "right"] as const;
@@ -9,24 +10,18 @@ export const ActivityBar = () => {
   const { data: activityBarState } = useGetActivityBarState();
   const { mutate: changeActivityBarState } = useChangeActivityBarState();
 
-  const [list, setList] = useState([
-    {
-      icon: "ActivityBarIcon1",
-      active: true,
-    },
-    {
-      icon: "ActivityBarIcon2",
-      active: false,
-    },
-  ]);
+  const { data: viewGroups } = useGetViewGroups();
+  const { mutate: changeViewGroups } = useChangeViewGroups();
 
   const toggleActiveItem = (index: number) => {
-    setList((prev) =>
-      prev.map((item, i) => ({
-        ...item,
-        active: i === index,
-      }))
-    );
+    const newGroups = viewGroups?.map((item, i) => ({
+      ...item,
+      active: i === index,
+    }));
+
+    if (!newGroups) return;
+
+    changeViewGroups(newGroups);
   };
 
   const handleSelectPosition = (position: ActivityBarState["position"]) => {
@@ -44,7 +39,7 @@ export const ActivityBar = () => {
         })}
         onDoubleClick={() => handleSelectPosition(activityBarState?.position)}
       >
-        {list.map(({ icon, active }, index) => (
+        {viewGroups?.map(({ icon, active }, index) => (
           <ActivityBarButton key={index} icon={icon as Icons} active={active} onClick={() => toggleActiveItem(index)} />
         ))}
       </div>
@@ -59,7 +54,7 @@ export const ActivityBar = () => {
       })}
       onDoubleClick={() => handleSelectPosition(activityBarState?.position as ActivityBarState["position"])}
     >
-      {list.map(({ icon, active }, index) => (
+      {viewGroups?.map(({ icon, active }, index) => (
         <ActivityBarButton key={index} icon={icon as Icons} active={active} onClick={() => toggleActiveItem(index)} />
       ))}
     </div>

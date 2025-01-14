@@ -27,6 +27,7 @@ export const useChangeActivityBarState = () => {
       await new Promise((resolve) => setTimeout(resolve, 50));
 
       ActivityBarState = newLayout;
+
       return newLayout;
     },
     onSuccess() {
