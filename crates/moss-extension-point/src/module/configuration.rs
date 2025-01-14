@@ -1,7 +1,8 @@
 use arcstr::ArcStr;
+use hashbrown::{HashMap, HashSet};
 use serde::{Deserialize, Serialize};
 use serde_json::{Number, Value as JsonValue};
-use std::{collections::HashMap, sync::Arc};
+use std::sync::Arc;
 
 #[derive(Debug, Deserialize, Serialize)]
 pub enum ParameterValueType {
@@ -53,14 +54,22 @@ pub struct ParameterValue {
     pub protected: bool,
 }
 
+#[derive(Debug, Hash, Clone, PartialEq, Eq, Deserialize, Serialize)]
+pub enum OverrideContext {
+    #[serde(rename = "*")]
+    Global,
+    #[serde(untagged)]
+    Specific(String),
+}
+
 #[derive(Debug, Deserialize, Serialize)]
 pub struct OverrideValue {
     pub value: JsonValue,
+    pub context: HashSet<OverrideContext>,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct ConfigurationDecl {
-    pub id: String,
     pub title: Option<String>,
     pub description: Option<String>,
 
@@ -70,9 +79,4 @@ pub struct ConfigurationDecl {
     pub parameters: HashMap<ArcStr, Arc<ParameterValue>>,
     #[serde(rename = "override")]
     pub overrides: HashMap<ArcStr, OverrideValue>,
-}
-
-#[derive(Debug, Deserialize, Serialize)]
-pub struct ExtendsDecl {
-    pub configuration: Option<Arc<ConfigurationDecl>>,
 }

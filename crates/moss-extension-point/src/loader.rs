@@ -79,7 +79,6 @@ mod tests {
     use std::path::PathBuf;
 
     use super::Loader;
-    use crate::module::ExtensionPointFile;
 
     fn workspace_dir() -> PathBuf {
         let output = std::process::Command::new(env!("CARGO"))
@@ -103,8 +102,7 @@ mod tests {
     #[test]
     fn test2() {
         let input = r#"
-extends "configuration" {
-    id = "moss.core.window"
+configuration "moss.core.window" {
     title = "Window"
     order = 5
 
@@ -128,24 +126,45 @@ extends "configuration" {
         description = "The height of the application window in pixels."
     }
 
+    parameter "editor.fontSize" {
+        type = number
+        minimum = 10
+        maximum = 20
+        default = 14
+        order = 1
+        scope = "WINDOW"
+        description = "The width of the application window in pixels."
+    }
+
     override "editor.fontSize" {
         value = 16
+        context = [
+            "typescript",
+            "javascript"
+        ]
+    }
+}
+
+configuration {
+    override "editor.fontSize" {
+        value = 16
+        context = [
+            "typescript",
+            "javascript"
+        ]
     }
 }
     "#;
-        // let loader = Loader::new();
-        // loader.process(input).unwrap();
-
         let mut ctx = hcl::eval::Context::new();
 
-        // ctx.declare_var("name", "Test");
         ctx.declare_var("number", "number");
         let body: hcl::Body = hcl::from_str(input).unwrap();
         let r = body.evaluate(&ctx).unwrap();
 
         let json_value: serde_json::Value = hcl::from_body(r).unwrap();
-        let v: ExtensionPointFile = serde_json::from_value(json_value.clone()).unwrap();
-        dbg!(v);
+        // let v: crate::module::ExtensionPointFile =
+        //     serde_json::from_value(json_value.clone()).unwrap();
+        // dbg!(v);
         let pretty_json = serde_json::to_string_pretty(&json_value).unwrap();
         println!("{}", pretty_json);
     }

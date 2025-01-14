@@ -4,8 +4,7 @@ locals {
     max_subnet_length = 10
 }
 
-extends "configuration" {
-    id = "moss.core.window"
+configuration "moss.core.window" {
     title = "Window"
     order = 5
 
@@ -29,11 +28,31 @@ extends "configuration" {
         description = "The height of the application window in pixels."
     }
 
-    override "editor.fontSize" {
-        value = 16
+    parameter "editor.fontSize" {
+        type = number
+        minimum = 10
+        maximum = 20
+        default = 14
+        order = 1
+        scope = "WINDOW"
+        description = "The width of the application window in pixels."
     }
 
-    modify "window.defaultHeight" {
+    override "editor.fontSize" {
         value = 16
+        context = [
+            "typescript",
+            "javascript"
+        ]
+    }
+}
+
+configuration {
+    override "editor.fontSize" {
+        value = 16
+        context = [
+            "typescript",
+            "javascript"
+        ]
     }
 }
