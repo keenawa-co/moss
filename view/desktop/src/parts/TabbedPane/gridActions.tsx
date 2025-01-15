@@ -113,16 +113,21 @@ export const GridActions = (props: {
 
   const popover = usePopover();
 
-  const onAddPanel = (options?: { advanced?: boolean; nested?: boolean }) => {
+  const onAddPanel = (options?: { advanced?: boolean; type?: string }) => {
+    const panelType = options?.type;
+    if (panelType && props.api?.getPanel(panelType) !== undefined) {
+      return;
+    }
+
     if (options?.advanced) {
       popover.open(({ close }) => {
         return <PanelBuilder api={props.api!} done={close} />;
       });
     } else {
       props.api?.addPanel({
-        id: `id_${Date.now().toString()}`,
-        component: options?.nested ? "nested" : "Default",
-        title: `Tab ${nextId()}`,
+        id: panelType && panelType !== "nested" ? panelType : `id_${Date.now().toString()}`,
+        component: options?.type ?? "Default",
+        title: options?.type ?? `Tab ${nextId()}`,
         renderer: "always",
       });
     }
@@ -140,15 +145,25 @@ export const GridActions = (props: {
 
   return (
     <div className="action-container">
+      <button className="text-button" onClick={() => onAddPanel({ type: "Home" })}>
+        Home
+      </button>
+      <button className="text-button" onClick={() => onAddPanel({ type: "Settings" })}>
+        Settings
+      </button>
+      <button className="text-button" onClick={() => onAddPanel({ type: "Logs" })}>
+        Logs
+      </button>
+      <span className="flex-grow" />
       <div className="button-group">
         <button className="text-button" onClick={() => onAddPanel()}>
           Add Panel
         </button>
-        <button className="demo-icon-button" onClick={() => onAddPanel({ advanced: true })}>
+        <button className="demo-icon-button !rounded" onClick={() => onAddPanel({ advanced: true })}>
           <span className="material-symbols-outlined">tune</span>
         </button>
       </div>
-      <button className="text-button" onClick={() => onAddPanel({ nested: true })}>
+      <button className="text-button" onClick={() => onAddPanel({ type: "nested" })}>
         Add Nested Panel
       </button>
       <button className="text-button" onClick={onAddGroup}>
@@ -156,7 +171,7 @@ export const GridActions = (props: {
       </button>
       <span className="button-action">
         <button
-          className={props.hasCustomWatermark ? "demo-button selected" : "demo-button"}
+          className={props.hasCustomWatermark ? "demo-button selected !rounded" : "demo-button !rounded"}
           onClick={props.toggleCustomWatermark}
         >
           Use Custom Watermark
@@ -176,9 +191,9 @@ export const GridActions = (props: {
       </button>
       <span className="flex-grow" />
       <div className="flex items-center">
-        <span className="pr-1">Grid Gap</span>
+        <span className="pr-1 text-[var(--moss-activegroup-visiblepanel-tab-color)]">Grid Gap</span>
         <input
-          className="w-10"
+          className="w-10 text-center"
           type="number"
           min={0}
           max={99}
@@ -186,7 +201,9 @@ export const GridActions = (props: {
           value={gap}
           onChange={(event) => setGap(Number(event.target.value))}
         />
-        <button onClick={() => setGap(0)}>Reset</button>
+        <button className="text-button" onClick={() => setGap(0)}>
+          Reset
+        </button>
       </div>
     </div>
   );

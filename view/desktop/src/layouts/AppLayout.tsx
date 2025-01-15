@@ -150,7 +150,6 @@ const CenterLayout = ({ ...props }: ResizableLayoutProps) => {
           <ResizablePanel>
             <MainContent />
           </ResizablePanel>
-          <TabbedPane theme="dockview-theme-light" />
           <ResizablePanel
             preferredSize={props.bottomPaneGetHeight()}
             snap
@@ -360,14 +359,7 @@ const SecondarySideBar = () => <div>SecondarySideBar</div>;
 const MainContent = () => (
   <ContentLayout className="relative flex h-full flex-col overflow-auto">
     <Suspense fallback={<div>Loading...</div>}>
-      <BrowserRouter>
-        <Menu />
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/settings" element={<Settings />} />
-          <Route path="/logs" element={<Logs />} />
-        </Routes>
-      </BrowserRouter>
+      <TabbedPane theme="dockview-theme-light" />
     </Suspense>
   </ContentLayout>
 );

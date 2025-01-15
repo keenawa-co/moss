@@ -8,23 +8,23 @@ export const nextId = (() => {
 
 export function defaultConfig(api: DockviewApi) {
   const panel1 = api.addPanel({
-    id: "panel_1",
-    component: "Default",
+    id: "Home",
+    component: "Home",
     renderer: "always",
-    title: "Panel 1",
+    title: "Home",
   });
 
   api.addPanel({
-    id: "panel_2",
-    component: "Default",
-    title: "Panel 2",
+    id: "Settings",
+    component: "Settings",
+    title: "Settings",
     position: { referencePanel: panel1 },
   });
 
   api.addPanel({
-    id: "panel_3",
-    component: "Default",
-    title: "Panel 3",
+    id: "Logs",
+    component: "Logs",
+    title: "Logs",
     position: { referencePanel: panel1 },
   });
 

@@ -1,5 +1,6 @@
 import * as React from "react";
 
+import { Home, Logs, Settings } from "@/pages";
 import {
   DockviewApi,
   DockviewDefaultTab,
@@ -24,7 +25,9 @@ const Option = (props: { title: string; onClick: () => void; value: string }) =>
   return (
     <div>
       <span>{`${props.title}: `}</span>
-      <button onClick={props.onClick}>{props.value}</button>
+      <button className="rounded !bg-cyan-300 p-2 !text-black hover:!bg-cyan-500" onClick={props.onClick}>
+        {props.value}
+      </button>
     </div>
   );
 };
@@ -43,7 +46,7 @@ const components = {
         </span>
 
         {isDebug && (
-          <div className="text-[0.8em]">
+          <div className="text-sm">
             <Option
               title="Panel Rendering Mode"
               value={metadata.renderer.value}
@@ -72,7 +75,7 @@ const components = {
             console.log("remove", e);
           });
         }}
-        className={"dockview-theme-abyss"}
+        className={"dockview-theme-light"}
       />
     );
   },
@@ -85,11 +88,43 @@ const components = {
           }
         }}
         className="h-full w-full"
-        src="https://dockview.dev"
       />
     );
   },
+  Home: (props: IDockviewPanelProps) => {
+    return RenderPage(props, Home);
+  },
+  Settings: (props: IDockviewPanelProps) => {
+    return RenderPage(props, Settings);
+  },
+  Logs: (props: IDockviewPanelProps) => {
+    return RenderPage(props, Logs);
+  },
 };
+
+function RenderPage(props: IDockviewPanelProps, page: React.FC) {
+  const isDebug = React.useContext(DebugContext);
+  const metadata = usePanelApiMetadata(props.api);
+  return (
+    <div
+      className={`p-1.25 relative h-full overflow-auto ${isDebug ? "border-2 border-dashed border-orange-500" : ""}`}
+    >
+      <span>{React.createElement(page)}</span>
+
+      {isDebug && (
+        <div className="text-sm">
+          <Option
+            title="Panel Rendering Mode"
+            value={metadata.renderer.value}
+            onClick={() => props.api.setRenderer(props.api.renderer === "always" ? "onlyWhenVisible" : "always")}
+          />
+
+          <Table data={metadata} />
+        </div>
+      )}
+    </div>
+  );
+}
 
 const headerComponents = {
   default: (props: IDockviewPanelHeaderProps) => {
@@ -265,8 +300,9 @@ const TabbedPane = (props: { theme?: string }) => {
                   </button>
               </div> */}
       </div>
-      <div className="action-container flex items-center justify-end p-1">
+      <div className="action-container mb-2 flex items-center justify-end p-1">
         <button
+          className="mr-2 rounded"
           onClick={() => {
             setDebug(!debug);
           }}
@@ -275,6 +311,7 @@ const TabbedPane = (props: { theme?: string }) => {
         </button>
         {showLogs && (
           <button
+            className="mr-1 rounded"
             onClick={() => {
               setLogLines([]);
             }}
@@ -283,6 +320,7 @@ const TabbedPane = (props: { theme?: string }) => {
           </button>
         )}
         <button
+          className="rounded p-1"
           onClick={() => {
             setShowLogs(!showLogs);
           }}
