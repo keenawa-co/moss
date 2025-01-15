@@ -43,7 +43,7 @@ pub fn execute_command(
 #[tauri::command(async)]
 #[instrument(level = "trace", skip(app_manager))]
 pub async fn get_color_theme(
-    app_manager: State<'_, AppManager<'_>>,
+    app_manager: State<'_, AppManager>,
     path: String,
 ) -> TauriResult<String> {
     let theme_service = app_manager.service::<ThemeService>()?;
@@ -54,7 +54,7 @@ pub async fn get_color_theme(
 #[tauri::command(async)]
 #[instrument(level = "trace", skip(app_manager))]
 pub async fn get_translations(
-    app_manager: State<'_, AppManager<'_>>,
+    app_manager: State<'_, AppManager>,
     language: String,
     namespace: String,
 ) -> TauriResult<Value> {
@@ -81,9 +81,7 @@ pub fn get_state(state_manager: State<'_, AppStateManager>) -> Result<AppState, 
 
 #[tauri::command(async)]
 #[instrument(level = "trace", skip(app_manager))]
-pub async fn get_themes(
-    app_manager: State<'_, AppManager<'_>>,
-) -> TauriResult<Vec<ThemeDescriptor>> {
+pub async fn get_themes(app_manager: State<'_, AppManager>) -> TauriResult<Vec<ThemeDescriptor>> {
     let theme_service = app_manager.service::<ThemeService>()?;
 
     Ok(theme_service
@@ -95,33 +93,8 @@ pub async fn get_themes(
 
 #[tauri::command(async)]
 #[instrument(level = "trace", skip(app_manager))]
-pub async fn get_locales(
-    app_manager: State<'_, AppManager<'_>>,
-) -> TauriResult<Vec<LocaleDescriptor>> {
+pub async fn get_locales(app_manager: State<'_, AppManager>) -> TauriResult<Vec<LocaleDescriptor>> {
     let locale_service = app_manager.service::<LocaleService>()?;
 
     Ok(locale_service.get_locales().clone().into_iter().collect())
 }
-
-// // FIXME: This is a temporary solution until we have a registry of installed
-// // plugins and the ability to check which language packs are installed.
-// #[tauri::command]
-// pub fn get_locales() -> Vec<LocaleDescriptor> {
-//     vec![
-//         LocaleDescriptor {
-//             code: "en".to_string(),
-//             name: "English".to_string(),
-//             direction: Some("ltr".to_string()),
-//         },
-//         LocaleDescriptor {
-//             code: "de".to_string(),
-//             name: "Deutsche".to_string(),
-//             direction: Some("ltr".to_string()),
-//         },
-//         LocaleDescriptor {
-//             code: "ru".to_string(),
-//             name: "Русский".to_string(),
-//             direction: Some("ltr".to_string()),
-//         },
-//     ]
-// }

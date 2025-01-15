@@ -203,12 +203,11 @@ impl ConfigurationRegistry {
     }
 }
 
-pub struct Registry<'a> {
+pub struct Registry {
     configurations: Arc<ConfigurationRegistry>,
-    phantom: PhantomData<&'a ()>,
 }
 
-impl Registry<'_> {
+impl Registry {
     pub fn new(modules: &HashMap<PathBuf, ExtensionPointModule>) -> Self {
         let mut configurations = ConfigurationRegistry::default();
 
@@ -222,7 +221,6 @@ impl Registry<'_> {
 
         Self {
             configurations: Arc::new(configurations),
-            phantom: PhantomData,
         }
     }
 

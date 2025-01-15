@@ -7,16 +7,16 @@ use super::{
     service::{Service, ServiceCollection, ServiceHandle},
 };
 
-pub struct AppManager<'a> {
+pub struct AppManager {
     services: ServiceCollection,
-    registry: Registry<'a>,
+    registry: Registry,
 }
 
-unsafe impl<'a> Send for AppManager<'a> {}
-unsafe impl<'a> Sync for AppManager<'a> {}
+unsafe impl Send for AppManager {}
+unsafe impl Sync for AppManager {}
 
-impl<'a> AppManager<'a> {
-    pub fn new(app_handle: AppHandle, registry: Registry<'a>) -> Self {
+impl AppManager {
+    pub fn new(app_handle: AppHandle, registry: Registry) -> Self {
         Self {
             services: ServiceCollection::new(app_handle),
             registry,
