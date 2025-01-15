@@ -92,81 +92,39 @@ const components = {
     );
   },
   Home: (props: IDockviewPanelProps) => {
-    const isDebug = React.useContext(DebugContext);
-    const metadata = usePanelApiMetadata(props.api);
-    return (
-      <div
-        className={`p-1.25 relative h-full overflow-auto ${isDebug ? "border-2 border-dashed border-orange-500" : ""}`}
-      >
-        <span>
-          <Home />
-        </span>
-
-        {isDebug && (
-          <div className="text-sm">
-            <Option
-              title="Panel Rendering Mode"
-              value={metadata.renderer.value}
-              onClick={() => props.api.setRenderer(props.api.renderer === "always" ? "onlyWhenVisible" : "always")}
-            />
-
-            <Table data={metadata} />
-          </div>
-        )}
-      </div>
-    );
+    return RenderPage(props, Home);
   },
   Settings: (props: IDockviewPanelProps) => {
-    const isDebug = React.useContext(DebugContext);
-    const metadata = usePanelApiMetadata(props.api);
-    return (
-      <div
-        className={`p-1.25 relative h-full overflow-auto ${isDebug ? "border-2 border-dashed border-orange-500" : ""}`}
-      >
-        <span>
-          <Settings />
-        </span>
-
-        {isDebug && (
-          <div className="text-sm">
-            <Option
-              title="Panel Rendering Mode"
-              value={metadata.renderer.value}
-              onClick={() => props.api.setRenderer(props.api.renderer === "always" ? "onlyWhenVisible" : "always")}
-            />
-
-            <Table data={metadata} />
-          </div>
-        )}
-      </div>
-    );
+    return RenderPage(props, Settings);
   },
   Logs: (props: IDockviewPanelProps) => {
-    const isDebug = React.useContext(DebugContext);
-    const metadata = usePanelApiMetadata(props.api);
-    return (
-      <div
-        className={`p-1.25 relative h-full overflow-auto ${isDebug ? "border-2 border-dashed border-orange-500" : ""}`}
-      >
-        <span>
-          <Logs />
-        </span>
-
-        {isDebug && (
-          <div className="text-sm">
-            <Option
-              title="Panel Rendering Mode"
-              value={metadata.renderer.value}
-              onClick={() => props.api.setRenderer(props.api.renderer === "always" ? "onlyWhenVisible" : "always")}
-            />
-
-            <Table data={metadata} />
-          </div>
-        )}
-      </div>
-    );
+    return RenderPage(props, Logs);
   },
 };
+
+function RenderPage(props: IDockviewPanelProps, page: React.FC) {
+  const isDebug = React.useContext(DebugContext);
+  const metadata = usePanelApiMetadata(props.api);
+  return (
+    <div
+      className={`p-1.25 relative h-full overflow-auto ${isDebug ? "border-2 border-dashed border-orange-500" : ""}`}
+    >
+      <span>{React.createElement(page)}</span>
+
+      {isDebug && (
+        <div className="text-sm">
+          <Option
+            title="Panel Rendering Mode"
+            value={metadata.renderer.value}
+            onClick={() => props.api.setRenderer(props.api.renderer === "always" ? "onlyWhenVisible" : "always")}
+          />
+
+          <Table data={metadata} />
+        </div>
+      )}
+    </div>
+  );
+}
 
 const headerComponents = {
   default: (props: IDockviewPanelHeaderProps) => {
