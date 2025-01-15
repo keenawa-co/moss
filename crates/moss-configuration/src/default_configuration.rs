@@ -17,16 +17,17 @@ impl DefaultConfiguration {
     pub fn new(registry: Arc<ConfigurationRegistry>) -> Self {
         let mut model = ConfigurationModel::new();
         for (key, value) in registry.parameters() {
-            // TODO: Check if there are overrides for the given key
-
-            let default_value = if value.default.is_null() {
-                value.typ.default_json_value()
-            } else {
+            let default_value = if let Some(override_descriptor) = registry.get_override(key) {
+                override_descriptor.value.clone()
+            } else if !value.default.is_null() {
                 value.default.clone()
+            } else {
+                value.typ.default_json_value()
             };
 
             if !model.insert(key, default_value) {
-                warn!("Parameter '{key}' already exists in the default configuration model")
+                warn!("Parameter '{key}' already exists in the default configuration model");
+                continue;
             }
         }
 
