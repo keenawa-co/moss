@@ -93,14 +93,6 @@ export const PanelBuilder = (props: { api: DockviewApi; done: () => void }) => {
         <button
           className="panel-builder-button"
           onClick={() => {
-            props.done();
-          }}
-        >
-          Cancel
-        </button>
-        <button
-          className="panel-builder-button"
-          onClick={() => {
             props.api?.addPanel({
               id: `id_${Date.now().toString()}`,
               component: "Default",
@@ -112,7 +104,15 @@ export const PanelBuilder = (props: { api: DockviewApi; done: () => void }) => {
             props.done();
           }}
         >
-          Go
+          Add Panel
+        </button>
+        <button
+          className="panel-builder-button"
+          onClick={() => {
+            props.done();
+          }}
+        >
+          Cancel
         </button>
       </div>
     </div>
