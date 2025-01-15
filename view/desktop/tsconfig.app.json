@@ -9,6 +9,13 @@
     "lib": ["ESNext", "DOM", "DOM.Iterable", "webworker"],
     "module": "ESNext",
     "skipLibCheck": true,
+    "sourceMap": true,
+    "allowJs": true,
+    "forceConsistentCasingInFileNames": true,
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
     /* Bundler mode */
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,

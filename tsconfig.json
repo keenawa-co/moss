@@ -35,6 +35,9 @@
       "path": "tools/icongen"
     },
     {
+      "path": "packages/moss-tabs"
+    },
+    {
       "path": "addons/theme-defaults"
     }
   ]

@@ -1,0 +1,496 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*-------------------dv-svg---------------------*/
+
+.dv-svg {
+  @apply inline-block fill-current stroke-current stroke-0 leading-none;
+}
+
+/*------------------dv-drop-target----------------------*/
+
+.dv-drop-target {
+  @apply relative;
+}
+
+.dv-drop-target > .dv-drop-target-dropzone {
+  @apply pointer-events-none absolute left-0 top-0 z-[1000] h-full w-full;
+}
+
+.dv-drop-target > .dv-drop-target-dropzone > .dv-drop-target-selection {
+  @apply pointer-events-none relative box-border h-full w-full bg-[var(--moss-drag-over-background-color)];
+  transition:
+    top 70ms ease-out,
+    left 70ms ease-out,
+    width 70ms ease-out,
+    height 70ms ease-out,
+    opacity 0.15s ease-out;
+  will-change: transform;
+}
+
+.dv-drop-target
+  > .dv-drop-target-dropzone
+  > .dv-drop-target-selection.dv-drop-target-top.dv-drop-target-small-vertical {
+  @apply border-t border-[var(--moss-drag-over-border-color)];
+}
+
+.dv-drop-target
+  > .dv-drop-target-dropzone
+  > .dv-drop-target-selection.dv-drop-target-bottom.dv-drop-target-small-vertical {
+  @apply border-b border-[var(--moss-drag-over-border-color)];
+}
+
+.dv-drop-target
+  > .dv-drop-target-dropzone
+  > .dv-drop-target-selection.dv-drop-target-left.dv-drop-target-small-horizontal {
+  @apply border-l border-[var(--moss-drag-over-border-color)];
+}
+
+.dv-drop-target
+  > .dv-drop-target-dropzone
+  > .dv-drop-target-selection.dv-drop-target-right.dv-drop-target-small-horizontal {
+  @apply border-r border-[var(--moss-drag-over-border-color)];
+}
+
+/*--------------------dv-dockview--------------------*/
+
+.dv-dockview {
+  @apply relative bg-[var(--moss-group-view-background-color)];
+}
+
+.dv-dockview .dv-watermark-container {
+  @apply absolute left-0 top-0 z-[1] h-full w-full;
+}
+
+.dv-dockview .dv-overlay-render-container {
+  @apply relative;
+}
+
+/*--------------------dv-groupview--------------------*/
+
+.dv-groupview {
+  @apply flex h-full flex-col overflow-hidden bg-[var(--moss-group-view-background-color)];
+}
+
+.dv-groupview:focus {
+  @apply outline-none;
+}
+
+.dv-groupview > .dv-content-container {
+  @apply min-h-0 flex-grow outline-none;
+}
+
+.dv-groupview.dv-active-group > .dv-tabs-and-actions-container > .dv-tabs-container > .dv-tab.dv-active-tab {
+  @apply bg-[var(--moss-activegroup-visiblepanel-tab-background-color)] text-[var(--moss-activegroup-visiblepanel-tab-color)];
+}
+
+.dv-groupview.dv-active-group > .dv-tabs-and-actions-container > .dv-tabs-container > .dv-tab.dv-inactive-tab {
+  @apply bg-[var(--moss-activegroup-hiddenpanel-tab-background-color)] text-[var(--moss-activegroup-hiddenpanel-tab-color)];
+}
+
+.dv-groupview.dv-inactive-group > .dv-tabs-and-actions-container > .dv-tabs-container > .dv-tab.dv-active-tab {
+  @apply bg-[var(--moss-inactivegroup-visiblepanel-tab-background-color)] text-[var(--moss-inactivegroup-visiblepanel-tab-color)];
+}
+
+.dv-groupview.dv-inactive-group > .dv-tabs-and-actions-container > .dv-tabs-container > .dv-tab.dv-inactive-tab {
+  @apply bg-[var(--moss-inactivegroup-hiddenpanel-tab-background-color)] text-[var(--moss-inactivegroup-hiddenpanel-tab-color)];
+}
+
+/*--------------------dv-tab--------------------*/
+
+.dv-tab {
+  @apply flex-shrink-0;
+}
+
+.dv-tab:focus-within,
+.dv-tab:focus {
+  @apply relative;
+}
+
+.dv-tab:focus-within::after,
+.dv-tab:focus::after {
+  @apply pointer-events-none absolute left-0 top-0 z-[5] h-full w-full !outline !outline-1 outline-offset-[-1px] !outline-[var(--moss-tab-divider-color)] content-[''];
+}
+
+/**
+ * when a tab is dragged we lose the above stylings because they are conditional on parent elements
+ * therefore we also set some stylings for the dragging event
+ **/
+.dv-tab.dv-tab-dragging {
+  @apply bg-[var(--moss-activegroup-visiblepanel-tab-background-color)] text-[var(--moss-activegroup-visiblepanel-tab-color)];
+}
+
+.dv-tab.dv-tab-dragging .dv-default-tab-action {
+  @apply bg-[var(--moss-activegroup-visiblepanel-tab-color)];
+}
+
+.dv-tab.dv-active-tab .dv-default-tab .dv-default-tab-action {
+  @apply visible;
+}
+
+.dv-tab.dv-inactive-tab .dv-default-tab .dv-default-tab-action {
+  @apply invisible;
+}
+
+.dv-tab.dv-inactive-tab .dv-default-tab:hover .dv-default-tab-action {
+  @apply visible;
+}
+
+.dv-tab .dv-default-tab {
+  @apply relative flex h-full min-w-20 items-center overflow-ellipsis whitespace-nowrap px-2;
+}
+
+.dv-tab .dv-default-tab .dv-default-tab-content {
+  @apply flex-grow px-2;
+}
+
+.dv-tab .dv-default-tab .dv-default-tab-action {
+  @apply box-border flex items-center justify-center p-1;
+}
+
+.dv-tab .dv-default-tab .dv-default-tab-action:hover {
+  @apply rounded-sm bg-[var(--moss-icon-hover-background-color)];
+}
+
+/*--------------------dv-root-wrapper--------------------*/
+
+.dv-root-wrapper {
+  @apply h-full w-full;
+}
+
+/*--------------------dv-grid-view--------------------*/
+
+.dv-grid-view,
+.dv-branch-node {
+  @apply h-full w-full;
+}
+
+/*--------------------dv-debug--------------------*/
+
+.dv-debug .dv-resize-container .dv-resize-handle-top {
+  @apply bg-red-500;
+}
+
+.dv-debug .dv-resize-container .dv-resize-handle-bottom {
+  @apply bg-green-500;
+}
+
+.dv-debug .dv-resize-container .dv-resize-handle-left {
+  @apply bg-yellow-500;
+}
+
+.dv-debug .dv-resize-container .dv-resize-handle-right {
+  @apply bg-blue-500;
+}
+
+.dv-debug .dv-resize-container .dv-resize-handle-topleft,
+.dv-debug .dv-resize-container .dv-resize-handle-topright,
+.dv-debug .dv-resize-container .dv-resize-handle-bottomleft,
+.dv-debug .dv-resize-container .dv-resize-handle-bottomright {
+  @apply bg-cyan-500;
+}
+
+.dv-debug .dv-render-overlay {
+  @apply outline outline-1 outline-offset-[-1] outline-red-500;
+}
+
+.dv-debug .dv-split-view-container .dv-sash-container .dv-sash.dv-enabled {
+  @apply bg-black;
+}
+
+.dv-debug .dv-split-view-container .dv-sash-container .dv-sash.dv-disabled {
+  @apply bg-orange-500;
+}
+
+.dv-debug .dv-split-view-container .dv-sash-container .dv-sash.dv-maximum {
+  @apply bg-green-500;
+}
+
+.dv-debug .dv-split-view-container .dv-sash-container .dv-sash.dv-minimum {
+  @apply bg-red-500;
+}
+
+/*--------------------dv-resize-container--------------------*/
+
+.dv-resize-container {
+  --moss-overlay-z-index: var(--moss-overlay-z-index, 999);
+  @apply absolute z-[calc(var(--moss-overlay-z-index)-2)] border border-[var(--moss-tab-divider-color)] shadow-[var(--moss-floating-box-shadow)];
+}
+
+.dv-resize-container.dv-hidden {
+  @apply hidden;
+}
+
+.dv-resize-container.dv-resize-container-dragging {
+  @apply opacity-50;
+}
+
+.dv-resize-container .dv-resize-handle-top {
+  @apply absolute left-1 top-[-2px] z-[var(--moss-overlay-z-index)] h-1 w-[calc(100%-8px)] cursor-ns-resize;
+}
+
+.dv-resize-container .dv-resize-handle-bottom {
+  @apply absolute bottom-[-2px] left-1 z-[var(--moss-overlay-z-index)] h-1 w-[calc(100%-8px)] cursor-ns-resize;
+}
+
+.dv-resize-container .dv-resize-handle-left {
+  @apply absolute left-[-2px] top-1 z-[var(--moss-overlay-z-index)] h-[calc(100%-8px)] w-1 cursor-ew-resize;
+}
+
+.dv-resize-container .dv-resize-handle-right {
+  @apply absolute right-[-2px] top-1 z-[var(--moss-overlay-z-index)] h-[calc(100%-8px)] w-1 cursor-ew-resize;
+}
+
+.dv-resize-container .dv-resize-handle-topleft {
+  @apply absolute left-[-2px] top-[-2px] z-[var(--moss-overlay-z-index)] h-1 w-1 cursor-nw-resize;
+}
+
+.dv-resize-container .dv-resize-handle-topright {
+  @apply absolute right-[-2px] top-[-2px] z-[var(--moss-overlay-z-index)] h-1 w-1 cursor-ne-resize;
+}
+
+.dv-resize-container .dv-resize-handle-bottomleft {
+  @apply absolute bottom-[-2px] left-[-2px] z-[var(--moss-overlay-z-index)] h-1 w-1 cursor-sw-resize;
+}
+
+.dv-resize-container .dv-resize-handle-bottomright {
+  @apply absolute bottom-[-2px] right-[-2px] z-[var(--moss-overlay-z-index)] h-1 w-1 cursor-se-resize;
+}
+
+/*--------------------dv-render-overlay--------------------*/
+
+.dv-render-overlay {
+  --moss-overlay-z-index: var(--moss-overlay-z-index, 999);
+  @apply absolute z-[1] h-full;
+}
+
+.dv-render-overlay.dv-render-overlay-float {
+  @apply z-[calc(var(--moss-overlay-z-index)-1)];
+}
+
+/*--------------------dv-pane-container--------------------*/
+
+.dv-pane-container {
+  @apply h-full w-full;
+}
+
+.dv-pane-container.dv-animated .dv-view {
+  @apply transition duration-150 ease-out;
+}
+
+.dv-pane-container .dv-view {
+  @apply flex flex-col overflow-hidden !p-0;
+}
+
+.dv-pane-container .dv-view:not(:first-child)::before {
+  @apply !bg-transparent;
+}
+
+.dv-pane-container .dv-view:not(:first-child) .dv-pane > .dv-pane-header {
+  @apply border-t border-[var(--moss-paneview-header-border-color)];
+}
+
+.dv-pane-container .dv-view .dv-default-header {
+  @apply flex cursor-pointer bg-[var(--moss-group-view-background-color)] px-2 text-[var(--moss-activegroup-visiblepanel-tab-color)];
+}
+
+.dv-pane-container .dv-view .dv-default-header .dv-pane-header-icon {
+  @apply flex items-center justify-center;
+}
+
+.dv-pane-container .dv-view .dv-default-header > span {
+  @apply flex-grow pl-2;
+}
+
+.dv-pane-container:first-of-type > .dv-pane > .dv-pane-header {
+  @apply !border-t-0;
+}
+
+.dv-pane-container .dv-pane {
+  @apply flex h-full flex-col overflow-hidden;
+}
+
+.dv-pane-container .dv-pane .dv-pane-header {
+  @apply relative box-border select-none outline-none;
+}
+
+.dv-pane-container .dv-pane .dv-pane-header.dv-pane-draggable {
+  @apply cursor-pointer;
+}
+
+.dv-pane-container .dv-pane .dv-pane-header:focus:before,
+.dv-pane-container .dv-pane .dv-pane-header:focus-within:before {
+  @apply pointer-events-none absolute left-0 top-0 z-[5] h-full w-full outline outline-1 outline-offset-[-1px] outline-[var(--moss-paneview-active-outline-color)] content-[''];
+  outline-width: -1px;
+  outline-style: solid;
+}
+
+.dv-pane-container .dv-pane .dv-pane-body {
+  @apply relative flex-grow overflow-y-auto overflow-x-hidden outline-none;
+}
+
+/*--------------------dv-split-view-contain--------------------*/
+
+.dv-split-view-container {
+  @apply relative h-full w-full overflow-hidden;
+}
+
+.dv-split-view-container.dv-splitview-disabled > .dv-sash-container > .dv-sash {
+  @apply pointer-events-none;
+}
+
+.dv-split-view-container.dv-animation .dv-view,
+.dv-split-view-container.dv-animation .dv-sash {
+  @apply transition duration-150 ease-out;
+}
+
+.dv-split-view-container.dv-horizontal {
+  @apply h-full;
+}
+
+.dv-split-view-container.dv-horizontal > .dv-sash-container > .dv-sash {
+  @apply h-full w-1;
+}
+
+.dv-split-view-container.dv-horizontal > .dv-sash-container > .dv-sash.dv-enabled {
+  @apply cursor-ew-resize;
+}
+
+.dv-split-view-container.dv-horizontal > .dv-sash-container > .dv-sash.dv-disabled {
+  @apply cursor-default;
+}
+
+.dv-split-view-container.dv-horizontal > .dv-sash-container > .dv-sash.dv-maximum {
+  @apply cursor-w-resize;
+}
+
+.dv-split-view-container.dv-horizontal > .dv-sash-container > .dv-sash.dv-minimum {
+  @apply cursor-e-resize;
+}
+
+.dv-split-view-container.dv-horizontal > .dv-view-container > .dv-view:not(:first-child)::before {
+  @apply h-full w-[1px];
+}
+
+.dv-split-view-container.dv-vertical {
+  @apply w-full;
+}
+
+.dv-split-view-container.dv-vertical > .dv-sash-container > .dv-sash {
+  @apply h-1 w-full;
+}
+
+.dv-split-view-container.dv-vertical > .dv-sash-container > .dv-sash.dv-enabled {
+  @apply cursor-ns-resize;
+}
+
+.dv-split-view-container.dv-vertical > .dv-sash-container > .dv-sash.dv-disabled {
+  @apply cursor-default;
+}
+
+.dv-split-view-container.dv-vertical > .dv-sash-container > .dv-sash.dv-maximum {
+  @apply cursor-n-resize;
+}
+
+.dv-split-view-container.dv-vertical > .dv-sash-container > .dv-sash.dv-minimum {
+  @apply cursor-s-resize;
+}
+
+.dv-split-view-container.dv-vertical > .dv-view-container > .dv-view {
+  @apply w-full;
+}
+
+.dv-split-view-container.dv-vertical > .dv-view-container > .dv-view:not(:first-child)::before {
+  @apply h-[1px] w-full;
+}
+
+.dv-split-view-container .dv-sash-container {
+  @apply absolute h-full w-full;
+}
+
+.dv-split-view-container .dv-sash-container .dv-sash {
+  @apply absolute z-[99] touch-none outline-none;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
+.dv-split-view-container .dv-sash-container .dv-sash:not(.disabled):active {
+  @apply bg-[var(--moss-active-sash-color,transparent)] transition-colors duration-100 ease-in-out;
+}
+
+.dv-split-view-container .dv-sash-container .dv-sash:not(.disabled):hover {
+  @apply bg-[var(--moss-active-sash-color,transparent)] transition-colors delay-500 duration-100 ease-in-out;
+}
+
+.dv-split-view-container .dv-view-container {
+  @apply relative h-full w-full;
+}
+
+.dv-split-view-container .dv-view-container .dv-view {
+  @apply absolute box-border h-full overflow-auto;
+}
+
+.dv-split-view-container.dv-separator-border .dv-view:not(:first-child)::before {
+  @apply pointer-events-none absolute left-0 top-0 z-[5] bg-[var(--moss-separator-border)] content-[''];
+}
+
+/*--------------------dv-split-view-contain--------------------*/
+
+.dv-tabs-and-actions-container {
+  @apply box-border flex h-[var(--moss-tabs-and-actions-container-height)] flex-shrink-0 bg-[var(--moss-tabs-and-actions-container-background-color)] text-[var(--moss-tabs-and-actions-container-font-size)];
+}
+
+.dv-tabs-and-actions-container.dv-single-tab.dv-full-width-single-tab .dv-tabs-container {
+  @apply flex-grow;
+}
+
+.dv-tabs-and-actions-container.dv-single-tab.dv-full-width-single-tab .dv-tabs-container .dv-tab {
+  @apply flex-grow;
+}
+
+.dv-tabs-and-actions-container.dv-single-tab.dv-full-width-single-tab .dv-void-container {
+  @apply flex-grow-0;
+}
+
+.dv-tabs-and-actions-container .dv-void-container {
+  @apply flex flex-grow cursor-grab;
+}
+
+.dv-tabs-and-actions-container .dv-tabs-container {
+  @apply /* Track | Handle */ flex overflow-x-auto overflow-y-hidden;
+  scrollbar-width: thin;
+}
+
+.dv-tabs-and-actions-container .dv-tabs-container::-webkit-scrollbar {
+  @apply h-[3px];
+}
+
+.dv-tabs-and-actions-container .dv-tabs-container::-webkit-scrollbar-track {
+  @apply bg-transparent;
+}
+
+.dv-tabs-and-actions-container .dv-tabs-container::-webkit-scrollbar-thumb {
+  @apply bg-[var(--moss-tabs-container-scrollbar-color)];
+}
+
+.dv-tabs-and-actions-container .dv-tabs-container .dv-tab {
+  @apply relative box-border min-w-[75px] cursor-pointer outline-none;
+  -webkit-user-drag: element;
+}
+
+.dv-tabs-and-actions-container .dv-tabs-container .dv-tab:not(:first-child)::before {
+  @apply pointer-events-none absolute left-0 top-0 z-[5] h-full w-[1px] bg-[var(--moss-tab-divider-color)] content-[''];
+}
+
+/*--------------------dv-dragged--------------------*/
+
+.dv-dragged {
+  transform: translate3d(
+    0px,
+    0px,
+    0px
+  ); /* forces tab to be drawn on a separate layer (see https://github.com/microsoft/vscode/issues/18733) */
+}

@@ -6,9 +6,12 @@ import { AppLayoutState, useGetAppLayoutState } from "@/hooks/useAppLayoutState"
 import { Home, Logs, Settings } from "@/pages";
 import { useAppResizableLayoutStore } from "@/store/appResizableLayout";
 
+import "@repo/moss-tabs/assets/styles.css";
+
 import { LaunchPad } from "../components/LaunchPad";
 import { Menu } from "../components/Menu";
 import { Resizable, ResizablePanel } from "../components/Resizable";
+import TabbedPane from "../parts/TabbedPane/TabbedPane";
 import { ContentLayout } from "./ContentLayout";
 
 export const AppLayout = () => {
@@ -356,14 +359,7 @@ const SecondarySideBar = () => <div>SecondarySideBar</div>;
 const MainContent = () => (
   <ContentLayout className="relative flex h-full flex-col overflow-auto">
     <Suspense fallback={<div>Loading...</div>}>
-      <BrowserRouter>
-        <Menu />
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/settings" element={<Settings />} />
-          <Route path="/logs" element={<Logs />} />
-        </Routes>
-      </BrowserRouter>
+      <TabbedPane theme="dockview-theme-light" />
     </Suspense>
   </ContentLayout>
 );

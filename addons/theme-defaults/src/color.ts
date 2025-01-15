@@ -6,6 +6,8 @@ export const clampRgb = (value: number): number => clamp(0, 255, value);
 export const clampAlpha = (value: number): number => clamp(0, 1, value);
 export const clampPercent = (value: number): number => clamp(0, 100, value);
 
+export const rgb = (r: number, g: number, b: number): string => `rgba(${clampRgb(r)}, ${clampRgb(g)}, ${clampRgb(b)}})`;
+
 export const rgba = (r: number, g: number, b: number, a: number): string =>
   `rgba(${clampRgb(r)}, ${clampRgb(g)}, ${clampRgb(b)}, ${clampAlpha(a)})`;
 

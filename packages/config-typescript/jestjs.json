@@ -1,0 +1,12 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "display": "Jest.js",
+  "extends": "./base.json",
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "noImplicitAny": false,
+    "sourceMap": true,
+    "types": ["jest", "node"]
+  },
+  "include": ["**/*.spec.ts", "./jest-setup.ts"]
+}

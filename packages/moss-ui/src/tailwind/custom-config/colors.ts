@@ -1,4 +1,4 @@
-import tailwindColors from "tailwindcss/colors";
+import tailwindColors, { blue } from "tailwindcss/colors";
 
 const extendedTailwindColors = {
   amber: tailwindColors.amber,
@@ -10,6 +10,31 @@ const extendedTailwindColors = {
 };
 
 export const staticColors = {
+  black: "#000000",
+  cyan: {
+    50: "#E0F7FA",
+    100: "#B3ECEF",
+    200: "#80E1E3",
+    300: "#4DD6D8",
+    400: "#26CCCE",
+    500: "#00C2C3",
+    600: "#00A0A1",
+    700: "#00777A",
+    800: "#004F52",
+    900: "#002729",
+  },
+  blue: {
+    50: "#EBF8FF",
+    100: "#BEE3F8",
+    200: "#90CDF4",
+    300: "#63B3ED",
+    400: "#4299E1",
+    500: "#0078D4",
+    600: "#2B6CB0",
+    700: "#2C5282",
+    800: "#2A4365",
+    900: "#1A365D",
+  },
   olive: {
     50: "#FAF9E0",
     100: "#F5F2C2",
@@ -26,6 +51,18 @@ export const staticColors = {
   coral: {
     50: "#FFE2D9",
     400: "#FF7042",
+  },
+  gray: {
+    50: "#F7F7F7",
+    100: "#E1E1E1",
+    200: "#CFCFCF",
+    300: "#B1B1B1",
+    400: "#9E9E9E",
+    500: "#7E7E7E",
+    600: "#626262",
+    700: "#515151",
+    800: "#3B3B3B",
+    900: "#222222",
   },
   green: {
     50: "#DEFBEC",
@@ -74,10 +111,14 @@ export const staticColors = {
   red: {
     50: "#FCD3D3",
     100: "#FAADAD",
+    200: "#F88989",
     300: "#F56260",
     400: "#F23C3A",
     500: "#D43130",
     600: "#B52725",
+    700: "#941C1C",
+    800: "#731414",
+    900: "#520D0D",
   },
   sky: {
     50: "#D4E7FC",

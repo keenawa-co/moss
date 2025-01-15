@@ -1,0 +1,84 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.dockview-demo .group-control .action {
+  @apply box-border flex cursor-pointer items-center justify-center p-1 text-[18px];
+}
+
+.dockview-demo .group-control .action:hover {
+  @apply rounded-sm bg-[var(--moss-icon-hover-background-color)];
+}
+
+.dockview-demo .data-table table {
+  @apply text-[11px];
+}
+
+.dockview-demo .data-table table th {
+  @apply px-2 py-0;
+}
+
+.dockview-demo button {
+  @apply flex h-[25px] cursor-pointer items-center justify-center border-none bg-[#1c254a] text-white outline outline-1 outline-[#4c65d4];
+}
+
+.dockview-demo button:focus {
+  @apply !outline !outline-1 !outline-[#4c65d4];
+}
+
+.dockview-demo button:hover {
+  @apply bg-[#222e62];
+}
+
+.dockview-demo input {
+  @apply m-0 h-[25px] border-none outline outline-1 outline-[#4c65d4];
+}
+
+.dockview-demo input:focus {
+  @apply !outline !outline-1 !outline-[#4c65d4];
+}
+
+.dockview-demo .action-container {
+  @apply flex overflow-auto p-1;
+}
+
+.dockview-demo .action-container .text-button {
+  @apply mx-1 my-0 rounded px-1;
+}
+
+.dockview-demo .action-container .button-action {
+  @apply mx-[4px] my-0;
+}
+
+.dockview-demo .action-container .button-action .selected {
+  @apply bg-[#4864dc];
+}
+
+.dockview-demo .action-container .button-group button {
+  @apply mr-1 inline-flex h-full align-middle;
+}
+
+.dockview-demo .action-container .demo-button {
+  @apply flex min-w-[50px] flex-grow items-center rounded-none px-[2px] py-0 !outline !outline-1 !outline-[#4c65d4];
+}
+
+.dockview-demo .action-container .demo-icon-button {
+  @apply flex flex-grow cursor-pointer items-center rounded-none border-none px-1 py-0 outline outline-1 outline-[#4c65d4];
+}
+
+.dockview-demo .action-container .demo-icon-button:disabled {
+  @apply cursor-help text-gray-500;
+}
+
+.dockview-demo .action-container .demo-icon-button span {
+  @apply text-[16px];
+}
+
+/* Moss customm styles */
+.panel-builder-input {
+  @apply text-center text-black;
+}
+
+.panel-builder-button {
+  @apply mr-1 mt-2 inline-block cursor-pointer list-none rounded-lg border-0 bg-gray-100 px-3 py-1 text-center font-sans text-sm font-medium leading-5 text-gray-800 hover:bg-gray-300;
+}

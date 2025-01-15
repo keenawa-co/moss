@@ -16,15 +16,15 @@ export const Home: React.FC = () => {
   };
 
   return (
-    <div>
-      <h1 className="text-[var(--moss-primary)]">{t("title")}</h1>
+    <div className="p-5 text-[var(--moss-primary)]">
+      <h1 className="mb-3 text-2xl">{t("title")}</h1>
 
-      <button className="bg-green-500 px-3" onClick={handleNewWindowButton}>
+      <button className="mb-2 rounded !bg-green-500 p-1" onClick={handleNewWindowButton}>
         New Window
       </button>
 
       <div>
-        <Tooltip label="Test" className="text-[var(--moss-primary)]">
+        <Tooltip label="Test">
           <Icon icon="Code" />
         </Tooltip>
       </div>
@@ -33,10 +33,10 @@ export const Home: React.FC = () => {
 
       <div className="flex">
         <Icon icon="Accessibility" className="text-6xl hover:*:fill-green-500" />
-        <Icon icon="NewProject" className="text-red-700 text-6xl hover:fill-green-500" />
+        <Icon icon="NewProject" className="text-6xl text-red-700 hover:fill-green-500" />
       </div>
 
-      <div className="mt-5">
+      <div>
         <div>List of 50 elements:</div>
         {Array.from({ length: 50 }).map((_, i) => (
           <div key={i}>{i + 1 === 50 ? "last element" : `${i + 1}: ${Math.random().toFixed(2)}`}</div>
