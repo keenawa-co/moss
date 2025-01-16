@@ -8,5 +8,5 @@ serde = { workspace = true, features = ["derive"] }
 serde_json.workspace = true
 moss_extension_point.workspace = true
 arcstr.workspace = true
-hashbrown.workspace = true
+hashbrown = { workspace = true }
 tracing.workspace = true

@@ -99,7 +99,7 @@ pub fn run() {
 
             // ---------------------------------------
 
-            let app_manager = AppManager::new(app_handle.clone())
+            let app_manager = AppManager::new(app_handle.clone(), registry)
                 .with_service(|_| LifecycleService::new(), InstantiationType::Instant)
                 .with_service(
                     |_| ConfigurationService::new(default_configurations),

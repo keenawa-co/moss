@@ -1,7 +1,8 @@
 use arcstr::ArcStr;
+use hashbrown::{HashMap, HashSet};
 use serde::{Deserialize, Serialize};
 use serde_json::{Number, Value as JsonValue};
-use std::{collections::HashMap, sync::Arc};
+use std::sync::Arc;
 
 #[derive(Debug, Deserialize, Serialize)]
 pub enum ParameterValueType {
@@ -31,7 +32,7 @@ pub enum ParameterScope {
 }
 
 #[derive(Debug, Deserialize, Serialize)]
-pub struct ParameterValue {
+pub struct ParameterDecl {
     #[serde(rename = "type")]
     pub typ: ParameterValueType,
     #[serde(default)]
@@ -54,25 +55,20 @@ pub struct ParameterValue {
 }
 
 #[derive(Debug, Deserialize, Serialize)]
-pub struct OverrideValue {
+pub struct OverrideDecl {
     pub value: JsonValue,
+    pub context: Option<HashSet<String>>,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct ConfigurationDecl {
-    pub id: String,
     pub title: Option<String>,
     pub description: Option<String>,
 
     /// The order in which this group appears in the settings UI.
     pub order: Option<usize>,
     #[serde(rename = "parameter")]
-    pub parameters: HashMap<ArcStr, Arc<ParameterValue>>,
+    pub parameters: HashMap<ArcStr, Arc<ParameterDecl>>,
     #[serde(rename = "override")]
-    pub overrides: HashMap<ArcStr, OverrideValue>,
-}
-
-#[derive(Debug, Deserialize, Serialize)]
-pub struct ExtendsDecl {
-    pub configuration: Option<Arc<ConfigurationDecl>>,
+    pub overrides: HashMap<ArcStr, Arc<OverrideDecl>>,
 }
