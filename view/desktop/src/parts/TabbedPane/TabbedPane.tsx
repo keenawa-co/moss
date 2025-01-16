@@ -4,10 +4,12 @@ import { Home, Logs, Settings } from "@/pages";
 import {
   DockviewApi,
   DockviewDefaultTab,
+  DockviewDidDropEvent,
   DockviewReact,
   DockviewReadyEvent,
   IDockviewPanelHeaderProps,
   IDockviewPanelProps,
+  positionToDirection,
 } from "@repo/moss-tabs";
 
 import { LeftControls, PrefixHeaderControls, RightControls } from "./controls";
@@ -18,6 +20,8 @@ import { GroupActions } from "./groupActions";
 import { PanelActions } from "./panelActions";
 
 import "./assets/styles.css";
+
+import { dropTargetForElements, ElementDragPayload } from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
 
 const DebugContext = React.createContext<boolean>(false);
 
@@ -232,6 +236,28 @@ const TabbedPane = (props: { theme?: string }) => {
         setActiveGroup(event?.id);
         addLogLine(`Group Activated ${event?.id}`);
       }),
+      api.onWillDragPanel((event) => {
+        console.log("panelDragDisposable");
+        const dataTransfer = event.nativeEvent.dataTransfer;
+
+        if (dataTransfer) {
+          dataTransfer.setData("text/plain", "Some custom panel data transfer data");
+          dataTransfer.setData("text/json", '{text: "Some custom panel data transfer data"}');
+        }
+      }),
+
+      api.onWillDragGroup((event) => {
+        console.log("groupDragDisposable");
+        const dataTransfer = event.nativeEvent.dataTransfer;
+
+        if (dataTransfer) {
+          dataTransfer.setData("text/plain", "Some custom group data transfer data");
+          dataTransfer.setData("text/json", '{text: "Some custom group data transfer data"}');
+        }
+      }),
+      api.onUnhandledDragOverEvent((event) => {
+        event.accept();
+      }),
     ];
 
     const loadLayout = () => {
@@ -260,6 +286,43 @@ const TabbedPane = (props: { theme?: string }) => {
   const onReady = (event: DockviewReadyEvent) => {
     setApi(event.api);
   };
+
+  const dockviewRef = React.useRef<HTMLDivElement | null>(null);
+  const [pragmaticDropElement, setPragmaticDropElement] = React.useState<
+    (ElementDragPayload & { pragmaticType: boolean }) | null
+  >(null);
+
+  const onDidDrop = (event: DockviewDidDropEvent) => {
+    if (!pragmaticDropElement || !pragmaticDropElement?.pragmaticType) return;
+
+    const newPanelId = (pragmaticDropElement.data?.label as string) || "panel_1"; //TS error: Property 'label' does not exist on type '{}'.ts(2339)
+
+    event.api.addPanel({
+      id: newPanelId,
+      component: "Default",
+      position: {
+        direction: positionToDirection(event.position),
+        referenceGroup: event.group || undefined,
+      },
+    });
+
+    setPragmaticDropElement(null);
+  };
+
+  React.useEffect(() => {
+    if (!dockviewRef.current) {
+      return;
+    }
+    return dropTargetForElements({
+      element: dockviewRef.current,
+      onDragEnter({ source }) {
+        if (source) setPragmaticDropElement({ ...source, pragmaticType: true });
+      },
+      onDragLeave() {
+        setPragmaticDropElement(null);
+      },
+    });
+  }, [dockviewRef]);
 
   const [watermark, setWatermark] = React.useState<boolean>(false);
 
@@ -333,6 +396,7 @@ const TabbedPane = (props: { theme?: string }) => {
         <div className="flex h-full flex-grow overflow-hidden">
           <DebugContext.Provider value={debug}>
             <DockviewReact
+              ref={dockviewRef}
               components={components}
               defaultTabComponent={headerComponents.default}
               rightHeaderActionsComponent={RightControls}
@@ -341,6 +405,7 @@ const TabbedPane = (props: { theme?: string }) => {
               watermarkComponent={watermark ? WatermarkComponent : undefined}
               onReady={onReady}
               className={props.theme || "dockview-theme-abyss"}
+              onDidDrop={onDidDrop}
             />
           </DebugContext.Provider>
         </div>

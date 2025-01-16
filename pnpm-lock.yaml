@@ -23,7 +23,7 @@ importers:
         version: 4.4.0(prettier@3.4.2)
       '@storybook/experimental-addon-test':
         specifier: ^8.4.7
-        version: 8.4.7(@vitest/browser@2.1.8(@types/node@22.10.2)(playwright@1.49.1)(typescript@5.7.2)(vite@6.0.3(@types/node@22.10.2)(jiti@2.4.1)(sass-embedded@1.83.0)(terser@5.37.0)(yaml@2.6.1))(vitest@2.1.8))(@vitest/runner@2.1.8)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(storybook@8.4.7(prettier@3.4.2))(vitest@2.1.8(@types/node@22.10.2)(@vitest/browser@2.1.8)(jsdom@20.0.3)(msw@2.7.0(@types/node@22.10.2)(typescript@5.7.2))(sass-embedded@1.83.0)(terser@5.37.0))
+        version: 8.4.7(@vitest/browser@2.1.8)(@vitest/runner@2.1.8)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(storybook@8.4.7(prettier@3.4.2))(vitest@2.1.8)
       '@storybook/test':
         specifier: ^8.4.7
         version: 8.4.7(storybook@8.4.7(prettier@3.4.2))
@@ -114,17 +114,17 @@ importers:
     dependencies:
       '@typespec-tools/emitter-typescript':
         specifier: ^0.3.0
-        version: 0.3.0(@typespec/compiler@0.63.0)
+        version: 0.3.0(@typespec/compiler@0.64.0)
       '@typespec/json-schema':
         specifier: ^0.62.0
-        version: 0.62.0(@typespec/compiler@0.63.0)
+        version: 0.62.0(@typespec/compiler@0.64.0)
     devDependencies:
       '@repo/typescript-config':
         specifier: workspace:*
         version: link:../../packages/config-typescript
       '@typespec/compiler':
         specifier: latest
-        version: 0.63.0
+        version: 0.64.0
 
   crates/moss-desktop:
     dependencies:
@@ -166,14 +166,14 @@ importers:
     dependencies:
       '@typespec/json-schema':
         specifier: ^0.63.0
-        version: 0.63.0(@typespec/compiler@0.63.0)
+        version: 0.63.0(@typespec/compiler@0.64.0)
     devDependencies:
       '@repo/typescript-config':
         specifier: workspace:*
         version: link:../../packages/config-typescript
       '@typespec/compiler':
         specifier: latest
-        version: 0.63.0
+        version: 0.64.0
 
   crates/moss-uikit:
     dependencies:
@@ -244,6 +244,9 @@ importers:
 
   packages/moss-tabs:
     dependencies:
+      '@atlaskit/pragmatic-drag-and-drop':
+        specifier: ^1.4.0
+        version: 1.4.0
       '@testing-library/dom':
         specifier: ^10.4.0
         version: 10.4.0
@@ -533,7 +536,7 @@ importers:
         version: 8.4.7(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(storybook@8.4.7(prettier@3.4.2))
       '@storybook/experimental-addon-test':
         specifier: ^8.4.7
-        version: 8.4.7(@vitest/browser@2.1.8(@types/node@22.10.2)(playwright@1.49.1)(typescript@5.7.2)(vite@6.0.3(@types/node@22.10.2)(jiti@2.4.1)(sass-embedded@1.83.0)(terser@5.37.0)(yaml@2.6.1))(vitest@2.1.8))(@vitest/runner@2.1.8)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(storybook@8.4.7(prettier@3.4.2))(vitest@2.1.8(@types/node@22.10.2)(@vitest/browser@2.1.8)(jsdom@20.0.3)(msw@2.7.0(@types/node@22.10.2)(typescript@5.7.2))(sass-embedded@1.83.0)(terser@5.37.0))
+        version: 8.4.7(@vitest/browser@2.1.8)(@vitest/runner@2.1.8)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(storybook@8.4.7(prettier@3.4.2))(vitest@2.1.8)
       '@storybook/react':
         specifier: ^8.4.7
         version: 8.4.7(@storybook/test@8.4.7(storybook@8.4.7(prettier@3.4.2)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(storybook@8.4.7(prettier@3.4.2))(typescript@5.7.2)
@@ -3271,8 +3274,8 @@ packages:
     peerDependencies:
       '@typespec/compiler': ^0.59.1
 
-  '@typespec/compiler@0.63.0':
-    resolution: {integrity: sha512-cC3YniwbFghn1fASX3r1IgNjMrwaY4gmzznkHT4f/NxE+HK4XoXWn4EG7287QgVMCaHUykzJCIfW9k7kIleW5A==}
+  '@typespec/compiler@0.64.0':
+    resolution: {integrity: sha512-LnQGlQMWyqvhGg4Z9iyr5qSBTjI9zd49sodbEJbLafrxbj9pbHyjfSFbvt60gVbfuNvLErsdXvZiqqXV5nZdmQ==}
     engines: {node: '>=18.0.0'}
     hasBin: true
 
@@ -9035,7 +9038,7 @@ snapshots:
     dependencies:
       type-fest: 2.19.0
 
-  '@storybook/experimental-addon-test@8.4.7(@vitest/browser@2.1.8(@types/node@22.10.2)(playwright@1.49.1)(typescript@5.7.2)(vite@6.0.3(@types/node@22.10.2)(jiti@2.4.1)(sass-embedded@1.83.0)(terser@5.37.0)(yaml@2.6.1))(vitest@2.1.8))(@vitest/runner@2.1.8)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(storybook@8.4.7(prettier@3.4.2))(vitest@2.1.8(@types/node@22.10.2)(@vitest/browser@2.1.8)(jsdom@20.0.3)(msw@2.7.0(@types/node@22.10.2)(typescript@5.7.2))(sass-embedded@1.83.0)(terser@5.37.0))':
+  '@storybook/experimental-addon-test@8.4.7(@vitest/browser@2.1.8)(@vitest/runner@2.1.8)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(storybook@8.4.7(prettier@3.4.2))(vitest@2.1.8)':
     dependencies:
       '@storybook/csf': 0.1.12
       '@storybook/global': 5.0.0
@@ -9674,11 +9677,11 @@ snapshots:
       '@typescript-eslint/types': 8.19.1
       eslint-visitor-keys: 4.2.0
 
-  '@typespec-tools/emitter-typescript@0.3.0(@typespec/compiler@0.63.0)':
+  '@typespec-tools/emitter-typescript@0.3.0(@typespec/compiler@0.64.0)':
     dependencies:
-      '@typespec/compiler': 0.63.0
+      '@typespec/compiler': 0.64.0
 
-  '@typespec/compiler@0.63.0':
+  '@typespec/compiler@0.64.0':
     dependencies:
       '@babel/code-frame': 7.25.9
       ajv: 8.17.1
@@ -9695,14 +9698,14 @@ snapshots:
       yaml: 2.5.1
       yargs: 17.7.2
 
-  '@typespec/json-schema@0.62.0(@typespec/compiler@0.63.0)':
+  '@typespec/json-schema@0.62.0(@typespec/compiler@0.64.0)':
     dependencies:
-      '@typespec/compiler': 0.63.0
+      '@typespec/compiler': 0.64.0
       yaml: 2.5.1
 
-  '@typespec/json-schema@0.63.0(@typespec/compiler@0.63.0)':
+  '@typespec/json-schema@0.63.0(@typespec/compiler@0.64.0)':
     dependencies:
-      '@typespec/compiler': 0.63.0
+      '@typespec/compiler': 0.64.0
       yaml: 2.5.1
 
   '@typespec/prettier-plugin-typespec@0.62.0':

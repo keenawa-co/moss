@@ -12,23 +12,15 @@ const edgeToOrientationMap: Record<Edge, Orientation> = {
   right: "vertical",
 };
 
-//FIXME remove eslint-disable-next-line when we update eslint rule for token names
-
 const orientationStyles: Record<Orientation, HTMLAttributes<HTMLElement>["className"]> = {
-  //eslint-disable-next-line
   horizontal: "h-[--line-thickness] left-[--terminal-radius] right-0 before:left-[--negative-terminal-size]",
-  //eslint-disable-next-line
   vertical: "w-[--line-thickness] top-[--terminal-radius] bottom-0 before:top-[--negative-terminal-size]",
 };
 
 const edgeStyles: Record<Edge, HTMLAttributes<HTMLElement>["className"]> = {
-  //eslint-disable-next-line
   top: "top-[--line-offset] before:top-[--offset-terminal]",
-  //eslint-disable-next-line
   right: "right-[--line-offset] before:right-[--offset-terminal]",
-  //eslint-disable-next-line
   bottom: "bottom-[--line-offset] before:bottom-[--offset-terminal]",
-  //eslint-disable-next-line
   left: "left-[--line-offset] before:left-[--offset-terminal]",
 };
 
@@ -62,7 +54,6 @@ export function DropIndicator({ edge, gap = 0, strokeSize = 2, terminalSize = 8,
         } as CSSProperties
       }
       className={cn(
-        //eslint-disable-next-line
         `pointer-events-none absolute z-10 box-border bg-sky-700 before:absolute before:h-[--terminal-size] before:w-[--terminal-size] before:rounded-full before:border-[length:--line-thickness] before:border-solid before:border-sky-700 before:content-['']`,
         orientationStyles[orientation],
         edgeStyles[edge],
