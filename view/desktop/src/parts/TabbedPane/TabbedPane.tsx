@@ -295,7 +295,7 @@ const TabbedPane = (props: { theme?: string }) => {
   const onDidDrop = (event: DockviewDidDropEvent) => {
     if (!pragmaticDropElement || !pragmaticDropElement?.pragmaticType) return;
 
-    const newPanelId = (pragmaticDropElement.data?.label as string) || "panel_1"; //TS error: Property 'label' does not exist on type '{}'.ts(2339)
+    const newPanelId = (pragmaticDropElement.data?.label as string) || "test_pragmatic_panel";
 
     event.api.addPanel({
       id: newPanelId,
