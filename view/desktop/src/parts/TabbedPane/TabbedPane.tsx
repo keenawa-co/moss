@@ -236,25 +236,6 @@ const TabbedPane = (props: { theme?: string }) => {
         setActiveGroup(event?.id);
         addLogLine(`Group Activated ${event?.id}`);
       }),
-      api.onWillDragPanel((event) => {
-        console.log("panelDragDisposable");
-        const dataTransfer = event.nativeEvent.dataTransfer;
-
-        if (dataTransfer) {
-          dataTransfer.setData("text/plain", "Some custom panel data transfer data");
-          dataTransfer.setData("text/json", '{text: "Some custom panel data transfer data"}');
-        }
-      }),
-
-      api.onWillDragGroup((event) => {
-        console.log("groupDragDisposable");
-        const dataTransfer = event.nativeEvent.dataTransfer;
-
-        if (dataTransfer) {
-          dataTransfer.setData("text/plain", "Some custom group data transfer data");
-          dataTransfer.setData("text/json", '{text: "Some custom group data transfer data"}');
-        }
-      }),
       api.onUnhandledDragOverEvent((event) => {
         event.accept();
       }),
