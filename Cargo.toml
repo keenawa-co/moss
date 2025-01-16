@@ -108,3 +108,4 @@ moka = { version = "0.12.8", features = ["sync"] }
 derive_more = "1.0.0"
 hcl-rs = "0.18.2"
 ctor = "0.2.9"
+wasmtime = "28.0.1"

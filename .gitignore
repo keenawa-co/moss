@@ -45,3 +45,4 @@ dist/
 ### IDEs and Editors
 .idea
 .idea/**
+/view/desktop/bin/src/wasm/target/
