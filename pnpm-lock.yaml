@@ -8,6 +8,15 @@ importers:
 
   .:
     dependencies:
+      '@atlaskit/pragmatic-drag-and-drop':
+        specifier: ^1.4.0
+        version: 1.4.0
+      '@atlaskit/pragmatic-drag-and-drop-hitbox':
+        specifier: ^1.0.3
+        version: 1.0.3
+      '@atlaskit/pragmatic-drag-and-drop-react-drop-indicator':
+        specifier: ^1.1.3
+        version: 1.1.3(@types/react@18.3.16)(react@18.3.1)
       react:
         specifier: ^18.3.1
         version: 18.3.1
@@ -244,9 +253,6 @@ importers:
 
   packages/moss-tabs:
     dependencies:
-      '@atlaskit/pragmatic-drag-and-drop':
-        specifier: ^1.4.0
-        version: 1.4.0
       '@testing-library/dom':
         specifier: ^10.4.0
         version: 10.4.0
@@ -274,7 +280,7 @@ importers:
         version: link:../config-typescript
       '@tailwindcss/typography':
         specifier: ^0.5.15
-        version: 0.5.15(tailwindcss@3.4.16(ts-node@10.9.2(@types/node@22.10.2)(typescript@5.7.2)))
+        version: 0.5.15
       '@types/jest':
         specifier: ^29.5.14
         version: 29.5.14
@@ -394,18 +400,9 @@ importers:
 
   view/desktop:
     dependencies:
-      '@atlaskit/pragmatic-drag-and-drop':
-        specifier: ^1.4.0
-        version: 1.4.0
-      '@atlaskit/pragmatic-drag-and-drop-hitbox':
-        specifier: ^1.0.3
-        version: 1.0.3
-      '@atlaskit/pragmatic-drag-and-drop-react-drop-indicator':
-        specifier: ^1.1.3
-        version: 1.1.3(@types/react@18.3.16)(react@19.0.0)
       '@reduxjs/toolkit':
         specifier: ^2.4.0
-        version: 2.5.0(react-redux@9.2.0(@types/react@18.3.16)(react@19.0.0)(redux@5.0.1))(react@19.0.0)
+        version: 2.5.0(react-redux@9.2.0(@types/react@19.0.1)(react@19.0.0)(redux@5.0.1))(react@19.0.0)
       '@repo/moss-tabs':
         specifier: workspace:*
         version: link:../../packages/moss-tabs
@@ -441,10 +438,10 @@ importers:
         version: 1.2.1
       react-redux:
         specifier: ^9.2.0
-        version: 9.2.0(@types/react@18.3.16)(react@19.0.0)(redux@5.0.1)
+        version: 9.2.0(@types/react@19.0.1)(react@19.0.0)(redux@5.0.1)
       zustand:
         specifier: ^5.0.2
-        version: 5.0.2(@types/react@18.3.16)(immer@10.1.1)(react@19.0.0)(use-sync-external-store@1.4.0(react@19.0.0))
+        version: 5.0.2(@types/react@19.0.1)(immer@10.1.1)(react@19.0.0)(use-sync-external-store@1.4.0(react@19.0.0))
     devDependencies:
       '@repo/eslint-config':
         specifier: workspace:*
@@ -463,7 +460,7 @@ importers:
         version: 8.4.7(@storybook/test@8.4.7(storybook@8.4.7(prettier@3.4.2)))(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(storybook@8.4.7(prettier@3.4.2))(typescript@5.7.2)
       '@tailwindcss/typography':
         specifier: ^0.5.15
-        version: 0.5.15(tailwindcss@3.4.16(ts-node@10.9.2(@types/node@22.10.2)(typescript@5.7.2)))
+        version: 0.5.15
       '@tauri-apps/cli':
         specifier: ^2.1.0
         version: 2.1.0
@@ -6786,13 +6783,13 @@ snapshots:
       '@jridgewell/gen-mapping': 0.3.8
       '@jridgewell/trace-mapping': 0.3.25
 
-  '@atlaskit/ds-lib@3.3.0(@types/react@18.3.16)(react@19.0.0)':
+  '@atlaskit/ds-lib@3.3.0(@types/react@18.3.16)(react@18.3.1)':
     dependencies:
       '@atlaskit/platform-feature-flags': 0.3.0
       '@babel/runtime': 7.26.0
       bind-event-listener: 3.0.0
-      react: 19.0.0
-      react-uid: 2.3.3(@types/react@18.3.16)(react@19.0.0)
+      react: 18.3.1
+      react-uid: 2.3.3(@types/react@18.3.16)(react@18.3.1)
     transitivePeerDependencies:
       - '@types/react'
 
@@ -6805,14 +6802,14 @@ snapshots:
       '@atlaskit/pragmatic-drag-and-drop': 1.4.0
       '@babel/runtime': 7.26.0
 
-  '@atlaskit/pragmatic-drag-and-drop-react-drop-indicator@1.1.3(@types/react@18.3.16)(react@19.0.0)':
+  '@atlaskit/pragmatic-drag-and-drop-react-drop-indicator@1.1.3(@types/react@18.3.16)(react@18.3.1)':
     dependencies:
       '@atlaskit/pragmatic-drag-and-drop': 1.4.0
       '@atlaskit/pragmatic-drag-and-drop-hitbox': 1.0.3
-      '@atlaskit/tokens': 2.5.0(@types/react@18.3.16)(react@19.0.0)
+      '@atlaskit/tokens': 2.5.0(@types/react@18.3.16)(react@18.3.1)
       '@babel/runtime': 7.26.0
-      '@emotion/react': 11.14.0(@types/react@18.3.16)(react@19.0.0)
-      react: 19.0.0
+      '@emotion/react': 11.14.0(@types/react@18.3.16)(react@18.3.1)
+      react: 18.3.1
     transitivePeerDependencies:
       - '@types/react'
       - supports-color
@@ -6823,15 +6820,15 @@ snapshots:
       bind-event-listener: 3.0.0
       raf-schd: 4.0.3
 
-  '@atlaskit/tokens@2.5.0(@types/react@18.3.16)(react@19.0.0)':
+  '@atlaskit/tokens@2.5.0(@types/react@18.3.16)(react@18.3.1)':
     dependencies:
-      '@atlaskit/ds-lib': 3.3.0(@types/react@18.3.16)(react@19.0.0)
+      '@atlaskit/ds-lib': 3.3.0(@types/react@18.3.16)(react@18.3.1)
       '@atlaskit/platform-feature-flags': 0.3.0
       '@babel/runtime': 7.26.0
       '@babel/traverse': 7.26.4
       '@babel/types': 7.26.3
       bind-event-listener: 3.0.0
-      react: 19.0.0
+      react: 18.3.1
     transitivePeerDependencies:
       - '@types/react'
       - supports-color
@@ -6862,7 +6859,7 @@ snapshots:
       '@babel/traverse': 7.26.4
       '@babel/types': 7.26.3
       convert-source-map: 2.0.0
-      debug: 4.3.7
+      debug: 4.4.0
       gensync: 1.0.0-beta.2
       json5: 2.2.3
       semver: 6.3.1
@@ -7765,17 +7762,17 @@ snapshots:
 
   '@emotion/memoize@0.9.0': {}
 
-  '@emotion/react@11.14.0(@types/react@18.3.16)(react@19.0.0)':
+  '@emotion/react@11.14.0(@types/react@18.3.16)(react@18.3.1)':
     dependencies:
       '@babel/runtime': 7.26.0
       '@emotion/babel-plugin': 11.13.5
       '@emotion/cache': 11.14.0
       '@emotion/serialize': 1.3.3
-      '@emotion/use-insertion-effect-with-fallbacks': 1.2.0(react@19.0.0)
+      '@emotion/use-insertion-effect-with-fallbacks': 1.2.0(react@18.3.1)
       '@emotion/utils': 1.4.2
       '@emotion/weak-memoize': 0.4.0
       hoist-non-react-statics: 3.3.2
-      react: 19.0.0
+      react: 18.3.1
     optionalDependencies:
       '@types/react': 18.3.16
     transitivePeerDependencies:
@@ -7793,9 +7790,9 @@ snapshots:
 
   '@emotion/unitless@0.10.0': {}
 
-  '@emotion/use-insertion-effect-with-fallbacks@1.2.0(react@19.0.0)':
+  '@emotion/use-insertion-effect-with-fallbacks@1.2.0(react@18.3.1)':
     dependencies:
-      react: 19.0.0
+      react: 18.3.1
 
   '@emotion/utils@1.4.2': {}
 
@@ -8711,7 +8708,7 @@ snapshots:
 
   '@radix-ui/rect@1.1.0': {}
 
-  '@reduxjs/toolkit@2.5.0(react-redux@9.2.0(@types/react@18.3.16)(react@19.0.0)(redux@5.0.1))(react@19.0.0)':
+  '@reduxjs/toolkit@2.5.0(react-redux@9.2.0(@types/react@19.0.1)(react@19.0.0)(redux@5.0.1))(react@19.0.0)':
     dependencies:
       immer: 10.1.1
       redux: 5.0.1
@@ -8719,7 +8716,7 @@ snapshots:
       reselect: 5.1.1
     optionalDependencies:
       react: 19.0.0
-      react-redux: 9.2.0(@types/react@18.3.16)(react@19.0.0)(redux@5.0.1)
+      react-redux: 9.2.0(@types/react@19.0.1)(react@19.0.0)(redux@5.0.1)
 
   '@remix-run/router@1.21.0': {}
 
@@ -9285,13 +9282,12 @@ snapshots:
     dependencies:
       tslib: 2.8.1
 
-  '@tailwindcss/typography@0.5.15(tailwindcss@3.4.16(ts-node@10.9.2(@types/node@22.10.2)(typescript@5.7.2)))':
+  '@tailwindcss/typography@0.5.15':
     dependencies:
       lodash.castarray: 4.4.0
       lodash.isplainobject: 4.0.6
       lodash.merge: 4.6.2
       postcss-selector-parser: 6.0.10
-      tailwindcss: 3.4.16(ts-node@10.9.2(@types/node@22.10.2)(typescript@5.7.2))
 
   '@tanstack/query-core@5.62.7': {}
 
@@ -12198,13 +12194,13 @@ snapshots:
 
   react-is@18.3.1: {}
 
-  react-redux@9.2.0(@types/react@18.3.16)(react@19.0.0)(redux@5.0.1):
+  react-redux@9.2.0(@types/react@19.0.1)(react@19.0.0)(redux@5.0.1):
     dependencies:
       '@types/use-sync-external-store': 0.0.6
       react: 19.0.0
       use-sync-external-store: 1.4.0(react@19.0.0)
     optionalDependencies:
-      '@types/react': 18.3.16
+      '@types/react': 19.0.1
       redux: 5.0.1
 
   react-refresh@0.14.2: {}
@@ -12249,9 +12245,9 @@ snapshots:
     optionalDependencies:
       '@types/react': 18.3.16
 
-  react-uid@2.3.3(@types/react@18.3.16)(react@19.0.0):
+  react-uid@2.3.3(@types/react@18.3.16)(react@18.3.1):
     dependencies:
-      react: 19.0.0
+      react: 18.3.1
       tslib: 2.8.1
     optionalDependencies:
       '@types/react': 18.3.16
@@ -13345,9 +13341,9 @@ snapshots:
 
   yoctocolors-cjs@2.1.2: {}
 
-  zustand@5.0.2(@types/react@18.3.16)(immer@10.1.1)(react@19.0.0)(use-sync-external-store@1.4.0(react@19.0.0)):
+  zustand@5.0.2(@types/react@19.0.1)(immer@10.1.1)(react@19.0.0)(use-sync-external-store@1.4.0(react@19.0.0)):
     optionalDependencies:
-      '@types/react': 18.3.16
+      '@types/react': 19.0.1
       immer: 10.1.1
       react: 19.0.0
       use-sync-external-store: 1.4.0(react@19.0.0)

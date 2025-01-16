@@ -37,7 +37,6 @@
     "react": "^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0"
   },
   "dependencies": {
-    "@atlaskit/pragmatic-drag-and-drop": "^1.4.0",
     "@testing-library/dom": "^10.4.0",
     "@testing-library/react": "^16.1.0",
     "@total-typescript/shoehorn": "^0.1.2",
