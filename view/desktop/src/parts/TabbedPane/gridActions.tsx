@@ -128,7 +128,7 @@ export const GridActions = (props: {
         id: panelType && panelType !== "nested" ? panelType : `id_${Date.now().toString()}`,
         component: options?.type ?? "Default",
         title: options?.type ?? `Tab ${nextId()}`,
-        renderer: "always",
+        renderer: "onlyWhenVisible",
       });
     }
   };

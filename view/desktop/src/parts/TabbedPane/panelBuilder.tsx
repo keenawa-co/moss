@@ -97,7 +97,7 @@ export const PanelBuilder = (props: { api: DockviewApi; done: () => void }) => {
               id: `id_${Date.now().toString()}`,
               component: "Default",
               title: `Tab ${nextId()}`,
-              renderer: "always",
+              renderer: "onlyWhenVisible",
               ...parameters,
             });
 

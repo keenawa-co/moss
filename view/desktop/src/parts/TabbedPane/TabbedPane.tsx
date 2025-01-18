@@ -92,9 +92,11 @@ const components = {
     );
   },
   Home: (props: IDockviewPanelProps) => {
+    console.log(props.api.renderer);
     return RenderPage(props, Home);
   },
   Settings: (props: IDockviewPanelProps) => {
+    console.log(props.api.renderer);
     return RenderPage(props, Settings);
   },
   Logs: (props: IDockviewPanelProps) => {
@@ -340,7 +342,7 @@ const TabbedPane = (props: { theme?: string }) => {
               prefixHeaderActionsComponent={PrefixHeaderControls}
               watermarkComponent={watermark ? WatermarkComponent : undefined}
               onReady={onReady}
-              className={props.theme || "dockview-theme-abyss"}
+              className={props.theme || "dockview-theme-light"}
             />
           </DebugContext.Provider>
         </div>
