@@ -47,7 +47,7 @@ configuration "moss.kernel.window" {
         maximum = 20
         default = 14
         order = 1
-        scope = "USER"
+        scope = "WINDOW"
         description = "The width of the application window in pixels."
     }
 
