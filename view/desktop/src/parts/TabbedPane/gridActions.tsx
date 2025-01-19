@@ -1,6 +1,7 @@
 import * as React from "react";
 import { createRoot, Root } from "react-dom/client";
 
+import { useTabbedPaneStore } from "@/store/tabbedPane";
 import { DockviewApi } from "@repo/moss-tabs";
 
 import { defaultConfig, nextId } from "./defaultLayout";
@@ -77,16 +78,16 @@ export const GridActions = (props: {
 }) => {
   const onClear = () => {
     props.api?.clear();
+    //localStorage.removeItem("dv-demo-state");
   };
 
+  const gridState = useTabbedPaneStore((state) => state.gridState);
   const onLoad = () => {
-    const state = localStorage.getItem("dv-demo-state");
-    if (state) {
+    if (gridState) {
       try {
-        props.api?.fromJSON(JSON.parse(state));
+        props.api?.fromJSON(gridState);
       } catch (err) {
-        console.error("failed to load state", err);
-        localStorage.removeItem("dv-demo-state");
+        console.error("failed to load saved state", err);
       }
     }
   };
@@ -94,9 +95,9 @@ export const GridActions = (props: {
   const onSave = () => {
     if (props.api) {
       const state = props.api.toJSON();
-      console.log(state);
 
-      localStorage.setItem("dv-demo-state", JSON.stringify(state));
+      const setGridState = useTabbedPaneStore.getState().setGridState;
+      setGridState(state);
     }
   };
 
@@ -106,7 +107,7 @@ export const GridActions = (props: {
         props.api.clear();
         defaultConfig(props.api);
       } catch (err) {
-        localStorage.removeItem("dv-demo-state");
+        console.error("failed to reset state to default", err);
       }
     }
   };

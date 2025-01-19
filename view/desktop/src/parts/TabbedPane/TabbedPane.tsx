@@ -92,11 +92,9 @@ const components = {
     );
   },
   Home: (props: IDockviewPanelProps) => {
-    console.log(props.api.renderer);
     return RenderPage(props, Home);
   },
   Settings: (props: IDockviewPanelProps) => {
-    console.log(props.api.renderer);
     return RenderPage(props, Settings);
   },
   Logs: (props: IDockviewPanelProps) => {
@@ -237,6 +235,7 @@ const TabbedPane = (props: { theme?: string }) => {
     ];
 
     const loadLayout = () => {
+      /*
       const state = localStorage.getItem("dv-demo-state");
 
       if (state) {
@@ -244,10 +243,11 @@ const TabbedPane = (props: { theme?: string }) => {
           api.fromJSON(JSON.parse(state));
           return;
         } catch {
-          localStorage.removeItem("dv-demo-state");
+          console.error("failed to load saved state");
         }
         return;
       }
+        */
 
       defaultConfig(api);
     };
