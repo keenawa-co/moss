@@ -117,6 +117,7 @@ export const GridActions = (props: {
   const onAddPanel = (options?: { advanced?: boolean; type?: string }) => {
     const panelType = options?.type;
     if (panelType && props.api?.getPanel(panelType) !== undefined) {
+      props.api.getPanel(panelType)?.focus();
       return;
     }
 
