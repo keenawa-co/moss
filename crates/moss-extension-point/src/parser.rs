@@ -43,11 +43,6 @@ impl Parser {
         let body: Body = hcl::from_str(input)?;
         let mut result = Scope::default();
 
-        // let mut local_obj = Map::new();
-        // local_obj.insert("test".into(), hcl::Value::from("Ваше значение"));
-
-        // ctx.declare_var("local", hcl::Value::Object(local_obj));
-
         for block in body.into_blocks() {
             match block.identifier() {
                 CONFIGURATION_LIT => {
@@ -142,8 +137,6 @@ fn collect_local_refs(expr: &Expression) -> HashSet<String> {
             }
         }
         Expression::Traversal(trav) => {
-            // Здесь может быть что-то типа local.x.y,
-            // но по сути "local.x" + GetAttr("y").
             set.extend(collect_refs_in_traversal(trav));
         }
 
@@ -155,16 +148,12 @@ fn collect_local_refs(expr: &Expression) -> HashSet<String> {
 
 fn collect_refs_in_traversal(trav: &Traversal) -> HashSet<String> {
     let mut set = HashSet::new();
-    // Сначала смотрим базовый expr — вдруг там уже local.x
+
     set.extend(collect_local_refs(&trav.expr));
 
-    // Потом смотрим оператор.
-    // - If `GetAttr(Identifier("x"))` и базовый expr == Variable("local"), то => "x".
-    // - If `Index(expr)`, надо обойти `expr`, но сами ссылки local? ...
     for op in &trav.operators {
         match op {
             hcl::TraversalOperator::GetAttr(ident) => {
-                // Если trav.expr == Variable("local"), это local.<ident>
                 if let Expression::Variable(base_var) = &trav.expr {
                     if base_var.as_str() == "local" {
                         set.insert(ident.as_str().to_string());
@@ -172,7 +161,6 @@ fn collect_refs_in_traversal(trav: &Traversal) -> HashSet<String> {
                 }
             }
             hcl::TraversalOperator::Index(idx_expr) => {
-                // Вдруг idx_expr содержит local.*?
                 set.extend(collect_local_refs(idx_expr));
             }
             _ => {}
