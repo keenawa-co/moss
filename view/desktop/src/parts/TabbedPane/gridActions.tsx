@@ -1,11 +1,12 @@
 import * as React from "react";
-import { createRoot, Root } from "react-dom/client";
+import { createRoot } from "react-dom/client";
 
 import { useTabbedPaneStore } from "@/store/tabbedPane";
 import { DockviewApi } from "@repo/moss-tabs";
 
 import { defaultConfig, nextId } from "./defaultLayout";
 import { PanelBuilder } from "./panelBuilder";
+import { setGridState } from "./utils";
 
 let mount = document.querySelector(".popover-anchor") as HTMLElement | null;
 
@@ -94,10 +95,7 @@ export const GridActions = (props: {
 
   const onSave = () => {
     if (props.api) {
-      const state = props.api.toJSON();
-
-      const setGridState = useTabbedPaneStore.getState().setGridState;
-      setGridState(state);
+      setGridState(props.api);
     }
   };
 
@@ -182,14 +180,15 @@ export const GridActions = (props: {
       <button className="text-button" onClick={onClear}>
         Clear
       </button>
+      <span className="flex-grow" />
       <button className="text-button" onClick={onLoad}>
-        Load
+        Load State
       </button>
       <button className="text-button" onClick={onSave}>
-        Save
+        Save State
       </button>
       <button className="text-button" onClick={onReset}>
-        Reset
+        Use Default State
       </button>
       <span className="flex-grow" />
       <div className="flex items-center">

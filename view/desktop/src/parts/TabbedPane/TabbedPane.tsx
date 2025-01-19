@@ -16,6 +16,7 @@ import { defaultConfig } from "./defaultLayout";
 import { GridActions } from "./gridActions";
 import { GroupActions } from "./groupActions";
 import { PanelActions } from "./panelActions";
+import { setGridState } from "./utils";
 
 import "./assets/styles.css";
 
@@ -50,7 +51,9 @@ const components = {
             <Option
               title="Panel Rendering Mode"
               value={metadata.renderer.value}
-              onClick={() => props.api.setRenderer(props.api.renderer === "always" ? "onlyWhenVisible" : "always")}
+              onClick={() => {
+                props.api.setRenderer(props.api.renderer === "always" ? "onlyWhenVisible" : "always");
+              }}
             />
 
             <Table data={metadata} />
@@ -116,7 +119,9 @@ function RenderPage(props: IDockviewPanelProps, page: React.FC) {
           <Option
             title="Panel Rendering Mode"
             value={metadata.renderer.value}
-            onClick={() => props.api.setRenderer(props.api.renderer === "always" ? "onlyWhenVisible" : "always")}
+            onClick={() => {
+              props.api.setRenderer(props.api.renderer === "always" ? "onlyWhenVisible" : "always");
+            }}
           />
 
           <Table data={metadata} />
@@ -209,6 +214,7 @@ const TabbedPane = (props: { theme?: string }) => {
 
       api.onDidMovePanel((event) => {
         addLogLine(`Panel Moved ${event.panel.id}`);
+        setGridState(api);
       }),
 
       api.onDidMaximizedGroupChange((event) => {
@@ -250,6 +256,7 @@ const TabbedPane = (props: { theme?: string }) => {
         */
 
       defaultConfig(api);
+      setGridState(api);
     };
 
     loadLayout();
@@ -373,7 +380,13 @@ const TabbedPane = (props: { theme?: string }) => {
               })}
             </div>
             <div className="flex justify-end p-1">
-              <button onClick={() => setLogLines([])}>Clear</button>
+              <button
+                onClick={() => {
+                  setLogLines([]);
+                }}
+              >
+                Clear
+              </button>
             </div>
           </div>
         )}
