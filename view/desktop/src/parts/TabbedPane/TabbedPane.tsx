@@ -108,6 +108,9 @@ const components = {
 function RenderPage(props: IDockviewPanelProps, page: React.FC) {
   const isDebug = React.useContext(DebugContext);
   const metadata = usePanelApiMetadata(props.api);
+
+  setGridState(props.containerApi);
+
   return (
     <div
       className={`p-1.25 relative h-full overflow-auto ${isDebug ? "border-2 border-dashed border-orange-500" : ""}`}
@@ -152,7 +155,7 @@ const colors = [
 let count = 0;
 
 const WatermarkComponent = () => {
-  return <div>custom watermark</div>;
+  return <div className="bg-red-200">Custom Watermark</div>;
 };
 
 const TabbedPane = (props: { theme?: string }) => {
@@ -214,7 +217,6 @@ const TabbedPane = (props: { theme?: string }) => {
 
       api.onDidMovePanel((event) => {
         addLogLine(`Panel Moved ${event.panel.id}`);
-        setGridState(api);
       }),
 
       api.onDidMaximizedGroupChange((event) => {
@@ -241,22 +243,7 @@ const TabbedPane = (props: { theme?: string }) => {
     ];
 
     const loadLayout = () => {
-      /*
-      const state = localStorage.getItem("dv-demo-state");
-
-      if (state) {
-        try {
-          api.fromJSON(JSON.parse(state));
-          return;
-        } catch {
-          console.error("failed to load saved state");
-        }
-        return;
-      }
-        */
-
       defaultConfig(api);
-      setGridState(api);
     };
 
     loadLayout();

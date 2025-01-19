@@ -79,7 +79,6 @@ export const GridActions = (props: {
 }) => {
   const onClear = () => {
     props.api?.clear();
-    //localStorage.removeItem("dv-demo-state");
   };
 
   const gridState = useTabbedPaneStore((state) => state.gridState);
