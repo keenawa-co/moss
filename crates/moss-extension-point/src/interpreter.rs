@@ -153,15 +153,20 @@ pub struct Scope {
 }
 
 impl Scope {
-    pub fn evaluate(self, ctx: &mut Context) -> Result<ResolvedScope> {
+    pub fn evaluate_with_context(self, ctx: &Context) -> Result<ResolvedScope> {
+        let mut ctx = ctx.clone();
         let mut package = ResolvedScope::new();
         ctx.declare_var("local", hcl::Value::Object(self.locals));
 
         for decl in self.configurations {
-            package.configurations.push(decl.evaluate(ctx)?);
+            package.configurations.push(decl.evaluate(&ctx)?);
         }
 
         Ok(package)
+    }
+
+    pub fn evaluate(self) -> Result<ResolvedScope> {
+        self.evaluate_with_context(&Context::default())
     }
 }
 

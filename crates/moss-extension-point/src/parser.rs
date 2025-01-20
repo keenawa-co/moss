@@ -1,15 +1,13 @@
-use std::result;
-
 use anyhow::{anyhow, Result};
 use hashbrown::{HashMap, HashSet};
 use hcl::{
     eval::{Context, Evaluate},
     expr::{Traversal, Variable},
-    Block, Body, Expression, Identifier, Map, Object,
+    Block, Body, Expression, Object, ObjectKey, Value,
 };
 use phf::phf_set;
 
-use crate::interpreter::{ParsedConfigurationDecl, ParserLocalVarDecl, ResolvedScope, Scope};
+use crate::interpreter::{ParsedConfigurationDecl, Scope};
 
 const CONFIGURATION_LIT: &'static str = "configuration";
 const LOCALS_LIT: &'static str = "locals";
@@ -42,7 +40,6 @@ impl Parser {
     pub fn parse_module(&self, input: &str) -> Result<Scope> {
         let body: Body = hcl::from_str(input)?;
         let mut result = Scope::default();
-
         for block in body.into_blocks() {
             match block.identifier() {
                 CONFIGURATION_LIT => {
@@ -51,17 +48,17 @@ impl Parser {
                 }
                 LOCALS_LIT => {
                     let parsed = self.parse_locals_block(block)?;
-
                     let mut graph = petgraph::Graph::<String, ()>::new();
                     let mut node_map = HashMap::new();
-
+                    let mut name_map = HashMap::new();
                     for local_name in parsed.keys() {
                         let idx = graph.add_node(local_name.clone());
                         node_map.insert(local_name.clone(), idx);
+                        name_map.insert(idx, local_name.clone());
                     }
 
-                    for (name, expr) in parsed {
-                        let from_idx = node_map[&name];
+                    for (name, expr) in parsed.iter() {
+                        let from_idx = node_map[name];
                         let deps = collect_local_refs(&expr);
 
                         for dep in deps {
@@ -71,8 +68,21 @@ impl Parser {
                         }
                     }
 
-                    let _ = petgraph::algo::toposort(&graph, None)
-                        .map_err(|_| anyhow!("Cycle detected in locals"))?;
+                    let dependency_chain = petgraph::algo::toposort(&graph, None)
+                        .map_err(|_| anyhow!("Cycle detected in locals"))?
+                        .iter()
+                        .map(|idx| name_map.get(idx).unwrap().to_string())
+                        .rev()
+                        .collect::<Vec<String>>();
+
+                    for name in dependency_chain.iter() {
+                        // TODO: We could potentially optimize this part
+                        let expr = parsed.get(name).unwrap();
+                        let mut ctx = Context::new();
+                        ctx.declare_var("local", Value::Object(result.locals.clone()));
+                        let value = expr.evaluate(&ctx)?;
+                        result.locals.insert(name.to_string(), value.clone());
+                    }
                 }
                 _ => {
                     continue;
@@ -115,6 +125,7 @@ impl Parser {
                 "description" => result.description = Some(attribute.expr),
                 "order" => result.order = Some(attribute.expr),
                 _ => {
+
                     // TODO: Add logging for encountering an unknown attribute
                 }
             }
@@ -139,7 +150,12 @@ fn collect_local_refs(expr: &Expression) -> HashSet<String> {
         Expression::Traversal(trav) => {
             set.extend(collect_refs_in_traversal(trav));
         }
-
+        Expression::Object(obj) => {
+            set.extend(collect_refs_in_object(obj));
+        }
+        Expression::Array(arr) => {
+            set.extend(collect_refs_in_array(arr));
+        }
         _ => unimplemented!(),
     }
 
@@ -157,6 +173,7 @@ fn collect_refs_in_traversal(trav: &Traversal) -> HashSet<String> {
                 if let Expression::Variable(base_var) = &trav.expr {
                     if base_var.as_str() == "local" {
                         set.insert(ident.as_str().to_string());
+                        break;
                     }
                 }
             }
@@ -167,6 +184,22 @@ fn collect_refs_in_traversal(trav: &Traversal) -> HashSet<String> {
         }
     }
 
+    set
+}
+
+fn collect_refs_in_object(obj: &Object<ObjectKey, Expression>) -> HashSet<String> {
+    let mut set = HashSet::new();
+    for (_, expr) in obj.iter() {
+        set.extend(collect_local_refs(expr));
+    }
+    set
+}
+
+fn collect_refs_in_array(arr: &Vec<Expression>) -> HashSet<String> {
+    let mut set = HashSet::new();
+    for expr in arr {
+        set.extend(collect_local_refs(&expr.to_owned().into()));
+    }
     set
 }
 
@@ -183,47 +216,25 @@ fn parse_local_variable(var: &Variable) -> Option<String> {
 #[cfg(test)]
 mod tests {
     use super::Parser;
+    use hcl::eval::Context;
 
     #[test]
     fn test() {
         let input = r#"
         locals {
-            private_test = "Hello, World!"
-            test = local.private_test
-            some = local.test
+            default = {
+                width = 800
+            }
+            dimensions = [800, 3840]
         }
-
         configuration "moss.kernel.window" {
-            display_name = local.test
-            order = 5
-        
             parameter "window.defaultWidth" {
                 type = number
-                minimum = 800
-                maximum = 3840
-                default = 800
+                minimum = local.dimensions[0]
+                maximum = local.dimensions[1]
+                default = local.default.width
                 order = 1
                 scope = "APPLICATION"
-                description = "The width of the application window in pixels."
-            }
-        
-            parameter "window.defaultHeight" {
-                type = number
-                minimum = 600
-                maximum = 2160
-                default = 600
-                order = 2
-                scope = "APPLICATION"
-                description = "The height of the application window in pixels."
-            }
-        
-            parameter "editor.fontSize" {
-                type = number
-                minimum = 10
-                maximum = 20
-                default = 14
-                order = 1
-                scope = "WINDOW"
                 description = "The width of the application window in pixels."
             }
         }
@@ -231,7 +242,97 @@ mod tests {
 
         let parser = Parser::new();
         let parsed_module = parser.parse_module(input).unwrap();
+
+        let resolved = parsed_module.evaluate();
+        println!("Resolved: {:#?}", resolved);
         // let resolved = resolve(parsed_module).unwrap();
         // dbg!(resolved);
+    }
+
+    #[test]
+    fn test_cycle_sort_error() {
+        let input = r#"
+        locals {
+            A = local.B
+            B = local.C
+            C = local.A
+        }
+        "#;
+        let parser = Parser::new();
+        let parsed_module = parser.parse_module(input);
+        assert_eq!(
+            parsed_module.unwrap_err().to_string(),
+            "Cycle detected in locals"
+        );
+    }
+
+    #[test]
+    fn test_cycle_self_referential_sort_error() {
+        let input = r#"
+        locals {
+            A = local.A
+        }
+        "#;
+        let parser = Parser::new();
+        let parsed_module = parser.parse_module(input);
+        assert_eq!(
+            parsed_module.unwrap_err().to_string(),
+            "Cycle detected in locals"
+        );
+    }
+
+    #[test]
+    fn test_cycle_with_objects_sort_error() {
+        let input = r#"
+        locals {
+            A = {
+                x = local.B.x
+            }
+            B = {
+                x = local.A.x
+            }
+        }
+
+
+        "#;
+        let parser = Parser::new();
+        let parsed_module = parser.parse_module(input);
+        assert_eq!(
+            parsed_module.unwrap_err().to_string(),
+            "Cycle detected in locals"
+        );
+    }
+
+    #[test]
+    fn test_cycle_with_arrays_sort_error() {
+        let input = r#"
+        locals {
+            arr = [local.A.x]
+            A = {
+                x = local.arr[0]
+            }
+        }
+        "#;
+        let parser = Parser::new();
+        let parsed_module = parser.parse_module(input);
+        assert_eq!(
+            parsed_module.unwrap_err().to_string(),
+            "Cycle detected in locals"
+        );
+    }
+
+    #[test]
+    fn test_unregistered_local_variable_eval_error() {
+        let input = r#"
+        locals {
+            A = local.B
+        }
+        "#;
+        let parser = Parser::new();
+        let parsed_module = parser.parse_module(input);
+        assert_eq!(
+            parsed_module.unwrap_err().to_string(),
+            "no such key: `B` in expression `local.B`"
+        );
     }
 }
