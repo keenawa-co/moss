@@ -135,8 +135,30 @@ pub fn run() {
                 tauri_plugin_global_shortcut::Builder::new()
                     .with_handler(move |app, shortcut, event| {
                         let wasm_engine = Engine::default();
-                        let bytes = std::fs::read("open-new-window-shortcut.wasm").unwrap();
-                        let wasm_component = Component::new(&wasm_engine, bytes).unwrap();
+                        let mut wasm_component;
+                        unsafe {
+                            // TODO: In the future, we will need to have a checksum mechanism
+                            // To ensure that the serialized component had not been tampered with.
+                            wasm_component = match Component::deserialize_file(
+                                &wasm_engine,
+                                "open-new-window-shortcut.component",
+                            ) {
+                                Ok(component) => component,
+                                Err(_) => {
+                                    let bytes =
+                                        std::fs::read("open-new-window-shortcut.wasm").unwrap();
+                                    let wasm_component =
+                                        Component::new(&wasm_engine, bytes).unwrap();
+                                    std::fs::write(
+                                        "open-new-window-shortcut.component",
+                                        wasm_component.serialize().unwrap(),
+                                    )
+                                    .unwrap();
+                                    wasm_component
+                                }
+                            }
+                        }
+
                         let mut wasm_linker = Linker::new(&wasm_engine);
                         let app_handle = app.to_owned();
                         wasm_linker
