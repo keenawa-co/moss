@@ -80,13 +80,9 @@ export * from "./dockview/types";
 
 export type { DockviewPanelRenderer } from "./overlay/overlayRenderContainer";
 
-export type {
-  Position,
-  positionToDirection,
-  directionToPosition,
-  MeasuredValue,
-  DroptargetOverlayModel,
-} from "./dnd/droptarget";
+export type { Position, MeasuredValue, DroptargetOverlayModel } from "./dnd/droptarget";
+
+export { positionToDirection, directionToPosition } from "./dnd/droptarget";
 
 export type { FocusEvent, PanelDimensionChangeEvent, VisibilityEvent, ActiveEvent, PanelApi } from "./api/panelApi";
 export type { SizeEvent, GridviewPanelApi, GridConstraintChangeEvent } from "./api/gridviewPanelApi";

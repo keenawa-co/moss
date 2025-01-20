@@ -8,7 +8,8 @@ import { useAppResizableLayoutStore } from "@/store/appResizableLayout";
 
 import "@repo/moss-tabs/assets/styles.css";
 
-import { LaunchPad } from "../components/LaunchPad";
+import { Sidebar } from "@/components";
+
 import { Menu } from "../components/Menu";
 import { Resizable, ResizablePanel } from "../components/Resizable";
 import TabbedPane from "../parts/TabbedPane/TabbedPane";
@@ -352,7 +353,7 @@ const RightLayout = ({ ...props }: ResizableLayoutProps) => {
   );
 };
 
-const PrimarySideBar = () => <LaunchPad />;
+const PrimarySideBar = () => <Sidebar />;
 
 const SecondarySideBar = () => <div>SecondarySideBar</div>;
 

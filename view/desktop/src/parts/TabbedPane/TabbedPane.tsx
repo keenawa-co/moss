@@ -4,10 +4,12 @@ import { Home, Logs, Settings } from "@/pages";
 import {
   DockviewApi,
   DockviewDefaultTab,
+  DockviewDidDropEvent,
   DockviewReact,
   DockviewReadyEvent,
   IDockviewPanelHeaderProps,
   IDockviewPanelProps,
+  positionToDirection,
 } from "@repo/moss-tabs";
 
 import { LeftControls, PrefixHeaderControls, RightControls } from "./controls";
@@ -19,6 +21,8 @@ import { PanelActions } from "./panelActions";
 import { setGridState } from "./utils";
 
 import "./assets/styles.css";
+
+import { dropTargetForElements, ElementDragPayload } from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
 
 const DebugContext = React.createContext<boolean>(false);
 
@@ -240,6 +244,9 @@ const TabbedPane = (props: { theme?: string }) => {
         setActiveGroup(event?.id);
         addLogLine(`Group Activated ${event?.id}`);
       }),
+      api.onUnhandledDragOverEvent((event) => {
+        event.accept();
+      }),
     ];
 
     const loadLayout = () => {
@@ -256,6 +263,43 @@ const TabbedPane = (props: { theme?: string }) => {
   const onReady = (event: DockviewReadyEvent) => {
     setApi(event.api);
   };
+
+  const dockviewRef = React.useRef<HTMLDivElement | null>(null);
+  const [pragmaticDropElement, setPragmaticDropElement] = React.useState<
+    (ElementDragPayload & { pragmaticType: boolean }) | null
+  >(null);
+
+  const onDidDrop = (event: DockviewDidDropEvent) => {
+    if (!pragmaticDropElement || !pragmaticDropElement?.pragmaticType) return;
+
+    const newPanelId = (pragmaticDropElement.data?.label as string) || "test_pragmatic_panel";
+
+    event.api.addPanel({
+      id: newPanelId,
+      component: "Default",
+      position: {
+        direction: positionToDirection(event.position),
+        referenceGroup: event.group || undefined,
+      },
+    });
+
+    setPragmaticDropElement(null);
+  };
+
+  React.useEffect(() => {
+    if (!dockviewRef.current) {
+      return;
+    }
+    return dropTargetForElements({
+      element: dockviewRef.current,
+      onDragEnter({ source }) {
+        if (source) setPragmaticDropElement({ ...source, pragmaticType: true });
+      },
+      onDragLeave() {
+        setPragmaticDropElement(null);
+      },
+    });
+  }, [dockviewRef]);
 
   const [watermark, setWatermark] = React.useState<boolean>(false);
 
@@ -329,6 +373,7 @@ const TabbedPane = (props: { theme?: string }) => {
         <div className="flex h-full flex-grow overflow-hidden">
           <DebugContext.Provider value={debug}>
             <DockviewReact
+              ref={dockviewRef}
               components={components}
               defaultTabComponent={headerComponents.default}
               rightHeaderActionsComponent={RightControls}
@@ -337,6 +382,7 @@ const TabbedPane = (props: { theme?: string }) => {
               watermarkComponent={watermark ? WatermarkComponent : undefined}
               onReady={onReady}
               className={props.theme || "dockview-theme-light"}
+              onDidDrop={onDidDrop}
             />
           </DebugContext.Provider>
         </div>
