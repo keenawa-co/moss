@@ -18,6 +18,7 @@ export const PanelBuilder = (props: { api: DockviewApi; done: () => void }) => {
       <div className="grid grid-cols-2">
         <div>{"Initial Width"}</div>
         <input
+          className="panel-builder-input"
           type="number"
           value={parameters.initialWidth}
           onChange={(event) =>
@@ -29,6 +30,7 @@ export const PanelBuilder = (props: { api: DockviewApi; done: () => void }) => {
         />
         <div>{"Initial Height"}</div>
         <input
+          className="panel-builder-input"
           type="number"
           value={parameters.initialHeight}
           onChange={(event) =>
@@ -40,6 +42,7 @@ export const PanelBuilder = (props: { api: DockviewApi; done: () => void }) => {
         />
         <div>{"Maximum Width"}</div>
         <input
+          className="panel-builder-input"
           type="number"
           value={parameters.maximumWidth}
           onChange={(event) =>
@@ -51,6 +54,7 @@ export const PanelBuilder = (props: { api: DockviewApi; done: () => void }) => {
         />
         <div>{"Maximum Height"}</div>
         <input
+          className="panel-builder-input"
           type="number"
           value={parameters.maximumHeight}
           onChange={(event) =>
@@ -62,6 +66,7 @@ export const PanelBuilder = (props: { api: DockviewApi; done: () => void }) => {
         />
         <div>{"Minimum Width"}</div>
         <input
+          className="panel-builder-input"
           type="number"
           value={parameters.minimumWidth}
           onChange={(event) =>
@@ -73,6 +78,7 @@ export const PanelBuilder = (props: { api: DockviewApi; done: () => void }) => {
         />
         <div>{"Minimum Height"}</div>
         <input
+          className="panel-builder-input"
           type="number"
           value={parameters.minimumHeight}
           onChange={(event) =>
@@ -85,6 +91,7 @@ export const PanelBuilder = (props: { api: DockviewApi; done: () => void }) => {
       </div>
       <div>
         <button
+          className="panel-builder-button"
           onClick={() => {
             props.done();
           }}
@@ -92,6 +99,7 @@ export const PanelBuilder = (props: { api: DockviewApi; done: () => void }) => {
           Cancel
         </button>
         <button
+          className="panel-builder-button"
           onClick={() => {
             props.api?.addPanel({
               id: `id_${Date.now().toString()}`,

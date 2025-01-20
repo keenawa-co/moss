@@ -1,24 +1,26 @@
-pub mod extends;
+pub mod configuration;
 
-use extends::ExtendsDecl;
-use hashbrown::HashSet;
+use arcstr::ArcStr;
+use configuration::ConfigurationDecl;
+use hashbrown::{HashMap, HashSet};
 use serde::{Deserialize, Serialize};
-use std::path::PathBuf;
+use std::{path::PathBuf, sync::Arc};
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct ExtensionPointFile {
-    extends: ExtendsDecl,
+    #[serde(rename = "configuration")]
+    configurations: Option<HashMap<ArcStr, Arc<ConfigurationDecl>>>,
 }
 
 pub struct ExtensionPointModule {
-    pub extends: Vec<ExtendsDecl>,
+    pub configurations: HashMap<ArcStr, Arc<ConfigurationDecl>>,
     pub known_files: HashSet<PathBuf>,
 }
 
 impl ExtensionPointModule {
     pub fn new() -> Self {
         Self {
-            extends: Vec::new(),
+            configurations: HashMap::new(),
             known_files: HashSet::new(),
         }
     }
@@ -28,7 +30,10 @@ impl ExtensionPointModule {
             return false;
         }
 
-        self.extends.push(file.extends);
+        if let Some(configuration) = file.configurations {
+            self.configurations.extend(configuration);
+        }
+
         true
     }
 }

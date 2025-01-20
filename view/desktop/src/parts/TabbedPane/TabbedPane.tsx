@@ -1,12 +1,15 @@
 import * as React from "react";
 
+import { Home, Logs, Settings } from "@/pages";
 import {
   DockviewApi,
   DockviewDefaultTab,
+  DockviewDidDropEvent,
   DockviewReact,
   DockviewReadyEvent,
   IDockviewPanelHeaderProps,
   IDockviewPanelProps,
+  positionToDirection,
 } from "@repo/moss-tabs";
 
 import { LeftControls, PrefixHeaderControls, RightControls } from "./controls";
@@ -18,13 +21,17 @@ import { PanelActions } from "./panelActions";
 
 import "./assets/styles.css";
 
+import { dropTargetForElements, ElementDragPayload } from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
+
 const DebugContext = React.createContext<boolean>(false);
 
 const Option = (props: { title: string; onClick: () => void; value: string }) => {
   return (
     <div>
       <span>{`${props.title}: `}</span>
-      <button onClick={props.onClick}>{props.value}</button>
+      <button className="rounded !bg-cyan-300 p-2 !text-black hover:!bg-cyan-500" onClick={props.onClick}>
+        {props.value}
+      </button>
     </div>
   );
 };
@@ -43,7 +50,7 @@ const components = {
         </span>
 
         {isDebug && (
-          <div className="text-[0.8em]">
+          <div className="text-sm">
             <Option
               title="Panel Rendering Mode"
               value={metadata.renderer.value}
@@ -72,7 +79,7 @@ const components = {
             console.log("remove", e);
           });
         }}
-        className={"dockview-theme-abyss"}
+        className={"dockview-theme-light"}
       />
     );
   },
@@ -85,11 +92,43 @@ const components = {
           }
         }}
         className="h-full w-full"
-        src="https://dockview.dev"
       />
     );
   },
+  Home: (props: IDockviewPanelProps) => {
+    return RenderPage(props, Home);
+  },
+  Settings: (props: IDockviewPanelProps) => {
+    return RenderPage(props, Settings);
+  },
+  Logs: (props: IDockviewPanelProps) => {
+    return RenderPage(props, Logs);
+  },
 };
+
+function RenderPage(props: IDockviewPanelProps, page: React.FC) {
+  const isDebug = React.useContext(DebugContext);
+  const metadata = usePanelApiMetadata(props.api);
+  return (
+    <div
+      className={`p-1.25 relative h-full overflow-auto ${isDebug ? "border-2 border-dashed border-orange-500" : ""}`}
+    >
+      <span>{React.createElement(page)}</span>
+
+      {isDebug && (
+        <div className="text-sm">
+          <Option
+            title="Panel Rendering Mode"
+            value={metadata.renderer.value}
+            onClick={() => props.api.setRenderer(props.api.renderer === "always" ? "onlyWhenVisible" : "always")}
+          />
+
+          <Table data={metadata} />
+        </div>
+      )}
+    </div>
+  );
+}
 
 const headerComponents = {
   default: (props: IDockviewPanelHeaderProps) => {
@@ -197,6 +236,9 @@ const TabbedPane = (props: { theme?: string }) => {
         setActiveGroup(event?.id);
         addLogLine(`Group Activated ${event?.id}`);
       }),
+      api.onUnhandledDragOverEvent((event) => {
+        event.accept();
+      }),
     ];
 
     const loadLayout = () => {
@@ -225,6 +267,43 @@ const TabbedPane = (props: { theme?: string }) => {
   const onReady = (event: DockviewReadyEvent) => {
     setApi(event.api);
   };
+
+  const dockviewRef = React.useRef<HTMLDivElement | null>(null);
+  const [pragmaticDropElement, setPragmaticDropElement] = React.useState<
+    (ElementDragPayload & { pragmaticType: boolean }) | null
+  >(null);
+
+  const onDidDrop = (event: DockviewDidDropEvent) => {
+    if (!pragmaticDropElement || !pragmaticDropElement?.pragmaticType) return;
+
+    const newPanelId = (pragmaticDropElement.data?.label as string) || "test_pragmatic_panel";
+
+    event.api.addPanel({
+      id: newPanelId,
+      component: "Default",
+      position: {
+        direction: positionToDirection(event.position),
+        referenceGroup: event.group || undefined,
+      },
+    });
+
+    setPragmaticDropElement(null);
+  };
+
+  React.useEffect(() => {
+    if (!dockviewRef.current) {
+      return;
+    }
+    return dropTargetForElements({
+      element: dockviewRef.current,
+      onDragEnter({ source }) {
+        if (source) setPragmaticDropElement({ ...source, pragmaticType: true });
+      },
+      onDragLeave() {
+        setPragmaticDropElement(null);
+      },
+    });
+  }, [dockviewRef]);
 
   const [watermark, setWatermark] = React.useState<boolean>(false);
 
@@ -265,8 +344,9 @@ const TabbedPane = (props: { theme?: string }) => {
                   </button>
               </div> */}
       </div>
-      <div className="action-container flex items-center justify-end p-1">
+      <div className="action-container mb-2 flex items-center justify-end p-1">
         <button
+          className="mr-2 rounded"
           onClick={() => {
             setDebug(!debug);
           }}
@@ -275,6 +355,7 @@ const TabbedPane = (props: { theme?: string }) => {
         </button>
         {showLogs && (
           <button
+            className="mr-1 rounded"
             onClick={() => {
               setLogLines([]);
             }}
@@ -283,6 +364,7 @@ const TabbedPane = (props: { theme?: string }) => {
           </button>
         )}
         <button
+          className="rounded p-1"
           onClick={() => {
             setShowLogs(!showLogs);
           }}
@@ -295,6 +377,7 @@ const TabbedPane = (props: { theme?: string }) => {
         <div className="flex h-full flex-grow overflow-hidden">
           <DebugContext.Provider value={debug}>
             <DockviewReact
+              ref={dockviewRef}
               components={components}
               defaultTabComponent={headerComponents.default}
               rightHeaderActionsComponent={RightControls}
@@ -303,6 +386,7 @@ const TabbedPane = (props: { theme?: string }) => {
               watermarkComponent={watermark ? WatermarkComponent : undefined}
               onReady={onReady}
               className={props.theme || "dockview-theme-abyss"}
+              onDidDrop={onDidDrop}
             />
           </DebugContext.Provider>
         </div>
