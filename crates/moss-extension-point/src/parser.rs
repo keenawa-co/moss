@@ -1,4 +1,5 @@
 use anyhow::{anyhow, Result};
+use arcstr::ArcStr;
 use hashbrown::{HashMap, HashSet};
 use hcl::{
     eval::{Context, Evaluate},
@@ -7,13 +8,14 @@ use hcl::{
 };
 use phf::phf_set;
 
-use crate::interpreter::{ParsedConfigurationDecl, Scope};
+use crate::interpreter::{
+    ConfigurationDecl, ConfigurationOverrideDecl, ConfigurationParameterDecl, Scope,
+};
 
 const CONFIGURATION_LIT: &'static str = "configuration";
+const PARAMETER_LIT: &'static str = "parameter";
+const OVERRIDE_LIT: &'static str = "override";
 const LOCALS_LIT: &'static str = "locals";
-
-const CONFIGURATION_IDENT_POS: usize = 0;
-const CONFIGURATION_PARENT_IDENT_POS: usize = 1;
 
 // TODO
 
@@ -103,31 +105,115 @@ impl Parser {
         Ok(result)
     }
 
-    fn parse_configuration_block(&self, block: Block) -> Result<ParsedConfigurationDecl> {
-        let mut result = ParsedConfigurationDecl {
+    fn parse_configuration_block(&self, block: Block) -> Result<ConfigurationDecl> {
+        let mut result = ConfigurationDecl {
             ident: block
                 .labels()
-                .get(CONFIGURATION_IDENT_POS)
-                .map(|label| label.as_str().to_string()),
+                .get(0)
+                .map(|label| ArcStr::from(label.as_str())),
             parent_ident: block
                 .labels()
-                .get(CONFIGURATION_PARENT_IDENT_POS)
-                .map(|label| label.as_str().to_string()),
-            display_name: None,
-            description: None,
-            order: None,
+                .get(1)
+                .map(|label| ArcStr::from(label.as_str())),
+            display_name: Expression::Null,
+            description: Expression::Null,
+            order: Expression::Null,
             parameters: Vec::new(),
+            overrides: Vec::new(),
         };
 
-        for attribute in block.body.into_attributes() {
+        for attribute in block.body.clone().into_attributes() {
             match attribute.key() {
-                "display_name" => result.display_name = Some(attribute.expr),
-                "description" => result.description = Some(attribute.expr),
-                "order" => result.order = Some(attribute.expr),
+                "display_name" => result.display_name = attribute.expr,
+                "description" => result.description = attribute.expr,
+                "order" => result.order = attribute.expr,
                 _ => {
 
                     // TODO: Add logging for encountering an unknown attribute
                 }
+            }
+        }
+
+        for block in block.body.into_blocks() {
+            match block.identifier() {
+                OVERRIDE_LIT => {
+                    let ident = if let Some(label) = block
+                        .labels()
+                        .get(0)
+                        .map(|label| ArcStr::from(label.as_str()))
+                    {
+                        label
+                    } else {
+                        // TODO: Add logging for encountering an unknown parameter
+                        continue;
+                    };
+
+                    let mut override_decl = ConfigurationOverrideDecl {
+                        ident,
+                        value: Expression::Null,
+                        context: Expression::Null,
+                    };
+
+                    for attribute in block.body.into_attributes() {
+                        match attribute.key() {
+                            "value" => override_decl.value = attribute.expr,
+                            "context" => override_decl.context = attribute.expr,
+                            _ => {
+
+                                // TODO: Add logging for encountering an unknown attribute
+                            }
+                        }
+                    }
+
+                    result.overrides.push(override_decl);
+                }
+
+                PARAMETER_LIT => {
+                    let ident = if let Some(label) = block
+                        .labels()
+                        .get(0)
+                        .map(|label| ArcStr::from(label.as_str()))
+                    {
+                        label
+                    } else {
+                        // TODO: Add logging for encountering an unknown parameter
+                        continue;
+                    };
+
+                    let mut parameter_decl = ConfigurationParameterDecl {
+                        ident,
+                        value_type: Expression::Null,
+                        maximum: Expression::Null,
+                        minimum: Expression::Null,
+                        default: Expression::Null,
+                        order: Expression::Null,
+                        scope: Expression::Null,
+                        description: Expression::Null,
+                        excluded: Expression::Null,
+                        protected: Expression::Null,
+                    };
+
+                    for attribute in block.body.into_attributes() {
+                        match attribute.key() {
+                            "type" => parameter_decl.value_type = attribute.expr,
+                            "maximum" => parameter_decl.maximum = attribute.expr,
+                            "minimum" => parameter_decl.minimum = attribute.expr,
+                            "default" => parameter_decl.default = attribute.expr,
+                            "order" => parameter_decl.order = attribute.expr,
+                            "scope" => parameter_decl.scope = attribute.expr,
+                            "description" => parameter_decl.description = attribute.expr,
+                            "excluded" => parameter_decl.excluded = attribute.expr,
+                            "protected" => parameter_decl.protected = attribute.expr,
+                            _ => {
+
+                                // TODO: Add logging for encountering an unknown attribute
+                            }
+                        }
+                    }
+
+                    result.parameters.push(parameter_decl);
+                }
+                _ => {}
             }
         }
 
@@ -216,18 +302,21 @@ fn parse_local_variable(var: &Variable) -> Option<String> {
 #[cfg(test)]
 mod tests {
     use super::Parser;
-    use hcl::eval::Context;
 
     #[test]
     fn test() {
         let input = r#"
         locals {
+            desc = "The width of the application window in pixels 2"
             default = {
                 width = 800
             }
             dimensions = [800, 3840]
         }
         configuration "moss.kernel.window" {
+            display_name = "Window"
+            description = local.desc
+
             parameter "window.defaultWidth" {
                 type = number
                 minimum = local.dimensions[0]
@@ -235,7 +324,11 @@ mod tests {
                 default = local.default.width
                 order = 1
                 scope = "APPLICATION"
-                description = "The width of the application window in pixels."
+                description = local.desc
+            }
+
+            override "editor.fontSize" {
+                value = 16
             }
         }
             "#;
@@ -243,8 +336,9 @@ mod tests {
         let parser = Parser::new();
         let parsed_module = parser.parse_module(input).unwrap();
 
-        let resolved = parsed_module.evaluate();
+        let resolved = parsed_module.evaluate().unwrap();
         println!("Resolved: {:#?}", resolved);
+
         // let resolved = resolve(parsed_module).unwrap();
         // dbg!(resolved);
     }

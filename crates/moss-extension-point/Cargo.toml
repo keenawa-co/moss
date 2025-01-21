@@ -15,3 +15,4 @@ arcstr = { workspace = true, features = ["serde"] }
 tracing.workspace = true
 phf = { workspace = true, features = ["macros"] }
 petgraph = "0.7"
+strum = { workspace = true, features = ["derive"] }

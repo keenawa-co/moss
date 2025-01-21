@@ -2710,7 +2710,6 @@ dependencies = [
  "serde_json",
  "smallvec",
  "smol",
- "strum",
  "tauri",
  "thiserror 2.0.8",
  "tokio",
@@ -2737,6 +2736,7 @@ dependencies = [
  "phf 0.11.3",
  "serde",
  "serde_json",
+ "strum",
  "tracing",
 ]
 
