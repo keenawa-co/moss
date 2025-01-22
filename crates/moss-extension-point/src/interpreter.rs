@@ -7,6 +7,7 @@ use hcl::{
 };
 use serde::Deserialize;
 use std::str::FromStr;
+use std::sync::Arc;
 use strum::EnumString as StrumEnumString;
 
 #[inline]
@@ -78,7 +79,7 @@ pub struct ConfigurationOverrideDecl {
 
 #[derive(Debug)]
 pub struct ConfigurationDecl {
-    pub ident: Option<ArcStr>,
+    pub ident: ArcStr,
     pub parent_ident: Option<ArcStr>,
     pub display_name: Expression,
     pub description: Expression,
@@ -103,7 +104,7 @@ impl ConfigurationDecl {
 
             parameters.insert(
                 parameter_decl.ident.clone(),
-                Parameter {
+                Arc::new(Parameter {
                     ident: parameter_decl.ident,
                     typ,
                     maximum: try_evaluate_to_u64(ctx, parameter_decl.maximum)?,
@@ -117,7 +118,7 @@ impl ConfigurationDecl {
                     excluded: try_evaluate_to_bool(ctx, parameter_decl.excluded)?.unwrap_or(false),
                     protected: try_evaluate_to_bool(ctx, parameter_decl.protected)?
                         .unwrap_or(false),
-                },
+                }),
             );
         }
 
@@ -136,11 +137,11 @@ impl ConfigurationDecl {
 
             overrides.insert(
                 override_decl.ident.clone(),
-                Override {
+                Arc::new(Override {
                     ident: override_decl.ident,
                     value,
                     context: None,
-                },
+                }),
             );
         }
 
@@ -194,13 +195,13 @@ impl Scope {
 
 #[derive(Debug)]
 pub struct ConfigurationNode {
-    pub ident: Option<ArcStr>,
+    pub ident: ArcStr,
     pub parent_ident: Option<ArcStr>,
     pub display_name: Option<String>,
     pub description: Option<String>,
     pub order: Option<u64>,
-    pub parameters: HashMap<ArcStr, Parameter>,
-    pub overrides: HashMap<ArcStr, Override>,
+    pub parameters: HashMap<ArcStr, Arc<Parameter>>,
+    pub overrides: HashMap<ArcStr, Arc<Override>>,
 }
 
 #[derive(Debug)]

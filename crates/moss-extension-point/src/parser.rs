@@ -110,6 +110,7 @@ impl Parser {
             ident: block
                 .labels()
                 .get(0)
+                .expect("No identifier found")
                 .map(|label| ArcStr::from(label.as_str())),
             parent_ident: block
                 .labels()

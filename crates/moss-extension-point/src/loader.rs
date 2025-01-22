@@ -1,14 +1,14 @@
+use crate::interpreter::ResolvedScope;
+use crate::parser::Parser;
 use anyhow::Result;
 use hashbrown::HashMap;
 use hcl::eval::{Context as EvalContext, Evaluate};
 use std::path::PathBuf;
 
-use crate::module::{ExtensionPointFile, ExtensionPointModule};
-
 const FILE_EXTENSION: &'static str = "hcl";
 
 pub struct Loader {
-    modules: HashMap<PathBuf, ExtensionPointModule>,
+    modules: HashMap<PathBuf, ResolvedScope>,
 }
 
 impl Loader {
@@ -18,7 +18,7 @@ impl Loader {
         }
     }
 
-    pub fn modules(&self) -> &HashMap<PathBuf, ExtensionPointModule> {
+    pub fn modules(&self) -> &HashMap<PathBuf, ResolvedScope> {
         &self.modules
     }
 
@@ -39,9 +39,9 @@ impl Loader {
         Ok(())
     }
 
-    fn load_module(&self, ctx: &mut EvalContext, path: &PathBuf) -> Result<ExtensionPointModule> {
+    fn load_module(&self, ctx: &mut EvalContext, path: &PathBuf) -> Result<ResolvedScope> {
         let mut read_dir = std::fs::read_dir(path)?;
-        let mut module = ExtensionPointModule::new();
+        let mut module = ResolvedScope::new();
 
         while let Some(entry) = read_dir.next() {
             let path = entry?.path();
@@ -58,18 +58,19 @@ impl Loader {
                 }
 
                 let ep_file = self.parse_file(ctx, &path)?;
-                module.register_file(path, ep_file);
+                module.configurations.extend(ep_file.configurations);
             }
         }
 
         Ok(module)
     }
 
-    fn parse_file(&self, ctx: &mut EvalContext, path: &PathBuf) -> Result<ExtensionPointFile> {
+    fn parse_file(&self, ctx: &mut EvalContext, path: &PathBuf) -> Result<ResolvedScope> {
         let file_content = std::fs::read_to_string(path)?;
-        let body: hcl::Body = hcl::from_str(&file_content)?;
-
-        Ok(hcl::from_body(body.evaluate(&ctx)?)?)
+        let parser = Parser::new();
+        parser
+            .parse_module(&file_content)
+            .map(|scope| scope.evaluate_with_context(ctx))?
     }
 }
 
