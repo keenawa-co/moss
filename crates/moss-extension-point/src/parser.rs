@@ -12,6 +12,9 @@ use crate::interpreter::{
     ConfigurationDecl, ConfigurationOverrideDecl, ConfigurationParameterDecl, Scope,
 };
 
+pub static OTHER_EXTEND_CONFIGURATION_PARENT_ID: ArcStr =
+    arcstr::literal!("moss.configuration.other");
+
 const CONFIGURATION_LIT: &'static str = "configuration";
 const PARAMETER_LIT: &'static str = "parameter";
 const OVERRIDE_LIT: &'static str = "override";
@@ -45,7 +48,12 @@ impl Parser {
         for block in body.into_blocks() {
             match block.identifier() {
                 CONFIGURATION_LIT => {
-                    let parsed = self.parse_configuration_block(block)?;
+                    let parsed = if block.labels().is_empty() {
+                        self.parse_extend_configuration_block(block)?
+                    } else {
+                        self.parse_configuration_block(block)?
+                    };
+
                     result.configurations.push(parsed);
                 }
                 LOCALS_LIT => {
@@ -105,12 +113,19 @@ impl Parser {
         Ok(result)
     }
 
+    fn parse_extend_configuration_block(&self, block: Block) -> Result<ConfigurationDecl> {
+        // If a configuration block does not have an explicitly specified
+        // identifier, we identify such a block as an extension of the specially
+        // reserved `OTHER_EXTEND_CONFIGURATION_PARENT_ID` node.
+
+        unimplemented!()
+    }
+
     fn parse_configuration_block(&self, block: Block) -> Result<ConfigurationDecl> {
         let mut result = ConfigurationDecl {
             ident: block
                 .labels()
                 .get(0)
-                .expect("No identifier found")
                 .map(|label| ArcStr::from(label.as_str())),
             parent_ident: block
                 .labels()

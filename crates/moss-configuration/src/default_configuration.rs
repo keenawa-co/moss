@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use moss_extension_point::registry::ConfigurationRegistry;
+use moss_extension_point::{interpreter::type_default_json_value, registry::ConfigurationRegistry};
 
 use crate::ConfigurationModel;
 
@@ -22,7 +22,7 @@ impl DefaultConfiguration {
             } else if !value.default.is_null() {
                 value.default.clone()
             } else {
-                value.typ.default_json_value()
+                type_default_json_value(&value.typ)
             };
 
             if !model.insert(key, default_value) {

@@ -1,6 +1,7 @@
 pub mod default_configuration;
 
 use arcstr::ArcStr;
+use hcl::Value as HclValue;
 use serde_json::Value as JsonValue;
 use std::{
     collections::{HashMap, HashSet},

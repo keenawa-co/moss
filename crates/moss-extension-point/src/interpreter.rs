@@ -3,9 +3,10 @@ use arcstr::ArcStr;
 use hashbrown::{HashMap, HashSet};
 use hcl::{
     eval::{Context, Evaluate},
-    Expression, Map, Value as HclValue,
+    Expression, Map, Number, Value as HclValue,
 };
 use serde::Deserialize;
+use serde_json::Value as JsonValue;
 use std::str::FromStr;
 use std::sync::Arc;
 use strum::EnumString as StrumEnumString;
@@ -38,11 +39,11 @@ impl TryFrom<hcl::Variable> for ParameterType {
     }
 }
 
-pub fn type_default_value(typ: &ParameterType) -> Expression {
+pub fn type_default_json_value(typ: &ParameterType) -> JsonValue {
     match typ {
-        ParameterType::Number => Expression::Number(hcl::Number::from(0)),
-        ParameterType::String => Expression::String(String::new()),
-        ParameterType::Bool => Expression::Bool(false),
+        ParameterType::Number => 0.into(),
+        ParameterType::String => "".into(),
+        ParameterType::Bool => false.into(),
     }
 }
 
@@ -79,7 +80,7 @@ pub struct ConfigurationOverrideDecl {
 
 #[derive(Debug)]
 pub struct ConfigurationDecl {
-    pub ident: ArcStr,
+    pub ident: Option<ArcStr>,
     pub parent_ident: Option<ArcStr>,
     pub display_name: Expression,
     pub description: Expression,
@@ -109,7 +110,9 @@ impl ConfigurationDecl {
                     typ,
                     maximum: try_evaluate_to_u64(ctx, parameter_decl.maximum)?,
                     minimum: try_evaluate_to_u64(ctx, parameter_decl.minimum)?,
-                    default: parameter_decl.default.evaluate(ctx)?,
+                    default: serde_json::from_str(
+                        parameter_decl.default.evaluate(ctx)?.to_string().as_str(),
+                    )?,
                     scope: try_evaluate_to_string(ctx, parameter_decl.scope)?
                         .and_then(|value| ParameterScope::from_str(&value).ok())
                         .unwrap_or_default(),
@@ -128,7 +131,7 @@ impl ConfigurationDecl {
                 // TODO: Add logging
                 continue;
             } else {
-                override_decl.value.evaluate(ctx)?
+                serde_json::from_str(override_decl.value.evaluate(ctx)?.to_string().as_str())?
             };
 
             let _context = if !is_null_expression(&override_decl.context) {
@@ -146,7 +149,7 @@ impl ConfigurationDecl {
         }
 
         Ok(ConfigurationNode {
-            ident: self.ident,
+            ident: self.ident.unwrap_or_default(),
             parent_ident: self.parent_ident,
             display_name: try_evaluate_to_string(ctx, self.display_name)?,
             description: try_evaluate_to_string(ctx, self.description)?,
@@ -172,6 +175,7 @@ fn try_evaluate_to_bool(ctx: &Context, expr: Expression) -> Result<Option<bool>>
 #[derive(Debug, Default)]
 pub struct Scope {
     pub configurations: Vec<ConfigurationDecl>,
+    pub configuration_extends: Vec<ConfigurationDecl>,
     pub locals: Map<String, HclValue>,
 }
 
@@ -182,7 +186,7 @@ impl Scope {
         ctx.declare_var("local", hcl::Value::Object(self.locals));
 
         for decl in self.configurations {
-            package.configurations.push(decl.evaluate(&ctx)?);
+            package.insert_configuration(decl.evaluate(&ctx)?);
         }
 
         Ok(package)
@@ -210,7 +214,7 @@ pub struct Parameter {
     pub typ: ParameterType,
     pub maximum: Option<u64>,
     pub minimum: Option<u64>,
-    pub default: HclValue,
+    pub default: JsonValue,
     /// The order in which the parameter appears within its group in the settings UI.
     pub order: Option<u64>,
     pub scope: ParameterScope,
@@ -224,19 +228,27 @@ pub struct Parameter {
 #[derive(Debug)]
 pub struct Override {
     pub ident: ArcStr,
-    pub value: HclValue,
+    pub value: JsonValue,
     pub context: Option<HashSet<String>>,
 }
 
 #[derive(Debug)]
 pub struct ResolvedScope {
-    pub configurations: Vec<ConfigurationNode>,
+    pub configurations: HashMap<ArcStr, ConfigurationNode>,
 }
 
 impl ResolvedScope {
     pub fn new() -> Self {
         Self {
-            configurations: Vec::new(),
+            configurations: HashMap::new(),
         }
+    }
+
+    pub fn insert_configuration(&mut self, node: ConfigurationNode) {
+        self.configurations.insert(ArcStr::clone(&node.ident), node);
+    }
+
+    pub fn extend_configuration(&mut self, node: ConfigurationNode) {
+        unimplemented!()
     }
 }

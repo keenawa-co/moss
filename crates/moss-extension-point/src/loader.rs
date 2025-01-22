@@ -18,8 +18,8 @@ impl Loader {
         }
     }
 
-    pub fn modules(&self) -> &HashMap<PathBuf, ResolvedScope> {
-        &self.modules
+    pub fn modules(self) -> HashMap<PathBuf, ResolvedScope> {
+        self.modules
     }
 
     pub fn load(&mut self, workspace_root: PathBuf, paths: Vec<PathBuf>) -> Result<()> {

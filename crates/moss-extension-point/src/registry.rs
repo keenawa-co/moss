@@ -4,6 +4,7 @@ use arcstr::ArcStr;
 use hashbrown::{HashMap, HashSet};
 use hcl::Value as HclValue;
 use parking_lot::Mutex;
+use serde_json::Value as JsonValue;
 use std::{marker::PhantomData, path::PathBuf, sync::Arc};
 static __EP_REGISTRY__: Mutex<Vec<PathBuf>> = Mutex::new(vec![]);
 
@@ -34,7 +35,7 @@ pub struct ValueProviderInfo {
 
 #[derive(Debug, Clone)]
 pub struct DefaultOverrideDescriptor {
-    pub value: HclValue,
+    pub value: JsonValue,
     pub provider_info: Option<ValueProviderInfo>,
 }
 
@@ -67,9 +68,12 @@ impl ConfigurationRegistry {
             .cloned()
     }
 
-    pub fn register(&mut self, nodes: Vec<ConfigurationNode>) {
+    pub fn register<I>(&mut self, nodes: I)
+    where
+        I: IntoIterator<Item = ConfigurationNode>,
+    {
         for node in nodes {
-            if let Err(err) = self.validate_node(&node) {
+            if let Err(err) = self.validate_decl(&node) {
                 warn!("Failed to register the parameter '{}': {err}", node.ident);
                 continue;
             }
@@ -116,13 +120,13 @@ impl ConfigurationRegistry {
             }
 
             let new_descriptor = Arc::new(match &override_decl.value {
-                HclValue::Bool(_) | HclValue::Number(_) | HclValue::String(_) => {
+                JsonValue::Bool(_) | JsonValue::Number(_) | JsonValue::String(_) => {
                     DefaultOverrideDescriptor {
-                        value: override_decl.value.clone().into(),
+                        value: override_decl.value.clone(),
                         provider_info: None,
                     }
                 }
-                HclValue::Null => unreachable!("Null values are already checked earlier."),
+                JsonValue::Null => unreachable!("Null values are already checked earlier."),
                 _ => unimplemented!("Handling for this type is not implemented."),
             });
 
@@ -204,16 +208,10 @@ pub struct Registry {
 }
 
 impl Registry {
-    pub fn new(modules: &HashMap<PathBuf, ResolvedScope>) -> Self {
-        let mut configurations = ConfigurationRegistry::default();
+    pub fn new(configurations: ConfigurationRegistry) -> Self {
+        // let mut configurations = ConfigurationRegistry::default();
 
-        for (_path, module) in modules {
-            // OPTIMIZE: I think this can be optimized by removing cloning at this point.
-            // In theory, after the data has been collected, there's no need to keep a
-            // clone of the data in the Loader. Therefore, we could take ownership of
-            // the data instead, eliminating the need for cloning here.
-            configurations.register(module.configurations.clone());
-        }
+        // configurations.register(scope.configurations.into_values());
 
         Self {
             configurations: Arc::new(configurations),
