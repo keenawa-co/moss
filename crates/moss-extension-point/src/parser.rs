@@ -6,10 +6,9 @@ use hcl::{
     expr::{Traversal, Variable},
     Block, Body, Expression, Object, ObjectKey, Value,
 };
-use phf::phf_set;
 
 use crate::interpreter::{
-    ConfigurationDecl, ConfigurationOverrideDecl, ConfigurationParameterDecl, Scope,
+    ConfigurationDecl, ConfigurationOverrideDecl, ConfigurationParameterDecl, ParsedScope,
 };
 
 pub static OTHER_EXTEND_CONFIGURATION_PARENT_ID: ArcStr =
@@ -22,18 +21,18 @@ const LOCALS_LIT: &'static str = "locals";
 
 // TODO
 
-static RESERVED_WORDS: phf::Set<&'static str> = phf_set! {
-    "configuration",
-    "theme",
-};
+// static RESERVED_WORDS: phf::Set<&'static str> = phf::phf_set! {
+//     "configuration",
+//     "theme",
+// };
 
-fn is_reserved_word(value: &str) -> bool {
-    RESERVED_WORDS.get_key(value).is_some()
-}
+// fn is_reserved_word(value: &str) -> bool {
+//     RESERVED_WORDS.get_key(value).is_some()
+// }
 
-fn is_valid_configuration_id(value: &str) -> bool {
-    unimplemented!()
-}
+// fn is_valid_configuration_id(value: &str) -> bool {
+//     unimplemented!()
+// }
 
 pub struct Parser {}
 
@@ -42,9 +41,9 @@ impl Parser {
         Self {}
     }
 
-    pub fn parse_module(&self, input: &str) -> Result<Scope> {
+    pub fn parse_module(&self, input: &str) -> Result<ParsedScope> {
         let body: Body = hcl::from_str(input)?;
-        let mut result = Scope::default();
+        let mut result = ParsedScope::default();
         for block in body.into_blocks() {
             match block.identifier() {
                 CONFIGURATION_LIT => {

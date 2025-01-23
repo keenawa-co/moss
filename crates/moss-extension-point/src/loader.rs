@@ -1,9 +1,10 @@
-use crate::interpreter::ResolvedScope;
-use crate::parser::Parser;
 use anyhow::Result;
 use hashbrown::HashMap;
-use hcl::eval::{Context as EvalContext, Evaluate};
+use hcl::eval::Context as EvalContext;
 use std::path::PathBuf;
+
+use crate::interpreter::types::scope::ResolvedScope;
+use crate::parser::Parser;
 
 const FILE_EXTENSION: &'static str = "hcl";
 
@@ -24,11 +25,6 @@ impl Loader {
 
     pub fn load(&mut self, workspace_root: PathBuf, paths: Vec<PathBuf>) -> Result<()> {
         let mut ctx = EvalContext::new();
-
-        // TODO: A temporary solution: ideally, adding supported types should be
-        // dynamic, based on an enum that lists all possible types.
-        ctx.declare_var("number", "number");
-        ctx.declare_var("string", "string");
 
         for path in paths {
             let module_path = &workspace_root.join(path);

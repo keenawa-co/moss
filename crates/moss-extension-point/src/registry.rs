@@ -1,11 +1,12 @@
-use crate::interpreter::{ConfigurationNode, Override, Parameter, ResolvedScope};
 use anyhow::{anyhow, Result};
 use arcstr::ArcStr;
 use hashbrown::{HashMap, HashSet};
-use hcl::Value as HclValue;
 use parking_lot::Mutex;
 use serde_json::Value as JsonValue;
-use std::{marker::PhantomData, path::PathBuf, sync::Arc};
+use std::{path::PathBuf, sync::Arc};
+
+use crate::interpreter::types::configuration::*;
+
 static __EP_REGISTRY__: Mutex<Vec<PathBuf>> = Mutex::new(vec![]);
 
 #[macro_export]

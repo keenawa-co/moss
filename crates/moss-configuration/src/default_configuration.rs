@@ -1,6 +1,8 @@
+use moss_extension_point::{
+    interpreter::types::configuration::ParameterType, registry::ConfigurationRegistry,
+};
+use serde_json::Value as JsonValue;
 use std::sync::Arc;
-
-use moss_extension_point::{interpreter::type_default_json_value, registry::ConfigurationRegistry};
 
 use crate::ConfigurationModel;
 
@@ -38,5 +40,13 @@ impl DefaultConfiguration {
 
     pub fn model(&self) -> &Arc<ConfigurationModel> {
         &self.model
+    }
+}
+
+pub fn type_default_json_value(typ: &ParameterType) -> JsonValue {
+    match typ {
+        ParameterType::Number => 0.into(),
+        ParameterType::String => "".into(),
+        ParameterType::Bool => false.into(),
     }
 }

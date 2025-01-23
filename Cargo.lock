@@ -2672,7 +2672,6 @@ version = "0.1.0"
 dependencies = [
  "arcstr",
  "hashbrown 0.15.2",
- "hcl-rs",
  "moss_extension_point",
  "serde",
  "serde_json",
@@ -2689,7 +2688,6 @@ dependencies = [
  "dirs",
  "fnv",
  "hashbrown 0.15.2",
- "hcl-rs",
  "indexmap 2.7.0",
  "jsonschema",
  "linkme",

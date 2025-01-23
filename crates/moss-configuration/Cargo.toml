@@ -10,4 +10,3 @@ moss_extension_point.workspace = true
 arcstr.workspace = true
 hashbrown = { workspace = true }
 tracing.workspace = true
-hcl-rs.workspace = true
