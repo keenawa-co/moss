@@ -46,3 +46,4 @@ dist/
 .idea
 .idea/**
 /view/desktop/bin/src/wasm/target/
+/crates/moss-wasmhost/wasm/target

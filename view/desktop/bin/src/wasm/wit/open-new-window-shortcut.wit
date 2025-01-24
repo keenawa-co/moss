@@ -1,6 +1,0 @@
-package plugin:demo;
-
-world open-new-window-shortcut {
-    export execute: func();
-    import open-new-window: func();
-}

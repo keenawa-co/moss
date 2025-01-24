@@ -1,5 +1,5 @@
 [package]
-name = "open-new-window-shortcut"
+name = "wasmhost-demo"
 version = "0.1.0"
 edition = "2021"
 
@@ -7,6 +7,6 @@ edition = "2021"
 crate-type = ["cdylib"]
 
 [dependencies]
-wit-bindgen = "0.37.0"
+wit-bindgen = "0.38.0"
 
 [workspace]

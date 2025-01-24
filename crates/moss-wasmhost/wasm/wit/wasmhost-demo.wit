@@ -1,0 +1,7 @@
+package addon:demo;
+
+world wasmhost-demo {
+    import get-hash: func() -> string;
+    import create-folder: func(name: string);
+    export execute: func();
+}
