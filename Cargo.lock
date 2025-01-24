@@ -2730,6 +2730,7 @@ dependencies = [
  "ctor",
  "hashbrown 0.15.2",
  "hcl-rs",
+ "moss_mel",
  "parking_lot",
  "petgraph",
  "phf 0.11.3",
@@ -2772,6 +2773,20 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 2.0.90",
+]
+
+[[package]]
+name = "moss_mel"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "arcstr",
+ "hashbrown 0.15.2",
+ "hcl-rs",
+ "petgraph",
+ "serde",
+ "serde_json",
+ "strum",
 ]
 
 [[package]]
