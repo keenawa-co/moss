@@ -22,7 +22,8 @@ members = [
     "crates/moss-addon",
     "crates/moss-tauri", 
     "crates/moss-configuration", 
-    "crates/moss-extension-point",
+    "crates/moss-extension-point", 
+    "crates/moss-mel",
 ]
 
 [profile.dev]
@@ -61,6 +62,7 @@ moss_tauri = { path = "crates/moss-tauri" }
 moss_theme = { path = "crates/moss-theme" }
 moss_configuration = { path = "crates/moss-configuration" }
 moss_extension_point = { path = "crates/moss-extension-point" }
+moss_mel = { path = "crates/moss-mel" }
 
 smallvec = "1.13.2"
 toml = "0.8.19"
@@ -108,3 +110,4 @@ moka = { version = "0.12.8", features = ["sync"] }
 derive_more = "1.0.0"
 hcl-rs = "0.18.2"
 ctor = "0.2.9"
+petgraph = "0.7"

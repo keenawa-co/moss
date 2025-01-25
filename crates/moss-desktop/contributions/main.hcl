@@ -1,11 +1,24 @@
-pragma required_version ">= 1.0" {}
+# package {
+#     required_version = ">= 1.0"
+#     provider = "moss-desktop"
+# }
 
-locals {
-    max_subnet_length = 10
-}
+# locals {
+#     max_subnet_length = 10
+# }
+ 
+# configuration {
+#     override "editor.fontSize" {
+#         value = 16
+#         # context = [
+#         #     "typescript",
+#         #     "javascript"
+#         # ]
+#     }
+# }
 
 configuration "moss.kernel.window" {
-    title = "Window"
+    display_name = "Window"
     order = 5
 
     parameter "window.defaultWidth" {

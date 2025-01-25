@@ -1,6 +1,6 @@
-use std::sync::Arc;
-
 use moss_extension_point::registry::ConfigurationRegistry;
+use moss_mel::foundations::typ::default_json_value;
+use std::sync::Arc;
 
 use crate::ConfigurationModel;
 
@@ -22,7 +22,12 @@ impl DefaultConfiguration {
             } else if !value.default.is_null() {
                 value.default.clone()
             } else {
-                value.typ.default_json_value()
+                if let Ok(typ) = default_json_value(&value.typ) {
+                    typ
+                } else {
+                    // TODO: logs
+                    continue;
+                }
             };
 
             if !model.insert(key, default_value) {

@@ -10,7 +10,7 @@ use anyhow::Result;
 use moss_configuration::default_configuration::DefaultConfiguration;
 use moss_desktop::services::configuration_service::ConfigurationService;
 use moss_extension_point::loader::Loader;
-use moss_extension_point::registry::{self, Registry};
+use moss_extension_point::registry::{self, ConfigurationRegistry, Registry};
 use rand::random;
 use tauri::{AppHandle, Manager, RunEvent, WebviewWindow, WindowEvent};
 use tauri_plugin_global_shortcut::{Code, GlobalShortcutExt, Modifiers, Shortcut, ShortcutState};
@@ -93,7 +93,16 @@ pub fn run() {
                 )
                 .unwrap();
 
-            let registry = Registry::new(loader.modules());
+            let configuration_registry = {
+                let mut registry = ConfigurationRegistry::default();
+                for scope in loader.modules().into_values() {
+                    registry.register(scope.configurations.into_values());
+                }
+
+                registry
+            };
+
+            let registry = Registry::new(configuration_registry);
             let default_configurations =
                 DefaultConfiguration::new(registry.configuration_registry());
 
@@ -204,6 +213,8 @@ fn create_main_window(app_handle: &AppHandle, url: &str) -> WebviewWindow {
     let window_inner_width = configuration_service
         .get_typed_value("window.defaultWidth")
         .unwrap();
+
+    dbg!(&window_inner_height, &window_inner_width);
 
     let label = format!("{MAIN_WINDOW_PREFIX}{}", 0);
     let config = CreateWindowInput {
