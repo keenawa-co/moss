@@ -2733,11 +2733,8 @@ dependencies = [
  "hcl-rs",
  "moss_mel",
  "parking_lot",
- "petgraph",
- "phf 0.11.3",
  "serde",
  "serde_json",
- "strum",
  "tracing",
 ]
 
