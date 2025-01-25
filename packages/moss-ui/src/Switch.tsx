@@ -1,29 +1,36 @@
-"use client";
+import { ComponentPropsWithoutRef, createContext, ElementRef, forwardRef } from "react";
 
-import * as React from "react";
-
-import * as SwitchPrimitives from "@radix-ui/react-switch";
+import * as Switch from "@radix-ui/react-switch";
+import { type SwitchProps } from "@tailus/themer";
 
 import { cn } from "./utils";
 
-const Switch = React.forwardRef<
-  React.ElementRef<typeof SwitchPrimitives.Root>,
-  React.ComponentPropsWithoutRef<typeof SwitchPrimitives.Root>
->(({ className, ...props }, ref) => (
-  <SwitchPrimitives.Root
-    className={cn(
-      `focus-visible:ring-offset-background peer inline-flex h-5 w-9 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent shadow-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-300 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-sky-400 data-[state=unchecked]:bg-gray-200`,
-      className
-    )}
-    {...props}
-    ref={ref}
-  >
-    <SwitchPrimitives.Thumb
-      className={cn(
-        `pointer-events-none block h-4 w-4 rounded-full bg-white shadow-lg ring-0 transition-transform data-[state=checked]:translate-x-4 data-[state=unchecked]:translate-x-0`
-      )}
-    />
-  </SwitchPrimitives.Root>
-));
+const SwitchContext = createContext({});
 
-export default Switch;
+const defaultSwitchRootStyles =
+  "relative inline-block border border-gray-900/5 group rounded-full bg-gray-200 transition dark:bg-gray-800 outline-2 outline-blue-600 outline-offset-2 overflow-hidden focus-visible:outline disabled:bg-gray-100 dark:border-gray-800 disabled:opacity-50 disabled:shadow-none data-[state=checked]:border-blue-600 data-[state=checked]:bg-blue-600 h-5 w-8";
+
+const SwitchRoot = forwardRef<ElementRef<typeof Switch.Root>, ComponentPropsWithoutRef<typeof Switch.Root>>(
+  ({ className, ...props }, forwardedRef) => {
+    return (
+      <SwitchContext.Provider value={{}}>
+        <Switch.Root className={cn(defaultSwitchRootStyles, className)} {...props} ref={forwardedRef} />
+      </SwitchContext.Provider>
+    );
+  }
+);
+
+const defaultSwitchThumbStyles =
+  "absolute inset-x-[1px] inset-y-0 my-auto size-4 rounded-full bg-white shadow-sm shadow-gray-950/25 transition-[transform,width] ease-in-out duration-300 will-change-transform data-[state=checked]:translate-x-3";
+
+const SwitchThumb = forwardRef<
+  ElementRef<typeof Switch.Thumb>,
+  ComponentPropsWithoutRef<typeof Switch.Thumb> & SwitchProps
+>(({ className, ...props }, forwardedRef) => {
+  return <Switch.Thumb className={cn(defaultSwitchThumbStyles, className)} {...props} ref={forwardedRef} />;
+});
+
+const Root = SwitchRoot;
+const Thumb = SwitchThumb;
+
+export { Root, Thumb };

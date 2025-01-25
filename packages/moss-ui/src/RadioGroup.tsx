@@ -1,43 +1,65 @@
-import React, { useContext } from "react";
+import { ComponentPropsWithoutRef, createContext, ElementRef, forwardRef, useContext } from "react";
 
 import * as RadioGroupPrimitive from "@radix-ui/react-radio-group";
-import { fancyRadio, radio, type RadioProps } from "@tailus/themer";
+import { radio, type RadioProps } from "@tailus/themer";
+
+import { cn } from "./utils";
 
 export interface RadioRootProps extends RadioProps {
   className?: string;
 }
 
-const RadioGroupContext = React.createContext<RadioRootProps>({ fancy: false, intent: "primary" });
+const RadioGroupContext = createContext<RadioRootProps>({ fancy: false, intent: "primary" });
 
-const RadioGroupRoot = React.forwardRef<
-  React.ElementRef<typeof RadioGroupPrimitive.Root>,
-  React.ComponentPropsWithoutRef<typeof RadioGroupPrimitive.Root> & RadioRootProps
->(({ className, intent, fancy, ...props }, forwardedRef) => {
+const Root = forwardRef<
+  ElementRef<typeof RadioGroupPrimitive.Root>,
+  ComponentPropsWithoutRef<typeof RadioGroupPrimitive.Root> & RadioRootProps
+>(({ className, ...props }, forwardedRef) => {
   return (
-    <RadioGroupContext.Provider value={{ fancy, intent }}>
+    <RadioGroupContext.Provider value={{}}>
       <RadioGroupPrimitive.Root {...props} ref={forwardedRef} className={className} />
     </RadioGroupContext.Provider>
   );
 });
 
 export interface RadioItemProps {
-  fancy?: boolean;
-  intent?: RadioProps["intent"];
   className?: string;
 }
 
-const RadioGroupItem = React.forwardRef<
-  React.ElementRef<typeof RadioGroupPrimitive.Item>,
-  React.ComponentPropsWithoutRef<typeof RadioGroupPrimitive.Item> & RadioItemProps
+const defaultRadioGroupItemStyles = ` size-4 border bg-white shadow-sm group rounded-full peer flex justify-center items-center outline-2 outline-blue-600 outline-offset-2
+ hover:brightness-95
+ focus-visible:outline
+ bg-gray-500/10
+ data-[state=checked]:border-none
+ data-[state=checked]:bg-blue-600
+
+ disabled:bg-gray-100
+ disabled:bg-gray-800
+ disabled:opacity-50
+ disabled:border-gray-300
+ disabled:border-gray-700
+ disabled:shadow-none
+ disabled:data-[state=checked]:bg-gray-300
+ disabled:data-[state=checked]:bg-gray-700
+ disabled:data-[state=checked]:shadow-none
+`;
+
+const Item = forwardRef<
+  ElementRef<typeof RadioGroupPrimitive.Item>,
+  ComponentPropsWithoutRef<typeof RadioGroupPrimitive.Item> & RadioItemProps
 >((props, forwardedRef) => {
-  const { intent, fancy } = useContext(RadioGroupContext);
-  const { item } = fancy ? fancyRadio({ intent }) : radio({ intent });
-  return <RadioGroupPrimitive.Item {...props} ref={forwardedRef} className={item({ className: props.className })} />;
+  return (
+    <RadioGroupPrimitive.Item
+      {...props}
+      ref={forwardedRef}
+      className={cn(defaultRadioGroupItemStyles, props.className)}
+    />
+  );
 });
 
-const RadioGroupIndicator = React.forwardRef<
-  React.ElementRef<typeof RadioGroupPrimitive.Indicator>,
-  React.ComponentPropsWithoutRef<typeof RadioGroupPrimitive.Indicator> &
+const Indicator = forwardRef<
+  ElementRef<typeof RadioGroupPrimitive.Indicator>,
+  ComponentPropsWithoutRef<typeof RadioGroupPrimitive.Indicator> &
     RadioProps & {
       className?: string;
     }
@@ -53,10 +75,4 @@ const RadioGroupIndicator = React.forwardRef<
   );
 });
 
-export default {
-  Root: RadioGroupRoot,
-  Item: RadioGroupItem,
-  Indicator: RadioGroupIndicator,
-};
-
-export { RadioGroupRoot, RadioGroupItem, RadioGroupIndicator };
+export { Root, Item, Indicator };

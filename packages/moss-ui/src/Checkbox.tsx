@@ -1,26 +1,39 @@
 import { ComponentPropsWithoutRef, ElementRef, forwardRef } from "react";
 
 import * as CheckboxPrimitive from "@radix-ui/react-checkbox";
-import { checkbox, fancyCheckbox, type CheckboxProps as CheckboxVariants } from "@tailus/themer";
 
-export interface CheckboxProps extends CheckboxVariants {
+import { cn } from "./utils";
+
+export interface CheckboxProps {
   className?: string;
-  fancy?: boolean;
 }
+
+const defaultCheckboxRootStyles = `border shadow-sm group rounded peer flex justify-center items-center size-[1.125rem] outline-2 outline-blue-600 outline-offset-2 text-white
+  hover:brightness-95
+  focus-visible:outline
+
+  data-[state=checked]:border-none
+  data-[state=checked]:bg-blue-400
+  data-[state=indeterminate]:border-none
+
+  disabled:bg-gray-100
+  disabled:opacity-50
+  disabled:border-gray-300
+  disabled:shadow-none
+
+  disabled:data-[state=checked]:bg-gray-300
+  disabled:data-[state=checked]:shadow-none
+  disabled:data-[state=indeterminate]:bg-gray-300
+  disabled:data-[state=indeterminate]:shadow-none`;
 
 const CheckboxRoot = forwardRef<
   ElementRef<typeof CheckboxPrimitive.Root>,
   ComponentPropsWithoutRef<typeof CheckboxPrimitive.Root> & CheckboxProps
->(({ className, intent, fancy, ...props }: CheckboxProps, forwardedRef) => {
-  const classes = fancy ? fancyCheckbox({ intent, className }) : checkbox({ intent, className });
-  return <CheckboxPrimitive.Root ref={forwardedRef} className={classes} {...props} />;
+>(({ className, ...props }: CheckboxProps, forwardedRef) => {
+  return <CheckboxPrimitive.Root ref={forwardedRef} className={cn(defaultCheckboxRootStyles, className)} {...props} />;
 });
 
-const CheckboxIndicator = CheckboxPrimitive.Indicator;
+const Root = CheckboxRoot;
+const Indicator = CheckboxPrimitive.Indicator;
 
-export { CheckboxRoot, CheckboxIndicator };
-
-export default {
-  Root: CheckboxRoot,
-  Indicator: CheckboxIndicator,
-};
+export { Root, Indicator };

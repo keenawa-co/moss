@@ -3,6 +3,7 @@ import { Children, forwardRef, HTMLAttributes, isValidElement } from "react";
 
 import Icon from "./Icon";
 import { cn } from "./utils";
+import { toCssVarIfNecessary } from "./utils/toCssVarIfNecessary";
 
 export type Root = typeof Root;
 export type Label = typeof Label;
@@ -13,7 +14,7 @@ export interface ButtonProps extends HTMLAttributes<HTMLButtonElement | HTMLAnch
   href?: string;
   variant?: "solid" | "outlined" | "soft" | "ghost";
   size?: "xs" | "sm" | "md" | "lg" | "xl";
-  colors: {
+  styles: {
     bg: string;
     bgHover: string;
     border: string;
@@ -65,7 +66,7 @@ export const Label = forwardRef<HTMLElement, HTMLAttributes<HTMLElement>>(
 
 export const Root = forwardRef<HTMLButtonElement & HTMLAnchorElement, ButtonProps>(
   (
-    { className, variant = "solid", size = "md", disabled, loading, href, children, colors, ...props },
+    { className, variant = "solid", size = "md", disabled, loading, href, children, styles, ...props },
     forwardedRef
   ) => {
     const Component = href ? "a" : "button";
@@ -83,11 +84,11 @@ export const Root = forwardRef<HTMLButtonElement & HTMLAnchorElement, ButtonProp
         {...props}
         style={
           {
-            "--bg": colors?.bg,
-            "--bg-hover": colors?.bgHover,
-            "--border": colors?.border,
-            "--text": colors?.text,
-            "--ring": colors?.ring,
+            "--bg": toCssVarIfNecessary(styles?.bg),
+            "--bg-hover": toCssVarIfNecessary(styles?.bgHover),
+            "--border": toCssVarIfNecessary(styles?.border),
+            "--text": toCssVarIfNecessary(styles?.text),
+            "--ring": toCssVarIfNecessary(styles?.ring),
           } as React.CSSProperties
         }
       >
@@ -104,6 +105,6 @@ export const Root = forwardRef<HTMLButtonElement & HTMLAnchorElement, ButtonProp
 );
 
 export default {
-  Root: Root,
-  Label: Label,
+  Root,
+  Label,
 };

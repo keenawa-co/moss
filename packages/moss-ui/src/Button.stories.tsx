@@ -18,17 +18,12 @@ export const All: Story = {
   render: () => {
     const variants = ["solid", "outlined", "soft", "ghost"] as const;
     const sizes = ["xs", "sm", "md", "lg", "xl"] as const;
-    //   primary: "[--bg:#0073ca] [--bg-hover:#0c92eb] [--border:#0073ca] [--text:white] [--ring:#b9e0fe]",
-    //   warning: "[--bg:#d1bf00] [--bg-hover:#ffff00] [--border:#d1bf00] [--text:white] [--ring:#eeff86]",
-    //   success: "[--bg:#53b800] [--bg-hover:#6ee600] [--border:#53b800] [--text:white] [--ring:#d0ff90]",
-    //   danger: "[--bg:#ff0000] [--bg-hover:#ff5757] [--border:#ff0000] [--text:white] [--ring:#ffc0c0]",
-    //   neutral: "[--bg:#969696] [--bg-hover:#aaaaaa] [--border:#969696] [--text:white] [--ring:#e3e3e3]",
     const colors = [
       {
         bg: "#0073ca",
         bgHover: "#0c92eb",
         border: "#0073ca",
-        text: "white",
+        text: "--moss-windowsCloseButton-background",
         ring: "#b9e0fe",
       },
       {
@@ -80,7 +75,7 @@ export const All: Story = {
                   {variants.map((variant) => {
                     return (
                       <td>
-                        <Button.Root colors={color} variant={variant}>
+                        <Button.Root styles={color} variant={variant}>
                           <Button.Label>Button</Button.Label>
                         </Button.Root>
                       </td>
@@ -111,7 +106,7 @@ export const All: Story = {
                   {sizes.map((size) => {
                     return (
                       <td>
-                        <Button.Root colors={color} size={size}>
+                        <Button.Root styles={color} size={size}>
                           <Button.Label>Button</Button.Label>
                         </Button.Root>
                       </td>
@@ -140,7 +135,7 @@ export const All: Story = {
               {variants.map((variant) => {
                 return (
                   <td>
-                    <Button.Root variant={variant} colors={colors[0]}>
+                    <Button.Root variant={variant} styles={colors[0]}>
                       <Button.Label>Button</Button.Label>
                     </Button.Root>
                   </td>
@@ -153,7 +148,7 @@ export const All: Story = {
               {variants.map((variant) => {
                 return (
                   <td>
-                    <Button.Root variant={variant} loading colors={colors[0]}>
+                    <Button.Root variant={variant} loading styles={colors[0]}>
                       <Button.Label>Button</Button.Label>
                     </Button.Root>
                   </td>
@@ -166,7 +161,7 @@ export const All: Story = {
               {variants.map((variant) => {
                 return (
                   <td>
-                    <Button.Root variant={variant} disabled colors={colors[0]}>
+                    <Button.Root variant={variant} disabled styles={colors[0]}>
                       <Button.Label>Button</Button.Label>
                     </Button.Root>
                   </td>
@@ -185,12 +180,12 @@ export const All: Story = {
             <tr>
               <th>Idle</th>
               <td>
-                <Button.Root colors={colors[0]}>
+                <Button.Root styles={colors[0]}>
                   <Icon icon="Documentation" />
                 </Button.Root>
               </td>
               <td>
-                <Button.Root className="flex gap-2" colors={colors[0]}>
+                <Button.Root className="flex gap-2" styles={colors[0]}>
                   <Button.Label>Label</Button.Label>
                   <Icon icon="ArrowRight" />
                 </Button.Root>
@@ -200,12 +195,12 @@ export const All: Story = {
             <tr>
               <th>Disabled</th>
               <td>
-                <Button.Root disabled colors={colors[0]}>
+                <Button.Root disabled styles={colors[0]}>
                   <Icon icon="Documentation" />
                 </Button.Root>
               </td>
               <td>
-                <Button.Root disabled className="flex gap-2" colors={colors[0]}>
+                <Button.Root disabled className="flex gap-2" styles={colors[0]}>
                   <Button.Label>Label</Button.Label>
                   <Icon icon="ArrowRight" />
                 </Button.Root>
@@ -215,12 +210,12 @@ export const All: Story = {
             <tr>
               <th>Loading</th>
               <td>
-                <Button.Root loading colors={colors[0]}>
+                <Button.Root loading styles={colors[0]}>
                   <Icon icon="Documentation" />
                 </Button.Root>
               </td>
               <td>
-                <Button.Root loading className="flex gap-2" colors={colors[0]}>
+                <Button.Root loading className="flex gap-2" styles={colors[0]}>
                   <Button.Label>Label</Button.Label>
                   <Icon icon="ArrowRight" />
                 </Button.Root>

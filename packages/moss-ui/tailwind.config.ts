@@ -1,6 +1,8 @@
 import type { Config } from "tailwindcss";
-import sharedConfig from "@repo/tailwind-config";
 import tailwindAnimate from "tailwindcss-animate";
+
+import sharedConfig from "@repo/tailwind-config";
+
 import fontSize from "./src/tailwind/custom-config/fontSize";
 
 const config: Pick<Config, "presets" | "content" | "extend" | "plugins" | "darkMode"> = {
