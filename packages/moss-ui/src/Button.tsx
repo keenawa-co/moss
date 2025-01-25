@@ -104,7 +104,4 @@ export const Root = forwardRef<HTMLButtonElement & HTMLAnchorElement, ButtonProp
   }
 );
 
-export default {
-  Root,
-  Label,
-};
+export default { Root, Label };
