@@ -214,6 +214,8 @@ fn create_main_window(app_handle: &AppHandle, url: &str) -> WebviewWindow {
         .get_typed_value("window.defaultWidth")
         .unwrap();
 
+    dbg!(&window_inner_height, &window_inner_width);
+
     let label = format!("{MAIN_WINDOW_PREFIX}{}", 0);
     let config = CreateWindowInput {
         url,

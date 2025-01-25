@@ -1,7 +1,5 @@
-use moss_extension_point::{
-    interpreter::types::configuration::ParameterType, registry::ConfigurationRegistry,
-};
-use serde_json::Value as JsonValue;
+use moss_extension_point::registry::ConfigurationRegistry;
+use moss_mel::foundations::typ::default_json_value;
 use std::sync::Arc;
 
 use crate::ConfigurationModel;
@@ -24,7 +22,12 @@ impl DefaultConfiguration {
             } else if !value.default.is_null() {
                 value.default.clone()
             } else {
-                type_default_json_value(&value.typ)
+                if let Ok(typ) = default_json_value(&value.typ) {
+                    typ
+                } else {
+                    // TODO: logs
+                    continue;
+                }
             };
 
             if !model.insert(key, default_value) {
@@ -40,13 +43,5 @@ impl DefaultConfiguration {
 
     pub fn model(&self) -> &Arc<ConfigurationModel> {
         &self.model
-    }
-}
-
-pub fn type_default_json_value(typ: &ParameterType) -> JsonValue {
-    match typ {
-        ParameterType::Number => 0.into(),
-        ParameterType::String => "".into(),
-        ParameterType::Bool => false.into(),
     }
 }

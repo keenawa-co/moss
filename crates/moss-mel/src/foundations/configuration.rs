@@ -11,6 +11,8 @@ use std::str::FromStr;
 use std::sync::Arc;
 use strum::EnumString as StrumEnumString;
 
+use super::typ::{self, Type};
+
 #[inline]
 fn is_null_expression(expr: &Expression) -> bool {
     match expr {
@@ -55,11 +57,19 @@ impl ConfigurationDecl {
     pub fn evaluate(self, ctx: &Context) -> Result<ConfigurationNode> {
         let mut parameters = HashMap::new();
         for parameter_decl in self.parameters {
-            let typ = match parameter_decl.value_type {
-                Expression::Array(_vec) => unimplemented!(),
-                Expression::Object(_vec_map) => unimplemented!(),
-                Expression::Variable(variable) => ParameterType::try_from(variable)?,
-                _ => {
+            // let typ = match parameter_decl.value_type {
+            //     Expression::Array(_vec) => unimplemented!(),
+            //     Expression::Object(_vec_map) => unimplemented!(),
+            //     Expression::Variable(variable) => ParameterType::try_from(variable)?,
+            //     _ => {
+            //         // TODO: Add logging for encountering an unknown type
+            //         continue;
+            //     }
+            // };
+
+            let typ = match Type::try_from(parameter_decl.value_type) {
+                Ok(ty) => ty,
+                Err(_) => {
                     // TODO: Add logging for encountering an unknown type
                     continue;
                 }
@@ -134,25 +144,25 @@ fn try_evaluate_to_bool(ctx: &Context, expr: Expression) -> Result<Option<bool>>
     Ok(expr.evaluate(ctx)?.as_bool())
 }
 
-#[derive(Debug, Deserialize)]
-pub enum ParameterType {
-    Number,
-    String,
-    Bool,
-}
+// #[derive(Debug, Deserialize)]
+// pub enum ParameterType {
+//     Number,
+//     String,
+//     Bool,
+// }
 
-impl TryFrom<hcl::Variable> for ParameterType {
-    type Error = anyhow::Error;
+// impl TryFrom<hcl::Variable> for ParameterType {
+//     type Error = anyhow::Error;
 
-    fn try_from(value: hcl::Variable) -> std::result::Result<Self, Self::Error> {
-        match value.to_string().as_str() {
-            "number" => Ok(ParameterType::Number),
-            "string" => Ok(ParameterType::String),
-            "bool" => Ok(ParameterType::Bool),
-            _ => Err(anyhow!("unknown type")),
-        }
-    }
-}
+//     fn try_from(value: hcl::Variable) -> std::result::Result<Self, Self::Error> {
+//         match value.to_string().as_str() {
+//             "number" => Ok(ParameterType::Number),
+//             "string" => Ok(ParameterType::String),
+//             "bool" => Ok(ParameterType::Bool),
+//             _ => Err(anyhow!("unknown type")),
+//         }
+//     }
+// }
 
 #[derive(Debug, Default, StrumEnumString)]
 pub enum ParameterScope {
@@ -178,7 +188,7 @@ pub struct ConfigurationNode {
 #[derive(Debug)]
 pub struct Parameter {
     pub ident: ArcStr,
-    pub typ: ParameterType,
+    pub typ: Type,
     pub maximum: Option<u64>,
     pub minimum: Option<u64>,
     pub default: JsonValue,

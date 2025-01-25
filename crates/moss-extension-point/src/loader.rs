@@ -1,10 +1,11 @@
 use anyhow::Result;
 use hashbrown::HashMap;
 use hcl::eval::Context as EvalContext;
+use moss_mel::{foundations::scope::ResolvedScope, parse::parse};
 use std::path::PathBuf;
 
-use crate::interpreter::types::scope::ResolvedScope;
-use crate::parser::Parser;
+// use crate::interpreter::types::scope::ResolvedScope;
+// use crate::parser::Parser;
 
 const FILE_EXTENSION: &'static str = "hcl";
 
@@ -63,10 +64,8 @@ impl Loader {
 
     fn parse_file(&self, ctx: &mut EvalContext, path: &PathBuf) -> Result<ResolvedScope> {
         let file_content = std::fs::read_to_string(path)?;
-        let parser = Parser::new();
-        parser
-            .parse_module(&file_content)
-            .map(|scope| scope.evaluate_with_context(ctx))?
+
+        parse(&file_content).map(|scope| scope.evaluate_with_context(ctx))?
     }
 }
 
