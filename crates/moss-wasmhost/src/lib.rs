@@ -2,7 +2,7 @@ use sha2::{Digest, Sha256};
 use std::collections::HashMap;
 use std::fs;
 use std::fs::create_dir;
-use wasmtime::component::{Component, Instance, Linker};
+use wasmtime::component::{bindgen, Component, Instance, Linker};
 use wasmtime::{AsContextMut, Config, Engine, Store, StoreContextMut};
 use wasmtime_wasi::{ResourceTable, WasiCtx, WasiCtxBuilder, WasiView};
 
@@ -50,8 +50,9 @@ impl WasmHost {
         let engine = Engine::new(&config).unwrap();
         let mut linker = Linker::new(&engine);
         wasmtime_wasi::add_to_linker_sync(&mut linker).unwrap();
-        linker
-            .root()
+        let mut host_functions = linker.instance("addon:demo/host-functions").unwrap();
+
+        host_functions
             .func_wrap(
                 "get-hash",
                 move |store: StoreContextMut<'_, AddonContext>, _params: ()| {
@@ -59,8 +60,7 @@ impl WasmHost {
                 },
             )
             .unwrap();
-        linker
-            .root()
+        host_functions
             .func_wrap(
                 "create-folder",
                 move |store: StoreContextMut<'_, AddonContext>, params: (String,)| {
@@ -177,10 +177,17 @@ mod test {
     use super::*;
 
     #[test]
-    fn test() {
+    fn test_rust() {
         let mut host = WasmHost::new();
-        host.register_addon("wasmhost_demo", vec![]);
-        host.execute_addon("wasmhost_demo", vec![]);
+        host.register_addon("rust_demo", vec![]);
+        host.execute_addon("rust_demo", vec![]);
+    }
+
+    #[test]
+    fn test_js() {
+        let mut host = WasmHost::new();
+        host.register_addon("js_demo", vec![]);
+        host.execute_addon("js_demo", vec![]);
     }
 }
 // policy

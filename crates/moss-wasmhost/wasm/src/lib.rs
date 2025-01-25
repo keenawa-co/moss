@@ -1,8 +1,8 @@
 use wit_bindgen;
 
-wit_bindgen::generate!({
-    world: "wasmhost-demo"
-});
+wit_bindgen::generate!({});
+
+use addon::demo::host_functions::{create_folder, get_hash};
 
 struct Addon {}
 impl Guest for Addon {
