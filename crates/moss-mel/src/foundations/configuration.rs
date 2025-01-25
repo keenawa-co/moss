@@ -57,16 +57,6 @@ impl ConfigurationDecl {
     pub fn evaluate(self, ctx: &Context) -> Result<ConfigurationNode> {
         let mut parameters = HashMap::new();
         for parameter_decl in self.parameters {
-            // let typ = match parameter_decl.value_type {
-            //     Expression::Array(_vec) => unimplemented!(),
-            //     Expression::Object(_vec_map) => unimplemented!(),
-            //     Expression::Variable(variable) => ParameterType::try_from(variable)?,
-            //     _ => {
-            //         // TODO: Add logging for encountering an unknown type
-            //         continue;
-            //     }
-            // };
-
             let typ = match Type::try_from(parameter_decl.value_type) {
                 Ok(ty) => ty,
                 Err(_) => {
@@ -143,26 +133,6 @@ fn try_evaluate_to_u64(ctx: &Context, expr: Expression) -> Result<Option<u64>> {
 fn try_evaluate_to_bool(ctx: &Context, expr: Expression) -> Result<Option<bool>> {
     Ok(expr.evaluate(ctx)?.as_bool())
 }
-
-// #[derive(Debug, Deserialize)]
-// pub enum ParameterType {
-//     Number,
-//     String,
-//     Bool,
-// }
-
-// impl TryFrom<hcl::Variable> for ParameterType {
-//     type Error = anyhow::Error;
-
-//     fn try_from(value: hcl::Variable) -> std::result::Result<Self, Self::Error> {
-//         match value.to_string().as_str() {
-//             "number" => Ok(ParameterType::Number),
-//             "string" => Ok(ParameterType::String),
-//             "bool" => Ok(ParameterType::Bool),
-//             _ => Err(anyhow!("unknown type")),
-//         }
-//     }
-// }
 
 #[derive(Debug, Default, StrumEnumString)]
 pub enum ParameterScope {

@@ -4,9 +4,6 @@ use hcl::eval::Context as EvalContext;
 use moss_mel::{foundations::scope::ResolvedScope, parse::parse};
 use std::path::PathBuf;
 
-// use crate::interpreter::types::scope::ResolvedScope;
-// use crate::parser::Parser;
-
 const FILE_EXTENSION: &'static str = "hcl";
 
 pub struct Loader {
