@@ -1,0 +1,32 @@
+package addon:demo;
+
+interface application-models {
+    record theme-descriptor {
+        id: string,
+        name: string,
+        source: string,
+    }
+
+    record locale-descriptor {
+        code: string,
+        name: string,
+        direction: option<string>
+    }
+
+    record preferences {
+        theme: option<theme-descriptor>,
+        locale: option<locale-descriptor>,
+    }
+}
+
+interface host-functions-preferences {
+    use application-models.{preferences};
+    get-preferences: func() -> preferences;
+    set-preferences: func(pref: preferences) -> ();
+}
+
+world passing-data {
+    import application-models;
+    import host-functions-preferences;
+    export execute: func();
+}

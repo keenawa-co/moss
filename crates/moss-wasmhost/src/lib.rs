@@ -2,9 +2,14 @@ use sha2::{Digest, Sha256};
 use std::collections::HashMap;
 use std::fs;
 use std::fs::create_dir;
+use std::sync::Mutex;
 use wasmtime::component::{bindgen, Component, Instance, Linker};
 use wasmtime::{AsContextMut, Config, Engine, Store, StoreContextMut};
 use wasmtime_wasi::{ResourceTable, WasiCtx, WasiCtxBuilder, WasiView};
+
+// Generate typings defined in passing-data.wit
+bindgen!("passing-data" in "wit/passing-data.wit");
+use addon::demo::application_models::*;
 
 // TODO: Better pathing
 const ADDON_PATH: &str = "addons";
@@ -35,6 +40,20 @@ pub struct AddonInstance {
     store: Store<AddonContext>,
     component: Component,
     instance: Instance,
+}
+
+pub struct GlobalState {
+    preferences: Mutex<Preferences>,
+}
+
+impl GlobalState {
+    pub fn get_preferences(&self) -> Preferences {
+        self.preferences.lock().unwrap().clone()
+    }
+
+    pub fn set_preferences(&self, preferences: Preferences) {
+        *self.preferences.lock().unwrap() = preferences;
+    }
 }
 
 pub struct WasmHost {
@@ -173,8 +192,9 @@ impl WasmHost {
 }
 
 mod test {
-
     use super::*;
+    use std::ops::Deref;
+    use std::sync::Arc;
 
     #[test]
     fn test_rust() {
@@ -188,6 +208,47 @@ mod test {
         let mut host = WasmHost::new();
         host.register_addon("js_demo", vec![]);
         host.execute_addon("js_demo", vec![]);
+    }
+
+    #[test]
+    fn test_passing_data() {
+        let mut host = WasmHost::new();
+        let mut global_state = Arc::new(GlobalState {
+            preferences: Preferences {
+                theme: None,
+                locale: None,
+            }
+            .into(),
+        });
+        let state = Arc::clone(&global_state);
+        let mut host_functions_preferences = host
+            .linker
+            .instance("addon:demo/host-functions-preferences")
+            .unwrap();
+        host_functions_preferences
+            .func_wrap(
+                "get-preferences",
+                move |store: StoreContextMut<'_, AddonContext>, _params: ()| {
+                    Ok((state.get_preferences(),))
+                },
+            )
+            .unwrap();
+        // FIXME: Just to make compiler happy
+        let state = Arc::clone(&global_state);
+        host_functions_preferences
+            .func_wrap(
+                "set-preferences",
+                move |store: StoreContextMut<'_, AddonContext>, params: (Preferences,)| {
+                    state.set_preferences(params.0);
+                    Ok(())
+                },
+            )
+            .unwrap();
+
+        host.register_addon("passing_data", vec![]);
+        host.execute_addon("passing_data", vec![]);
+
+        println!("{:#?}", global_state.preferences);
     }
 }
 // policy
