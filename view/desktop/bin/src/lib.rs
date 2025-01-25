@@ -36,6 +36,9 @@ use crate::plugins::*;
 pub use constants::*;
 use moss_desktop::services::locale_service::LocaleService;
 
+use wasmtime::component::{Component, Linker};
+use wasmtime::{Engine, Store};
+
 #[macro_use]
 extern crate tracing;
 
@@ -131,13 +134,54 @@ pub fn run() {
             app.handle().plugin(
                 tauri_plugin_global_shortcut::Builder::new()
                     .with_handler(move |app, shortcut, event| {
+                        let wasm_engine = Engine::default();
+                        let mut wasm_component;
+                        unsafe {
+                            // TODO: In the future, we will need to have a checksum mechanism
+                            // To ensure that the serialized component had not been tampered with.
+                            wasm_component = match Component::deserialize_file(
+                                &wasm_engine,
+                                "open-new-window-shortcut.component",
+                            ) {
+                                Ok(component) => component,
+                                Err(_) => {
+                                    let bytes =
+                                        std::fs::read("open-new-window-shortcut.wasm").unwrap();
+                                    let wasm_component =
+                                        Component::new(&wasm_engine, bytes).unwrap();
+                                    std::fs::write(
+                                        "open-new-window-shortcut.component",
+                                        wasm_component.serialize().unwrap(),
+                                    )
+                                    .unwrap();
+                                    wasm_component
+                                }
+                            }
+                        }
+
+                        let mut wasm_linker = Linker::new(&wasm_engine);
+                        let app_handle = app.to_owned();
+                        wasm_linker
+                            .root()
+                            .func_wrap("open-new-window", move |_store, _params: ()| {
+                                tauri::async_runtime::spawn(cmd_window::create_new_window(
+                                    app_handle.clone(),
+                                ));
+                                Ok(())
+                            })
+                            .unwrap();
                         println!("{:?}", shortcut);
                         if shortcut == &ctrl_n_shortcut {
                             match event.state() {
                                 ShortcutState::Pressed => {
-                                    tauri::async_runtime::spawn(cmd_window::create_new_window(
-                                        app.clone(),
-                                    ));
+                                    let mut wasm_store = Store::new(&wasm_engine, ());
+                                    let wasm_instance = wasm_linker
+                                        .instantiate(&mut wasm_store, &wasm_component)
+                                        .unwrap();
+                                    let execute_shortcut = wasm_instance
+                                        .get_typed_func::<(), ()>(&mut wasm_store, "execute")
+                                        .unwrap();
+                                    execute_shortcut.call(&mut wasm_store, ()).unwrap();
                                 }
                                 ShortcutState::Released => {}
                             }
