@@ -18,7 +18,48 @@ export const All: Story = {
   render: () => {
     const variants = ["solid", "outlined", "soft", "ghost"] as const;
     const sizes = ["xs", "sm", "md", "lg", "xl"] as const;
-    const intents = ["primary", "warning", "success", "danger", "neutral"] as const;
+    //   primary: "[--bg:#0073ca] [--bg-hover:#0c92eb] [--border:#0073ca] [--text:white] [--ring:#b9e0fe]",
+    //   warning: "[--bg:#d1bf00] [--bg-hover:#ffff00] [--border:#d1bf00] [--text:white] [--ring:#eeff86]",
+    //   success: "[--bg:#53b800] [--bg-hover:#6ee600] [--border:#53b800] [--text:white] [--ring:#d0ff90]",
+    //   danger: "[--bg:#ff0000] [--bg-hover:#ff5757] [--border:#ff0000] [--text:white] [--ring:#ffc0c0]",
+    //   neutral: "[--bg:#969696] [--bg-hover:#aaaaaa] [--border:#969696] [--text:white] [--ring:#e3e3e3]",
+    const colors = [
+      {
+        bg: "#0073ca",
+        bgHover: "#0c92eb",
+        border: "#0073ca",
+        text: "white",
+        ring: "#b9e0fe",
+      },
+      {
+        bg: "#d1bf00",
+        bgHover: "#ffff00",
+        border: "#d1bf00",
+        text: "white",
+        ring: "#eeff86",
+      },
+      {
+        bg: "#53b800",
+        bgHover: "#6ee600",
+        border: "#53b800",
+        text: "white",
+        ring: "#d0ff90",
+      },
+      {
+        bg: "#ff0000",
+        bgHover: "#ff5757",
+        border: "#ff0000",
+        text: "white",
+        ring: "#ffc0c0",
+      },
+      {
+        bg: "#969696",
+        bgHover: "#aaaaaa",
+        border: "#969696",
+        text: "white",
+        ring: "#e3e3e3",
+      },
+    ] as const;
 
     return (
       <div>
@@ -32,14 +73,14 @@ export const All: Story = {
               })}
             </tr>
 
-            {intents.map((intent) => {
+            {colors.map((color, i) => {
               return (
                 <tr>
-                  <th className="text-left capitalize">{intent}</th>
+                  <th className="text-left capitalize">{i}</th>
                   {variants.map((variant) => {
                     return (
                       <td>
-                        <Button.Root intent={intent} variant={variant}>
+                        <Button.Root colors={color} variant={variant}>
                           <Button.Label>Button</Button.Label>
                         </Button.Root>
                       </td>
@@ -63,14 +104,14 @@ export const All: Story = {
               })}
             </tr>
 
-            {intents.map((intent) => {
+            {colors.map((color, i) => {
               return (
                 <tr>
-                  <th className="text-left capitalize">{intent}</th>
+                  <th className="text-left capitalize">{i}</th>
                   {sizes.map((size) => {
                     return (
                       <td>
-                        <Button.Root intent={intent} size={size}>
+                        <Button.Root colors={color} size={size}>
                           <Button.Label>Button</Button.Label>
                         </Button.Root>
                       </td>
@@ -99,7 +140,7 @@ export const All: Story = {
               {variants.map((variant) => {
                 return (
                   <td>
-                    <Button.Root variant={variant}>
+                    <Button.Root variant={variant} colors={colors[0]}>
                       <Button.Label>Button</Button.Label>
                     </Button.Root>
                   </td>
@@ -112,7 +153,7 @@ export const All: Story = {
               {variants.map((variant) => {
                 return (
                   <td>
-                    <Button.Root variant={variant} loading>
+                    <Button.Root variant={variant} loading colors={colors[0]}>
                       <Button.Label>Button</Button.Label>
                     </Button.Root>
                   </td>
@@ -125,7 +166,7 @@ export const All: Story = {
               {variants.map((variant) => {
                 return (
                   <td>
-                    <Button.Root variant={variant} disabled>
+                    <Button.Root variant={variant} disabled colors={colors[0]}>
                       <Button.Label>Button</Button.Label>
                     </Button.Root>
                   </td>
@@ -144,12 +185,12 @@ export const All: Story = {
             <tr>
               <th>Idle</th>
               <td>
-                <Button.Root>
+                <Button.Root colors={colors[0]}>
                   <Icon icon="Documentation" />
                 </Button.Root>
               </td>
               <td>
-                <Button.Root className="flex gap-2">
+                <Button.Root className="flex gap-2" colors={colors[0]}>
                   <Button.Label>Label</Button.Label>
                   <Icon icon="ArrowRight" />
                 </Button.Root>
@@ -159,12 +200,12 @@ export const All: Story = {
             <tr>
               <th>Disabled</th>
               <td>
-                <Button.Root disabled>
+                <Button.Root disabled colors={colors[0]}>
                   <Icon icon="Documentation" />
                 </Button.Root>
               </td>
               <td>
-                <Button.Root disabled className="flex gap-2">
+                <Button.Root disabled className="flex gap-2" colors={colors[0]}>
                   <Button.Label>Label</Button.Label>
                   <Icon icon="ArrowRight" />
                 </Button.Root>
@@ -174,12 +215,12 @@ export const All: Story = {
             <tr>
               <th>Loading</th>
               <td>
-                <Button.Root loading>
+                <Button.Root loading colors={colors[0]}>
                   <Icon icon="Documentation" />
                 </Button.Root>
               </td>
               <td>
-                <Button.Root loading className="flex gap-2">
+                <Button.Root loading className="flex gap-2" colors={colors[0]}>
                   <Button.Label>Label</Button.Label>
                   <Icon icon="ArrowRight" />
                 </Button.Root>
