@@ -1,6 +1,6 @@
-import plugin from "tailwindcss/plugin";
+import createPlugin from "tailwindcss/plugin";
 
-const widgetPlugin = plugin(({ addUtilities }) => {
+const widgetPlugin = createPlugin(({ addUtilities }) => {
   addUtilities({
     ".widget-shadow": {
       "box-shadow": "0 0 4px 0 rgba(148, 163, 167, 0.5)",
@@ -26,7 +26,7 @@ const widgetPlugin = plugin(({ addUtilities }) => {
   });
 });
 
-const oddSizesPlugin = plugin(({ addUtilities }) => {
+const oddSizesPlugin = createPlugin(({ addUtilities }) => {
   addUtilities({
     ".z-1": {
       zIndex: "1",
@@ -64,7 +64,7 @@ const oddSizesPlugin = plugin(({ addUtilities }) => {
   });
 });
 
-const borderPlugin = plugin(({ addUtilities }) => {
+const borderPlugin = createPlugin(({ addUtilities }) => {
   addUtilities({
     ".border-opaque-rounded": {
       border: "1px solid rgba(255, 255, 255, 0.15)",
@@ -73,7 +73,7 @@ const borderPlugin = plugin(({ addUtilities }) => {
   });
 });
 
-const backgroundPlugin = plugin(({ addUtilities }) => {
+const backgroundPlugin = createPlugin(({ addUtilities }) => {
   addUtilities({
     ".bg-opaque-rounded": {
       backgroundColor: "rgba(255, 255, 255, 0.1)",
@@ -82,4 +82,16 @@ const backgroundPlugin = plugin(({ addUtilities }) => {
   });
 });
 
-export default [widgetPlugin, oddSizesPlugin, borderPlugin, backgroundPlugin];
+const customBackgroundPlugin = createPlugin(({ matchUtilities, theme }) => {
+  matchUtilities(
+    {
+      background: (value: string) => ({ background: value }),
+    },
+    {
+      values: theme("colors"), // Allow the use of arbitrary values
+      type: ["color", "any"], // Permit any color values
+    }
+  );
+});
+
+export default [widgetPlugin, oddSizesPlugin, borderPlugin, backgroundPlugin, customBackgroundPlugin];

@@ -64,7 +64,7 @@ const StatusBar = ({ className }: ComponentPropsWithoutRef<"div">) => {
   return (
     <footer
       className={cn(
-        "flex h-[26px] w-screen justify-between pr-[26px] background-[--moss-statusBar-background]",
+        "background-[--moss-statusBar-background] flex h-[26px] w-screen justify-between pr-[26px]",
         className
       )}
     >
@@ -85,12 +85,12 @@ const StatusBar = ({ className }: ComponentPropsWithoutRef<"div">) => {
         <StatusBarButton label="4 Spaces" />
         <StatusBarButton label="Rust" />
 
-        <div className="group flex h-full items-center gap-1 px-2 text-white transition hover:bg-white hover:bg-opacity-10 focus:bg-white focus:bg-opacity-10">
+        <div className="group flex h-full items-center gap-1 px-2 text-white transition hover:bg-white hover:bg-white/10 focus:bg-white focus:bg-white/10">
           <StatusCircle className="size-[6px] bg-[#D62A18]" />
           <span>2 Errors</span>
         </div>
 
-        <div className="group flex h-full items-center gap-1 px-2 text-white transition hover:bg-white hover:bg-opacity-10 focus:bg-white focus:bg-opacity-10">
+        <div className="group flex h-full items-center gap-1 px-2 text-white transition hover:bg-white hover:bg-white/10 focus:bg-white focus:bg-white/10">
           <StatusCircle className="size-[6px] bg-[#FFC505]" />
           <span>15 Warnings</span>
         </div>

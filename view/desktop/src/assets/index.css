@@ -1,6 +1,5 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+@plugin "@repo/tailwind-config/plugins/background";
 
 #root {
   height: 100%;
@@ -22,12 +21,11 @@
 @layer base {
   html,
   body {
-    @apply font-sans text-[rgba(var(--moss-primary))];
+    @apply font-sans text-[rgba(var(--moss-primary))] transition-colors duration-75 ease-linear;
     overflow: hidden;
     position: fixed;
     width: 100vw;
     height: 100vh;
-    @apply transition-colors duration-75 ease-linear;
     overflow: hidden;
   }
 

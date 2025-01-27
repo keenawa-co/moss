@@ -1,6 +1,4 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
 .dockview-demo .group-control .action {
   @apply box-border flex cursor-pointer items-center justify-center p-1 text-[18px];
@@ -80,5 +78,5 @@
 }
 
 .panel-builder-button {
-  @apply mr-1 mt-2 inline-block cursor-pointer list-none rounded-lg border-0 bg-gray-100 px-3 py-1 text-center font-sans text-sm font-medium leading-5 text-gray-800 hover:bg-gray-300;
+  @apply mt-2 mr-1 inline-block cursor-pointer list-none rounded-lg border-0 bg-gray-100 px-3 py-1 text-center font-sans text-sm leading-5 font-medium text-gray-800 hover:bg-gray-300;
 }
