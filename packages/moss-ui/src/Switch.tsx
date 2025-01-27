@@ -7,13 +7,13 @@ import { cn } from "./utils";
 
 const SwitchContext = createContext({});
 
-const defaultSwitchRootStyles = `relative inline-block border border-gray-900/5 group rounded-full bg-gray-200 transition outline-2 outline-blue-600 outline-offset-2 overflow-hidden
+const defaultSwitchRootStyles = `relative h-5 w-8 inline-block border border-gray-900/5 group rounded-full bg-gray-200 transition outline-2 outline-blue-600 outline-offset-2 overflow-hidden
   focus-visible:outline
   disabled:bg-gray-100
   disabled:opacity-50
   disabled:shadow-none
   data-[state=checked]:border-blue-600
-  data-[state=checked]:bg-blue-600 h-5 w-8
+  data-[state=checked]:bg-blue-600
 `;
 
 const Root = forwardRef<ElementRef<typeof Switch.Root>, ComponentPropsWithoutRef<typeof Switch.Root>>(

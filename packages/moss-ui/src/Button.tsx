@@ -2,6 +2,7 @@ import { cva } from "class-variance-authority";
 import { Children, forwardRef, HTMLAttributes, isValidElement } from "react";
 
 import Icon from "./Icon";
+import { ButtonStyleProps } from "./types";
 import { cn } from "./utils";
 import { toCssVarIfNecessary } from "./utils/toCssVarIfNecessary";
 
@@ -14,13 +15,7 @@ export interface ButtonProps extends HTMLAttributes<HTMLButtonElement | HTMLAnch
   href?: string;
   variant?: "solid" | "outlined" | "soft" | "ghost";
   size?: "xs" | "sm" | "md" | "lg" | "xl";
-  styles: {
-    bg: string;
-    bgHover: string;
-    border: string;
-    text: string;
-    ring: string;
-  };
+  styles: ButtonStyleProps;
 }
 
 const buttonRootStyles = cva(
@@ -84,10 +79,10 @@ export const Root = forwardRef<HTMLButtonElement & HTMLAnchorElement, ButtonProp
         {...props}
         style={
           {
-            "--bg": toCssVarIfNecessary(styles?.bg),
-            "--bg-hover": toCssVarIfNecessary(styles?.bgHover),
-            "--border": toCssVarIfNecessary(styles?.border),
-            "--text": toCssVarIfNecessary(styles?.text),
+            "--bg": toCssVarIfNecessary(styles?.background.default),
+            "--bg-hover": toCssVarIfNecessary(styles?.background.hover),
+            "--border": toCssVarIfNecessary(styles?.borderColor?.default),
+            "--text": toCssVarIfNecessary(styles?.color?.default),
             "--ring": toCssVarIfNecessary(styles?.ring),
           } as React.CSSProperties
         }

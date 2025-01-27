@@ -1,6 +1,7 @@
 import { Meta, StoryObj } from "@storybook/react";
 
 import { Button, Icon } from "./index";
+import { ButtonStyleProps } from "./types";
 
 const meta: Meta = {
   title: "Moss-ui/Button",
@@ -14,48 +15,79 @@ const meta: Meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
+const variants = ["solid", "outlined", "soft", "ghost"] as const;
+const sizes = ["xs", "sm", "md", "lg", "xl"] as const;
+const colors = [
+  {
+    background: {
+      default: "#0073ca",
+      hover: "#0c92eb",
+    },
+    borderColor: {
+      default: "#0073ca",
+    },
+    color: {
+      default: "--moss-windowsCloseButton-background",
+    },
+    ring: "#b9e0fe",
+  },
+  {
+    background: {
+      default: "#d1bf00",
+      hover: "#ffff00",
+    },
+    borderColor: {
+      default: "#d1bf00",
+    },
+    color: {
+      default: "white",
+    },
+
+    ring: "#eeff86",
+  },
+  {
+    background: {
+      default: "#53b800",
+      hover: "#6ee600",
+    },
+    borderColor: {
+      default: "#53b800",
+    },
+    color: {
+      default: "white",
+    },
+    ring: "#d0ff90",
+  },
+  {
+    background: {
+      default: "#ff0000",
+      hover: "#ff5757",
+    },
+    borderColor: {
+      default: "#ff0000",
+    },
+    color: {
+      default: "white",
+    },
+    ring: "#ffc0c0",
+  },
+  {
+    background: {
+      default: "#969696",
+      hover: "#aaaaaa",
+    },
+    borderColor: {
+      default: "#969696",
+    },
+    color: {
+      default: "white",
+    },
+    ring: "#e3e3e3",
+  },
+] as ButtonStyleProps[];
+
 export const All: Story = {
   render: () => {
-    const variants = ["solid", "outlined", "soft", "ghost"] as const;
-    const sizes = ["xs", "sm", "md", "lg", "xl"] as const;
-    const colors = [
-      {
-        bg: "#0073ca",
-        bgHover: "#0c92eb",
-        border: "#0073ca",
-        text: "--moss-windowsCloseButton-background",
-        ring: "#b9e0fe",
-      },
-      {
-        bg: "#d1bf00",
-        bgHover: "#ffff00",
-        border: "#d1bf00",
-        text: "white",
-        ring: "#eeff86",
-      },
-      {
-        bg: "#53b800",
-        bgHover: "#6ee600",
-        border: "#53b800",
-        text: "white",
-        ring: "#d0ff90",
-      },
-      {
-        bg: "#ff0000",
-        bgHover: "#ff5757",
-        border: "#ff0000",
-        text: "white",
-        ring: "#ffc0c0",
-      },
-      {
-        bg: "#969696",
-        bgHover: "#aaaaaa",
-        border: "#969696",
-        text: "white",
-        ring: "#e3e3e3",
-      },
-    ] as const;
-
     return (
       <div>
         <h2>Intents</h2>

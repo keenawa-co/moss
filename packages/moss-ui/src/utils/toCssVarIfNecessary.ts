@@ -1,5 +1,5 @@
-export const toCssVarIfNecessary = (value: string) => {
-  if (value.startsWith("--")) {
+export const toCssVarIfNecessary = (value?: string) => {
+  if (value && value.startsWith("--")) {
     return `var(${value})`;
   }
 
