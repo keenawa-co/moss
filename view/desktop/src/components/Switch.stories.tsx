@@ -18,7 +18,7 @@ export const WithLabel: Story = {
   render: () => {
     return (
       <div className="flex gap-4">
-        <Switch.Root className="">
+        <Switch.Root>
           <Switch.Thumb />
         </Switch.Root>
         <div>Label</div>
@@ -34,6 +34,27 @@ export const Standalone: Story = {
         <Switch.Root>
           <Switch.Thumb />
         </Switch.Root>
+      </div>
+    );
+  },
+};
+
+export const Disabled: Story = {
+  render: () => {
+    return (
+      <div className="flex flex-col gap-4">
+        <div className="flex gap-4">
+          <Switch.Root disabled>
+            <Switch.Thumb />
+          </Switch.Root>
+          <div>Label</div>
+        </div>
+        <div className="flex gap-4">
+          <Switch.Root disabled checked>
+            <Switch.Thumb />
+          </Switch.Root>
+          <div>Label</div>
+        </div>
       </div>
     );
   },

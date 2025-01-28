@@ -8,9 +8,10 @@ const SwitchContext = createContext({});
 
 const defaultSwitchRootStyles = `relative h-5 w-8 inline-block border border-gray-900/5 group rounded-full bg-gray-200 transition outline-2 outline-blue-600 outline-offset-2 overflow-hidden
   focus-visible:outline
-  disabled:bg-gray-100
+  disabled:bg-gray-700
   disabled:opacity-50
   disabled:shadow-none
+  disabled:cursor-not-allowed
   data-[state=checked]:border-blue-600
   data-[state=checked]:bg-blue-600
 `;
