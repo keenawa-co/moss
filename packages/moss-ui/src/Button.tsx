@@ -2,12 +2,14 @@ import { cva } from "class-variance-authority";
 import { Children, forwardRef, HTMLAttributes, isValidElement } from "react";
 
 import Icon from "./Icon";
-import { ButtonStyleProps } from "./types";
+import { Background, Border, Effects, Spacing, Typography } from "./types";
 import { cn } from "./utils";
 import { toCssVarIfNecessary } from "./utils/toCssVarIfNecessary";
 
 export type Root = typeof Root;
 export type Label = typeof Label;
+
+export interface ButtonStyleProps extends Background, Border, Spacing, Typography, Effects {}
 
 export interface ButtonProps extends HTMLAttributes<HTMLButtonElement | HTMLAnchorElement> {
   loading?: boolean;

@@ -1,8 +1,6 @@
 import { CSSProperties } from "react";
 
-export interface ButtonStyleProps extends Background, Border, Spacing, Typography, Effects {}
-
-interface ColorsPseudoClasses {
+export interface ColorsPseudoClasses {
   default: string;
   hover?: string;
   active?: string;
@@ -14,7 +12,7 @@ interface ColorsPseudoClasses {
   dataState?: "checked" | "unchecked" | "intermediate";
 }
 
-interface Background {
+export interface Background {
   background: ColorsPseudoClasses;
   backgroundAttachment?: string;
   backgroundClip?: string;
@@ -25,7 +23,7 @@ interface Background {
   backgroundSize?: number;
 }
 
-interface Border {
+export interface Border {
   borderRadius?: CSSProperties["borderRadius"];
   borderWidth?: number;
   borderColor?: ColorsPseudoClasses;
@@ -37,12 +35,12 @@ interface Border {
   outlineOffset?: string;
 }
 
-interface Spacing {
+export interface Spacing {
   margin?: string;
   padding?: string;
 }
 
-interface Typography {
+export interface Typography {
   fontFamily?: string;
   fontSize?: string;
   fontSmoothing?: string;
@@ -74,7 +72,7 @@ interface Typography {
   content?: string;
 }
 
-interface Effects {
+export interface Effects {
   boxShadow?: string;
   opacity?: string;
   mixBlendMode?: string;
