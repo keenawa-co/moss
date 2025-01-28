@@ -1,7 +1,11 @@
-use anyhow::Result;
+use anyhow::{anyhow, Result};
+use arcstr::ArcStr;
 use hashbrown::HashMap;
 use hcl::eval::Context as EvalContext;
+use moss_mel::foundations::configuration::ConfigurationNode;
+use moss_mel::foundations::scope::ScopeRepr;
 use moss_mel::{foundations::scope::ResolvedScope, parse::parse};
+use std::collections::HashSet;
 use std::path::PathBuf;
 
 const FILE_EXTENSION: &'static str = "hcl";
@@ -35,7 +39,7 @@ impl Loader {
 
     fn load_module(&self, ctx: &mut EvalContext, path: &PathBuf) -> Result<ResolvedScope> {
         let mut read_dir = std::fs::read_dir(path)?;
-        let mut module = ResolvedScope::new();
+        let mut module_scope = ScopeRepr::new();
 
         while let Some(entry) = read_dir.next() {
             let path = entry?.path();
@@ -51,18 +55,31 @@ impl Loader {
                     continue;
                 }
 
-                let ep_file = self.parse_file(ctx, &path)?;
-                module.configurations.extend(ep_file.configurations);
+                self.parse_module_file(&mut module_scope, ctx, &path)?;
             }
         }
-
-        Ok(module)
+        Ok(module_scope.evaluate_with_context(ctx)?)
     }
 
-    fn parse_file(&self, ctx: &mut EvalContext, path: &PathBuf) -> Result<ResolvedScope> {
+    fn parse_module_file(
+        &self,
+        module_scope: &mut ScopeRepr,
+        _ctx: &mut EvalContext,
+        path: &PathBuf,
+    ) -> Result<()> {
         let file_content = std::fs::read_to_string(path)?;
 
-        parse(&file_content).map(|scope| scope.evaluate_with_context(ctx))?
+        // OPTIMIZE: We can change the parse function to directly update a ScopeRepr
+        // But I'm not sure if it's necessary.
+        let mut newly_parsed = parse(&file_content)?;
+        module_scope
+            .configurations
+            .append(&mut newly_parsed.configurations);
+        module_scope
+            .configuration_extends
+            .append(&mut newly_parsed.configuration_extends);
+        module_scope.locals.append(&mut newly_parsed.locals);
+        Ok(())
     }
 }
 
@@ -90,6 +107,7 @@ mod tests {
         let paths = vec![PathBuf::from("crates/moss-desktop/contributions")];
         let mut loader = Loader::new();
         loader.load(workspace_dir(), paths).unwrap();
+        println!("{:#?}", loader.modules());
     }
 
     #[test]

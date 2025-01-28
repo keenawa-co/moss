@@ -144,7 +144,7 @@ pub enum ParameterScope {
     LANGUAGE_SPECIFIC,
 }
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct ConfigurationNode {
     pub ident: ArcStr,
     pub parent_ident: Option<ArcStr>,

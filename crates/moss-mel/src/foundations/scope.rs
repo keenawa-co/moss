@@ -5,6 +5,8 @@ use hcl::{
     eval::{Context, Evaluate},
     Expression, Map, Value as HclValue,
 };
+use std::convert::identity;
+use std::ops::Index;
 use std::sync::atomic::AtomicUsize;
 
 use super::configuration::ConfigurationNode;
@@ -39,7 +41,26 @@ impl ConfigurationSet {
         Ok(())
     }
 
+    pub fn extend_other(&mut self, node: ConfigurationNode) -> Result<()> {
+        let child_id = ArcStr::from(format!(
+            "{}::{}",
+            OTHER_EXTEND_CONFIGURATION_PARENT_ID,
+            self.other_extend_idx
+                .fetch_add(1, std::sync::atomic::Ordering::SeqCst)
+        ));
+        let node = ConfigurationNode {
+            ident: child_id.clone(),
+            ..node
+        };
+        self.add_node(node)?;
+        self.add_edge(
+            &ArcStr::from(OTHER_EXTEND_CONFIGURATION_PARENT_ID),
+            &child_id,
+        )
+    }
+
     pub fn add_edge(&mut self, from: &ArcStr, to: &ArcStr) -> Result<()> {
+        println!("{:?}", self.index_map);
         if !self.index_map.contains_key(from) {
             return Err(anyhow!("Parent `{}` does not exist", from));
         } else if !self.index_map.contains_key(to) {
@@ -82,6 +103,15 @@ impl ConfigurationSet {
             Vec::new()
         }
     }
+
+    pub fn into_values(self) -> Vec<ConfigurationNode> {
+        petgraph::algo::toposort(&self.graph, None)
+            .expect("Cycles detected")
+            .iter()
+            .rev()
+            .map(|&i| self.graph.index(i).clone())
+            .collect::<Vec<ConfigurationNode>>()
+    }
 }
 
 #[derive(Debug)]
@@ -106,28 +136,16 @@ impl ResolvedScope {
         let child_id = node.ident.clone();
         // Handling anonymous extends for `other` node
         if child_id == "" {
-            let child_id = ArcStr::from(format!(
-                "{}::{}",
-                OTHER_EXTEND_CONFIGURATION_PARENT_ID,
-                self.configurations
-                    .other_extend_idx
-                    .fetch_add(1, std::sync::atomic::Ordering::SeqCst)
-            ));
-            let node = ConfigurationNode {
-                ident: child_id.clone(),
-                ..node
-            };
-            self.configurations.add_node(node)?;
-            self.configurations.add_edge(&parent_id, &child_id)
+            self.configurations.extend_other(node)?;
+            Ok(())
         } else {
             self.configurations.add_node(node)?;
             self.configurations.add_edge(&parent_id, &child_id)
         }
     }
-
-    pub fn extend_other_configuration(&mut self, node: ConfigurationNode) {}
 }
 
+#[derive(Debug)]
 pub struct ScopeRepr {
     pub configurations: Vec<ConfigurationDecl>,
     pub configuration_extends: Vec<ConfigurationDecl>,
