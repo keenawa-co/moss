@@ -1,10 +1,14 @@
 export * from "../layouts/index";
 export * from "./Menu";
-export * from "../parts/SideBar/Sidebar";
 export * from "./Accordion";
+export * from "../parts/SideBar/Sidebar";
 export * from "../parts/SideBar/SidebarHeader";
 export * from "../parts/SideBar/SidebarGeneral";
 export * from "../parts/SideBar/SidebarLinks";
 export * from "./LaunchPad";
 export * from "./Resizable";
 export * from "./DropIndicator";
+export * as Button from "./Button";
+export * as Checkbox from "./Checkbox";
+export * as RadioGroup from "./RadioGroup";
+export * as Switch from "./Switch";

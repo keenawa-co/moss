@@ -1,9 +1,8 @@
 import { ComponentPropsWithoutRef, createContext, ElementRef, forwardRef, useContext } from "react";
 
 import * as RadioGroupPrimitive from "@radix-ui/react-radio-group";
+import { cn } from "@repo/moss-ui";
 import { radio, type RadioProps } from "@tailus/themer";
-
-import { cn } from "./utils";
 
 export interface RadioRootProps extends RadioProps {
   className?: string;
@@ -26,19 +25,18 @@ export interface RadioItemProps {
   className?: string;
 }
 
-const defaultRadioGroupItemStyles = ` size-4 border bg-white shadow-sm group rounded-full peer flex justify-center items-center outline-2 outline-blue-600 outline-offset-2
+const defaultRadioGroupItemStyles = `size-4 border bg-white shadow-sm group rounded-full peer flex justify-center items-center outline-2 outline-blue-600 outline-offset-2
  hover:brightness-95
  focus-visible:outline
  bg-gray-500/10
  data-[state=checked]:border-none
  data-[state=checked]:bg-blue-600
 
- disabled:bg-gray-100
  disabled:bg-gray-800
  disabled:opacity-50
- disabled:border-gray-300
  disabled:border-gray-700
  disabled:shadow-none
+ disabled:cursor-not-allowed
  disabled:data-[state=checked]:bg-gray-300
  disabled:data-[state=checked]:bg-gray-700
  disabled:data-[state=checked]:shadow-none

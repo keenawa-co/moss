@@ -1,9 +1,9 @@
 import { Meta, StoryObj } from "@storybook/react";
 
-import { Switch } from "./index";
+import * as Switch from "./Switch";
 
 const meta: Meta = {
-  title: "Moss-ui/Switch",
+  title: "Desktop/Switch",
   component: Switch.Root,
   tags: ["autodocs"],
   parameters: {
@@ -14,15 +14,24 @@ const meta: Meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const All: Story = {
+export const WithLabel: Story = {
   render: () => {
     return (
-      <div className="flex flex-col gap-4">
+      <div className="flex gap-4">
         <Switch.Root className="">
           <Switch.Thumb />
         </Switch.Root>
+        <div>Label</div>
+      </div>
+    );
+  },
+};
 
-        <Switch.Root checked>
+export const Standalone: Story = {
+  render: () => {
+    return (
+      <div className="flex">
+        <Switch.Root>
           <Switch.Thumb />
         </Switch.Root>
       </div>

@@ -1,8 +1,7 @@
 import { ComponentPropsWithoutRef, ElementRef, forwardRef } from "react";
 
 import * as CheckboxPrimitive from "@radix-ui/react-checkbox";
-
-import { cn } from "./utils";
+import { cn } from "@repo/moss-ui";
 
 export interface CheckboxProps {
   className?: string;
@@ -16,10 +15,11 @@ const defaultCheckboxRootStyles = `border shadow-sm group rounded peer flex just
   data-[state=checked]:bg-blue-400
   data-[state=indeterminate]:border-none
 
-  disabled:bg-gray-100
+  disabled:bg-gray-300
   disabled:opacity-50
   disabled:border-gray-300
   disabled:shadow-none
+  disabled:cursor-not-allowed
 
   disabled:data-[state=checked]:bg-gray-300
   disabled:data-[state=checked]:shadow-none

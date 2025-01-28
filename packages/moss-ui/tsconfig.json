@@ -23,5 +23,15 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src"]
+  "include": [
+    "src",
+    "../../view/desktop/src/components/Button.tsx",
+    "../../view/desktop/src/components/Button.stories.tsx",
+    "../../view/desktop/src/components/RadioGroup.tsx",
+    "../../view/desktop/src/components/RadioGroup.stories.tsx",
+    "../../view/desktop/src/components/Switch.stories.tsx",
+    "../../view/desktop/src/components/Switch.tsx",
+    "../../view/desktop/src/components/Checkbox.stories.tsx",
+    "../../view/desktop/src/components/Checkbox.tsx"
+  ]
 }

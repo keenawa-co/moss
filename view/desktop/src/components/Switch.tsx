@@ -1,9 +1,8 @@
 import { ComponentPropsWithoutRef, createContext, ElementRef, forwardRef } from "react";
 
 import * as Switch from "@radix-ui/react-switch";
+import { cn } from "@repo/moss-ui";
 import { type SwitchProps } from "@tailus/themer";
-
-import { cn } from "./utils";
 
 const SwitchContext = createContext({});
 

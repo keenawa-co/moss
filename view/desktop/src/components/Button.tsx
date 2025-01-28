@@ -1,29 +1,31 @@
 import { cva } from "class-variance-authority";
 import { Children, forwardRef, HTMLAttributes, isValidElement } from "react";
 
-import Icon from "./Icon";
-import { Background, Border, Effects, Spacing, Typography } from "./types";
-import { cn } from "./utils";
-import { toCssVarIfNecessary } from "./utils/toCssVarIfNecessary";
+import { cn, Icon } from "@repo/moss-ui";
 
 export type Root = typeof Root;
 export type Label = typeof Label;
-
-export interface ButtonStyleProps extends Background, Border, Spacing, Typography, Effects {}
 
 export interface ButtonProps extends HTMLAttributes<HTMLButtonElement | HTMLAnchorElement> {
   loading?: boolean;
   disabled?: boolean;
   href?: string;
+  intent?: "primary" | "danger" | "warning" | "success" | "neutral";
   variant?: "solid" | "outlined" | "soft" | "ghost";
   size?: "xs" | "sm" | "md" | "lg" | "xl";
-  styles: ButtonStyleProps;
 }
 
 const buttonRootStyles = cva(
   "relative flex items-center justify-center rounded transition-colors focus:outline-none focus:ring-2 ",
   {
     variants: {
+      intent: {
+        primary: "[--bg:#0073ca] [--bg-hover:#0c92eb] [--border:#0073ca] [--text:white] [--ring:#b9e0fe]",
+        warning: "[--bg:#d1bf00] [--bg-hover:#ffff00] [--border:#d1bf00] [--text:white] [--ring:#eeff86]",
+        success: "[--bg:#53b800] [--bg-hover:#6ee600] [--border:#53b800] [--text:white] [--ring:#d0ff90]",
+        danger: "[--bg:#ff0000] [--bg-hover:#ff5757] [--border:#ff0000] [--text:white] [--ring:#ffc0c0]",
+        neutral: "[--bg:#969696] [--bg-hover:#aaaaaa] [--border:#969696] [--text:white] [--ring:#e3e3e3]",
+      },
       variant: {
         solid:
           "background-[--bg] inset-border border-[--border] hover:background-[--bg-hover] text-[--text] focus:ring-[--ring]",
@@ -40,11 +42,11 @@ const buttonRootStyles = cva(
       },
       disabled: {
         false: null,
-        true: ["opacity-40 pointer-events-none cursor-not-allowed"],
+        true: ["opacity-40", "cursor-not-allowed"],
       },
       loading: {
         false: null,
-        true: ["[&>:not(.LoadingIcon)]:opacity-0 pointer-events-none cursor-not-allowed"],
+        true: ["[&>:not(.LoadingIcon)]:opacity-0", "cursor-progress "],
       },
     },
     compoundVariants: [],
@@ -63,7 +65,7 @@ export const Label = forwardRef<HTMLElement, HTMLAttributes<HTMLElement>>(
 
 export const Root = forwardRef<HTMLButtonElement & HTMLAnchorElement, ButtonProps>(
   (
-    { className, variant = "solid", size = "md", disabled, loading, href, children, styles, ...props },
+    { className, variant = "solid", size = "md", disabled, loading, href, children, intent = "primary", ...props },
     forwardedRef
   ) => {
     const Component = href ? "a" : "button";
@@ -76,18 +78,9 @@ export const Root = forwardRef<HTMLButtonElement & HTMLAnchorElement, ButtonProp
       <Component
         ref={forwardedRef}
         href={href}
-        className={cn(buttonRootStyles({ variant, size, disabled, loading, className }), buttonSize)}
-        disabled={disabled}
+        className={cn(buttonRootStyles({ intent, variant, size, disabled, loading, className }), buttonSize)}
+        disabled={disabled || loading}
         {...props}
-        style={
-          {
-            "--bg": toCssVarIfNecessary(styles?.background.default),
-            "--bg-hover": toCssVarIfNecessary(styles?.background.hover),
-            "--border": toCssVarIfNecessary(styles?.borderColor?.default),
-            "--text": toCssVarIfNecessary(styles?.color?.default),
-            "--ring": toCssVarIfNecessary(styles?.ring),
-          } as React.CSSProperties
-        }
       >
         {children}
 
