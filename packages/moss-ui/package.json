@@ -47,6 +47,7 @@
     "@radix-ui/react-tooltip": "^1.1.2",
     "@radix-ui/react-use-callback-ref": "^1.1.0",
     "@radix-ui/react-use-controllable-state": "^1.1.0",
+    "@tailus/themer": "^0.1.8",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "deepmerge": "^4.3.1",
