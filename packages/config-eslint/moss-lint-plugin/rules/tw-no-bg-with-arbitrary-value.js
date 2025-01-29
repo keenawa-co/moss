@@ -1,7 +1,13 @@
-const ANY_TW_BG_WITH_ARBITRARY_VALUE = /\b[\w|\-:]*bg-\((--[\w-]+)\)/g;
+const ANY_TW_BG_WITH_ARBITRARY_VALUE =
+  /\b[\w\-:]*bg-(?:\[(?:var\((--[\w-]+)\)|(--[\w-]+))\]|\((?:var\((--[\w-]+)\)|(--[\w-]+))\))/g;
 
-const fixArbitraryValue = (str) => {
-  return str.replace("bg-(", "background-(");
+const fixArbitraryValue = (className) => {
+  return className
+    .replace("bg-(", "background-(")
+    .replace("bg-[", "background-(")
+    .replace("]", ")")
+    .replace("var(", "")
+    .replace("))", ")");
 };
 
 const getAllInvalidTokens = (str, loc) => {
@@ -10,7 +16,7 @@ const getAllInvalidTokens = (str, loc) => {
 
   while ((arr = ANY_TW_BG_WITH_ARBITRARY_VALUE.exec(str)) !== null) {
     const className = arr[0];
-    const name = arr[1] || arr[2];
+    const name = arr[1] || arr[2] || arr[3] || arr[4];
 
     const startColumn = loc.start.column + str.indexOf(className) + 1;
     const endColumn = startColumn + className.length;
