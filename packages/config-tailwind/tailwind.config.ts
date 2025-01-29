@@ -3,12 +3,10 @@ import { Config } from "tailwindcss";
 import breakpoints from "./extends/breakpoints";
 import colors from "./extends/colors";
 import fontSize from "./extends/fontSize";
-import plugins from "./extends/plugins";
 import typography from "./extends/typography";
 
 // We want each package to be responsible for its own content.
 const config: Config = {
-  plugins,
   theme: {
     gradientColorStops: colors,
     colors,
