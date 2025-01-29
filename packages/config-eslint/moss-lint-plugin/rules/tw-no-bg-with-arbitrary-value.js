@@ -1,7 +1,7 @@
-const ANY_TW_BG_WITH_ARBITRARY_VALUE = /\b[\w|\-:]*bg-\[(?:var\((--[\w-]+)\)|(--[\w-]+))\]/g;
+const ANY_TW_BG_WITH_ARBITRARY_VALUE = /\b[\w|\-:]*bg-\((--[\w-]+)\)/g;
 
 const fixArbitraryValue = (str) => {
-  return str.replace("bg-[", "background-[").replace("var(", "").replace(")", "");
+  return str.replace("bg-(", "background-(");
 };
 
 const getAllInvalidTokens = (str, loc) => {
