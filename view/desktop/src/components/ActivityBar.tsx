@@ -40,7 +40,7 @@ export const ActivityBar = () => {
   if (activityBarState?.position === "top" || activityBarState?.position === "bottom") {
     return (
       <div
-        className={cn("flex w-full items-center gap-2.5 border-solid bg-[#F4F4F4] px-2 py-1", {
+        className={cn("flex w-full items-center gap-2.5 border-b border-b-[#E0E0E0] bg-[#F4F4F4] px-2 py-1", {
           "border-b-[#c6c6c6]": activityBarState?.position === "top",
           "border-t-[#c6c6c6]": activityBarState?.position === "bottom",
         })}
