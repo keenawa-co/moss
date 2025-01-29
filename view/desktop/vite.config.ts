@@ -1,6 +1,7 @@
-import react from "@vitejs/plugin-react";
 import { resolve } from "path";
 import { defineConfig } from "vite";
+
+import react from "@vitejs/plugin-react";
 
 export default defineConfig({
   server: {
@@ -16,6 +17,7 @@ export default defineConfig({
       "@/hooks": resolve("src/hooks"),
       "@/assets": resolve("src/assets"),
       "@/components": resolve("src/components"),
+      "@/store": resolve("src/store"),
     },
   },
 });
