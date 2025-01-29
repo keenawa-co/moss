@@ -12,3 +12,5 @@ export * as Button from "./Button";
 export * as Checkbox from "./Checkbox";
 export * as RadioGroup from "./RadioGroup";
 export * as Switch from "./Switch";
+export * from "./AccordionsList";
+export * from "./ActivitiesList";

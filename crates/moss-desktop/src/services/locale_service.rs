@@ -6,7 +6,6 @@ use anyhow::{anyhow, Context as _, Result};
 use dashmap::DashSet;
 use dirs::home_dir;
 use moss_cache::{backend::moka::MokaBackend, Cache, CacheError};
-use serde::Deserialize;
 use serde_json::Value;
 use std::any::Any;
 use std::{path::PathBuf, sync::Arc};

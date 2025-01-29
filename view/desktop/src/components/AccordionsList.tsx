@@ -1,5 +1,4 @@
 import { AllotmentHandle } from "allotment";
-import { use } from "i18next";
 import { useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
 
@@ -16,6 +15,7 @@ type OmittedComponents = Omit<
   "RootLayout" | "ContentLayout" | "PropertiesLayout" | "Button" | "SidebarHeader"
 >;
 type DesktopComponentsOmitted = keyof OmittedComponents;
+
 const getDesktopComponentByName = (name: DesktopComponentsOmitted) => {
   if (!DesktopComponents[name]) return <div>{name}</div>;
 
@@ -56,6 +56,7 @@ export const AccordionsList = () => {
   const handleOnDragEnd = (sizes: number[]) => {
     dispatch(setPreferredSizes(sizes));
   };
+
   return (
     <div className="h-full overflow-auto bg-[#F4F4F4]">
       <Resizable ref={ref} vertical className="h-full" proportionalLayout={false} onDragEnd={handleOnDragEnd}>

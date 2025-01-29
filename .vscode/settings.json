@@ -124,5 +124,4 @@
   "[typespec]": {
     "editor.formatOnSave": false
   },
-  "tailwindCSS.rootFontSize": 16,
 }

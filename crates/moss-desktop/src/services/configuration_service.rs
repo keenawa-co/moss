@@ -7,7 +7,7 @@ use std::sync::Arc;
 use crate::app::service::Service;
 
 pub struct ConfigurationService {
-    default_configurations: DefaultConfiguration,
+    _default_configurations: DefaultConfiguration,
     configuration: Configuration,
 }
 
@@ -16,7 +16,7 @@ impl ConfigurationService {
         let configuration = Configuration::new(Arc::clone(default_configurations.model()));
 
         Self {
-            default_configurations,
+            _default_configurations: default_configurations,
             configuration,
         }
     }

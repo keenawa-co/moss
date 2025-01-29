@@ -19,12 +19,12 @@ export interface AccordionState {
 
 const initialState: AccordionState = {
   accordion: [
-    {
-      id: 1,
-      title: "Sidebar",
-      content: "Sidebar",
-      isOpen: false,
-    },
+    // {
+    //   id: 1,
+    //   title: "Sidebar",
+    //   content: "Sidebar",
+    //   isOpen: false,
+    // },
     {
       id: 2,
       title: "General",

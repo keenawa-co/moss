@@ -1,14 +1,10 @@
 use anyhow::{anyhow, Result};
 use arcstr::ArcStr;
 use hashbrown::{HashMap, HashSet};
+use moss_mel::foundations::configuration::{ConfigurationNode, Override, Parameter};
 use parking_lot::Mutex;
 use serde_json::Value as JsonValue;
-use std::{marker::PhantomData, path::PathBuf, sync::Arc};
-
-use crate::module::{
-    configuration::{ConfigurationDecl, OverrideDecl, ParameterDecl},
-    ExtensionPointModule,
-};
+use std::{path::PathBuf, sync::Arc};
 
 static __EP_REGISTRY__: Mutex<Vec<PathBuf>> = Mutex::new(vec![]);
 
@@ -51,17 +47,17 @@ pub struct DefaultOverrides {
 
 #[derive(Debug, Default)]
 pub struct ConfigurationRegistry {
-    configuration_decls: Vec<(ArcStr, Arc<ConfigurationDecl>)>,
-    known_parameters: HashMap<ArcStr, Arc<ParameterDecl>>,
-    excluded_parameters: HashMap<ArcStr, Arc<ParameterDecl>>,
+    configuration_nodes: Vec<Arc<ConfigurationNode>>,
+    known_parameters: HashMap<ArcStr, Arc<Parameter>>,
+    excluded_parameters: HashMap<ArcStr, Arc<Parameter>>,
     default_overrides: HashMap<ArcStr, DefaultOverrides>,
-    specific_overrides: HashMap<ArcStr, OverrideDecl>,
+    specific_overrides: HashMap<ArcStr, Override>,
     override_identifiers: HashSet<ArcStr>,
     decl_identifiers: HashSet<ArcStr>,
 }
 
 impl ConfigurationRegistry {
-    pub fn parameters(&self) -> &HashMap<ArcStr, Arc<ParameterDecl>> {
+    pub fn parameters(&self) -> &HashMap<ArcStr, Arc<Parameter>> {
         &self.known_parameters
     }
 
@@ -72,24 +68,27 @@ impl ConfigurationRegistry {
             .cloned()
     }
 
-    pub fn register(&mut self, decls: HashMap<ArcStr, Arc<ConfigurationDecl>>) {
-        for (id, decl) in decls {
-            if let Err(err) = self.validate_decl(&id, &decl) {
-                warn!("Failed to register the parameter '{}': {err}", id);
+    pub fn register<I>(&mut self, nodes: I)
+    where
+        I: IntoIterator<Item = ConfigurationNode>,
+    {
+        for node in nodes {
+            if let Err(err) = self.validate_decl(&node) {
+                warn!("Failed to register the parameter '{}': {err}", node.ident);
                 continue;
             }
 
-            self.register_parameters(&decl.parameters);
-            self.register_overrides(&decl.overrides);
+            self.register_parameters(&node.parameters);
+            self.register_overrides(&node.overrides);
 
             self.override_identifiers
-                .extend(decl.overrides.keys().cloned());
-            self.decl_identifiers.insert(ArcStr::clone(&id));
-            self.configuration_decls.push((id, decl));
+                .extend(node.overrides.keys().cloned());
+            self.decl_identifiers.insert(ArcStr::clone(&node.ident));
+            self.configuration_nodes.push(Arc::new(node));
         }
     }
 
-    fn register_parameters(&mut self, parameters: &HashMap<ArcStr, Arc<ParameterDecl>>) {
+    fn register_parameters(&mut self, parameters: &HashMap<ArcStr, Arc<Parameter>>) {
         for (key, decl) in parameters {
             if let Err(err) = self.validate_parameter(&key, &decl) {
                 warn!("Failed to register the parameter '{}': {err}", key);
@@ -106,7 +105,7 @@ impl ConfigurationRegistry {
         }
     }
 
-    fn register_overrides(&mut self, overrides: &HashMap<ArcStr, Arc<OverrideDecl>>) {
+    fn register_overrides(&mut self, overrides: &HashMap<ArcStr, Arc<Override>>) {
         for (override_key, override_decl) in overrides {
             // TODO: validate the override key and declaration
 
@@ -146,15 +145,16 @@ impl ConfigurationRegistry {
         }
     }
 
-    fn validate_decl(&self, key: &ArcStr, _decl: &Arc<ConfigurationDecl>) -> Result<()> {
-        if self.decl_identifiers.get(key).is_some() {
+    fn validate_decl(&self, decl: &ConfigurationNode) -> Result<()> {
+        let key = decl.ident.clone();
+        if self.decl_identifiers.get(&key).is_some() {
             return Err(anyhow!(
                 "A declaration with the identifier {} already exists.",
                 key
             ));
         }
 
-        self.validate_decl_key(key)?;
+        self.validate_decl_key(&key)?;
 
         Ok(())
     }
@@ -169,7 +169,7 @@ impl ConfigurationRegistry {
         Ok(())
     }
 
-    fn validate_parameter(&self, key: &ArcStr, parameter: &Arc<ParameterDecl>) -> Result<()> {
+    fn validate_parameter(&self, key: &ArcStr, parameter: &Parameter) -> Result<()> {
         if self.known_parameters.get(key).is_some() {
             return Err(anyhow!("This parameter has already been registered"));
         }
@@ -190,7 +190,7 @@ impl ConfigurationRegistry {
         Ok(())
     }
 
-    fn validate_parameter_value(&self, _parameter: &Arc<ParameterDecl>) -> Result<()> {
+    fn validate_parameter_value(&self, _parameter: &Parameter) -> Result<()> {
         // TODO: Validate the default value of the parameter to ensure it meets
         // the specified constraints. For example, if it is a numeric value, it must
         // not be less than the minimum or greater than the maximum, and so on.
@@ -208,16 +208,10 @@ pub struct Registry {
 }
 
 impl Registry {
-    pub fn new(modules: &HashMap<PathBuf, ExtensionPointModule>) -> Self {
-        let mut configurations = ConfigurationRegistry::default();
+    pub fn new(configurations: ConfigurationRegistry) -> Self {
+        // let mut configurations = ConfigurationRegistry::default();
 
-        for (_path, module) in modules {
-            // OPTIMIZE: I think this can be optimized by removing cloning at this point.
-            // In theory, after the data has been collected, there's no need to keep a
-            // clone of the data in the Loader. Therefore, we could take ownership of
-            // the data instead, eliminating the need for cloning here.
-            configurations.register(module.configurations.clone());
-        }
+        // configurations.register(scope.configurations.into_values());
 
         Self {
             configurations: Arc::new(configurations),
