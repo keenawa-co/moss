@@ -10,7 +10,7 @@ export const RootLayout = ({ children, className, ...props }: ComponentProps<"ma
     <div className="background-(--moss-page-background) grid h-full grid-rows-[minmax(0px,46px)_1fr_auto]">
       <HeadBar />
 
-      <main className={cn("RootLayout background-(--moss-page-background)", className)} {...props}>
+      <main className={cn("background-(--moss-page-background)", className)} {...props}>
         {children}
       </main>
 
