@@ -29,8 +29,12 @@ pub struct ConfigurationOverrideDecl {
 }
 
 #[derive(Debug)]
-pub struct ConfigurationParameterDecl {
+pub struct ParameterDecl {
     pub ident: ArcStr,
+    pub body: ParameterDeclBodyStmt,
+}
+
+pub struct ParameterDeclBodyStmt {
     pub value_type: Expression,
     pub maximum: Expression,
     pub minimum: Expression,
@@ -43,9 +47,7 @@ pub struct ConfigurationParameterDecl {
 }
 
 #[derive(Debug)]
-pub struct ConfigurationDecl {
-    pub ident: Option<ArcStr>,
-    pub parent_ident: Option<ArcStr>,
+pub struct ConfigurationBodyStmt {
     pub display_name: Expression,
     pub description: Expression,
     pub order: Expression,
@@ -53,11 +55,66 @@ pub struct ConfigurationDecl {
     pub overrides: Vec<ConfigurationOverrideDecl>,
 }
 
+#[derive(Debug)]
+pub enum ConfigurationDecl {
+    Genesis {
+        ident: ArcStr,
+        body: ConfigurationBodyStmt,
+    },
+    Successor {
+        ident: ArcStr,
+        parent_ident: ArcStr,
+        body: ConfigurationBodyStmt,
+    },
+    Anonymous {
+        body: ConfigurationBodyStmt,
+    },
+}
+
+impl ConfigurationDecl {
+    fn ident(&self) -> Option<ArcStr> {
+        match self {
+            ConfigurationDecl::Genesis { ident, .. } => Some(ArcStr::clone(ident)),
+            ConfigurationDecl::Successor { ident, .. } => Some(ArcStr::clone(ident)),
+            ConfigurationDecl::Anonymous { .. } => None,
+        }
+    }
+
+    fn parent_ident(&self) -> Option<ArcStr> {
+        match self {
+            ConfigurationDecl::Genesis { .. } => None,
+            ConfigurationDecl::Successor { parent_ident, .. } => Some(ArcStr::clone(parent_ident)),
+            ConfigurationDecl::Anonymous { .. } => None,
+        }
+    }
+
+    fn body(&self) -> &ConfigurationBodyStmt {
+        match self {
+            ConfigurationDecl::Genesis { body, .. } => body,
+            ConfigurationDecl::Successor { body, .. } => body,
+            ConfigurationDecl::Anonymous { body } => body,
+        }
+    }
+}
+
+// #[derive(Debug)]
+// pub struct ConfigurationDecl {
+//     pub ident: Option<ArcStr>,
+//     pub parent_ident: Option<ArcStr>,
+//     pub display_name: Expression,
+//     pub description: Expression,
+//     pub order: Expression,
+//     pub parameters: Vec<ConfigurationParameterDecl>,
+//     pub overrides: Vec<ConfigurationOverrideDecl>,
+// }
+
 impl ConfigurationDecl {
     pub fn evaluate(self, ctx: &Context) -> Result<ConfigurationNode> {
+        let body = self.body();
         let mut parameters = HashMap::new();
-        for parameter_decl in self.parameters {
-            let typ = match Type::try_from(parameter_decl.value_type) {
+
+        for parameter_decl in &body.parameters {
+            let typ = match Type::try_from(&parameter_decl.value_type) {
                 Ok(ty) => ty,
                 Err(_) => {
                     // TODO: Add logging for encountering an unknown type
@@ -68,27 +125,27 @@ impl ConfigurationDecl {
             parameters.insert(
                 parameter_decl.ident.clone(),
                 Arc::new(Parameter {
-                    ident: parameter_decl.ident,
+                    ident: ArcStr::clone(&parameter_decl.ident),
                     typ,
-                    maximum: try_evaluate_to_u64(ctx, parameter_decl.maximum)?,
-                    minimum: try_evaluate_to_u64(ctx, parameter_decl.minimum)?,
+                    maximum: try_evaluate_to_u64(ctx, &parameter_decl.maximum)?,
+                    minimum: try_evaluate_to_u64(ctx, &parameter_decl.minimum)?,
                     default: serde_json::from_str(
                         parameter_decl.default.evaluate(ctx)?.to_string().as_str(),
                     )?,
-                    scope: try_evaluate_to_string(ctx, parameter_decl.scope)?
+                    scope: try_evaluate_to_string(ctx, &parameter_decl.scope)?
                         .and_then(|value| ParameterScope::from_str(&value).ok())
                         .unwrap_or_default(),
-                    order: try_evaluate_to_u64(ctx, parameter_decl.order)?,
-                    description: try_evaluate_to_string(ctx, parameter_decl.description)?,
-                    excluded: try_evaluate_to_bool(ctx, parameter_decl.excluded)?.unwrap_or(false),
-                    protected: try_evaluate_to_bool(ctx, parameter_decl.protected)?
+                    order: try_evaluate_to_u64(ctx, &parameter_decl.order)?,
+                    description: try_evaluate_to_string(ctx, &parameter_decl.description)?,
+                    excluded: try_evaluate_to_bool(ctx, &parameter_decl.excluded)?.unwrap_or(false),
+                    protected: try_evaluate_to_bool(ctx, &parameter_decl.protected)?
                         .unwrap_or(false),
                 }),
             );
         }
 
         let mut overrides = HashMap::new();
-        for override_decl in self.overrides {
+        for override_decl in &body.overrides {
             let value = if is_null_expression(&override_decl.value) {
                 // TODO: Add logging
                 continue;
@@ -103,7 +160,7 @@ impl ConfigurationDecl {
             overrides.insert(
                 override_decl.ident.clone(),
                 Arc::new(Override {
-                    ident: override_decl.ident,
+                    ident: ArcStr::clone(&override_decl.ident),
                     value,
                     context: None,
                 }),
@@ -111,26 +168,26 @@ impl ConfigurationDecl {
         }
 
         Ok(ConfigurationNode {
-            ident: self.ident.unwrap_or_default(),
-            parent_ident: self.parent_ident,
-            display_name: try_evaluate_to_string(ctx, self.display_name)?,
-            description: try_evaluate_to_string(ctx, self.description)?,
-            order: try_evaluate_to_u64(ctx, self.order)?,
+            ident: self.ident().unwrap_or_default(),
+            parent_ident: self.parent_ident(),
+            display_name: try_evaluate_to_string(ctx, &body.display_name)?,
+            description: try_evaluate_to_string(ctx, &body.description)?,
+            order: try_evaluate_to_u64(ctx, &body.order)?,
             parameters,
             overrides,
         })
     }
 }
 
-fn try_evaluate_to_string(ctx: &Context, expr: Expression) -> Result<Option<String>> {
+fn try_evaluate_to_string(ctx: &Context, expr: &Expression) -> Result<Option<String>> {
     Ok(expr.evaluate(ctx)?.as_str().map(ToString::to_string))
 }
 
-fn try_evaluate_to_u64(ctx: &Context, expr: Expression) -> Result<Option<u64>> {
+fn try_evaluate_to_u64(ctx: &Context, expr: &Expression) -> Result<Option<u64>> {
     Ok(expr.evaluate(ctx)?.as_u64())
 }
 
-fn try_evaluate_to_bool(ctx: &Context, expr: Expression) -> Result<Option<bool>> {
+fn try_evaluate_to_bool(ctx: &Context, expr: &Expression) -> Result<Option<bool>> {
     Ok(expr.evaluate(ctx)?.as_bool())
 }
 

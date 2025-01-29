@@ -10,8 +10,13 @@ use std::path::PathBuf;
 
 const FILE_EXTENSION: &'static str = "hcl";
 
+// struct Package {
+//     modules: HashMap<PathBuf, ResolvedScope>,
+// }
+
 pub struct Loader {
     modules: HashMap<PathBuf, ResolvedScope>,
+    // packages: HashMap<PathBuf, Package>
 }
 
 impl Loader {
@@ -58,6 +63,11 @@ impl Loader {
                 self.parse_module_file(&mut module_scope, ctx, &path)?;
             }
         }
+
+        // FIXME:
+        // The `eval` operation now needs to be performed at the package level, not the module level.
+        // This is because, in the future, a module might reference other modules.
+        // Therefore, we must first collect all modules, build the module dependency graph, and then execute the `eval` operation.
         Ok(module_scope.evaluate_with_context(ctx)?)
     }
 

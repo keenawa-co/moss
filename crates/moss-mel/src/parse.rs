@@ -13,24 +13,46 @@ use crate::foundations::{
     scope::ScopeRepr,
 };
 
+// pub enum ConfigurationDecl {
+//     Genesis(ConfigurationDeclBody),
+//     Successor(ConfigurationDeclBody),
+//     Anonymous(ConfigurationDecl),
+// }
+
+// pub struct ModuleScope {
+//     // locals
+//     configurations: Vec<ConfigurationDecl>,
+// }
+
+// pub fn parse(module: &mut ModuleScope, input: &str) -> Result<()> {}
+
 pub fn parse(input: &str) -> Result<ScopeRepr> {
     let body: Body = hcl::from_str(input)?;
     let mut result = ScopeRepr::new();
 
     for block in body.into_blocks() {
+        let labels = block.labels();
+
         match block.identifier() {
-            CONFIGURATION_LIT => {
-                if block.labels().len() == 1 {
-                    // configuration "xxx" {}
-                    let parsed = parse_configuration_block(block)?;
-                    result.configurations.push(parsed);
-                } else {
-                    // configuration {}
-                    // configuration "xxx" extends "xxx" {}
-                    let parsed = parse_extend_configuration_block(block)?;
-                    result.configuration_extends.push(parsed);
-                }
-            }
+            // CONFIGURATION_LIT => {
+            //     if block.labels().len() == 1 {
+            //         // configuration "xxx" {}
+            //         let parsed = parse_configuration_block(block)?;
+            //         result.configurations.push(parsed);
+            //     } else {
+            //         // configuration {}
+            //         // configuration "xxx" extends "xxx" {}
+            //         let parsed = parse_extend_configuration_block(block)?;
+            //         result.configuration_extends.push(parsed);
+            //     }
+            // }
+            CONFIGURATION_LIT => match (labels.get(0), labels.get(2)) {
+                (Some(ident), None) => {}               // Genesis
+                (Some(ident), Some(parent_ident)) => {} // Successor
+                (None, None) => {}                      // Anonymous
+                _ => {}
+            },
+
             LOCALS_LIT => {
                 let parsed = parse_locals_block(block)?;
                 let mut graph = petgraph::Graph::<String, ()>::new();
@@ -88,6 +110,7 @@ fn parse_locals_block(block: Block) -> Result<HashMap<String, Expression>> {
     Ok(result)
 }
 
+// FIXME:
 fn parse_extend_configuration_block(block: Block) -> Result<ConfigurationDecl> {
     let parent_ident = if block.labels().is_empty() {
         Some(ArcStr::from(OTHER_EXTEND_CONFIGURATION_PARENT_ID))

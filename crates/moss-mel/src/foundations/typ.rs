@@ -26,10 +26,10 @@ impl Type {
     }
 }
 
-impl TryFrom<Expression> for Type {
+impl TryFrom<&Expression> for Type {
     type Error = anyhow::Error;
 
-    fn try_from(value: Expression) -> Result<Self, Self::Error> {
+    fn try_from(value: &Expression) -> Result<Self, Self::Error> {
         match value {
             Expression::Array(_vec) => unimplemented!(),
             Expression::Object(_vec_map) => unimplemented!(),
@@ -39,10 +39,10 @@ impl TryFrom<Expression> for Type {
     }
 }
 
-impl TryFrom<Variable> for Type {
+impl TryFrom<&Variable> for Type {
     type Error = anyhow::Error;
 
-    fn try_from(value: Variable) -> Result<Self, Self::Error> {
+    fn try_from(value: &Variable) -> Result<Self, Self::Error> {
         match value.to_string().as_str() {
             TypeNumber::NAME => Ok(Type::of::<TypeNumber>()),
             TypeString::NAME => Ok(Type::of::<TypeString>()),
