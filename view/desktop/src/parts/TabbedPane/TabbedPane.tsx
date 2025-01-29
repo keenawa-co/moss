@@ -325,7 +325,7 @@ const TabbedPane = (props: { theme?: string }) => {
 
   return (
     <div
-      className="dockview-demo relative flex h-full flex-grow flex-col rounded bg-[rgba(0,0,50,0.25)] p-2"
+      className="dockview-demo relative flex h-full grow flex-col rounded bg-[rgba(0,0,50,0.25)] p-2"
       style={{
         ...css,
       }}
@@ -373,8 +373,8 @@ const TabbedPane = (props: { theme?: string }) => {
           <span className="material-symbols-outlined">terminal</span>
         </button>
       </div>
-      <div className="flex h-0 flex-grow">
-        <div className="flex h-full flex-grow overflow-hidden">
+      <div className="flex h-0 grow">
+        <div className="flex h-full grow overflow-hidden">
           <DebugContext.Provider value={debug}>
             <DockviewReact
               ref={dockviewRef}
@@ -393,7 +393,7 @@ const TabbedPane = (props: { theme?: string }) => {
 
         {showLogs && (
           <div className="ml-2 flex w-[400px] shrink-0 flex-col overflow-hidden bg-black font-mono text-white">
-            <div className="flex-grow overflow-auto">
+            <div className="grow overflow-auto">
               {logLines.map((line, i) => {
                 return (
                   <div

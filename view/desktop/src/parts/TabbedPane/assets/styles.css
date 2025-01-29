@@ -57,11 +57,11 @@
 }
 
 .dockview-demo .action-container .demo-button {
-  @apply flex min-w-[50px] flex-grow items-center rounded-none px-[2px] py-0 !outline !outline-1 !outline-[#4c65d4];
+  @apply flex min-w-[50px] grow items-center rounded-none px-[2px] py-0 !outline !outline-1 !outline-[#4c65d4];
 }
 
 .dockview-demo .action-container .demo-icon-button {
-  @apply flex flex-grow cursor-pointer items-center rounded-none border-none px-1 py-0 outline outline-1 outline-[#4c65d4];
+  @apply flex grow cursor-pointer items-center rounded-none border-none px-1 py-0 outline outline-1 outline-[#4c65d4];
 }
 
 .dockview-demo .action-container .demo-icon-button:disabled {

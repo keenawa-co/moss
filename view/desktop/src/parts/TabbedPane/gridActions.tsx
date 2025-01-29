@@ -39,10 +39,10 @@ const PopoverComponent = (props: { close: () => void; component: React.FC<{ clos
   }, []);
 
   return (
-    <div className="absolute left-0 top-0 z-[9999] h-full w-full">
+    <div className="absolute top-0 left-0 z-[9999] h-full w-full">
       <div
         ref={ref}
-        className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transform bg-black p-2.5 text-white"
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 transform bg-black p-2.5 text-white"
       >
         <props.component close={props.close} />
       </div>
@@ -154,7 +154,7 @@ export const GridActions = (props: {
       <button className="text-button" onClick={() => onAddPanel({ type: "Logs" })}>
         Logs
       </button>
-      <span className="flex-grow" />
+      <span className="grow" />
       <div className="button-group">
         <button className="text-button" onClick={() => onAddPanel()}>
           Add Panel
@@ -189,7 +189,7 @@ export const GridActions = (props: {
       <button className="text-button" onClick={onReset}>
         Reset
       </button>
-      <span className="flex-grow" />
+      <span className="grow" />
       <div className="flex items-center">
         <span className="pr-1 text-[var(--moss-activegroup-visiblepanel-tab-color)]">Grid Gap</span>
         <input

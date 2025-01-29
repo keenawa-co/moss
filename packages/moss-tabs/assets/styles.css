@@ -139,7 +139,7 @@
 }
 
 .dv-tab .dv-default-tab .dv-default-tab-content {
-  @apply flex-grow px-2;
+  @apply grow px-2;
 }
 
 .dv-tab .dv-default-tab .dv-default-tab-action {
@@ -297,7 +297,7 @@
 }
 
 .dv-pane-container .dv-view .dv-default-header > span {
-  @apply flex-grow pl-2;
+  @apply grow pl-2;
 }
 
 .dv-pane-container:first-of-type > .dv-pane > .dv-pane-header {
@@ -324,7 +324,7 @@
 }
 
 .dv-pane-container .dv-pane .dv-pane-body {
-  @apply relative flex-grow overflow-x-hidden overflow-y-auto outline-hidden;
+  @apply relative grow overflow-x-hidden overflow-y-auto outline-hidden;
 }
 
 /*--------------------dv-split-view-contain--------------------*/
@@ -441,19 +441,19 @@
 }
 
 .dv-tabs-and-actions-container.dv-single-tab.dv-full-width-single-tab .dv-tabs-container {
-  @apply flex-grow;
+  @apply grow;
 }
 
 .dv-tabs-and-actions-container.dv-single-tab.dv-full-width-single-tab .dv-tabs-container .dv-tab {
-  @apply flex-grow;
+  @apply grow;
 }
 
 .dv-tabs-and-actions-container.dv-single-tab.dv-full-width-single-tab .dv-void-container {
-  @apply flex-grow-0;
+  @apply grow-0;
 }
 
 .dv-tabs-and-actions-container .dv-void-container {
-  @apply flex flex-grow cursor-grab;
+  @apply flex grow cursor-grab;
 }
 
 .dv-tabs-and-actions-container .dv-tabs-container {
