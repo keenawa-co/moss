@@ -1,3 +1,5 @@
+import { beforeEach, describe, expect, test } from "vitest";
+
 import { CompositeDisposable } from "../../lifecycle";
 import { Paneview } from "../../paneview/paneview";
 import { IPanePart, PaneviewPanel } from "../../paneview/paneviewPanel";
