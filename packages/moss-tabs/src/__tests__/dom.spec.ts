@@ -1,3 +1,5 @@
+import { describe, expect, test } from "vitest";
+
 import { disableIframePointEvents, isInDocument, quasiDefaultPrevented, quasiPreventDefault } from "../dom";
 
 describe("dom", () => {

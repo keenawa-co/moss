@@ -1,3 +1,6 @@
+import { fail } from "assert";
+import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
+
 import { fireEvent, queryByTestId } from "@testing-library/dom";
 import { fromPartial } from "@total-typescript/shoehorn";
 
@@ -1439,7 +1442,7 @@ describe("dockviewComponent", () => {
       tabComponent: "default",
     });
 
-    const panel1Spy = jest.spyOn(panel1, "dispose");
+    const panel1Spy = vi.spyOn(panel1, "dispose");
 
     expect(panel1Spy).not.toHaveBeenCalled();
 
@@ -1527,7 +1530,7 @@ describe("dockviewComponent", () => {
       tabComponent: "default",
     });
 
-    const panel1Spy = jest.spyOn(panel1, "dispose");
+    const panel1Spy = vi.spyOn(panel1, "dispose");
 
     expect(panel1Spy).not.toHaveBeenCalled();
 
@@ -1576,8 +1579,8 @@ describe("dockviewComponent", () => {
       },
     });
 
-    const panel1Spy = jest.spyOn(panel1, "dispose");
-    const panel2Spy = jest.spyOn(panel2, "dispose");
+    const panel1Spy = vi.spyOn(panel1, "dispose");
+    const panel2Spy = vi.spyOn(panel2, "dispose");
 
     dockview.moveGroupOrPanel({
       from: { groupId: panel2.group.id, panelId: "panel2" },
@@ -1628,8 +1631,8 @@ describe("dockviewComponent", () => {
       },
     });
 
-    const panel1Spy = jest.spyOn(panel1, "dispose");
-    const panel2Spy = jest.spyOn(panel2, "dispose");
+    const panel1Spy = vi.spyOn(panel1, "dispose");
+    const panel2Spy = vi.spyOn(panel2, "dispose");
 
     dockview.moveGroupOrPanel({
       from: { groupId: panel2.group.id, panelId: "panel2" },
@@ -1678,8 +1681,8 @@ describe("dockviewComponent", () => {
 
     expect(panel1.group).toEqual(panel2.group);
 
-    const panel1Spy = jest.spyOn(panel1, "dispose");
-    const panel2Spy = jest.spyOn(panel2, "dispose");
+    const panel1Spy = vi.spyOn(panel1, "dispose");
+    const panel2Spy = vi.spyOn(panel2, "dispose");
 
     dockview.moveGroupOrPanel({
       from: { groupId: panel1.group.id, panelId: "panel1" },
@@ -1728,8 +1731,8 @@ describe("dockviewComponent", () => {
 
     expect(panel1.group).toEqual(panel2.group);
 
-    const panel1Spy = jest.spyOn(panel1, "dispose");
-    const panel2Spy = jest.spyOn(panel2, "dispose");
+    const panel1Spy = vi.spyOn(panel1, "dispose");
+    const panel2Spy = vi.spyOn(panel2, "dispose");
 
     dockview.removeGroup(panel1.group);
 
@@ -1775,8 +1778,8 @@ describe("dockviewComponent", () => {
 
     // expect(panel1.group).toEqual(panel2.group);
 
-    const panel1Spy = jest.spyOn(panel1, "dispose");
-    // const panel2Spy = jest.spyOn(panel2, 'dispose');
+    const panel1Spy = vi.spyOn(panel1, "dispose");
+    // const panel2Spy = vi.spyOn(panel2, 'dispose');
 
     dockview.dispose();
 
@@ -1822,9 +1825,9 @@ describe("dockviewComponent", () => {
 
     expect(panel1.group).toEqual(panel2.group);
 
-    const groupSpy = jest.spyOn(panel1.group, "dispose");
-    const panel1Spy = jest.spyOn(panel1, "dispose");
-    const panel2Spy = jest.spyOn(panel2, "dispose");
+    const groupSpy = vi.spyOn(panel1.group, "dispose");
+    const panel1Spy = vi.spyOn(panel1, "dispose");
+    const panel2Spy = vi.spyOn(panel2, "dispose");
 
     dockview.fromJSON({
       grid: {
@@ -1888,7 +1891,7 @@ describe("dockviewComponent", () => {
       },
     });
 
-    const panel1Spy = jest.spyOn(panel1.group, "dispose");
+    const panel1Spy = vi.spyOn(panel1.group, "dispose");
 
     expect(dockview.groups.length).toBe(2);
 
@@ -1902,7 +1905,7 @@ describe("dockviewComponent", () => {
   });
 
   test("fromJSON events should still fire", () => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
 
     dockview.layout(1000, 1000);
 
@@ -2021,7 +2024,7 @@ describe("dockviewComponent", () => {
       },
     });
 
-    jest.runAllTimers();
+    vi.runAllTimers();
 
     expect(addGroup.length).toBe(4);
     expect(removeGroup.length).toBe(0);
@@ -2056,7 +2059,7 @@ describe("dockviewComponent", () => {
       panels: {},
     });
 
-    jest.runAllTimers();
+    vi.runAllTimers();
 
     expect(addGroup.length).toBe(0);
     expect(removeGroup.length).toBe(4);
@@ -3237,7 +3240,7 @@ describe("dockviewComponent", () => {
       get: () => 100,
     });
 
-    jest.spyOn(dockview.element, "getBoundingClientRect").mockReturnValue({
+    vi.spyOn(dockview.element, "getBoundingClientRect").mockReturnValue({
       left: 0,
       top: 0,
       width: 100,
@@ -4663,25 +4666,25 @@ describe("dockviewComponent", () => {
 
   describe("popout group", () => {
     beforeEach(() => {
-      jest.spyOn(window, "open").mockReturnValue(
+      vi.spyOn(window, "open").mockReturnValue(
         fromPartial<Window>({
           document: fromPartial<Document>({
             body: document.createElement("body"),
           }),
-          focus: jest.fn(),
-          addEventListener: jest.fn().mockImplementation((name, cb) => {
+          focus: vi.fn(),
+          addEventListener: vi.fn().mockImplementation((name, cb) => {
             if (name === "load") {
               cb();
             }
           }),
-          removeEventListener: jest.fn(),
-          close: jest.fn(),
+          removeEventListener: vi.fn(),
+          close: vi.fn(),
         })
       );
     });
 
     test("deserailize popout with no reference group", async () => {
-      jest.useRealTimers();
+      vi.useRealTimers();
 
       const container = document.createElement("div");
 
@@ -5042,7 +5045,7 @@ describe("dockviewComponent", () => {
     });
 
     test("popout / floating layouts", async () => {
-      jest.useRealTimers();
+      vi.useRealTimers();
       const container = document.createElement("div");
 
       window.open = () => setupMockWindow();
@@ -5498,7 +5501,7 @@ describe("dockviewComponent", () => {
     let dockview: DockviewComponent;
 
     beforeEach(() => {
-      jest.useFakeTimers();
+      vi.useFakeTimers();
 
       dockview = new DockviewComponent(container, {
         createComponent(options) {
@@ -5513,12 +5516,12 @@ describe("dockviewComponent", () => {
     });
 
     afterEach(() => {
-      jest.runAllTimers();
-      jest.useRealTimers();
+      vi.runAllTimers();
+      vi.useRealTimers();
     });
 
     test("when panels or groups change", () => {
-      const didLayoutChangeHandler = jest.fn();
+      const didLayoutChangeHandler = vi.fn();
       dockview.onDidLayoutChange(didLayoutChangeHandler);
 
       // add panel
@@ -5531,22 +5534,22 @@ describe("dockviewComponent", () => {
         component: "default",
         position: { referenceGroup: panel1.group },
       });
-      jest.runAllTimers();
+      vi.runAllTimers();
       expect(didLayoutChangeHandler).toHaveBeenCalledTimes(1);
 
       // add group
       const group = dockview.addGroup();
-      jest.runAllTimers();
+      vi.runAllTimers();
       expect(didLayoutChangeHandler).toHaveBeenCalledTimes(2);
 
       // remove group
       group.api.close();
-      jest.runAllTimers();
+      vi.runAllTimers();
       expect(didLayoutChangeHandler).toHaveBeenCalledTimes(3);
 
       // active panel
       panel1.api.setActive();
-      jest.runAllTimers();
+      vi.runAllTimers();
       expect(didLayoutChangeHandler).toHaveBeenCalledTimes(4);
 
       // move panel
@@ -5564,7 +5567,7 @@ describe("dockviewComponent", () => {
 
       // remove panel
       panel2.api.close();
-      jest.runAllTimers();
+      vi.runAllTimers();
       expect(didLayoutChangeHandler).toHaveBeenCalledTimes(5);
     });
 
@@ -5574,12 +5577,12 @@ describe("dockviewComponent", () => {
         component: "default",
       });
 
-      const didLayoutChangeHandler = jest.fn();
+      const didLayoutChangeHandler = vi.fn();
       const { dispose: disposeDidLayoutChangeHandler } = dockview.onDidLayoutChange(didLayoutChangeHandler);
 
       panel1.setTitle("new title");
 
-      jest.runAllTimers();
+      vi.runAllTimers();
 
       expect(didLayoutChangeHandler).toHaveBeenCalledTimes(1);
 
@@ -5592,12 +5595,12 @@ describe("dockviewComponent", () => {
         component: "default",
       });
 
-      const didLayoutChangeHandler = jest.fn();
+      const didLayoutChangeHandler = vi.fn();
       const { dispose: disposeDidLayoutChangeHandler } = dockview.onDidLayoutChange(didLayoutChangeHandler);
 
       panel1.api.updateParameters({ keyA: "valueA" });
 
-      jest.runAllTimers();
+      vi.runAllTimers();
 
       expect(didLayoutChangeHandler).toHaveBeenCalledTimes(1);
 
@@ -5766,7 +5769,7 @@ describe("dockviewComponent", () => {
     });
 
     test("that watermark appears when all views are not visible", () => {
-      jest.useFakeTimers();
+      vi.useFakeTimers();
       const container = document.createElement("div");
 
       const dockview = new DockviewComponent(container, {
@@ -5799,17 +5802,17 @@ describe("dockviewComponent", () => {
       expect(query).toBeFalsy();
 
       panel1.group.api.setVisible(false);
-      jest.runAllTicks(); // visibility events check fires on microtask-queue
+      vi.runAllTicks(); // visibility events check fires on microtask-queue
       query = queryByTestId(container, "watermark-component");
       expect(query).toBeFalsy();
 
       panel2.group.api.setVisible(false);
-      jest.runAllTicks(); // visibility events check fires on microtask-queue
+      vi.runAllTicks(); // visibility events check fires on microtask-queue
       query = queryByTestId(container, "watermark-component");
       expect(query).toBeTruthy();
 
       panel1.group.api.setVisible(true);
-      jest.runAllTicks(); // visibility events check fires on microtask-queue
+      vi.runAllTicks(); // visibility events check fires on microtask-queue
       query = queryByTestId(container, "watermark-component");
       expect(query).toBeFalsy();
     });
@@ -6262,7 +6265,7 @@ describe("dockviewComponent", () => {
   });
 
   test("that `onDidLayoutChange` only subscribes to events after initial subscription time", () => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
 
     const container = document.createElement("div");
 
@@ -6305,7 +6308,7 @@ describe("dockviewComponent", () => {
       b++;
     });
 
-    jest.runAllTicks();
+    vi.runAllTicks();
 
     expect(a).toBe(1);
     expect(b).toBe(0);

@@ -1,3 +1,5 @@
+import { beforeEach, describe, expect, test, vi } from "vitest";
+
 import { fireEvent } from "@testing-library/dom";
 
 import { Emitter } from "../../events";
@@ -81,7 +83,7 @@ describe("splitview", () => {
     container = document.createElement("div");
     container.className = "container";
 
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   test("vertical splitview", () => {
@@ -572,8 +574,8 @@ describe("splitview", () => {
     splitview.addView(view1);
     splitview.addView(view2);
 
-    const addEventListenerSpy = jest.spyOn(document, "addEventListener");
-    const removeEventListenerSpy = jest.spyOn(document, "removeEventListener");
+    const addEventListenerSpy = vi.spyOn(document, "addEventListener");
+    const removeEventListenerSpy = vi.spyOn(document, "removeEventListener");
 
     const sashElement = container.getElementsByClassName("dv-sash").item(0) as HTMLElement;
 

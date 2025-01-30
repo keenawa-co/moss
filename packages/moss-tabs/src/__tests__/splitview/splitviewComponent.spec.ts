@@ -1,3 +1,6 @@
+import { fail } from "assert";
+import { beforeEach, describe, expect, test, vi } from "vitest";
+
 import { PanelDimensionChangeEvent } from "../../api/panelApi";
 import { Emitter } from "../../events";
 import { CompositeDisposable } from "../../lifecycle";
@@ -498,8 +501,8 @@ describe("componentSplitview", () => {
     const panel1 = splitview.getPanel("panel1")!;
     const panel2 = splitview.getPanel("panel2")!;
 
-    const panel1Spy = jest.spyOn(panel1, "dispose");
-    const panel2Spy = jest.spyOn(panel2, "dispose");
+    const panel1Spy = vi.spyOn(panel1, "dispose");
+    const panel2Spy = vi.spyOn(panel2, "dispose");
 
     splitview.dispose();
 
@@ -534,8 +537,8 @@ describe("componentSplitview", () => {
     const panel1 = splitview.getPanel("panel1")!;
     const panel2 = splitview.getPanel("panel2")!;
 
-    const panel1Spy = jest.spyOn(panel1, "dispose");
-    const panel2Spy = jest.spyOn(panel2, "dispose");
+    const panel1Spy = vi.spyOn(panel1, "dispose");
+    const panel2Spy = vi.spyOn(panel2, "dispose");
 
     splitview.removePanel(panel2);
 
@@ -570,8 +573,8 @@ describe("componentSplitview", () => {
     const panel1 = splitview.getPanel("panel1")!;
     const panel2 = splitview.getPanel("panel2")!;
 
-    const panel1Spy = jest.spyOn(panel1, "dispose");
-    const panel2Spy = jest.spyOn(panel2, "dispose");
+    const panel1Spy = vi.spyOn(panel1, "dispose");
+    const panel2Spy = vi.spyOn(panel2, "dispose");
 
     splitview.fromJSON({
       orientation: Orientation.HORIZONTAL,

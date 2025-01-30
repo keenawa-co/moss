@@ -1,30 +1,33 @@
+import { beforeEach, describe, expect, test, vi } from "vitest";
+
+import { fromPartial } from "@total-typescript/shoehorn";
+
 import { DockviewPanelApiImpl } from "../../api/dockviewPanelApi";
 import { DockviewComponent } from "../../dockview/dockviewComponent";
-import { DockviewPanel } from "../../dockview/dockviewPanel";
 import { DockviewGroupPanel } from "../../dockview/dockviewGroupPanel";
-import { fromPartial } from "@total-typescript/shoehorn";
+import { DockviewPanel } from "../../dockview/dockviewPanel";
 
 describe("groupPanelApi", () => {
   test("title", () => {
     const accessor = fromPartial<DockviewComponent>({
-      onDidAddPanel: jest.fn(),
-      onDidRemovePanel: jest.fn(),
+      onDidAddPanel: vi.fn(),
+      onDidRemovePanel: vi.fn(),
       options: {},
     });
 
-    const panelMock = jest.fn<DockviewPanel, []>(() => {
+    const panelMock = vi.fn<DockviewPanel>(() => {
       return {
-        update: jest.fn(),
-        setTitle: jest.fn(),
+        update: vi.fn(),
+        setTitle: vi.fn(),
       } as any;
     });
 
     const panel = new panelMock();
     const group = fromPartial<DockviewGroupPanel>({
       api: {
-        onDidVisibilityChange: jest.fn(),
-        onDidLocationChange: jest.fn(),
-        onDidActiveChange: jest.fn(),
+        onDidVisibilityChange: vi.fn(),
+        onDidLocationChange: vi.fn(),
+        onDidActiveChange: vi.fn(),
       },
     });
 
@@ -38,12 +41,12 @@ describe("groupPanelApi", () => {
   test("updateParameters", () => {
     const groupPanel: Partial<DockviewPanel> = {
       id: "test_id",
-      update: jest.fn(),
+      update: vi.fn(),
     };
 
     const accessor = fromPartial<DockviewComponent>({
-      onDidAddPanel: jest.fn(),
-      onDidRemovePanel: jest.fn(),
+      onDidAddPanel: vi.fn(),
+      onDidRemovePanel: vi.fn(),
       options: {},
     });
 
@@ -70,8 +73,8 @@ describe("groupPanelApi", () => {
     };
 
     const accessor = fromPartial<DockviewComponent>({
-      onDidAddPanel: jest.fn(),
-      onDidRemovePanel: jest.fn(),
+      onDidAddPanel: vi.fn(),
+      onDidRemovePanel: vi.fn(),
       options: {},
     });
 
