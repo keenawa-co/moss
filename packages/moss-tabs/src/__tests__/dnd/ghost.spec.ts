@@ -8,7 +8,7 @@ describe("ghost", () => {
     vi.clearAllTimers();
   });
 
-  test("that a custom class is added, the element is added to the document and all is removed afterwards", () => {
+  test("that a custom class is added, the element is added to the document and all is removed afterwards", async () => {
     const dataTransferMock = vi.fn<Partial<DataTransfer>, []>(() => {
       return {
         setDragImage: vi.fn(),
@@ -25,7 +25,7 @@ describe("ghost", () => {
     expect(dataTransfer.setDragImage).toBeCalledTimes(1);
     expect(dataTransfer.setDragImage).toBeCalledWith(element, 0, 0);
 
-    vi.runAllTimers();
+    await vi.runAllTimersAsync();
 
     expect(element.className).toBe("");
     expect(element.parentElement).toBe(null);

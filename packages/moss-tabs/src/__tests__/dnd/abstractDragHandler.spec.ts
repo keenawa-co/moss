@@ -6,7 +6,7 @@ import { DragHandler } from "../../dnd/abstractDragHandler";
 import { IDisposable } from "../../lifecycle";
 
 describe("abstractDragHandler", () => {
-  test("that className dv-dragged is added to element after dragstart event", () => {
+  test("that className dv-dragged is added to element after dragstart event", async () => {
     vi.useFakeTimers();
 
     const element = document.createElement("div");
@@ -30,7 +30,7 @@ describe("abstractDragHandler", () => {
     fireEvent.dragStart(element);
     expect(element.classList.contains("dv-dragged")).toBeTruthy();
 
-    vi.runAllTimers();
+    await vi.runAllTimersAsync();
     expect(element.classList.contains("dv-dragged")).toBeFalsy();
 
     handler.dispose();

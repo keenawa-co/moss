@@ -1904,7 +1904,7 @@ describe("dockviewComponent", () => {
     expect(panel1Spy).toBeCalledTimes(1);
   });
 
-  test("fromJSON events should still fire", () => {
+  test("fromJSON events should still fire", async () => {
     vi.useFakeTimers();
 
     dockview.layout(1000, 1000);
@@ -2024,7 +2024,7 @@ describe("dockviewComponent", () => {
       },
     });
 
-    vi.runAllTimers();
+    await vi.runAllTimersAsync();
 
     expect(addGroup.length).toBe(4);
     expect(removeGroup.length).toBe(0);
@@ -2059,7 +2059,7 @@ describe("dockviewComponent", () => {
       panels: {},
     });
 
-    vi.runAllTimers();
+    await vi.runAllTimersAsync();
 
     expect(addGroup.length).toBe(0);
     expect(removeGroup.length).toBe(4);
@@ -5515,12 +5515,12 @@ describe("dockviewComponent", () => {
       });
     });
 
-    afterEach(() => {
-      vi.runAllTimers();
+    afterEach(async () => {
+      await vi.runAllTimersAsync();
       vi.useRealTimers();
     });
 
-    test("when panels or groups change", () => {
+    test("when panels or groups change", async () => {
       const didLayoutChangeHandler = vi.fn();
       dockview.onDidLayoutChange(didLayoutChangeHandler);
 
@@ -5534,22 +5534,22 @@ describe("dockviewComponent", () => {
         component: "default",
         position: { referenceGroup: panel1.group },
       });
-      vi.runAllTimers();
+      await vi.runAllTimersAsync();
       expect(didLayoutChangeHandler).toHaveBeenCalledTimes(1);
 
       // add group
       const group = dockview.addGroup();
-      vi.runAllTimers();
+      await vi.runAllTimersAsync();
       expect(didLayoutChangeHandler).toHaveBeenCalledTimes(2);
 
       // remove group
       group.api.close();
-      vi.runAllTimers();
+      await vi.runAllTimersAsync();
       expect(didLayoutChangeHandler).toHaveBeenCalledTimes(3);
 
       // active panel
       panel1.api.setActive();
-      vi.runAllTimers();
+      await vi.runAllTimersAsync();
       expect(didLayoutChangeHandler).toHaveBeenCalledTimes(4);
 
       // move panel
@@ -5567,11 +5567,11 @@ describe("dockviewComponent", () => {
 
       // remove panel
       panel2.api.close();
-      vi.runAllTimers();
+      await vi.runAllTimersAsync();
       expect(didLayoutChangeHandler).toHaveBeenCalledTimes(5);
     });
 
-    test("that emits onDidPanelTitleChange and onDidLayoutChange when the panel set a title", () => {
+    test("that emits onDidPanelTitleChange and onDidLayoutChange when the panel set a title", async () => {
       const panel1 = dockview.addPanel({
         id: "panel_1",
         component: "default",
@@ -5582,14 +5582,14 @@ describe("dockviewComponent", () => {
 
       panel1.setTitle("new title");
 
-      vi.runAllTimers();
+      await vi.runAllTimersAsync();
 
       expect(didLayoutChangeHandler).toHaveBeenCalledTimes(1);
 
       disposeDidLayoutChangeHandler();
     });
 
-    test("that emits onDidPanelParametersChange and onDidLayoutChange when the panel updates parameters", () => {
+    test("that emits onDidPanelParametersChange and onDidLayoutChange when the panel updates parameters", async () => {
       const panel1 = dockview.addPanel({
         id: "panel_1",
         component: "default",
@@ -5600,7 +5600,7 @@ describe("dockviewComponent", () => {
 
       panel1.api.updateParameters({ keyA: "valueA" });
 
-      vi.runAllTimers();
+      await vi.runAllTimersAsync();
 
       expect(didLayoutChangeHandler).toHaveBeenCalledTimes(1);
 

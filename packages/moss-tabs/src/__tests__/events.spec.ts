@@ -80,7 +80,7 @@ describe("events", () => {
   });
 
   describe("asapEvent", () => {
-    test("that asapEvents fire once per event-loop-cycle", () => {
+    test("that asapEvents fire once per event-loop-cycle", async () => {
       vi.useFakeTimers();
 
       const event = new AsapEvent();
@@ -107,7 +107,7 @@ describe("events", () => {
       expect(preFireCount).toBe(0);
       expect(postFireCount).toBe(0);
 
-      vi.runAllTimers();
+      await vi.runAllTimersAsync();
 
       expect(preFireCount).toBe(1);
       expect(postFireCount).toBe(0);

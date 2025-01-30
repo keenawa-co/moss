@@ -47,7 +47,7 @@ describe("contentContainer", () => {
     vi.useFakeTimers();
   });
 
-  test("basic focus test", () => {
+  test("basic focus test", async () => {
     let focus = 0;
     let blur = 0;
 
@@ -98,7 +98,7 @@ describe("contentContainer", () => {
 
     // container looses focus
     fireEvent.blur(contentRenderer.element);
-    vi.runAllTimers();
+    await vi.runAllTimersAsync();
     expect(focus).toBe(1);
     expect(blur).toBe(1);
 
@@ -122,7 +122,7 @@ describe("contentContainer", () => {
 
     // new panel looses focus
     fireEvent.blur(contentRenderer2.element);
-    vi.runAllTimers();
+    await vi.runAllTimersAsync();
     expect(focus).toBe(2);
     expect(blur).toBe(2);
 
