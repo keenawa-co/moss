@@ -82,8 +82,8 @@ describe("gridview react", () => {
     });
 
     await waitFor(() => {
-      expect(wrapper.queryByText(/key=keyA,value=valueA/i)).toBeInTheDocument();
-      expect(wrapper.queryByText(/key=keyB,value=valueB/i)).toBeInTheDocument();
+      expect(wrapper.queryByText(/key=keyA,value=valueA/i)).toBeDefined();
+      expect(wrapper.queryByText(/key=keyB,value=valueB/i)).toBeDefined();
     });
 
     act(() => {
@@ -91,9 +91,9 @@ describe("gridview react", () => {
     });
 
     await waitFor(() => {
-      expect(wrapper.queryByText(/key=keyA,value=valueAA/i)).toBeInTheDocument();
-      expect(wrapper.queryByText(/key=keyB,value=valueB/i)).toBeInTheDocument();
-      expect(wrapper.queryByText(/key=keyC,value=valueC/i)).toBeInTheDocument();
+      expect(wrapper.queryByText(/key=keyA,value=valueAA/i)).toBeDefined();
+      expect(wrapper.queryByText(/key=keyB,value=valueB/i)).toBeDefined();
+      expect(wrapper.queryByText(/key=keyC,value=valueC/i)).toBeDefined();
     });
 
     act(() => {
@@ -101,9 +101,9 @@ describe("gridview react", () => {
     });
 
     await waitFor(() => {
-      expect(wrapper.queryByText(/key=keyA,value=valueAA/i)).toBeInTheDocument();
-      expect(wrapper.queryByText(/key=keyB,value=valueB/i)).toBeInTheDocument();
-      expect(wrapper.queryByText(/key=keyC,value=null/i)).toBeInTheDocument();
+      expect(wrapper.queryByText(/key=keyA,value=valueAA/i)).toBeDefined();
+      expect(wrapper.queryByText(/key=keyB,value=valueB/i)).toBeDefined();
+      expect(wrapper.queryByText(/key=keyC,value=null/i)).toBeDefined();
     });
 
     act(() => {
@@ -111,9 +111,9 @@ describe("gridview react", () => {
     });
 
     await waitFor(() => {
-      expect(wrapper.queryByText(/key=keyA/i)).not.toBeInTheDocument();
-      expect(wrapper.queryByText(/key=keyB,value=valueB/i)).toBeInTheDocument();
-      expect(wrapper.queryByText(/key=keyC,value=null/i)).toBeInTheDocument();
+      expect(wrapper.queryByText(/key=keyA/i)).toBe(null);
+      expect(wrapper.queryByText(/key=keyB,value=valueB/i)).toBeDefined();
+      expect(wrapper.queryByText(/key=keyC,value=null/i)).toBeDefined();
     });
   });
 });

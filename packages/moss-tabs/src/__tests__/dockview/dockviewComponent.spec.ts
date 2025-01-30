@@ -4798,7 +4798,7 @@ describe("dockviewComponent", () => {
       expect(panel2.api.location.type).toBe("grid");
       expect(panel3.api.location.type).toBe("grid");
 
-      dockview.addFloatingGroup(panel2);
+      await dockview.addFloatingGroup(panel2);
 
       expect(panel1.api.location.type).toBe("grid");
       expect(panel2.api.location.type).toBe("floating");
@@ -5768,8 +5768,9 @@ describe("dockviewComponent", () => {
       expect(panel3.group.api.isVisible).toBeFalsy();
     });
 
-    test("that watermark appears when all views are not visible", () => {
-      vi.useFakeTimers();
+    test("that watermark appears when all views are not visible", async () => {
+      await vi.useFakeTimers();
+
       const container = document.createElement("div");
 
       const dockview = new DockviewComponent(container, {
@@ -5802,17 +5803,17 @@ describe("dockviewComponent", () => {
       expect(query).toBeFalsy();
 
       panel1.group.api.setVisible(false);
-      vi.runAllTicks(); // visibility events check fires on microtask-queue
+      await vi.runAllTicks(); // visibility events check fires on microtask-queue
       query = queryByTestId(container, "watermark-component");
       expect(query).toBeFalsy();
 
       panel2.group.api.setVisible(false);
-      vi.runAllTicks(); // visibility events check fires on microtask-queue
+      await vi.runAllTicks(); // visibility events check fires on microtask-queue
       query = queryByTestId(container, "watermark-component");
       expect(query).toBeTruthy();
 
       panel1.group.api.setVisible(true);
-      vi.runAllTicks(); // visibility events check fires on microtask-queue
+      await vi.runAllTicks(); // visibility events check fires on microtask-queue
       query = queryByTestId(container, "watermark-component");
       expect(query).toBeFalsy();
     });
@@ -6264,8 +6265,8 @@ describe("dockviewComponent", () => {
     });
   });
 
-  test("that `onDidLayoutChange` only subscribes to events after initial subscription time", () => {
-    vi.useFakeTimers();
+  test("that `onDidLayoutChange` only subscribes to events after initial subscription time", async () => {
+    await vi.useFakeTimers();
 
     const container = document.createElement("div");
 
@@ -6287,6 +6288,7 @@ describe("dockviewComponent", () => {
 
     api.onDidLayoutChange((e) => {
       a++;
+      console.log({ a });
     });
 
     api.addPanel({
@@ -6308,7 +6310,7 @@ describe("dockviewComponent", () => {
       b++;
     });
 
-    vi.runAllTicks();
+    await vi.runAllTicks();
 
     expect(a).toBe(1);
     expect(b).toBe(0);
