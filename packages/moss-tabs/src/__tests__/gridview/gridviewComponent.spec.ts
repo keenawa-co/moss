@@ -1953,7 +1953,7 @@ describe("gridview", () => {
     expect(panel2Spy).toHaveBeenCalledTimes(1);
   });
 
-  test("fromJSON  events should still fire", () => {
+  test("fromJSON  events should still fire", async () => {
     vi.useFakeTimers();
 
     const gridview = new GridviewComponent(container, {
@@ -2050,7 +2050,7 @@ describe("gridview", () => {
       activePanel: "panel_1",
     });
 
-    vi.runAllTimers();
+    await vi.runAllTimersAsync();
 
     expect(addGroup.length).toBe(4);
     expect(removeGroup.length).toBe(0);
@@ -2071,7 +2071,7 @@ describe("gridview", () => {
       },
     });
 
-    vi.runAllTimers();
+    await vi.runAllTimersAsync();
 
     expect(addGroup.length).toBe(0);
     expect(removeGroup.length).toBe(4);
