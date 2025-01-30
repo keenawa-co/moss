@@ -1,21 +1,18 @@
-import { beforeEach, describe, expect, test, vi } from "vitest";
-
-import { fromPartial } from "@total-typescript/shoehorn";
-
-import { DockviewPanelModelMock } from "../__mocks__/mockDockviewPanelModel";
 import { DockviewComponent } from "../../dockview/dockviewComponent";
 import { DockviewGroupPanel } from "../../dockview/dockviewGroupPanel";
+import { fromPartial } from "@total-typescript/shoehorn";
 import { GroupOptions } from "../../dockview/dockviewGroupPanelModel";
 import { DockviewPanel } from "../../dockview/dockviewPanel";
+import { DockviewPanelModelMock } from "../__mocks__/mockDockviewPanelModel";
 import { IContentRenderer, ITabRenderer } from "../../dockview/types";
 import { OverlayRenderContainer } from "../../overlay/overlayRenderContainer";
 
 describe("dockviewGroupPanel", () => {
   test("default minimum/maximium width/height", () => {
     const accessor = fromPartial<DockviewComponent>({
-      onDidActivePanelChange: vi.fn(),
-      onDidAddPanel: vi.fn(),
-      onDidRemovePanel: vi.fn(),
+      onDidActivePanelChange: jest.fn(),
+      onDidAddPanel: jest.fn(),
+      onDidRemovePanel: jest.fn(),
       options: {},
     });
     const options = fromPartial<GroupOptions>({});
@@ -29,13 +26,13 @@ describe("dockviewGroupPanel", () => {
 
   test("group constraints", () => {
     const accessor = fromPartial<DockviewComponent>({
-      onDidActivePanelChange: vi.fn(),
-      onDidAddPanel: vi.fn(),
-      onDidRemovePanel: vi.fn(),
-      doSetGroupActive: vi.fn(),
+      onDidActivePanelChange: jest.fn(),
+      onDidAddPanel: jest.fn(),
+      onDidRemovePanel: jest.fn(),
+      doSetGroupActive: jest.fn(),
       overlayRenderContainer: fromPartial<OverlayRenderContainer>({
-        attach: vi.fn(),
-        detatch: vi.fn(),
+        attach: jest.fn(),
+        detatch: jest.fn(),
       }),
       options: {},
     });

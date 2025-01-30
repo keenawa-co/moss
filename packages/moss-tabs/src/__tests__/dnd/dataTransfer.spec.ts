@@ -1,5 +1,3 @@
-import { beforeEach, describe, expect, test, vi } from "vitest";
-
 import { getPaneData, getPanelData, LocalSelectionTransfer, PanelTransfer, PaneTransfer } from "../../dnd/dataTransfer";
 
 describe("dataTransfer", () => {

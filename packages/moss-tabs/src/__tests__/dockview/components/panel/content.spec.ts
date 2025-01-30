@@ -1,17 +1,14 @@
-import { beforeEach, describe, expect, test, vi } from "vitest";
-
 import { fireEvent } from "@testing-library/dom";
-import { fromPartial } from "@total-typescript/shoehorn";
-
 import { ContentContainer } from "../../../../dockview/components/panel/content";
-import { DockviewComponent } from "../../../../dockview/dockviewComponent";
-import { DockviewGroupPanelModel } from "../../../../dockview/dockviewGroupPanelModel";
-import { IDockviewPanel } from "../../../../dockview/dockviewPanel";
-import { IDockviewPanelModel } from "../../../../dockview/dockviewPanelModel";
 import { GroupPanelPartInitParameters, IContentRenderer } from "../../../../dockview/types";
 import { CompositeDisposable } from "../../../../lifecycle";
-import { OverlayRenderContainer } from "../../../../overlay/overlayRenderContainer";
 import { PanelUpdateEvent } from "../../../../panel/types";
+import { IDockviewPanel } from "../../../../dockview/dockviewPanel";
+import { IDockviewPanelModel } from "../../../../dockview/dockviewPanelModel";
+import { DockviewComponent } from "../../../../dockview/dockviewComponent";
+import { fromPartial } from "@total-typescript/shoehorn";
+import { DockviewGroupPanelModel } from "../../../../dockview/dockviewGroupPanelModel";
+import { OverlayRenderContainer } from "../../../../overlay/overlayRenderContainer";
 
 class TestContentRenderer extends CompositeDisposable implements IContentRenderer {
   readonly element: HTMLElement;
@@ -44,7 +41,7 @@ class TestContentRenderer extends CompositeDisposable implements IContentRendere
 
 describe("contentContainer", () => {
   beforeEach(() => {
-    vi.useFakeTimers();
+    jest.useFakeTimers();
   });
 
   test("basic focus test", () => {
@@ -98,7 +95,7 @@ describe("contentContainer", () => {
 
     // container looses focus
     fireEvent.blur(contentRenderer.element);
-    vi.runAllTimers();
+    jest.runAllTimers();
     expect(focus).toBe(1);
     expect(blur).toBe(1);
 
@@ -122,7 +119,7 @@ describe("contentContainer", () => {
 
     // new panel looses focus
     fireEvent.blur(contentRenderer2.element);
-    vi.runAllTimers();
+    jest.runAllTimers();
     expect(focus).toBe(2);
     expect(blur).toBe(2);
 
@@ -131,7 +128,7 @@ describe("contentContainer", () => {
 
   test("that panels renderered as 'onlyWhenVisible' are removed when closed", () => {
     const overlayRenderContainer = fromPartial<OverlayRenderContainer>({
-      detatch: vi.fn(),
+      detatch: jest.fn(),
     });
 
     const cut = new ContentContainer(

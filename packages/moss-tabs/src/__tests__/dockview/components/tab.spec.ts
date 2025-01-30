@@ -1,18 +1,15 @@
-import { beforeEach, describe, expect, test, vi } from "vitest";
-
 import { fireEvent } from "@testing-library/dom";
-
 import { LocalSelectionTransfer, PanelTransfer } from "../../../dnd/dataTransfer";
-import { Tab } from "../../../dockview/components/tab/tab";
 import { DockviewComponent } from "../../../dockview/dockviewComponent";
 import { DockviewGroupPanel } from "../../../dockview/dockviewGroupPanel";
 import { DockviewGroupPanelModel } from "../../../dockview/dockviewGroupPanelModel";
+import { Tab } from "../../../dockview/components/tab/tab";
 import { IDockviewPanel } from "../../../dockview/dockviewPanel";
 
 describe("tab", () => {
   test("that empty tab has inactive-tab class", () => {
-    const accessorMock = vi.fn();
-    const groupMock = vi.fn();
+    const accessorMock = jest.fn();
+    const groupMock = jest.fn();
 
     const cut = new Tab({ id: "panelId" } as IDockviewPanel, new accessorMock(), new groupMock());
 
@@ -20,8 +17,8 @@ describe("tab", () => {
   });
 
   test("that active tab has active-tab class", () => {
-    const accessorMock = vi.fn();
-    const groupMock = vi.fn();
+    const accessorMock = jest.fn();
+    const groupMock = jest.fn();
 
     const cut = new Tab({ id: "panelId" } as IDockviewPanel, new accessorMock(), new groupMock());
 
@@ -33,20 +30,20 @@ describe("tab", () => {
   });
 
   test("that an external event does not render a drop target and calls through to the group model", () => {
-    const accessorMock = vi.fn<Partial<DockviewComponent>, []>(() => {
+    const accessorMock = jest.fn<Partial<DockviewComponent>, []>(() => {
       return {
         id: "testcomponentid",
       };
     });
-    const groupviewMock = vi.fn<Partial<DockviewGroupPanelModel>, []>(() => {
+    const groupviewMock = jest.fn<Partial<DockviewGroupPanelModel>, []>(() => {
       return {
-        canDisplayOverlay: vi.fn(),
+        canDisplayOverlay: jest.fn(),
       };
     });
 
     const groupView = new groupviewMock() as DockviewGroupPanelModel;
 
-    const groupPanelMock = vi.fn<Partial<DockviewGroupPanel>, []>(() => {
+    const groupPanelMock = jest.fn<Partial<DockviewGroupPanel>, []>(() => {
       return {
         id: "testgroupid",
         model: groupView,
@@ -58,8 +55,8 @@ describe("tab", () => {
 
     const cut = new Tab({ id: "panelId" } as IDockviewPanel, accessor, groupPanel);
 
-    vi.spyOn(cut.element, "clientHeight", "get").mockImplementation(() => 100);
-    vi.spyOn(cut.element, "clientWidth", "get").mockImplementation(() => 100);
+    jest.spyOn(cut.element, "clientHeight", "get").mockImplementation(() => 100);
+    jest.spyOn(cut.element, "clientWidth", "get").mockImplementation(() => 100);
 
     fireEvent.dragEnter(cut.element);
     fireEvent.dragOver(cut.element);
@@ -70,20 +67,20 @@ describe("tab", () => {
   });
 
   test("that if you drag over yourself no drop target is shown", () => {
-    const accessorMock = vi.fn<Partial<DockviewComponent>, []>(() => {
+    const accessorMock = jest.fn<Partial<DockviewComponent>, []>(() => {
       return {
         id: "testcomponentid",
       };
     });
-    const groupviewMock = vi.fn<Partial<DockviewGroupPanelModel>, []>(() => {
+    const groupviewMock = jest.fn<Partial<DockviewGroupPanelModel>, []>(() => {
       return {
-        canDisplayOverlay: vi.fn(),
+        canDisplayOverlay: jest.fn(),
       };
     });
 
     const groupView = new groupviewMock() as DockviewGroupPanelModel;
 
-    const groupPanelMock = vi.fn<Partial<DockviewGroupPanel>, []>(() => {
+    const groupPanelMock = jest.fn<Partial<DockviewGroupPanel>, []>(() => {
       return {
         id: "testgroupid",
         model: groupView,
@@ -95,8 +92,8 @@ describe("tab", () => {
 
     const cut = new Tab({ id: "panel1" } as IDockviewPanel, accessor, groupPanel);
 
-    vi.spyOn(cut.element, "clientHeight", "get").mockImplementation(() => 100);
-    vi.spyOn(cut.element, "clientWidth", "get").mockImplementation(() => 100);
+    jest.spyOn(cut.element, "clientHeight", "get").mockImplementation(() => 100);
+    jest.spyOn(cut.element, "clientWidth", "get").mockImplementation(() => 100);
 
     LocalSelectionTransfer.getInstance().setData(
       [new PanelTransfer("testcomponentid", "anothergroupid", "panel1")],
@@ -112,20 +109,20 @@ describe("tab", () => {
   });
 
   test("that if you drag over another tab a drop target is shown", () => {
-    const accessorMock = vi.fn<Partial<DockviewComponent>, []>(() => {
+    const accessorMock = jest.fn<Partial<DockviewComponent>, []>(() => {
       return {
         id: "testcomponentid",
       };
     });
-    const groupviewMock = vi.fn<Partial<DockviewGroupPanelModel>, []>(() => {
+    const groupviewMock = jest.fn<Partial<DockviewGroupPanelModel>, []>(() => {
       return {
-        canDisplayOverlay: vi.fn(),
+        canDisplayOverlay: jest.fn(),
       };
     });
 
     const groupView = new groupviewMock() as DockviewGroupPanelModel;
 
-    const groupPanelMock = vi.fn<Partial<DockviewGroupPanel>, []>(() => {
+    const groupPanelMock = jest.fn<Partial<DockviewGroupPanel>, []>(() => {
       return {
         id: "testgroupid",
         model: groupView,
@@ -137,8 +134,8 @@ describe("tab", () => {
 
     const cut = new Tab({ id: "panel1" } as IDockviewPanel, accessor, groupPanel);
 
-    vi.spyOn(cut.element, "clientHeight", "get").mockImplementation(() => 100);
-    vi.spyOn(cut.element, "clientWidth", "get").mockImplementation(() => 100);
+    jest.spyOn(cut.element, "clientHeight", "get").mockImplementation(() => 100);
+    jest.spyOn(cut.element, "clientWidth", "get").mockImplementation(() => 100);
 
     LocalSelectionTransfer.getInstance().setData(
       [new PanelTransfer("testcomponentid", "anothergroupid", "panel2")],
@@ -154,20 +151,20 @@ describe("tab", () => {
   });
 
   test("that dropping on a tab with the same id but from a different component should not render a drop over and call through to the group model", () => {
-    const accessorMock = vi.fn<Partial<DockviewComponent>, []>(() => {
+    const accessorMock = jest.fn<Partial<DockviewComponent>, []>(() => {
       return {
         id: "testcomponentid",
       };
     });
-    const groupviewMock = vi.fn<Partial<DockviewGroupPanelModel>, []>(() => {
+    const groupviewMock = jest.fn<Partial<DockviewGroupPanelModel>, []>(() => {
       return {
-        canDisplayOverlay: vi.fn(),
+        canDisplayOverlay: jest.fn(),
       };
     });
 
     const groupView = new groupviewMock() as DockviewGroupPanelModel;
 
-    const groupPanelMock = vi.fn<Partial<DockviewGroupPanel>, []>(() => {
+    const groupPanelMock = jest.fn<Partial<DockviewGroupPanel>, []>(() => {
       return {
         id: "testgroupid",
         model: groupView,
@@ -179,8 +176,8 @@ describe("tab", () => {
 
     const cut = new Tab({ id: "panel1" } as IDockviewPanel, accessor, groupPanel);
 
-    vi.spyOn(cut.element, "clientHeight", "get").mockImplementation(() => 100);
-    vi.spyOn(cut.element, "clientWidth", "get").mockImplementation(() => 100);
+    jest.spyOn(cut.element, "clientHeight", "get").mockImplementation(() => 100);
+    jest.spyOn(cut.element, "clientWidth", "get").mockImplementation(() => 100);
 
     LocalSelectionTransfer.getInstance().setData(
       [new PanelTransfer("anothercomponentid", "anothergroupid", "panel1")],
@@ -196,20 +193,20 @@ describe("tab", () => {
   });
 
   test("that dropping on a tab from a different component should not render a drop over and call through to the group model", () => {
-    const accessorMock = vi.fn<Partial<DockviewComponent>, []>(() => {
+    const accessorMock = jest.fn<Partial<DockviewComponent>, []>(() => {
       return {
         id: "testcomponentid",
       };
     });
-    const groupviewMock = vi.fn<Partial<DockviewGroupPanelModel>, []>(() => {
+    const groupviewMock = jest.fn<Partial<DockviewGroupPanelModel>, []>(() => {
       return {
-        canDisplayOverlay: vi.fn(),
+        canDisplayOverlay: jest.fn(),
       };
     });
 
     const groupView = new groupviewMock() as DockviewGroupPanelModel;
 
-    const groupPanelMock = vi.fn<Partial<DockviewGroupPanel>, []>(() => {
+    const groupPanelMock = jest.fn<Partial<DockviewGroupPanel>, []>(() => {
       return {
         id: "testgroupid",
         model: groupView,
@@ -221,8 +218,8 @@ describe("tab", () => {
 
     const cut = new Tab({ id: "panel1" } as IDockviewPanel, accessor, groupPanel);
 
-    vi.spyOn(cut.element, "clientHeight", "get").mockImplementation(() => 100);
-    vi.spyOn(cut.element, "clientWidth", "get").mockImplementation(() => 100);
+    jest.spyOn(cut.element, "clientHeight", "get").mockImplementation(() => 100);
+    jest.spyOn(cut.element, "clientWidth", "get").mockImplementation(() => 100);
 
     LocalSelectionTransfer.getInstance().setData(
       [new PanelTransfer("anothercomponentid", "anothergroupid", "panel2")],

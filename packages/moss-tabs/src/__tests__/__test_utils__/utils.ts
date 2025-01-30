@@ -1,5 +1,4 @@
 import React from "react";
-import { vi } from "vitest";
 
 /**
  * useful utility type to erase readonly signatures for testing purposes
@@ -18,7 +17,7 @@ export function setMockRefElement(node: Partial<HTMLElement>): void {
     },
   };
 
-  vi.spyOn(React, "useRef").mockReturnValueOnce(mockRef);
+  jest.spyOn(React, "useRef").mockReturnValueOnce(mockRef);
 }
 
 export function createOffsetDragOverEvent(params: { clientX: number; clientY: number }): Event {

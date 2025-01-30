@@ -6,7 +6,7 @@
     "tsBuildInfoFile": ".build/tsconfig.tsbuildinfo.cjs",
     "jsx": "react",
     "rootDir": "src",
-    "types": ["node"]
+    "types": ["jest", "node"]
   },
   "include": ["src"],
   "exclude": ["**/node_modules"]

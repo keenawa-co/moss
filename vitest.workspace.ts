@@ -1,3 +1,4 @@
+import { env } from "process";
 import { defineWorkspace } from "vitest/config";
 
 import { storybookTest } from "@storybook/experimental-addon-test/vitest-plugin";
@@ -31,15 +32,6 @@ export default defineWorkspace([
         "packages/moss_lang/**/*.{test,spec}.?(c|m)[jt]s?(x)",
         "packages/moss-ui/**/*.{test,spec}.?(c|m)[jt]s?(x)",
       ],
-    },
-  },
-  {
-    test: {
-      name: "packages/moss-tabs",
-      include: ["packages/moss-tabs/**/*.{test,spec}.?(c|m)[jt]s?(x)"],
-      globals: true,
-      environment: "jsdom",
-      setupFiles: ["./packages/moss-tabs/vitest.setup.ts"],
     },
   },
   {

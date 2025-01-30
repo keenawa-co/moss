@@ -1,5 +1,3 @@
-import { describe, expect, test } from "vitest";
-
 import { firstIndex, last, pushToEnd, pushToStart, remove, sequenceEquals, tail } from "../array";
 
 describe("array", () => {

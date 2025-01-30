@@ -1,7 +1,4 @@
-import "@testing-library/jest-dom";
-
 import React from "react";
-import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { act, render, waitFor } from "@testing-library/react";
 
@@ -9,6 +6,8 @@ import { setMockRefElement } from "../__test_utils__/utils";
 import { PaneviewApi } from "../../api/component.api";
 import { IPaneviewPanel } from "../../paneview/paneviewPanel";
 import { IPaneviewPanelProps, PaneviewReact, PaneviewReadyEvent } from "../../paneview/paneviewReact";
+
+const { expect } = require("@jest/globals");
 
 describe("gridview react", () => {
   let components: Record<string, React.FunctionComponent<IPaneviewPanelProps>>;
@@ -43,7 +42,7 @@ describe("gridview react", () => {
     setMockRefElement({
       clientHeight: 450,
       clientWidth: 650,
-      appendChild: vi.fn(),
+      appendChild: jest.fn(),
     });
     let api: PaneviewApi | undefined;
 
@@ -81,7 +80,7 @@ describe("gridview react", () => {
     });
 
     await waitFor(() => {
-      expect(wrapper.queryByText(/key=keyA,value=valueA/i)).toBeInTheDocument(); //TSError: Property 'toBeInTheDocument' does not exist on type 'Assertion<HTMLElement | null>'.ts(2339)
+      expect(wrapper.queryByText(/key=keyA,value=valueA/i)).toBeInTheDocument();
       expect(wrapper.queryByText(/key=keyB,value=valueB/i)).toBeInTheDocument();
     });
 

@@ -1,13 +1,10 @@
-import { beforeEach, describe, expect, test, vi } from "vitest";
-
 import { fireEvent } from "@testing-library/dom";
-
 import { DragHandler } from "../../dnd/abstractDragHandler";
 import { IDisposable } from "../../lifecycle";
 
 describe("abstractDragHandler", () => {
   test("that className dv-dragged is added to element after dragstart event", () => {
-    vi.useFakeTimers();
+    jest.useFakeTimers();
 
     const element = document.createElement("div");
 
@@ -30,14 +27,14 @@ describe("abstractDragHandler", () => {
     fireEvent.dragStart(element);
     expect(element.classList.contains("dv-dragged")).toBeTruthy();
 
-    vi.runAllTimers();
+    jest.runAllTimers();
     expect(element.classList.contains("dv-dragged")).toBeFalsy();
 
     handler.dispose();
   });
 
   test("that iframes and webviews have pointerEvents=none set whilst drag action is in process", () => {
-    vi.useFakeTimers();
+    jest.useFakeTimers();
 
     const element = document.createElement("div");
     const iframe = document.createElement("iframe");
@@ -81,7 +78,7 @@ describe("abstractDragHandler", () => {
   });
 
   test("that the disabling of pointerEvents is restored on a premature disposal of the handler", () => {
-    vi.useFakeTimers();
+    jest.useFakeTimers();
 
     const element = document.createElement("div");
     const iframe = document.createElement("iframe");
@@ -144,7 +141,7 @@ describe("abstractDragHandler", () => {
     })(element);
 
     const event = new Event("dragstart");
-    const spy = vi.spyOn(event, "preventDefault");
+    const spy = jest.spyOn(event, "preventDefault");
     fireEvent(element, event);
     expect(spy).toBeCalledTimes(1);
 
@@ -173,7 +170,7 @@ describe("abstractDragHandler", () => {
     })(element);
 
     const event = new Event("dragstart");
-    const spy = vi.spyOn(event, "preventDefault");
+    const spy = jest.spyOn(event, "preventDefault");
     fireEvent(element, event);
     expect(spy).toHaveBeenCalledTimes(0);
 

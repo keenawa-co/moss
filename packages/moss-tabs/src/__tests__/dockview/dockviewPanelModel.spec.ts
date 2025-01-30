@@ -1,5 +1,3 @@
-import { beforeEach, describe, expect, Mock, test, vi } from "vitest";
-
 import { fromPartial } from "@total-typescript/shoehorn";
 
 import { DefaultTab } from "../../dockview/components/tab/defaultTab";
@@ -8,29 +6,26 @@ import { DockviewPanelModel } from "../../dockview/dockviewPanelModel";
 import { IContentRenderer, ITabRenderer } from "../../dockview/types";
 
 describe("dockviewGroupPanel", () => {
-  let contentMock: Mock<IContentRenderer>; //Type 'IContentRenderer' does not satisfy the constraint 'Procedure'. Type 'IContentRenderer' provides no match for the signature '(...args: any[]): any'.ts(2344)
-  let tabMock: Mock<ITabRenderer>; //Type 'ITabRenderer' does not satisfy the constraint 'Procedure'. Type 'ITabRenderer' provides no match for the signature '(...args: any[]): any'.ts(2344)
+  let contentMock: jest.Mock<IContentRenderer>;
+  let tabMock: jest.Mock<ITabRenderer>;
   let accessorMock: DockviewComponent;
 
   beforeEach(() => {
-    contentMock = vi.fn<IContentRenderer>(() => {
-      // Type 'IContentRenderer' does not satisfy the constraint 'Procedure'. Type 'IContentRenderer' provides no match for the signature '(...args: any[]): any'.ts(2344)
+    contentMock = jest.fn<IContentRenderer, []>(() => {
       const partial: Partial<IContentRenderer> = {
         element: document.createElement("div"),
-        dispose: vi.fn(),
-        update: vi.fn(),
+        dispose: jest.fn(),
+        update: jest.fn(),
       };
       return partial as IContentRenderer;
     });
 
-    tabMock = vi.fn<ITabRenderer>(() => {
-      //Type 'ITabRenderer' does not satisfy the constraint 'Procedure'. Type 'ITabRenderer' provides no match for the signature '(...args: any[]): any'.ts(2344)
-
+    tabMock = jest.fn<ITabRenderer, []>(() => {
       const partial: Partial<ITabRenderer> = {
         element: document.createElement("div"),
-        dispose: vi.fn(),
-        update: vi.fn(),
-        init: vi.fn(),
+        dispose: jest.fn(),
+        update: jest.fn(),
+        init: jest.fn(),
       };
       return partial as ITabRenderer;
     });
@@ -40,7 +35,7 @@ describe("dockviewGroupPanel", () => {
         createComponent(options: { id: string; name: string }): IContentRenderer {
           switch (options.name) {
             case "contentComponent":
-              return new contentMock(options.id, options.name); //Argument of type '[string, "contentComponent"]' is not assignable to parameter of type 'never'.ts(2345)
+              return new contentMock(options.id, options.name);
             default:
               throw new Error(`unsupported`);
           }
@@ -48,7 +43,7 @@ describe("dockviewGroupPanel", () => {
         createTabComponent(options: { id: string; name: string }): ITabRenderer {
           switch (options.name) {
             case "tabComponent":
-              return new tabMock(options.id, options.name); //Argument of type '[string, "tabComponent"]' is not assignable to parameter of type 'never'.ts(2345)
+              return new tabMock(options.id, options.name);
             default:
               throw new Error(`unsupported`);
           }

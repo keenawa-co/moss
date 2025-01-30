@@ -1,5 +1,3 @@
-import { describe, expect, test, vi } from "vitest";
-
 import { DockviewGroupPanelApi } from "../../api/dockviewGroupPanelApi";
 import { DockviewGroupPanel } from "../../dockview/dockviewGroupPanel";
 import { DockviewGroupPanelModel } from "../../dockview/dockviewGroupPanelModel";
@@ -7,17 +5,17 @@ import { ReactHeaderActionsRendererPart } from "../../dockview/headerActionsRend
 
 describe("headerActionsRenderer", () => {
   test("#1", () => {
-    const groupviewMock = vi.fn<Partial<DockviewGroupPanelModel>, []>(() => {
+    const groupviewMock = jest.fn<Partial<DockviewGroupPanelModel>, []>(() => {
       return {
-        onDidAddPanel: vi.fn(),
-        onDidRemovePanel: vi.fn(),
-        onDidActivePanelChange: vi.fn(),
+        onDidAddPanel: jest.fn(),
+        onDidRemovePanel: jest.fn(),
+        onDidActivePanelChange: jest.fn(),
       };
     });
 
     const groupview = new groupviewMock() as DockviewGroupPanelModel;
 
-    const groupPanelMock = vi.fn<Partial<DockviewGroupPanel>, []>(() => {
+    const groupPanelMock = jest.fn<Partial<DockviewGroupPanel>, []>(() => {
       return {
         api: {} as DockviewGroupPanelApi as any,
         model: groupview,
@@ -27,9 +25,9 @@ describe("headerActionsRenderer", () => {
     const groupPanel = new groupPanelMock() as DockviewGroupPanel;
 
     const cut = new ReactHeaderActionsRendererPart(
-      vi.fn(),
+      jest.fn(),
       {
-        addPortal: vi.fn(),
+        addPortal: jest.fn(),
       },
       groupPanel
     );
@@ -39,15 +37,15 @@ describe("headerActionsRenderer", () => {
     expect(cut.part).toBeUndefined();
 
     cut.init({
-      containerApi: <any>vi.fn(),
+      containerApi: <any>jest.fn(),
       api: <any>{
-        onDidActiveChange: vi.fn(),
+        onDidActiveChange: jest.fn(),
       },
     });
 
-    const update = vi.fn();
+    const update = jest.fn();
 
-    vi.spyOn(cut.part!, "update").mockImplementation(update);
+    jest.spyOn(cut.part!, "update").mockImplementation(update);
 
     cut.update({ params: { valueA: "A" } });
 

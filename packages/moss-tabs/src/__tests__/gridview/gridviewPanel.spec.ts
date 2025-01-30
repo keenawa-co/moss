@@ -1,14 +1,12 @@
-import { describe, expect, test, vi } from "vitest";
-
 import { DockviewComponent } from "../../dockview/dockviewComponent";
 import { DockviewGroupPanel } from "../../dockview/dockviewGroupPanel";
 
 describe("gridviewPanel", () => {
   test("get panel", () => {
-    const accessorMock = vi.fn<DockviewComponent, []>(() => {
+    const accessorMock = jest.fn<DockviewComponent, []>(() => {
       return {
-        onDidAddPanel: vi.fn(),
-        onDidRemovePanel: vi.fn(),
+        onDidAddPanel: jest.fn(),
+        onDidRemovePanel: jest.fn(),
         options: {},
       } as any;
     });

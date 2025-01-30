@@ -1,17 +1,15 @@
-import { beforeEach, describe, expect, test, vi } from "vitest";
-
 import { addGhostImage } from "../../dnd/ghost";
 
 describe("ghost", () => {
   beforeEach(() => {
-    vi.useFakeTimers();
-    vi.clearAllTimers();
+    jest.useFakeTimers();
+    jest.clearAllTimers();
   });
 
   test("that a custom class is added, the element is added to the document and all is removed afterwards", () => {
-    const dataTransferMock = vi.fn<Partial<DataTransfer>, []>(() => {
+    const dataTransferMock = jest.fn<Partial<DataTransfer>, []>(() => {
       return {
-        setDragImage: vi.fn(),
+        setDragImage: jest.fn(),
       };
     });
 
@@ -25,7 +23,7 @@ describe("ghost", () => {
     expect(dataTransfer.setDragImage).toBeCalledTimes(1);
     expect(dataTransfer.setDragImage).toBeCalledWith(element, 0, 0);
 
-    vi.runAllTimers();
+    jest.runAllTimers();
 
     expect(element.className).toBe("");
     expect(element.parentElement).toBe(null);

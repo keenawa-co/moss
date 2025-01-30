@@ -1,5 +1,3 @@
-import { describe, expect, test, vi } from "vitest";
-
 import { Emitter } from "../../events";
 import { BaseGrid, BaseGridOptions, IGridPanelView } from "../../gridview/baseComponentGridview";
 import { IViewSize } from "../../gridview/gridview";
@@ -117,7 +115,7 @@ describe("baseComponentGridview", () => {
       proportionalLayout: true,
     });
 
-    const spy = vi.spyOn(cut.gridview, "layout");
+    const spy = jest.spyOn(cut.gridview, "layout");
 
     cut.layout(100, 100);
     expect(spy).toHaveBeenCalledTimes(1);

@@ -1,5 +1,4 @@
 import React from "react";
-import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { act, render, waitFor } from "@testing-library/react";
 
@@ -8,6 +7,8 @@ import { GridviewApi } from "../../api/component.api";
 import { IGridviewPanel } from "../../gridview/gridviewPanel";
 import { GridviewReact, GridviewReadyEvent, IGridviewPanelProps } from "../../gridview/gridviewReact";
 import { Orientation } from "../../splitview/splitview";
+
+const { expect } = require("@jest/globals");
 
 describe("gridview react", () => {
   let components: Record<string, React.FunctionComponent<IGridviewPanelProps>>;
@@ -41,8 +42,8 @@ describe("gridview react", () => {
   test("is sized to container", () => {
     const el = document.createElement("div") as any;
 
-    vi.spyOn(el, "clientHeight", "get").mockReturnValue(450);
-    vi.spyOn(el, "clientWidth", "get").mockReturnValue(650);
+    jest.spyOn(el, "clientHeight", "get").mockReturnValue(450);
+    jest.spyOn(el, "clientWidth", "get").mockReturnValue(650);
 
     setMockRefElement(el);
     let api: GridviewApi | undefined;

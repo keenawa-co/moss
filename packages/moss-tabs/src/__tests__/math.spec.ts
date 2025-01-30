@@ -1,5 +1,3 @@
-import { beforeEach, describe, expect, it, Mock, test, vi } from "vitest";
-
 import { clamp, range } from "../math";
 
 describe("math", () => {

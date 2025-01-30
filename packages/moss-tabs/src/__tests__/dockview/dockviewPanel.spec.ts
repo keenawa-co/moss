@@ -1,12 +1,9 @@
-import { describe, expect, test, vi } from "vitest";
-
-import { fromPartial } from "@total-typescript/shoehorn";
-
-import { DockviewApi } from "../../api/component.api";
 import { DockviewComponent } from "../../dockview/dockviewComponent";
-import { DockviewGroupPanel } from "../../dockview/dockviewGroupPanel";
+import { DockviewApi } from "../../api/component.api";
 import { DockviewPanel } from "../../dockview/dockviewPanel";
 import { IDockviewPanelModel } from "../../dockview/dockviewPanelModel";
+import { DockviewGroupPanel } from "../../dockview/dockviewGroupPanel";
+import { fromPartial } from "@total-typescript/shoehorn";
 
 describe("dockviewPanel", () => {
   test("update title", () => {
@@ -14,15 +11,15 @@ describe("dockviewPanel", () => {
     const accessor = fromPartial<DockviewComponent>({});
     const group = fromPartial<DockviewGroupPanel>({
       api: {
-        onDidVisibilityChange: vi.fn(),
-        onDidLocationChange: vi.fn(),
-        onDidActiveChange: vi.fn(),
+        onDidVisibilityChange: jest.fn(),
+        onDidLocationChange: jest.fn(),
+        onDidActiveChange: jest.fn(),
       },
     });
     const model = fromPartial<IDockviewPanelModel>({
-      update: vi.fn(),
-      init: vi.fn(),
-      dispose: vi.fn(),
+      update: jest.fn(),
+      init: jest.fn(),
+      dispose: jest.fn(),
     });
 
     const cut = new DockviewPanel("fake-id", "fake-component", undefined, accessor, api, group, model, {
@@ -53,14 +50,14 @@ describe("dockviewPanel", () => {
     const accessor = fromPartial<DockviewComponent>({});
     const group = fromPartial<DockviewGroupPanel>({
       api: {
-        onDidVisibilityChange: vi.fn(),
-        onDidLocationChange: vi.fn(),
-        onDidActiveChange: vi.fn(),
+        onDidVisibilityChange: jest.fn(),
+        onDidLocationChange: jest.fn(),
+        onDidActiveChange: jest.fn(),
       },
     });
     const model = fromPartial<IDockviewPanelModel>({
-      update: vi.fn(),
-      init: vi.fn(),
+      update: jest.fn(),
+      init: jest.fn(),
     });
 
     const cut = new DockviewPanel("fake-id", "fake-component", undefined, accessor, api, group, model, {
@@ -82,15 +79,15 @@ describe("dockviewPanel", () => {
     const accessor = fromPartial<DockviewComponent>({});
     const group = fromPartial<DockviewGroupPanel>({
       api: {
-        onDidVisibilityChange: vi.fn().mockReturnValue({ dispose: vi.fn() }),
-        onDidLocationChange: vi.fn().mockReturnValue({ dispose: vi.fn() }),
-        onDidActiveChange: vi.fn().mockReturnValue({ dispose: vi.fn() }),
+        onDidVisibilityChange: jest.fn().mockReturnValue({ dispose: jest.fn() }),
+        onDidLocationChange: jest.fn().mockReturnValue({ dispose: jest.fn() }),
+        onDidActiveChange: jest.fn().mockReturnValue({ dispose: jest.fn() }),
       },
     });
     const model = fromPartial<IDockviewPanelModel>({
-      update: vi.fn(),
-      init: vi.fn(),
-      dispose: vi.fn(),
+      update: jest.fn(),
+      init: jest.fn(),
+      dispose: jest.fn(),
     });
 
     const cut = new DockviewPanel("fake-id", "fake-component", undefined, accessor, api, group, model, {
@@ -109,15 +106,15 @@ describe("dockviewPanel", () => {
     const accessor = fromPartial<DockviewComponent>({});
     const group = fromPartial<DockviewGroupPanel>({
       api: {
-        onDidVisibilityChange: vi.fn(),
-        onDidLocationChange: vi.fn(),
-        onDidActiveChange: vi.fn(),
+        onDidVisibilityChange: jest.fn(),
+        onDidLocationChange: jest.fn(),
+        onDidActiveChange: jest.fn(),
       },
     });
     const model = fromPartial<IDockviewPanelModel>({
-      update: vi.fn(),
-      init: vi.fn(),
-      dispose: vi.fn(),
+      update: jest.fn(),
+      init: jest.fn(),
+      dispose: jest.fn(),
     });
 
     const cut = new DockviewPanel("fake-id", "fake-component", undefined, accessor, api, group, model, {
@@ -136,16 +133,16 @@ describe("dockviewPanel", () => {
     const accessor = fromPartial<DockviewComponent>({});
     const group = fromPartial<DockviewGroupPanel>({
       api: {
-        onDidVisibilityChange: vi.fn(),
-        onDidLocationChange: vi.fn(),
-        onDidActiveChange: vi.fn(),
-        setSize: vi.fn(),
+        onDidVisibilityChange: jest.fn(),
+        onDidLocationChange: jest.fn(),
+        onDidActiveChange: jest.fn(),
+        setSize: jest.fn(),
       },
     });
     const model = fromPartial<IDockviewPanelModel>({
-      update: vi.fn(),
-      init: vi.fn(),
-      dispose: vi.fn(),
+      update: jest.fn(),
+      init: jest.fn(),
+      dispose: jest.fn(),
     });
 
     const cut = new DockviewPanel("fake-id", "fake-component", undefined, accessor, api, group, model, {
@@ -166,15 +163,15 @@ describe("dockviewPanel", () => {
     const accessor = fromPartial<DockviewComponent>({});
     const group = fromPartial<DockviewGroupPanel>({
       api: {
-        onDidVisibilityChange: vi.fn(),
-        onDidLocationChange: vi.fn(),
-        onDidActiveChange: vi.fn(),
+        onDidVisibilityChange: jest.fn(),
+        onDidLocationChange: jest.fn(),
+        onDidActiveChange: jest.fn(),
       },
     });
     const model = fromPartial<IDockviewPanelModel>({
-      update: vi.fn(),
-      init: vi.fn(),
-      dispose: vi.fn(),
+      update: jest.fn(),
+      init: jest.fn(),
+      dispose: jest.fn(),
     });
 
     const cut = new DockviewPanel("fake-id", "fake-component", undefined, accessor, api, group, model, {

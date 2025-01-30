@@ -1,6 +1,3 @@
-import { fail } from "assert";
-import { beforeEach, describe, expect, test, vi } from "vitest";
-
 import { GridviewComponent } from "../../gridview/gridviewComponent";
 import { GridviewPanel } from "../../gridview/gridviewPanel";
 import { CompositeDisposable } from "../../lifecycle";
@@ -1865,8 +1862,8 @@ describe("gridview", () => {
     const panel1 = gridview.getPanel("panel1")!;
     const panel2 = gridview.getPanel("panel2")!;
 
-    const panel1Spy = vi.spyOn(panel1, "dispose");
-    const panel2Spy = vi.spyOn(panel2, "dispose");
+    const panel1Spy = jest.spyOn(panel1, "dispose");
+    const panel2Spy = jest.spyOn(panel2, "dispose");
 
     gridview.dispose();
 
@@ -1901,8 +1898,8 @@ describe("gridview", () => {
     const panel1 = gridview.getPanel("panel1")!;
     const panel2 = gridview.getPanel("panel2")!;
 
-    const panel1Spy = vi.spyOn(panel1, "dispose");
-    const panel2Spy = vi.spyOn(panel2, "dispose");
+    const panel1Spy = jest.spyOn(panel1, "dispose");
+    const panel2Spy = jest.spyOn(panel2, "dispose");
 
     gridview.removePanel(panel2);
 
@@ -1937,8 +1934,8 @@ describe("gridview", () => {
     const panel1 = gridview.getPanel("panel1")!;
     const panel2 = gridview.getPanel("panel2")!;
 
-    const panel1Spy = vi.spyOn(panel1, "dispose");
-    const panel2Spy = vi.spyOn(panel2, "dispose");
+    const panel1Spy = jest.spyOn(panel1, "dispose");
+    const panel2Spy = jest.spyOn(panel2, "dispose");
 
     gridview.fromJSON({
       grid: {
@@ -1954,7 +1951,7 @@ describe("gridview", () => {
   });
 
   test("fromJSON  events should still fire", () => {
-    vi.useFakeTimers();
+    jest.useFakeTimers();
 
     const gridview = new GridviewComponent(container, {
       proportionalLayout: true,
@@ -2050,7 +2047,7 @@ describe("gridview", () => {
       activePanel: "panel_1",
     });
 
-    vi.runAllTimers();
+    jest.runAllTimers();
 
     expect(addGroup.length).toBe(4);
     expect(removeGroup.length).toBe(0);
@@ -2071,7 +2068,7 @@ describe("gridview", () => {
       },
     });
 
-    vi.runAllTimers();
+    jest.runAllTimers();
 
     expect(addGroup.length).toBe(0);
     expect(removeGroup.length).toBe(4);

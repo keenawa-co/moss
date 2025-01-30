@@ -1,13 +1,16 @@
 import React from "react";
-import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { act, render, waitFor } from "@testing-library/react";
+
+import "@testing-library/jest-dom";
 
 import { setMockRefElement } from "../__test_utils__/utils";
 import { DockviewApi } from "../../api/component.api";
 import { DockviewReact } from "../../dockview/dockview";
 import { IDockviewPanel } from "../../dockview/dockviewPanel";
 import { DockviewReadyEvent, IDockviewPanelProps } from "../../dockview/framework";
+
+const { expect } = require("@jest/globals");
 
 describe("gridview react", () => {
   let components: Record<string, React.FunctionComponent<IDockviewPanelProps>>;
@@ -41,29 +44,21 @@ describe("gridview react", () => {
   test("is sized to container", () => {
     const el = document.createElement("div");
 
-    vi.spyOn(el, "clientHeight", "get").mockReturnValue(450);
-    vi.spyOn(el, "clientWidth", "get").mockReturnValue(650);
+    jest.spyOn(el, "clientHeight", "get").mockReturnValue(450);
+    jest.spyOn(el, "clientWidth", "get").mockReturnValue(650);
 
     setMockRefElement(el);
 
     let api: DockviewApi | undefined;
 
     const onReady = (event: DockviewReadyEvent) => {
-      // console.log({
-      //   api,
-      //   "event.api": event.api,
-      //   "event.api.width": event.api.width,
-      //   "event.api.height": event.api.height,
-      // });
       api = event.api;
-      // api.width = event.api.width;
-      // api.height = event.api.height;
     };
 
     render(<DockviewReact components={components} onReady={onReady} />);
 
-    expect(api?.width).toBe(650);
-    expect(api?.height).toBe(450);
+    expect(api!.width).toBe(650);
+    expect(api!.height).toBe(450);
   });
 
   test("that the component can update parameters", async () => {

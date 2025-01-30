@@ -1,10 +1,8 @@
-import { beforeEach, describe, expect, test, vi } from "vitest";
-
-import { DockviewApi, GridviewApi, PaneviewApi, SplitviewApi } from "../../api/component.api";
-import { DockviewComponent } from "../../dockview/dockviewComponent";
+import { SplitviewApi, PaneviewApi, GridviewApi, DockviewApi } from "../../api/component.api";
 import { GridviewComponent } from "../../gridview/gridviewComponent";
 import { PaneviewComponent } from "../../paneview/paneviewComponent";
 import { SplitviewComponent } from "../../splitview/splitviewComponent";
+import { DockviewComponent } from "../../dockview/dockviewComponent";
 
 describe("component.api", () => {
   describe("splitview", () => {
@@ -25,7 +23,7 @@ describe("component.api", () => {
       ];
 
       for (const _ of list) {
-        const f = vi.fn();
+        const f = jest.fn();
 
         const component: Partial<SplitviewComponent> = {
           [_]: f(),
@@ -56,7 +54,7 @@ describe("component.api", () => {
       ];
 
       for (const _ of list) {
-        const f = vi.fn();
+        const f = jest.fn();
 
         const component: Partial<PaneviewComponent> = {
           [_]: f(),
@@ -91,7 +89,7 @@ describe("component.api", () => {
       ];
 
       for (const _ of list) {
-        const f = vi.fn();
+        const f = jest.fn();
 
         const component: Partial<GridviewComponent> = {
           [_]: f(),
@@ -135,7 +133,7 @@ describe("component.api", () => {
       ];
 
       for (const _ of list) {
-        const f = vi.fn();
+        const f = jest.fn();
 
         const component: Partial<DockviewComponent> = {
           [_]: f(),

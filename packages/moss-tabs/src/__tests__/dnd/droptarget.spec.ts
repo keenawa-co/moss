@@ -1,8 +1,3 @@
-import { beforeEach, describe, expect, test, vi } from "vitest";
-
-import { fireEvent } from "@testing-library/dom";
-
-import { createOffsetDragOverEvent } from "../__test_utils__/utils";
 import {
   calculateQuadrantAsPercentage,
   calculateQuadrantAsPixels,
@@ -11,6 +6,8 @@ import {
   Position,
   positionToDirection,
 } from "../../dnd/droptarget";
+import { fireEvent } from "@testing-library/dom";
+import { createOffsetDragOverEvent } from "../__test_utils__/utils";
 
 describe("droptarget", () => {
   let element: HTMLElement;
@@ -19,8 +16,8 @@ describe("droptarget", () => {
   beforeEach(() => {
     element = document.createElement("div");
 
-    vi.spyOn(element, "clientHeight", "get").mockImplementation(() => 100);
-    vi.spyOn(element, "clientWidth", "get").mockImplementation(() => 200);
+    jest.spyOn(element, "clientHeight", "get").mockImplementation(() => 100);
+    jest.spyOn(element, "clientWidth", "get").mockImplementation(() => 200);
   });
 
   test("that dragover events are marked", () => {
@@ -116,8 +113,8 @@ describe("droptarget", () => {
 
     const target = element.querySelector(".dv-drop-target-dropzone") as HTMLElement;
 
-    vi.spyOn(target, "clientHeight", "get").mockImplementation(() => 100);
-    vi.spyOn(target, "clientWidth", "get").mockImplementation(() => 200);
+    jest.spyOn(target, "clientHeight", "get").mockImplementation(() => 100);
+    jest.spyOn(target, "clientWidth", "get").mockImplementation(() => 200);
 
     fireEvent(
       target,
@@ -148,8 +145,8 @@ describe("droptarget", () => {
 
     const target = element.querySelector(".dv-drop-target-dropzone") as HTMLElement;
 
-    vi.spyOn(target, "clientHeight", "get").mockImplementation(() => 100);
-    vi.spyOn(target, "clientWidth", "get").mockImplementation(() => 200);
+    jest.spyOn(target, "clientHeight", "get").mockImplementation(() => 100);
+    jest.spyOn(target, "clientWidth", "get").mockImplementation(() => 200);
 
     fireEvent(target, createOffsetDragOverEvent({ clientX: 19, clientY: 0 }));
 

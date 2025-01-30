@@ -138,6 +138,9 @@ jobs:
           - name: Test Packages (Vitest)
             command: pnpm run test --project packages
 
+          - name: Test Packages (Jest)
+            command: pnpm run jest
+
           - name: Test Packages Stories (Vitest)
             command: pnpm run test --project packages-stories
 

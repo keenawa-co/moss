@@ -1,5 +1,3 @@
-import { beforeEach, describe, expect, Mock, test, vi } from "vitest";
-
 import { fireEvent } from "@testing-library/dom";
 import { fromPartial } from "@total-typescript/shoehorn";
 
@@ -235,14 +233,14 @@ describe("dockviewGroupPanelModel", () => {
   let dockview: DockviewComponent;
   let options: GroupOptions;
 
-  let removePanelMock: Mock;
-  let removeGroupMock: Mock;
+  let removePanelMock: jest.Mock;
+  let removeGroupMock: jest.Mock;
 
   let panelApi: DockviewPanelApi;
 
   beforeEach(() => {
-    removePanelMock = vi.fn();
-    removeGroupMock = vi.fn();
+    removePanelMock = jest.fn();
+    removeGroupMock = jest.fn();
 
     options = {};
 
@@ -255,12 +253,12 @@ describe("dockviewGroupPanelModel", () => {
     dockview = fromPartial<DockviewComponent>({
       options: {},
       createWatermarkComponent: () => new Watermark(),
-      doSetGroupActive: vi.fn(),
+      doSetGroupActive: jest.fn(),
       id: "dockview-1",
       removePanel: removePanelMock,
       removeGroup: removeGroupMock,
-      onDidAddPanel: () => ({ dispose: vi.fn() }),
-      onDidRemovePanel: () => ({ dispose: vi.fn() }),
+      onDidAddPanel: () => ({ dispose: jest.fn() }),
+      onDidRemovePanel: () => ({ dispose: jest.fn() }),
       overlayRenderContainer: new OverlayRenderContainer(
         document.createElement("div"),
         fromPartial<DockviewComponent>({})
@@ -610,20 +608,20 @@ describe("dockviewGroupPanelModel", () => {
     const accessor = fromPartial<DockviewComponent>({
       id: "testcomponentid",
       options: {},
-      getPanel: vi.fn(),
-      onDidAddPanel: vi.fn(),
-      onDidRemovePanel: vi.fn(),
+      getPanel: jest.fn(),
+      onDidAddPanel: jest.fn(),
+      onDidRemovePanel: jest.fn(),
     });
 
-    const groupviewMock = vi.fn<Partial<DockviewGroupPanelModel>, []>(() => {
+    const groupviewMock = jest.fn<Partial<DockviewGroupPanelModel>, []>(() => {
       return {
-        canDisplayOverlay: vi.fn(),
+        canDisplayOverlay: jest.fn(),
       };
     });
 
     const groupView = new groupviewMock() as DockviewGroupPanelModel;
 
-    const groupPanelMock = vi.fn<Partial<DockviewGroupPanelModel>, []>(() => {
+    const groupPanelMock = jest.fn<Partial<DockviewGroupPanelModel>, []>(() => {
       return {
         id: "testgroupid",
         model: groupView,
@@ -647,8 +645,8 @@ describe("dockviewGroupPanelModel", () => {
 
     const element = container.getElementsByClassName("dv-content-container").item(0)!;
 
-    vi.spyOn(element, "clientHeight", "get").mockImplementation(() => 100);
-    vi.spyOn(element, "clientWidth", "get").mockImplementation(() => 100);
+    jest.spyOn(element, "clientHeight", "get").mockImplementation(() => 100);
+    jest.spyOn(element, "clientWidth", "get").mockImplementation(() => 100);
 
     fireEvent.dragEnter(element);
     fireEvent.dragOver(element);
@@ -662,20 +660,20 @@ describe("dockviewGroupPanelModel", () => {
     const accessor = fromPartial<DockviewComponent>({
       id: "testcomponentid",
       options: {},
-      getPanel: vi.fn(),
-      onDidAddPanel: vi.fn(),
-      onDidRemovePanel: vi.fn(),
+      getPanel: jest.fn(),
+      onDidAddPanel: jest.fn(),
+      onDidRemovePanel: jest.fn(),
     });
 
-    const groupviewMock = vi.fn<Partial<DockviewGroupPanelModel>, []>(() => {
+    const groupviewMock = jest.fn<Partial<DockviewGroupPanelModel>, []>(() => {
       return {
-        canDisplayOverlay: vi.fn(),
+        canDisplayOverlay: jest.fn(),
       };
     });
 
     const groupView = new groupviewMock() as DockviewGroupPanelModel;
 
-    const groupPanelMock = vi.fn<Partial<DockviewGroupPanelModel>, []>(() => {
+    const groupPanelMock = jest.fn<Partial<DockviewGroupPanelModel>, []>(() => {
       return {
         id: "testgroupid",
         model: groupView,
@@ -697,8 +695,8 @@ describe("dockviewGroupPanelModel", () => {
 
     const element = container.getElementsByClassName("dv-content-container").item(0)!;
 
-    vi.spyOn(element, "clientHeight", "get").mockImplementation(() => 100);
-    vi.spyOn(element, "clientWidth", "get").mockImplementation(() => 100);
+    jest.spyOn(element, "clientHeight", "get").mockImplementation(() => 100);
+    jest.spyOn(element, "clientWidth", "get").mockImplementation(() => 100);
 
     function run(value: number) {
       fireEvent.dragEnter(element);
@@ -734,25 +732,25 @@ describe("dockviewGroupPanelModel", () => {
     const accessor = fromPartial<DockviewComponent>({
       id: "testcomponentid",
       options: {},
-      getPanel: vi.fn(),
-      doSetGroupActive: vi.fn(),
-      onDidAddPanel: vi.fn(),
-      onDidRemovePanel: vi.fn(),
+      getPanel: jest.fn(),
+      doSetGroupActive: jest.fn(),
+      onDidAddPanel: jest.fn(),
+      onDidRemovePanel: jest.fn(),
       overlayRenderContainer: new OverlayRenderContainer(
         document.createElement("div"),
         fromPartial<DockviewComponent>({})
       ),
     });
 
-    const groupviewMock = vi.fn<Partial<DockviewGroupPanelModel>, []>(() => {
+    const groupviewMock = jest.fn<Partial<DockviewGroupPanelModel>, []>(() => {
       return {
-        canDisplayOverlay: vi.fn(),
+        canDisplayOverlay: jest.fn(),
       };
     });
 
     const groupView = new groupviewMock() as DockviewGroupPanelModel;
 
-    const groupPanelMock = vi.fn<Partial<DockviewGroupPanel>, []>(() => {
+    const groupPanelMock = jest.fn<Partial<DockviewGroupPanel>, []>(() => {
       return {
         id: "testgroupid",
         model: groupView,
@@ -778,8 +776,8 @@ describe("dockviewGroupPanelModel", () => {
 
     const element = container.getElementsByClassName("dv-content-container").item(0)!;
 
-    vi.spyOn(element, "clientHeight", "get").mockImplementation(() => 100);
-    vi.spyOn(element, "clientWidth", "get").mockImplementation(() => 100);
+    jest.spyOn(element, "clientHeight", "get").mockImplementation(() => 100);
+    jest.spyOn(element, "clientWidth", "get").mockImplementation(() => 100);
 
     LocalSelectionTransfer.getInstance().setData(
       [new PanelTransfer("testcomponentid", "groupviewid", "panel1")],
@@ -798,25 +796,25 @@ describe("dockviewGroupPanelModel", () => {
     const accessor = fromPartial<DockviewComponent>({
       id: "testcomponentid",
       options: {},
-      getPanel: vi.fn(),
-      doSetGroupActive: vi.fn(),
-      onDidAddPanel: vi.fn(),
-      onDidRemovePanel: vi.fn(),
+      getPanel: jest.fn(),
+      doSetGroupActive: jest.fn(),
+      onDidAddPanel: jest.fn(),
+      onDidRemovePanel: jest.fn(),
       overlayRenderContainer: new OverlayRenderContainer(
         document.createElement("div"),
         fromPartial<DockviewComponent>({})
       ),
     });
 
-    const groupviewMock = vi.fn<Partial<DockviewGroupPanelModel>, []>(() => {
+    const groupviewMock = jest.fn<Partial<DockviewGroupPanelModel>, []>(() => {
       return {
-        canDisplayOverlay: vi.fn(),
+        canDisplayOverlay: jest.fn(),
       };
     });
 
     const groupView = new groupviewMock() as DockviewGroupPanelModel;
 
-    const groupPanelMock = vi.fn<Partial<DockviewGroupPanel>, []>(() => {
+    const groupPanelMock = jest.fn<Partial<DockviewGroupPanel>, []>(() => {
       return {
         id: "testgroupid",
         model: groupView,
@@ -843,8 +841,8 @@ describe("dockviewGroupPanelModel", () => {
 
     const element = container.getElementsByClassName("dv-content-container").item(0)!;
 
-    vi.spyOn(element, "clientHeight", "get").mockImplementation(() => 100);
-    vi.spyOn(element, "clientWidth", "get").mockImplementation(() => 100);
+    jest.spyOn(element, "clientHeight", "get").mockImplementation(() => 100);
+    jest.spyOn(element, "clientWidth", "get").mockImplementation(() => 100);
 
     LocalSelectionTransfer.getInstance().setData(
       [new PanelTransfer("testcomponentid", "groupviewid", "panel1")],
@@ -863,25 +861,25 @@ describe("dockviewGroupPanelModel", () => {
     const accessor = fromPartial<DockviewComponent>({
       id: "testcomponentid",
       options: {},
-      getPanel: vi.fn(),
-      doSetGroupActive: vi.fn(),
-      onDidAddPanel: vi.fn(),
-      onDidRemovePanel: vi.fn(),
+      getPanel: jest.fn(),
+      doSetGroupActive: jest.fn(),
+      onDidAddPanel: jest.fn(),
+      onDidRemovePanel: jest.fn(),
       overlayRenderContainer: new OverlayRenderContainer(
         document.createElement("div"),
         fromPartial<DockviewComponent>({})
       ),
     });
 
-    const groupviewMock = vi.fn<Partial<DockviewGroupPanelModel>, []>(() => {
+    const groupviewMock = jest.fn<Partial<DockviewGroupPanelModel>, []>(() => {
       return {
-        canDisplayOverlay: vi.fn(),
+        canDisplayOverlay: jest.fn(),
       };
     });
 
     const groupView = new groupviewMock() as DockviewGroupPanelModel;
 
-    const groupPanelMock = vi.fn<Partial<DockviewGroupPanel>, []>(() => {
+    const groupPanelMock = jest.fn<Partial<DockviewGroupPanel>, []>(() => {
       return {
         id: "testgroupid",
         model: groupView,
@@ -908,8 +906,8 @@ describe("dockviewGroupPanelModel", () => {
 
     const element = container.getElementsByClassName("dv-content-container").item(0)!;
 
-    vi.spyOn(element, "clientHeight", "get").mockImplementation(() => 100);
-    vi.spyOn(element, "clientWidth", "get").mockImplementation(() => 100);
+    jest.spyOn(element, "clientHeight", "get").mockImplementation(() => 100);
+    jest.spyOn(element, "clientWidth", "get").mockImplementation(() => 100);
 
     LocalSelectionTransfer.getInstance().setData(
       [new PanelTransfer("anothercomponentid", "groupviewid", "panel1")],
@@ -925,15 +923,15 @@ describe("dockviewGroupPanelModel", () => {
   });
 
   test("that the watermark is removed when dispose is called", () => {
-    const groupviewMock = vi.fn<Partial<DockviewGroupPanelModel>, []>(() => {
+    const groupviewMock = jest.fn<Partial<DockviewGroupPanelModel>, []>(() => {
       return {
-        canDisplayOverlay: vi.fn(),
+        canDisplayOverlay: jest.fn(),
       };
     });
 
     const groupView = new groupviewMock() as DockviewGroupPanelModel;
 
-    const groupPanelMock = vi.fn<Partial<DockviewGroupPanel>, []>(() => {
+    const groupPanelMock = jest.fn<Partial<DockviewGroupPanel>, []>(() => {
       return {
         id: "testgroupid",
         model: groupView,
@@ -960,15 +958,15 @@ describe("dockviewGroupPanelModel", () => {
   });
 
   test("that watermark is added", () => {
-    const groupviewMock = vi.fn<Partial<DockviewGroupPanelModel>, []>(() => {
+    const groupviewMock = jest.fn<Partial<DockviewGroupPanelModel>, []>(() => {
       return {
-        canDisplayOverlay: vi.fn(),
+        canDisplayOverlay: jest.fn(),
       };
     });
 
     const groupView = new groupviewMock() as DockviewGroupPanelModel;
 
-    const groupPanelMock = vi.fn<Partial<DockviewGroupPanel>, []>(() => {
+    const groupPanelMock = jest.fn<Partial<DockviewGroupPanel>, []>(() => {
       return {
         id: "testgroupid",
         model: groupView,
