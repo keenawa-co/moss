@@ -48,7 +48,7 @@ const PanelAction = (props: { panels: string[]; api: DockviewApi; activePanel?: 
 
   const [visible, setVisible] = React.useState<boolean>(true);
 
-  const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const [isPopupOpen, setIsPopupOpen] = React.useState(false);
 
   const togglePopup = () => {
     setIsPopupOpen(!isPopupOpen);
@@ -111,7 +111,7 @@ const PanelAction = (props: { panels: string[]; api: DockviewApi; activePanel?: 
 };
 
 const TitleEditPopup: React.FC<{ panel: IDockviewPanel; onClose: () => void }> = ({ panel, onClose }) => {
-  const [title, setTitle] = useState<string>(panel.title ?? "");
+  const [title, setTitle] = React.useState<string>(panel.title ?? "");
 
   const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setTitle(event.target.value);
