@@ -6304,7 +6304,6 @@ describe("dockviewComponent", () => {
 
     api.onDidLayoutChange((e) => {
       a++;
-      console.log({ a });
     });
 
     api.addPanel({
