@@ -1,3 +1,5 @@
+import { describe, expect, test, vi } from "vitest";
+
 import { CompositeDisposable, Disposable, MutableDisposable } from "../lifecycle";
 
 describe("lifecycle", () => {
@@ -26,16 +28,16 @@ describe("lifecycle", () => {
 
   test("composite disposable", () => {
     const d1 = {
-      dispose: jest.fn(),
+      dispose: vi.fn(),
     };
     const d2 = {
-      dispose: jest.fn(),
+      dispose: vi.fn(),
     };
     const d3 = {
-      dispose: jest.fn(),
+      dispose: vi.fn(),
     };
     const d4 = {
-      dispose: jest.fn(),
+      dispose: vi.fn(),
     };
 
     const cut = new CompositeDisposable(d1, d2);
@@ -66,7 +68,7 @@ describe("lifecycle", () => {
   });
 
   test("Disposable.from(...)", () => {
-    const func = jest.fn();
+    const func = vi.fn();
 
     const disposable = Disposable.from(func);
 

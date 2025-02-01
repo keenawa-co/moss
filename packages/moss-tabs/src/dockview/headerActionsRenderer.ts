@@ -1,4 +1,4 @@
-import * as React from "react";
+import React from "react";
 
 import { DockviewApi } from "../api/component.api";
 import { DockviewGroupPanelApi } from "../api/dockviewGroupPanelApi";

@@ -1,10 +1,12 @@
-import * as React from "react";
+import React from "react";
 import { createRoot, Root } from "react-dom/client";
 
+import { useTabbedPaneStore } from "@/store/tabbedPane";
 import { DockviewApi } from "@repo/moss-tabs";
 
 import { defaultConfig, nextId } from "./defaultLayout";
 import { PanelBuilder } from "./panelBuilder";
+import { setGridState } from "./utils";
 
 let mount = document.querySelector(".popover-anchor") as HTMLElement | null;
 
@@ -79,24 +81,20 @@ export const GridActions = (props: {
     props.api?.clear();
   };
 
+  const gridState = useTabbedPaneStore((state) => state.gridState);
   const onLoad = () => {
-    const state = localStorage.getItem("dv-demo-state");
-    if (state) {
+    if (gridState) {
       try {
-        props.api?.fromJSON(JSON.parse(state));
+        props.api?.fromJSON(gridState);
       } catch (err) {
-        console.error("failed to load state", err);
-        localStorage.removeItem("dv-demo-state");
+        console.error("failed to load saved state", err);
       }
     }
   };
 
   const onSave = () => {
     if (props.api) {
-      const state = props.api.toJSON();
-      console.log(state);
-
-      localStorage.setItem("dv-demo-state", JSON.stringify(state));
+      setGridState(props.api);
     }
   };
 
@@ -106,7 +104,7 @@ export const GridActions = (props: {
         props.api.clear();
         defaultConfig(props.api);
       } catch (err) {
-        localStorage.removeItem("dv-demo-state");
+        console.error("failed to reset state to default", err);
       }
     }
   };
@@ -116,6 +114,7 @@ export const GridActions = (props: {
   const onAddPanel = (options?: { advanced?: boolean; type?: string }) => {
     const panelType = options?.type;
     if (panelType && props.api?.getPanel(panelType) !== undefined) {
+      props.api.getPanel(panelType)?.focus();
       return;
     }
 
@@ -128,7 +127,7 @@ export const GridActions = (props: {
         id: panelType && panelType !== "nested" ? panelType : `id_${Date.now().toString()}`,
         component: options?.type ?? "Default",
         title: options?.type ?? `Tab ${nextId()}`,
-        renderer: "always",
+        renderer: "onlyWhenVisible",
       });
     }
   };
@@ -180,14 +179,15 @@ export const GridActions = (props: {
       <button className="text-button" onClick={onClear}>
         Clear
       </button>
+      <span className="flex-grow" />
       <button className="text-button" onClick={onLoad}>
-        Load
+        Load State
       </button>
       <button className="text-button" onClick={onSave}>
-        Save
+        Save State
       </button>
       <button className="text-button" onClick={onReset}>
-        Reset
+        Use Default State
       </button>
       <span className="grow" />
       <div className="flex items-center">

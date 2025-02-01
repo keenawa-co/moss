@@ -18,6 +18,7 @@ export default defineConfig({
       "@/hooks": resolve("src/hooks"),
       "@/assets": resolve("src/assets"),
       "@/components": resolve("src/components"),
+      "@/store": resolve("src/store"),
     },
   },
 });

@@ -1,4 +1,5 @@
 import React from "react";
+import { describe, expect, test, vi } from "vitest";
 
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { fromPartial } from "@total-typescript/shoehorn";
@@ -12,7 +13,7 @@ import { Disposable } from "../../lifecycle";
 describe("defaultTab", () => {
   test("has close button by default", async () => {
     const api = fromPartial<DockviewPanelApi>({
-      onDidTitleChange: jest.fn().mockImplementation(() => Disposable.NONE),
+      onDidTitleChange: vi.fn().mockImplementation(() => Disposable.NONE),
     });
     const containerApi = fromPartial<DockviewApi>({});
     const params = {};
@@ -26,7 +27,7 @@ describe("defaultTab", () => {
   test("that title is displayed", async () => {
     const api = fromPartial<DockviewPanelApi>({
       title: "test_title",
-      onDidTitleChange: jest.fn().mockImplementation(() => Disposable.NONE),
+      onDidTitleChange: vi.fn().mockImplementation(() => Disposable.NONE),
     });
     const containerApi = fromPartial<DockviewApi>({});
     const params = {};
@@ -62,7 +63,7 @@ describe("defaultTab", () => {
 
   test("has no close button when hideClose=true", async () => {
     const api = fromPartial<DockviewPanelApi>({
-      onDidTitleChange: jest.fn().mockImplementation(() => Disposable.NONE),
+      onDidTitleChange: vi.fn().mockImplementation(() => Disposable.NONE),
     });
     const containerApi = fromPartial<DockviewApi>({});
     const params = {};
@@ -75,13 +76,13 @@ describe("defaultTab", () => {
 
   test("that settings closeActionOverride skips api.close()", async () => {
     const api = fromPartial<DockviewPanelApi>({
-      close: jest.fn(),
-      onDidTitleChange: jest.fn().mockImplementation(() => Disposable.NONE),
+      close: vi.fn(),
+      onDidTitleChange: vi.fn().mockImplementation(() => Disposable.NONE),
     });
     const containerApi = fromPartial<DockviewApi>({});
     const params = {};
 
-    const closeActionOverride = jest.fn();
+    const closeActionOverride = vi.fn();
 
     render(
       <DockviewDefaultTab
@@ -102,8 +103,8 @@ describe("defaultTab", () => {
 
   test("that clicking close calls api.close()", async () => {
     const api = fromPartial<DockviewPanelApi>({
-      close: jest.fn(),
-      onDidTitleChange: jest.fn().mockImplementation(() => Disposable.NONE),
+      close: vi.fn(),
+      onDidTitleChange: vi.fn().mockImplementation(() => Disposable.NONE),
     });
     const containerApi = fromPartial<DockviewApi>({});
     const params = {};
@@ -119,7 +120,7 @@ describe("defaultTab", () => {
 
   test("has close button when hideClose=false", async () => {
     const api = fromPartial<DockviewPanelApi>({
-      onDidTitleChange: jest.fn().mockImplementation(() => Disposable.NONE),
+      onDidTitleChange: vi.fn().mockImplementation(() => Disposable.NONE),
     });
     const containerApi = fromPartial<DockviewApi>({});
     const params = {};
@@ -132,8 +133,8 @@ describe("defaultTab", () => {
 
   test("that pointerDown on close button prevents panel becoming active", async () => {
     const api = fromPartial<DockviewPanelApi>({
-      setActive: jest.fn(),
-      onDidTitleChange: jest.fn().mockImplementation(() => Disposable.NONE),
+      setActive: vi.fn(),
+      onDidTitleChange: vi.fn().mockImplementation(() => Disposable.NONE),
     });
     const containerApi = fromPartial<DockviewApi>({});
     const params = {};

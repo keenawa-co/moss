@@ -1,3 +1,5 @@
+import { beforeEach, describe, expect, test, vi } from "vitest";
+
 import { PanelApiImpl } from "../../api/panelApi";
 import { IPanel } from "../../panel/types";
 
@@ -10,7 +12,7 @@ describe("api", () => {
 
   test("updateParameters", () => {
     const panel = {
-      update: jest.fn(),
+      update: vi.fn(),
     } as Partial<IPanel>;
 
     api.initialize(panel as IPanel);
