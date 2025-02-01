@@ -8,7 +8,7 @@ import { vi } from "vitest";
  */
 export type Writable<T> = T extends object ? { -readonly [K in keyof T]: Writable<T[K]> } : T;
 
-export function setMockRefElement(node: Partial<HTMLElement>): void {
+export function setMockRefElement(node: Partial<HTMLElement>) {
   const mockRef = {
     get current() {
       return node;
@@ -18,7 +18,7 @@ export function setMockRefElement(node: Partial<HTMLElement>): void {
     },
   };
 
-  vi.spyOn(React, "useRef").mockReturnValueOnce(mockRef);
+  return vi.spyOn(React, "useRef").mockReturnValueOnce(mockRef);
 }
 
 export function createOffsetDragOverEvent(params: { clientX: number; clientY: number }): Event {

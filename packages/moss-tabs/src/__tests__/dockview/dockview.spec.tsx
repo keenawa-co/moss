@@ -44,16 +44,16 @@ describe("gridview react", () => {
     vi.spyOn(el, "clientHeight", "get").mockReturnValue(450);
     vi.spyOn(el, "clientWidth", "get").mockReturnValue(650);
 
-    setMockRefElement(el);
+    const mockRef = setMockRefElement(el);
 
     let api: DockviewApi | undefined;
-
     const onReady = (event: DockviewReadyEvent) => {
       api = event.api;
     };
 
     render(<DockviewReact components={components} onReady={onReady} />);
 
+    expect(mockRef).toHaveBeenCalled();
     expect(api?.width).toBe(650);
     expect(api?.height).toBe(450);
   });

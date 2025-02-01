@@ -1,4 +1,4 @@
-import * as React from "react";
+import React from "react";
 
 import { DockviewApi, IDockviewPanel } from "@repo/moss-tabs";
 

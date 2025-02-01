@@ -1,4 +1,4 @@
-import * as React from "react";
+import React from "react";
 
 import { DockviewApi } from "../api/component.api";
 import { createDockview } from "../api/entryPoints";
@@ -136,6 +136,7 @@ export const DockviewReact = React.forwardRef((props: IDockviewReactProps, ref: 
     });
 
     const { clientWidth, clientHeight } = domRef.current;
+
     api.layout(clientWidth, clientHeight);
 
     if (props.onReady) {
