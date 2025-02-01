@@ -4763,7 +4763,11 @@ describe("dockviewComponent", () => {
     test("grid -> floating -> popout -> popout closed", async () => {
       const container = document.createElement("div");
 
-      window.open = () => setupMockWindow();
+      Object.defineProperty(window, "open", {
+        writable: true,
+        configurable: true,
+        value: () => setupMockWindow(),
+      });
 
       const dockview = new DockviewComponent(container, {
         createComponent(options) {
@@ -4982,7 +4986,11 @@ describe("dockviewComponent", () => {
     test("add a popout group", async () => {
       const container = document.createElement("div");
 
-      window.open = () => setupMockWindow();
+      Object.defineProperty(window, "open", {
+        writable: true,
+        configurable: true,
+        value: () => setupMockWindow(),
+      });
 
       const dockview = new DockviewComponent(container, {
         createComponent(options) {
@@ -5133,7 +5141,11 @@ describe("dockviewComponent", () => {
       const container = document.createElement("div");
 
       const mockWindow = setupMockWindow();
-      window.open = () => mockWindow;
+      Object.defineProperty(window, "open", {
+        writable: true,
+        configurable: true,
+        value: () => mockWindow,
+      });
 
       const dockview = new DockviewComponent(container, {
         createComponent(options) {
@@ -5340,7 +5352,11 @@ describe("dockviewComponent", () => {
     test("persistance with custom url", async () => {
       const container = document.createElement("div");
 
-      window.open = () => setupMockWindow();
+      Object.defineProperty(window, "open", {
+        writable: true,
+        configurable: true,
+        value: () => setupMockWindow(),
+      });
 
       const dockview = new DockviewComponent(container, {
         createComponent(options) {

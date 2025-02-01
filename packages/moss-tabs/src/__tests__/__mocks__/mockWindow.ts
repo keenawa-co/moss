@@ -6,7 +6,7 @@ export function setupMockWindow() {
   let width = 1000;
   let height = 2000;
 
-  return fromPartial<Window>({
+  const mock = {
     addEventListener: (type: string, listener: () => void) => {
       if (!listeners[type]) {
         listeners[type] = [];
@@ -35,11 +35,18 @@ export function setupMockWindow() {
     close: () => {
       listeners["beforeunload"]?.forEach((f) => f());
     },
-    get innerWidth() {
-      return width++;
-    },
-    get innerHeight() {
-      return height++;
-    },
+  };
+
+  // Define innerWidth and innerHeight using Object.defineProperty
+  Object.defineProperty(mock, "innerWidth", {
+    get: () => width++,
+    configurable: true,
   });
+
+  Object.defineProperty(mock, "innerHeight", {
+    get: () => height++,
+    configurable: true,
+  });
+
+  return mock as Window;
 }
