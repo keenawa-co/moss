@@ -1,3 +1,5 @@
+import { beforeEach, describe, expect, Mock, Mocked, test, vi } from "vitest";
+
 import { fromPartial } from "@total-typescript/shoehorn";
 
 import { exhaustMicrotaskQueue, Writable } from "../__test_utils__/utils";
@@ -90,7 +92,7 @@ describe("overlayRenderContainer", () => {
       },
     });
 
-    (parentContainer as jest.Mocked<HTMLDivElement>).getBoundingClientRect = jest
+    (parentContainer as Mocked<HTMLDivElement>).getBoundingClientRect = vi
       .fn<DOMRect, []>()
       .mockReturnValueOnce(
         fromPartial<DOMRect>({
@@ -117,7 +119,7 @@ describe("overlayRenderContainer", () => {
         })
       );
 
-    (referenceContainer.element as jest.Mocked<HTMLDivElement>).getBoundingClientRect = jest
+    (referenceContainer.element as Mocked<HTMLDivElement>).getBoundingClientRect = vi
       .fn<DOMRect, []>()
       .mockReturnValueOnce(
         fromPartial<DOMRect>({
@@ -189,7 +191,7 @@ describe("overlayRenderContainer", () => {
 
     const element = document.createElement("div");
     element.setAttribute("aria-level", "2");
-    const spy = jest.spyOn(element, "getAttribute");
+    const spy = vi.spyOn(element, "getAttribute");
 
     const accessor = fromPartial<DockviewComponent>({
       floatingGroups: [

@@ -1,4 +1,6 @@
-import { AsapEvent, Emitter, Event, addDisposableListener, addDisposableWindowListener } from "../events";
+import { describe, expect, it, test, vi } from "vitest";
+
+import { addDisposableListener, addDisposableWindowListener, AsapEvent, Emitter, Event } from "../events";
 
 describe("events", () => {
   describe("emitter", () => {
@@ -78,8 +80,8 @@ describe("events", () => {
   });
 
   describe("asapEvent", () => {
-    test("that asapEvents fire once per event-loop-cycle", () => {
-      jest.useFakeTimers();
+    test("that asapEvents fire once per event-loop-cycle", async () => {
+      vi.useFakeTimers();
 
       const event = new AsapEvent();
 
@@ -105,7 +107,7 @@ describe("events", () => {
       expect(preFireCount).toBe(0);
       expect(postFireCount).toBe(0);
 
-      jest.runAllTimers();
+      await vi.runAllTimersAsync();
 
       expect(preFireCount).toBe(1);
       expect(postFireCount).toBe(0);
@@ -139,11 +141,11 @@ describe("events", () => {
 
   it("addDisposableWindowListener with capture options", () => {
     const element = {
-      addEventListener: jest.fn(),
-      removeEventListener: jest.fn(),
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
     };
 
-    const handler = jest.fn();
+    const handler = vi.fn();
 
     const disposable = addDisposableWindowListener(element as any, "pointerdown", handler, true);
 
@@ -160,11 +162,11 @@ describe("events", () => {
 
   it("addDisposableWindowListener without capture options", () => {
     const element = {
-      addEventListener: jest.fn(),
-      removeEventListener: jest.fn(),
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
     };
 
-    const handler = jest.fn();
+    const handler = vi.fn();
 
     const disposable = addDisposableWindowListener(element as any, "pointerdown", handler);
 
@@ -181,11 +183,11 @@ describe("events", () => {
 
   it("addDisposableListener with capture options", () => {
     const element = {
-      addEventListener: jest.fn(),
-      removeEventListener: jest.fn(),
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
     };
 
-    const handler = jest.fn();
+    const handler = vi.fn();
 
     const disposable = addDisposableListener(element as any, "pointerdown", handler, true);
 
@@ -202,11 +204,11 @@ describe("events", () => {
 
   it("addDisposableListener without capture options", () => {
     const element = {
-      addEventListener: jest.fn(),
-      removeEventListener: jest.fn(),
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
     };
 
-    const handler = jest.fn();
+    const handler = vi.fn();
 
     const disposable = addDisposableListener(element as any, "pointerdown", handler);
 

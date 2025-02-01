@@ -9,7 +9,7 @@
     "tsBuildInfoFile": ".build/tsconfig.tsbuildinfo.esm",
     "jsx": "react",
     "rootDir": "src",
-    "types": ["jest", "node"]
+    "types": ["node"]
   },
   "include": ["src"],
   "exclude": ["**/node_modules"]

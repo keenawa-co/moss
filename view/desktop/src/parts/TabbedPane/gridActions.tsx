@@ -1,5 +1,5 @@
-import * as React from "react";
-import { createRoot } from "react-dom/client";
+import React from "react";
+import { createRoot, Root } from "react-dom/client";
 
 import { useTabbedPaneStore } from "@/store/tabbedPane";
 import { DockviewApi } from "@repo/moss-tabs";
