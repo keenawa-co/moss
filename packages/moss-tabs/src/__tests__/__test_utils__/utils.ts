@@ -31,12 +31,6 @@ export function createOffsetDragOverEvent(params: { clientX: number; clientY: nu
   return event;
 }
 
-/**
- * `jest.runAllTicks` doesn't seem to exhaust all events in the micro-task queue so
- * as a **hacky** alternative we'll wait for an empty Promise to complete which runs
- * on the micro-task queue so will force a run-to-completion emptying the queue
- * of any pending micro-task
- */
 export function exhaustMicrotaskQueue(): Promise<void> {
   return new Promise<void>((resolve) => resolve());
 }

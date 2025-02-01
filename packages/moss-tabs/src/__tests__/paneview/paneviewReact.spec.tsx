@@ -1,5 +1,3 @@
-import "@testing-library/jest-dom";
-
 import React from "react";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 

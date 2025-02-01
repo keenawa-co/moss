@@ -1,5 +1,3 @@
-import { fromPartial } from "@total-typescript/shoehorn";
-
 export function setupMockWindow() {
   const listeners: Record<string, (() => void)[]> = {};
 

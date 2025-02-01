@@ -27,7 +27,6 @@
     "@repo/tailwind-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
     "@tailwindcss/typography": "^0.5.15",
-    "@testing-library/jest-dom": "^6.6.3",
     "@types/node": "^22.10.1",
     "jsdom": "^26.0.0",
     "ts-node": "^10.9.2"
