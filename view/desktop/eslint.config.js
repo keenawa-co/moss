@@ -22,6 +22,7 @@ export default [
           map: [
             ["@/hooks", path.resolve(__dirname, "./src/hooks")],
             ["@/assets", path.resolve(__dirname, "./src/assets")],
+            ["@/store", path.resolve(__dirname, "./src/store")],
             ["@/components", path.resolve(__dirname, "./src/components")],
             ["@/packages", path.resolve(__dirname, "../../packages/moss-ui/src")],
           ],
