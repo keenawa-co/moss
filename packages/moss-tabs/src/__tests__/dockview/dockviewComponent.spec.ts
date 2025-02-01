@@ -4798,7 +4798,7 @@ describe("dockviewComponent", () => {
       expect(panel2.api.location.type).toBe("grid");
       expect(panel3.api.location.type).toBe("grid");
 
-      await dockview.addFloatingGroup(panel2);
+      dockview.addFloatingGroup(panel2);
 
       expect(panel1.api.location.type).toBe("grid");
       expect(panel2.api.location.type).toBe("floating");
@@ -4813,7 +4813,7 @@ describe("dockviewComponent", () => {
       const windowObject = panel2.api.location.type === "popout" ? panel2.api.location.getWindow() : undefined;
       expect(windowObject).toBeTruthy();
 
-      windowObject!.close();
+      windowObject?.close();
 
       expect(panel1.api.location.type).toBe("grid");
       expect(panel2.api.location.type).toBe("floating");
