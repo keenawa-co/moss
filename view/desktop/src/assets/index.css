@@ -21,8 +21,7 @@
 @layer base {
   html,
   body {
-    /* TODO remove background-[--moss-primary] */
-    @apply background-[--moss-primary] font-sans text-[rgba(var(--moss-primary))] transition-colors duration-75 ease-linear;
+    @apply font-sans text-[rgba(var(--moss-primary))] transition-colors duration-75 ease-linear;
     overflow: hidden;
     position: fixed;
     width: 100vw;
