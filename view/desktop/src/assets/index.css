@@ -4,6 +4,7 @@
 #root {
   height: 100%;
 }
+
 .visually-hidden {
   position: absolute;
   width: 1px;
