@@ -11,7 +11,6 @@ export default defineConfig({
     },
   },
   plugins: [tailwindcss(), react()],
-  assetsInclude: "src/renderer/assets/**", //TODO what's this assetsInclude for???
   resolve: {
     alias: {
       "@": resolve("src"),

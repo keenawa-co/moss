@@ -1,3 +1,5 @@
+import tailwindcss from "@tailwindcss/vite";
+
 /* eslint-disable */
 
 const { join } = require("path");
@@ -62,6 +64,7 @@ function createBundle(format, options) {
     typescript({
       tsconfig: "tsconfig.esm.json",
     }),
+    tailwindcss(),
   ];
 
   if (isMinified) {

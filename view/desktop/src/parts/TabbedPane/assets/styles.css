@@ -1,11 +1,12 @@
+@config "@repo/tailwind-config";
 @import "tailwindcss";
 
 .dockview-demo .group-control .action {
-  @apply box-border flex cursor-pointer items-center justify-center p-1 text-[18px];
+  @apply background-(--moss-color) box-border flex cursor-pointer items-center justify-center p-1 text-[18px];
 }
 
 .dockview-demo .group-control .action:hover {
-  @apply rounded-sm bg-[var(--moss-icon-hover-background-color)];
+  @apply rounded-sm bg-[--moss-icon-hover-background-color];
 }
 
 .dockview-demo .data-table table {
@@ -17,11 +18,11 @@
 }
 
 .dockview-demo button {
-  @apply flex h-[25px] cursor-pointer items-center justify-center border-none bg-[#1c254a] text-white outline outline-1 outline-[#4c65d4];
+  @apply flex h-[25px] cursor-pointer items-center justify-center border-none bg-[#1c254a] text-white outline outline-[#4c65d4];
 }
 
 .dockview-demo button:focus {
-  @apply !outline !outline-1 !outline-[#4c65d4];
+  @apply !outline !outline-[#4c65d4];
 }
 
 .dockview-demo button:hover {
@@ -29,11 +30,11 @@
 }
 
 .dockview-demo input {
-  @apply m-0 h-[25px] border-none outline outline-1 outline-[#4c65d4];
+  @apply m-0 h-[25px] border-none outline outline-[#4c65d4];
 }
 
 .dockview-demo input:focus {
-  @apply !outline !outline-1 !outline-[#4c65d4];
+  @apply !outline !outline-[#4c65d4];
 }
 
 .dockview-demo .action-container {
@@ -57,11 +58,11 @@
 }
 
 .dockview-demo .action-container .demo-button {
-  @apply flex min-w-[50px] grow items-center rounded-none px-[2px] py-0 !outline !outline-1 !outline-[#4c65d4];
+  @apply flex min-w-[50px] grow items-center rounded-none px-[2px] py-0 !outline !outline-[#4c65d4];
 }
 
 .dockview-demo .action-container .demo-icon-button {
-  @apply flex grow cursor-pointer items-center rounded-none border-none px-1 py-0 outline outline-1 outline-[#4c65d4];
+  @apply flex grow cursor-pointer items-center rounded-none border-none px-1 py-0 outline outline-[#4c65d4];
 }
 
 .dockview-demo .action-container .demo-icon-button:disabled {

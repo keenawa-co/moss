@@ -24,7 +24,12 @@ export default Icon;
 
 const FailedIcon = ({ className, ...props }: { className?: string } & ComponentPropsWithoutRef<"svg">) => {
   return (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" className={cn("size-4 shrink-0", className)} {...props}>
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 16 16"
+      className={cn("size-4 shrink-0 bg-amber-500", className)}
+      {...props}
+    >
       <path fill="#ff69b4" d="M0 0h4v4H0z" />
       <path d="M4 0h4v4H4z" />
       <path fill="#ff69b4" d="M8 0h4v4H8z" />

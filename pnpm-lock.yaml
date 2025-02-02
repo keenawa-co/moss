@@ -36,6 +36,9 @@ importers:
       '@storybook/test':
         specifier: ^8.4.7
         version: 8.4.7(storybook@8.4.7(prettier@3.4.2))
+      '@tailwindcss/vite':
+        specifier: ^4.0.0
+        version: 4.0.3(vite@6.0.3(@types/node@22.10.2)(jiti@2.4.2)(lightningcss@1.29.1)(sass-embedded@1.83.4)(terser@5.37.0)(yaml@2.6.1))
       '@types/node':
         specifier: ^22.10.1
         version: 22.10.2
@@ -73,7 +76,7 @@ importers:
         specifier: ^2.6.0
         version: 2.6.0
       tailwindcss:
-        specifier: ^4.0.0
+        specifier: ^4.0.3
         version: 4.0.3
       ts-jest:
         specifier: ^29.2.5
@@ -226,9 +229,12 @@ importers:
 
   packages/config-tailwind:
     dependencies:
-      tailwindcss:
-        specifier: ^4.0.0
-        version: 4.0.3
+      '@tailwindcss/typography':
+        specifier: ^0.5.16
+        version: 0.5.16(tailwindcss@4.0.3)
+      tailwindcss-animate:
+        specifier: ^1.0.7
+        version: 1.0.7(tailwindcss@4.0.3)
     devDependencies:
       '@repo/typescript-config':
         specifier: workspace:*
@@ -264,9 +270,6 @@ importers:
       '@repo/typescript-config':
         specifier: workspace:*
         version: link:../config-typescript
-      '@tailwindcss/typography':
-        specifier: ^0.5.15
-        version: 0.5.15(tailwindcss@4.0.3)
       '@types/node':
         specifier: ^22.10.1
         version: 22.10.2
@@ -324,9 +327,6 @@ importers:
       deepmerge:
         specifier: ^4.3.1
         version: 4.3.1
-      tailwindcss-animate:
-        specifier: ^1.0.7
-        version: 1.0.7(tailwindcss@4.0.3)
     devDependencies:
       '@repo/eslint-config':
         specifier: workspace:*
@@ -392,9 +392,6 @@ importers:
       '@repo/tailwind-config':
         specifier: workspace:*
         version: link:../../packages/config-tailwind
-      '@tailwindcss/upgrade':
-        specifier: ^4.0.0
-        version: 4.0.3(babel-plugin-macros@3.1.0)
       '@tanstack/react-query':
         specifier: ^5.64.2
         version: 5.66.0(react@19.0.0)
@@ -441,12 +438,6 @@ importers:
       '@storybook/react':
         specifier: ^8.5.2
         version: 8.5.2(@storybook/test@8.4.7(storybook@8.4.7(prettier@3.4.2)))(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(storybook@8.4.7(prettier@3.4.2))(typescript@5.7.2)
-      '@tailwindcss/typography':
-        specifier: ^0.5.16
-        version: 0.5.16(tailwindcss@4.0.3)
-      '@tailwindcss/vite':
-        specifier: ^4.0.0
-        version: 4.0.3(vite@6.0.3(@types/node@22.10.2)(jiti@2.4.2)(lightningcss@1.29.1)(sass-embedded@1.83.4)(terser@5.37.0)(yaml@2.6.1))
       '@tauri-apps/cli':
         specifier: ^2.2.7
         version: 2.2.7
@@ -3035,19 +3026,10 @@ packages:
     resolution: {integrity: sha512-FFcp3VNvRjjmFA39ORM27g2mbflMQljhvM7gxBAujHxUy4LXlKa6yMF9wbHdTbPqTONiCyyOYxccvJyVyI/XBg==}
     engines: {node: '>= 10'}
 
-  '@tailwindcss/typography@0.5.15':
-    resolution: {integrity: sha512-AqhlCXl+8grUz8uqExv5OTtgpjuVIwFTSXTrh8y9/pw6q2ek7fJ+Y8ZEVw7EB2DCcuCOtEjf9w3+J3rzts01uA==}
-    peerDependencies:
-      tailwindcss: '>=3.0.0 || insiders || >=4.0.0-alpha.20'
-
   '@tailwindcss/typography@0.5.16':
     resolution: {integrity: sha512-0wDLwCVF5V3x3b1SGXPCDcdsbDHMBe+lkFzBRaHeLvNi+nrrnZ1lA18u+OTWO8iSWU2GxUOCvlXtDuqftc1oiA==}
     peerDependencies:
       tailwindcss: '>=3.0.0 || insiders || >=4.0.0-alpha.20 || >=4.0.0-beta.1'
-
-  '@tailwindcss/upgrade@4.0.3':
-    resolution: {integrity: sha512-R3WDKnFHQe3RHX6A60zeNtkYwLn9HukcUvtKBbzvqpkFl/a9s9bKk7JoLRhq+jc3a01I4xuoz9CJhO7mQLA3hg==}
-    hasBin: true
 
   '@tailwindcss/vite@4.0.3':
     resolution: {integrity: sha512-Qj6rSO+EvXnNDymloKZ11D54JJTnDrkRWJBzNHENDxjt0HtrCZJbSLIrcJ/WdaoU4othrel/oFqHpO/doxIS/Q==}
@@ -4871,10 +4853,6 @@ packages:
       node-notifier:
         optional: true
 
-  jiti@2.4.1:
-    resolution: {integrity: sha512-yPBThwecp1wS9DmoA4x4KR2h3QoslacnDR8ypuFM962kI4/456Iy1oHx2RAgh4jfZNdn0bctsdadceiBUgpU1g==}
-    hasBin: true
-
   jiti@2.4.2:
     resolution: {integrity: sha512-rg9zJN+G4n2nfJl5MW3BMygZX56zKPNVEYYqq7adpmMh4Jn2QNEwhvQlFy6jPVdcod7txZtKHWnyZiA3a0zP7A==}
     hasBin: true
@@ -5195,10 +5173,6 @@ packages:
     resolution: {integrity: sha512-qOOzS1cBTWYF4BH8fVePDBOO9iptMnGUEZwNc/cMWnTV2nVLZ7VoNWEPHkYczZA0pdoA7dl6e7FL659nX9S2aw==}
     engines: {node: '>=16 || 14 >=14.17'}
 
-  mri@1.2.0:
-    resolution: {integrity: sha512-tzzskb3bG8LvYGFF/mDTpq3jpI6Q9wc3LEmBaghu+DdCssd1FakN7Bc0hVNmEyGq1bq3RgfkCb3cmQLpNPOroA==}
-    engines: {node: '>=4'}
-
   mrmime@2.0.0:
     resolution: {integrity: sha512-eu38+hdgojoyq63s+yTpN4XMBdt5l8HhMhc4VKLO9KM5caLIBvUm4thi7fFaxyTmCKeNnXZ5pAlBwCUnhA09uw==}
     engines: {node: '>=10'}
@@ -5259,10 +5233,6 @@ packages:
   no-case@3.0.4:
     resolution: {integrity: sha512-fgAN3jGAh+RoxUGZHTSOLJIqUc2wmoBwGR4tbpNAKmmovFoWq0OdRkb0VkldReO2a2iBT/OEulG9XSUc10r3zg==}
 
-  node-addon-api@8.3.0:
-    resolution: {integrity: sha512-8VOpLHFrOQlAH+qA0ZzuGRlALRA6/LVh8QJldbrC4DY0hXoMP0l4Acq8TzFC018HztWiRqyCEj2aTWY2UvnJUg==}
-    engines: {node: ^18 || ^20 || >= 21}
-
   node-fetch@2.7.0:
     resolution: {integrity: sha512-c4FRfUm/dbcWZ7U+1Wq0AwCyFL+3nt2bEw05wfxSz+DWpWsitgmSgYmy2dQdWyKC1694ELPqMs/YzUSNozLt8A==}
     engines: {node: 4.x || >=6.0.0}
@@ -5271,10 +5241,6 @@ packages:
     peerDependenciesMeta:
       encoding:
         optional: true
-
-  node-gyp-build@4.8.4:
-    resolution: {integrity: sha512-LA4ZjwlnUblHVgq0oBF3Jl/6h/Nvs5fzBLwdEF4nuxnFdsfajde4WfxtJr3CaiH+F6ewcIB/q4jQ4UzPyid+CQ==}
-    hasBin: true
 
   node-int64@0.4.0:
     resolution: {integrity: sha512-O5lz91xSOeoXP6DulyHfllpq+Eg00MWitZIbtPfoSEvqIHdl5gfcY6hYzDWnj0qD5tz52PI08u9qUvSVeUBeHw==}
@@ -5420,10 +5386,6 @@ packages:
     engines: {node: '>=0.10'}
     hasBin: true
 
-  pify@2.3.0:
-    resolution: {integrity: sha512-udgsAY+fTnvv7kI7aaxbqwWNb0AHiB0qBO89PZKPkoTmGOgdbrHDKD+0B2X4uTfJ/FT1R09r9gTsjUjNJotuog==}
-    engines: {node: '>=0.10.0'}
-
   pirates@4.0.6:
     resolution: {integrity: sha512-saLsH7WeYYPiD25LDuLRRY/i+6HaPYr6G1OUlN39otzkSTxKnubR9RTxS3/Kk50s1g2JTgFwWQDQyplC5/SHZg==}
     engines: {node: '>= 6'}
@@ -5450,22 +5412,9 @@ packages:
     resolution: {integrity: sha512-d7Uw+eZoloe0EHDIYoe+bQ5WXnGMOpmiZFTuMWCwpjzzkL2nTjcKiAk4hh8TjnGye2TwWOk3UXucZ+3rbmBa8Q==}
     engines: {node: '>= 0.4'}
 
-  postcss-import@16.1.0:
-    resolution: {integrity: sha512-7hsAZ4xGXl4MW+OKEWCnF6T5jqBw80/EE9aXg1r2yyn1RsVEU8EtKXbijEODa+rg7iih4bKf7vlvTGYR4CnPNg==}
-    engines: {node: '>=18.0.0'}
-    peerDependencies:
-      postcss: ^8.0.0
-
   postcss-selector-parser@6.0.10:
     resolution: {integrity: sha512-IQ7TZdoaqbT+LCpShg46jnZVlhWD2w6iQYAcYXfHARZ7X1t/UGhhceQDs5X0cGqKvYlHNOuv7Oa1xmb0oQuA3w==}
     engines: {node: '>=4'}
-
-  postcss-selector-parser@7.0.0:
-    resolution: {integrity: sha512-9RbEr1Y7FFfptd/1eEdntyjMwLeghW1bHX9GWjXo19vx4ytPQhANltvVxDggzJl7mnWM+dX28kb6cyS/4iQjlQ==}
-    engines: {node: '>=4'}
-
-  postcss-value-parser@4.2.0:
-    resolution: {integrity: sha512-1NNCs6uurfkVbeXG4S8JFT9t19m45ICnif8zWLd5oPSZ50QnwMfK+H3jv408d4jw/7Bttv5axS5IiHoLaVNHeQ==}
 
   postcss@8.4.31:
     resolution: {integrity: sha512-PS08Iboia9mts/2ygV3eLpY5ghnUcfLV/EXTOW1E2qYxJKGGBUtNjN76FYHnMs36RmARn41bC0AZmn+rR0OVpQ==}
@@ -5710,9 +5659,6 @@ packages:
   react@19.0.0:
     resolution: {integrity: sha512-V8AVnmPIICiWpGfm6GLzCR/W5FXLchHop40W4nXBmdlEceh16rCN8O8LNWm5bh5XUX91fh7KpA+W0TgMKmgTpQ==}
     engines: {node: '>=0.10.0'}
-
-  read-cache@1.0.0:
-    resolution: {integrity: sha512-Owdv/Ft7IjOgm/i0xvNDZ1LrRANRfew4b2prF3OWMQLxLfu3bS8FVhCsrSCMK4lR56Y9ya+AThoTpDCTxCmpRA==}
 
   recast@0.23.9:
     resolution: {integrity: sha512-Hx/BGIbwj+Des3+xy5uAtAbdCyqK9y9wbBcDFDYanLS9JnMqf7OeF87HQwUimE87OEc72mr6tkKUKMBBL+hF9Q==}
@@ -6296,25 +6242,6 @@ packages:
   tr46@5.0.0:
     resolution: {integrity: sha512-tk2G5R2KRwBd+ZN0zaEXpmzdKyOYksXwywulIX95MBODjSzMIuQnQ3m8JxgbhnL1LeVo7lqQKsYa1O3Htl7K5g==}
     engines: {node: '>=18'}
-
-  tree-sitter-javascript@0.23.1:
-    resolution: {integrity: sha512-/bnhbrTD9frUYHQTiYnPcxyHORIw157ERBa6dqzaKxvR/x3PC4Yzd+D1pZIMS6zNg2v3a8BZ0oK7jHqsQo9fWA==}
-    peerDependencies:
-      tree-sitter: ^0.21.1
-    peerDependenciesMeta:
-      tree-sitter:
-        optional: true
-
-  tree-sitter-typescript@0.23.2:
-    resolution: {integrity: sha512-e04JUUKxTT53/x3Uq1zIL45DoYKVfHH4CZqwgZhPg5qYROl5nQjV+85ruFzFGZxu+QeFVbRTPDRnqL9UbU4VeA==}
-    peerDependencies:
-      tree-sitter: ^0.21.0
-    peerDependenciesMeta:
-      tree-sitter:
-        optional: true
-
-  tree-sitter@0.22.4:
-    resolution: {integrity: sha512-usbHZP9/oxNsUY65MQUsduGRqDHQOou1cagUSwjhoSYAmSahjQDAVsh9s+SlZkn8X8+O1FULRGwHu7AFP3kjzg==}
 
   ts-api-utils@1.4.3:
     resolution: {integrity: sha512-i3eMG77UTMD0hZhgRS562pv83RC6ukSAC2GMNWc+9dieh/+jDM5u5YG+NHX6VNDRHQcHwmsTHctP9LhbC3WxVw==}
@@ -9481,14 +9408,6 @@ snapshots:
       '@tailwindcss/oxide-win32-arm64-msvc': 4.0.3
       '@tailwindcss/oxide-win32-x64-msvc': 4.0.3
 
-  '@tailwindcss/typography@0.5.15(tailwindcss@4.0.3)':
-    dependencies:
-      lodash.castarray: 4.4.0
-      lodash.isplainobject: 4.0.6
-      lodash.merge: 4.6.2
-      postcss-selector-parser: 6.0.10
-      tailwindcss: 4.0.3
-
   '@tailwindcss/typography@0.5.16(tailwindcss@4.0.3)':
     dependencies:
       lodash.castarray: 4.4.0
@@ -9496,27 +9415,6 @@ snapshots:
       lodash.merge: 4.6.2
       postcss-selector-parser: 6.0.10
       tailwindcss: 4.0.3
-
-  '@tailwindcss/upgrade@4.0.3(babel-plugin-macros@3.1.0)':
-    dependencies:
-      '@tailwindcss/node': 4.0.3
-      '@tailwindcss/oxide': 4.0.3
-      braces: 3.0.3
-      dedent: 1.5.3(babel-plugin-macros@3.1.0)
-      enhanced-resolve: 5.18.0
-      globby: 14.0.2
-      jiti: 2.4.1
-      mri: 1.2.0
-      picocolors: 1.1.1
-      postcss: 8.4.49
-      postcss-import: 16.1.0(postcss@8.4.49)
-      postcss-selector-parser: 7.0.0
-      prettier: 3.4.2
-      tailwindcss: 4.0.3
-      tree-sitter: 0.22.4
-      tree-sitter-typescript: 0.23.2(tree-sitter@0.22.4)
-    transitivePeerDependencies:
-      - babel-plugin-macros
 
   '@tailwindcss/vite@4.0.3(vite@6.0.3(@types/node@22.10.2)(jiti@2.4.2)(lightningcss@1.29.1)(sass-embedded@1.83.4)(terser@5.37.0)(yaml@2.6.1))':
     dependencies:
@@ -11671,8 +11569,6 @@ snapshots:
       - supports-color
       - ts-node
 
-  jiti@2.4.1: {}
-
   jiti@2.4.2: {}
 
   js-tokens@4.0.0: {}
@@ -11967,8 +11863,6 @@ snapshots:
 
   minipass@7.1.2: {}
 
-  mri@1.2.0: {}
-
   mrmime@2.0.0: {}
 
   ms@2.1.3: {}
@@ -12038,13 +11932,9 @@ snapshots:
       lower-case: 2.0.2
       tslib: 2.8.1
 
-  node-addon-api@8.3.0: {}
-
   node-fetch@2.7.0:
     dependencies:
       whatwg-url: 5.0.0
-
-  node-gyp-build@4.8.4: {}
 
   node-int64@0.4.0: {}
 
@@ -12169,8 +12059,6 @@ snapshots:
 
   pidtree@0.6.0: {}
 
-  pify@2.3.0: {}
-
   pirates@4.0.6: {}
 
   pkg-dir@4.2.0:
@@ -12191,24 +12079,10 @@ snapshots:
 
   possible-typed-array-names@1.0.0: {}
 
-  postcss-import@16.1.0(postcss@8.4.49):
-    dependencies:
-      postcss: 8.4.49
-      postcss-value-parser: 4.2.0
-      read-cache: 1.0.0
-      resolve: 1.22.9
-
   postcss-selector-parser@6.0.10:
     dependencies:
       cssesc: 3.0.0
       util-deprecate: 1.0.2
-
-  postcss-selector-parser@7.0.0:
-    dependencies:
-      cssesc: 3.0.0
-      util-deprecate: 1.0.2
-
-  postcss-value-parser@4.2.0: {}
 
   postcss@8.4.31:
     dependencies:
@@ -12387,10 +12261,6 @@ snapshots:
       loose-envify: 1.4.0
 
   react@19.0.0: {}
-
-  read-cache@1.0.0:
-    dependencies:
-      pify: 2.3.0
 
   recast@0.23.9:
     dependencies:
@@ -12961,26 +12831,6 @@ snapshots:
   tr46@5.0.0:
     dependencies:
       punycode: 2.3.1
-
-  tree-sitter-javascript@0.23.1(tree-sitter@0.22.4):
-    dependencies:
-      node-addon-api: 8.3.0
-      node-gyp-build: 4.8.4
-    optionalDependencies:
-      tree-sitter: 0.22.4
-
-  tree-sitter-typescript@0.23.2(tree-sitter@0.22.4):
-    dependencies:
-      node-addon-api: 8.3.0
-      node-gyp-build: 4.8.4
-      tree-sitter-javascript: 0.23.1(tree-sitter@0.22.4)
-    optionalDependencies:
-      tree-sitter: 0.22.4
-
-  tree-sitter@0.22.4:
-    dependencies:
-      node-addon-api: 8.3.0
-      node-gyp-build: 4.8.4
 
   ts-api-utils@1.4.3(typescript@5.7.2):
     dependencies:
