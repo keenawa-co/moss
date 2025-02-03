@@ -42,11 +42,15 @@ const buttonRootStyles = cva(
       },
       disabled: {
         false: null,
-        true: ["opacity-40", "cursor-not-allowed"],
+        true: "opacity-40 cursor-not-allowed",
       },
       loading: {
         false: null,
-        true: ["[&>:not(.LoadingIcon)]:opacity-0 cursor-progress "],
+        true: "[&>:not(.LoadingIcon)]:opacity-0 cursor-progress",
+      },
+      Component: {
+        a: "max-w-max",
+        button: null,
       },
     },
   }
@@ -77,7 +81,7 @@ export const Root = forwardRef<HTMLButtonElement & HTMLAnchorElement, ButtonProp
       <Component
         ref={forwardedRef}
         href={href}
-        className={cn(buttonRootStyles({ intent, variant, size, disabled, loading, className }), buttonSize)}
+        className={cn(buttonRootStyles({ intent, variant, size, disabled, loading, className, Component }), buttonSize)}
         disabled={disabled || loading}
         {...props}
       >

@@ -104,7 +104,7 @@ const meta: Meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Buttons: Story = {
+export const Primary: Story = {
   render: (args) => {
     return (
       <Button.Root {...args}>
