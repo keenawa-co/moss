@@ -129,7 +129,9 @@ export const Root = forwardRef<HTMLButtonElement & HTMLAnchorElement, ButtonProp
     forwardedRef
   ) => {
     const Component = href ? "a" : "button";
-    const iconOnly = Children.toArray(children).some((child) => isValidElement(child) && child.type === Icon);
+    const iconOnly =
+      Children.toArray(children).length === 1 &&
+      Children.toArray(children).some((child) => isValidElement(child) && child.type === Icon);
 
     return (
       <Component
