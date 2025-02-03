@@ -34,11 +34,11 @@ const buttonRootStyles = cva(
         ghost: "text-(--bg) hover:background-(--ring) focus:ring-transparent",
       },
       size: {
-        "xs": "h-7 px-3",
-        "sm": "h-8 px-3.5",
-        "md": "h-9 px-4",
-        "lg": "h-10 px-5",
-        "xl": "h-12 px-6",
+        "xs": "h-7",
+        "sm": "h-8",
+        "md": "h-9",
+        "lg": "h-10",
+        "xl": "h-12",
       },
       disabled: {
         false: null,
@@ -52,7 +52,64 @@ const buttonRootStyles = cva(
         a: "max-w-max",
         button: null,
       },
+      iconOnly: {
+        false: "notOnlyIcon",
+        true: "iconOnly",
+      },
     },
+    compoundVariants: [
+      {
+        iconOnly: true,
+        size: "xs",
+        className: "px-1.5",
+      },
+      {
+        iconOnly: false,
+        size: "xs",
+        className: "px-3",
+      },
+      {
+        iconOnly: true,
+        size: "sm",
+        className: "px-2",
+      },
+      {
+        iconOnly: false,
+        size: "sm",
+        className: "px-3.5",
+      },
+
+      {
+        iconOnly: true,
+        size: "md",
+        className: "px-2.5",
+      },
+      {
+        iconOnly: false,
+        size: "md",
+        className: " px-4",
+      },
+      {
+        iconOnly: true,
+        size: "lg",
+        className: "px-3",
+      },
+      {
+        iconOnly: false,
+        size: "lg",
+        className: " px-5",
+      },
+      {
+        iconOnly: true,
+        size: "xl",
+        className: "px-4",
+      },
+      {
+        iconOnly: false,
+        size: "xl",
+        className: "px-6",
+      },
+    ],
   }
 );
 
@@ -72,16 +129,13 @@ export const Root = forwardRef<HTMLButtonElement & HTMLAnchorElement, ButtonProp
     forwardedRef
   ) => {
     const Component = href ? "a" : "button";
-    const iconOnly = Children.toArray(children).some(
-      (child) => isValidElement(child) && child.type === Icon && child.props.type === "only"
-    );
-    const buttonSize = iconOnly ? "iconOnlyButtonSize" : "size";
+    const iconOnly = Children.toArray(children).some((child) => isValidElement(child) && child.type === Icon);
 
     return (
       <Component
         ref={forwardedRef}
         href={href}
-        className={cn(buttonRootStyles({ intent, variant, size, disabled, loading, className, Component }), buttonSize)}
+        className={cn(buttonRootStyles({ intent, variant, size, disabled, loading, className, Component, iconOnly }))}
         disabled={disabled || loading}
         {...props}
       >
