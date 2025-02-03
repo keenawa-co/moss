@@ -1,14 +1,13 @@
-import { ComponentPropsWithoutRef, createContext, ElementRef, forwardRef, useContext } from "react";
+import { ComponentPropsWithoutRef, createContext, ElementRef, forwardRef } from "react";
 
 import * as RadioGroupPrimitive from "@radix-ui/react-radio-group";
 import { cn } from "@repo/moss-ui";
-import { radio, type RadioProps } from "@tailus/themer";
 
-export interface RadioRootProps extends RadioProps {
+export interface RadioRootProps {
   className?: string;
 }
 
-const RadioGroupContext = createContext<RadioRootProps>({ fancy: false, intent: "primary" });
+const RadioGroupContext = createContext<RadioRootProps>({});
 
 const Root = forwardRef<
   ElementRef<typeof RadioGroupPrimitive.Root>,
@@ -25,7 +24,7 @@ export interface RadioItemProps {
   className?: string;
 }
 
-const defaultRadioGroupItemStyles = `size-4 border bg-white shadow-sm group rounded-full peer flex justify-center items-center outline-2 outline-blue-600 outline-offset-2
+const defaultRadioGroupItemStyles = `size-4 border bg-white shadow-sm group rounded-full peer flex justify-center items-center focus-visible:outline-2 focus-visible:outline-blue-600 focus-visible:outline-offset-2
  hover:brightness-95
  focus-visible:outline
  bg-gray-500/10
@@ -57,20 +56,11 @@ const Item = forwardRef<
 
 const Indicator = forwardRef<
   ElementRef<typeof RadioGroupPrimitive.Indicator>,
-  ComponentPropsWithoutRef<typeof RadioGroupPrimitive.Indicator> &
-    RadioProps & {
-      className?: string;
-    }
+  ComponentPropsWithoutRef<typeof RadioGroupPrimitive.Indicator> & {
+    className?: string;
+  }
 >((props, forwardedRef) => {
-  const { intent } = useContext(RadioGroupContext);
-  const { indicator } = radio({ intent });
-  return (
-    <RadioGroupPrimitive.Indicator
-      {...props}
-      ref={forwardedRef}
-      className={indicator({ intent: props.intent, className: props.className })}
-    />
-  );
+  return <RadioGroupPrimitive.Indicator {...props} ref={forwardedRef} className={props.className} />;
 });
 
 export { Root, Item, Indicator };

@@ -22,7 +22,6 @@
     "@reduxjs/toolkit": "^2.5.1",
     "@repo/moss-tabs": "workspace:*",
     "@repo/moss-ui": "workspace:*",
-    "@tailus/themer": "^0.1.8",
     "@repo/tailwind-config": "workspace:*",
     "@tanstack/react-query": "^5.64.2",
     "@tanstack/react-query-devtools": "^5.64.2",
