@@ -1,4 +1,4 @@
-import * as React from "react";
+import React from "react";
 
 import { Emitter as DockviewEmitter, Event as DockviewEvent } from "../events";
 import { PanelUpdateEvent } from "../panel/types";

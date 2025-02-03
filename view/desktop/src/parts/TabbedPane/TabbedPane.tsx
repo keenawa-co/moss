@@ -1,4 +1,4 @@
-import * as React from "react";
+import React from "react";
 
 import { Home, Logs, Settings } from "@/pages";
 import {
@@ -18,6 +18,7 @@ import { defaultConfig } from "./defaultLayout";
 import { GridActions } from "./gridActions";
 import { GroupActions } from "./groupActions";
 import { PanelActions } from "./panelActions";
+import { setGridState } from "./utils";
 
 import "./assets/styles.css";
 
@@ -43,9 +44,9 @@ const components = {
 
     return (
       <div
-        className={`p-1.25 relative h-full overflow-auto ${isDebug ? "border-2 border-dashed border-orange-500" : ""}`}
+        className={`relative h-full overflow-auto p-1.25 ${isDebug ? "border-2 border-dashed border-orange-500" : ""}`}
       >
-        <span className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transform text-[42px] opacity-50">
+        <span className="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 transform text-[42px] opacity-50">
           {props.api.title}
         </span>
 
@@ -54,7 +55,9 @@ const components = {
             <Option
               title="Panel Rendering Mode"
               value={metadata.renderer.value}
-              onClick={() => props.api.setRenderer(props.api.renderer === "always" ? "onlyWhenVisible" : "always")}
+              onClick={() => {
+                props.api.setRenderer(props.api.renderer === "always" ? "onlyWhenVisible" : "always");
+              }}
             />
 
             <Table data={metadata} />
@@ -109,9 +112,12 @@ const components = {
 function RenderPage(props: IDockviewPanelProps, page: React.FC) {
   const isDebug = React.useContext(DebugContext);
   const metadata = usePanelApiMetadata(props.api);
+
+  setGridState(props.containerApi);
+
   return (
     <div
-      className={`p-1.25 relative h-full overflow-auto ${isDebug ? "border-2 border-dashed border-orange-500" : ""}`}
+      className={`relative h-full overflow-auto p-1.25 ${isDebug ? "border-2 border-dashed border-orange-500" : ""}`}
     >
       <span>{React.createElement(page)}</span>
 
@@ -120,7 +126,9 @@ function RenderPage(props: IDockviewPanelProps, page: React.FC) {
           <Option
             title="Panel Rendering Mode"
             value={metadata.renderer.value}
-            onClick={() => props.api.setRenderer(props.api.renderer === "always" ? "onlyWhenVisible" : "always")}
+            onClick={() => {
+              props.api.setRenderer(props.api.renderer === "always" ? "onlyWhenVisible" : "always");
+            }}
           />
 
           <Table data={metadata} />
@@ -151,7 +159,7 @@ const colors = [
 let count = 0;
 
 const WatermarkComponent = () => {
-  return <div>custom watermark</div>;
+  return <div className="bg-red-200">Custom Watermark</div>;
 };
 
 const TabbedPane = (props: { theme?: string }) => {
@@ -242,18 +250,6 @@ const TabbedPane = (props: { theme?: string }) => {
     ];
 
     const loadLayout = () => {
-      const state = localStorage.getItem("dv-demo-state");
-
-      if (state) {
-        try {
-          api.fromJSON(JSON.parse(state));
-          return;
-        } catch {
-          localStorage.removeItem("dv-demo-state");
-        }
-        return;
-      }
-
       defaultConfig(api);
     };
 
@@ -325,7 +321,7 @@ const TabbedPane = (props: { theme?: string }) => {
 
   return (
     <div
-      className="dockview-demo relative flex h-full flex-grow flex-col rounded bg-[rgba(0,0,50,0.25)] p-2"
+      className="dockview-demo relative flex h-full grow flex-col rounded bg-[rgba(0,0,50,0.25)] p-2"
       style={{
         ...css,
       }}
@@ -373,8 +369,8 @@ const TabbedPane = (props: { theme?: string }) => {
           <span className="material-symbols-outlined">terminal</span>
         </button>
       </div>
-      <div className="flex h-0 flex-grow">
-        <div className="flex h-full flex-grow overflow-hidden">
+      <div className="flex h-0 grow">
+        <div className="flex h-full grow overflow-hidden">
           <DebugContext.Provider value={debug}>
             <DockviewReact
               ref={dockviewRef}
@@ -385,25 +381,25 @@ const TabbedPane = (props: { theme?: string }) => {
               prefixHeaderActionsComponent={PrefixHeaderControls}
               watermarkComponent={watermark ? WatermarkComponent : undefined}
               onReady={onReady}
-              className={props.theme || "dockview-theme-abyss"}
+              className={props.theme || "dockview-theme-light"}
               onDidDrop={onDidDrop}
             />
           </DebugContext.Provider>
         </div>
 
         {showLogs && (
-          <div className="ml-2 flex w-[400px] flex-shrink-0 flex-col overflow-hidden bg-black font-mono text-white">
-            <div className="flex-grow overflow-auto">
+          <div className="ml-2 flex w-[400px] shrink-0 flex-col overflow-hidden bg-black font-mono text-white">
+            <div className="grow overflow-auto">
               {logLines.map((line, i) => {
                 return (
                   <div
-                    className="flex h-[30px] items-center overflow-hidden text-ellipsis whitespace-nowrap text-[13px]"
+                    className="flex h-[30px] items-center overflow-hidden text-[13px] text-ellipsis whitespace-nowrap"
                     style={{
                       backgroundColor: line.backgroundColor,
                     }}
                     key={i}
                   >
-                    <span className="mr-1 flex h-full min-w-[20px] max-w-[20px] items-center border-r border-gray-500 pl-1 text-gray-500">
+                    <span className="mr-1 flex h-full max-w-[20px] min-w-[20px] items-center border-r border-gray-500 pl-1 text-gray-500">
                       {logLines.length - i}
                     </span>
                     <span>
@@ -417,7 +413,13 @@ const TabbedPane = (props: { theme?: string }) => {
               })}
             </div>
             <div className="flex justify-end p-1">
-              <button onClick={() => setLogLines([])}>Clear</button>
+              <button
+                onClick={() => {
+                  setLogLines([]);
+                }}
+              >
+                Clear
+              </button>
             </div>
           </div>
         )}

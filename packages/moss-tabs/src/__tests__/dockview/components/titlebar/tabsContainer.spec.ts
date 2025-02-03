@@ -1,3 +1,5 @@
+import { beforeEach, describe, expect, test, vi } from "vitest";
+
 import { fireEvent } from "@testing-library/dom";
 import { fromPartial } from "@total-typescript/shoehorn";
 
@@ -13,20 +15,20 @@ import { TestPanel } from "../../dockviewGroupPanelModel.spec";
 describe("tabsContainer", () => {
   test("that an external event does not render a drop target and calls through to the group mode", () => {
     const accessor = fromPartial<DockviewComponent>({
-      onDidAddPanel: jest.fn(),
-      onDidRemovePanel: jest.fn(),
+      onDidAddPanel: vi.fn(),
+      onDidRemovePanel: vi.fn(),
       options: {},
     });
 
-    const groupviewMock = jest.fn<Partial<DockviewGroupPanelModel>, []>(() => {
+    const groupviewMock = vi.fn<Partial<DockviewGroupPanelModel>, []>(() => {
       return {
-        canDisplayOverlay: jest.fn(),
+        canDisplayOverlay: vi.fn(),
       };
     });
 
     const groupView = new groupviewMock() as DockviewGroupPanelModel;
 
-    const groupPanelMock = jest.fn<Partial<DockviewGroupPanel>, []>(() => {
+    const groupPanelMock = vi.fn<Partial<DockviewGroupPanel>, []>(() => {
       return {
         model: groupView,
       };
@@ -42,8 +44,8 @@ describe("tabsContainer", () => {
       fail("element not found");
     }
 
-    jest.spyOn(emptySpace!, "clientHeight", "get").mockImplementation(() => 100);
-    jest.spyOn(emptySpace!, "clientWidth", "get").mockImplementation(() => 100);
+    vi.spyOn(emptySpace!, "clientHeight", "get").mockImplementation(() => 100);
+    vi.spyOn(emptySpace!, "clientWidth", "get").mockImplementation(() => 100);
 
     fireEvent.dragEnter(emptySpace!);
     fireEvent.dragOver(emptySpace!);
@@ -56,20 +58,20 @@ describe("tabsContainer", () => {
   test("that a drag over event from another tab should render a drop target", () => {
     const accessor = fromPartial<DockviewComponent>({
       id: "testcomponentid",
-      onDidAddPanel: jest.fn(),
-      onDidRemovePanel: jest.fn(),
+      onDidAddPanel: vi.fn(),
+      onDidRemovePanel: vi.fn(),
       options: {},
     });
 
-    const groupviewMock = jest.fn<Partial<DockviewGroupPanelModel>, []>(() => {
+    const groupviewMock = vi.fn<Partial<DockviewGroupPanelModel>, []>(() => {
       return {
-        canDisplayOverlay: jest.fn(),
+        canDisplayOverlay: vi.fn(),
       };
     });
 
     const groupView = new groupviewMock() as DockviewGroupPanelModel;
 
-    const groupPanelMock = jest.fn<Partial<DockviewGroupPanel>, []>(() => {
+    const groupPanelMock = vi.fn<Partial<DockviewGroupPanel>, []>(() => {
       return {
         id: "testgroupid",
         model: groupView,
@@ -87,8 +89,8 @@ describe("tabsContainer", () => {
       fail("element not found");
     }
 
-    jest.spyOn(emptySpace!, "clientHeight", "get").mockImplementation(() => 100);
-    jest.spyOn(emptySpace!, "clientWidth", "get").mockImplementation(() => 100);
+    vi.spyOn(emptySpace!, "clientHeight", "get").mockImplementation(() => 100);
+    vi.spyOn(emptySpace!, "clientWidth", "get").mockImplementation(() => 100);
 
     LocalSelectionTransfer.getInstance().setData(
       [new PanelTransfer("testcomponentid", "anothergroupid", "anotherpanelid")],
@@ -106,20 +108,20 @@ describe("tabsContainer", () => {
   test("that dropping over the empty space should render a drop target", () => {
     const accessor = fromPartial<DockviewComponent>({
       id: "testcomponentid",
-      onDidAddPanel: jest.fn(),
-      onDidRemovePanel: jest.fn(),
+      onDidAddPanel: vi.fn(),
+      onDidRemovePanel: vi.fn(),
       options: {},
     });
 
-    const groupviewMock = jest.fn<Partial<DockviewGroupPanelModel>, []>(() => {
+    const groupviewMock = vi.fn<Partial<DockviewGroupPanelModel>, []>(() => {
       return {
-        canDisplayOverlay: jest.fn(),
+        canDisplayOverlay: vi.fn(),
       };
     });
 
     const groupView = new groupviewMock() as DockviewGroupPanelModel;
 
-    const groupPanelMock = jest.fn<Partial<DockviewGroupPanel>, []>(() => {
+    const groupPanelMock = vi.fn<Partial<DockviewGroupPanel>, []>(() => {
       return {
         id: "testgroupid",
         model: groupView,
@@ -131,8 +133,8 @@ describe("tabsContainer", () => {
 
     const cut = new TabsContainer(accessor, groupPanel);
 
-    cut.openPanel(new TestPanel("panel1", jest.fn() as any));
-    cut.openPanel(new TestPanel("panel2", jest.fn() as any));
+    cut.openPanel(new TestPanel("panel1", vi.fn() as any));
+    cut.openPanel(new TestPanel("panel2", vi.fn() as any));
 
     const emptySpace = cut.element.getElementsByClassName("dv-void-container").item(0);
 
@@ -140,8 +142,8 @@ describe("tabsContainer", () => {
       fail("element not found");
     }
 
-    jest.spyOn(emptySpace!, "clientHeight", "get").mockImplementation(() => 100);
-    jest.spyOn(emptySpace!, "clientWidth", "get").mockImplementation(() => 100);
+    vi.spyOn(emptySpace!, "clientHeight", "get").mockImplementation(() => 100);
+    vi.spyOn(emptySpace!, "clientWidth", "get").mockImplementation(() => 100);
 
     LocalSelectionTransfer.getInstance().setData(
       [new PanelTransfer("testcomponentid", "anothergroupid", "panel2")],
@@ -159,20 +161,20 @@ describe("tabsContainer", () => {
   test("that dropping the first tab should render a drop target", () => {
     const accessor = fromPartial<DockviewComponent>({
       id: "testcomponentid",
-      onDidAddPanel: jest.fn(),
-      onDidRemovePanel: jest.fn(),
+      onDidAddPanel: vi.fn(),
+      onDidRemovePanel: vi.fn(),
       options: {},
     });
 
-    const groupviewMock = jest.fn<Partial<DockviewGroupPanelModel>, []>(() => {
+    const groupviewMock = vi.fn<Partial<DockviewGroupPanelModel>, []>(() => {
       return {
-        canDisplayOverlay: jest.fn(),
+        canDisplayOverlay: vi.fn(),
       };
     });
 
     const groupView = new groupviewMock() as DockviewGroupPanelModel;
 
-    const groupPanelMock = jest.fn<Partial<DockviewGroupPanel>, []>(() => {
+    const groupPanelMock = vi.fn<Partial<DockviewGroupPanel>, []>(() => {
       return {
         id: "testgroupid",
         model: groupView,
@@ -184,8 +186,8 @@ describe("tabsContainer", () => {
 
     const cut = new TabsContainer(accessor, groupPanel);
 
-    cut.openPanel(new TestPanel("panel1", jest.fn() as any));
-    cut.openPanel(new TestPanel("panel2", jest.fn() as any));
+    cut.openPanel(new TestPanel("panel1", vi.fn() as any));
+    cut.openPanel(new TestPanel("panel2", vi.fn() as any));
 
     const emptySpace = cut.element.getElementsByClassName("dv-void-container").item(0);
 
@@ -193,8 +195,8 @@ describe("tabsContainer", () => {
       fail("element not found");
     }
 
-    jest.spyOn(emptySpace!, "clientHeight", "get").mockImplementation(() => 100);
-    jest.spyOn(emptySpace!, "clientWidth", "get").mockImplementation(() => 100);
+    vi.spyOn(emptySpace!, "clientHeight", "get").mockImplementation(() => 100);
+    vi.spyOn(emptySpace!, "clientWidth", "get").mockImplementation(() => 100);
 
     LocalSelectionTransfer.getInstance().setData(
       [new PanelTransfer("testcomponentid", "anothergroupid", "panel1")],
@@ -212,20 +214,20 @@ describe("tabsContainer", () => {
   test("that dropping a tab from another component should not render a drop target", () => {
     const accessor = fromPartial<DockviewComponent>({
       id: "testcomponentid",
-      onDidAddPanel: jest.fn(),
-      onDidRemovePanel: jest.fn(),
+      onDidAddPanel: vi.fn(),
+      onDidRemovePanel: vi.fn(),
       options: {},
     });
 
-    const groupviewMock = jest.fn<Partial<DockviewGroupPanelModel>, []>(() => {
+    const groupviewMock = vi.fn<Partial<DockviewGroupPanelModel>, []>(() => {
       return {
-        canDisplayOverlay: jest.fn(),
+        canDisplayOverlay: vi.fn(),
       };
     });
 
     const groupView = new groupviewMock() as DockviewGroupPanelModel;
 
-    const groupPanelMock = jest.fn<Partial<DockviewGroupPanel>, []>(() => {
+    const groupPanelMock = vi.fn<Partial<DockviewGroupPanel>, []>(() => {
       return {
         id: "testgroupid",
         model: groupView,
@@ -236,8 +238,8 @@ describe("tabsContainer", () => {
 
     const cut = new TabsContainer(accessor, groupPanel);
 
-    cut.openPanel(new TestPanel("panel1", jest.fn() as any));
-    cut.openPanel(new TestPanel("panel2", jest.fn() as any));
+    cut.openPanel(new TestPanel("panel1", vi.fn() as any));
+    cut.openPanel(new TestPanel("panel2", vi.fn() as any));
 
     const emptySpace = cut.element.getElementsByClassName("dv-void-container").item(0);
 
@@ -245,8 +247,8 @@ describe("tabsContainer", () => {
       fail("element not found");
     }
 
-    jest.spyOn(emptySpace!, "clientHeight", "get").mockImplementation(() => 100);
-    jest.spyOn(emptySpace!, "clientWidth", "get").mockImplementation(() => 100);
+    vi.spyOn(emptySpace!, "clientHeight", "get").mockImplementation(() => 100);
+    vi.spyOn(emptySpace!, "clientWidth", "get").mockImplementation(() => 100);
 
     LocalSelectionTransfer.getInstance().setData(
       [new PanelTransfer("anothercomponentid", "anothergroupid", "panel1")],
@@ -264,12 +266,12 @@ describe("tabsContainer", () => {
   test("left actions", () => {
     const accessor = fromPartial<DockviewComponent>({
       id: "testcomponentid",
-      onDidAddPanel: jest.fn(),
-      onDidRemovePanel: jest.fn(),
+      onDidAddPanel: vi.fn(),
+      onDidRemovePanel: vi.fn(),
       options: {},
     });
 
-    const groupPanelMock = jest.fn<DockviewGroupPanel, []>(() => {
+    const groupPanelMock = vi.fn<DockviewGroupPanel, []>(() => {
       return (<Partial<DockviewGroupPanel>>{}) as DockviewGroupPanel;
     });
 
@@ -316,12 +318,12 @@ describe("tabsContainer", () => {
   test("right actions", () => {
     const accessor = fromPartial<DockviewComponent>({
       id: "testcomponentid",
-      onDidAddPanel: jest.fn(),
-      onDidRemovePanel: jest.fn(),
+      onDidAddPanel: vi.fn(),
+      onDidRemovePanel: vi.fn(),
       options: {},
     });
 
-    const groupPanelMock = jest.fn<DockviewGroupPanel, []>(() => {
+    const groupPanelMock = vi.fn<DockviewGroupPanel, []>(() => {
       return (<Partial<DockviewGroupPanel>>{}) as DockviewGroupPanel;
     });
 
@@ -368,14 +370,14 @@ describe("tabsContainer", () => {
   test("that a tab will become floating when clicked if not floating and shift is selected", () => {
     const accessor = fromPartial<DockviewComponent>({
       options: {},
-      onDidAddPanel: jest.fn(),
-      onDidRemovePanel: jest.fn(),
+      onDidAddPanel: vi.fn(),
+      onDidRemovePanel: vi.fn(),
       element: document.createElement("div"),
-      addFloatingGroup: jest.fn(),
-      doSetGroupActive: jest.fn(),
+      addFloatingGroup: vi.fn(),
+      doSetGroupActive: vi.fn(),
     });
 
-    const groupPanelMock = jest.fn<DockviewGroupPanel, []>(() => {
+    const groupPanelMock = vi.fn<DockviewGroupPanel, []>(() => {
       return (<Partial<DockviewGroupPanel>>{
         api: { location: { type: "grid" } } as any,
       }) as DockviewGroupPanel;
@@ -388,15 +390,15 @@ describe("tabsContainer", () => {
     const container = cut.element.querySelector(".dv-void-container")!;
     expect(container).toBeTruthy();
 
-    jest.spyOn(cut.element, "getBoundingClientRect").mockImplementation(() => {
+    vi.spyOn(cut.element, "getBoundingClientRect").mockImplementation(() => {
       return { top: 50, left: 100, width: 0, height: 0 } as any;
     });
-    jest.spyOn(accessor.element, "getBoundingClientRect").mockImplementation(() => {
+    vi.spyOn(accessor.element, "getBoundingClientRect").mockImplementation(() => {
       return { top: 10, left: 20, width: 0, height: 0 } as any;
     });
 
     const event = new KeyboardEvent("pointerdown", { shiftKey: true });
-    const eventPreventDefaultSpy = jest.spyOn(event, "preventDefault");
+    const eventPreventDefaultSpy = vi.spyOn(event, "preventDefault");
     fireEvent(container, event);
 
     expect(accessor.doSetGroupActive).toHaveBeenCalledWith(groupPanel);
@@ -409,7 +411,7 @@ describe("tabsContainer", () => {
     expect(eventPreventDefaultSpy).toHaveBeenCalledTimes(1);
 
     const event2 = new KeyboardEvent("pointerdown", { shiftKey: false });
-    const eventPreventDefaultSpy2 = jest.spyOn(event2, "preventDefault");
+    const eventPreventDefaultSpy2 = vi.spyOn(event2, "preventDefault");
     fireEvent(container, event2);
 
     expect(accessor.addFloatingGroup).toHaveBeenCalledTimes(1);
@@ -419,14 +421,14 @@ describe("tabsContainer", () => {
   test("that a tab that is already floating cannot be floated again", () => {
     const accessor = fromPartial<DockviewComponent>({
       options: {},
-      onDidAddPanel: jest.fn(),
-      onDidRemovePanel: jest.fn(),
+      onDidAddPanel: vi.fn(),
+      onDidRemovePanel: vi.fn(),
       element: document.createElement("div"),
-      addFloatingGroup: jest.fn(),
-      doSetGroupActive: jest.fn(),
+      addFloatingGroup: vi.fn(),
+      doSetGroupActive: vi.fn(),
     });
 
-    const groupPanelMock = jest.fn<DockviewGroupPanel, []>(() => {
+    const groupPanelMock = vi.fn<DockviewGroupPanel, []>(() => {
       return (<Partial<DockviewGroupPanel>>{
         api: { location: { type: "floating" } } as any,
       }) as DockviewGroupPanel;
@@ -439,15 +441,15 @@ describe("tabsContainer", () => {
     const container = cut.element.querySelector(".dv-void-container")!;
     expect(container).toBeTruthy();
 
-    jest.spyOn(cut.element, "getBoundingClientRect").mockImplementation(() => {
+    vi.spyOn(cut.element, "getBoundingClientRect").mockImplementation(() => {
       return { top: 50, left: 100, width: 0, height: 0 } as any;
     });
-    jest.spyOn(accessor.element, "getBoundingClientRect").mockImplementation(() => {
+    vi.spyOn(accessor.element, "getBoundingClientRect").mockImplementation(() => {
       return { top: 10, left: 20, width: 0, height: 0 } as any;
     });
 
     const event = new KeyboardEvent("pointerdown", { shiftKey: true });
-    const eventPreventDefaultSpy = jest.spyOn(event, "preventDefault");
+    const eventPreventDefaultSpy = vi.spyOn(event, "preventDefault");
     fireEvent(container, event);
 
     expect(accessor.doSetGroupActive).toHaveBeenCalledWith(groupPanel);
@@ -455,7 +457,7 @@ describe("tabsContainer", () => {
     expect(eventPreventDefaultSpy).toHaveBeenCalledTimes(0);
 
     const event2 = new KeyboardEvent("pointerdown", { shiftKey: false });
-    const eventPreventDefaultSpy2 = jest.spyOn(event2, "preventDefault");
+    const eventPreventDefaultSpy2 = vi.spyOn(event2, "preventDefault");
     fireEvent(container, event2);
 
     expect(accessor.addFloatingGroup).toHaveBeenCalledTimes(0);
@@ -465,14 +467,14 @@ describe("tabsContainer", () => {
   test("that selecting a tab with shift down will move that tab into a new floating group", () => {
     const accessor = fromPartial<DockviewComponent>({
       options: {},
-      onDidAddPanel: jest.fn(),
-      onDidRemovePanel: jest.fn(),
+      onDidAddPanel: vi.fn(),
+      onDidRemovePanel: vi.fn(),
       element: document.createElement("div"),
-      addFloatingGroup: jest.fn(),
-      getGroupPanel: jest.fn(),
+      addFloatingGroup: vi.fn(),
+      getGroupPanel: vi.fn(),
     });
 
-    const groupPanelMock = jest.fn<DockviewGroupPanel, []>(() => {
+    const groupPanelMock = vi.fn<DockviewGroupPanel, []>(() => {
       return (<Partial<DockviewGroupPanel>>{
         api: { location: { type: "floating" } } as any,
         model: {} as any,
@@ -503,7 +505,7 @@ describe("tabsContainer", () => {
     expect(el).toBeTruthy();
 
     const event = new KeyboardEvent("pointerdown", { shiftKey: true });
-    const preventDefaultSpy = jest.spyOn(event, "preventDefault");
+    const preventDefaultSpy = vi.spyOn(event, "preventDefault");
     fireEvent(el, event);
 
     // a floating group with a single tab shouldn't be eligible
@@ -521,14 +523,14 @@ describe("tabsContainer", () => {
   test("pre header actions", () => {
     const accessor = fromPartial<DockviewComponent>({
       options: {},
-      onDidAddPanel: jest.fn(),
-      onDidRemovePanel: jest.fn(),
+      onDidAddPanel: vi.fn(),
+      onDidRemovePanel: vi.fn(),
       element: document.createElement("div"),
-      addFloatingGroup: jest.fn(),
-      getGroupPanel: jest.fn(),
+      addFloatingGroup: vi.fn(),
+      getGroupPanel: vi.fn(),
     });
 
-    const groupPanelMock = jest.fn<DockviewGroupPanel, []>(() => {
+    const groupPanelMock = vi.fn<DockviewGroupPanel, []>(() => {
       return (<Partial<DockviewGroupPanel>>{
         api: { location: { type: "grid" } } as any,
         model: {} as any,
@@ -539,7 +541,7 @@ describe("tabsContainer", () => {
 
     const cut = new TabsContainer(accessor, groupPanel);
 
-    const panelMock = jest.fn<IDockviewPanel, [string]>((id: string) => {
+    const panelMock = vi.fn<IDockviewPanel, [string]>((id: string) => {
       const partial: Partial<IDockviewPanel> = {
         id,
 
@@ -588,14 +590,14 @@ describe("tabsContainer", () => {
   test("left header actions", () => {
     const accessor = fromPartial<DockviewComponent>({
       options: {},
-      onDidAddPanel: jest.fn(),
-      onDidRemovePanel: jest.fn(),
+      onDidAddPanel: vi.fn(),
+      onDidRemovePanel: vi.fn(),
       element: document.createElement("div"),
-      addFloatingGroup: jest.fn(),
-      getGroupPanel: jest.fn(),
+      addFloatingGroup: vi.fn(),
+      getGroupPanel: vi.fn(),
     });
 
-    const groupPanelMock = jest.fn<DockviewGroupPanel, []>(() => {
+    const groupPanelMock = vi.fn<DockviewGroupPanel, []>(() => {
       return (<Partial<DockviewGroupPanel>>{
         api: { location: { type: "grid" } } as any,
         model: {} as any,
@@ -606,7 +608,7 @@ describe("tabsContainer", () => {
 
     const cut = new TabsContainer(accessor, groupPanel);
 
-    const panelMock = jest.fn<IDockviewPanel, [string]>((id: string) => {
+    const panelMock = vi.fn<IDockviewPanel, [string]>((id: string) => {
       const partial: Partial<IDockviewPanel> = {
         id,
 
@@ -655,14 +657,14 @@ describe("tabsContainer", () => {
   test("right header actions", () => {
     const accessor = fromPartial<DockviewComponent>({
       options: {},
-      onDidAddPanel: jest.fn(),
-      onDidRemovePanel: jest.fn(),
+      onDidAddPanel: vi.fn(),
+      onDidRemovePanel: vi.fn(),
       element: document.createElement("div"),
-      addFloatingGroup: jest.fn(),
-      getGroupPanel: jest.fn(),
+      addFloatingGroup: vi.fn(),
+      getGroupPanel: vi.fn(),
     });
 
-    const groupPanelMock = jest.fn<DockviewGroupPanel, []>(() => {
+    const groupPanelMock = vi.fn<DockviewGroupPanel, []>(() => {
       return (<Partial<DockviewGroupPanel>>{
         api: { location: { type: "grid" } } as any,
         model: {} as any,
@@ -673,7 +675,7 @@ describe("tabsContainer", () => {
 
     const cut = new TabsContainer(accessor, groupPanel);
 
-    const panelMock = jest.fn<IDockviewPanel, [string]>((id: string) => {
+    const panelMock = vi.fn<IDockviewPanel, [string]>((id: string) => {
       const partial: Partial<IDockviewPanel> = {
         id,
 

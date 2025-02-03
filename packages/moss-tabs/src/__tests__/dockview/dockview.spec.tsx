@@ -1,16 +1,13 @@
 import React from "react";
+import { beforeEach, describe, expect, test, vi } from "vitest";
 
-import { act, render, waitFor } from "@testing-library/react";
-
-import "@testing-library/jest-dom";
+import { act, render, screen, waitFor } from "@testing-library/react";
 
 import { setMockRefElement } from "../__test_utils__/utils";
 import { DockviewApi } from "../../api/component.api";
 import { DockviewReact } from "../../dockview/dockview";
 import { IDockviewPanel } from "../../dockview/dockviewPanel";
 import { DockviewReadyEvent, IDockviewPanelProps } from "../../dockview/framework";
-
-const { expect } = require("@jest/globals");
 
 describe("gridview react", () => {
   let components: Record<string, React.FunctionComponent<IDockviewPanelProps>>;
@@ -41,24 +38,24 @@ describe("gridview react", () => {
     expect(api).toBeTruthy();
   });
 
-  test("is sized to container", () => {
+  test("is sized to container", async () => {
     const el = document.createElement("div");
 
-    jest.spyOn(el, "clientHeight", "get").mockReturnValue(450);
-    jest.spyOn(el, "clientWidth", "get").mockReturnValue(650);
+    vi.spyOn(el, "clientHeight", "get").mockReturnValue(450);
+    vi.spyOn(el, "clientWidth", "get").mockReturnValue(650);
 
-    setMockRefElement(el);
+    const mockRef = setMockRefElement(el);
 
     let api: DockviewApi | undefined;
-
     const onReady = (event: DockviewReadyEvent) => {
       api = event.api;
     };
 
     render(<DockviewReact components={components} onReady={onReady} />);
 
-    expect(api!.width).toBe(650);
-    expect(api!.height).toBe(450);
+    expect(mockRef).toHaveBeenCalled();
+    expect(api?.width).toBe(650);
+    expect(api?.height).toBe(450);
   });
 
   test("that the component can update parameters", async () => {
@@ -83,39 +80,39 @@ describe("gridview react", () => {
       });
     });
 
-    await waitFor(() => {
-      expect(wrapper.queryByText(/key=keyA,value=valueA/i)).toBeInTheDocument();
-      expect(wrapper.queryByText(/key=keyB,value=valueB/i)).toBeInTheDocument();
+    waitFor(() => {
+      expect(wrapper.getByText(/key=keyA,value=valueA/i)).toBeDefined();
+      expect(wrapper.getByText(/key=keyB,value=valueB/i)).toBeDefined();
     });
 
     act(() => {
       panel.api.updateParameters({ keyA: "valueAA", keyC: "valueC" });
     });
 
-    await waitFor(() => {
-      expect(wrapper.queryByText(/key=keyA,value=valueAA/i)).toBeInTheDocument();
-      expect(wrapper.queryByText(/key=keyB,value=valueB/i)).toBeInTheDocument();
-      expect(wrapper.queryByText(/key=keyC,value=valueC/i)).toBeInTheDocument();
+    waitFor(() => {
+      expect(wrapper.getByText(/key=keyA,value=valueAA/i)).toBeDefined();
+      expect(wrapper.getByText(/key=keyB,value=valueB/i)).toBeDefined();
+      expect(wrapper.getByText(/key=keyC,value=valueC/i)).toBeDefined();
     });
 
     act(() => {
       panel.api.updateParameters({ keyC: null });
     });
 
-    await waitFor(() => {
-      expect(wrapper.queryByText(/key=keyA,value=valueAA/i)).toBeInTheDocument();
-      expect(wrapper.queryByText(/key=keyB,value=valueB/i)).toBeInTheDocument();
-      expect(wrapper.queryByText(/key=keyC,value=null/i)).toBeInTheDocument();
+    waitFor(() => {
+      expect(wrapper.getByText(/key=keyA,value=valueAA/i)).toBeDefined();
+      expect(wrapper.getByText(/key=keyB,value=valueB/i)).toBeDefined();
+      expect(wrapper.getByText(/key=keyC,value=null/i)).toBeDefined();
     });
 
     act(() => {
       panel.api.updateParameters({ keyA: undefined });
     });
 
-    await waitFor(() => {
-      expect(wrapper.queryByText(/key=keyA/i)).not.toBeInTheDocument();
-      expect(wrapper.queryByText(/key=keyB,value=valueB/i)).toBeInTheDocument();
-      expect(wrapper.queryByText(/key=keyC,value=null/i)).toBeInTheDocument();
+    waitFor(() => {
+      expect(wrapper.getByText(/key=keyA/i)).not.toBeDefined();
+      expect(wrapper.getByText(/key=keyB,value=valueB/i)).toBeDefined();
+      expect(wrapper.getByText(/key=keyC,value=null/i)).toBeDefined();
     });
   });
 });

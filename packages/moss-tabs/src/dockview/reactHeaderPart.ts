@@ -1,4 +1,4 @@
-import * as React from "react";
+import React from "react";
 
 import { PanelUpdateEvent } from "../panel/types";
 import { ReactPart, ReactPortalStore } from "../react";

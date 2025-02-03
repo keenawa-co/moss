@@ -1,4 +1,4 @@
-import * as React from "react";
+import React from "react";
 
 import { DockviewApi, IDockviewPanel } from "@repo/moss-tabs";
 
@@ -48,6 +48,12 @@ const PanelAction = (props: { panels: string[]; api: DockviewApi; activePanel?: 
 
   const [visible, setVisible] = React.useState<boolean>(true);
 
+  const [isPopupOpen, setIsPopupOpen] = React.useState(false);
+
+  const togglePopup = () => {
+    setIsPopupOpen(!isPopupOpen);
+  };
+
   return (
     <div className="button-action">
       <div className="flex">
@@ -92,6 +98,42 @@ const PanelAction = (props: { panels: string[]; api: DockviewApi; activePanel?: 
         </button>
         <button title="Panel visiblity cannot be edited manually." disabled={true} className="demo-icon-button">
           <span className="material-symbols-outlined">{visible ? "visibility" : "visibility_off"}</span>
+        </button>
+        <div>
+          <button className="demo-icon-button" onClick={togglePopup}>
+            <span className="material-symbols-outlined">edit</span>
+          </button>
+          {isPopupOpen && panel && <TitleEditPopup panel={panel} onClose={togglePopup} />}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const TitleEditPopup: React.FC<{ panel: IDockviewPanel; onClose: () => void }> = ({ panel, onClose }) => {
+  const [title, setTitle] = React.useState<string>(panel.title ?? "");
+
+  const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setTitle(event.target.value);
+  };
+
+  const onClick = () => {
+    panel.setTitle(title);
+    onClose();
+  };
+
+  return (
+    <div className="absolute top-1/2 left-1/2 z-50 -translate-x-1/2 -translate-y-1/2 transform bg-black p-5">
+      <div>
+        <span className="!text-white">Edit Panel Title</span>
+      </div>
+      <input className="!text-black" value={title} onChange={onChange} />
+      <div className="button-group">
+        <button className="panel-builder-button" onClick={onClick}>
+          Edit
+        </button>
+        <button className="panel-builder-button" onClick={onClose}>
+          Close
         </button>
       </div>
     </div>

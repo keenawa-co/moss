@@ -1,25 +1,25 @@
-import { mergeConfig } from "../moss-ui/src/tailwind/mergeConfig";
-import type { Config } from "tailwindcss";
-import plugin from "tailwindcss/plugin";
+import { Config } from "tailwindcss";
+import tailwindAnimate from "tailwindcss-animate";
 
-// We want each package to be responsible for its own content.
-const config: Omit<Config, "content"> = mergeConfig({
-  content: ["../moss-ui/src/**/*.{js,ts,jsx,tsx,css}"],
-  plugins: [
-    plugin(function ({ matchUtilities, theme }) {
-      matchUtilities(
-        {
-          background: (value: string) => ({
-            background: value,
-          }),
-        },
-        {
-          values: theme("colors"), // Allow the use of arbitrary values
-          type: ["color", "any"], // Permit any color values
-        }
-      );
-    }),
-  ],
-});
+import tailwindTypography from "@tailwindcss/typography";
+
+import breakpoints from "./extends/breakpoints";
+import colors from "./extends/colors";
+import fontSize from "./extends/fontSize";
+import plugins from "./extends/plugins";
+import typography from "./extends/typography";
+
+const config: Config = {
+  theme: {
+    gradientColorStops: colors,
+    colors,
+    extend: {
+      fontSize: fontSize,
+      fontFamily: typography,
+      screens: breakpoints,
+    },
+  },
+  plugins: [tailwindAnimate, tailwindTypography, ...plugins],
+};
 
 export default config;

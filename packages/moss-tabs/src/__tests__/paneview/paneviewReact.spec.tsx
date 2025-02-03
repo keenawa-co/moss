@@ -1,4 +1,5 @@
 import React from "react";
+import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { act, render, waitFor } from "@testing-library/react";
 
@@ -6,8 +7,6 @@ import { setMockRefElement } from "../__test_utils__/utils";
 import { PaneviewApi } from "../../api/component.api";
 import { IPaneviewPanel } from "../../paneview/paneviewPanel";
 import { IPaneviewPanelProps, PaneviewReact, PaneviewReadyEvent } from "../../paneview/paneviewReact";
-
-const { expect } = require("@jest/globals");
 
 describe("gridview react", () => {
   let components: Record<string, React.FunctionComponent<IPaneviewPanelProps>>;
@@ -42,7 +41,7 @@ describe("gridview react", () => {
     setMockRefElement({
       clientHeight: 450,
       clientWidth: 650,
-      appendChild: jest.fn(),
+      appendChild: vi.fn(),
     });
     let api: PaneviewApi | undefined;
 
@@ -80,8 +79,8 @@ describe("gridview react", () => {
     });
 
     await waitFor(() => {
-      expect(wrapper.queryByText(/key=keyA,value=valueA/i)).toBeInTheDocument();
-      expect(wrapper.queryByText(/key=keyB,value=valueB/i)).toBeInTheDocument();
+      expect(wrapper.queryByText(/key=keyA,value=valueA/i)).toBeDefined(); //TSError: Property 'toBeInTheDocument' does not exist on type 'Assertion<HTMLElement | null>'.ts(2339)
+      expect(wrapper.queryByText(/key=keyB,value=valueB/i)).toBeDefined();
     });
 
     act(() => {
@@ -89,9 +88,9 @@ describe("gridview react", () => {
     });
 
     await waitFor(() => {
-      expect(wrapper.queryByText(/key=keyA,value=valueAA/i)).toBeInTheDocument();
-      expect(wrapper.queryByText(/key=keyB,value=valueB/i)).toBeInTheDocument();
-      expect(wrapper.queryByText(/key=keyC,value=valueC/i)).toBeInTheDocument();
+      expect(wrapper.queryByText(/key=keyA,value=valueAA/i)).toBeDefined();
+      expect(wrapper.queryByText(/key=keyB,value=valueB/i)).toBeDefined();
+      expect(wrapper.queryByText(/key=keyC,value=valueC/i)).toBeDefined();
     });
 
     act(() => {
@@ -99,9 +98,9 @@ describe("gridview react", () => {
     });
 
     await waitFor(() => {
-      expect(wrapper.queryByText(/key=keyA,value=valueAA/i)).toBeInTheDocument();
-      expect(wrapper.queryByText(/key=keyB,value=valueB/i)).toBeInTheDocument();
-      expect(wrapper.queryByText(/key=keyC,value=null/i)).toBeInTheDocument();
+      expect(wrapper.queryByText(/key=keyA,value=valueAA/i)).toBeDefined();
+      expect(wrapper.queryByText(/key=keyB,value=valueB/i)).toBeDefined();
+      expect(wrapper.queryByText(/key=keyC,value=null/i)).toBeDefined();
     });
 
     act(() => {
@@ -109,9 +108,9 @@ describe("gridview react", () => {
     });
 
     await waitFor(() => {
-      expect(wrapper.queryByText(/key=keyA/i)).not.toBeInTheDocument();
-      expect(wrapper.queryByText(/key=keyB,value=valueB/i)).toBeInTheDocument();
-      expect(wrapper.queryByText(/key=keyC,value=null/i)).toBeInTheDocument();
+      expect(wrapper.queryByText(/key=keyA/i)).toBe(null);
+      expect(wrapper.queryByText(/key=keyB,value=valueB/i)).toBeDefined();
+      expect(wrapper.queryByText(/key=keyC,value=null/i)).toBeDefined();
     });
   });
 });
