@@ -17,9 +17,6 @@
 #     }
 # }
 
-
-configuration "moss.kernel.window" "moss.kernel.window" extends {}
-
 configuration "moss.kernel.window" {
     display_name = "Window"
     order = 5

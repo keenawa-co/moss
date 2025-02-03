@@ -21,19 +21,20 @@ fn is_null_expression(expr: &Expression) -> bool {
     }
 }
 
-#[derive(Debug)]
-pub struct ConfigurationOverrideDecl {
+#[derive(Clone, Debug)]
+pub struct OverrideDecl {
     pub ident: ArcStr,
     pub value: Expression,
     pub context: Expression,
 }
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct ParameterDecl {
     pub ident: ArcStr,
     pub body: ParameterDeclBodyStmt,
 }
 
+#[derive(Clone, Debug)]
 pub struct ParameterDeclBodyStmt {
     pub value_type: Expression,
     pub maximum: Expression,
@@ -46,16 +47,16 @@ pub struct ParameterDeclBodyStmt {
     pub protected: Expression,
 }
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct ConfigurationBodyStmt {
     pub display_name: Expression,
     pub description: Expression,
     pub order: Expression,
-    pub parameters: Vec<ConfigurationParameterDecl>,
-    pub overrides: Vec<ConfigurationOverrideDecl>,
+    pub parameters: Vec<ParameterDecl>,
+    pub overrides: Vec<OverrideDecl>,
 }
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub enum ConfigurationDecl {
     Genesis {
         ident: ArcStr,
@@ -72,7 +73,7 @@ pub enum ConfigurationDecl {
 }
 
 impl ConfigurationDecl {
-    fn ident(&self) -> Option<ArcStr> {
+    pub fn ident(&self) -> Option<ArcStr> {
         match self {
             ConfigurationDecl::Genesis { ident, .. } => Some(ArcStr::clone(ident)),
             ConfigurationDecl::Successor { ident, .. } => Some(ArcStr::clone(ident)),
@@ -80,7 +81,7 @@ impl ConfigurationDecl {
         }
     }
 
-    fn parent_ident(&self) -> Option<ArcStr> {
+    pub fn parent_ident(&self) -> Option<ArcStr> {
         match self {
             ConfigurationDecl::Genesis { .. } => None,
             ConfigurationDecl::Successor { parent_ident, .. } => Some(ArcStr::clone(parent_ident)),
@@ -114,7 +115,7 @@ impl ConfigurationDecl {
         let mut parameters = HashMap::new();
 
         for parameter_decl in &body.parameters {
-            let typ = match Type::try_from(&parameter_decl.value_type) {
+            let typ = match Type::try_from(&parameter_decl.body.value_type) {
                 Ok(ty) => ty,
                 Err(_) => {
                     // TODO: Add logging for encountering an unknown type
@@ -127,18 +128,24 @@ impl ConfigurationDecl {
                 Arc::new(Parameter {
                     ident: ArcStr::clone(&parameter_decl.ident),
                     typ,
-                    maximum: try_evaluate_to_u64(ctx, &parameter_decl.maximum)?,
-                    minimum: try_evaluate_to_u64(ctx, &parameter_decl.minimum)?,
+                    maximum: try_evaluate_to_u64(ctx, &parameter_decl.body.maximum)?,
+                    minimum: try_evaluate_to_u64(ctx, &parameter_decl.body.minimum)?,
                     default: serde_json::from_str(
-                        parameter_decl.default.evaluate(ctx)?.to_string().as_str(),
+                        parameter_decl
+                            .body
+                            .default
+                            .evaluate(ctx)?
+                            .to_string()
+                            .as_str(),
                     )?,
-                    scope: try_evaluate_to_string(ctx, &parameter_decl.scope)?
+                    scope: try_evaluate_to_string(ctx, &parameter_decl.body.scope)?
                         .and_then(|value| ParameterScope::from_str(&value).ok())
                         .unwrap_or_default(),
-                    order: try_evaluate_to_u64(ctx, &parameter_decl.order)?,
-                    description: try_evaluate_to_string(ctx, &parameter_decl.description)?,
-                    excluded: try_evaluate_to_bool(ctx, &parameter_decl.excluded)?.unwrap_or(false),
-                    protected: try_evaluate_to_bool(ctx, &parameter_decl.protected)?
+                    order: try_evaluate_to_u64(ctx, &parameter_decl.body.order)?,
+                    description: try_evaluate_to_string(ctx, &parameter_decl.body.description)?,
+                    excluded: try_evaluate_to_bool(ctx, &parameter_decl.body.excluded)?
+                        .unwrap_or(false),
+                    protected: try_evaluate_to_bool(ctx, &parameter_decl.body.protected)?
                         .unwrap_or(false),
                 }),
             );
