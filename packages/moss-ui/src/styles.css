@@ -1,5 +1,2 @@
-@import "fonts.css";
-
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@config "@repo/tailwind-config";
+@import "tailwindcss";

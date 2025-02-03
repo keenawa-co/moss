@@ -10,7 +10,7 @@ const VALID_TOKENS = new Set(colorKeysToCssValues(themeInterface.colors));
 
 const ANY_TW_SELECTOR_WITH_ARBITRARY_VALUE = /\b[\w|\-:]+\[(?:var\((--[\w-]+)\)|(--[\w-]+))\]/g;
 
-const getAllInvalidTokens = (str, loc) => {
+const getTokensWithInvalidArbitraryValues = (str, loc) => {
   const invalidTokens = [];
   let arr;
 
@@ -59,7 +59,7 @@ export default {
     return {
       Literal(node) {
         if (typeof node.value === "string") {
-          const invalidTokens = getAllInvalidTokens(node.value, node.loc);
+          const invalidTokens = getTokensWithInvalidArbitraryValues(node.value, node.loc);
 
           invalidTokens.forEach((token) => {
             context.report({
@@ -75,7 +75,7 @@ export default {
       },
       TemplateElement(node) {
         if (typeof node.value.raw === "string") {
-          const invalidTokens = getAllInvalidTokens(node.value.raw, node.loc);
+          const invalidTokens = getTokensWithInvalidArbitraryValues(node.value.raw, node.loc);
 
           invalidTokens.forEach((token) => {
             context.report({

@@ -1,6 +1,7 @@
 import { resolve } from "path";
 import { defineConfig } from "vite";
 
+import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react";
 
 export default defineConfig({
@@ -9,8 +10,7 @@ export default defineConfig({
       ignored: ["**/*.spec.ts", "**/*.test.ts", "storage/**"],
     },
   },
-  plugins: [react()],
-  assetsInclude: "src/renderer/assets/**",
+  plugins: [tailwindcss(), react()],
   resolve: {
     alias: {
       "@": resolve("src"),

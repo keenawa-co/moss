@@ -1,11 +1,6 @@
 import type { Config } from "tailwindcss";
 
-import sharedConfig from "@repo/tailwind-config";
-import tailwindTypography from "@tailwindcss/typography";
-
 const config: Pick<Config, "content" | "presets" | "theme" | "plugins"> = {
-  content: ["./src/**/*.{js,ts,jsx,tsx}", "../../packages/moss-ui/src/**/*.{js,ts,jsx,tsx,mdx}"],
-  presets: [sharedConfig],
   theme: {
     extend: {
       fontSize: {
@@ -31,7 +26,6 @@ const config: Pick<Config, "content" | "presets" | "theme" | "plugins"> = {
       },
     },
   },
-  plugins: [tailwindTypography],
 };
 
 export default config;

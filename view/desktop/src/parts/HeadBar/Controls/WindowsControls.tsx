@@ -16,7 +16,7 @@ export function WindowsControls({ className, ...props }: HTMLProps<HTMLDivElemen
     <div className={cn("flex h-full", className)} {...props}>
       <ControlButton
         onClick={minimizeWindow}
-        className="text-[--moss-primary]/90 active:background-[--moss-primary]/[.03] h-full w-[46px] cursor-default rounded-none bg-transparent hover:bg-[#0000000d]"
+        className="active:background-(--moss-primary)/[.03] h-full w-[46px] cursor-default rounded-none bg-transparent text-(--moss-primary)/90 hover:bg-[#0000000d]"
       >
         <ControlsIcons.minimizeWin />
       </ControlButton>
@@ -24,14 +24,14 @@ export function WindowsControls({ className, ...props }: HTMLProps<HTMLDivElemen
         onClick={maximizeWindow}
         className={cn(
           "h-full w-[46px] cursor-default rounded-none bg-transparent",
-          "text-[--moss-primary]/90 active:background-[--moss-primary]/[.03] hover:bg-[#0000000d]"
+          "active:background-(--moss-primary)/[.03] text-(--moss-primary)/90 hover:bg-[#0000000d]"
         )}
       >
         {isWindowMaximized ? <ControlsIcons.maximizeRestoreWin /> : <ControlsIcons.maximizeWin />}
       </ControlButton>
       <ControlButton
         onClick={closeWindow}
-        className="text-[--moss-primary]/90 active:background-[--moss-windowsCloseButton-background]/90 h-full w-[46px] cursor-default rounded-none bg-transparent hover:text-white hover:background-[--moss-windowsCloseButton-background]"
+        className="active:background-(--moss-windowsCloseButton-background)/90 hover:background-(--moss-windowsCloseButton-background) h-full w-[46px] cursor-default rounded-none bg-transparent text-(--moss-primary)/90 hover:text-white"
       >
         <ControlsIcons.closeWin />
       </ControlButton>

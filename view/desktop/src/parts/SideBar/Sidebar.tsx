@@ -17,7 +17,7 @@ export const Sidebar = () => {
 
   if (activityBarState?.position === "top") {
     return (
-      <div className="flex h-full flex-col background-[--moss-sideBar-background]">
+      <div className="background-(--moss-sideBar-background) flex h-full flex-col">
         <ActivityBar />
         <SidebarHeader title={activeGroupTitle} />
         <ViewContainer groupId={activeGroupId} />
@@ -27,7 +27,7 @@ export const Sidebar = () => {
 
   if (activityBarState?.position === "bottom") {
     return (
-      <div className="flex h-full flex-col background-[--moss-sideBar-background]">
+      <div className="background-(--moss-sideBar-background) flex h-full flex-col">
         <SidebarHeader title={activeGroupTitle} />
         <ViewContainer groupId={activeGroupId} />
         <ActivityBar />
@@ -37,7 +37,7 @@ export const Sidebar = () => {
 
   if (activityBarState?.position === "left") {
     return (
-      <div className="flex h-full background-[--moss-sideBar-background]">
+      <div className="background-(--moss-sideBar-background) flex h-full">
         <ActivityBar />
         <div className="w-full">
           <SidebarHeader title={activeGroupTitle} />
@@ -49,7 +49,7 @@ export const Sidebar = () => {
 
   if (activityBarState?.position === "right") {
     return (
-      <div className="flex h-full background-[--moss-sideBar-background]">
+      <div className="background-(--moss-sideBar-background) flex h-full">
         <div className="w-full">
           <SidebarHeader title={activeGroupTitle} />
           <ViewContainer groupId={activeGroupId} />

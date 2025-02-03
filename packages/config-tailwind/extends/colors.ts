@@ -1,4 +1,4 @@
-import tailwindColors, { blue } from "tailwindcss/colors";
+import tailwindColors from "tailwindcss/colors";
 
 const extendedTailwindColors = {
   amber: tailwindColors.amber,
