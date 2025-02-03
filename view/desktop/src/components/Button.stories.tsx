@@ -114,7 +114,7 @@ export const Primary: Story = {
   },
 };
 
-export const IntentsAndVariants: Story = {
+export const Intents: Story = {
   render: () => {
     return (
       <table className="border-separate border-spacing-2">
@@ -145,76 +145,32 @@ export const IntentsAndVariants: Story = {
   },
 };
 
-export const Intents: Story = {
-  render: () => {
-    return (
-      <table className="border-separate border-spacing-2">
-        <tr>
-          {Object.keys(intents).map((intent) => {
-            return <th className="text-left capitalize">{intent}</th>;
-          })}
-        </tr>
-        <tr>
-          {(Object.keys(intents) as Array<keyof typeof intents>).map((intent) => {
-            return (
-              <td key={intent}>
-                <Button.Root intent={intent}>
-                  <Button.Label>Button</Button.Label>
-                </Button.Root>
-              </td>
-            );
-          })}
-        </tr>
-      </table>
-    );
-  },
-};
-
-export const Variants: Story = {
-  render: () => {
-    return (
-      <table className="border-separate border-spacing-2">
-        <tr>
-          {variants.map((variant) => {
-            return <th className="text-left capitalize">{variant}</th>;
-          })}
-        </tr>
-        <tr>
-          {variants.map((variant) => {
-            return (
-              <td>
-                <Button.Root variant={variant}>
-                  <Button.Label>Button</Button.Label>
-                </Button.Root>
-              </td>
-            );
-          })}
-        </tr>
-      </table>
-    );
-  },
-};
-
 export const Sizes: Story = {
   render: () => {
     return (
       <table className="border-separate border-spacing-2">
         <tr>
+          <th />
           {sizes.map((size) => {
             return <th className="text-left capitalize">{size}</th>;
           })}
         </tr>
-        <tr>
-          {sizes.map((size) => {
-            return (
-              <td>
-                <Button.Root size={size}>
-                  <Button.Label>Button</Button.Label>
-                </Button.Root>
-              </td>
-            );
-          })}
-        </tr>
+        {(Object.keys(intents) as Array<keyof typeof intents>).map((intent) => {
+          return (
+            <tr key={intent} className="align-bottom">
+              <th className="text-left capitalize">{intent}</th>
+              {sizes.map((size) => {
+                return (
+                  <td key={size}>
+                    <Button.Root intent={intent} size={size}>
+                      <Button.Label>Button</Button.Label>
+                    </Button.Root>
+                  </td>
+                );
+              })}
+            </tr>
+          );
+        })}
       </table>
     );
   },
@@ -246,23 +202,87 @@ export const Loading: Story = {
   },
 };
 
-export const IconWithLabel: Story = {
-  render: (args) => {
+export const WithIcons: Story = {
+  render: () => {
     return (
-      <Button.Root {...args} className="flex gap-2">
-        <Button.Label>Button</Button.Label>
-        <Icon icon="ArrowRight" />
-      </Button.Root>
-    );
-  },
-};
-
-export const IconOnly: Story = {
-  render: (args) => {
-    return (
-      <Button.Root {...args}>
-        <Icon icon="ArrowRight" />
-      </Button.Root>
+      <table className="border-separate border-spacing-2">
+        <tr>
+          <td>
+            <Button.Root className="flex gap-2">
+              <Icon icon="ArrowRight" />
+              <Button.Label>Label</Button.Label>
+            </Button.Root>
+          </td>
+          <td>
+            <Button.Root>
+              <Icon icon="ArrowRight" />
+            </Button.Root>
+          </td>
+          <td>
+            <Button.Root className="flex gap-2">
+              <Button.Label>Label</Button.Label>
+              <Icon icon="ArrowRight" />
+            </Button.Root>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <Button.Root variant="outlined" className="flex gap-2">
+              <Icon icon="ArrowRight" />
+              <Button.Label>Label</Button.Label>
+            </Button.Root>
+          </td>
+          <td>
+            <Button.Root variant="outlined">
+              <Icon icon="ArrowRight" />
+            </Button.Root>
+          </td>
+          <td>
+            <Button.Root variant="outlined" className="flex gap-2">
+              <Button.Label>Label</Button.Label>
+              <Icon icon="ArrowRight" />
+            </Button.Root>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <Button.Root variant="soft" className="flex gap-2">
+              <Icon icon="ArrowRight" />
+              <Button.Label>Label</Button.Label>
+            </Button.Root>
+          </td>
+          <td>
+            <Button.Root variant="soft">
+              <Icon icon="ArrowRight" />
+            </Button.Root>
+          </td>
+          <td>
+            <Button.Root variant="soft" className="flex gap-2">
+              <Button.Label>Label</Button.Label>
+              <Icon icon="ArrowRight" />
+            </Button.Root>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <Button.Root variant="ghost" className="flex gap-2">
+              <Icon icon="ArrowRight" />
+              <Button.Label>Label</Button.Label>
+            </Button.Root>
+          </td>
+          <td>
+            <Button.Root variant="ghost">
+              <Icon icon="ArrowRight" />
+            </Button.Root>
+          </td>
+          <td>
+            <Button.Root variant="ghost" className="flex gap-2">
+              <Button.Label>Label</Button.Label>
+              <Icon icon="ArrowRight" />
+            </Button.Root>
+          </td>
+        </tr>
+      </table>
     );
   },
 };
