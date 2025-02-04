@@ -144,7 +144,7 @@ export const Root = forwardRef<HTMLButtonElement & HTMLAnchorElement, ButtonProp
 
         {loading && (
           <div className="LoadingIcon absolute inset-0 grid place-items-center">
-            <Icon icon="Loader" className="animate-spin" />
+            <Icon icon="LoaderTailus" className="animate-spin" />
           </div>
         )}
       </Component>
