@@ -12,7 +12,7 @@ const defaultCheckboxRootStyles = `border shadow-sm group rounded peer flex just
   focus-visible:outline
 
   data-[state=checked]:border-none
-  data-[state=checked]:bg-blue-400
+  data-[state=checked]:bg-blue-500
   data-[state=indeterminate]:border-none
 
   disabled:bg-gray-300

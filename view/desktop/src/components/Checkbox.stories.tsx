@@ -24,7 +24,7 @@ export const WithLabel: Story = {
         <div className="flex gap-2">
           <Checkbox.Root id="c1">
             <Checkbox.Indicator>
-              <Icon icon="DropdownMenuCheckboxIndicator" className="text-white" />
+              <Icon icon="CheckboxIndicator" className="size-3.5 text-white" />
             </Checkbox.Indicator>
           </Checkbox.Root>
           <label htmlFor="c1">Checkbox 1</label>
@@ -32,7 +32,7 @@ export const WithLabel: Story = {
         <div className="flex gap-2">
           <Checkbox.Root id="c2">
             <Checkbox.Indicator>
-              <Icon icon="DropdownMenuCheckboxIndicator" className="text-white" />
+              <Icon icon="CheckboxIndicator" className="size-3.5 text-white" />
             </Checkbox.Indicator>
           </Checkbox.Root>
           <label htmlFor="c2">Checkbox 2</label>
@@ -40,7 +40,7 @@ export const WithLabel: Story = {
         <div className="flex gap-2">
           <Checkbox.Root id="c3">
             <Checkbox.Indicator>
-              <Icon icon="DropdownMenuCheckboxIndicator" className="text-white" />
+              <Icon icon="CheckboxIndicator" className="size-3.5 text-white" />
             </Checkbox.Indicator>
           </Checkbox.Root>
           <label htmlFor="c3">Checkbox 3</label>
@@ -56,18 +56,18 @@ export const Standalone: Story = {
       <div className="flex gap-4">
         <Checkbox.Root id="c1">
           <Checkbox.Indicator>
-            <Icon icon="DropdownMenuCheckboxIndicator" className="text-white" />
+            <Icon icon="CheckboxIndicator" className="size-3.5 text-white" />
           </Checkbox.Indicator>
         </Checkbox.Root>
         <Checkbox.Root id="c2">
           <Checkbox.Indicator>
-            <Icon icon="DropdownMenuCheckboxIndicator" className="text-white" />
+            <Icon icon="CheckboxIndicator" className="size-3.5 text-white" />
           </Checkbox.Indicator>
         </Checkbox.Root>
 
         <Checkbox.Root id="c3">
           <Checkbox.Indicator>
-            <Icon icon="DropdownMenuCheckboxIndicator" className="text-white" />
+            <Icon icon="CheckboxIndicator" className="size-3.5 text-white" />
           </Checkbox.Indicator>
         </Checkbox.Root>
       </div>
@@ -81,7 +81,7 @@ export const Disabled: Story = {
         <div className="flex gap-2">
           <Checkbox.Root id="c1" disabled>
             <Checkbox.Indicator>
-              <Icon icon="DropdownMenuCheckboxIndicator" className="text-white" />
+              <Icon icon="CheckboxIndicator" className="size-3.5 text-white" />
             </Checkbox.Indicator>
           </Checkbox.Root>
           <label htmlFor="c1">Checkbox 1</label>
@@ -89,7 +89,7 @@ export const Disabled: Story = {
         <div className="flex gap-2">
           <Checkbox.Root id="c2" disabled>
             <Checkbox.Indicator>
-              <Icon icon="DropdownMenuCheckboxIndicator" className="text-white" />
+              <Icon icon="CheckboxIndicator" className="size-3.5 text-white" />
             </Checkbox.Indicator>
           </Checkbox.Root>
           <label htmlFor="c2">Checkbox 2</label>
@@ -97,7 +97,7 @@ export const Disabled: Story = {
         <div className="flex gap-2">
           <Checkbox.Root id="c3" disabled>
             <Checkbox.Indicator>
-              <Icon icon="DropdownMenuCheckboxIndicator" className="text-white" />
+              <Icon icon="CheckboxIndicator" className="size-3.5 text-white" />
             </Checkbox.Indicator>
           </Checkbox.Root>
           <label htmlFor="c3">Checkbox 3</label>
@@ -172,7 +172,7 @@ export const Intermediate: Story = {
                 </svg>
               )}
 
-              {allState === true && <Icon icon="DropdownMenuCheckboxIndicator" className="text-white" />}
+              {allState === true && <Icon icon="CheckboxIndicator" className="size-3.5 text-white" />}
             </Checkbox.Indicator>
           </Checkbox.Root>
           <h2>All</h2>
@@ -197,7 +197,7 @@ export const Intermediate: Story = {
                   }}
                 >
                   <Checkbox.Indicator>
-                    <Icon icon="DropdownMenuCheckboxIndicator" className="text-white" />
+                    <Icon icon="CheckboxIndicator" className="size-3.5 text-white" />
                   </Checkbox.Indicator>
                 </Checkbox.Root>
                 <label htmlFor={item.id}>{item.label}</label>
