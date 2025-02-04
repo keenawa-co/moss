@@ -5,43 +5,135 @@ import Button from "./Button";
 
 const variants = ["solid", "outlined", "soft", "ghost"] as const;
 const sizes = ["xs", "sm", "md", "lg", "xl"] as const;
-const intents = {
+const colors = {
   primary: {
-    bg: "#0073ca",
-    bgHover: "#0c92eb",
-    border: "#0073ca",
-    text: "white",
-    ring: "#b9e0fe",
+    solid: {
+      bg: "#2563eb",
+      border: "#0073ca",
+      text: "white",
+    },
+    outlined: {
+      bg: "#141b29",
+      border: "rgb(29, 50, 87)",
+      text: "rgb(147, 197, 253)",
+    },
+    soft: {
+      bg: "#141b29",
+      border: "#141b29",
+      text: "rgb(147, 197, 253)",
+    },
+    ghost: {
+      bg: "#141b29",
+      border: "#141b29",
+      text: "rgb(147, 197, 253)",
+    },
   },
   warning: {
-    bg: "#d1bf00",
-    bgHover: "#ffff00",
-    border: "#d1bf00",
-    text: "white",
-    ring: "#eeff86",
+    solid: {
+      bg: "#eab50e",
+      border: "#eab50e",
+      text: "#422006",
+    },
+    outlined: {
+      bg: "#262010",
+      border: "#51400e",
+      text: "#fde047",
+    },
+    soft: {
+      bg: "#262010",
+      border: "#262010",
+      text: "#fde047",
+    },
+    ghost: {
+      bg: "#262010",
+      border: "#262010",
+      text: "#fde047",
+    },
   },
   success: {
-    bg: "#53b800",
-    bgHover: "#6ee600",
-    border: "#53b800",
-    text: "white",
-    ring: "#d0ff90",
+    solid: {
+      bg: "#16a34a",
+      border: "#16a34a",
+      text: "white",
+    },
+    outlined: {
+      bg: "#112219",
+      border: "#144628",
+      text: "#86efac",
+    },
+    soft: {
+      bg: "#112219",
+      border: "#112219",
+      text: "#86efac",
+    },
+    ghost: {
+      bg: "#112219",
+      border: "#112219",
+      text: "#86efac",
+    },
   },
   danger: {
-    bg: "#ff0000",
-    bgHover: "#ff5757",
-    border: "#ff0000",
-    text: "white",
-    ring: "#ffc0c0",
+    solid: {
+      bg: "#dc2626",
+      border: "#dc2626",
+      text: "white",
+    },
+    outlined: {
+      bg: "#1c1214",
+      border: "#521e20",
+      text: "#fca5a5",
+    },
+    soft: {
+      bg: "#1c1214",
+      border: "#1c1214",
+      text: "#fca5a5",
+    },
+    ghost: {
+      bg: "#1c1214",
+      border: "#1c1214",
+      text: "#fca5a5",
+    },
   },
   neutral: {
-    bg: "#969696",
-    bgHover: "#aaaaaa",
-    border: "#969696",
-    text: "white",
-    ring: "#e3e3e3",
+    solid: {
+      bg: "#52525b",
+      border: "#52525b",
+      text: "white",
+    },
+    outlined: {
+      bg: "#19191c",
+      border: "#2c2c31",
+      text: "white",
+    },
+    soft: {
+      bg: "#19191c",
+      border: "#19191c",
+      text: "white",
+    },
+    ghost: {
+      bg: "#19191c",
+      border: "#19191c",
+      text: "white",
+    },
   },
 } as const;
+
+const convertColorsToCSSVars = (
+  colors: Record<string, Record<string, Record<string, string>>>
+): Record<string, string> => {
+  const cssVars: Record<string, string> = {};
+
+  for (const [category, variants] of Object.entries(colors)) {
+    for (const [variant, properties] of Object.entries(variants)) {
+      for (const [prop, value] of Object.entries(properties)) {
+        const cssVarName = `--color-button-${category}-${variant}-${prop}`.replace(/bg/g, "background");
+        cssVars[cssVarName] = value;
+      }
+    }
+  }
+
+  return cssVars;
+};
 
 const meta: Meta = {
   title: "Desktop/Button",
@@ -52,41 +144,7 @@ const meta: Meta = {
   },
   decorators: [
     (Story) => (
-      <div
-        style={
-          {
-            "--color-button-primary-bg": intents.primary.bg,
-            "--color-button-primary-bg-hover": intents.primary.bgHover,
-            "--color-button-primary-border": intents.primary.border,
-            "--color-button-primary-text": intents.primary.text,
-            "--color-button-primary-ring": intents.primary.ring,
-
-            "--color-button-warning-bg": intents.warning.bg,
-            "--color-button-warning-bg-hover": intents.warning.bgHover,
-            "--color-button-warning-border": intents.warning.border,
-            "--color-button-warning-text": intents.warning.text,
-            "--color-button-warning-ring": intents.warning.ring,
-
-            "--color-button-success-bg": intents.success.bg,
-            "--color-button-success-bg-hover": intents.success.bgHover,
-            "--color-button-success-border": intents.success.border,
-            "--color-button-success-text": intents.success.text,
-            "--color-button-success-ring": intents.success.ring,
-
-            "--color-button-danger-bg": intents.danger.bg,
-            "--color-button-danger-bg-hover": intents.danger.bgHover,
-            "--color-button-danger-border": intents.danger.border,
-            "--color-button-danger-text": intents.danger.text,
-            "--color-button-danger-ring": intents.danger.ring,
-
-            "--color-button-neutral-bg": intents.neutral.bg,
-            "--color-button-neutral-bg-hover": intents.neutral.bgHover,
-            "--color-button-neutral-border": intents.neutral.border,
-            "--color-button-neutral-text": intents.neutral.text,
-            "--color-button-neutral-ring": intents.neutral.ring,
-          } as React.CSSProperties
-        }
-      >
+      <div style={convertColorsToCSSVars(colors)} className="text-(--moss-primary)">
         <Story />
       </div>
     ),
@@ -124,7 +182,7 @@ export const Intents: Story = {
             return <th className="text-left capitalize">{variant}</th>;
           })}
         </tr>
-        {(Object.keys(intents) as Array<keyof typeof intents>).map((intent) => {
+        {(Object.keys(colors) as Array<keyof typeof colors>).map((intent) => {
           return (
             <tr key={intent}>
               <th className="text-left capitalize">{intent}</th>
@@ -155,7 +213,7 @@ export const Sizes: Story = {
             return <th className="text-left capitalize">{size}</th>;
           })}
         </tr>
-        {(Object.keys(intents) as Array<keyof typeof intents>).map((intent) => {
+        {(Object.keys(colors) as Array<keyof typeof colors>).map((intent) => {
           return (
             <tr key={intent} className="align-bottom">
               <th className="text-left capitalize">{intent}</th>

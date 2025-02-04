@@ -18,7 +18,7 @@
     },
     "page.background": {
       "type": "solid",
-      "value": "rgba(22, 24, 25, 1)"
+      "value": "#101012"
     },
     "statusBar.background": {
       "type": "solid",
