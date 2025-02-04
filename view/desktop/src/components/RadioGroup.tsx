@@ -24,7 +24,7 @@ export interface RadioItemProps {
   className?: string;
 }
 
-const defaultRadioGroupItemStyles = `size-4 border bg-white shadow-sm group rounded-full peer flex justify-center items-center focus-visible:outline-2 focus-visible:outline-blue-600 focus-visible:outline-offset-2
+const defaultRadioGroupItemStyles = `size-[18px] border border-gray-100 cursor-pointer bg-white hover:bg-gray-50 shadow-sm group rounded-full peer flex justify-center items-center focus-visible:outline-2 focus-visible:outline-blue-600 focus-visible:outline-offset-2
  hover:brightness-95
  focus-visible:outline
  bg-gray-500/10
@@ -53,14 +53,20 @@ const Item = forwardRef<
     />
   );
 });
-
+const defaultRadioGroupIndicatorStyles = `size-[8px]`;
 const Indicator = forwardRef<
   ElementRef<typeof RadioGroupPrimitive.Indicator>,
   ComponentPropsWithoutRef<typeof RadioGroupPrimitive.Indicator> & {
     className?: string;
   }
 >((props, forwardedRef) => {
-  return <RadioGroupPrimitive.Indicator {...props} ref={forwardedRef} className={props.className} />;
+  return (
+    <RadioGroupPrimitive.Indicator
+      {...props}
+      ref={forwardedRef}
+      className={cn(defaultRadioGroupIndicatorStyles, props.className)}
+    />
+  );
 });
 
 export { Root, Item, Indicator };
