@@ -41,7 +41,7 @@ const buttonRootStyles = cva(
       },
       disabled: {
         false: null,
-        true: "opacity-40 cursor-not-allowed",
+        true: "grayscale-70 cursor-not-allowed hover:brightness-100 active:brightness-100 active:pointer-events-none",
       },
       loading: {
         false: null,
