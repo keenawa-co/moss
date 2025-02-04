@@ -5,7 +5,7 @@ import { cn } from "@repo/moss-ui";
 
 const SwitchContext = createContext({});
 
-const defaultSwitchRootStyles = `relative h-5 w-8 inline-block border border-gray-900/5 group rounded-full bg-gray-200 transition-[transform,width] focus-visible:outline-2 focus-visible:outline-blue-600 focus-visible:outline-offset-2 overflow-hidden
+const defaultSwitchRootStyles = `relative cursor-pointer h-5 w-8 inline-block border border-gray-900/5 rounded-full bg-gray-200 transition-[transform,width] focus-visible:outline-2 focus-visible:outline-blue-600 focus-visible:outline-offset-2 overflow-hidden
   disabled:bg-gray-700
   disabled:opacity-50
   disabled:shadow-none

@@ -23,10 +23,10 @@ export const WithLabel: Story = {
     return (
       <div className="flex flex-col gap-4">
         <div className="flex gap-4">
-          <Switch.Root>
+          <Switch.Root id="test-switch">
             <Switch.Thumb />
           </Switch.Root>
-          <div>Label</div>
+          <label htmlFor="test-switch">Label</label>
         </div>
         <div className="flex gap-4">
           <Switch.Root onClick={() => setValue(!value)} checked={value}>
