@@ -16,7 +16,7 @@ export interface ButtonProps extends HTMLAttributes<HTMLButtonElement | HTMLAnch
 }
 
 const buttonRootStyles = cva(
-  "relative flex items-center cursor-pointer justify-center rounded-lg border-2  transition hover:brightness-110 active:brightness-90",
+  "relative flex items-center cursor-pointer justify-center rounded-lg border-2 transition hover:brightness-110 active:brightness-90 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none focus-visible:ring-blue-600",
   {
     variants: {
       intent: {
