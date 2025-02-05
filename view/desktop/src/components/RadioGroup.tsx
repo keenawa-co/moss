@@ -24,7 +24,7 @@ export interface RadioItemProps {
   className?: string;
 }
 
-const defaultRadioGroupItemStyles = `bg-white border-1 border-solid border-[rgb(228,228,231)] dark:border-[rgb(39,39,42)] shadow-sm group rounded-full peer flex justify-center items-center cursor-pointer size-[18px]
+const defaultRadioGroupItemStyles = `bg-white border-1 border-solid border-[rgb(228,228,231)] dark:border-[rgb(39,39,42)] group rounded-full peer flex justify-center items-center cursor-pointer size-[18px]
 focus-visible:outline-2
 focus-visible:outline-[rgb(37,99,235)]
 focus-visible:outline-offset-2
@@ -36,11 +36,7 @@ data-[state=checked]:border-none
 disabled:bg-gray-100
 disabled:opacity-50
 disabled:border-gray-300
-disabled:shadow-none
 disabled:data-[state=checked]:bg-gray-300
-disabled:data-[state=checked]:shadow-none
-
-
 
 dark:bg-gray-500/10
 dark:disabled:bg-gray-800
