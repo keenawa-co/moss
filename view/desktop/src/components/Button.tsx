@@ -119,8 +119,8 @@ const loadingIconStyles = cva("animate-spin", {
       "xs": "size-4",
       "sm": "size-5",
       "md": "size-6",
-      "lg": "size-6",
-      "xl": "size-7",
+      "lg": "size-7",
+      "xl": "size-8",
     },
   },
 });
