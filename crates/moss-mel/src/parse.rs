@@ -2,18 +2,17 @@ use anyhow::{anyhow, Result};
 use arcstr::ArcStr;
 use hashbrown::{HashMap, HashSet};
 use hcl::{
-    eval::{Context, Evaluate},
     expr::{Traversal, Variable},
-    Block, Body, Expression, Object, ObjectKey, Value,
+    Block, Body, Expression, Object, ObjectKey,
 };
 
-use crate::foundations::token::*;
 use crate::foundations::{
     configuration::{
         ConfigurationBodyStmt, ConfigurationDecl, OverrideDecl, ParameterDecl,
         ParameterDeclBodyStmt,
     },
     scope::ModuleScope,
+    token::*,
 };
 
 pub fn parse_module_file(input: &str, module_scope: &mut ModuleScope) -> Result<()> {

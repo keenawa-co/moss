@@ -1,4 +1,3 @@
-use arcstr::ArcStr;
 use phf::{phf_set, Set};
 
 pub(crate) const CONFIGURATION_LIT: &'static str = "configuration";

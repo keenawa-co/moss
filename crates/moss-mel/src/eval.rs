@@ -3,6 +3,7 @@ use hashbrown::HashMap;
 use hcl::eval::{Context, Evaluate};
 use hcl::{Expression, Map, Value};
 
+// TODO: Is it a good idea to put this function here instead of `ModuleScope`?
 pub fn evaluate_locals(locals: HashMap<String, Expression>) -> Result<Map<String, Value>> {
     // OPTIMIZE: maybe using Acyclic would be better?
     let mut graph = petgraph::Graph::<String, ()>::new();

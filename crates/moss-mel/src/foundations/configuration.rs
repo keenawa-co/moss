@@ -1,17 +1,16 @@
-use anyhow::{anyhow, Result};
+use anyhow::Result;
 use arcstr::ArcStr;
 use hashbrown::{HashMap, HashSet};
 use hcl::{
     eval::{Context, Evaluate},
-    Expression, Map, Value as HclValue,
+    Expression,
 };
-use serde::Deserialize;
 use serde_json::Value as JsonValue;
 use std::str::FromStr;
 use std::sync::Arc;
 use strum::EnumString as StrumEnumString;
 
-use super::typ::{self, Type};
+use super::typ::Type;
 
 #[inline]
 fn is_null_expression(expr: &Expression) -> bool {

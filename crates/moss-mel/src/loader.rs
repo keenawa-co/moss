@@ -1,152 +1,34 @@
-use crate::eval::evaluate_locals;
-use crate::foundations::configuration::{ConfigurationDecl, ConfigurationNode};
+use crate::foundations::configuration::ConfigurationDecl;
 use crate::foundations::scope::{ModuleScope, ResolvedScope};
 use crate::parse::parse_module_file;
-use anyhow::{anyhow, Result};
-use arcstr::ArcStr;
+use anyhow::Result;
 use hashbrown::HashMap;
 use hcl::eval::{Context as EvalContext, Context};
-use hcl::Value::Object;
-use hcl::{Expression, Identifier, Map as HclMap, Value};
-use std::collections::HashSet;
 use std::ffi::OsStr;
 use std::path::PathBuf;
-use std::sync::Arc;
 
 const FILE_EXTENSION: &'static str = "hcl";
 
+// TODO: graph at the module level
 #[derive(Debug)]
 struct Package {
     modules: HashMap<PathBuf, ModuleScope>,
 }
 
 impl Package {
-    fn resolve_decl_order(&self) -> Result<Vec<(PathBuf, ConfigurationDecl)>> {
-        let configurations = self
-            .modules
-            .iter()
-            .flat_map(|(path, module)| {
-                module
-                    .configurations
-                    .iter()
-                    .map(|conf| (path.clone(), conf.clone()))
-            })
-            .collect::<Vec<(PathBuf, ConfigurationDecl)>>();
-
-        let mut named_confs = HashMap::new();
-        let mut genesis = Vec::new();
-        let mut successor = Vec::new();
-        let mut anonymous = Vec::new();
-
-        for (path, conf) in configurations {
-            match conf {
-                ConfigurationDecl::Genesis { ref ident, .. } => {
-                    if named_confs.contains_key(ident) {
-                        return Err(anyhow!("Duplicte configuration ident `{}`", ident));
-                    }
-                    genesis.push((path.clone(), ident.clone()));
-                    named_confs.insert(ident.clone(), (path, conf));
-                }
-                ConfigurationDecl::Successor { ref ident, .. } => {
-                    if named_confs.contains_key(ident) {
-                        return Err(anyhow!("Duplicte configuration ident `{}`", ident));
-                    }
-                    successor.push((path.clone(), ident.clone()));
-                    named_confs.insert(ident.clone(), (path, conf));
-                }
-                ConfigurationDecl::Anonymous { .. } => {
-                    anonymous.push((path, conf));
-                }
-            }
-        }
-
-        // TODO: Right now we only have a basic extend order resolution
-        // We will need more sophisticated dependency tracking in the future
-        // Similar to `collect_local_refs`
-
-        let mut extend_graph = petgraph::Graph::<ArcStr, ()>::new();
-        let mut node_map = HashMap::new();
-        let mut name_map = HashMap::new();
-
-        for ident in named_confs.keys() {
-            let idx = extend_graph.add_node(ident.clone());
-            node_map.insert(ident.clone(), idx);
-            name_map.insert(idx, ident.clone());
-        }
-
-        for (path, ident) in successor {
-            let parent_ident = named_confs[&ident].1.parent_ident().unwrap();
-            let from_idx = node_map[&ident];
-
-            if let Some(&to_idx) = node_map.get(&parent_ident) {
-                println!("{} depends on {}", ident, parent_ident);
-                extend_graph.add_edge(from_idx, to_idx, ());
-            } else {
-                return Err(anyhow!("Cannot find configuration `{}`", parent_ident));
-            }
-        }
-
-        Ok(petgraph::algo::toposort(&extend_graph, None)
-            .map_err(|_| anyhow!("Cycle detected in extends"))?
-            .into_iter()
-            .rev()
-            .map(|idx| name_map.get(&idx).unwrap())
-            .map(|name| named_confs.get(name).unwrap().to_owned())
-            .collect::<Vec<_>>())
+    fn resolve_module_order(&self) -> Result<Vec<ModuleScope>> {
+        // TODO: implement this once we have module imports and dependency
+        // Right now we will just use an arbitrary order
+        Ok(self.modules.values().cloned().collect::<Vec<_>>())
     }
 
-    pub fn evaluate_with_context(self, ctx: &mut Context) -> Result<ResolvedScope> {
+    pub fn evaluate_with_context(self, global_ctx: &mut Context) -> Result<ResolvedScope> {
         let mut result = ResolvedScope::new();
-        let mut global_ctxmap = HclMap::<Identifier, Value>::new();
-        let module_context = self
-            .modules
-            .iter()
-            .map(|(path, module)| (path.clone(), module.generate_ctx().unwrap()))
-            .collect::<HashMap<PathBuf, Context>>();
-
-        let mut anonymous_extends = Vec::new();
-        for (path, module) in self.modules.iter() {
-            for conf in module.configurations.iter() {
-                if conf.ident().is_none() {
-                    anonymous_extends.push((path.clone(), conf.clone()));
-                }
-            }
+        for module in self.resolve_module_order()? {
+            result.merge(module.evaluate_with_context(global_ctx)?);
         }
-
-        // TODO: Introducing package-level variables
-
-        // TODO: Right now we only have a basic extend order resolution
-        // We will need more sophisticated dependency tracking in the future
-        // Similar to `collect_local_refs`
-        let resolution_order: Vec<(PathBuf, ConfigurationDecl)> = self.resolve_decl_order()?;
-
-        for (path, decl) in resolution_order {
-            let mut ctx = module_context.get(&path).unwrap().clone();
-            global_ctxmap
-                .iter()
-                .for_each(|(ident, value)| ctx.declare_var(ident.clone(), value.clone()));
-            let evaluated = decl.evaluate(&ctx)?;
-            result.insert_configuration(evaluated.ident.clone().as_str(), evaluated);
-            // TODO: update the global context based on newly evaluated configuration node
-        }
-
-        for (path, decl) in anonymous_extends {
-            let mut ctx = module_context.get(&path).unwrap().clone();
-            global_ctxmap
-                .iter()
-                .for_each(|(ident, value)| ctx.declare_var(ident.clone(), value.clone()));
-            let evaluated = decl.evaluate(&ctx)?;
-            result.insert_anonymous_extends(evaluated);
-        }
-
         Ok(result)
     }
-}
-
-fn validate_successor(parent: &ConfigurationDecl, successor: &ConfigurationDecl) -> Result<()> {
-    // TODO: implement various validation logic
-    // e.g. No duplicate parameter names
-    Ok(())
 }
 
 #[derive(Debug)]
@@ -165,7 +47,6 @@ impl Loader {
         // FIXME: clarify the loading of packages and modules
         // What does `paths` refer to here? The paths of all modules of a package?
         // Here I assume each path refers to one package
-        let mut ctx = EvalContext::new();
         for path in paths {
             let package_path = &workspace_root.join(&path);
             let package = self.load_package(package_path)?;
@@ -176,7 +57,7 @@ impl Loader {
     }
 
     fn load_package(&self, path: &PathBuf) -> Result<Package> {
-        let mut read_dir = std::fs::read_dir(path)?;
+        let read_dir = std::fs::read_dir(path)?;
         let mut package = Package {
             modules: Default::default(),
         };
@@ -199,7 +80,7 @@ impl Loader {
     }
 
     fn load_module(&self, ctx: &mut EvalContext, path: &PathBuf) -> Result<ModuleScope> {
-        let mut read_dir = std::fs::read_dir(path)?;
+        let read_dir = std::fs::read_dir(path)?;
         let mut module_scope = ModuleScope::new();
 
         for entry in read_dir {

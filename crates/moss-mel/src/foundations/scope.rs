@@ -1,100 +1,30 @@
 use super::configuration::ConfigurationNode;
 use crate::eval::evaluate_locals;
 use crate::foundations::configuration::ConfigurationDecl;
-use crate::foundations::token::OTHER_EXTEND_CONFIGURATION_PARENT_ID;
 use anyhow::{anyhow, Result};
 use arcstr::ArcStr;
 use hashbrown::HashMap;
 use hcl::Value::Object;
-use hcl::{
-    eval::{Context, Evaluate},
-    Expression, Map, Value as HclValue,
-};
-use std::convert::identity;
-use std::ops::Index;
-use std::sync::atomic::AtomicUsize;
-
-// impl ConfigurationSet {
-
-// pub fn add_node(&mut self, node: ConfigurationNode) -> Result<()> {
-//     if self.index_map.contains_key(&node.ident) {
-//         return Err(anyhow!("Duplicate configuration ident: {}", node.ident));
-//     }
-//     let idx = self.dependency_graph.add_node(node);
-//     let ident = self.dependency_graph[idx].ident.clone();
-//     self.index_map.insert(ident, idx);
-//     Ok(())
-// }
-//
-// pub fn extend_other(&mut self, node: ConfigurationNode) -> Result<()> {
-//     let child_id = ArcStr::from(format!(
-//         "{}::{}",
-//         OTHER_EXTEND_CONFIGURATION_PARENT_ID,
-//         self.other_extend_idx
-//             .fetch_add(1, std::sync::atomic::Ordering::SeqCst)
-//     ));
-//     let node = ConfigurationNode {
-//         ident: child_id.clone(),
-//         ..node
-//     };
-//     self.add_node(node)?;
-//     self.add_edge(
-//         &ArcStr::from(OTHER_EXTEND_CONFIGURATION_PARENT_ID),
-//         &child_id,
-//     )
-// }
-//
-// pub fn add_edge(&mut self, from: &ArcStr, to: &ArcStr) -> Result<()> {
-//     println!("{:?}", self.index_map);
-//     if !self.index_map.contains_key(from) {
-//         return Err(anyhow!("Parent `{}` does not exist", from));
-//     } else if !self.index_map.contains_key(to) {
-//         return Err(anyhow!("Child `{}` does not exist", to));
-//     }
-//     let (&from_idx, &to_idx) = (
-//         self.index_map.get(from).unwrap(),
-//         self.index_map.get(to).unwrap(),
-//     );
-//     self.dependency_graph.add_edge(from_idx, to_idx, ());
-//     Ok(())
-// }
-//
-// pub fn get_parents(&self, node_ident: &ArcStr) -> Vec<&ConfigurationNode> {
-//     if let Some(&idx) = self.index_map.get(node_ident) {
-//         let mut parents = Vec::new();
-//         for neighbor in self
-//             .dependency_graph
-//             .neighbors_directed(idx, petgraph::Direction::Incoming)
-//         {
-//             parents.push(&self.dependency_graph[neighbor]);
-//         }
-//         parents
-//     } else {
-//         Vec::new()
-//     }
-// }
-//
-// pub fn get_children(&self, node_ident: &ArcStr) -> Vec<&ConfigurationNode> {
-//     if let Some(&idx) = self.index_map.get(node_ident) {
-//         let mut children = Vec::new();
-//         for neighbor in self
-//             .dependency_graph
-//             .neighbors_directed(idx, petgraph::Direction::Outgoing)
-//         {
-//             children.push(&self.dependency_graph[neighbor]);
-//         }
-//         children
-//     } else {
-//         Vec::new()
-//     }
-// }
-//
-// }
+use hcl::{eval::Context, Expression};
 
 #[derive(Debug)]
 pub struct ConfigurationSet {
     pub named_configs: HashMap<String, ConfigurationNode>,
     pub anonymous_extends: Vec<ConfigurationNode>,
+}
+
+impl ConfigurationSet {
+    pub fn new() -> Self {
+        ConfigurationSet {
+            named_configs: Default::default(),
+            anonymous_extends: vec![],
+        }
+    }
+
+    pub fn merge(&mut self, other: ConfigurationSet) {
+        self.named_configs.extend(other.named_configs);
+        self.anonymous_extends.extend(other.anonymous_extends);
+    }
 }
 
 #[derive(Debug)]
@@ -105,12 +35,14 @@ pub struct ResolvedScope {
 impl ResolvedScope {
     pub fn new() -> Self {
         Self {
-            configuration_set: ConfigurationSet {
-                named_configs: Default::default(),
-                anonymous_extends: vec![],
-            },
+            configuration_set: ConfigurationSet::new(),
         }
     }
+
+    pub fn merge(&mut self, other: ResolvedScope) {
+        self.configuration_set.merge(other.configuration_set);
+    }
+
     pub fn get_configuration(&self, name: &str) -> Option<&ConfigurationNode> {
         self.configuration_set.named_configs.get(name)
     }
@@ -125,15 +57,6 @@ impl ResolvedScope {
         self.configuration_set.anonymous_extends.push(configuration);
     }
 
-    // pub fn into_values(self) -> Vec<ConfigurationNode> {
-    //     petgraph::algo::toposort(&self.dependency_graph, None)
-    //         .expect("Cycles detected")
-    //         .iter()
-    //         .rev()
-    //         .map(|&i| self.dependency_graph.index(i).clone())
-    //         .collect::<Vec<ConfigurationNode>>()
-    // }
-
     pub fn into_values(self) -> Vec<ConfigurationNode> {
         self.configuration_set
             .named_configs
@@ -143,7 +66,7 @@ impl ResolvedScope {
     }
 }
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct ModuleScope {
     pub configurations: Vec<ConfigurationDecl>,
     pub locals: HashMap<String, Expression>,
@@ -157,10 +80,90 @@ impl ModuleScope {
         }
     }
 
-    pub fn generate_ctx(&self) -> Result<Context> {
-        let mut ctx = Context::new();
+    fn resolve_extend_order(&self) -> Result<Vec<ConfigurationDecl>> {
+        let mut named_confs = HashMap::new();
+        let mut genesis = Vec::new();
+        let mut successor = Vec::new();
+
+        for conf in self.configurations.iter() {
+            match conf {
+                ConfigurationDecl::Genesis { ref ident, .. } => {
+                    if named_confs.contains_key(ident) {
+                        return Err(anyhow!("Duplicte configuration ident `{}`", ident));
+                    }
+                    genesis.push(ident.clone());
+                    named_confs.insert(ident.clone(), conf.clone());
+                }
+                ConfigurationDecl::Successor { ref ident, .. } => {
+                    if named_confs.contains_key(ident) {
+                        return Err(anyhow!("Duplicte configuration ident `{}`", ident));
+                    }
+                    successor.push(ident.clone());
+                    named_confs.insert(ident.clone(), conf.clone());
+                }
+                _ => {}
+            }
+        }
+
+        let mut extend_graph = petgraph::Graph::<ArcStr, ()>::new();
+        let mut node_map = HashMap::new();
+        let mut name_map = HashMap::new();
+
+        for ident in named_confs.keys() {
+            let idx = extend_graph.add_node(ident.clone());
+            node_map.insert(ident.clone(), idx);
+            name_map.insert(idx, ident.clone());
+        }
+
+        for ident in successor {
+            let parent_ident = named_confs[&ident].parent_ident().unwrap();
+            let from_idx = node_map[&ident];
+
+            if let Some(&to_idx) = node_map.get(&parent_ident) {
+                println!("{} depends on {}", ident, parent_ident);
+                extend_graph.add_edge(from_idx, to_idx, ());
+            } else {
+                return Err(anyhow!("Cannot find configuration `{}`", parent_ident));
+            }
+        }
+
+        Ok(petgraph::algo::toposort(&extend_graph, None)
+            .map_err(|_| anyhow!("Cycle detected in extends"))?
+            .into_iter()
+            .rev()
+            .map(|idx| name_map.get(&idx).unwrap())
+            .map(|name| named_confs.get(name).unwrap().to_owned())
+            .collect::<Vec<_>>())
+    }
+
+    pub fn collect_dependencies(&self) -> Option<Vec<ArcStr>> {
+        None
+        // TODO: Implement it after we have module import mechanism
+    }
+
+    pub fn evaluate_with_context(self, global_ctx: &mut Context) -> Result<ResolvedScope> {
+        let mut result = ResolvedScope::new();
         let evaluated_locals = evaluate_locals(self.locals.clone())?;
-        ctx.declare_var("local", Object(evaluated_locals));
-        Ok(ctx)
+        let mut module_ctx = global_ctx.clone();
+        module_ctx.declare_var("local", Object(evaluated_locals));
+        let resolution_queue = self.resolve_extend_order()?;
+        let anonymous_extends = self
+            .configurations
+            .iter()
+            .filter(|decl| decl.ident().is_some())
+            .map(|decl| decl.to_owned())
+            .collect::<Vec<_>>();
+
+        for decl in resolution_queue {
+            let evaluated = decl.evaluate(&module_ctx)?;
+            result.insert_configuration(evaluated.ident.clone().as_str(), evaluated);
+            // TODO: update the module/package context based on newly evaluated ConfigurationNode
+        }
+
+        for decl in anonymous_extends {
+            let evaluated = decl.evaluate(&module_ctx)?;
+            result.insert_anonymous_extends(evaluated);
+        }
+        Ok(result)
     }
 }
