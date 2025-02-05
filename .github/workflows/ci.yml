@@ -63,7 +63,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Setup Rust toolchain
-        uses: dtolnay/rust-toolchain@1.82
+        uses: dtolnay/rust-toolchain@master
         with:
           targets: ${{ matrix.platform.target }}
 
@@ -98,7 +98,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Setup Rust toolchain
-        uses: dtolnay/rust-toolchain@1.82
+        uses: dtolnay/rust-toolchain@master
 
       - name: Use Linux Apt Cache
         uses: awalsh128/cache-apt-pkgs-action@latest
