@@ -282,9 +282,19 @@ export const Loading: Story = {
   },
   render: (args) => {
     return (
-      <Button.Root {...args}>
-        <Button.Label>Button</Button.Label>
-      </Button.Root>
+      <table className="border-separate border-spacing-2">
+        <tr>
+          {sizes.map((size) => {
+            return (
+              <td key={size}>
+                <Button.Root {...args} size={size}>
+                  <Button.Label>Button</Button.Label>
+                </Button.Root>
+              </td>
+            );
+          })}
+        </tr>
+      </table>
     );
   },
 };

@@ -113,6 +113,18 @@ const buttonRootStyles = cva(
   }
 );
 
+const loadingIconStyles = cva("animate-spin", {
+  variants: {
+    size: {
+      "xs": "size-4",
+      "sm": "size-5",
+      "md": "size-6",
+      "lg": "size-6",
+      "xl": "size-7",
+    },
+  },
+});
+
 export const Label = forwardRef<HTMLElement, HTMLAttributes<HTMLElement>>(
   ({ className, children, ...props }, forwardedRef) => {
     return (
@@ -145,7 +157,7 @@ export const Root = forwardRef<HTMLButtonElement & HTMLAnchorElement, ButtonProp
 
         {loading && (
           <div className="LoadingIcon absolute inset-0 grid place-items-center">
-            <Icon icon="LoaderTailus" className="size-6 animate-spin" />
+            <Icon icon="LoaderTailus" className={cn(loadingIconStyles({ size }))} />
           </div>
         )}
       </Component>
