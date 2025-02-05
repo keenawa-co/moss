@@ -24,21 +24,28 @@ export interface RadioItemProps {
   className?: string;
 }
 
-const defaultRadioGroupItemStyles = `size-[18px] border border-gray-100 cursor-pointer bg-white hover:bg-gray-50 shadow-sm group rounded-full peer flex justify-center items-center focus-visible:outline-2 focus-visible:outline-blue-600 focus-visible:outline-offset-2
- hover:brightness-95
- focus-visible:outline
- bg-gray-500/10
- data-[state=checked]:border-none
- data-[state=checked]:bg-blue-600
+const defaultRadioGroupItemStyles = `bg-white shadow-sm group rounded-full peer flex justify-center items-center cursor-pointer size-[18px]
+focus-visible:outline-2
+focus-visible:outline-[rgb(37,99,235)]
+focus-visible:outline-offset-2
 
- disabled:bg-gray-800
- disabled:opacity-50
- disabled:border-gray-700
- disabled:shadow-none
- disabled:cursor-not-allowed
- disabled:data-[state=checked]:bg-gray-300
- disabled:data-[state=checked]:bg-gray-700
- disabled:data-[state=checked]:shadow-none
+hover:brightness-95
+data-[state=checked]:bg-[rgb(37,99,235)]
+
+disabled:bg-gray-100
+disabled:opacity-50
+disabled:border-gray-300
+disabled:shadow-none
+disabled:data-[state=checked]:bg-gray-300
+disabled:data-[state=checked]:shadow-none
+
+
+
+dark:bg-gray-500/10
+dark:disabled:bg-gray-800
+dark:disabled:border-gray-700
+dark:disabled:data-[state=checked]:bg-gray-700
+
 `;
 
 const Item = forwardRef<
@@ -53,7 +60,7 @@ const Item = forwardRef<
     />
   );
 });
-const defaultRadioGroupIndicatorStyles = `size-[8px]`;
+const defaultRadioGroupIndicatorStyles = ` *:size-[10px]`;
 const Indicator = forwardRef<
   ElementRef<typeof RadioGroupPrimitive.Indicator>,
   ComponentPropsWithoutRef<typeof RadioGroupPrimitive.Indicator> & {

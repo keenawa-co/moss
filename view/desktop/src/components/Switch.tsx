@@ -5,13 +5,13 @@ import { cn } from "@repo/moss-ui";
 
 const SwitchContext = createContext({});
 
-const defaultSwitchRootStyles = `relative cursor-pointer h-5 w-8 inline-block border border-gray-900/5 rounded-full bg-gray-200 transition-[transform,width] focus-visible:outline-2 focus-visible:outline-blue-600 focus-visible:outline-offset-2 overflow-hidden
+const defaultSwitchRootStyles = `relative cursor-pointer h-5 w-8 inline-block border border-gray-900/5 rounded-full bg-gray-200 transition-[transform,width,background,border] focus-visible:outline-2 focus-visible:outline-blue-600 focus-visible:outline-offset-2 overflow-hidden
   disabled:bg-gray-700
   disabled:opacity-50
   disabled:shadow-none
   disabled:cursor-not-allowed
-  data-[state=checked]:border-blue-600
-  data-[state=checked]:bg-blue-600
+  data-[state=checked]:border-[rgb(37,99,235)]
+  data-[state=checked]:bg-[rgb(37,99,235)]
 `;
 
 const Root = forwardRef<ElementRef<typeof Switch.Root>, ComponentPropsWithoutRef<typeof Switch.Root>>(
