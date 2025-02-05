@@ -31,6 +31,7 @@ focus-visible:outline-offset-2
 
 hover:brightness-95
 data-[state=checked]:bg-[rgb(37,99,235)]
+data-[state=checked]:border-none
 
 disabled:bg-gray-100
 disabled:opacity-50
