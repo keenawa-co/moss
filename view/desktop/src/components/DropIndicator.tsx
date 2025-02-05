@@ -13,15 +13,15 @@ const edgeToOrientationMap: Record<Edge, Orientation> = {
 };
 
 const orientationStyles: Record<Orientation, HTMLAttributes<HTMLElement>["className"]> = {
-  horizontal: "h-[--line-thickness] left-[--terminal-radius] right-0 before:left-[--negative-terminal-size]",
-  vertical: "w-[--line-thickness] top-[--terminal-radius] bottom-0 before:top-[--negative-terminal-size]",
+  horizontal: "h-(--line-thickness) left-(--terminal-radius) right-0 before:left-(--negative-terminal-size)",
+  vertical: "w-(--line-thickness) top-(--terminal-radius) bottom-0 before:top-(--negative-terminal-size)",
 };
 
 const edgeStyles: Record<Edge, HTMLAttributes<HTMLElement>["className"]> = {
-  top: "top-[--line-offset] before:top-[--offset-terminal]",
-  right: "right-[--line-offset] before:right-[--offset-terminal]",
-  bottom: "bottom-[--line-offset] before:bottom-[--offset-terminal]",
-  left: "left-[--line-offset] before:left-[--offset-terminal]",
+  top: "top-(--line-offset) before:top-(--offset-terminal)",
+  right: "right-(--line-offset) before:right-(--offset-terminal)",
+  bottom: "bottom-(--line-offset) before:bottom-(--offset-terminal)",
+  left: "left-(--line-offset) before:left-(--offset-terminal)",
 };
 
 /**
@@ -54,7 +54,7 @@ export function DropIndicator({ edge, gap = 0, strokeSize = 2, terminalSize = 8,
         } as CSSProperties
       }
       className={cn(
-        `pointer-events-none absolute z-10 box-border bg-sky-700 before:absolute before:h-[--terminal-size] before:w-[--terminal-size] before:rounded-full before:border-[length:--line-thickness] before:border-solid before:border-sky-700 before:content-['']`,
+        `pointer-events-none absolute z-10 box-border bg-sky-700 before:absolute before:h-(--terminal-size) before:w-(--terminal-size) before:rounded-full before:border-[length:--line-thickness] before:border-solid before:border-sky-700 before:content-['']`,
         orientationStyles[orientation],
         edgeStyles[edge],
         className

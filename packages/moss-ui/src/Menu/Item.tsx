@@ -23,19 +23,19 @@ export const Item = forwardRef<ItemElement, ItemProps>(
         {...props}
         ref={forwardedRef}
         className={cn(
-          "flex items-center gap-1.5 rounded py-0.5 pl-[7px] pr-5",
+          "flex items-center gap-1.5 rounded py-0.5 pr-5 pl-[7px]",
           {
             "cursor-not-allowed opacity-50": props.disabled,
-            "cursor-pointer hover:bg-[#D4E2FF] hover:outline-none": !props.disabled,
+            "cursor-pointer hover:bg-[#D4E2FF] hover:outline-hidden": !props.disabled,
           },
           className
         )}
       >
         {!hideIcon &&
           (props.icon ? (
-            <Icon icon={props.icon} className={cn("flex-shrink-0 text-[#8D8D8D]", iconClassName)} />
+            <Icon icon={props.icon} className={cn("shrink-0 text-[#8D8D8D]", iconClassName)} />
           ) : (
-            <Icon icon="Documentation" className={cn("flex-shrink-0 opacity-0", iconClassName)} />
+            <Icon icon="Documentation" className={cn("shrink-0 opacity-0", iconClassName)} />
           ))}
         <div className="flex w-full items-center gap-2.5">
           <span>{props.label}</span>

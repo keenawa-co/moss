@@ -3,6 +3,7 @@ import React from "react";
 import type { Preview } from "@storybook/react";
 
 import "@repo/moss-ui/src/styles.css";
+import "@repo/moss-ui/src/fonts.css";
 
 import * as themeFiles from "./themes";
 

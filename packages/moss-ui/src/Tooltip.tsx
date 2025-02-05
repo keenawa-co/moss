@@ -1,4 +1,4 @@
-import * as React from "react";
+import React from "react";
 
 import * as TooltipPrimitive from "@radix-ui/react-tooltip";
 
@@ -39,7 +39,7 @@ export interface TooltipOptions {
 
 const TooltipShortcut = ({ shortcut }: { shortcut: string[] }) => {
   return (
-    <div className="font-medium uppercase text-[#818594]">
+    <div className="font-medium text-[#818594] uppercase">
       {shortcut.map((s) => (
         <span key={s}>{s}</span>
       ))}

@@ -1,3 +1,5 @@
+import { describe, expect, test, vi } from "vitest";
+
 import { mockGetBoundingClientRect } from "../__test_utils__/utils";
 import { Overlay } from "../../overlay/overlay";
 
@@ -20,7 +22,7 @@ describe("overlay", () => {
       content,
     });
 
-    jest.spyOn(container.childNodes.item(0) as HTMLElement, "getBoundingClientRect").mockImplementation(() => {
+    vi.spyOn(container.childNodes.item(0) as HTMLElement, "getBoundingClientRect").mockImplementation(() => {
       return mockGetBoundingClientRect({
         left: 80,
         top: 100,
@@ -28,7 +30,7 @@ describe("overlay", () => {
         height: 50,
       });
     });
-    jest.spyOn(container, "getBoundingClientRect").mockImplementation(() => {
+    vi.spyOn(container, "getBoundingClientRect").mockImplementation(() => {
       return mockGetBoundingClientRect({
         left: 20,
         top: 30,
@@ -67,7 +69,7 @@ describe("overlay", () => {
       content,
     });
 
-    jest.spyOn(container.childNodes.item(0) as HTMLElement, "getBoundingClientRect").mockImplementation(() => {
+    vi.spyOn(container.childNodes.item(0) as HTMLElement, "getBoundingClientRect").mockImplementation(() => {
       return mockGetBoundingClientRect({
         left: 80,
         top: 100,
@@ -75,7 +77,7 @@ describe("overlay", () => {
         height: 50,
       });
     });
-    jest.spyOn(container, "getBoundingClientRect").mockImplementation(() => {
+    vi.spyOn(container, "getBoundingClientRect").mockImplementation(() => {
       return mockGetBoundingClientRect({
         left: 20,
         top: 30,
@@ -114,7 +116,7 @@ describe("overlay", () => {
       content,
     });
 
-    jest.spyOn(container.childNodes.item(0) as HTMLElement, "getBoundingClientRect").mockImplementation(() => {
+    vi.spyOn(container.childNodes.item(0) as HTMLElement, "getBoundingClientRect").mockImplementation(() => {
       return mockGetBoundingClientRect({
         left: 80,
         top: 100,
@@ -122,7 +124,7 @@ describe("overlay", () => {
         height: 50,
       });
     });
-    jest.spyOn(container, "getBoundingClientRect").mockImplementation(() => {
+    vi.spyOn(container, "getBoundingClientRect").mockImplementation(() => {
       return mockGetBoundingClientRect({
         left: 20,
         top: 30,
@@ -161,7 +163,7 @@ describe("overlay", () => {
       content,
     });
 
-    jest.spyOn(container.childNodes.item(0) as HTMLElement, "getBoundingClientRect").mockImplementation(() => {
+    vi.spyOn(container.childNodes.item(0) as HTMLElement, "getBoundingClientRect").mockImplementation(() => {
       return mockGetBoundingClientRect({
         left: 80,
         top: 100,
@@ -169,7 +171,7 @@ describe("overlay", () => {
         height: 50,
       });
     });
-    jest.spyOn(container, "getBoundingClientRect").mockImplementation(() => {
+    vi.spyOn(container, "getBoundingClientRect").mockImplementation(() => {
       return mockGetBoundingClientRect({
         left: 20,
         top: 30,
@@ -211,7 +213,7 @@ describe("overlay", () => {
     const element: HTMLElement = container.querySelector(".dv-resize-container")!;
     expect(element).toBeTruthy();
 
-    jest.spyOn(element, "getBoundingClientRect").mockImplementation(() => {
+    vi.spyOn(element, "getBoundingClientRect").mockImplementation(() => {
       return mockGetBoundingClientRect({
         left: 300,
         top: 400,
@@ -219,7 +221,7 @@ describe("overlay", () => {
         height: 100,
       });
     });
-    jest.spyOn(container, "getBoundingClientRect").mockImplementation(() => {
+    vi.spyOn(container, "getBoundingClientRect").mockImplementation(() => {
       return mockGetBoundingClientRect({
         left: 0,
         top: 0,
@@ -259,7 +261,7 @@ describe("overlay", () => {
     const element: HTMLElement = container.querySelector(".dv-resize-container")!;
     expect(element).toBeTruthy();
 
-    jest.spyOn(element, "getBoundingClientRect").mockImplementation(() => {
+    vi.spyOn(element, "getBoundingClientRect").mockImplementation(() => {
       return mockGetBoundingClientRect({
         left: 500,
         top: 500,
@@ -267,7 +269,7 @@ describe("overlay", () => {
         height: 100,
       });
     });
-    jest.spyOn(container, "getBoundingClientRect").mockImplementation(() => {
+    vi.spyOn(container, "getBoundingClientRect").mockImplementation(() => {
       return mockGetBoundingClientRect({
         left: 0,
         top: 0,

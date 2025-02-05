@@ -111,7 +111,7 @@ const GalleryComponent = () => {
   const [theme, setTheme] = useState<"light" | "dark">("light");
 
   return (
-    <div className={cn("h-screen overflow-auto px-4 pb-12 pt-4", theme === "light" ? "" : "bg-[#161819] text-white")}>
+    <div className={cn("h-screen overflow-auto px-4 pt-4 pb-12", theme === "light" ? "" : "bg-[#161819] text-white")}>
       <div className="flex gap-6">
         <div className="flex w-full flex-col gap-6">
           <input
@@ -119,8 +119,8 @@ const GalleryComponent = () => {
             onChange={(e) => setSearch(e.target.value)}
             type="text"
             className={cn(
-              "text-black w-full rounded border border-[#E0E0E0] px-2 py-1 font-medium placeholder-[#A8ADBD] hover:bg-[#EAEAEA] focus:bg-[#C6C6C6] focus:outline-none focus-visible:outline-none active:outline-none",
-              theme === "light" ? "" : "text-black bg-[#1E2021]"
+              "w-full rounded border border-[#E0E0E0] px-2 py-1 font-medium text-black placeholder-[#A8ADBD] hover:bg-[#EAEAEA] focus:bg-[#C6C6C6] focus:outline-hidden focus-visible:outline-hidden active:outline-hidden",
+              theme === "light" ? "" : "bg-[#1E2021] text-black"
             )}
             placeholder={`Search for ${Object.keys(icons).length} icons`}
           />
@@ -138,7 +138,7 @@ const GalleryComponent = () => {
                     }
                   />
                 </div>
-                <div className="w-full break-all text-center text-xs font-semibold">{name}</div>
+                <div className="w-full text-center text-xs font-semibold break-all">{name}</div>
               </div>
             ))}
           </div>

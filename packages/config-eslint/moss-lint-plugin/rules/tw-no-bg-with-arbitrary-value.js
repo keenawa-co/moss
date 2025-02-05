@@ -1,37 +1,15 @@
-const ANY_TW_BG_WITH_ARBITRARY_VALUE = /\b[\w|\-:]*bg-\[(?:var\((--[\w-]+)\)|(--[\w-]+))\]/g;
+import { getAllInvalidTokens } from "../utils/getAllInvalidTokens.js";
 
-const fixArbitraryValue = (str) => {
-  return str.replace("bg-[", "background-[").replace("var(", "").replace(")", "");
-};
+const ANY_TW_BG_WITH_ARBITRARY_VALUE =
+  /\b[\w\-:]*bg-(?:\[(?:var\((--[\w-]+)\)|(--[\w-]+))\]|\((?:var\((--[\w-]+)\)|(--[\w-]+))\))/g;
 
-const getAllInvalidTokens = (str, loc) => {
-  const invalidTokens = [];
-  let arr;
-
-  while ((arr = ANY_TW_BG_WITH_ARBITRARY_VALUE.exec(str)) !== null) {
-    const className = arr[0];
-    const name = arr[1] || arr[2];
-
-    const startColumn = loc.start.column + str.indexOf(className) + 1;
-    const endColumn = startColumn + className.length;
-
-    invalidTokens.push({
-      name,
-      value: className,
-      loc: {
-        start: {
-          line: loc.start.line,
-          column: startColumn,
-        },
-        end: {
-          line: loc.end.line,
-          column: endColumn,
-        },
-      },
-    });
-  }
-
-  return invalidTokens;
+const fixArbitraryValue = (className) => {
+  return className
+    .replace("bg-(", "background-(")
+    .replace("bg-[", "background-(")
+    .replace("]", ")")
+    .replace("var(", "")
+    .replace("))", ")");
 };
 
 /** @type {import('eslint').Rule.RuleModule} **/
@@ -56,7 +34,7 @@ export default {
     return {
       Literal(node) {
         if (typeof node.value === "string") {
-          const invalidTokens = getAllInvalidTokens(node.value, node.loc);
+          const invalidTokens = getAllInvalidTokens(node.value, node.loc, ANY_TW_BG_WITH_ARBITRARY_VALUE);
 
           invalidTokens.forEach((token) => {
             context.report({
@@ -76,7 +54,7 @@ export default {
       },
       TemplateElement(node) {
         if (typeof node.value.raw === "string") {
-          const invalidTokens = getAllInvalidTokens(node.value.raw, node.loc);
+          const invalidTokens = getAllInvalidTokens(node.value.raw, node.loc, ANY_TW_BG_WITH_ARBITRARY_VALUE);
 
           invalidTokens.forEach((token) => {
             context.report({

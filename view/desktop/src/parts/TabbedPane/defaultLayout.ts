@@ -10,7 +10,7 @@ export function defaultConfig(api: DockviewApi) {
   const panel1 = api.addPanel({
     id: "Home",
     component: "Home",
-    renderer: "always",
+    renderer: "onlyWhenVisible",
     title: "Home",
   });
 

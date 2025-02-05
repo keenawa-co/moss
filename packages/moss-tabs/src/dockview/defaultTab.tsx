@@ -1,4 +1,4 @@
-import * as React from "react";
+import React from "react";
 
 import { DockviewPanelApi } from "../api/dockviewPanelApi";
 import { CloseButton } from "../svgReact";

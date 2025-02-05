@@ -1,9 +1,12 @@
+import { beforeEach, describe, expect, test, vi } from "vitest";
+
+import { fireEvent } from "@testing-library/dom";
+import { fromPartial } from "@total-typescript/shoehorn";
+
 import { DockviewApi } from "../../../../api/component.api";
 import { DockviewPanelApi, TitleEvent } from "../../../../api/dockviewPanelApi";
 import { DefaultTab } from "../../../../dockview/components/tab/defaultTab";
-import { fromPartial } from "@total-typescript/shoehorn";
 import { Emitter } from "../../../../events";
-import { fireEvent } from "@testing-library/dom";
 
 describe("defaultTab", () => {
   test("that title updates", () => {
@@ -40,8 +43,8 @@ describe("defaultTab", () => {
     const cut = new DefaultTab();
 
     const api = fromPartial<DockviewPanelApi>({
-      onDidTitleChange: jest.fn(),
-      close: jest.fn(),
+      onDidTitleChange: vi.fn(),
+      close: vi.fn(),
     });
     const containerApi = fromPartial<DockviewApi>({});
 

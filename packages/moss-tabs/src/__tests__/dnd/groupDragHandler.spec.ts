@@ -1,14 +1,17 @@
+import { beforeEach, describe, expect, test, vi } from "vitest";
+
 import { fireEvent } from "@testing-library/dom";
-import { GroupDragHandler } from "../../dnd/groupDragHandler";
-import { DockviewGroupPanel } from "../../dockview/dockviewGroupPanel";
+
 import { LocalSelectionTransfer, PanelTransfer } from "../../dnd/dataTransfer";
+import { GroupDragHandler } from "../../dnd/groupDragHandler";
 import { DockviewComponent } from "../../dockview/dockviewComponent";
+import { DockviewGroupPanel } from "../../dockview/dockviewGroupPanel";
 
 describe("groupDragHandler", () => {
   test("that the dnd transfer object is setup and torndown", () => {
     const element = document.createElement("div");
 
-    const groupMock = jest.fn<DockviewGroupPanel, []>(() => {
+    const groupMock = vi.fn<DockviewGroupPanel, []>(() => {
       const partial: Partial<DockviewGroupPanel> = {
         id: "test_group_id",
         api: { location: { type: "grid" } } as any,
@@ -36,7 +39,7 @@ describe("groupDragHandler", () => {
   test("that the event is cancelled when floating and shiftKey=true", () => {
     const element = document.createElement("div");
 
-    const groupMock = jest.fn<DockviewGroupPanel, []>(() => {
+    const groupMock = vi.fn<DockviewGroupPanel, []>(() => {
       const partial: Partial<DockviewGroupPanel> = {
         api: { location: { type: "floating" } } as any,
       };
@@ -48,13 +51,13 @@ describe("groupDragHandler", () => {
 
     const event = new KeyboardEvent("dragstart", { shiftKey: false });
 
-    const spy = jest.spyOn(event, "preventDefault");
+    const spy = vi.spyOn(event, "preventDefault");
     fireEvent(element, event);
     expect(spy).toBeCalledTimes(1);
 
     const event2 = new KeyboardEvent("dragstart", { shiftKey: true });
 
-    const spy2 = jest.spyOn(event2, "preventDefault");
+    const spy2 = vi.spyOn(event2, "preventDefault");
     fireEvent(element, event);
     expect(spy2).toBeCalledTimes(0);
 
@@ -64,7 +67,7 @@ describe("groupDragHandler", () => {
   test("that the event is never cancelled when the group is not floating", () => {
     const element = document.createElement("div");
 
-    const groupMock = jest.fn<DockviewGroupPanel, []>(() => {
+    const groupMock = vi.fn<DockviewGroupPanel, []>(() => {
       const partial: Partial<DockviewGroupPanel> = {
         api: { location: { type: "grid" } } as any,
       };
@@ -76,13 +79,13 @@ describe("groupDragHandler", () => {
 
     const event = new KeyboardEvent("dragstart", { shiftKey: false });
 
-    const spy = jest.spyOn(event, "preventDefault");
+    const spy = vi.spyOn(event, "preventDefault");
     fireEvent(element, event);
     expect(spy).toBeCalledTimes(0);
 
     const event2 = new KeyboardEvent("dragstart", { shiftKey: true });
 
-    const spy2 = jest.spyOn(event2, "preventDefault");
+    const spy2 = vi.spyOn(event2, "preventDefault");
     fireEvent(element, event);
     expect(spy2).toBeCalledTimes(0);
 

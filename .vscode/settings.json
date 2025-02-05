@@ -10,6 +10,7 @@
     "canonicalize",
     "chrono",
     "Deque",
+    "Dockview",
     "Downcaster",
     "filetree",
     "fullscreen",
@@ -124,5 +125,4 @@
   "[typespec]": {
     "editor.formatOnSave": false
   },
-  "tailwindCSS.rootFontSize": 16,
 }

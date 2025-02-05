@@ -1,5 +1,4 @@
-import * as React from "react";
-import { forwardRef } from "react";
+import React, { forwardRef } from "react";
 
 import { composeEventHandlers } from "@radix-ui/primitive";
 import { composeRefs } from "@radix-ui/react-compose-refs";

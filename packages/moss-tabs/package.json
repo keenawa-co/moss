@@ -20,17 +20,14 @@
     "clean": "rimraf dist/ .build/ .rollup.cache/",
     "prepublishOnly": "npm run rebuild && npm run test",
     "rebuild": "npm run clean && npm run build",
-    "test": "cross-env npx jest --selectProjects moss-tabs --env=jsdom",
-    "test:cov": "cross-env npx jest --selectProjects moss-tabs --coverage --env=jsdom"
+    "test": "vitest",
+    "test:cov": "vitest --coverage"
   },
   "devDependencies": {
     "@repo/tailwind-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
-    "@tailwindcss/typography": "^0.5.15",
-    "@types/jest": "^29.5.14",
     "@types/node": "^22.10.1",
-    "jest-environment-jsdom": "^29.7.0",
-    "jest-sonar-reporter": "^2.0.0",
+    "jsdom": "^26.0.0",
     "ts-node": "^10.9.2"
   },
   "peerDependencies": {
@@ -40,7 +37,6 @@
     "@testing-library/dom": "^10.4.0",
     "@testing-library/react": "^16.1.0",
     "@total-typescript/shoehorn": "^0.1.2",
-    "cross-env": "^7.0.3",
-    "ts-jest": "^29.2.5"
+    "cross-env": "^7.0.3"
   }
 }
