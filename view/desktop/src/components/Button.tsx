@@ -31,7 +31,7 @@ const buttonRootStyles = cva(
         solid: `   background-(--bg-solid)    text-(--text-solid)    [box-shadow:var(--boxShadow-solid)]    dark:border-t dark:border-(--border-solid) hover:brightness-110 active:brightness-95 `,
         outlined: `background-(--bg-outlined) text-(--text-outlined) [box-shadow:var(--boxShadow-outlined)] hover:brightness-[0.98] active:brightness-100 dark:hover:brightness-150 dark:active:background-(--bg-outlined)/40`,
         soft: `    background-(--bg-soft)     text-(--text-soft)     [box-shadow:var(--boxShadow-soft)]     hover:brightness-95     active:brightness-105 dark:hover:brightness-120 dark:active:brightness-80`,
-        ghost: `   background-transparent     text-(--text-ghost)    [box-shadow:var(--boxShadow-ghost)]    dark:border-(--border-ghost) hover:background-(--bg-ghost) hover:[box-shadow:var(--border-ghost)_0px_0px_0px_1px] active:brightness-95 `,
+        ghost: `   background-transparent     text-(--text-ghost)    [box-shadow:var(--boxShadow-ghost)]    dark:border-(--border-ghost) hover:background-(--bg-ghost) hover:[box-shadow:var(--border-ghost)_0px_0px_0px_1px] active:brightness-80 `,
       },
       size: {
         "xs": "h-7",
