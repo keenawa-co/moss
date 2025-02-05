@@ -116,11 +116,11 @@ const buttonRootStyles = cva(
 const loadingIconStyles = cva("animate-spin", {
   variants: {
     size: {
-      "xs": "size-4",
-      "sm": "size-5",
-      "md": "size-6",
-      "lg": "size-7",
-      "xl": "size-8",
+      "xs": "size-5",
+      "sm": "size-6",
+      "md": "size-7",
+      "lg": "size-8",
+      "xl": "size-9",
     },
   },
 });
