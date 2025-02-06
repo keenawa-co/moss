@@ -12,7 +12,6 @@ function getAbsolutePath(value: string): string {
 }
 const config: StorybookConfig = {
   stories: [
-    "../../../packages/moss-ui/src/**/*.stories.@(js|jsx|mjs|ts|tsx)",
     "../../desktop/src/components/**/*.stories.@(js|jsx|mjs|ts|tsx)",
     "../../web/src/**/*.stories.@(js|jsx|mjs|ts|tsx)",
   ],
