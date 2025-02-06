@@ -1,5 +1,5 @@
-@config "@repo/tailwind-config";
 @import "tailwindcss";
+@config "@repo/tailwind-config";
 
 #root {
   height: 100%;
