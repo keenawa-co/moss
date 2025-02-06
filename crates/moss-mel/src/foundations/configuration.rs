@@ -23,6 +23,11 @@ fn is_null_expression(expr: &Expression) -> bool {
 #[derive(Clone, Debug)]
 pub struct OverrideDecl {
     pub ident: ArcStr,
+    pub body: OverrideBodyStmt,
+}
+
+#[derive(Clone, Debug)]
+pub struct OverrideBodyStmt {
     pub value: Expression,
     pub context: Expression,
 }
@@ -30,11 +35,11 @@ pub struct OverrideDecl {
 #[derive(Clone, Debug)]
 pub struct ParameterDecl {
     pub ident: ArcStr,
-    pub body: ParameterDeclBodyStmt,
+    pub body: ParameterBodyStmt,
 }
 
 #[derive(Clone, Debug)]
-pub struct ParameterDeclBodyStmt {
+pub struct ParameterBodyStmt {
     pub value_type: Expression,
     pub maximum: Expression,
     pub minimum: Expression,
@@ -97,17 +102,6 @@ impl ConfigurationDecl {
     }
 }
 
-// #[derive(Debug)]
-// pub struct ConfigurationDecl {
-//     pub ident: Option<ArcStr>,
-//     pub parent_ident: Option<ArcStr>,
-//     pub display_name: Expression,
-//     pub description: Expression,
-//     pub order: Expression,
-//     pub parameters: Vec<ConfigurationParameterDecl>,
-//     pub overrides: Vec<ConfigurationOverrideDecl>,
-// }
-
 impl ConfigurationDecl {
     pub fn evaluate(self, ctx: &Context) -> Result<ConfigurationNode> {
         let body = self.body();
@@ -152,14 +146,14 @@ impl ConfigurationDecl {
 
         let mut overrides = HashMap::new();
         for override_decl in &body.overrides {
-            let value = if is_null_expression(&override_decl.value) {
+            let value = if is_null_expression(&override_decl.body.value) {
                 // TODO: Add logging
                 continue;
             } else {
-                serde_json::from_str(override_decl.value.evaluate(ctx)?.to_string().as_str())?
+                serde_json::from_str(override_decl.body.value.evaluate(ctx)?.to_string().as_str())?
             };
 
-            let _context = if !is_null_expression(&override_decl.context) {
+            let _context = if !is_null_expression(&override_decl.body.context) {
                 unimplemented!()
             };
 

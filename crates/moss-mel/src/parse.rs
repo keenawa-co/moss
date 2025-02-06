@@ -6,11 +6,9 @@ use hcl::{
     Block, Body, Expression, Object, ObjectKey,
 };
 
+use crate::foundations::configuration::{OverrideBodyStmt, ParameterBodyStmt};
 use crate::foundations::{
-    configuration::{
-        ConfigurationBodyStmt, ConfigurationDecl, OverrideDecl, ParameterDecl,
-        ParameterDeclBodyStmt,
-    },
+    configuration::{ConfigurationBodyStmt, ConfigurationDecl, OverrideDecl, ParameterDecl},
     scope::ModuleScope,
     token::*,
 };
@@ -133,14 +131,16 @@ fn parse_configuration_body(block: Block) -> Result<ConfigurationBodyStmt> {
 
                 let mut override_decl = OverrideDecl {
                     ident,
-                    value: Expression::Null,
-                    context: Expression::Null,
+                    body: OverrideBodyStmt {
+                        value: Expression::Null,
+                        context: Expression::Null,
+                    },
                 };
 
                 for attribute in block.body.into_attributes() {
                     match attribute.key() {
-                        "value" => override_decl.value = attribute.expr,
-                        "context" => override_decl.context = attribute.expr,
+                        "value" => override_decl.body.value = attribute.expr,
+                        "context" => override_decl.body.context = attribute.expr,
                         _ => {
 
                             // TODO: Add logging for encountering an unknown attribute
@@ -165,7 +165,7 @@ fn parse_configuration_body(block: Block) -> Result<ConfigurationBodyStmt> {
 
                 let mut parameter_decl = ParameterDecl {
                     ident,
-                    body: ParameterDeclBodyStmt {
+                    body: ParameterBodyStmt {
                         value_type: Expression::Null,
                         maximum: Expression::Null,
                         minimum: Expression::Null,

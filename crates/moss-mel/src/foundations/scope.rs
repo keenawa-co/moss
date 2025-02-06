@@ -29,39 +29,39 @@ impl ConfigurationSet {
 
 #[derive(Debug)]
 pub struct ResolvedScope {
-    pub configuration_set: ConfigurationSet,
+    pub configurations: ConfigurationSet,
 }
 
 impl ResolvedScope {
     pub fn new() -> Self {
         Self {
-            configuration_set: ConfigurationSet::new(),
+            configurations: ConfigurationSet::new(),
         }
     }
 
     pub fn merge(&mut self, other: ResolvedScope) {
-        self.configuration_set.merge(other.configuration_set);
+        self.configurations.merge(other.configurations);
     }
 
     pub fn get_configuration(&self, name: &str) -> Option<&ConfigurationNode> {
-        self.configuration_set.named_configs.get(name)
+        self.configurations.named_configs.get(name)
     }
 
     pub fn insert_configuration(&mut self, name: &str, configuration: ConfigurationNode) {
-        self.configuration_set
+        self.configurations
             .named_configs
             .insert(name.to_string(), configuration);
     }
 
     pub fn insert_anonymous_extends(&mut self, configuration: ConfigurationNode) {
-        self.configuration_set.anonymous_extends.push(configuration);
+        self.configurations.anonymous_extends.push(configuration);
     }
 
     pub fn into_values(self) -> Vec<ConfigurationNode> {
-        self.configuration_set
+        self.configurations
             .named_configs
             .into_values()
-            .chain(self.configuration_set.anonymous_extends.into_iter())
+            .chain(self.configurations.anonymous_extends.into_iter())
             .collect::<Vec<_>>()
     }
 }
