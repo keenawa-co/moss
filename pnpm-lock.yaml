@@ -49,8 +49,8 @@ importers:
         specifier: ^18
         version: 18.3.5(@types/react@18.3.16)
       '@typespec/prettier-plugin-typespec':
-        specifier: 0.62.0
-        version: 0.62.0
+        specifier: 0.64.0
+        version: 0.64.0
       '@vitejs/plugin-react':
         specifier: ^4.3.4
         version: 4.3.4(vite@6.0.3(@types/node@22.10.2)(jiti@2.4.2)(lightningcss@1.29.1)(sass-embedded@1.83.4)(terser@5.38.0)(yaml@2.6.1))
@@ -3506,8 +3506,8 @@ packages:
     peerDependencies:
       '@typespec/compiler': ~0.63.0
 
-  '@typespec/prettier-plugin-typespec@0.62.0':
-    resolution: {integrity: sha512-VJRtX4RcUYE0qiQpKL8K7Mgfozy/icieaoap44XR+2OmWegZmuR1Qjq5iWtjLBS7MFwSXHel+BT/LBlqu1v+dA==}
+  '@typespec/prettier-plugin-typespec@0.64.0':
+    resolution: {integrity: sha512-hL/DOo7+PFp/HGeZgkKqkbG9Q4iUYbhvqHcwXhzCOIaBFn50fgNQbBRdQD9VgvrGGbwN7fyTJmsGWyFnuSNjJA==}
 
   '@vitejs/plugin-react@4.3.4':
     resolution: {integrity: sha512-SCCPBJtYLdE8PX/7ZQAs1QAZ8Jqwih+0VBLum1EGqmCCQal+MIUqLCzj3ZUy8ufbC0cAM4LRlSTm7IQJwWT4ug==}
@@ -10308,7 +10308,7 @@ snapshots:
       '@typespec/compiler': 0.64.0
       yaml: 2.5.1
 
-  '@typespec/prettier-plugin-typespec@0.62.0':
+  '@typespec/prettier-plugin-typespec@0.64.0':
     dependencies:
       prettier: 3.3.3
 
