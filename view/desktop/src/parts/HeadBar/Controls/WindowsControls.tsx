@@ -1,6 +1,6 @@
 import { useContext, type HTMLProps } from "react";
 
-import { cn } from "@repo/moss-ui";
+import { cn } from "@/utils";
 
 import { ControlButton } from "./ControlButton";
 import ControlsContext from "./ControlsContext";

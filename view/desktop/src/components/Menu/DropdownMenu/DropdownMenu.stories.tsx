@@ -1,9 +1,11 @@
-import { Meta, StoryObj } from "@storybook/react";
-import * as DM from "./DropdownMenu";
 import { useState } from "react";
 
+import { Meta, StoryObj } from "@storybook/react";
+
+import * as DM from "./DropdownMenu";
+
 const meta: Meta<typeof DM.Root> = {
-  title: "Shared/DropdownMenu",
+  title: "Desktop/DropdownMenu",
   component: DM.Root,
   tags: ["autodocs"],
   decorators: [

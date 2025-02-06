@@ -1,6 +1,8 @@
 import { ComponentPropsWithoutRef, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
+import { DropdownMenu as DM, Icon, Icons } from "@/components";
+import { cn } from "@/utils";
 import {
   attachClosestEdge,
   extractClosestEdge,
@@ -9,7 +11,6 @@ import {
 import { combine } from "@atlaskit/pragmatic-drag-and-drop/combine";
 import { draggable, dropTargetForElements } from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
 import { setCustomNativeDragPreview } from "@atlaskit/pragmatic-drag-and-drop/element/set-custom-native-drag-preview";
-import { cn, DropdownMenu as DM, Icon, Icons } from "@repo/moss-ui";
 
 import { DropIndicator } from "./DropIndicator";
 

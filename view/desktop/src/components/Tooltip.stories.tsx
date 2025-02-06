@@ -1,8 +1,9 @@
-import type { Meta, StoryObj, Args } from "@storybook/react";
+import type { Args, Meta, StoryObj } from "@storybook/react";
+
 import Tooltip from "./Tooltip";
 
 const meta = {
-  title: "Shared/Tooltip",
+  title: "Desktop/Tooltip",
   component: Tooltip,
   parameters: {
     layout: "centered",

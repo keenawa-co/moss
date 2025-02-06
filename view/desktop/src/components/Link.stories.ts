@@ -1,8 +1,9 @@
 import { Meta, StoryObj } from "@storybook/react";
+
 import { Link } from "./index";
 
 const meta: Meta = {
-  title: "Shared/Link",
+  title: "Desktop/Link",
   component: Link,
   tags: ["autodocs"],
   parameters: {

@@ -1,7 +1,7 @@
 import { ComponentPropsWithoutRef, createContext, ElementRef, forwardRef } from "react";
 
+import { cn } from "@/utils";
 import * as RadioGroupPrimitive from "@radix-ui/react-radio-group";
-import { cn } from "@repo/moss-ui";
 
 export interface RadioRootProps {
   className?: string;

@@ -1,7 +1,7 @@
-import { Icon } from "@repo/moss-ui";
 import { Meta, StoryObj } from "@storybook/react";
 
 import Button from "./Button";
+import Icon from "./Icon";
 
 const variants = ["solid", "outlined", "soft", "ghost"] as const;
 const sizes = ["xs", "sm", "md", "lg", "xl"] as const;
@@ -137,23 +137,6 @@ const colors = {
     },
   },
 } as const;
-
-const convertColorsToCSSVars = (
-  colors: Record<string, Record<string, Record<string, string>>>
-): Record<string, string> => {
-  const cssVars: Record<string, string> = {};
-
-  for (const [category, variants] of Object.entries(colors)) {
-    for (const [variant, properties] of Object.entries(variants)) {
-      for (const [prop, value] of Object.entries(properties)) {
-        const cssVarName = `--color-button-${category}-${variant}-${prop}`;
-        cssVars[cssVarName] = value;
-      }
-    }
-  }
-
-  return cssVars;
-};
 
 const meta: Meta = {
   title: "Desktop/Button",

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import { Icon } from "@repo/moss-ui";
+import Icon from "./Icon";
 
 // FIXME:
 // The statically created array `tips` is a temporary solution.

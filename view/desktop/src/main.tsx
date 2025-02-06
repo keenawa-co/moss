@@ -9,7 +9,9 @@ import { PageLoader } from "./components/PageLoader";
 import { store } from "./store";
 
 import "@/assets/index.css";
-import "@repo/moss-ui/src/fonts.css";
+import "@/assets/fonts.css";
+
+// import "@repo/moss-ui/src/fonts.css";
 
 import { QueryCache, QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";

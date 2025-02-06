@@ -1,8 +1,8 @@
 import { useState } from "react";
 
-import { Icon } from "@repo/moss-ui";
 import { Meta, StoryObj } from "@storybook/react";
 
+import Icon from "./Icon";
 import * as RadioGroup from "./RadioGroup";
 
 const meta: Meta = {

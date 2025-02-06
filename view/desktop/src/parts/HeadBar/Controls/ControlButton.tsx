@@ -1,5 +1,6 @@
-import { cn } from "@repo/moss-ui";
 import type { ButtonHTMLAttributes } from "react";
+
+import { cn } from "@/utils";
 
 export function ControlButton({ className, children, ...props }: ButtonHTMLAttributes<HTMLButtonElement>) {
   return (

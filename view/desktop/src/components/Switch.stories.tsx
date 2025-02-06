@@ -2,7 +2,7 @@ import { useState } from "react";
 
 import { Meta, StoryObj } from "@storybook/react";
 
-import * as Switch from "./Switch";
+import { Switch } from "./Switch";
 
 const meta: Meta = {
   title: "Desktop/Switch",

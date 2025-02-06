@@ -1,10 +1,12 @@
-import { OsType, type } from "@tauri-apps/plugin-os";
-import { MacOSControls } from "./MacOSControls";
-import { LinuxControls } from "./LinuxControls";
-import { WindowsControls } from "./WindowsControls";
-import { cn } from "@repo/moss-ui";
 import { HTMLProps } from "react";
+
+import { cn } from "@/utils";
+import { OsType, type } from "@tauri-apps/plugin-os";
+
 import { TauriAppWindowProvider } from "./ControlsContext";
+import { LinuxControls } from "./LinuxControls";
+import { MacOSControls } from "./MacOSControls";
+import { WindowsControls } from "./WindowsControls";
 
 interface ControlsProps extends HTMLProps<HTMLDivElement> {
   os?: OsType;

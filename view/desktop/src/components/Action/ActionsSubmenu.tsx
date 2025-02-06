@@ -1,7 +1,8 @@
 import { ComponentPropsWithoutRef, useState } from "react";
 
+import { DropdownMenu as DM, Icon, Icons } from "@/components";
+import { cn } from "@/utils";
 import { MenuItemVisibility, SubmenuMenuItem } from "@repo/moss-desktop";
-import { cn, DropdownMenu as DM, Icon, Icons } from "@repo/moss-ui";
 
 const buttonStyle =
   "hover:border-[#c5c5c5] hover:bg-[#D3D3D3] box-border transition group flex rounded border border-transparent";

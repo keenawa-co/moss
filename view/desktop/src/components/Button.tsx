@@ -1,7 +1,9 @@
 import { cva } from "class-variance-authority";
 import { Children, forwardRef, HTMLAttributes, isValidElement } from "react";
 
-import { cn, Icon } from "@repo/moss-ui";
+import { cn } from "@/utils";
+
+import Icon from "./Icon";
 
 export type Root = typeof Root;
 export type Label = typeof Label;

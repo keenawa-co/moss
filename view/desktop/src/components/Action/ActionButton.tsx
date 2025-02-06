@@ -1,7 +1,9 @@
 import { ComponentPropsWithoutRef } from "react";
 
+import { cn } from "@/utils";
 import { CommandAction, MenuItemVisibility } from "@repo/moss-desktop";
-import { cn, Icon, Icons } from "@repo/moss-ui";
+
+import Icon, { Icons } from "../Icon";
 
 interface ActionsGroupProps extends Omit<ComponentPropsWithoutRef<"div">, "id" | "title">, CommandAction {
   icon: Icons;

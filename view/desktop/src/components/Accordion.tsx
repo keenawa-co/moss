@@ -1,6 +1,8 @@
 import { ComponentPropsWithoutRef } from "react";
 
-import { cn, Icon } from "@repo/moss-ui";
+import { cn } from "@/utils";
+
+import Icon from "./Icon";
 
 interface AccordionProps extends ComponentPropsWithoutRef<"div"> {
   title: string;
@@ -19,7 +21,7 @@ const Accordion = ({ title, isOpen = false, handleClick, children, ...props }: A
         <span className="font-bold">{title}</span>
       </div>
 
-      <div className={isOpen ? "text-gray-500 h-full overflow-auto pl-6 text-xs" : "visually-hidden"}>{children}</div>
+      <div className={isOpen ? "h-full overflow-auto pl-6 text-xs text-gray-500" : "visually-hidden"}>{children}</div>
     </div>
   );
 };

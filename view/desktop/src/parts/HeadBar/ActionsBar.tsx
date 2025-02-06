@@ -1,5 +1,6 @@
 import { HTMLProps } from "react";
 
+import { DropdownMenu } from "@/components";
 import { ActionButton } from "@/components/Action/ActionButton";
 import { ActionsSubmenu } from "@/components/Action/ActionsSubmenu";
 import { ActionsGroup } from "@/components/ActionsGroup";
@@ -7,7 +8,7 @@ import { useGetActivitiesState } from "@/hooks/useActivitiesState";
 import { useChangeActivityBarState, useGetActivityBarState } from "@/hooks/useActivityBarState";
 import { AppLayoutState, useChangeAppLayoutState, useGetAppLayoutState } from "@/hooks/useAppLayoutState";
 import { useAppResizableLayoutStore } from "@/store/appResizableLayout";
-import { cn, DropdownMenu } from "@repo/moss-ui";
+import { cn } from "@/utils";
 
 export const ActionsBar = ({ className, ...props }: HTMLProps<HTMLDivElement>) => {
   const { data: activityBarState } = useGetActivityBarState();

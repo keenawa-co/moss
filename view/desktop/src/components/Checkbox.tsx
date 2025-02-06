@@ -1,7 +1,7 @@
 import { ComponentPropsWithoutRef, ElementRef, forwardRef } from "react";
 
+import { cn } from "@/utils";
 import * as CheckboxPrimitive from "@radix-ui/react-checkbox";
-import { cn } from "@repo/moss-ui";
 
 export interface CheckboxProps {
   className?: string;

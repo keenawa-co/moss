@@ -12,6 +12,9 @@
     "interface": "i18next-resources-for-ts interface -i ./public/locales/de -o ./src/@types/resources.d.ts",
     "test": "vitest"
   },
+  "exports": {
+    "./fonts.css": "./src/assets/fonts.css"
+  },
   "dependencies": {
     "@atlaskit/pragmatic-drag-and-drop": "^1.4.0",
     "@atlaskit/pragmatic-drag-and-drop-hitbox": "^1.0.3",
@@ -21,7 +24,6 @@
     "@radix-ui/react-switch": "^1.1.2",
     "@reduxjs/toolkit": "^2.5.1",
     "@repo/moss-tabs": "workspace:*",
-    "@repo/moss-ui": "workspace:*",
     "@repo/tailwind-config": "workspace:*",
     "@tanstack/react-query": "^5.64.2",
     "@tanstack/react-query-devtools": "^5.64.2",
@@ -34,7 +36,21 @@
     "class-variance-authority": "^0.7.0",
     "i18next-resources-to-backend": "^1.2.1",
     "react-redux": "^9.2.0",
-    "zustand": "^5.0.3"
+    "zustand": "^5.0.3",
+    "@radix-ui/primitive": "^1.1.0",
+    "@radix-ui/react-compose-refs": "^1.1.0",
+    "@radix-ui/react-context": "^1.1.1",
+    "@radix-ui/react-context-menu": "^2.2.2",
+    "@radix-ui/react-direction": "^1.1.0",
+    "@radix-ui/react-dropdown-menu": "^2.1.1",
+    "@radix-ui/react-id": "^1.1.0",
+    "@radix-ui/react-menu": "^2.1.2",
+    "@radix-ui/react-primitive": "^2.0.0",
+    "@radix-ui/react-tooltip": "^1.1.2",
+    "@radix-ui/react-use-callback-ref": "^1.1.0",
+    "@radix-ui/react-use-controllable-state": "^1.1.0",
+    "clsx": "^2.1.1",
+    "deepmerge": "^4.3.1"
   },
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",
@@ -46,6 +62,9 @@
     "i18next-http-backend": "^3.0.2",
     "i18next-resources-for-ts": "^1.5.0",
     "react-i18next": "^15.4.0",
-    "sass-embedded": "^1.83.4"
+    "sass-embedded": "^1.83.4",
+    "@repo/icongen": "workspace:*",
+    "@repo/tailwind-config": "workspace:*",
+    "@storybook/test": "^8.1.11"
   }
 }

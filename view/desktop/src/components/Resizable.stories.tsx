@@ -6,7 +6,7 @@ import "allotment/dist/style.css";
 
 import { useState } from "react";
 
-import { cn } from "@repo/moss-ui";
+import { cn } from "@/utils";
 import { expect, within } from "@storybook/test";
 
 const meta: Meta = {
@@ -211,7 +211,7 @@ export const OverflowXY: Story = {
       <Resizable>
         <ResizablePanel className="grid place-items-center" preferredSize={200} maxSize={300} snap>
           <div className="h-full w-full overflow-y-scroll">
-            <div className="mb-4 mt-12 h-12 text-center font-bold">Overflow Y</div>
+            <div className="mt-12 mb-4 h-12 text-center font-bold">Overflow Y</div>
             {Array(10)
               .fill(0)
               .map((_, i) => (

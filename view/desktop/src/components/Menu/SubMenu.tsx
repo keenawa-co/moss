@@ -1,9 +1,9 @@
 import { ComponentPropsWithoutRef, ElementRef, forwardRef } from "react";
 
+import { cn } from "@/utils";
 import * as MenuPrimitive from "@radix-ui/react-menu";
 
 import Icon, { Icons } from "../Icon";
-import { cn } from "../utils";
 import { ScopedProps } from "./types";
 
 /* -------------------------------------------------------------------------------------------------

@@ -1,5 +1,4 @@
 import Image from "next/image";
-import { Card } from "@repo/moss-ui/card";
 
 function Gradient({ conic, className, small }: { small?: boolean; conic?: boolean; className?: string }): JSX.Element {
   return (
@@ -38,11 +37,11 @@ export default function Page(): JSX.Element {
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
       <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
-        <p className="border-neutral-800 bg-zinc-800/30 from-inherit lg:bg-gray-200 lg:bg-zinc-800/30 fixed left-0 top-0 flex w-full justify-center border-b bg-gradient-to-b px-4 pb-6 pt-8 backdrop-blur-2xl lg:static lg:w-auto lg:rounded-xl lg:border lg:p-4">
+        <p className="fixed top-0 left-0 flex w-full justify-center border-b border-neutral-800 bg-zinc-800/30 bg-gradient-to-b from-inherit px-4 pt-8 pb-6 backdrop-blur-2xl lg:static lg:w-auto lg:rounded-xl lg:border lg:bg-gray-200 lg:bg-zinc-800/30 lg:p-4">
           examples/with-tailwind -&nbsp;
           <code className="font-mono font-bold">web</code>
         </p>
-        <div className="from-black via-black fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t lg:static lg:h-auto lg:w-auto lg:bg-none">
+        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-black via-black lg:static lg:h-auto lg:w-auto lg:bg-none">
           <a
             className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
             href="https://vercel.com?utm_source=create-turbo&utm_medium=basic&utm_campaign=create-turbo"
@@ -54,8 +53,8 @@ export default function Page(): JSX.Element {
         </div>
       </div>
 
-      <div className="relative flex place-items-center ">
-        <div className="relative z-0 flex w-auto flex-col items-center justify-between gap-8 pb-16 pt-[48px] font-sans md:pb-24 md:pt-16 lg:pb-32 lg:pt-20">
+      <div className="relative flex place-items-center">
+        <div className="relative z-0 flex w-auto flex-col items-center justify-between gap-8 pt-[48px] pb-16 font-sans md:pt-16 md:pb-24 lg:pt-20 lg:pb-32">
           <div className="z-50 flex w-full items-center justify-center">
             <div className="absolute min-h-[614px] min-w-[614px]">
               <Image alt="Turborepo" height={614} src="circles.svg" width={614} />
