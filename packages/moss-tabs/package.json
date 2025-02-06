@@ -35,7 +35,7 @@
   },
   "dependencies": {
     "@testing-library/dom": "^10.4.0",
-    "@testing-library/react": "^16.1.0",
+    "@testing-library/react": "^16.2.0",
     "@total-typescript/shoehorn": "^0.1.2",
     "cross-env": "^7.0.3"
   }
