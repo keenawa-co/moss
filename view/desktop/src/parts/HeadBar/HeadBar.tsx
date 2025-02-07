@@ -39,6 +39,7 @@ export const HeadBar = () => {
             overflowClipMargin: 4,
           }}
         />
+        <div className="size-4 bg-green-300 dark:bg-red-300"></div>
         <ActionsBar className="z-50" />
       </div>
 
