@@ -10,11 +10,9 @@ import type { StorybookConfig } from "@storybook/react-vite";
 function getAbsolutePath(value: string): string {
   return dirname(require.resolve(join(value, "package.json")));
 }
+
 const config: StorybookConfig = {
-  stories: [
-    "../../desktop/src/components/**/*.stories.@(js|jsx|mjs|ts|tsx)",
-    "../../web/src/**/*.stories.@(js|jsx|mjs|ts|tsx)",
-  ],
+  stories: ["../../desktop/src/components/**/*.stories.@(ts|tsx)", "../../web/src/**/*.stories.@(ts|tsx)"],
   staticDirs: ["../public"],
   addons: [
     getAbsolutePath("@storybook/addon-links"),
@@ -26,6 +24,9 @@ const config: StorybookConfig = {
   framework: {
     name: getAbsolutePath("@storybook/react-vite"),
     options: {},
+  },
+  typescript: {
+    reactDocgen: false, // Disable react-docgen for troubleshooting
   },
   async viteFinal(config) {
     return {

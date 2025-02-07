@@ -2,8 +2,8 @@ import React from "react";
 
 import type { Preview } from "@storybook/react";
 
-// import "@repo/moss-desktop/src/assets/styles.css";
-// import "@repo/moss-ui/src/fonts.css";
+import "desktop/styles";
+import "desktop/fonts";
 import "./styles.css";
 
 import * as themeFiles from "./themes";
@@ -27,7 +27,6 @@ const applyTheme = (theme: Theme) => {
   const colors = theme.colors;
 
   Object.entries(colors).forEach(([key, color]) => {
-    // @ts-expect-error this shouldn't be an error and seems to be a problem with config, but tsconfig seems fine
     root.style.setProperty(`--moss-${key}`.replaceAll(".", "-"), color.value);
   });
 

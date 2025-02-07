@@ -13,7 +13,8 @@
     "test": "vitest"
   },
   "exports": {
-    "./fonts.css": "./src/assets/fonts.css"
+    "./styles": "./src/assets/index.css",
+    "./fonts": "./src/assets/fonts.css"
   },
   "dependencies": {
     "@atlaskit/pragmatic-drag-and-drop": "^1.4.0",
