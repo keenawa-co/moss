@@ -42,33 +42,43 @@ export default defineWorkspace([
     },
   },
   {
-    test: {
-      name: "packages-stories",
-      include: ["packages/**/*.stories.?(c|m)[jt]s?(x)"],
-      ...storybookTestConfig,
-    },
-    plugins: [storybookTest(storybookPluginConfig)],
-  },
-  {
     extends: "view/desktop/vite.config.ts",
     test: {
       name: "desktop",
       include: ["view/desktop/**/*.{test,spec}.?(c|m)[jt]s?(x)"],
     },
   },
+
+  //storybook
+
   {
+    extends: "view/storybook/vite.config.ts",
+    test: {
+      name: "packages-stories",
+      include: ["packages/**/*.stories.?(c|m)[jt]s?(x)"],
+      ...storybookTestConfig,
+      globals: true,
+    },
+    plugins: [storybookTest(storybookPluginConfig)],
+  },
+
+  {
+    extends: "view/storybook/vite.config.ts",
     test: {
       name: "desktop-stories",
       include: ["view/desktop/**/*.stories.?(c|m)[jt]s?(x)"],
       ...storybookTestConfig,
+      globals: true,
     },
     plugins: [storybookTest(storybookPluginConfig)],
   },
   {
+    extends: "view/storybook/vite.config.ts",
     test: {
       name: "storybook",
       include: ["view/storybook/**/*.stories.?(c|m)[jt]s?(x)"],
       ...storybookTestConfig,
+      globals: true,
     },
 
     plugins: [storybookTest(storybookPluginConfig)],
