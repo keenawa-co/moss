@@ -51,6 +51,7 @@ export default defineWorkspace([
     plugins: [storybookTest(storybookPluginConfig)],
   },
   {
+    extends: "view/desktop/vite.config.ts",
     test: {
       name: "desktop",
       include: ["view/desktop/**/*.{test,spec}.?(c|m)[jt]s?(x)"],
