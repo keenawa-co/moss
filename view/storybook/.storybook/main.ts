@@ -25,8 +25,9 @@ const config: StorybookConfig = {
     name: getAbsolutePath("@storybook/react-vite"),
     options: {},
   },
+  core: { builder: "@storybook/builder-vite" },
   typescript: {
-    reactDocgen: false, // Disable react-docgen for troubleshooting
+    reactDocgen: "react-docgen-typescript",
   },
   async viteFinal(config) {
     return {

@@ -475,13 +475,13 @@ importers:
         specifier: ^8.1.0
         version: 8.1.0(@storybook/blocks@8.5.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(storybook@8.5.3(prettier@3.4.2)))(@storybook/components@8.5.3(storybook@8.5.3(prettier@3.4.2)))(@storybook/theming@8.5.3(storybook@8.5.3(prettier@3.4.2)))
       '@storybook/addon-essentials':
-        specifier: ^8.4.7
+        specifier: ^8.5.3
         version: 8.5.3(@types/react@18.3.18)(storybook@8.5.3(prettier@3.4.2))
       '@storybook/addon-interactions':
-        specifier: ^8.4.7
+        specifier: ^8.5.3
         version: 8.5.3(storybook@8.5.3(prettier@3.4.2))
       '@storybook/addon-links':
-        specifier: ^8.4.7
+        specifier: ^8.5.3
         version: 8.5.3(react@18.3.1)(storybook@8.5.3(prettier@3.4.2))
       '@storybook/addon-onboarding':
         specifier: ^8.5.3
@@ -499,16 +499,16 @@ importers:
         specifier: ^8.5.3
         version: 8.5.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(storybook@8.5.3(prettier@3.4.2))
       '@storybook/experimental-addon-test':
-        specifier: ^8.4.7
+        specifier: ^8.5.3
         version: 8.5.3(@vitest/browser@2.1.9)(@vitest/runner@2.1.9)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(storybook@8.5.3(prettier@3.4.2))(vitest@2.1.9)
       '@storybook/react':
-        specifier: ^8.4.7
+        specifier: ^8.5.3
         version: 8.5.3(@storybook/test@8.5.3(storybook@8.5.3(prettier@3.4.2)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(storybook@8.5.3(prettier@3.4.2))(typescript@5.7.3)
       '@storybook/react-vite':
-        specifier: ^8.4.7
+        specifier: ^8.5.3
         version: 8.5.3(@storybook/test@8.5.3(storybook@8.5.3(prettier@3.4.2)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(rollup@4.34.5)(storybook@8.5.3(prettier@3.4.2))(typescript@5.7.3)(vite@6.1.0(@types/node@22.13.1)(jiti@2.4.2)(lightningcss@1.29.1)(sass-embedded@1.83.4)(terser@5.38.1)(yaml@2.7.0))
       '@storybook/test':
-        specifier: ^8.4.7
+        specifier: ^8.5.3
         version: 8.5.3(storybook@8.5.3(prettier@3.4.2))
       '@tauri-apps/api':
         specifier: ^2.1.1

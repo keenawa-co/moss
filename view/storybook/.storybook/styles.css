@@ -1,7 +1,7 @@
 @import "tailwindcss";
-@config "@repo/tailwind-config";
-@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
+/* @config "@repo/tailwind-config"; */
 
 html {
   color: var(--moss-primary);
+  background: var(--moss-page-background);
 }

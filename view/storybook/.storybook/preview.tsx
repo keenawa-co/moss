@@ -2,6 +2,7 @@ import React from "react";
 
 import type { Preview } from "@storybook/react";
 
+// import "desktop/styles";
 import "desktop/fonts";
 import "./styles.css";
 
@@ -56,9 +57,6 @@ const preview: Preview = {
       const theme = context.args.theme ?? context.globals.theme;
 
       applyTheme(themeFiles[theme]);
-
-      document.querySelector("html")!.style.background = "var(--moss-page-background)";
-      document.documentElement.setAttribute("data-theme", theme.type);
 
       return <Story />;
     },

@@ -178,39 +178,30 @@ export const Primary: Story = {
 export const Intents: Story = {
   render: () => {
     return (
-      <>
-        <div>
-          <div className="flex">
-            <div className="text-black dark:text-[#101012]">Light theme</div>
-            <div className="text-white dark:text-white">Dark theme</div>
-          </div>
-        </div>
-
-        <table className="border-separate border-spacing-2">
-          <tr>
-            <th />
-            {variants.map((variant) => {
-              return <th className="text-left capitalize">{variant}</th>;
-            })}
-          </tr>
-          {(Object.keys(colors) as Array<keyof typeof colors>).map((intent) => {
-            return (
-              <tr key={intent}>
-                <th className="text-left capitalize">{intent}</th>
-                {variants.map((variant) => {
-                  return (
-                    <td key={variant}>
-                      <Button.Root intent={intent} variant={variant}>
-                        <Button.Label>Button</Button.Label>
-                      </Button.Root>
-                    </td>
-                  );
-                })}
-              </tr>
-            );
+      <table className="border-separate border-spacing-2">
+        <tr>
+          <th />
+          {variants.map((variant) => {
+            return <th className="text-left capitalize">{variant}</th>;
           })}
-        </table>
-      </>
+        </tr>
+        {(Object.keys(colors) as Array<keyof typeof colors>).map((intent) => {
+          return (
+            <tr key={intent}>
+              <th className="text-left capitalize">{intent}</th>
+              {variants.map((variant) => {
+                return (
+                  <td key={variant}>
+                    <Button.Root intent={intent} variant={variant}>
+                      <Button.Label>Button</Button.Label>
+                    </Button.Root>
+                  </td>
+                );
+              })}
+            </tr>
+          );
+        })}
+      </table>
     );
   },
 };
