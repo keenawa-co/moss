@@ -42,7 +42,6 @@ export default defineWorkspace([
     },
   },
   {
-    extends: "view/desktop/vite.config.ts",
     test: {
       name: "packages-stories",
       include: ["packages/**/*.stories.?(c|m)[jt]s?(x)"],
@@ -58,7 +57,6 @@ export default defineWorkspace([
     },
   },
   {
-    extends: "view/desktop/vite.config.ts",
     test: {
       name: "desktop-stories",
       include: ["view/desktop/**/*.stories.?(c|m)[jt]s?(x)"],
@@ -67,7 +65,6 @@ export default defineWorkspace([
     plugins: [storybookTest(storybookPluginConfig)],
   },
   {
-    extends: "view/storybook/vite.config.ts",
     test: {
       name: "storybook",
       include: ["view/storybook/**/*.stories.?(c|m)[jt]s?(x)"],
