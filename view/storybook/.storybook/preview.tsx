@@ -2,7 +2,6 @@ import React from "react";
 
 import type { Preview } from "@storybook/react";
 
-// import "desktop/styles";
 import "desktop/fonts";
 import "./styles.css";
 

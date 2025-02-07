@@ -1,6 +1,5 @@
 @import "tailwindcss";
 @config "@repo/tailwind-config";
-@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
 
 #root {
   height: 100%;
