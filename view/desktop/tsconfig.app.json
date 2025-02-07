@@ -32,7 +32,12 @@
     /* Path Mapping */
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": ["src/*"],
+      "@/hooks": ["src/hooks"],
+      "@/utils": ["src/utils"],
+      "@/assets": ["src/assets"],
+      "@/components": ["src/components"],
+      "@/store": ["src/store"]
     }
   },
   "include": ["./src"]
