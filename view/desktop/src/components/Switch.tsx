@@ -12,6 +12,12 @@ const defaultSwitchRootStyles = `relative cursor-pointer h-5 w-8 inline-block bo
   disabled:cursor-not-allowed
   data-[state=checked]:border-[rgb(37,99,235)]
   data-[state=checked]:bg-[rgb(37,99,235)]
+
+  dark:bg-white/15
+  dark:border-white/5
+  dark:disabled:bg-gray-800
+  dark:data-[state=checked]:border-[rgb(37,99,235)]
+  dark:data-[state=checked]:bg-[rgb(37,99,235)]
 `;
 
 const Root = forwardRef<ElementRef<typeof Switch.Root>, ComponentPropsWithoutRef<typeof Switch.Root>>(
