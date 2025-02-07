@@ -12,3 +12,4 @@ hashbrown = { workspace = true, features = ["serde"] }
 arcstr = { workspace = true, features = ["serde"] }
 petgraph.workspace = true
 strum = { workspace = true, features = ["derive"] }
+phf.workspace = true

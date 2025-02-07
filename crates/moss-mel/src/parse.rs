@@ -2,69 +2,78 @@ use anyhow::{anyhow, Result};
 use arcstr::ArcStr;
 use hashbrown::{HashMap, HashSet};
 use hcl::{
-    eval::{Context, Evaluate},
     expr::{Traversal, Variable},
-    Block, Body, Expression, Object, ObjectKey, Value,
+    Block, Body, Expression, Object, ObjectKey,
 };
 
-use crate::foundations::token::*;
+use crate::foundations::configuration::{OverrideBodyStmt, ParameterBodyStmt};
 use crate::foundations::{
-    configuration::{ConfigurationDecl, ConfigurationOverrideDecl, ConfigurationParameterDecl},
-    scope::ScopeRepr,
+    configuration::{ConfigurationBodyStmt, ConfigurationDecl, OverrideDecl, ParameterDecl},
+    scope::ModuleScope,
+    token::*,
 };
 
-pub fn parse(input: &str) -> Result<ScopeRepr> {
+pub fn parse_module_file(input: &str, module_scope: &mut ModuleScope) -> Result<()> {
     let body: Body = hcl::from_str(input)?;
-    let mut result = ScopeRepr::new();
 
     for block in body.into_blocks() {
+        let labels = block.labels();
+
         match block.identifier() {
             CONFIGURATION_LIT => {
-                let parsed = if block.labels().is_empty() {
-                    parse_extend_configuration_block(block)?
-                } else {
-                    parse_configuration_block(block)?
-                };
-
-                result.configurations.push(parsed);
-            }
-            LOCALS_LIT => {
-                let parsed = parse_locals_block(block)?;
-                let mut graph = petgraph::Graph::<String, ()>::new();
-                let mut node_map = HashMap::new();
-                let mut name_map = HashMap::new();
-                for local_name in parsed.keys() {
-                    let idx = graph.add_node(local_name.clone());
-                    node_map.insert(local_name.clone(), idx);
-                    name_map.insert(idx, local_name.clone());
+                let (ident, parent_ident) = (labels.get(0), labels.get(2));
+                println!("Ident: {:?}, Parent Ident: {:?}", ident, parent_ident);
+                if ident.is_some_and(|_| RESERVED_WORDS.contains(ident.unwrap().as_str())) {
+                    return Err(anyhow!("Illegal ident `{}`", ident.unwrap().as_str()));
+                }
+                if parent_ident
+                    .is_some_and(|_| RESERVED_WORDS.contains(parent_ident.unwrap().as_str()))
+                {
+                    return Err(anyhow!(
+                        "Illegal parent_ident `{}`",
+                        parent_ident.unwrap().as_str()
+                    ));
                 }
 
-                for (name, expr) in parsed.iter() {
-                    let from_idx = node_map[name];
-                    let deps = collect_local_refs(&expr);
-
-                    for dep in deps {
-                        if let Some(&to_idx) = node_map.get(&dep) {
-                            graph.add_edge(from_idx, to_idx, ());
+                let decl = match (labels.get(0), labels.get(2)) {
+                    // Genesis
+                    (Some(ident), None) => {
+                        if let Some(keyword) = labels.get(1) {
+                            if keyword.as_str() == EXTEND_LIT {
+                                return Err(anyhow!(
+                                    "Missing parent ident for configuration `{}`",
+                                    ident.as_str()
+                                ));
+                            }
+                        }
+                        ConfigurationDecl::Genesis {
+                            ident: ident.as_str().into(),
+                            body: parse_configuration_body(block)?,
                         }
                     }
-                }
+                    // Successor
+                    (Some(ident), Some(parent_ident)) => ConfigurationDecl::Successor {
+                        ident: ident.as_str().into(),
+                        parent_ident: parent_ident.as_str().into(),
+                        body: parse_configuration_body(block)?,
+                    },
+                    // Anonymous
+                    (None, None) => ConfigurationDecl::Anonymous {
+                        body: parse_configuration_body(block)?,
+                    },
+                    _ => {
+                        return Err(anyhow!(
+                            "Incorrect syntax: {} {:#?}",
+                            block.identifier(),
+                            block.labels
+                        ))
+                    }
+                };
+                module_scope.configurations.push(decl);
+            }
 
-                let dependency_chain = petgraph::algo::toposort(&graph, None)
-                    .map_err(|_| anyhow!("Cycle detected in locals"))?
-                    .iter()
-                    .map(|idx| name_map.get(idx).unwrap().to_string())
-                    .rev()
-                    .collect::<Vec<String>>();
-
-                for name in dependency_chain.iter() {
-                    // TODO: We could potentially optimize this part
-                    let expr = parsed.get(name).unwrap();
-                    let mut ctx = Context::new();
-                    ctx.declare_var("local", Value::Object(result.locals.clone()));
-                    let value = expr.evaluate(&ctx)?;
-                    result.locals.insert(name.to_string(), value.clone());
-                }
+            LOCALS_LIT => {
+                module_scope.locals.extend(parse_locals_block(block)?);
             }
             _ => {
                 continue;
@@ -72,7 +81,7 @@ pub fn parse(input: &str) -> Result<ScopeRepr> {
         }
     }
 
-    Ok(result)
+    Ok(())
 }
 
 fn parse_locals_block(block: Block) -> Result<HashMap<String, Expression>> {
@@ -85,26 +94,8 @@ fn parse_locals_block(block: Block) -> Result<HashMap<String, Expression>> {
     Ok(result)
 }
 
-fn parse_extend_configuration_block(block: Block) -> Result<ConfigurationDecl> {
-    // #[rustfmt::skip]
-    // pub(crate) const OTHER_EXTEND_CONFIGURATION_PARENT_ID: arcstr::ArcStr = arcstr::literal!("moss.configuration.other");
-    // If a configuration block does not have an explicitly specified
-    // identifier, we identify such a block as an extension of the specially
-    // reserved `OTHER_EXTEND_CONFIGURATION_PARENT_ID` node.
-
-    unimplemented!()
-}
-
-fn parse_configuration_block(block: Block) -> Result<ConfigurationDecl> {
-    let mut result = ConfigurationDecl {
-        ident: block
-            .labels()
-            .get(0)
-            .map(|label| ArcStr::from(label.as_str())),
-        parent_ident: block
-            .labels()
-            .get(1)
-            .map(|label| ArcStr::from(label.as_str())),
+fn parse_configuration_body(block: Block) -> Result<ConfigurationBodyStmt> {
+    let mut result = ConfigurationBodyStmt {
         display_name: Expression::Null,
         description: Expression::Null,
         order: Expression::Null,
@@ -138,16 +129,18 @@ fn parse_configuration_block(block: Block) -> Result<ConfigurationDecl> {
                     continue;
                 };
 
-                let mut override_decl = ConfigurationOverrideDecl {
+                let mut override_decl = OverrideDecl {
                     ident,
-                    value: Expression::Null,
-                    context: Expression::Null,
+                    body: OverrideBodyStmt {
+                        value: Expression::Null,
+                        context: Expression::Null,
+                    },
                 };
 
                 for attribute in block.body.into_attributes() {
                     match attribute.key() {
-                        "value" => override_decl.value = attribute.expr,
-                        "context" => override_decl.context = attribute.expr,
+                        "value" => override_decl.body.value = attribute.expr,
+                        "context" => override_decl.body.context = attribute.expr,
                         _ => {
 
                             // TODO: Add logging for encountering an unknown attribute
@@ -170,30 +163,32 @@ fn parse_configuration_block(block: Block) -> Result<ConfigurationDecl> {
                     continue;
                 };
 
-                let mut parameter_decl = ConfigurationParameterDecl {
+                let mut parameter_decl = ParameterDecl {
                     ident,
-                    value_type: Expression::Null,
-                    maximum: Expression::Null,
-                    minimum: Expression::Null,
-                    default: Expression::Null,
-                    order: Expression::Null,
-                    scope: Expression::Null,
-                    description: Expression::Null,
-                    excluded: Expression::Null,
-                    protected: Expression::Null,
+                    body: ParameterBodyStmt {
+                        value_type: Expression::Null,
+                        maximum: Expression::Null,
+                        minimum: Expression::Null,
+                        default: Expression::Null,
+                        order: Expression::Null,
+                        scope: Expression::Null,
+                        description: Expression::Null,
+                        excluded: Expression::Null,
+                        protected: Expression::Null,
+                    },
                 };
 
                 for attribute in block.body.into_attributes() {
                     match attribute.key() {
-                        "type" => parameter_decl.value_type = attribute.expr,
-                        "maximum" => parameter_decl.maximum = attribute.expr,
-                        "minimum" => parameter_decl.minimum = attribute.expr,
-                        "default" => parameter_decl.default = attribute.expr,
-                        "order" => parameter_decl.order = attribute.expr,
-                        "scope" => parameter_decl.scope = attribute.expr,
-                        "description" => parameter_decl.description = attribute.expr,
-                        "excluded" => parameter_decl.excluded = attribute.expr,
-                        "protected" => parameter_decl.protected = attribute.expr,
+                        "type" => parameter_decl.body.value_type = attribute.expr,
+                        "maximum" => parameter_decl.body.maximum = attribute.expr,
+                        "minimum" => parameter_decl.body.minimum = attribute.expr,
+                        "default" => parameter_decl.body.default = attribute.expr,
+                        "order" => parameter_decl.body.order = attribute.expr,
+                        "scope" => parameter_decl.body.scope = attribute.expr,
+                        "description" => parameter_decl.body.description = attribute.expr,
+                        "excluded" => parameter_decl.body.excluded = attribute.expr,
+                        "protected" => parameter_decl.body.protected = attribute.expr,
                         _ => {
 
                             // TODO: Add logging for encountering an unknown attribute
@@ -210,7 +205,7 @@ fn parse_configuration_block(block: Block) -> Result<ConfigurationDecl> {
     Ok(result)
 }
 
-fn collect_local_refs(expr: &Expression) -> HashSet<String> {
+pub(crate) fn collect_local_refs(expr: &Expression) -> HashSet<String> {
     let mut set = HashSet::new();
 
     match expr {
@@ -290,8 +285,15 @@ fn parse_local_variable(var: &Variable) -> Option<String> {
 
 #[cfg(test)]
 mod tests {
-    use super::parse;
+    use super::parse_module_file;
+    use crate::foundations::scope::ModuleScope;
 
+    fn resolve(input: &str) {
+        // FIXME: Rewrite this test
+        let mut scope = ModuleScope::new();
+        parse_module_file(input, &mut scope).unwrap();
+        println!("Module: {:#?}", scope);
+    }
     #[test]
     fn test() {
         let input = r#"
@@ -322,98 +324,154 @@ mod tests {
         }
             "#;
 
-        let parsed_module = parse(input).unwrap();
-
-        let resolved = parsed_module.evaluate().unwrap();
-        println!("Resolved: {:#?}", resolved);
+        resolve(input);
 
         // let resolved = resolve(parsed_module).unwrap();
         // dbg!(resolved);
     }
 
-    // #[test]
-    // fn test_cycle_sort_error() {
-    //     let input = r#"
-    //     locals {
-    //         A = local.B
-    //         B = local.C
-    //         C = local.A
-    //     }
-    //     "#;
-    //     let parsed_module = parse(input).unwrap();
+    #[test]
+    fn test_extend_normal() {
+        let input = r#"
+        configuration "parent" {}
+        configuration "child" extends "parent" {}
+        "#;
+        resolve(input);
+    }
 
-    //     assert_eq!(
-    //         parsed_module.unwrap_err().to_string(),
-    //         "Cycle detected in locals"
-    //     );
+    #[test]
+    fn test_extend_other() {
+        let input = r#"
+        configuration {}
+        configuration {}
+        "#;
+        resolve(input);
+    }
+
+    #[test]
+    #[should_panic]
+    fn test_extend_missing_child_ident() {
+        let input = r#"
+        configuration "Parent" {}
+        configuration extends "Parent" {}
+        "#;
+        resolve(input);
+    }
+    #[test]
+    #[should_panic]
+    fn test_extend_missing_parent_ident() {
+        let input = r#"
+        configuration "Parent" {}
+        configuration "Child" extends {}
+        "#;
+        resolve(input);
+    }
+
+    // TODO: Move these tests to the validation step
+    // #[test]
+    // #[should_panic]
+    // fn test_extend_nonexistent_parent() {
+    //     let input = r#"
+    //     configuration "Child" extends "NonExistent" {}
+    //     "#;
+    //     resolve(input);
     // }
 
     // #[test]
-    // fn test_cycle_self_referential_sort_error() {
+    // #[should_panic]
+    // fn test_duplicate_configuration() {
     //     let input = r#"
-    //     locals {
-    //         A = local.A
-    //     }
+    //     configuration "Duplicate" {}
+    //     configuration "Duplicate" {}
     //     "#;
-    //     let parsed_module = parse(input).unwrap();
-
-    //     assert_eq!(
-    //         parsed_module.unwrap_err().to_string(),
-    //         "Cycle detected in locals"
-    //     );
+    //     resolve(input);
     // }
 
-    // #[test]
-    // fn test_cycle_with_objects_sort_error() {
-    //     let input = r#"
-    //     locals {
-    //         A = {
-    //             x = local.B.x
-    //         }
-    //         B = {
-    //             x = local.A.x
-    //         }
-    //     }
-
-    //     "#;
-    //     let parsed_module = parse(input).unwrap();
-
-    //     assert_eq!(
-    //         parsed_module.unwrap_err().to_string(),
-    //         "Cycle detected in locals"
-    //     );
-    // }
-
-    // #[test]
-    // fn test_cycle_with_arrays_sort_error() {
-    //     let input = r#"
-    //     locals {
-    //         arr = [local.A.x]
-    //         A = {
-    //             x = local.arr[0]
-    //         }
-    //     }
-    //     "#;
-    //     let parsed_module = parse(input).unwrap();
-
-    //     assert_eq!(
-    //         parsed_module.unwrap_err().to_string(),
-    //         "Cycle detected in locals"
-    //     );
-    // }
-
-    // #[test]
-    // fn test_unregistered_local_variable_eval_error() {
-    //     let input = r#"
-    //     locals {
-    //         A = local.B
-    //     }
-    //     "#;
-    //     let parsed_module = parse(input).unwrap();
-
-    //     assert_eq!(
-    //         parsed_module.unwrap_err().to_string(),
-    //         "no such key: `B` in expression `local.B`"
-    //     );
-    // }
+    // TODO: testing further validation logic
 }
+
+// #[test]
+// fn test_cycle_sort_error() {
+//     let input = r#"
+//     locals {
+//         A = local.B
+//         B = local.C
+//         C = local.A
+//     }
+//     "#;
+//     let parsed_module = parse(input).unwrap();
+
+//     assert_eq!(
+//         parsed_module.unwrap_err().to_string(),
+//         "Cycle detected in locals"
+//     );
+// }
+
+// #[test]
+// fn test_cycle_self_referential_sort_error() {
+//     let input = r#"
+//     locals {
+//         A = local.A
+//     }
+//     "#;
+//     let parsed_module = parse(input).unwrap();
+
+//     assert_eq!(
+//         parsed_module.unwrap_err().to_string(),
+//         "Cycle detected in locals"
+//     );
+// }
+
+// #[test]
+// fn test_cycle_with_objects_sort_error() {
+//     let input = r#"
+//     locals {
+//         A = {
+//             x = local.B.x
+//         }
+//         B = {
+//             x = local.A.x
+//         }
+//     }
+
+//     "#;
+//     let parsed_module = parse(input).unwrap();
+
+//     assert_eq!(
+//         parsed_module.unwrap_err().to_string(),
+//         "Cycle detected in locals"
+//     );
+// }
+
+// #[test]
+// fn test_cycle_with_arrays_sort_error() {
+//     let input = r#"
+//     locals {
+//         arr = [local.A.x]
+//         A = {
+//             x = local.arr[0]
+//         }
+//     }
+//     "#;
+//     let parsed_module = parse(input).unwrap();
+
+//     assert_eq!(
+//         parsed_module.unwrap_err().to_string(),
+//         "Cycle detected in locals"
+//     );
+// }
+
+// #[test]
+// fn test_unregistered_local_variable_eval_error() {
+//     let input = r#"
+//     locals {
+//         A = local.B
+//     }
+//     "#;
+//     let parsed_module = parse(input).unwrap();
+
+//     assert_eq!(
+//         parsed_module.unwrap_err().to_string(),
+//         "no such key: `B` in expression `local.B`"
+//     );
+// }

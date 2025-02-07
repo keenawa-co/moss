@@ -9,7 +9,6 @@ mod window;
 use anyhow::Result;
 use moss_configuration::default_configuration::DefaultConfiguration;
 use moss_desktop::services::configuration_service::ConfigurationService;
-use moss_extension_point::loader::Loader;
 use moss_extension_point::registry::{self, ConfigurationRegistry, Registry};
 use rand::random;
 use tauri::{AppHandle, Manager, RunEvent, WebviewWindow, WindowEvent};
@@ -30,6 +29,7 @@ use moss_desktop::services::window_service::WindowService;
 use moss_desktop::{
     app::instantiation::InstantiationType, services::lifecycle_service::LifecycleService,
 };
+use moss_mel::loader::Loader;
 
 use crate::commands::*;
 use crate::plugins::*;
@@ -95,8 +95,8 @@ pub fn run() {
 
             let configuration_registry = {
                 let mut registry = ConfigurationRegistry::default();
-                for scope in loader.modules().into_values() {
-                    registry.register(scope.configurations.into_values());
+                for result in loader.resolve() {
+                    registry.register(result.unwrap().into_values());
                 }
 
                 registry
