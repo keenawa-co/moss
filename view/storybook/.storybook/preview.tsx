@@ -4,6 +4,7 @@ import type { Preview } from "@storybook/react";
 
 import "@repo/moss-ui/src/styles.css";
 import "@repo/moss-ui/src/fonts.css";
+import "./styles.css";
 
 import * as themeFiles from "./themes";
 
@@ -29,6 +30,8 @@ const applyTheme = (theme: Theme) => {
     // @ts-expect-error this shouldn't be an error and seems to be a problem with config, but tsconfig seems fine
     root.style.setProperty(`--moss-${key}`.replaceAll(".", "-"), color.value);
   });
+
+  document.documentElement.setAttribute("data-theme", theme.type);
 };
 
 const preview: Preview = {
@@ -56,11 +59,9 @@ const preview: Preview = {
 
       applyTheme(themeFiles[theme]);
 
-      return (
-        <div style={{ backgroundColor: "var(--moss-page-background)" }}>
-          <Story />
-        </div>
-      );
+      document.querySelector("html")!.style.background = "var(--moss-page-background)";
+
+      return <Story />;
     },
   ],
 };

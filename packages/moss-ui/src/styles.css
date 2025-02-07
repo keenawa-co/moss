@@ -1,2 +1,3 @@
-@config "@repo/tailwind-config";
 @import "tailwindcss";
+@config "@repo/tailwind-config";
+@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
