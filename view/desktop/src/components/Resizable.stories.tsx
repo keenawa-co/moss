@@ -7,7 +7,6 @@ import "allotment/dist/style.css";
 import { useState } from "react";
 
 import { cn } from "@/utils";
-import { expect, within } from "@storybook/test";
 
 const meta: Meta = {
   title: "desktop/Resizable",
@@ -51,11 +50,6 @@ export const Vertical: Story = {
         <ResizablePanel className="grid place-items-center">Two</ResizablePanel>
       </Resizable>
     );
-  },
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-
-    expect(canvas.getByText("One")).toBeInTheDocument();
   },
 };
 

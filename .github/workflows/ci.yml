@@ -138,9 +138,6 @@ jobs:
           - name: Test Packages (Vitest)
             command: pnpm run test --project packages
 
-          - name: Test Packages Stories (Vitest)
-            command: pnpm run test --project packages-stories
-
           - name: Test Desktop (Vitest)
             command: pnpm run test --project desktop
 

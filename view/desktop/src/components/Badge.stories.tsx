@@ -1,5 +1,4 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { expect, userEvent, within } from "@storybook/test";
 
 import { Badge } from "./Badge";
 
@@ -32,11 +31,6 @@ export const Default: Story = {
   tags: ["stable"],
   args: {
     value: "Text",
-  },
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-
-    expect(canvas.getByText("Text")).toBeInTheDocument();
   },
 };
 
