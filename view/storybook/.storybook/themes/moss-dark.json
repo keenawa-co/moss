@@ -304,6 +304,38 @@
     },
     "button.neutral.ghost.boxShadow": {
       "value": null
+    },
+
+    "input.bg.plain": {
+      "value": "transparent"
+    },
+    "input.bg.soft": {
+      "value": "rgb(39, 39, 42)"
+    },
+    "input.bg.outlined": {
+      "value": "transparent"
+    },
+    "input.bg.mixed": {
+      "value": "rgb(24, 24, 27)"
+    },
+    "input.bg.bottomOutlined": {
+      "value": "transparent"
+    },
+
+    "input.border.plain": {
+      "value": "rgb(39, 39, 42)"
+    },
+    "input.border.soft": {
+      "value": "rgb(39, 39, 42)"
+    },
+    "input.border.outlined": {
+      "value": "rgb(39, 39, 42)"
+    },
+    "input.border.mixed": {
+      "value": "rgb(39, 39, 42)"
+    },
+    "input.border.bottomOutlined": {
+      "value": "rgb(39, 39, 42)"
     }
   }
 }

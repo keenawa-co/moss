@@ -283,6 +283,38 @@
     },
     "button.neutral.ghost.boxShadow": {
       "value": null
+    },
+
+    "input.bg.plain": {
+      "value": "transparent"
+    },
+    "input.bg.soft": {
+      "value": "rgb(244, 244, 245)"
+    },
+    "input.bg.outlined": {
+      "value": "transparent"
+    },
+    "input.bg.mixed": {
+      "value": "rgb(255, 255, 255)"
+    },
+    "input.bg.bottomOutlined": {
+      "value": "transparent"
+    },
+
+    "input.border.plain": {
+      "value": null
+    },
+    "input.border.soft": {
+      "value": null
+    },
+    "input.border.outlined": {
+      "value": "rgb(228, 228, 231)"
+    },
+    "input.border.mixed": {
+      "value": "rgb(228, 228, 231)"
+    },
+    "input.border.bottomOutlined": {
+      "value": "rgb(228 228 231 / 1)"
     }
   }
 }
