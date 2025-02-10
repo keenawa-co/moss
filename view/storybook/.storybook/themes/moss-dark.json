@@ -336,6 +336,38 @@
     },
     "input.border.bottomOutlined": {
       "value": "rgb(39, 39, 42)"
+    },
+
+    "textarea.bg.plain": {
+      "value": "transparent"
+    },
+    "textarea.bg.soft": {
+      "value": "rgb(39, 39, 42)"
+    },
+    "textarea.bg.outlined": {
+      "value": "transparent"
+    },
+    "textarea.bg.mixed": {
+      "value": "rgb(24, 24, 27)"
+    },
+    "textarea.bg.bottomOutlined": {
+      "value": "transparent"
+    },
+
+    "textarea.border.plain": {
+      "value": "rgb(39, 39, 42)"
+    },
+    "textarea.border.soft": {
+      "value": "rgb(39, 39, 42)"
+    },
+    "textarea.border.outlined": {
+      "value": "rgb(39, 39, 42)"
+    },
+    "textarea.border.mixed": {
+      "value": "rgb(39, 39, 42)"
+    },
+    "textarea.border.bottomOutlined": {
+      "value": "rgb(39, 39, 42)"
     }
   }
 }

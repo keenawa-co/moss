@@ -315,6 +315,38 @@
     },
     "input.border.bottomOutlined": {
       "value": "rgb(228 228 231 / 1)"
+    },
+
+    "textarea.bg.plain": {
+      "value": "transparent"
+    },
+    "textarea.bg.soft": {
+      "value": "rgb(244, 244, 245)"
+    },
+    "textarea.bg.outlined": {
+      "value": "transparent"
+    },
+    "textarea.bg.mixed": {
+      "value": "rgb(255, 255, 255)"
+    },
+    "textarea.bg.bottomOutlined": {
+      "value": "transparent"
+    },
+
+    "textarea.border.plain": {
+      "value": null
+    },
+    "textarea.border.soft": {
+      "value": null
+    },
+    "textarea.border.outlined": {
+      "value": "rgb(228, 228, 231)"
+    },
+    "textarea.border.mixed": {
+      "value": "rgb(228, 228, 231)"
+    },
+    "textarea.border.bottomOutlined": {
+      "value": "rgb(228 228 231 / 1)"
     }
   }
 }
