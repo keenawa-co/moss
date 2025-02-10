@@ -5,6 +5,8 @@ import type { Preview } from "@storybook/react";
 import "desktop/fonts";
 import "./styles.css";
 
+import { withThemeByDataAttribute } from "@storybook/addon-themes";
+
 import * as themeFiles from "./themes";
 
 interface Theme {
@@ -41,8 +43,9 @@ const preview: Preview = {
       toolbar: {
         icon: "circlehollow",
         items: [
-          { value: "light", title: "Moss Light" },
-          { value: "dark", title: "Moss Dark" },
+          { value: "light", title: "Moss Light", icon: "circle" },
+          { value: "dark", title: "Moss Dark", icon: "circlehollow" },
+          { value: "pink", title: "Moss Pink", icon: "circle" },
         ],
         showName: true,
       },
@@ -52,6 +55,15 @@ const preview: Preview = {
     layout: "fullscreen",
   },
   decorators: [
+    withThemeByDataAttribute({
+      defaultTheme: "light",
+      themes: {
+        light: "light",
+        dark: "dark",
+        pink: "pink",
+      },
+      attributeName: "data-mode",
+    }),
     (Story, context) => {
       const theme = context.args.theme ?? context.globals.theme;
 

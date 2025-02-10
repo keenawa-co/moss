@@ -1,7 +1,7 @@
 import { cva } from "class-variance-authority";
 import React from "react";
 
-import { cn } from "@repo/moss-ui";
+import { cn } from "@/utils";
 
 export interface InputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "size"> {
   variant?: "plain" | "soft" | "outlined" | "mixed" | "bottomOutlined";

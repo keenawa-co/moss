@@ -1,7 +1,7 @@
 import { cva } from "class-variance-authority";
 import { forwardRef, RefObject, TextareaHTMLAttributes } from "react";
 
-import { cn } from "@repo/moss-ui";
+import { cn } from "@/utils";
 
 export interface TextAreaProps extends Omit<TextareaHTMLAttributes<HTMLTextAreaElement>, "size"> {
   variant?: "plain" | "soft" | "outlined" | "mixed" | "bottomOutlined";
