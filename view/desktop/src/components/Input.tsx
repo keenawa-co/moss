@@ -1,6 +1,8 @@
 import { cva } from "class-variance-authority";
 import React from "react";
 
+import { cn } from "@repo/moss-ui";
+
 export interface InputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "size"> {
   variant?: "plain" | "soft" | "outlined" | "mixed" | "bottomOutlined";
   size?: "sm" | "md" | "lg" | "xl";
@@ -75,7 +77,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
     return (
       <input
         ref={forwardedRef}
-        className={inputVariants({ variant, disabled, size, className })}
+        className={cn(inputVariants({ variant, disabled, size }), className)}
         disabled={disabled}
         {...props}
       />
