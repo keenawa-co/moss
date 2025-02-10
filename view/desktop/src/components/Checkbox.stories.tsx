@@ -1,9 +1,9 @@
 import { useState } from "react";
 
-import { Icon } from "@repo/moss-ui";
+import { Checkbox } from "@/components";
 import { Meta, StoryObj } from "@storybook/react";
 
-import * as Checkbox from "./Checkbox";
+import Icon from "./Icon";
 
 const meta: Meta = {
   title: "Desktop/Checkbox",

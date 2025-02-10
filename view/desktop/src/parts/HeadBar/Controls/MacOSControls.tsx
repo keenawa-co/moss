@@ -1,8 +1,10 @@
 import { useContext, type HTMLProps } from "react";
+
+import { cn } from "@/utils";
+
 import { ControlButton } from "./ControlButton";
-import { ControlsIcons } from "./icons";
-import { cn } from "@repo/moss-ui";
 import ControlsContext from "./ControlsContext";
+import { ControlsIcons } from "./icons";
 
 const buttonStyles = `text-black/60 active:text-black/60 size-3 cursor-default grid  items-center justify-center self-center rounded-full `;
 const iconStyles = `hidden size-1.5 group-hover:block`;
@@ -11,7 +13,7 @@ export function MacOSControls({ className, ...props }: HTMLProps<HTMLDivElement>
   const { minimizeWindow, maximizeWindow, closeWindow } = useContext(ControlsContext);
 
   return (
-    <div className={cn("text-black group flex gap-2 px-4", className)} {...props}>
+    <div className={cn("group flex gap-2 px-4 text-black", className)} {...props}>
       <ControlButton
         onClick={closeWindow}
         className={cn(buttonStyles, "bg-[#ff544d] hover:bg-[#ff544d] active:bg-[#bf403a] dark:border-none")}

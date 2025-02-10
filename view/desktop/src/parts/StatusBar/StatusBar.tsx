@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState, type ComponentPropsWithoutRef } from "react";
 import { createPortal } from "react-dom";
 
-import { swapListById } from "@/utils";
+import { Icon, Icons } from "@/components";
+import { cn, swapListById } from "@/utils";
 import {
   attachClosestEdge,
   extractClosestEdge,
@@ -14,7 +15,6 @@ import {
   monitorForElements,
 } from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
 import { setCustomNativeDragPreview } from "@atlaskit/pragmatic-drag-and-drop/element/set-custom-native-drag-preview";
-import { cn, Icon, Icons } from "@repo/moss-ui";
 
 import { DropIndicator } from "../../components/DropIndicator";
 

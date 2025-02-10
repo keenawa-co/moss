@@ -13,11 +13,12 @@ export default defineConfig({
   plugins: [tailwindcss(), react()],
   resolve: {
     alias: {
-      "@": resolve("src"),
-      "@/hooks": resolve("src/hooks"),
-      "@/assets": resolve("src/assets"),
-      "@/components": resolve("src/components"),
-      "@/store": resolve("src/store"),
+      "@": resolve(__dirname, "src"),
+      "@/hooks": resolve(__dirname, "src/hooks"),
+      "@/utils": resolve(__dirname, "src/utils"),
+      "@/assets": resolve(__dirname, "src/assets"),
+      "@/components": resolve(__dirname, "src/components"),
+      "@/store": resolve(__dirname, "src/store"),
     },
   },
 });

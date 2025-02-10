@@ -1,9 +1,11 @@
-import { Meta, StoryObj } from "@storybook/react";
-import * as CM from "./ContextMenu";
 import { useState } from "react";
 
+import { Meta, StoryObj } from "@storybook/react";
+
+import * as CM from "./ContextMenu";
+
 const meta: Meta<typeof CM.Root> = {
-  title: "Shared/ContextMenu",
+  title: "Desktop/ContextMenu",
   component: CM.Root,
   tags: ["autodocs"],
   decorators: [

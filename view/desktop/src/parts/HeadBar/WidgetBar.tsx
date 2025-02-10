@@ -1,9 +1,9 @@
 import { HTMLProps, useEffect, useRef, useState } from "react";
 
+import { DropdownMenu as DM, Icon } from "@/components";
 import { ActionsGroup } from "@/components/ActionsGroup";
-import { swapListByIndex } from "@/utils";
+import { cn, swapListByIndex } from "@/utils";
 import { monitorForElements } from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
-import { cn, DropdownMenu as DM, Icon } from "@repo/moss-ui";
 import { OsType } from "@tauri-apps/plugin-os";
 
 interface WidgetBarProps extends HTMLProps<HTMLDivElement> {

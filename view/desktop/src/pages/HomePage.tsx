@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
+import { Icon, Tooltip } from "@/components";
 import { invokeTauriIpc } from "@/lib/backend/tauri";
-import { Icon, Tooltip } from "@repo/moss-ui";
 import { listen } from "@tauri-apps/api/event";
 
 export type DescribeActivityOutput = { tooltip: string; order: number };

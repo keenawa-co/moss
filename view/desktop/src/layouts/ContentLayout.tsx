@@ -1,5 +1,6 @@
-import { cn } from "@repo/moss-ui";
 import { ComponentProps, forwardRef } from "react";
+
+import { cn } from "@/utils";
 
 export const ContentLayout = forwardRef<HTMLDivElement, ComponentProps<"div">>(
   ({ children, className, ...props }, ref) => (

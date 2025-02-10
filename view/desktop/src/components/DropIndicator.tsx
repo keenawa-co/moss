@@ -1,7 +1,7 @@
 import type { CSSProperties, HTMLAttributes } from "react";
 
+import { cn } from "@/utils";
 import type { Edge } from "@atlaskit/pragmatic-drag-and-drop-hitbox/types";
-import { cn } from "@repo/moss-ui";
 
 type Orientation = "horizontal" | "vertical";
 

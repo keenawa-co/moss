@@ -1,8 +1,8 @@
 import { ComponentPropsWithoutRef, ElementRef, forwardRef } from "react";
 
+import { cn } from "@/utils";
 import * as MenuPrimitive from "@radix-ui/react-menu";
 
-import { cn } from "../utils";
 import { ScopedProps } from "./types";
 
 export type ContentElement = ElementRef<typeof MenuPrimitive.Content>;

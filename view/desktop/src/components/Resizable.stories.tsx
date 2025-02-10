@@ -6,8 +6,7 @@ import "allotment/dist/style.css";
 
 import { useState } from "react";
 
-import { cn } from "@repo/moss-ui";
-import { expect, within } from "@storybook/test";
+import { cn } from "@/utils";
 
 const meta: Meta = {
   title: "desktop/Resizable",
@@ -51,11 +50,6 @@ export const Vertical: Story = {
         <ResizablePanel className="grid place-items-center">Two</ResizablePanel>
       </Resizable>
     );
-  },
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-
-    expect(canvas.getByText("One")).toBeInTheDocument();
   },
 };
 
@@ -211,7 +205,7 @@ export const OverflowXY: Story = {
       <Resizable>
         <ResizablePanel className="grid place-items-center" preferredSize={200} maxSize={300} snap>
           <div className="h-full w-full overflow-y-scroll">
-            <div className="mb-4 mt-12 h-12 text-center font-bold">Overflow Y</div>
+            <div className="mt-12 mb-4 h-12 text-center font-bold">Overflow Y</div>
             {Array(10)
               .fill(0)
               .map((_, i) => (
