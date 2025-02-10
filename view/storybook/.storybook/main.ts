@@ -10,12 +10,9 @@ import type { StorybookConfig } from "@storybook/react-vite";
 function getAbsolutePath(value: string): string {
   return dirname(require.resolve(join(value, "package.json")));
 }
+
 const config: StorybookConfig = {
-  stories: [
-    "../../../packages/moss-ui/src/**/*.stories.@(js|jsx|mjs|ts|tsx)",
-    "../../desktop/src/components/**/*.stories.@(js|jsx|mjs|ts|tsx)",
-    "../../web/src/**/*.stories.@(js|jsx|mjs|ts|tsx)",
-  ],
+  stories: ["../../desktop/src/components/**/*.stories.@(ts|tsx)", "../../web/src/**/*.stories.@(ts|tsx)"],
   staticDirs: ["../public"],
   addons: [
     getAbsolutePath("@storybook/addon-links"),
@@ -28,6 +25,10 @@ const config: StorybookConfig = {
     name: getAbsolutePath("@storybook/react-vite"),
     options: {},
   },
+  core: { builder: "@storybook/builder-vite" },
+  typescript: {
+    reactDocgen: false,
+  },
   async viteFinal(config) {
     return {
       ...config,
@@ -35,4 +36,5 @@ const config: StorybookConfig = {
     };
   },
 };
+
 export default config;

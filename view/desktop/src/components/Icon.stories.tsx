@@ -1,15 +1,15 @@
 import { useState } from "react";
 
+import { cn } from "@/utils";
 import * as icons from "@repo/icongen";
 import type { Meta, StoryObj } from "@storybook/react";
 
 import { Icon, Icons } from "./Icon";
-import { cn } from "./utils";
 
 const iconOptions = Object.keys(icons) as Icons[];
 
 const meta: Meta<typeof Icon> = {
-  title: "Shared/Icon",
+  title: "Desktop/Icon",
   component: Icon,
   tags: ["autodocs"],
   parameters: {

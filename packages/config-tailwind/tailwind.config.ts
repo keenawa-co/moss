@@ -19,6 +19,7 @@ const config: Config = {
       screens: breakpoints,
     },
   },
+  darkMode: ["class", '[data-theme="dark"]'],
   plugins: [tailwindAnimate, tailwindTypography, ...plugins],
 };
 

@@ -1,7 +1,7 @@
-import { Icon } from "@repo/moss-ui";
 import { Meta, StoryObj } from "@storybook/react";
 
 import Button from "./Button";
+import Icon from "./Icon";
 
 const variants = ["solid", "outlined", "soft", "ghost"] as const;
 const sizes = ["xs", "sm", "md", "lg", "xl"] as const;
@@ -138,23 +138,6 @@ const colors = {
   },
 } as const;
 
-const convertColorsToCSSVars = (
-  colors: Record<string, Record<string, Record<string, string>>>
-): Record<string, string> => {
-  const cssVars: Record<string, string> = {};
-
-  for (const [category, variants] of Object.entries(colors)) {
-    for (const [variant, properties] of Object.entries(variants)) {
-      for (const [prop, value] of Object.entries(properties)) {
-        const cssVarName = `--color-button-${category}-${variant}-${prop}`;
-        cssVars[cssVarName] = value;
-      }
-    }
-  }
-
-  return cssVars;
-};
-
 const meta: Meta = {
   title: "Desktop/Button",
   component: Button.Root,
@@ -195,39 +178,30 @@ export const Primary: Story = {
 export const Intents: Story = {
   render: () => {
     return (
-      <>
-        <div>
-          <div className="flex">
-            <div className="text-black dark:text-[#101012]">Light theme</div>
-            <div className="text-white dark:text-white">Dark theme</div>
-          </div>
-        </div>
-
-        <table className="border-separate border-spacing-2">
-          <tr>
-            <th />
-            {variants.map((variant) => {
-              return <th className="text-left capitalize">{variant}</th>;
-            })}
-          </tr>
-          {(Object.keys(colors) as Array<keyof typeof colors>).map((intent) => {
-            return (
-              <tr key={intent}>
-                <th className="text-left capitalize">{intent}</th>
-                {variants.map((variant) => {
-                  return (
-                    <td key={variant}>
-                      <Button.Root intent={intent} variant={variant}>
-                        <Button.Label>Button</Button.Label>
-                      </Button.Root>
-                    </td>
-                  );
-                })}
-              </tr>
-            );
+      <table className="border-separate border-spacing-2">
+        <tr>
+          <th />
+          {variants.map((variant) => {
+            return <th className="text-left capitalize">{variant}</th>;
           })}
-        </table>
-      </>
+        </tr>
+        {(Object.keys(colors) as Array<keyof typeof colors>).map((intent) => {
+          return (
+            <tr key={intent}>
+              <th className="text-left capitalize">{intent}</th>
+              {variants.map((variant) => {
+                return (
+                  <td key={variant}>
+                    <Button.Root intent={intent} variant={variant}>
+                      <Button.Label>Button</Button.Label>
+                    </Button.Root>
+                  </td>
+                );
+              })}
+            </tr>
+          );
+        })}
+      </table>
     );
   },
 };

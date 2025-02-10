@@ -8,8 +8,8 @@ import { type } from "@tauri-apps/plugin-os";
 import { PageLoader } from "./components/PageLoader";
 import { store } from "./store";
 
+import "@/assets/fonts.css";
 import "@/assets/index.css";
-import "@repo/moss-ui/src/fonts.css";
 
 import { QueryCache, QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";

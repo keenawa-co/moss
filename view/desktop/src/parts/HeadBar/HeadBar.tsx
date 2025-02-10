@@ -1,4 +1,4 @@
-import { cn } from "@repo/moss-ui";
+import { cn } from "@/utils";
 import { type } from "@tauri-apps/plugin-os";
 
 import { ActionsBar } from "./ActionsBar";

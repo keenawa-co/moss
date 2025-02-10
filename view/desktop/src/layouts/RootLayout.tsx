@@ -1,6 +1,6 @@
 import { ComponentProps } from "react";
 
-import { cn } from "@repo/moss-ui";
+import { cn } from "@/utils";
 
 import { HeadBar } from "../parts/HeadBar/HeadBar";
 import StatusBar from "../parts/StatusBar/StatusBar";

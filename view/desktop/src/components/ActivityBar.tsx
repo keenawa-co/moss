@@ -3,7 +3,9 @@ import { ComponentPropsWithoutRef, forwardRef, useCallback } from "react";
 import { ActivityBarState, useChangeActivityBarState, useGetActivityBarState } from "@/hooks/useActivityBarState";
 import { useChangeProjectSessionState, useGetProjectSessionState } from "@/hooks/useProjectSession";
 import { useGetViewGroups } from "@/hooks/useViewGroups";
-import { cn, Icon, Icons } from "@repo/moss-ui";
+import { cn } from "@/utils";
+
+import Icon, { Icons } from "./Icon";
 
 const positions = ["top", "bottom", "left", "right"] as const;
 
