@@ -113,8 +113,8 @@ importers:
         specifier: ^0.3.0
         version: 0.3.0(@typespec/compiler@0.64.0)
       '@typespec/json-schema':
-        specifier: ^0.62.0
-        version: 0.62.0(@typespec/compiler@0.64.0)
+        specifier: ^0.64.0
+        version: 0.64.0(@typespec/compiler@0.64.0)
     devDependencies:
       '@repo/typescript-config':
         specifier: workspace:*
@@ -162,8 +162,8 @@ importers:
   crates/moss-theme:
     dependencies:
       '@typespec/json-schema':
-        specifier: ^0.63.0
-        version: 0.63.0(@typespec/compiler@0.64.0)
+        specifier: ^0.64.0
+        version: 0.64.0(@typespec/compiler@0.64.0)
     devDependencies:
       '@repo/typescript-config':
         specifier: workspace:*
@@ -3241,17 +3241,11 @@ packages:
     engines: {node: '>=18.0.0'}
     hasBin: true
 
-  '@typespec/json-schema@0.62.0':
-    resolution: {integrity: sha512-8wM+ENB8NY9y4mhevk6XImYqzgiZdQFlq9fMwsoJGT7jsNA4MYAHsDrVH2jWfOnR1EssCHNV5bu1DttfXpaZvg==}
+  '@typespec/json-schema@0.64.0':
+    resolution: {integrity: sha512-71E1c58xbHWYSli1Um2U3SQUANPoTp+p87xiH1h64NLlLHMMgFofiQcIb9v1H9tw0YBNB6ELz/zyFGJpZcM3bA==}
     engines: {node: '>=18.0.0'}
     peerDependencies:
-      '@typespec/compiler': ~0.62.0
-
-  '@typespec/json-schema@0.63.0':
-    resolution: {integrity: sha512-jGRXxUxdrwW/XzvaDqyt5mS/V1iBnrDaHUMRIkrFLCwzgll/NenquLI/nopihzLFXK78MfFYuHg4DEPYY5PdFw==}
-    engines: {node: '>=18.0.0'}
-    peerDependencies:
-      '@typespec/compiler': ~0.63.0
+      '@typespec/compiler': ~0.64.0
 
   '@typespec/prettier-plugin-typespec@0.64.0':
     resolution: {integrity: sha512-hL/DOo7+PFp/HGeZgkKqkbG9Q4iUYbhvqHcwXhzCOIaBFn50fgNQbBRdQD9VgvrGGbwN7fyTJmsGWyFnuSNjJA==}
@@ -9621,12 +9615,7 @@ snapshots:
       yaml: 2.5.1
       yargs: 17.7.2
 
-  '@typespec/json-schema@0.62.0(@typespec/compiler@0.64.0)':
-    dependencies:
-      '@typespec/compiler': 0.64.0
-      yaml: 2.5.1
-
-  '@typespec/json-schema@0.63.0(@typespec/compiler@0.64.0)':
+  '@typespec/json-schema@0.64.0(@typespec/compiler@0.64.0)':
     dependencies:
       '@typespec/compiler': 0.64.0
       yaml: 2.5.1
