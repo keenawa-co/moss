@@ -53,8 +53,9 @@ const selectTriggerStyles = cva(
           outline-none background-(--moss-select-bg-soft)
           focus:brightness-95 dark:focus:brightness-105
           data-[invalid]:bg-[rgb(254,226,226)]
-          dark:data-[invalid]:[rgba(22,101,52,25)]
+          dark:data-[invalid]:bg-[rgb(153,27,27,0.25)]
           data-[valid]:bg-[rgb(220,252,231)]
+          dark:data-[valid]:bg-[rgba(22,101,52,0.25)]
         `,
         mixed: `
           text-(--moss-select-text-mixed)
