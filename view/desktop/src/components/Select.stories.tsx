@@ -1,5 +1,6 @@
 import { Meta, StoryObj } from "@storybook/react";
 
+import Icon from "./Icon";
 import Select from "./Select";
 
 const variants = ["outlined", "soft", "plain", "mixed", "bottomOutlined"] as const;
@@ -61,7 +62,7 @@ export const Variants: Story = {
               <Select.Root defaultValue="DR Congo">
                 <Select.Trigger size="md" className="flex w-56 justify-between" variant={variant}>
                   <Select.Value placeholder="Role" />
-                  <Select.Icon />
+                  <Icon icon="ChevronDown" />
                 </Select.Trigger>
 
                 <Select.Portal>
@@ -93,7 +94,7 @@ export const Sizes: Story = {
               <Select.Root defaultValue="DR Congo">
                 <Select.Trigger className="flex w-56 justify-between" size={size}>
                   <Select.Value placeholder="Role" />
-                  <Select.Icon />
+                  <Icon icon="ChevronDown" />
                 </Select.Trigger>
 
                 <Select.Portal>
@@ -120,7 +121,7 @@ export const Disabled: Story = {
       <Select.Root defaultValue="DR Congo">
         <Select.Trigger className="flex w-56 justify-between" disabled>
           <Select.Value placeholder="Role" />
-          <Select.Icon />
+          <Icon icon="ChevronDown" />
         </Select.Trigger>
 
         <Select.Portal>
@@ -133,6 +134,70 @@ export const Disabled: Story = {
           </Select.Content>
         </Select.Portal>
       </Select.Root>
+    );
+  },
+};
+
+export const Valid: Story = {
+  render: () => {
+    return (
+      <table className="border-separate border-spacing-2">
+        {variants.map((variant) => (
+          <tr>
+            <th className="text-left">{variant}</th>
+            <th>
+              <Select.Root defaultValue="DR Congo">
+                <Select.Trigger size="md" className="flex w-56 justify-between" variant={variant} data-valid>
+                  <Select.Value placeholder="Role" />
+                  <Icon icon="ChevronDown" />
+                </Select.Trigger>
+
+                <Select.Portal>
+                  <Select.Content className="z-50">
+                    <Select.Viewport>
+                      {countries.map((country) => (
+                        <SelectItem entry={country} key={country.name} />
+                      ))}
+                    </Select.Viewport>
+                  </Select.Content>
+                </Select.Portal>
+              </Select.Root>
+            </th>
+          </tr>
+        ))}
+      </table>
+    );
+  },
+};
+
+export const Invalid: Story = {
+  render: () => {
+    return (
+      <table className="border-separate border-spacing-2">
+        {variants.map((variant) => (
+          <tr>
+            <th className="text-left">{variant}</th>
+            <th>
+              <Select.Root defaultValue="DR Congo">
+                <Select.Trigger size="md" className="flex w-56 justify-between" variant={variant} data-invalid>
+                  <Select.Value placeholder="Role" />
+                  <Icon icon="ChevronDown" />
+                </Select.Trigger>
+
+                <Select.Portal>
+                  <Select.Content className="z-50">
+                    <Select.Viewport>
+                      {countries.map((country) => (
+                        <SelectItem entry={country} key={country.name} />
+                      ))}
+                    </Select.Viewport>
+                  </Select.Content>
+                </Select.Portal>
+              </Select.Root>
+            </th>
+          </tr>
+        ))}
+      </table>
     );
   },
 };

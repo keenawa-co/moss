@@ -43,11 +43,13 @@ const selectTriggerStyles = cva(
     variants: {
       variant: {
         outlined: `
+          text-(--moss-select-text-outlined)
           border border-(--moss-select-border-soft)
           data-[invalid]:border-[rgb(239,68,68)] focus:data-[invalid]:outline-[rgb(239,68,68)]
           data-[valid]:border-[rgb(22,163,74)] focus:data-[valid]:outline-[rgb(22,163,74)]
         `,
         soft: `
+          text-(--moss-select-text-soft)
           outline-none background-(--moss-select-bg-soft)
           focus:brightness-95 dark:focus:brightness-105
           data-[invalid]:bg-[rgb(254,226,226)]
@@ -55,20 +57,24 @@ const selectTriggerStyles = cva(
           data-[valid]:bg-[rgb(220,252,231)]
         `,
         mixed: `
+          text-(--moss-select-text-mixed)
           shadow-sm shadow-gray-900/5 dark:shadow-gray-900/35 border border-(--moss-select-border-soft)
           background-(--moss-select-bg-mixed)
           data-[invalid]:border-[rgb(220,38,38)] focus:data-[invalid]:outline-[rgb(220,38,38)]
           data-[valid]:border-[rgb(22,163,74)] focus:data-[valid]:outline-[rgb(22,163,74)]
         `,
         plain: `
+          text-(--moss-select-text-plain)
           outline-none bg-transparent
           hover:background-(--moss-select-bg-plain)
-          invalid:text-[rgb(248,113,113)]
+          data-[valid]:text-[rgb(74,222,128)]
+          data-[invalid]:text-[rgb(248,113,113)]
           shadow-sm shadow-gray-900/5 dark:shadow-gray-900/35
         `,
         bottomOutlined: `
+          text-(--moss-select-text-bottomOutlined)
           rounded-none transition-[border] px-0
-          border-b focus:border-b-2 focus:border-[rgb(37,99,235)]
+          border-b border-black dark:border-white focus:border-b-2 focus:border-[rgb(37,99,235)]
           data-[invalid]:border-[rgb(248,113,113)]
           data-[valid]:border-[rgb(74,222,128)]
         `,
@@ -182,7 +188,6 @@ export default {
   Separator: SelectSeparator,
   Portal: SelectPrimitive.Portal,
   Value: SelectPrimitive.Value,
-  Icon: SelectPrimitive.Icon,
   ItemIndicator: SelectItemIndicator,
   ScrollUpButton: SelectScrollUpButton,
   ScrollDownButton: SelectScrollDownButton,

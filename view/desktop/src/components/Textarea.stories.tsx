@@ -95,7 +95,7 @@ export const Sizes: Story = {
   },
 };
 
-export const ValidTextareas: Story = {
+export const Valid: Story = {
   render: (args) => {
     return (
       <div className="flex flex-col gap-2">
@@ -107,7 +107,7 @@ export const ValidTextareas: Story = {
   },
 };
 
-export const InvalidTextareas: Story = {
+export const Invalid: Story = {
   render: (args) => {
     return (
       <div className="flex flex-col gap-2">
