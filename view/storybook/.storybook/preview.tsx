@@ -69,6 +69,8 @@ const preview: Preview = {
 
       applyTheme(themeFiles[theme]);
 
+      document.querySelector("body")!.classList.add("body");
+
       return <Story />;
     },
   ],
