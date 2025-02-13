@@ -31,22 +31,22 @@ const textareaVariants = cva(
           background-(--moss-textarea-bg-outlined)
           transition-[outline] focus:outline-2 focus:outline-[rgb(37,99,235)] -outline-offset-1
           border border-(--moss-textarea-border-outlined)
-               data-[valid]:border-[rgb(22,163,74)]      focus:data-[valid]:outline-[rgb(22,163,74)]
-          dark:data-[valid]:border-[rgb(34,197,94)] dark:focus:data-[valid]:outline-[rgb(34,197,94)]
+               data-[valid]:border-[rgb(22,163,74)]        focus:data-[valid]:outline-[rgb(22,163,74)]
+          dark:data-[valid]:border-[rgb(34,197,94)]   dark:focus:data-[valid]:outline-[rgb(34,197,94)]
                data-[invalid]:border-[rgb(220,38,38)]      focus:data-[invalid]:outline-[rgb(220,38,38)]
           dark:data-[invalid]:border-[rgb(239,68,68)] dark:focus:data-[invalid]:outline-[rgb(239,68,68)]
         `,
         mixed: `
-          rounded-sm
-          background-(--moss-textarea-bg-mixed)
-          transition-[outline] focus:outline-2 focus:outline-[rgb(37,99,235)]
-          shadow-sm shadow-gray-900/5 -outline-offset-1 border border-(--moss-textarea-border-mixed)
-          dark:shadow-gray-900/35
-          data-[invalid]:border-[rgb(220,38,38)] focus:data-[invalid]:outline-[rgb(220,38,38)]
-          dark:data-[invalid]:border-[rgb(239,68,68)] dark:focus:data-[invalid]:outline-[rgb(239,68,68)]
-          data-[valid]:border-[rgb(22,163,74)] focus:data-[valid]:outline-[rgb(22,163,74)]
-          dark:data-[valid]:border-[rgb(34,197,94)] dark:focus:data-[valid]:outline-[rgb(34,197,94)]
-        `,
+        rounded-sm
+        border border-(--moss-textarea-border-mixed)
+        background-(--moss-textarea-bg-mixed)
+        shadow-sm shadow-gray-900/5 dark:shadow-gray-900/35
+        transition-[outline] -outline-offset-1 focus:outline-2 focus:outline-[rgb(37,99,235)]
+             data-[invalid]:border-[rgb(220,38,38)]      focus:data-[invalid]:outline-[rgb(220,38,38)]
+        dark:data-[invalid]:border-[rgb(239,68,68)] dark:focus:data-[invalid]:outline-[rgb(239,68,68)]
+             data-[valid]:border-[rgb(22,163,74)]      focus:data-[valid]:outline-[rgb(22,163,74)]
+        dark:data-[valid]:border-[rgb(34,197,94)] dark:focus:data-[valid]:outline-[rgb(34,197,94)]
+      `,
         bottomOutlined: `
           rounded-none
           background-(--moss-textarea-bg-bottomOutlined)
@@ -57,7 +57,6 @@ const textareaVariants = cva(
           data-[valid]:border-[rgb(74,222,128)] dark:data-[valid]:border-[rgb(22,163,74)]
         `,
       },
-
       disabled: {
         false: null,
         true: "cursor-not-allowed opacity-50 active:pointer-events-none",
