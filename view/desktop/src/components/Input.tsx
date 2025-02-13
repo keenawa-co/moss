@@ -14,21 +14,21 @@ const inputVariants = cva(
     variants: {
       variant: {
         plain: `
-          py-0 rounded-md
+          py-0 rounded-sm
           background-(--moss-input-bg-plain)
           transition-[outline] outline-none
           data-[invalid]:text-[rgb(220,38,38)]   dark:data-[invalid]:text-[rgb(248,113,113)]
           data-[valid]:text-[rgba(22,101,52,25)] dark:data-[valid]:text-[rgb(220,252,231)]
         `,
         soft: `
-          rounded-md
+          rounded-sm
           background-(--moss-input-bg-soft)
           transition-[outline] outline-none focus:brightness-95 dark:focus:brightness-105
           data-[invalid]:bg-[rgb(254,226,226)] dark:data-[invalid]:bg-[rgba(153,27,27,25)]
           data-[valid]:bg-[rgb(220,252,231)]   dark:data-[valid]:bg-[rgba(22,101,52,25)]
         `,
         outlined: `
-          rounded-md
+          rounded-sm
           background-(--moss-input-bg-outlined)
           transition-[outline] focus:outline-2 focus:outline-[rgb(37,99,235)] -outline-offset-1
           border border-(--moss-input-border-outlined)
@@ -38,7 +38,7 @@ const inputVariants = cva(
           dark:data-[invalid]:border-[rgb(239,68,68)] dark:focus:data-[invalid]:outline-[rgb(239,68,68)]
         `,
         mixed: `
-          rounded-md
+          rounded-sm
           background-(--moss-input-bg-mixed)
           transition-[outline] focus:outline-2 focus:outline-[rgb(37,99,235)]
           shadow-sm shadow-gray-900/5 -outline-offset-1 border border-(--moss-input-border-mixed)
@@ -59,10 +59,11 @@ const inputVariants = cva(
         `,
       },
       size: {
-        sm: `text-[14px] h-8  px-2.5`,
-        md: `text-[14px] h-9  px-3`,
-        lg: `text-base   h-10 px-4`,
-        xl: `text-base   h-12 px-5`,
+        "xs": "h-6 px-2.5",
+        "sm": "h-7 px-2.5",
+        "md": "h-9 px-3",
+        "lg": "h-10 px-4 text-base",
+        "xl": "h-12 px-5 text-base",
       },
       disabled: {
         false: null,

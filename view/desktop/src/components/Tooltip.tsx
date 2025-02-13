@@ -78,7 +78,7 @@ export const Tooltip = ({
         <TooltipPrimitive.Trigger asChild={asChild}>{children}</TooltipPrimitive.Trigger>
         <TooltipPrimitive.Content
           className={cn(
-            "z-50 -mb-px flex max-w-80 overflow-hidden rounded-md bg-[#1E1E1E] leading-5 text-white shadow-md",
+            "z-50 -mb-px flex max-w-80 overflow-hidden rounded-sm bg-[#1E1E1E] leading-5 text-white shadow-md",
             className
           )}
           {...options?.content}

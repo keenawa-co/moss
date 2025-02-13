@@ -14,21 +14,21 @@ const textareaVariants = cva(
     variants: {
       variant: {
         plain: `
-          rounded-md
+          rounded-sm
           background-(--moss-textarea-bg-plain)
           transition-[outline] outline-none
           data-[invalid]:text-[rgb(220,38,38)]   dark:data-[invalid]:text-[rgb(248,113,113)]
           data-[valid]:text-[rgba(22,101,52,25)] dark:data-[valid]:text-[rgb(220,252,231)]
         `,
         soft: `
-          rounded-md
+          rounded-sm
           background-(--moss-textarea-bg-soft)
           transition-[outline] outline-none focus:brightness-95 dark:focus:brightness-105
           data-[invalid]:bg-[rgb(254,226,226)] dark:data-[invalid]:bg-[rgba(153,27,27,25)]
           data-[valid]:bg-[rgb(220,252,231)]   dark:data-[valid]:bg-[rgba(22,101,52,25)]
         `,
         outlined: `
-          rounded-md
+          rounded-sm
           background-(--moss-textarea-bg-outlined)
           transition-[outline] focus:outline-2 focus:outline-[rgb(37,99,235)] -outline-offset-1
           border border-(--moss-textarea-border-outlined)
@@ -38,7 +38,7 @@ const textareaVariants = cva(
           dark:data-[invalid]:border-[rgb(239,68,68)] dark:focus:data-[invalid]:outline-[rgb(239,68,68)]
         `,
         mixed: `
-          rounded-md
+          rounded-sm
           background-(--moss-textarea-bg-mixed)
           transition-[outline] focus:outline-2 focus:outline-[rgb(37,99,235)]
           shadow-sm shadow-gray-900/5 -outline-offset-1 border border-(--moss-textarea-border-mixed)

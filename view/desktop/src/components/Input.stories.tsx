@@ -5,7 +5,7 @@ import { Meta, StoryObj } from "@storybook/react";
 import Input from "./Input";
 
 const variants = ["plain", "soft", "outlined", "mixed", "bottomOutlined"] as const;
-const sizes = ["sm", "md", "lg", "xl"] as const;
+const sizes = ["xs", "sm", "md", "lg", "xl"] as const;
 const meta: Meta = {
   title: "Desktop/Input",
   component: Input,

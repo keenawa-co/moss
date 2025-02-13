@@ -23,7 +23,7 @@ export const SubTrigger = forwardRef<SubTriggerElement, SubTriggerProps>(
       <MenuPrimitive.SubTrigger
         {...props}
         ref={forwardedRef}
-        className={cn("flex items-center gap-1.5 rounded px-2 py-1", {
+        className={cn("flex items-center gap-1.5 rounded-sm px-2 py-1", {
           "cursor-not-allowed opacity-50": props.disabled,
           "cursor-pointer hover:bg-[#D4E2FF] hover:outline-hidden": !props.disabled,
         })}
