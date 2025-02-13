@@ -5,7 +5,7 @@ import { cn } from "@/utils";
 
 export interface InputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "size"> {
   variant?: "plain" | "soft" | "outlined" | "mixed" | "bottomOutlined";
-  size?: "sm" | "md" | "lg" | "xl";
+  size?: "xs" | "sm" | "md" | "lg" | "xl";
 }
 
 const inputVariants = cva(
