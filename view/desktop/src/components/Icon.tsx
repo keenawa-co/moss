@@ -1,4 +1,4 @@
-import { ComponentPropsWithoutRef } from "react";
+import { ComponentPropsWithoutRef, forwardRef } from "react";
 
 import { cn } from "@/utils";
 import * as icons from "@repo/icongen";
@@ -10,14 +10,14 @@ interface IconProps extends ComponentPropsWithoutRef<"svg"> {
   className?: string;
 }
 
-export const Icon = ({ icon, className, ...props }: IconProps) => {
+export const Icon = forwardRef<SVGSVGElement, IconProps>(({ icon, className, ...props }, forwardedRef) => {
   if (icon && icons[icon]) {
     const IconTag = icons[icon];
-    return <IconTag className={cn("size-4 shrink-0 text-current", className)} {...props} />;
+    return <IconTag ref={forwardedRef} className={cn("size-4 shrink-0 text-current", className)} {...props} />;
   }
 
   return <FailedIcon />;
-};
+});
 
 export default Icon;
 

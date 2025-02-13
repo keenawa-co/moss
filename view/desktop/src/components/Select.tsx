@@ -5,7 +5,7 @@ import { twMerge } from "tailwind-merge";
 import { cn } from "@/utils";
 import * as SelectPrimitive from "@radix-ui/react-select";
 
-import Icon from "./Icon";
+import Icon, { Icons } from "./Icon";
 
 const SelectGroup = SelectPrimitive.Group;
 
@@ -140,9 +140,15 @@ const SelectContent = forwardRef<
 
 const SelectItemIndicator = forwardRef<
   ElementRef<typeof SelectPrimitive.ItemIndicator>,
-  ComponentPropsWithoutRef<typeof SelectPrimitive.ItemIndicator>
->(({ className, ...props }, forwardedRef) => (
-  <SelectPrimitive.ItemIndicator {...props} ref={forwardedRef} className={cn(className)} />
+  ComponentPropsWithoutRef<typeof SelectPrimitive.ItemIndicator> & { icon?: Icons }
+>(({ className, icon = "CheckLucide", ...props }, forwardedRef) => (
+  <SelectPrimitive.ItemIndicator
+    {...props}
+    ref={forwardedRef}
+    className={cn(`absolute left-1.5 inline-flex size-4 items-center justify-center`, className)}
+  >
+    <Icon icon={icon} className="size-2.5" />
+  </SelectPrimitive.ItemIndicator>
 ));
 
 const selectItemStyles = cva(
