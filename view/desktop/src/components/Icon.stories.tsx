@@ -31,8 +31,8 @@ export const Gallery: Story = {
     layout: "fullscreen",
   },
   args: {
-    icon: null, // Default value for the `icon` argument
-    className: "text-6xl", // Match defaults if necessary
+    icon: null,
+    className: "text-6xl",
   },
   render: () => <GalleryComponent />,
 };
@@ -51,13 +51,13 @@ const GalleryComponent = () => {
 
   const [lastChosenSizeType, setLastChosenSizeType] = useState<"TW" | "px" | undefined>(undefined);
   const handleResetButton = () => {
-    setAllIconsSize("16");
+    setAllIconsSize("13");
     setAllIconsSizeTW("text-base");
     setLastChosenSizeType(undefined);
   };
 
   //all sizes
-  const [allIconsSize, setAllIconsSize] = useState("16");
+  const [allIconsSize, setAllIconsSize] = useState("13");
   const handleAllIconsSizeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setAllIconsSize(e.target.value);
     setLastChosenSizeType("px");
