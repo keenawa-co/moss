@@ -4,7 +4,7 @@ import Icon from "./Icon";
 import Select from "./Select";
 
 const variants = ["outlined", "soft", "plain", "mixed", "bottomOutlined"] as const;
-const sizes = ["sm", "md", "lg", "xl"] as const;
+const sizes = ["xs", "sm", "md", "lg", "xl"] as const;
 const countries = [
   { flag: "🇨🇩", name: "DR Congo" },
   { flag: "🇨🇬", name: "Congo Braza" },
@@ -60,7 +60,7 @@ export const Variants: Story = {
             <th className="text-left">{variant}</th>
             <th>
               <Select.Root defaultValue="DR Congo">
-                <Select.Trigger size="md" className="flex w-56 justify-between" variant={variant}>
+                <Select.Trigger className="flex w-56 justify-between" variant={variant}>
                   <Select.Value placeholder="Role" />
                   <Icon icon="ChevronDown" />
                 </Select.Trigger>

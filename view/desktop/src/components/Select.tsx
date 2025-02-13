@@ -32,13 +32,13 @@ const SelectScrollDownButton = forwardRef<
 ));
 
 export interface SelectTriggerProps extends ComponentPropsWithoutRef<typeof SelectPrimitive.Trigger> {
-  size?: "sm" | "md" | "lg" | "xl";
+  size?: "xs" | "sm" | "md" | "lg" | "xl";
   variant?: "outlined" | "soft" | "mixed" | "plain" | "bottomOutlined";
   disabled?: boolean;
 }
 
 const selectTriggerStyles = cva(
-  "relative text-sm px-3 flex items-center cursor-pointer justify-center rounded-xl transition duration-150 ease-in-out focus-visible:outline-2 focus-visible:outline-offset-2 outline-blue-600",
+  "relative text-sm px-3 flex items-center cursor-pointer justify-center rounded-md transition duration-150 ease-in-out focus-visible:outline-2 focus-visible:outline-offset-2 outline-blue-600",
   {
     variants: {
       variant: {
@@ -81,10 +81,11 @@ const selectTriggerStyles = cva(
         `,
       },
       size: {
-        sm: "h-8",
-        md: "h-9",
-        lg: "h-10",
-        xl: "h-12",
+        xs: "h-6",
+        sm: "h-7",
+        md: "h-8",
+        lg: "h-9",
+        xl: "h-10",
       },
       disabled: {
         true: "grayscale-70 cursor-not-allowed hover:brightness-100 active:brightness-100 active:pointer-events-none",
@@ -100,7 +101,7 @@ const selectTriggerStyles = cva(
 );
 
 const SelectTrigger = forwardRef<ElementRef<typeof SelectPrimitive.Trigger>, SelectTriggerProps>(
-  ({ size = "md", variant = "outlined", disabled = false, className, children, ...props }, forwardedRef) => {
+  ({ size = "sm", variant = "outlined", disabled = false, className, children, ...props }, forwardedRef) => {
     return (
       <SelectPrimitive.Trigger
         {...props}
@@ -128,7 +129,7 @@ const SelectContent = forwardRef<
         {...props}
         ref={forwardedRef}
         className={cn(
-          `data-[side=top]:animate-slideDownAndFade data-[side=right]:animate-slideLeftAndFade data-[side=bottom]:animate-slideUpAndFade data-[side=left]:animate-slideRightAndFade overflow-hidden rounded-xl bg-white p-1 shadow-lg will-change-[opacity,transform] dark:bg-[rgb(24,24,27)]`,
+          `data-[side=top]:animate-slideDownAndFade data-[side=right]:animate-slideLeftAndFade data-[side=bottom]:animate-slideUpAndFade data-[side=left]:animate-slideRightAndFade overflow-hidden rounded-md bg-white p-1 shadow-lg will-change-[opacity,transform] dark:bg-[rgb(24,24,27)]`,
           className
         )}
       >
