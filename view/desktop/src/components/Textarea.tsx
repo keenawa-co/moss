@@ -5,11 +5,10 @@ import { cn } from "@/utils";
 
 export interface TextAreaProps extends Omit<TextareaHTMLAttributes<HTMLTextAreaElement>, "size"> {
   variant?: "plain" | "soft" | "outlined" | "mixed" | "bottomOutlined";
-  size?: "sm" | "md" | "lg" | "xl";
 }
 
 const textareaVariants = cva(
-  "w-full peer placeholder-[rgb(161,161,170)] dark:placeholder-[rgb(82,82,91)] text-[rgb(9,9,11)] dark:text-white py-2",
+  "w-full peer placeholder-[rgb(161,161,170)] dark:placeholder-[rgb(82,82,91)] text-[rgb(9,9,11)] dark:text-white py-2  px-3",
   {
     variants: {
       variant: {
@@ -58,12 +57,7 @@ const textareaVariants = cva(
           data-[valid]:border-[rgb(74,222,128)] dark:data-[valid]:border-[rgb(22,163,74)]
         `,
       },
-      size: {
-        sm: `text-[14px] h-8  px-2.5`,
-        md: `text-[14px] h-9  px-3`,
-        lg: `text-base   h-10 px-4`,
-        xl: `text-base   h-12 px-5`,
-      },
+
       disabled: {
         false: null,
         true: "cursor-not-allowed opacity-50 active:pointer-events-none",
@@ -73,11 +67,11 @@ const textareaVariants = cva(
 );
 
 export const Textarea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
-  ({ className, variant = "mixed", size = "md", ...props }, forwardedRef) => {
+  ({ className, variant = "mixed", ...props }, forwardedRef) => {
     return (
       <textarea
         ref={forwardedRef as RefObject<HTMLTextAreaElement>}
-        className={cn(textareaVariants({ variant, size, className }), className)}
+        className={cn(textareaVariants({ variant, className }), className)}
         {...props}
       />
     );

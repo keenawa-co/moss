@@ -47,7 +47,7 @@ const buttonRootStyles = cva(
       },
       loading: {
         false: null,
-        true: "[&>:not(.LoadingIcon)]:opacity-0 cursor-progress",
+        true: "[&>:not(.LoadingIcon)]:opacity-0 cursor-wait hover:brightness-100 active:brightness-100",
       },
       Component: {
         a: "max-w-max",
@@ -149,7 +149,7 @@ export const Root = forwardRef<HTMLButtonElement & HTMLAnchorElement, ButtonProp
     return (
       <Component
         ref={forwardedRef}
-        href={href}
+        href={disabled || loading ? undefined : href}
         className={cn(buttonRootStyles({ intent, variant, size, disabled, loading, className, Component, iconOnly }))}
         disabled={disabled || loading}
         {...props}

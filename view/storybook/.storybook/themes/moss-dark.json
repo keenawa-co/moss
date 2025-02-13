@@ -192,17 +192,16 @@
     "textarea.text.mixed": { "value": "white" },
     "textarea.text.bottomOutlined": { "value": "white" },
 
-    "select.bg.plain": { "value": "transparent" },
     "select.bg.soft": { "value": "rgb(39, 39, 42)" },
     "select.bg.outlined": { "value": "transparent" },
     "select.bg.mixed": { "value": "rgb(24, 24, 27)" },
     "select.bg.bottomOutlined": { "value": "transparent" },
-    "select.border.plain": { "value": "rgb(39, 39, 42)" },
+
     "select.border.soft": { "value": "rgb(39, 39, 42)" },
     "select.border.outlined": { "value": "rgb(39, 39, 42)" },
     "select.border.mixed": { "value": "rgb(39, 39, 42)" },
     "select.border.bottomOutlined": { "value": "rgb(39, 39, 42)" },
-    "select.text.plain": { "value": "white" },
+
     "select.text.soft": { "value": "white" },
     "select.text.outlined": { "value": "white" },
     "select.text.mixed": { "value": "white" },
