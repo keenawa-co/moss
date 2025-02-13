@@ -3,7 +3,7 @@ import { Meta, StoryObj } from "@storybook/react";
 import Icon from "./Icon";
 import Select from "./Select";
 
-const variants = ["outlined", "soft", "plain", "mixed", "bottomOutlined"] as const;
+const variants = ["outlined", "soft", "mixed", "bottomOutlined"] as const;
 const sizes = ["xs", "sm", "md", "lg", "xl"] as const;
 const countries = [
   { flag: "🇨🇩", name: "DR Congo" },

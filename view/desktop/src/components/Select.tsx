@@ -33,7 +33,7 @@ const SelectScrollDownButton = forwardRef<
 
 export interface SelectTriggerProps extends ComponentPropsWithoutRef<typeof SelectPrimitive.Trigger> {
   size?: "xs" | "sm" | "md" | "lg" | "xl";
-  variant?: "outlined" | "soft" | "mixed" | "plain" | "bottomOutlined";
+  variant?: "outlined" | "soft" | "mixed" | "bottomOutlined";
   disabled?: boolean;
 }
 
@@ -44,7 +44,7 @@ const selectTriggerStyles = cva(
       variant: {
         outlined: `
           text-(--moss-select-text-outlined)
-          border border-(--moss-select-border-soft)
+          border border-(--moss-select-border-outlined)
           data-[invalid]:border-[rgb(239,68,68)] focus:data-[invalid]:outline-[rgb(239,68,68)]
           data-[valid]:border-[rgb(22,163,74)] focus:data-[valid]:outline-[rgb(22,163,74)]
         `,
@@ -63,14 +63,6 @@ const selectTriggerStyles = cva(
           background-(--moss-select-bg-mixed)
           data-[invalid]:border-[rgb(220,38,38)] focus:data-[invalid]:outline-[rgb(220,38,38)]
           data-[valid]:border-[rgb(22,163,74)] focus:data-[valid]:outline-[rgb(22,163,74)]
-        `,
-        plain: `
-          text-(--moss-select-text-plain)
-          outline-none bg-transparent
-          hover:background-(--moss-select-bg-plain)
-          data-[valid]:text-[rgb(74,222,128)]
-          data-[invalid]:text-[rgb(248,113,113)]
-          shadow-sm shadow-gray-900/5 dark:shadow-gray-900/35
         `,
         bottomOutlined: `
           text-(--moss-select-text-bottomOutlined)
