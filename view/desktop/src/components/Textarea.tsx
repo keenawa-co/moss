@@ -8,7 +8,7 @@ export interface TextAreaProps extends Omit<TextareaHTMLAttributes<HTMLTextAreaE
 }
 
 const textareaVariants = cva(
-  "w-full peer placeholder-[rgb(161,161,170)] dark:placeholder-[rgb(82,82,91)] text-[rgb(9,9,11)] dark:text-white py-2  px-3",
+  "w-full peer placeholder-[rgb(161,161,170)] dark:placeholder-[rgb(82,82,91)] text-[rgb(9,9,11)] dark:text-white py-2 px-3",
   {
     variants: {
       variant: {
@@ -16,8 +16,8 @@ const textareaVariants = cva(
           rounded-sm
           background-(--moss-textarea-bg-plain)
           transition-[outline] outline-none
-          data-[invalid]:text-[rgb(220,38,38)]   dark:data-[invalid]:text-[rgb(248,113,113)]
           data-[valid]:text-[rgba(22,101,52,25)] dark:data-[valid]:text-[rgb(220,252,231)]
+          data-[invalid]:text-[rgb(220,38,38)]   dark:data-[invalid]:text-[rgb(248,113,113)]
         `,
         soft: `
           rounded-sm
@@ -42,10 +42,10 @@ const textareaVariants = cva(
         background-(--moss-textarea-bg-mixed)
         shadow-sm shadow-gray-900/5 dark:shadow-gray-900/35
         transition-[outline] -outline-offset-1 focus:outline-2 focus:outline-[rgb(37,99,235)]
+             data-[valid]:border-[rgb(22,163,74)]        focus:data-[valid]:outline-[rgb(22,163,74)]
+        dark:data-[valid]:border-[rgb(34,197,94)]   dark:focus:data-[valid]:outline-[rgb(34,197,94)]
              data-[invalid]:border-[rgb(220,38,38)]      focus:data-[invalid]:outline-[rgb(220,38,38)]
         dark:data-[invalid]:border-[rgb(239,68,68)] dark:focus:data-[invalid]:outline-[rgb(239,68,68)]
-             data-[valid]:border-[rgb(22,163,74)]      focus:data-[valid]:outline-[rgb(22,163,74)]
-        dark:data-[valid]:border-[rgb(34,197,94)] dark:focus:data-[valid]:outline-[rgb(34,197,94)]
       `,
         bottomOutlined: `
           rounded-none
@@ -53,8 +53,8 @@ const textareaVariants = cva(
           transition-[border] focus:outline-none
           border-b border-(--moss-textarea-border-bottomOutlined)
           focus:border-b-2 focus:border-[rgb(37,99,235)]
+          data-[valid]:border-[rgb(74,222,128)]    dark:data-[valid]:border-[rgb(22,163,74)]
           data-[invalid]:border-[rgb(248,113,113)] dark:data-[invalid]:border-[rgb(220,38,38)]
-          data-[valid]:border-[rgb(74,222,128)] dark:data-[valid]:border-[rgb(22,163,74)]
         `,
       },
       disabled: {

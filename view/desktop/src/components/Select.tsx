@@ -45,31 +45,39 @@ const selectTriggerStyles = cva(
         outlined: `
           text-(--moss-select-text-outlined)
           border border-(--moss-select-border-outlined)
-          data-[invalid]:border-[rgb(239,68,68)] focus:data-[invalid]:outline-[rgb(239,68,68)]
-          data-[valid]:border-[rgb(22,163,74)] focus:data-[valid]:outline-[rgb(22,163,74)]
+                data-[valid]:border-[rgb(22,163,74)]
+          focus:data-[valid]:outline-[rgb(22,163,74)]
+                data-[invalid]:border-[rgb(239,68,68)]
+          focus:data-[invalid]:outline-[rgb(239,68,68)]
         `,
         soft: `
           text-(--moss-select-text-soft)
           outline-none background-(--moss-select-bg-soft)
-          focus:brightness-95 dark:focus:brightness-105
-          data-[invalid]:bg-[rgb(254,226,226)]
-          dark:data-[invalid]:bg-[rgb(153,27,27,0.25)]
-          data-[valid]:bg-[rgb(220,252,231)]
+          focus:brightness-95
+          dark:focus:brightness-105
+               data-[valid]:bg-[rgb(220,252,231)]
           dark:data-[valid]:bg-[rgba(22,101,52,0.25)]
+               data-[invalid]:bg-[rgb(254,226,226)]
+          dark:data-[invalid]:bg-[rgb(153,27,27,0.25)]
         `,
         mixed: `
           text-(--moss-select-text-mixed)
-          shadow-sm shadow-gray-900/5 dark:shadow-gray-900/35 border border-(--moss-select-border-mixed)
           background-(--moss-select-bg-mixed)
-          data-[invalid]:border-[rgb(220,38,38)] focus:data-[invalid]:outline-[rgb(220,38,38)]
-          data-[valid]:border-[rgb(22,163,74)] focus:data-[valid]:outline-[rgb(22,163,74)]
+          shadow-sm shadow-gray-900/5
+          dark:shadow-gray-900/35
+          border border-(--moss-select-border-mixed)
+                data-[valid]:border-[rgb(22,163,74)]
+          focus:data-[valid]:outline-[rgb(22,163,74)]
+                data-[invalid]:border-[rgb(220,38,38)]
+          focus:data-[invalid]:outline-[rgb(220,38,38)]
         `,
         bottomOutlined: `
           text-(--moss-select-text-bottomOutlined)
           rounded-none transition-[border] px-0
-          border-b border-(--moss-select-border-bottomOutlined)  focus:border-b-2 focus:border-[rgb(37,99,235)]
-          data-[invalid]:border-[rgb(248,113,113)]
+          border-b border-(--moss-select-border-bottomOutlined)
+          focus:border-b-2 focus:border-[rgb(37,99,235)]
           data-[valid]:border-[rgb(74,222,128)]
+          data-[invalid]:border-[rgb(248,113,113)]
         `,
       },
       size: {
