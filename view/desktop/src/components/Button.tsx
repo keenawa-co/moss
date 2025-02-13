@@ -18,7 +18,7 @@ export interface ButtonProps extends HTMLAttributes<HTMLButtonElement | HTMLAnch
 }
 
 const buttonRootStyles = cva(
-  "relative flex items-center cursor-pointer justify-center rounded-lg transition duration-150 ease-in-out focus-visible:outline-2 focus-visible:outline-offset-2 outline-blue-600",
+  "relative flex items-center cursor-pointer justify-center rounded-sm transition duration-150 ease-in-out focus-visible:outline-2 focus-visible:outline-offset-2 outline-blue-600",
   {
     variants: {
       intent: {
@@ -35,11 +35,11 @@ const buttonRootStyles = cva(
         ghost: `   background-transparent     text-(--text-ghost)    [box-shadow:var(--boxShadow-ghost)]    dark:border-(--border-ghost) hover:background-(--bg-ghost) hover:[box-shadow:var(--border-ghost)_0px_0px_0px_1px] active:brightness-150 `,
       },
       size: {
-        "xs": "h-7",
-        "sm": "h-8",
-        "md": "h-9",
-        "lg": "h-10",
-        "xl": "h-12",
+        "xs": "h-[22px]",
+        "sm": "h-[26px]",
+        "md": "h-[30px] ",
+        "lg": "h-[34px] ",
+        "xl": "h-[38px] ",
       },
       disabled: {
         false: null,
