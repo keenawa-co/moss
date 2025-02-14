@@ -31,16 +31,12 @@
     "prettier": "^3.5.0",
     "prettier-plugin-tailwindcss": "^0.6.9",
     "tailwind-merge": "^2.6.0",
-    "tailwindcss": "^4.0.3",
+    "tailwindcss": "^4.0.6",
     "ts-jest": "^29.2.5",
     "turbo": "^2.0.6",
     "typescript": "^5.7.2",
     "vite": "^6.0.3",
     "vitest": "^2.1.8"
-  },
-  "packageManager": "pnpm@9.15.0+sha512.76e2379760a4328ec4415815bcd6628dee727af3779aaa4c914e3944156c4299921a89f976381ee107d41f12cfa4b66681ca9c718f0668fa0831ed4c6d8ba56c",
-  "engines": {
-    "node": ">=18"
   },
   "dependencies": {
     "@atlaskit/pragmatic-drag-and-drop": "^1.4.0",
@@ -49,5 +45,14 @@
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "6"
+  },
+  "packageManager": "pnpm@9.15.0+sha512.76e2379760a4328ec4415815bcd6628dee727af3779aaa4c914e3944156c4299921a89f976381ee107d41f12cfa4b66681ca9c718f0668fa0831ed4c6d8ba56c",
+  "engines": {
+    "node": ">=18"
+  },
+  "pnpm": {
+  "overrides": {
+    "@types/react": "^18.0.0"
   }
+}
 }

@@ -18,7 +18,7 @@ export interface ButtonProps extends HTMLAttributes<HTMLButtonElement | HTMLAnch
 }
 
 const buttonRootStyles = cva(
-  "relative flex items-center cursor-pointer justify-center rounded-lg transition duration-150 ease-in-out focus-visible:outline-2 focus-visible:outline-offset-2 outline-blue-600",
+  "relative flex items-center cursor-pointer justify-center rounded-sm transition duration-150 ease-in-out focus-visible:outline-2 focus-visible:outline-offset-2 outline-blue-600",
   {
     variants: {
       intent: {
@@ -35,11 +35,11 @@ const buttonRootStyles = cva(
         ghost: `   background-transparent     text-(--text-ghost)    [box-shadow:var(--boxShadow-ghost)]    dark:border-(--border-ghost) hover:background-(--bg-ghost) hover:[box-shadow:var(--border-ghost)_0px_0px_0px_1px] active:brightness-150 `,
       },
       size: {
-        "xs": "h-7",
-        "sm": "h-8",
-        "md": "h-9",
-        "lg": "h-10",
-        "xl": "h-12",
+        "xs": "h-[22px]",
+        "sm": "h-[26px]",
+        "md": "h-[30px]",
+        "lg": "h-[34px]",
+        "xl": "h-[38px]",
       },
       disabled: {
         false: null,
@@ -47,7 +47,7 @@ const buttonRootStyles = cva(
       },
       loading: {
         false: null,
-        true: "[&>:not(.LoadingIcon)]:opacity-0 cursor-progress",
+        true: "[&>:not(.LoadingIcon)]:opacity-0 cursor-wait hover:brightness-100 active:brightness-100",
       },
       Component: {
         a: "max-w-max",
@@ -149,7 +149,7 @@ export const Root = forwardRef<HTMLButtonElement & HTMLAnchorElement, ButtonProp
     return (
       <Component
         ref={forwardedRef}
-        href={href}
+        href={disabled || loading ? undefined : href}
         className={cn(buttonRootStyles({ intent, variant, size, disabled, loading, className, Component, iconOnly }))}
         disabled={disabled || loading}
         {...props}

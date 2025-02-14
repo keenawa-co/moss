@@ -45,265 +45,166 @@
       "value": "rgba(86, 86, 86, 1)"
     },
 
-    "button.primary.solid.background": {
-      "value": "linear-gradient(rgb(59, 130, 246), rgb(37, 99, 235) 0%)"
-    },
-    "button.primary.solid.border": {
-      "value": "rgb(255, 255, 255, 0.3)"
-    },
-    "button.primary.solid.text": {
-      "value": "white"
-    },
-    "button.primary.solid.boxShadow": {
-      "value": " rgba(255, 255, 255, 0.1) 0px 2px 4px 0px inset"
-    },
+    "button.primary.solid.background": { "value": "linear-gradient(rgb(59, 130, 246), rgb(37, 99, 235) 0%)" },
+    "button.primary.solid.border": { "value": "rgb(255, 255, 255, 0.3)" },
+    "button.primary.solid.text": { "value": "white" },
+    "button.primary.solid.boxShadow": { "value": " rgba(255, 255, 255, 0.1) 0px 2px 4px 0px inset" },
 
-    "button.primary.outlined.background": {
-      "value": "rgba(59, 130, 246, 0.05)"
-    },
-    "button.primary.outlined.border": {
-      "value": "rgba(59, 130, 246, 0.05)"
-    },
-    "button.primary.outlined.text": {
-      "value": "rgb(147, 197, 253)"
-    },
+    "button.primary.outlined.background": { "value": "rgba(59, 130, 246, 0.05)" },
+    "button.primary.outlined.border": { "value": "rgba(59, 130, 246, 0.05)" },
+    "button.primary.outlined.text": { "value": "rgb(147, 197, 253)" },
     "button.primary.outlined.boxShadow": {
       "value": "rgba(255, 255, 255, 0) 0px 1px 0px 0px inset, rgba(59, 130, 246, 0.3) 0px 0px 0px 1px, rgba(0, 0, 0, 0.1) 0px 1px 2px 0px"
     },
 
-    "button.primary.soft.background": {
-      "value": "rgba(59, 130, 246, 0.1)"
-    },
-    "button.primary.soft.border": {
-      "value": null
-    },
-    "button.primary.soft.text": {
-      "value": "rgb(147, 197, 253)"
-    },
-    "button.primary.soft.boxShadow": {
-      "value": null
-    },
+    "button.primary.soft.background": { "value": "rgba(59, 130, 246, 0.1)" },
+    "button.primary.soft.border": { "value": null },
+    "button.primary.soft.text": { "value": "rgb(147, 197, 253)" },
+    "button.primary.soft.boxShadow": { "value": null },
 
-    "button.primary.ghost.background": {
-      "value": "rgba(59, 130, 246, 0.1)"
-    },
-    "button.primary.ghost.border": {
-      "value": null
-    },
-    "button.primary.ghost.text": {
-      "value": "rgb(147, 197, 253)"
-    },
-    "button.primary.ghost.boxShadow": {
-      "value": null
-    },
+    "button.primary.ghost.background": { "value": "rgba(59, 130, 246, 0.1)" },
+    "button.primary.ghost.border": { "value": null },
+    "button.primary.ghost.text": { "value": "rgb(147, 197, 253)" },
+    "button.primary.ghost.boxShadow": { "value": null },
 
-    "button.warning.solid.background": {
-      "value": "linear-gradient(rgb(250, 204, 21), rgb(234, 179, 8) 0%)"
-    },
-    "button.warning.solid.border": {
-      "value": "rgb(253 224 71)"
-    },
-    "button.warning.solid.text": {
-      "value": "rgb(66, 32, 6)"
-    },
-    "button.warning.solid.boxShadow": {
-      "value": "rgba(255, 255, 255, 0.1) 0px 2px 4px 0px inset"
-    },
+    "button.warning.solid.background": { "value": "linear-gradient(rgb(250, 204, 21), rgb(234, 179, 8) 0%)" },
+    "button.warning.solid.border": { "value": "rgb(253 224 71)" },
+    "button.warning.solid.text": { "value": "rgb(66, 32, 6)" },
+    "button.warning.solid.boxShadow": { "value": "rgba(255, 255, 255, 0.1) 0px 2px 4px 0px inset" },
 
-    "button.warning.outlined.background": {
-      "value": "rgba(234, 179, 8, 0.05)"
-    },
+    "button.warning.outlined.background": { "value": "rgba(234, 179, 8, 0.05)" },
 
-    "button.warning.outlined.border": {
-      "value": null
-    },
-    "button.warning.outlined.text": {
-      "value": "rgb(253, 224, 71)"
-    },
+    "button.warning.outlined.border": { "value": null },
+    "button.warning.outlined.text": { "value": "rgb(253, 224, 71)" },
     "button.warning.outlined.boxShadow": {
       "value": "rgba(255, 255, 255, 0) 0px 1px 0px 0px inset, rgba(234, 179, 8, 0.3) 0px 0px 0px 1px, rgba(0, 0, 0, 0.1) 0px 1px 2px 0px"
     },
 
-    "button.warning.soft.background": {
-      "value": "rgba(234, 179, 8, 0.1)"
-    },
-    "button.warning.soft.border": {
-      "value": null
-    },
-    "button.warning.soft.text": {
-      "value": "rgb(253, 224, 71)"
-    },
-    "button.warning.soft.boxShadow": {
-      "value": null
-    },
+    "button.warning.soft.background": { "value": "rgba(234, 179, 8, 0.1)" },
+    "button.warning.soft.border": { "value": null },
+    "button.warning.soft.text": { "value": "rgb(253, 224, 71)" },
+    "button.warning.soft.boxShadow": { "value": null },
 
-    "button.warning.ghost.background": {
-      "value": "rgba(234, 179, 8, 0.1)"
-    },
-    "button.warning.ghost.border": {
-      "value": null
-    },
-    "button.warning.ghost.text": {
-      "value": "rgb(253, 224, 71)"
-    },
-    "button.warning.ghost.boxShadow": {
-      "value": null
-    },
+    "button.warning.ghost.background": { "value": "rgba(234, 179, 8, 0.1)" },
+    "button.warning.ghost.border": { "value": null },
+    "button.warning.ghost.text": { "value": "rgb(253, 224, 71)" },
+    "button.warning.ghost.boxShadow": { "value": null },
 
-    "button.success.solid.background": {
-      "value": "linear-gradient(rgb(34, 197, 94), rgb(22, 163, 74) 0%)"
-    },
-    "button.success.solid.border": {
-      "value": "rgb(61 207 115 / 1)"
-    },
-    "button.success.solid.text": {
-      "value": "white"
-    },
+    "button.success.solid.background": { "value": "linear-gradient(rgb(34, 197, 94), rgb(22, 163, 74) 0%)" },
+    "button.success.solid.border": { "value": "rgb(61 207 115 / 1)" },
+    "button.success.solid.text": { "value": "white" },
     "button.success.solid.boxShadow": {
       "value": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(255, 255, 255, 0.1) 0px 2px 4px 0px inset"
     },
 
-    "button.success.outlined.background": {
-      "value": "rgba(34, 197, 94, 0.05)"
-    },
-    "button.success.outlined.border": {
-      "value": null
-    },
-    "button.success.outlined.text": {
-      "value": "rgb(134, 239, 172)"
-    },
+    "button.success.outlined.background": { "value": "rgba(34, 197, 94, 0.05)" },
+    "button.success.outlined.border": { "value": null },
+    "button.success.outlined.text": { "value": "rgb(134, 239, 172)" },
     "button.success.outlined.boxShadow": {
       "value": "rgba(255, 255, 255, 0) 0px 1px 0px 0px inset, rgba(34, 197, 94, 0.3) 0px 0px 0px 1px, rgba(0, 0, 0, 0.1) 0px 1px 2px 0px"
     },
 
-    "button.success.soft.background": {
-      "value": "rgba(34, 197, 94, 0.1)"
-    },
-    "button.success.soft.border": {
-      "value": null
-    },
-    "button.success.soft.text": {
-      "value": "rgb(134, 239, 172)"
-    },
-    "button.success.soft.boxShadow": {
-      "value": null
-    },
+    "button.success.soft.background": { "value": "rgba(34, 197, 94, 0.1)" },
+    "button.success.soft.border": { "value": null },
+    "button.success.soft.text": { "value": "rgb(134, 239, 172)" },
+    "button.success.soft.boxShadow": { "value": null },
 
-    "button.success.ghost.background": {
-      "value": "rgba(34, 197, 94, 0.1)"
-    },
-    "button.success.ghost.border": {
-      "value": null
-    },
-    "button.success.ghost.text": {
-      "value": "rgb(134, 239, 172)"
-    },
-    "button.success.ghost.boxShadow": {
-      "value": null
-    },
+    "button.success.ghost.background": { "value": "rgba(34, 197, 94, 0.1)" },
+    "button.success.ghost.border": { "value": null },
+    "button.success.ghost.text": { "value": "rgb(134, 239, 172)" },
+    "button.success.ghost.boxShadow": { "value": null },
 
-    "button.danger.solid.background": {
-      "value": "linear-gradient(rgb(239, 68, 68), rgb(220, 38, 38) 0%)"
-    },
-    "button.danger.solid.border": {
-      "value": "rgb(241 95 95)"
-    },
-    "button.danger.solid.text": {
-      "value": "white"
-    },
+    "button.danger.solid.background": { "value": "linear-gradient(rgb(239, 68, 68), rgb(220, 38, 38) 0%)" },
+    "button.danger.solid.border": { "value": "rgb(241 95 95)" },
+    "button.danger.solid.text": { "value": "white" },
     "button.danger.solid.boxShadow": {
       "value": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(255, 255, 255, 0.1) 0px 2px 4px 0px inset"
     },
 
-    "button.danger.outlined.background": {
-      "value": "rgba(239, 68, 68, 0.05)"
-    },
-    "button.danger.outlined.border": {
-      "value": null
-    },
-    "button.danger.outlined.text": {
-      "value": "rgb(252, 165, 165)"
-    },
+    "button.danger.outlined.background": { "value": "rgba(239, 68, 68, 0.05)" },
+    "button.danger.outlined.border": { "value": null },
+    "button.danger.outlined.text": { "value": "rgb(252, 165, 165)" },
     "button.danger.outlined.boxShadow": {
       "value": "rgba(255, 255, 255, 0) 0px 1px 0px 0px inset, rgba(239, 68, 68, 0.3) 0px 0px 0px 1px, rgba(0, 0, 0, 0.1) 0px 1px 2px 0px"
     },
 
-    "button.danger.soft.background": {
-      "value": "rgba(239, 68, 68, 0.1)"
-    },
-    "button.danger.soft.border": {
-      "value": null
-    },
-    "button.danger.soft.text": {
-      "value": "rgb(252, 165, 165)"
-    },
-    "button.danger.soft.boxShadow": {
-      "value": null
-    },
+    "button.danger.soft.background": { "value": "rgba(239, 68, 68, 0.1)" },
+    "button.danger.soft.border": { "value": null },
+    "button.danger.soft.text": { "value": "rgb(252, 165, 165)" },
+    "button.danger.soft.boxShadow": { "value": null },
 
-    "button.danger.ghost.background": {
-      "value": "rgba(239, 68, 68, 0.1)"
-    },
-    "button.danger.ghost.border": {
-      "value": null
-    },
-    "button.danger.ghost.text": {
-      "value": "rgb(252, 165, 165)"
-    },
-    "button.danger.ghost.boxShadow": {
-      "value": null
-    },
+    "button.danger.ghost.background": { "value": "rgba(239, 68, 68, 0.1)" },
+    "button.danger.ghost.border": { "value": null },
+    "button.danger.ghost.text": { "value": "rgb(252, 165, 165)" },
+    "button.danger.ghost.boxShadow": { "value": null },
 
-    "button.neutral.solid.background": {
-      "value": "linear-gradient(rgb(113, 113, 122), rgb(82, 82, 91) 0%)"
-    },
-    "button.neutral.solid.border": {
-      "value": "rgb(113 113 122)"
-    },
-    "button.neutral.solid.text": {
-      "value": "white"
-    },
-    "button.neutral.solid.boxShadow": {
-      "value": "rgba(255, 255, 255, 0.1) 0px 2px 4px 0px inset"
-    },
+    "button.neutral.solid.background": { "value": "linear-gradient(rgb(113, 113, 122), rgb(82, 82, 91) 0%)" },
+    "button.neutral.solid.border": { "value": "rgb(113 113 122)" },
+    "button.neutral.solid.text": { "value": "white" },
+    "button.neutral.solid.boxShadow": { "value": "rgba(255, 255, 255, 0.1) 0px 2px 4px 0px inset" },
 
-    "button.neutral.outlined.background": {
-      "value": "rgba(113, 113, 122, 0.05)"
-    },
-    "button.neutral.outlined.border": {
-      "value": null
-    },
-    "button.neutral.outlined.text": {
-      "value": "rgb(212, 212, 216)"
-    },
+    "button.neutral.outlined.background": { "value": "rgba(113, 113, 122, 0.05)" },
+    "button.neutral.outlined.border": { "value": null },
+    "button.neutral.outlined.text": { "value": "rgb(212, 212, 216)" },
     "button.neutral.outlined.boxShadow": {
       "value": "rgba(255, 255, 255, 0) 0px 1px 0px 0px inset, rgba(113, 113, 122, 0.3) 0px 0px 0px 1px, rgba(0, 0, 0, 0.1) 0px 1px 2px 0px"
     },
 
-    "button.neutral.soft.background": {
-      "value": "rgba(113, 113, 122, 0.1)"
-    },
-    "button.neutral.soft.border": {
-      "value": null
-    },
-    "button.neutral.soft.text": {
-      "value": "rgb(212, 212, 216)"
-    },
-    "button.neutral.soft.boxShadow": {
-      "value": null
-    },
+    "button.neutral.soft.background": { "value": "rgba(113, 113, 122, 0.1)" },
+    "button.neutral.soft.border": { "value": null },
+    "button.neutral.soft.text": { "value": "rgb(212, 212, 216)" },
+    "button.neutral.soft.boxShadow": { "value": null },
 
-    "button.neutral.ghost.background": {
-      "value": "rgba(113, 113, 122, 0.1)"
-    },
-    "button.neutral.ghost.border": {
-      "value": null
-    },
-    "button.neutral.ghost.text": {
-      "value": "rgb(212, 212, 216)"
-    },
-    "button.neutral.ghost.boxShadow": {
-      "value": null
-    }
+    "button.neutral.ghost.background": { "value": "rgba(113, 113, 122, 0.1)" },
+    "button.neutral.ghost.border": { "value": null },
+    "button.neutral.ghost.text": { "value": "rgb(212, 212, 216)" },
+    "button.neutral.ghost.boxShadow": { "value": null },
+
+    "input.bg.plain": { "value": "transparent" },
+    "input.bg.soft": { "value": "rgb(39, 39, 42)" },
+    "input.bg.outlined": { "value": "transparent" },
+    "input.bg.mixed": { "value": "rgb(24, 24, 27)" },
+    "input.bg.bottomOutlined": { "value": "transparent" },
+    "input.border.plain": { "value": "rgb(39, 39, 42)" },
+    "input.border.soft": { "value": "rgb(39, 39, 42)" },
+    "input.border.outlined": { "value": "rgb(39, 39, 42)" },
+    "input.border.mixed": { "value": "rgb(39, 39, 42)" },
+    "input.border.bottomOutlined": { "value": "rgb(39, 39, 42)" },
+    "input.text.plain": { "value": "white" },
+    "input.text.soft": { "value": "white" },
+    "input.text.outlined": { "value": "white" },
+    "input.text.mixed": { "value": "white" },
+    "input.text.bottomOutlined": { "value": "white" },
+
+    "textarea.bg.plain": { "value": "transparent" },
+    "textarea.bg.soft": { "value": "rgb(39, 39, 42)" },
+    "textarea.bg.outlined": { "value": "transparent" },
+    "textarea.bg.mixed": { "value": "rgb(24, 24, 27)" },
+    "textarea.bg.bottomOutlined": { "value": "transparent" },
+    "textarea.border.plain": { "value": "rgb(39, 39, 42)" },
+    "textarea.border.soft": { "value": "rgb(39, 39, 42)" },
+    "textarea.border.outlined": { "value": "rgb(39, 39, 42)" },
+    "textarea.border.mixed": { "value": "rgb(39, 39, 42)" },
+    "textarea.border.bottomOutlined": { "value": "rgb(39, 39, 42)" },
+    "textarea.text.plain": { "value": "white" },
+    "textarea.text.soft": { "value": "white" },
+    "textarea.text.outlined": { "value": "white" },
+    "textarea.text.mixed": { "value": "white" },
+    "textarea.text.bottomOutlined": { "value": "white" },
+
+    "select.bg.soft": { "value": "rgb(39, 39, 42)" },
+    "select.bg.outlined": { "value": "transparent" },
+    "select.bg.mixed": { "value": "rgb(24, 24, 27)" },
+    "select.bg.bottomOutlined": { "value": "transparent" },
+
+    "select.border.soft": { "value": "rgb(39, 39, 42)" },
+    "select.border.outlined": { "value": "rgb(39, 39, 42)" },
+    "select.border.mixed": { "value": "rgb(39, 39, 42)" },
+    "select.border.bottomOutlined": { "value": "rgb(39, 39, 42)" },
+
+    "select.text.soft": { "value": "white" },
+    "select.text.outlined": { "value": "white" },
+    "select.text.mixed": { "value": "white" },
+    "select.text.bottomOutlined": { "value": "white" }
   }
 }

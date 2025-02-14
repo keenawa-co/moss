@@ -7,15 +7,13 @@ export interface CheckboxProps {
   className?: string;
 }
 
-const defaultCheckboxRootStyles = `border-1 border-solid border-[rgb(228,228,231)] dark:border-[rgb(39,39,42)] shadow-sm group rounded peer flex justify-center items-center size-[1.125rem] text-white
+const defaultCheckboxRootStyles = `border-1 border-solid border-[rgb(228,228,231)] dark:border-[rgb(39,39,42)] group rounded peer flex justify-center items-center size-[1.125rem] text-white
   focus-visible:outline-2
   focus-visible:outline-bg-[rgb(37,99,235)]
   focus-visible:outline-offset-2
   focus-visible:outline
 
   hover:brightness-95
-
-
 
   disabled:bg-gray-100
   disabled:opacity-50
