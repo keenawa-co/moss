@@ -64,7 +64,7 @@ importers:
         specifier: ^1.49.1
         version: 1.50.1
       prettier:
-        specifier: ^3.4.1
+        specifier: ^3.5.0
         version: 3.5.1
       prettier-plugin-tailwindcss:
         specifier: ^0.6.9
@@ -116,8 +116,8 @@ importers:
         specifier: ^0.3.0
         version: 0.3.0(@typespec/compiler@0.65.1)
       '@typespec/json-schema':
-        specifier: ^0.62.0
-        version: 0.62.0(@typespec/compiler@0.65.1)
+        specifier: ^0.64.0
+        version: 0.64.0(@typespec/compiler@0.65.1)
     devDependencies:
       '@repo/typescript-config':
         specifier: workspace:*
@@ -165,8 +165,8 @@ importers:
   crates/moss-theme:
     dependencies:
       '@typespec/json-schema':
-        specifier: ^0.63.0
-        version: 0.63.0(@typespec/compiler@0.65.1)
+        specifier: ^0.64.0
+        version: 0.64.0(@typespec/compiler@0.65.1)
     devDependencies:
       '@repo/typescript-config':
         specifier: workspace:*
@@ -206,10 +206,10 @@ importers:
   packages/config-eslint:
     devDependencies:
       '@typescript-eslint/rule-tester':
-        specifier: ^8.23.0
+        specifier: ^8.24.0
         version: 8.24.0(eslint@9.20.1(jiti@2.4.2))(typescript@5.7.3)
       eslint:
-        specifier: ^9.16.0
+        specifier: ^9.20.0
         version: 9.20.1(jiti@2.4.2)
       eslint-config-turbo:
         specifier: ^2.0.0
@@ -221,7 +221,7 @@ importers:
         specifier: ^0.4.14
         version: 0.4.19(eslint@9.20.1(jiti@2.4.2))
       typescript-eslint:
-        specifier: ^8.19.0
+        specifier: ^8.24.0
         version: 8.24.0(eslint@9.20.1(jiti@2.4.2))(typescript@5.7.3)
 
   packages/config-tailwind:
@@ -3337,17 +3337,11 @@ packages:
     engines: {node: '>=18.0.0'}
     hasBin: true
 
-  '@typespec/json-schema@0.62.0':
-    resolution: {integrity: sha512-8wM+ENB8NY9y4mhevk6XImYqzgiZdQFlq9fMwsoJGT7jsNA4MYAHsDrVH2jWfOnR1EssCHNV5bu1DttfXpaZvg==}
+  '@typespec/json-schema@0.64.0':
+    resolution: {integrity: sha512-71E1c58xbHWYSli1Um2U3SQUANPoTp+p87xiH1h64NLlLHMMgFofiQcIb9v1H9tw0YBNB6ELz/zyFGJpZcM3bA==}
     engines: {node: '>=18.0.0'}
     peerDependencies:
-      '@typespec/compiler': ~0.62.0
-
-  '@typespec/json-schema@0.63.0':
-    resolution: {integrity: sha512-jGRXxUxdrwW/XzvaDqyt5mS/V1iBnrDaHUMRIkrFLCwzgll/NenquLI/nopihzLFXK78MfFYuHg4DEPYY5PdFw==}
-    engines: {node: '>=18.0.0'}
-    peerDependencies:
-      '@typespec/compiler': ~0.63.0
+      '@typespec/compiler': ~0.64.0
 
   '@typespec/prettier-plugin-typespec@0.64.0':
     resolution: {integrity: sha512-hL/DOo7+PFp/HGeZgkKqkbG9Q4iUYbhvqHcwXhzCOIaBFn50fgNQbBRdQD9VgvrGGbwN7fyTJmsGWyFnuSNjJA==}
@@ -10058,12 +10052,7 @@ snapshots:
       - bluebird
       - supports-color
 
-  '@typespec/json-schema@0.62.0(@typespec/compiler@0.65.1)':
-    dependencies:
-      '@typespec/compiler': 0.65.1
-      yaml: 2.5.1
-
-  '@typespec/json-schema@0.63.0(@typespec/compiler@0.65.1)':
+  '@typespec/json-schema@0.64.0(@typespec/compiler@0.65.1)':
     dependencies:
       '@typespec/compiler': 0.65.1
       yaml: 2.5.1
